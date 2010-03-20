@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="status">Starting</string>
+    <string name="app_name">WiGLE WiFi Android 1.0</string>
+    <string name="upload_button">Upload to WiGLE.net</string>
+</resources>

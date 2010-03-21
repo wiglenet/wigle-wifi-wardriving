@@ -20,6 +20,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -45,13 +47,48 @@ public class WigleAndroid extends Activity {
         setupList();
         setupWifi();
         setupLocation();
-        
     }
     
     @Override
     public void onPause() {
-      info( "killing on pause for now" );
-      System.exit( RESULT_OK );
+      info( "paused" );
+      super.onPause();
+    }
+    
+    @Override
+    public void onResume() {
+      info( "redumed" );
+      super.onResume();
+    }
+    
+    private static final int MENU_SETTINGS = 10;
+    private static final int MENU_EXIT = 11;
+    
+    /* Creates the menu items */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
+        item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        
+        item = menu.add(0, MENU_SETTINGS, 0, "Settings");
+        item.setIcon( android.R.drawable.ic_menu_preferences );
+        return true;
+    }
+
+    /* Handles item selections */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch ( item.getItemId() ) {
+          case MENU_SETTINGS:
+            info("settings");
+            Intent intent = new Intent( this, SettingsActivity.class );
+            this.startActivity( intent );
+            return true;
+          case MENU_EXIT:
+            finish();
+            return true;
+        }
+        return false;
     }
     
     private void setupList() {
@@ -81,7 +118,7 @@ public class WigleAndroid extends Activity {
               detail.append( network.getLevel() );
               detail.append( " | " ).append( network.getBssid() );
               detail.append( " - " ).append( channel );
-              detail.append( " - " ).append( network.getCapabilities() );
+              detail.append( " - " ).append( network.getShowCapabilities() );
               
               tv.setText( detail.toString() );
         
@@ -139,6 +176,9 @@ public class WigleAndroid extends Activity {
     }
     
     private void setupLocation() {
+      // set on UI if we already have one
+      setLocationUI( location );
+      
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       locationManager.addGpsStatusListener( new Listener(){
           public void onGpsStatusChanged( int event ) {
@@ -152,10 +192,7 @@ public class WigleAndroid extends Activity {
         locationManager.requestLocationUpdates(provider, 5000L, 0, new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
             location = newLocation;
-            TextView tv = (TextView) findViewById( R.id.LocationTextView01 );
-            tv.setText( "lat: " + (float) location.getLatitude() + " long: " + (float) location.getLongitude()
-                + " +/- " + location.getAccuracy() + "m" );
-            debug( "location: " + tv.getText() );
+            setLocationUI( location );
           }
           public void onProviderDisabled( String provider ) {
           }
@@ -164,6 +201,19 @@ public class WigleAndroid extends Activity {
           public void onStatusChanged( String provider, int status, Bundle extras ) {
           }
         });
+      }
+    }
+    
+    private void setLocationUI( Location location ) {
+      if ( location != null ) {
+        TextView tv = (TextView) findViewById( R.id.LocationTextView01 );
+        tv.setText( "Lat: " + (float) location.getLatitude() );
+        
+        tv = (TextView) findViewById( R.id.LocationTextView02 );
+        tv.setText( "Lon: " + (float) location.getLongitude() );
+        
+        tv = (TextView) findViewById( R.id.LocationTextView03 );
+        tv.setText( "+/- " + location.getAccuracy() + "m" );
       }
     }
     

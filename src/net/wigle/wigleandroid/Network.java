@@ -17,6 +17,7 @@ public class Network {
   private int level;
   private final Set<Observation> observations = new HashSet<Observation>();
   private final Integer channel;
+  private final String showCapabilities;
   
   private static final Map<Integer,Integer> freqToChan;
   static {
@@ -78,6 +79,13 @@ public class Network {
     this.capabilities = scanResult.capabilities;
     this.level = scanResult.level;
     this.channel = freqToChan.get( frequency );
+    
+    if ( capabilities.length() > 16 ) {
+      this.showCapabilities = capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1...]");
+    }
+    else {
+      this.showCapabilities = null;
+    }
   }
   
   public String getBssid() {
@@ -94,6 +102,13 @@ public class Network {
 
   public String getCapabilities() {
     return capabilities;
+  }
+  
+  public String getShowCapabilities() {
+    if ( showCapabilities == null ) {
+      return capabilities;
+    }
+    return showCapabilities;
   }
 
   public int getLevel() {

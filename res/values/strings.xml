@@ -2,5 +2,9 @@
 <resources>
     <string name="status">Starting</string>
     <string name="app_name">WiGLE WiFi Android 1.0</string>
-    <string name="upload_button">Upload to WiGLE.net</string>
+    <string name="settings_app_name">WiGLE WiFi Settings</string>
+    <string name="upload_button">Upload to\nWiGLE.net</string>
+    <string name="username">WiGLE Username</string>
+    <string name="password">WiGLE Password</string>
+    <string name="show_current">Show current networks only</string>
 </resources>

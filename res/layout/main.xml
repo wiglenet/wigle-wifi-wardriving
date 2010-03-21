@@ -4,16 +4,45 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
+<!--TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:text="@string/status"
-    />
-<TextView  
-android:layout_width="fill_parent" 
-android:layout_height="wrap_content" 
-android:id="@+id/LocationTextView01"
-/>
-<Button android:id="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/upload_button"></Button>
+    /-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+    <Button android:id="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" 
+		android:text="@string/upload_button" android:layout_weight="0"></Button>
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:orientation="vertical"
+	    android:layout_width="wrap_content"
+	    android:layout_height="fill_parent"
+	    android:layout_weight="6"
+	    >
+		<TextView  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/LocationTextView01"
+		android:text="Lat: "
+		/>
+		<TextView  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/LocationTextView02"
+		android:text="Lon: "
+		/>
+	</LinearLayout>
+	<TextView  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_gravity="top"
+		android:layout_weight="5"
+		android:id="@+id/LocationTextView03"
+		/>
+	</LinearLayout>
+
 <ListView android:id="@+id/ListView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ListView>
 </LinearLayout>

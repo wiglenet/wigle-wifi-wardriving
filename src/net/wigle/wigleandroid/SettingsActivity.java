@@ -28,7 +28,7 @@ public class SettingsActivity extends Activity {
       user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "") );
       user.setOnKeyListener(new OnKeyListener() {
           public boolean onKey(View v, int keyCode, KeyEvent event) {
-              String value = ((EditText)v).getText().toString();
+              String value = ((EditText)v).getText().toString().trim();
               // WigleAndroid.info( "user value: '" + value + "'" );
               editor.putString( WigleAndroid.PREF_USERNAME, value );
               editor.commit();
@@ -40,7 +40,7 @@ public class SettingsActivity extends Activity {
       pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "") );
       pass.setOnKeyListener(new OnKeyListener() {
           public boolean onKey(View v, int keyCode, KeyEvent event) {
-              String value = ((EditText)v).getText().toString();
+              String value = ((EditText)v).getText().toString().trim();
               // WigleAndroid.info( "pass value: '" + value + "'" );
               editor.putString( WigleAndroid.PREF_PASSWORD, value );
               editor.commit();

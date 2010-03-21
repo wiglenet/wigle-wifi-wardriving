@@ -3,12 +3,14 @@ package net.wigle.wigleandroid;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
@@ -36,7 +38,19 @@ public class WigleAndroid extends Activity {
     private GpsStatus gpsStatus;
     private Location location;
     private Handler wifiTimer;
+    private LocationListener locationListener;
+    private Listener gpsStatusListener;
+    
     private static final String LOG_TAG = "wigle";
+    private static final int MENU_SETTINGS = 10;
+    private static final int MENU_EXIT = 11;
+    private final AtomicBoolean finishing = new AtomicBoolean( false );
+    
+    // preferences
+    static final String SHARED_PREFS = "WiglePrefs";
+    static final String PREF_USERNAME = "username";
+    static final String PREF_PASSWORD = "password";
+    static final String PREF_SHOW_CURRENT = "showCurrent";
     
     /** Called when the activity is first created. */
     @Override
@@ -57,12 +71,24 @@ public class WigleAndroid extends Activity {
     
     @Override
     public void onResume() {
-      info( "redumed" );
+      info( "resumed" );
       super.onResume();
     }
     
-    private static final int MENU_SETTINGS = 10;
-    private static final int MENU_EXIT = 11;
+    @Override
+    public void finish() {
+      finishing.set( true );
+      
+      LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      if ( gpsStatusListener != null ) {
+        locationManager.removeGpsStatusListener( gpsStatusListener );
+      }
+      if ( locationListener != null ) {
+        locationManager.removeUpdates( locationListener );
+      }
+      
+      super.finish();
+    }
     
     /* Creates the menu items */
     @Override
@@ -86,6 +112,8 @@ public class WigleAndroid extends Activity {
             return true;
           case MENU_EXIT:
             finish();
+            // actually kill            
+            System.exit( 0 );
             return true;
         }
         return false;
@@ -138,20 +166,38 @@ public class WigleAndroid extends Activity {
         registerReceiver( new BroadcastReceiver(){
             public void onReceive(Context c, Intent i){
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
+              debug( "networks: " + results.size() );
+              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
+              boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
+              if ( showCurrent ) {
+                listAdapter.clear();
+              }
               for ( ScanResult result : results ) {
                 Network network = networks.get( result.BSSID );
                 if ( network == null ) {
-                  info( "new network: " + result.SSID );
+                  debug( "new network: " + result.SSID );
                   network = new Network( result );
                   networks.put( result.BSSID, network );
                   listAdapter.add( result.BSSID );
                 }
-                info( "network: " + result.SSID + " level: " + result.level );
+                else if ( showCurrent ) {
+                  listAdapter.add( result.BSSID );
+                }
+                debug( "network: " + result.SSID + " level: " + result.level );
                 // always set new signal level
                 network.addObservation( result.level, location );
-                // notify
-                listAdapter.notifyDataSetChanged();
               }
+              
+              if ( ! showCurrent && listAdapter.getCount() != networks.size() ) {
+                // the showCurrent must have been on, and is now off, add everything
+                listAdapter.clear();
+                for ( String bssid : networks.keySet() ) {
+                  listAdapter.add( bssid );
+                }
+              }
+              
+              // notify
+              listAdapter.notifyDataSetChanged();              
             }
           }, intentFilter );
         
@@ -160,11 +206,14 @@ public class WigleAndroid extends Activity {
         
         wifiTimer = new Handler();
         Runnable mUpdateTimeTask = new Runnable() {
-          public void run() {
-              long period = 1000L;
-              info( "timer start scan" );
-              wifiManager.startScan();
-              wifiTimer.postDelayed(this, period );
+          private static final long period = 1000L;
+          public void run() {              
+              // make sure the app isn't trying to finish
+              if ( ! finishing.get() ) {
+                debug( "timer start scan" );
+                wifiManager.startScan();
+                wifiTimer.postDelayed( this, period );
+              }
           }
         };
         wifiTimer.removeCallbacks(mUpdateTimeTask);
@@ -180,16 +229,14 @@ public class WigleAndroid extends Activity {
       setLocationUI( location );
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-      locationManager.addGpsStatusListener( new Listener(){
-          public void onGpsStatusChanged( int event ) {
-            gpsStatus = locationManager.getGpsStatus( gpsStatus );
-          }
-        });
+      gpsStatusListener = new Listener(){
+        public void onGpsStatusChanged( int event ) {
+          gpsStatus = locationManager.getGpsStatus( gpsStatus );
+        } };
+      locationManager.addGpsStatusListener( gpsStatusListener );
       
       List<String> providers = locationManager.getAllProviders();
-      for ( String provider : providers ) {
-        info( "provider: " + provider );
-        locationManager.requestLocationUpdates(provider, 5000L, 0, new LocationListener(){
+      locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
             location = newLocation;
             setLocationUI( location );
@@ -200,7 +247,10 @@ public class WigleAndroid extends Activity {
           }
           public void onStatusChanged( String provider, int status, Bundle extras ) {
           }
-        });
+        };
+      for ( String provider : providers ) {
+        info( "provider: " + provider );
+        locationManager.requestLocationUpdates( provider, 5000L, 0, locationListener );
       }
     }
     

@@ -2,6 +2,7 @@
 sql lite backend
 "upload every n" setting
 update frequency setting
+change upload to ssl
 
 --- done ---
 move storage to sdcard

@@ -30,6 +30,29 @@ public class FileUploaderTask extends Thread {
   private final List<Network> networksList;
   private final ProgressDialog pd;
   
+  private enum Status {
+    UNKNOWN("Unknown", "Unknown error"),
+    FAIL( "Fail", "Fail" ),
+    SUCCESS( "Success", "Upload Successful"),
+    BAD_USERNAME("Fail", "Username not set"),
+    BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
+    EXCEPTION("Fail", "Exception"),
+    BAD_LOGIN("Fail", "Login failed, check password?");
+    
+    private final String title;
+    private final String message;
+    private Status( String title, String message ) {
+      this.title = title;
+      this.message = message;
+    }
+    public String getTitle() {
+      return title;
+    }
+    public String getMessage() {
+      return message;
+    }
+  }
+  
   public FileUploaderTask( Context context, Collection<Network> networksList ) {
     this.context = context;
     // make a copy for thread safety
@@ -40,12 +63,12 @@ public class FileUploaderTask extends Thread {
     this.handler = new Handler() {
       @Override
       public void handleMessage(Message msg) {
-        boolean ok = msg.what == 1;
+        Status status = Status.values()[ msg.what ];
         pd.dismiss();
         AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
         builder.setCancelable( false );
-        builder.setTitle( ok ? "Success" : "Fail" );
-        builder.setMessage( ok ? "Upload successful" : "Upload failed" );
+        builder.setTitle( status.getTitle() );
+        builder.setMessage( status.getMessage() );
         AlertDialog ad = builder.create();
         ad.setButton("OK", new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int which) {
@@ -61,26 +84,34 @@ public class FileUploaderTask extends Thread {
     SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
     String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
     String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
+    Status status = Status.UNKNOWN;
     
     if ( "".equals( username ) ) {
       // TODO: error
       WigleAndroid.error( "username not defined" );
-      return;
+      status = Status.BAD_USERNAME;
     }
-    
-    if ( "".equals( password ) && ! "anonymous".equals( username.toLowerCase() ) ) {
+    else if ( "".equals( password ) && ! "anonymous".equals( username.toLowerCase() ) ) {
       // TODO: error
       WigleAndroid.error( "password not defined and username isn't 'anonymous'" );
-      return;
+      status = Status.BAD_PASSWORD;
     }
-    
+    else {
+      status = doUpload( username, password );
+    }
+
+    // tell the gui thread
+    handler.sendEmptyMessage( status.ordinal() );
+  }
+  
+  private Status doUpload( String username, String password ) {    
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
     SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
     String filepath = "/sdcard/wiglewifi/";
     
-    boolean ok = false;
+    Status status = Status.UNKNOWN;
     
     try {
       File sdcard = new File( "/sdcard/" );
@@ -133,21 +164,29 @@ public class FileUploaderTask extends Thread {
       String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params );
       
       if ( response.indexOf("uploaded successfully") > 0 ) {
-        ok = true;
+        status = Status.SUCCESS;
+      }
+      else if ( response.indexOf("does not match login") > 0 ) {
+        status = Status.BAD_LOGIN;
+      }
+      else {
+        WigleAndroid.error("fail: " + response );
+        status = Status.FAIL;
       }
     } 
     catch (FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
       WigleAndroid.error( "file problem: " + e );
+      status = Status.EXCEPTION;
     }
     catch ( IOException ex ) {
       ex.printStackTrace();
       WigleAndroid.error( "file problem: " + ex );
+      status = Status.EXCEPTION;
     }
     
-    // tell the gui thread
-    handler.sendEmptyMessage( ok ? 1 : 0 );
+    return status;
   }
   
   private void writeFos( OutputStream fos, String... data ) throws IOException, UnsupportedEncodingException {

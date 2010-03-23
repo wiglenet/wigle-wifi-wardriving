@@ -4,17 +4,26 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnKeyListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class SettingsActivity extends Activity {
+  /** convenience, just get the darn new string */
+  private static abstract class SetWatcher implements TextWatcher {
+    public void afterTextChanged(Editable s) {}
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+      onTextChanged( s.toString() ); 
+    }
+    public abstract void onTextChanged( String s );
+  }
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -26,26 +35,22 @@ public class SettingsActivity extends Activity {
       
       final EditText user = (EditText) findViewById(R.id.edit_username);
       user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "") );
-      user.setOnKeyListener(new OnKeyListener() {
-          public boolean onKey(View v, int keyCode, KeyEvent event) {
-              String value = ((EditText)v).getText().toString().trim();
-              // WigleAndroid.info( "user value: '" + value + "'" );
-              editor.putString( WigleAndroid.PREF_USERNAME, value );
-              editor.commit();
-              return false;
-          }
+      user.addTextChangedListener( new SetWatcher() {
+        public void onTextChanged(String s) {
+          WigleAndroid.debug("user: " + s);
+          editor.putString( WigleAndroid.PREF_USERNAME, s.trim() );
+          editor.commit();
+        } 
       });
       
       final EditText pass = (EditText) findViewById(R.id.edit_password);
       pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "") );
-      pass.setOnKeyListener(new OnKeyListener() {
-          public boolean onKey(View v, int keyCode, KeyEvent event) {
-              String value = ((EditText)v).getText().toString().trim();
-              // WigleAndroid.info( "pass value: '" + value + "'" );
-              editor.putString( WigleAndroid.PREF_PASSWORD, value );
-              editor.commit();
-              return false;
-          }
+      pass.addTextChangedListener( new SetWatcher() {
+        public void onTextChanged(String s) {
+          WigleAndroid.debug("pass: " + s);
+          editor.putString( WigleAndroid.PREF_PASSWORD, s.trim() );
+          editor.commit();
+        } 
       });
       
       final CheckBox showCurrent = (CheckBox) findViewById(R.id.edit_showcurrent);

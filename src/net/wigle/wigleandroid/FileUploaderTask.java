@@ -62,10 +62,6 @@ public class FileUploaderTask extends Thread {
     String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
     String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
     
-    SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-    String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
-    String filepath = "/sdcard/wiglewifi/";
-    
     if ( "".equals( username ) ) {
       // TODO: error
       WigleAndroid.error( "username not defined" );
@@ -79,6 +75,11 @@ public class FileUploaderTask extends Thread {
     }
     
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    
+    SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
+    String filepath = "/sdcard/wiglewifi/";
+    
     boolean ok = false;
     
     try {

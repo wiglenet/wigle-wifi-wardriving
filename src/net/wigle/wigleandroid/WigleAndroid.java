@@ -42,6 +42,7 @@ public class WigleAndroid extends Activity {
     private Handler wifiTimer;
     private LocationListener locationListener;
     private Listener gpsStatusListener;
+    private DatabaseHelper dbHelper;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -63,6 +64,7 @@ public class WigleAndroid extends Activity {
         setContentView(R.layout.main);
         networks = new ConcurrentHashMap<String,Network>();
         
+//        setupDatabase();
         setupUploadButton();
         setupList();
         setupWifi();
@@ -96,6 +98,7 @@ public class WigleAndroid extends Activity {
     @Override
     public void onDestroy() {
       info( "destroy. networks: " + networks.size() );
+//      dbHelper.close();
       super.onDestroy();
     }
     
@@ -141,6 +144,11 @@ public class WigleAndroid extends Activity {
             return true;
         }
         return false;
+    }
+    
+    private void setupDatabase() {
+      dbHelper = new DatabaseHelper();
+      dbHelper.open();
     }
     
     private void setupList() {
@@ -203,6 +211,9 @@ public class WigleAndroid extends Activity {
                   network = new Network( result );
                   networks.put( result.BSSID, network );
                   listAdapter.add( result.BSSID );
+                  if ( location != null && dbHelper != null ) {
+                    dbHelper.addObservation( network, new Observation( result.level, location ) );
+                  }
                 }
                 else if ( showCurrent ) {
                   listAdapter.add( result.BSSID );

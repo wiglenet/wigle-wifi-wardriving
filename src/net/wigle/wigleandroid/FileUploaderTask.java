@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,25 +8,53 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.Message;
 
 public class FileUploaderTask extends Thread {
   private final Context context;
   private final Handler handler;
   private final List<Network> networksList;
+  private final ProgressDialog pd;
   
-  public FileUploaderTask( Context context, Handler handler, List<Network> networksList ) {
+  public FileUploaderTask( Context context, Collection<Network> networksList ) {
     this.context = context;
-    this.handler = handler;
-    this.networksList = networksList;
+    // make a copy for thread safety
+    this.networksList = new ArrayList<Network>( networksList );
+    
+    this.pd = ProgressDialog.show( context, "Working..", "Uploading File", true, false );  
+    
+    this.handler = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+        boolean ok = msg.what == 1;
+        pd.dismiss();
+        AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
+        builder.setCancelable( false );
+        builder.setTitle( ok ? "Success" : "Fail" );
+        builder.setMessage( ok ? "Upload successful" : "Upload failed" );
+        AlertDialog ad = builder.create();
+        ad.setButton("OK", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            return;
+          } }); 
+        ad.show();
+      }
+     };
   }
   
   public void run() {
@@ -35,6 +64,7 @@ public class FileUploaderTask extends Thread {
     
     SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
+    String filepath = "/sdcard/wiglewifi/";
     
     if ( "".equals( username ) ) {
       // TODO: error
@@ -52,7 +82,21 @@ public class FileUploaderTask extends Thread {
     boolean ok = false;
     
     try {
-      FileOutputStream rawFos = context.openFileOutput( filename, Context.MODE_PRIVATE );
+      File sdcard = new File( "/sdcard/" );
+      boolean hasSD = sdcard.exists() && sdcard.isDirectory();
+      String openString = filename;
+      if ( hasSD ) {
+        File path = new File( filepath );
+        path.mkdirs();
+        openString = filepath + filename;
+      }
+      File file = new File( openString );
+      if ( ! file.exists() ) {
+        file.createNewFile();
+      }
+      
+      FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
+        : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
       GZIPOutputStream fos = new GZIPOutputStream( rawFos );
       // name, version
       writeFos( fos, "WigleWifi-1.0\n" );
@@ -79,7 +123,8 @@ public class FileUploaderTask extends Thread {
       fos.close();
       
       // send file
-      FileInputStream fis = context.openFileInput( filename );
+      FileInputStream fis = hasSD ? new FileInputStream( file ) 
+        : context.openFileInput( filepath );
       Map<String,String> params = new HashMap<String,String>();
       
       params.put("observer", username);

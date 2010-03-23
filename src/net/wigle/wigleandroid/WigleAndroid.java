@@ -1,17 +1,13 @@
 package net.wigle.wigleandroid;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -24,7 +20,6 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,7 +36,7 @@ public class WigleAndroid extends Activity {
     // private static final String WIFI_LOCK_NAME = "wifilock";
     private LayoutInflater mInflater;
     private ArrayAdapter<String> listAdapter;
-    private final Map<String,Network> networks = new ConcurrentHashMap<String,Network>();
+    private Map<String,Network> networks;
     private GpsStatus gpsStatus;
     private Location location;
     private Handler wifiTimer;
@@ -66,6 +61,7 @@ public class WigleAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        networks = new ConcurrentHashMap<String,Network>();
         
         setupUploadButton();
         setupList();
@@ -75,14 +71,32 @@ public class WigleAndroid extends Activity {
     
     @Override
     public void onPause() {
-      info( "paused" );
+      info( "paused. networks: " + networks.size() );
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "resumed" );
+      info( "resumed. networks: " + networks.size() );
       super.onResume();
+    }
+    
+    @Override
+    public void onStart() {
+      info( "start. networks: " + networks.size() );
+      super.onStart();
+    }
+    
+    @Override
+    public void onRestart() {
+      info( "restart. networks: " + networks.size() );
+      super.onRestart();
+    }
+    
+    @Override
+    public void onDestroy() {
+      info( "destroy. networks: " + networks.size() );
+      super.onDestroy();
     }
     
     @Override
@@ -206,6 +220,10 @@ public class WigleAndroid extends Activity {
                 }
               }
               
+              // update stat
+              TextView tv = (TextView) findViewById( R.id.stats );
+              tv.setText( "Current: " + results.size() + " Total: " + networks.size() );
+              
               // notify
               listAdapter.notifyDataSetChanged();              
             }
@@ -288,33 +306,9 @@ public class WigleAndroid extends Activity {
     
     private void uploadFile(){
       info( "upload file" );
-      
-      pd = ProgressDialog.show( this, "Working..", "Uploading File", true, false );  
-      List<Network> networksList = new ArrayList<Network>( networks.values() );
-      FileUploaderTask task = new FileUploaderTask( this, handler, networksList );
+      FileUploaderTask task = new FileUploaderTask( this, networks.values() );
       task.start();
     }
-    
-    private ProgressDialog pd;
-    private Handler handler = new Handler() {
-      @Override
-      public void handleMessage(Message msg) {
-        boolean ok = msg.what == 1;
-        pd.dismiss();
-        AlertDialog.Builder builder = new AlertDialog.Builder( WigleAndroid.this );
-        builder.setCancelable( false );
-        builder.setTitle( ok ? "Success" : "Fail" );
-        builder.setMessage( ok ? "Upload successful" : "Upload failed" );
-        AlertDialog ad = builder.create();
-        ad.setButton("OK", new DialogInterface.OnClickListener() {
-          public void onClick(DialogInterface dialog, int which) {
-            dialog.dismiss();
-            return;
-          } }); 
-        ad.show();
-      }
-     };
-    
     
     public static void info( String value ) {
       Log.i( LOG_TAG, value );

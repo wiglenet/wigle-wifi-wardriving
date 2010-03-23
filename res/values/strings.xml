@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="status">Starting</string>
+    <string name="stats">Starting</string>
     <string name="app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi Settings</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>

@@ -1,5 +1,11 @@
-	current/total stats
-	sql lite backend
-X upload popups
-X fix dupe location bug
-X gzip file
+--- todo ---
+sql lite backend
+"upload every n" setting
+update frequency setting
+
+--- done ---
+move storage to sdcard
+current/total stats
+upload popups
+fix dupe location bug
+gzip file

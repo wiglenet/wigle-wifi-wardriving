@@ -1,21 +1,17 @@
 package net.wigle.wigleandroid;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -28,6 +24,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,7 +48,7 @@ public class WigleAndroid extends Activity {
     private LocationListener locationListener;
     private Listener gpsStatusListener;
     
-    private static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
+    public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
@@ -292,76 +289,32 @@ public class WigleAndroid extends Activity {
     private void uploadFile(){
       info( "upload file" );
       
-      SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-      String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv";
-      
-      SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
-      String username = prefs.getString( PREF_USERNAME, "" );
-      String password = prefs.getString( PREF_PASSWORD, "" );
-      if ( "".equals( username ) ) {
-        // TODO: error
-        error( "username not defined" );
-        return;
-      }
-      
-      if ( "".equals( password ) && ! "anonymous".equals( username.toLowerCase() ) ) {
-        // TODO: error
-        error( "password not defined and username isn't 'anonymous'" );
-        return;
-      }
-      
-      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-      
-      try {
-        FileOutputStream fos = this.openFileOutput( filename, MODE_PRIVATE );
-        // name, version
-        writeFos( fos, "WigleWifi-1.0\n" );
-        // header
-        writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude\n" );
-        // write file
-        for ( Network network : networks.values() ) {
-          String ssid = network.getSsid();
-          ssid = ssid.replaceAll(",", "_"); // comma isn't a legal ssid character, but just in case
-          info("writing network: " + ssid + " observations: " + network.getObservations() );
-          for ( Observation observation : network.getObservations() ) {
-            writeFos( fos, network.getBssid(), "," );
-            writeFos( fos, ssid, "," );
-            writeFos( fos, network.getCapabilities(), "," );
-            writeFos( fos, dateFormat.format( new Date( observation.getTime() ) ), "," );
-            writeFos( fos, Integer.toString( network.getChannel() ), "," );
-            writeFos( fos, Integer.toString( network.getLevel() ), "," );
-            writeFos( fos, Double.toString( observation.getLat() ), "," );
-            writeFos( fos, Double.toString( observation.getLon() ), "\n" );
-          }          
-        }
-        fos.close();
-        
-        // send file
-        FileInputStream fis = this.openFileInput( filename );
-        Map<String,String> params = new HashMap<String,String>();
-        
-        params.put("observer", username);
-        params.put("password", password);
-        HttpFileUploader.upload( FILE_POST_URL, filename, "stumblefile", fis, params );
-      } 
-      catch (FileNotFoundException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      catch ( IOException ex ) {
-        error( "file problem: " + ex );
-      }
+      pd = ProgressDialog.show( this, "Working..", "Uploading File", true, false );  
+      List<Network> networksList = new ArrayList<Network>( networks.values() );
+      FileUploaderTask task = new FileUploaderTask( this, handler, networksList );
+      task.start();
     }
     
-    private void writeFos( FileOutputStream fos, String... data ) throws IOException, UnsupportedEncodingException {
-      if ( data != null ) {
-        for ( String item : data ) {
-          if ( item != null ) {
-            fos.write( item.getBytes( ENCODING ) );
-          }
-        }
+    private ProgressDialog pd;
+    private Handler handler = new Handler() {
+      @Override
+      public void handleMessage(Message msg) {
+        boolean ok = msg.what == 1;
+        pd.dismiss();
+        AlertDialog.Builder builder = new AlertDialog.Builder( WigleAndroid.this );
+        builder.setCancelable( false );
+        builder.setTitle( ok ? "Success" : "Fail" );
+        builder.setMessage( ok ? "Upload successful" : "Upload failed" );
+        AlertDialog ad = builder.create();
+        ad.setButton("OK", new DialogInterface.OnClickListener() {
+          public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+            return;
+          } }); 
+        ad.show();
       }
-    }
+     };
+    
     
     public static void info( String value ) {
       Log.i( LOG_TAG, value );

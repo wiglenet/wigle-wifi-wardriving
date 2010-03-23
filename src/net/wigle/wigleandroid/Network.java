@@ -9,6 +9,9 @@ import java.util.Set;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 
+/**
+ * get/set observations is synchronized, so this class should be thread-safe
+ */
 public class Network {
   private final String bssid;
   private final String ssid;
@@ -115,8 +118,16 @@ public class Network {
     return level;
   }
   
+  /**
+   * thread-safely copies observations and returns them
+   * @return copy of observations
+   */
   public Set<Observation> getObservations() {
-    return observations;
+    Set<Observation> retval = null;
+    synchronized ( observations ) {
+      retval = new HashSet<Observation>( observations );
+    }
+    return retval;
   }
   
   public Integer getChannel() {
@@ -128,7 +139,9 @@ public class Network {
     
     if ( location != null ) {
       Observation observation = new Observation( level, location );
-      observations.add( observation );
+      synchronized ( observations ) {
+        observations.add( observation );
+      }
     }
   }
 

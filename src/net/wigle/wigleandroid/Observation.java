@@ -58,8 +58,8 @@ public class Observation {
   public int hashCode() {
     int retval = 17;
     retval += 37 * level;
-    retval += 37 * lat;
-    retval += 37 * lon;
+    retval += 37 * Double.doubleToLongBits( lat );
+    retval += 37 * Double.doubleToLongBits( lon );
     return retval;
   }
   

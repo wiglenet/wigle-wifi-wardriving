@@ -18,7 +18,7 @@ class HttpFileUploader {
   private HttpFileUploader(){
   }
 
-  public static void upload( String urlString, String filename, String fileParamName,
+  public static String upload( String urlString, String filename, String fileParamName,
       FileInputStream fileInputStream, Map<String,String> params ){
     
     URL connectURL = null;
@@ -32,6 +32,7 @@ class HttpFileUploader {
     String lineEnd = "\r\n";
     String twoHyphens = "--";
     String boundary = "*****";
+    String retval = null;
 
     try {
       //------------------ CLIENT REQUEST
@@ -108,8 +109,9 @@ class HttpFileUploader {
       while( ( ch = is.read() ) != -1 ) {
         b.append( (char)ch );
       }
-      String s=b.toString();
-      WigleAndroid.info( "Response: " + s );
+      retval = b.toString();
+      WigleAndroid.debug( "Response: " + retval );
+
       dos.close();
     }
     catch (MalformedURLException ex) {
@@ -118,6 +120,8 @@ class HttpFileUploader {
     catch (IOException ioe) {
       WigleAndroid.error( ioe.toString() );
     }
+    
+    return retval;
   }
   
 }

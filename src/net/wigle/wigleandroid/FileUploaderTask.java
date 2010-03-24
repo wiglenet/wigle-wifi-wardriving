@@ -55,7 +55,7 @@ public class FileUploaderTask extends Thread {
     this.context = context;
     this.dbHelper = dbHelper;
     
-    this.pd = ProgressDialog.show( context, "Working..", "Uploading File", true, false );  
+    this.pd = ProgressDialog.show( context, "Working..", "Writing File", true, false );  
     
     this.handler = new Handler() {
       @Override
@@ -134,8 +134,10 @@ public class FileUploaderTask extends Thread {
       // write file
       long maxId = dbHelper.getLastUpload();
       Cursor cursor = dbHelper.networkIterator( maxId );
+      int linecount = 0;
       if ( cursor.getCount() > 0 ) {
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
+          linecount++;
           // _id,bssid,level,lat,lon,time
           long id = cursor.getLong(0);
           if ( id > maxId ) {
@@ -160,6 +162,9 @@ public class FileUploaderTask extends Thread {
       cursor.close();
       fos.close();
       
+      // show on the UI
+      pd.setMessage( "Uploading " + linecount + " line file.." );
+      
       // send file
       FileInputStream fis = hasSD ? new FileInputStream( file ) 
         : context.openFileInput( filepath );
@@ -170,15 +175,18 @@ public class FileUploaderTask extends Thread {
       String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params );
       
       if ( response.indexOf("uploaded successfully") > 0 ) {
+        pd.setMessage( "Success uploading " + linecount + " line file." );
         status = Status.SUCCESS;
         dbHelper.lastUpload( maxId );
       }
       else if ( response.indexOf("does not match login") > 0 ) {
         status = Status.BAD_LOGIN;
+        pd.setMessage( status.getMessage() );
       }
       else {
         WigleAndroid.error("fail: " + response );
         status = Status.FAIL;
+        pd.setMessage( status.getMessage() );
       }
     } 
     catch (FileNotFoundException e) {
@@ -186,11 +194,13 @@ public class FileUploaderTask extends Thread {
       e.printStackTrace();
       WigleAndroid.error( "file problem: " + e );
       status = Status.EXCEPTION;
+      pd.setMessage( status.getMessage() );
     }
     catch ( IOException ex ) {
       ex.printStackTrace();
       WigleAndroid.error( "file problem: " + ex );
       status = Status.EXCEPTION;
+      pd.setMessage( status.getMessage() );
     }
     
     return status;

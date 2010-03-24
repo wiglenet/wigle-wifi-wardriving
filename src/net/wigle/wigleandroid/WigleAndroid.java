@@ -36,7 +36,7 @@ public class WigleAndroid extends Activity {
     // private static final String WIFI_LOCK_NAME = "wifilock";
     private LayoutInflater mInflater;
     private ArrayAdapter<String> listAdapter;
-    private Map<String,Network> networks;
+    private Map<String,Network> currentNetworks;
     private GpsStatus gpsStatus;
     private Location location;
     private Handler wifiTimer;
@@ -62,9 +62,9 @@ public class WigleAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        networks = new ConcurrentHashMap<String,Network>();
+        currentNetworks = new ConcurrentHashMap<String,Network>();
         
-//        setupDatabase();
+        setupDatabase();
         setupUploadButton();
         setupList();
         setupWifi();
@@ -73,32 +73,32 @@ public class WigleAndroid extends Activity {
     
     @Override
     public void onPause() {
-      info( "paused. networks: " + networks.size() );
+      info( "paused. networks: " + currentNetworks.size() );
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "resumed. networks: " + networks.size() );
+      info( "resumed. networks: " + currentNetworks.size() );
       super.onResume();
     }
     
     @Override
     public void onStart() {
-      info( "start. networks: " + networks.size() );
+      info( "start. networks: " + currentNetworks.size() );
       super.onStart();
     }
     
     @Override
     public void onRestart() {
-      info( "restart. networks: " + networks.size() );
+      info( "restart. networks: " + currentNetworks.size() );
       super.onRestart();
     }
     
     @Override
     public void onDestroy() {
-      info( "destroy. networks: " + networks.size() );
-//      dbHelper.close();
+      info( "destroy. networks: " + currentNetworks.size() );
+      dbHelper.close();
       super.onDestroy();
     }
     
@@ -166,7 +166,7 @@ public class WigleAndroid extends Activity {
               }
         
               String bssid = getItem(position);
-              Network network = networks.get( bssid );
+              Network network = currentNetworks.get( bssid );
               
               TextView tv = (TextView) row.findViewById( R.id.ssid );              
               tv.setText( network.getSsid() );
@@ -205,35 +205,36 @@ public class WigleAndroid extends Activity {
                 listAdapter.clear();
               }
               for ( ScanResult result : results ) {
-                Network network = networks.get( result.BSSID );
+                Network network = currentNetworks.get( result.BSSID );
                 if ( network == null ) {
                   debug( "new network: " + result.SSID );
                   network = new Network( result );
-                  networks.put( result.BSSID, network );
-                  listAdapter.add( result.BSSID );
-                  if ( location != null && dbHelper != null ) {
-                    dbHelper.addObservation( network, new Observation( result.level, location ) );
-                  }
+                  currentNetworks.put( result.BSSID, network );
+                  listAdapter.add( result.BSSID );                  
                 }
                 else if ( showCurrent ) {
                   listAdapter.add( result.BSSID );
                 }
                 debug( "network: " + result.SSID + " level: " + result.level );
                 // always set new signal level
-                network.addObservation( result.level, location );
+                network.setLevel( result.level );
+                if ( location != null && dbHelper != null ) {
+                  dbHelper.addObservation( network, location );
+                }
               }
               
-              if ( ! showCurrent && listAdapter.getCount() != networks.size() ) {
+              if ( ! showCurrent && listAdapter.getCount() != currentNetworks.size() ) {
                 // the showCurrent must have been on, and is now off, add everything
                 listAdapter.clear();
-                for ( String bssid : networks.keySet() ) {
+                for ( String bssid : currentNetworks.keySet() ) {
                   listAdapter.add( bssid );
                 }
               }
               
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
-              tv.setText( "Current: " + results.size() + " Total: " + networks.size() );
+              tv.setText( "Current: " + results.size() + " Run: " + currentNetworks.size()
+                  + " DB: " + dbHelper.getNetworkCount() + " Loc: " + dbHelper.getLocationCount() );
               
               // notify
               listAdapter.notifyDataSetChanged();              
@@ -260,7 +261,7 @@ public class WigleAndroid extends Activity {
 
         // starts scan, sends event when done
         boolean scanOK = wifiManager.startScan();
-        info( "scanOK: " + scanOK );        
+        info( "startup finished. wifi scanOK: " + scanOK );        
     }
     
     private void setupLocation() {
@@ -280,16 +281,14 @@ public class WigleAndroid extends Activity {
             location = newLocation;
             setLocationUI( location );
           }
-          public void onProviderDisabled( String provider ) {
-          }
-          public void onProviderEnabled( String provider ) { 
-          }
-          public void onStatusChanged( String provider, int status, Bundle extras ) {
-          }
+          public void onProviderDisabled( String provider ) {}
+          public void onProviderEnabled( String provider ) {}
+          public void onStatusChanged( String provider, int status, Bundle extras ) {}
         };
+        
       for ( String provider : providers ) {
         info( "provider: " + provider );
-        locationManager.requestLocationUpdates( provider, 5000L, 0, locationListener );
+        locationManager.requestLocationUpdates( provider, 1000L, 0, locationListener );
       }
     }
     
@@ -317,10 +316,18 @@ public class WigleAndroid extends Activity {
     
     private void uploadFile(){
       info( "upload file" );
-      FileUploaderTask task = new FileUploaderTask( this, networks.values() );
+      FileUploaderTask task = new FileUploaderTask( this, dbHelper );
       task.start();
     }
     
+    public static void sleep( long sleep ) {
+      try {
+        Thread.sleep( sleep );
+      }
+      catch ( InterruptedException ex ) {
+        // no worries
+      }
+    }
     public static void info( String value ) {
       Log.i( LOG_TAG, value );
     }

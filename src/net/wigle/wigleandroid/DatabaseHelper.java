@@ -1,39 +1,186 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
 
 /**
  * our database
  */
 public class DatabaseHelper {
-  private static final String DATABASE_NAME = "/sdcard/wiglewifi/wiflewifi.sqlite";
-  private static final String DATABASE_TABLE = "observation_test";
-  private static final String DATABASE_CREATE =
-    "create table observation_test ( "
-    + "_id integer primary key autoincrement, "
+  private static final long LOC_DELAY = 10000L;
+  private static final String DATABASE_NAME = "wiglewifi.sqlite";
+  private static final String DATABASE_PATH = "/sdcard/wiglewifi/";
+  
+  private static final String NETWORK_TABLE = "network";
+  private static final String NETWORK_CREATE =
+    "create table " + NETWORK_TABLE + " ( "
+    + "bssid varchar(20) primary key not null,"
+    + "ssid text not null,"
+    + "frequency int not null,"
+    + "capabilities text not null"
+    + ")";
+  
+  private static final String LOCATION_TABLE = "location";
+  private static final String LOCATION_CREATE =
+    "create table " + LOCATION_TABLE + " ( "
+    + "_id integer primary key autoincrement,"
     + "bssid varchar(20) not null,"
-    + "ssid text not null"
-    +");";
+    + "level integer not null,"
+    + "lat double not null,"
+    + "lon double not null,"
+    + "time long not null"
+    + ")";
+  
+  private static final String UPLOAD_TABLE = "upload";
+  private static final String UPLOAD_CREATE = 
+    "create table " + UPLOAD_TABLE + " ( "
+    + "key integer primary key not null,"
+    + "lastupload long not null"
+    + ")";
   
   private SQLiteDatabase db;
   
   public void open() {
-    db = SQLiteDatabase.openOrCreateDatabase( DATABASE_NAME, null );
-    // check if we have tables
-//    db.rawQuery("select * from sqlite_master where type='table';", selectionArgs);
-    db.execSQL(DATABASE_CREATE);
+    File sdCard = new File("/sdcard/");
+    boolean hasSD = sdCard.exists() && sdCard.isDirectory();
+    String dbFilename = DATABASE_NAME;
+    if ( hasSD ) {
+      File path = new File( DATABASE_PATH );
+      path.mkdirs();
+      dbFilename = DATABASE_PATH + DATABASE_NAME;
+    }
+    File dbFile = new File( dbFilename );
+    boolean doCreate = false;
+    if ( ! dbFile.exists() ) {
+      doCreate = true;
+    }
+    WigleAndroid.info("opening: " + dbFilename );
+    db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
+    if ( doCreate ) {
+      WigleAndroid.info( "creating tables" );
+      db.execSQL(NETWORK_CREATE);
+      db.execSQL(LOCATION_CREATE);
+      db.execSQL(UPLOAD_CREATE);
+    }
   }
   
   public void close() {
     db.close();
   }
   
-  public void addObservation( Network network, Observation observation ) {
+  public void addObservation( Network network, Location location ) {
+    if ( ! db.isOpen() ) {
+      WigleAndroid.info( "re-opening db in addObservation" );
+      open();
+    }
+    // TODO: select first, insert locations once in a while
+    
     ContentValues values = new ContentValues();
-    values.put( "bssid", network.getBssid() );
-    values.put( "ssid", network.getSsid() );
-
-    db.insert(DATABASE_TABLE, null, values);
+    String[] args = new String[]{ network.getBssid() };    
+    Cursor cursor = db.rawQuery("SELECT bssid FROM network WHERE bssid = ?", args );
+    
+    if ( cursor.getCount() == 0 ) {    
+      WigleAndroid.debug("inserting net: " + network.getSsid() );
+      
+      values.put("bssid", network.getBssid() );
+      values.put("ssid", network.getSsid() );
+      values.put("frequency", network.getFrequency() );
+      values.put("capabilities", network.getCapabilities() );
+      db.replace(NETWORK_TABLE, null, values);
+    }
+    cursor.close();
+    
+    cursor = db.rawQuery("SELECT time FROM location WHERE bssid = ? ORDER BY _id DESC LIMIT 1", args );
+    long time = 0;
+    if ( cursor.getCount() > 0 ) {
+      cursor.moveToFirst();
+      time = cursor.getLong(0);
+    }
+    cursor.close();
+    
+    long now = System.currentTimeMillis();
+    // WigleAndroid.debug("time: " + time + " now: " + now + " ssid: " + network.getSsid() );
+    if ( now - time > LOC_DELAY ) {
+      WigleAndroid.debug("inserting loc: " + network.getSsid() );
+      values.clear();
+      values.put("bssid", network.getBssid() );
+      values.put("level", network.getLevel() );
+      values.put("lat", location.getLatitude() );
+      values.put("lon", location.getLongitude() );
+      values.put("time", location.getTime() );
+      db.insert( LOCATION_TABLE, null, values );
+    }
   }
+  
+  public long getNetworkCount() {
+    Cursor cursor = db.rawQuery("select count(*) FROM " + NETWORK_TABLE, null);
+    cursor.moveToFirst();
+    long count = cursor.getLong( 0 );
+    cursor.close();
+    return count;
+  }
+  
+  public long getLocationCount() {
+    Cursor cursor = db.rawQuery("select count(*) FROM " + LOCATION_TABLE, null);
+    cursor.moveToFirst();
+    long count = cursor.getLong( 0 );
+    cursor.close();
+    return count;
+  }
+  
+  public Network getNetwork( String bssid ) {
+    Network retval = null;
+    String[] args = new String[]{ bssid };
+    Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
+        + " WHERE bssid = ?", args);
+    if ( cursor.getCount() > 0 ) {
+      cursor.moveToFirst();
+      String ssid = cursor.getString(0);
+      int frequency = cursor.getInt(1);
+      String capabilities = cursor.getString(2);
+      retval = new Network( bssid, ssid, frequency, capabilities, 0 );
+    }
+    cursor.close();
+    return retval;
+  }
+  
+  public long getLastUpload() {
+    if ( ! db.isOpen() ) {
+      open();
+    }
+    Cursor cursor = db.rawQuery("SELECT lastupload FROM " + UPLOAD_TABLE + " WHERE key = 0", null);
+    long maxId = -1L;
+    if ( cursor.getCount() > 0 ) {
+      cursor.moveToFirst();
+      maxId = cursor.getLong(0);
+    }
+    cursor.close();
+    return maxId;
+  }
+  
+  public void lastUpload( long maxId ) {
+    if ( ! db.isOpen() ) {
+      open();
+    }
+    WigleAndroid.info("updating lastUpload maxId: " + maxId );
+    
+    ContentValues values = new ContentValues();
+    values.put( "key", 0);
+    values.put("lastupload", maxId);
+    db.replace(UPLOAD_TABLE, null, values);
+  }
+  
+  public Cursor networkIterator( long fromId ) {
+    if ( ! db.isOpen() ) {
+      open();
+    }
+    WigleAndroid.info("networkIterator fromId: " + fromId );
+    String[] args = new String[]{ Long.toString( fromId ) };
+    return db.rawQuery("SELECT _id,bssid,level,lat,lon,time FROM location WHERE _id > ?", args);
+  }
+  
 }

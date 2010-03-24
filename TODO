@@ -1,10 +1,11 @@
 --- todo ---
-sql lite backend
 "upload every n" setting
 update frequency setting
 change upload to ssl
+distance traveled
 
 --- done ---
+sql lite backend
 move storage to sdcard
 current/total stats
 upload popups

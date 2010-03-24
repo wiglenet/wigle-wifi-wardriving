@@ -2,15 +2,12 @@ package net.wigle.wigleandroid;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import android.location.Location;
 import android.net.wifi.ScanResult;
 
 /**
- * get/set observations is synchronized, so this class should be thread-safe
+ * network data. not thread-safe.
  */
 public class Network {
   private final String bssid;
@@ -18,7 +15,6 @@ public class Network {
   private final int frequency;
   private final String capabilities;
   private int level;
-  private final Set<Observation> observations = new HashSet<Observation>();
   private final Integer channel;
   private final String showCapabilities;
   
@@ -75,12 +71,21 @@ public class Network {
     freqToChan = Collections.unmodifiableMap( freqToChanTemp );
   }
   
+  /**
+   * convenience constructor
+   * @param scanResult a result from a wifi scan
+   */
   public Network( ScanResult scanResult ) {
-    this.bssid = scanResult.BSSID;
-    this.ssid = scanResult.SSID;
-    this.frequency = scanResult.frequency;
-    this.capabilities = scanResult.capabilities;
-    this.level = scanResult.level;
+    this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities, scanResult.level );
+  }
+  
+  public Network( String bssid, String ssid, int frequency, String capabilities, int level ) {
+    
+    this.bssid = bssid;
+    this.ssid = ssid;
+    this.frequency = frequency;
+    this.capabilities = capabilities;
+    this.level = level;
     this.channel = freqToChan.get( frequency );
     
     if ( capabilities.length() > 16 ) {
@@ -118,31 +123,12 @@ public class Network {
     return level;
   }
   
-  /**
-   * thread-safely copies observations and returns them
-   * @return copy of observations
-   */
-  public Set<Observation> getObservations() {
-    Set<Observation> retval = null;
-    synchronized ( observations ) {
-      retval = new HashSet<Observation>( observations );
-    }
-    return retval;
-  }
-  
   public Integer getChannel() {
     return channel;
   }
   
-  public void addObservation( int level, Location location ) {
+  public void setLevel( int level ) {
     this.level = level;
-    
-    if ( location != null ) {
-      Observation observation = new Observation( level, location );
-      synchronized ( observations ) {
-        observations.add( observation );
-      }
-    }
   }
 
 }

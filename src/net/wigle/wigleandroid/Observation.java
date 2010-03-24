@@ -47,8 +47,7 @@ public class Observation {
   public boolean equals( Object other ) {
     if ( other instanceof Observation ) {
       Observation o = (Observation) other;
-      return level == o.level
-        && lat == o.lat
+      return lat == o.lat
         && lon == o.lon;
     }
     return false;
@@ -57,7 +56,6 @@ public class Observation {
   @Override
   public int hashCode() {
     int retval = 17;
-    retval += 37 * level;
     retval += 37 * Double.doubleToLongBits( lat );
     retval += 37 * Double.doubleToLongBits( lon );
     return retval;

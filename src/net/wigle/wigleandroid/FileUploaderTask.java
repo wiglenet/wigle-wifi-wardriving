@@ -8,11 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
@@ -21,13 +18,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
 
 public class FileUploaderTask extends Thread {
   private final Context context;
   private final Handler handler;
-  private final List<Network> networksList;
+  private final DatabaseHelper dbHelper;
   private final ProgressDialog pd;
   
   private enum Status {
@@ -53,10 +51,9 @@ public class FileUploaderTask extends Thread {
     }
   }
   
-  public FileUploaderTask( Context context, Collection<Network> networksList ) {
+  public FileUploaderTask( Context context, DatabaseHelper dbHelper ) {
     this.context = context;
-    // make a copy for thread safety
-    this.networksList = new ArrayList<Network>( networksList );
+    this.dbHelper = dbHelper;
     
     this.pd = ProgressDialog.show( context, "Working..", "Uploading File", true, false );  
     
@@ -135,23 +132,32 @@ public class FileUploaderTask extends Thread {
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude\n" );
       // write file
-      for ( Network network : networksList ) {
-        String ssid = network.getSsid();
-        ssid = ssid.replaceAll(",", "_"); // comma isn't a legal ssid character, but just in case
-        WigleAndroid.debug("writing network: " + ssid + " observations: " + network.getObservations() );
-        for ( Observation observation : network.getObservations() ) {
+      long maxId = dbHelper.getLastUpload();
+      Cursor cursor = dbHelper.networkIterator( maxId );
+      if ( cursor.getCount() > 0 ) {
+        for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
+          // _id,bssid,level,lat,lon,time
+          long id = cursor.getLong(0);
+          if ( id > maxId ) {
+            maxId = id;
+          }
+          String bssid = cursor.getString(1);
+          Network network = dbHelper.getNetwork( bssid );
+          String ssid = network.getSsid();
+          ssid = ssid.replaceAll(",", "_"); // comma isn't a legal ssid character, but just in case
+          // WigleAndroid.debug("writing network: " + ssid );
+  
           writeFos( fos, network.getBssid(), "," );
           writeFos( fos, ssid, "," );
           writeFos( fos, network.getCapabilities(), "," );
-          writeFos( fos, dateFormat.format( new Date( observation.getTime() ) ), "," );
+          writeFos( fos, dateFormat.format( new Date( cursor.getLong(5) ) ), "," );
           writeFos( fos, Integer.toString( network.getChannel() ), "," );
-          writeFos( fos, Integer.toString( observation.getLevel() ), "," );
-          writeFos( fos, Double.toString( observation.getLat() ), "," );
-          writeFos( fos, Double.toString( observation.getLon() ), "\n" );
-          WigleAndroid.debug("writing observation: " + observation.getLevel() + " lat: " + observation.getLat() 
-              + " lon: " + observation.getLon() );
-        }          
+          writeFos( fos, Integer.toString( cursor.getInt(2) ), "," );
+          writeFos( fos, Double.toString( cursor.getDouble(3) ), "," );
+          writeFos( fos, Double.toString( cursor.getDouble(4) ), "\n" );
+        }
       }
+      cursor.close();
       fos.close();
       
       // send file
@@ -165,6 +171,7 @@ public class FileUploaderTask extends Thread {
       
       if ( response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
+        dbHelper.lastUpload( maxId );
       }
       else if ( response.indexOf("does not match login") > 0 ) {
         status = Status.BAD_LOGIN;

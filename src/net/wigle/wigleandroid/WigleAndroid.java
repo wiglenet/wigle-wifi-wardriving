@@ -60,6 +60,9 @@ public class WigleAndroid extends Activity {
     static final String PREF_USERNAME = "username";
     static final String PREF_PASSWORD = "password";
     static final String PREF_SHOW_CURRENT = "showCurrent";
+    static final String PREF_BE_ANONYMOUS= "beAnonymous";
+    
+    static final String ANONYMOUS = "anonymous";
     
     /** Called when the activity is first created. */
     @Override
@@ -103,13 +106,16 @@ public class WigleAndroid extends Activity {
     @Override
     public void onDestroy() {
       info( "destroy. networks: " + currentNetworks.size() );
-      dbHelper.close();
+      
       super.onDestroy();
     }
     
     @Override
     public void finish() {
       finishing.set( true );
+      
+      // close the db. not in destroy, because it'll still write after that.
+      dbHelper.close();
       
       LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       if ( gpsStatusListener != null ) {
@@ -244,7 +250,7 @@ public class WigleAndroid extends Activity {
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
               String stats = "Current: " + results.size() + " Run: " + currentNetworks.size()
-                + " DB: " + dbHelper.getNetworkCount() + " Loc: " + dbHelper.getLocationCount();
+                + " DB: " + dbHelper.getNetworkCount() + " Locs: " + dbHelper.getLocationCount();
               tv.setText( stats );
               
               // WigleAndroid.info( stats );

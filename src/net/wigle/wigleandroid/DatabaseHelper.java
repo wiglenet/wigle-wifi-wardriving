@@ -32,6 +32,8 @@ public class DatabaseHelper {
     + "level integer not null,"
     + "lat double not null,"
     + "lon double not null,"
+    + "altitude double not null,"
+    + "accuracy float not null,"
     + "time long not null"
     + ")";
   
@@ -115,6 +117,8 @@ public class DatabaseHelper {
       values.put("level", network.getLevel() );
       values.put("lat", location.getLatitude() );
       values.put("lon", location.getLongitude() );
+      values.put("altitude", location.getAltitude() );
+      values.put("accuracy", location.getAccuracy() );
       values.put("time", location.getTime() );
       db.insert( LOCATION_TABLE, null, values );
     }
@@ -181,7 +185,7 @@ public class DatabaseHelper {
     checkDB();
     WigleAndroid.info("networkIterator fromId: " + fromId );
     String[] args = new String[]{ Long.toString( fromId ) };
-    return db.rawQuery("SELECT _id,bssid,level,lat,lon,time FROM location WHERE _id > ?", args);
+    return db.rawQuery("SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args);
   }
   
 }

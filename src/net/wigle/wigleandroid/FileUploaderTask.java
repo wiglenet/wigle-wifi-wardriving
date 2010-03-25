@@ -93,7 +93,7 @@ public class FileUploaderTask extends Thread {
       WigleAndroid.error( "username not defined" );
       status = Status.BAD_USERNAME;
     }
-    else if ( "".equals( password ) && ! "anonymous".equals( username.toLowerCase() ) ) {
+    else if ( "".equals( password ) && ! WigleAndroid.ANONYMOUS.equals( username.toLowerCase() ) ) {
       // TODO: error
       WigleAndroid.error( "password not defined and username isn't 'anonymous'" );
       status = Status.BAD_PASSWORD;
@@ -135,7 +135,7 @@ public class FileUploaderTask extends Thread {
       // name, version
       writeFos( fos, "WigleWifi-1.0\n" );
       // header
-      writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude\n" );
+      writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file
       long maxId = dbHelper.getLastUpload();
       Cursor cursor = dbHelper.networkIterator( maxId );
@@ -157,11 +157,13 @@ public class FileUploaderTask extends Thread {
           writeFos( fos, network.getBssid(), "," );
           writeFos( fos, ssid, "," );
           writeFos( fos, network.getCapabilities(), "," );
-          writeFos( fos, dateFormat.format( new Date( cursor.getLong(5) ) ), "," );
+          writeFos( fos, dateFormat.format( new Date( cursor.getLong(7) ) ), "," );
           writeFos( fos, Integer.toString( network.getChannel() ), "," );
           writeFos( fos, Integer.toString( cursor.getInt(2) ), "," );
           writeFos( fos, Double.toString( cursor.getDouble(3) ), "," );
-          writeFos( fos, Double.toString( cursor.getDouble(4) ), "\n" );
+          writeFos( fos, Double.toString( cursor.getDouble(4) ), "," );
+          writeFos( fos, Double.toString( cursor.getDouble(5) ), "," );
+          writeFos( fos, Double.toString( cursor.getDouble(6) ), "\n" );
         }
       }
       cursor.close();

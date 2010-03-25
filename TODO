@@ -5,6 +5,9 @@ change upload to ssl
 distance traveled
 
 --- done ---
+store and upload altitude, accuracy
+anonymous checkbox
+service
 sql lite backend
 move storage to sdcard
 current/total stats

@@ -33,7 +33,42 @@ public class SettingsActivity extends Activity {
       SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
       final Editor editor = prefs.edit();
       
+      final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
       final EditText user = (EditText) findViewById(R.id.edit_username);
+      final EditText pass = (EditText) findViewById(R.id.edit_password);
+      boolean isAnonymous = prefs.getBoolean( WigleAndroid.PREF_BE_ANONYMOUS, false);
+      if ( isAnonymous ) {
+        user.setEnabled( false );
+        pass.setEnabled( false );
+      }
+      
+      beAnonymous.setChecked( isAnonymous );
+      beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
+              editor.putBoolean( WigleAndroid.PREF_BE_ANONYMOUS, isChecked );
+              editor.commit();
+              
+              if ( isChecked ) {
+                // turn anonymous
+                user.setEnabled( false );
+                pass.setEnabled( false );
+                user.setText( WigleAndroid.ANONYMOUS );
+                pass.setText( "" );
+                editor.putString( WigleAndroid.PREF_USERNAME, WigleAndroid.ANONYMOUS );
+                editor.putString( WigleAndroid.PREF_PASSWORD, "" );
+              }
+              else {
+                // unset anonymous
+                user.setEnabled( true );
+                pass.setEnabled( true );
+                user.setText( "" );
+                pass.setText( "" );
+                editor.putString( WigleAndroid.PREF_USERNAME, "" );
+                editor.putString( WigleAndroid.PREF_PASSWORD, "" );
+              }
+          }
+      });
+      
       user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "") );
       user.addTextChangedListener( new SetWatcher() {
         public void onTextChanged(String s) {
@@ -43,7 +78,6 @@ public class SettingsActivity extends Activity {
         } 
       });
       
-      final EditText pass = (EditText) findViewById(R.id.edit_password);
       pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "") );
       pass.addTextChangedListener( new SetWatcher() {
         public void onTextChanged(String s) {

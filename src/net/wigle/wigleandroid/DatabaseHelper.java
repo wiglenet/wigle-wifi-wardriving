@@ -69,16 +69,20 @@ public class DatabaseHelper {
   }
   
   public void close() {
-    db.close();
+    if ( db.isOpen() ) {
+      db.close();
+    }
+  }
+  
+  private void checkDB() {
+    if ( ! db.isOpen() ) {
+      WigleAndroid.info( "re-opening db in checkDB" );
+      open();
+    }
   }
   
   public void addObservation( Network network, Location location ) {
-    if ( ! db.isOpen() ) {
-      WigleAndroid.info( "re-opening db in addObservation" );
-      open();
-    }
-    // TODO: select first, insert locations once in a while
-    
+    checkDB();
     ContentValues values = new ContentValues();
     String[] args = new String[]{ network.getBssid() };    
     Cursor cursor = db.rawQuery("SELECT bssid FROM network WHERE bssid = ?", args );
@@ -117,6 +121,7 @@ public class DatabaseHelper {
   }
   
   public long getNetworkCount() {
+    checkDB();
     Cursor cursor = db.rawQuery("select count(*) FROM " + NETWORK_TABLE, null);
     cursor.moveToFirst();
     long count = cursor.getLong( 0 );
@@ -125,6 +130,7 @@ public class DatabaseHelper {
   }
   
   public long getLocationCount() {
+    checkDB();
     Cursor cursor = db.rawQuery("select count(*) FROM " + LOCATION_TABLE, null);
     cursor.moveToFirst();
     long count = cursor.getLong( 0 );
@@ -133,6 +139,7 @@ public class DatabaseHelper {
   }
   
   public Network getNetwork( String bssid ) {
+    checkDB();
     Network retval = null;
     String[] args = new String[]{ bssid };
     Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
@@ -149,9 +156,7 @@ public class DatabaseHelper {
   }
   
   public long getLastUpload() {
-    if ( ! db.isOpen() ) {
-      open();
-    }
+    checkDB();
     Cursor cursor = db.rawQuery("SELECT lastupload FROM " + UPLOAD_TABLE + " WHERE key = 0", null);
     long maxId = -1L;
     if ( cursor.getCount() > 0 ) {
@@ -163,9 +168,7 @@ public class DatabaseHelper {
   }
   
   public void lastUpload( long maxId ) {
-    if ( ! db.isOpen() ) {
-      open();
-    }
+    checkDB();
     WigleAndroid.info("updating lastUpload maxId: " + maxId );
     
     ContentValues values = new ContentValues();
@@ -175,9 +178,7 @@ public class DatabaseHelper {
   }
   
   public Cursor networkIterator( long fromId ) {
-    if ( ! db.isOpen() ) {
-      open();
-    }
+    checkDB();
     WigleAndroid.info("networkIterator fromId: " + fromId );
     String[] args = new String[]{ Long.toString( fromId ) };
     return db.rawQuery("SELECT _id,bssid,level,lat,lon,time FROM location WHERE _id > ?", args);

@@ -1,0 +1,64 @@
+package net.wigle.wigleandroid;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+
+public class WigleService extends Service {
+  private static final int NOTIFICATION_ID = 1;
+
+  @Override
+  public IBinder onBind( Intent intent ) {
+    return null;
+  }
+  
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    WigleAndroid.info("service: oncreate");
+    setupNotification();
+  }
+  
+  @Override
+  public void onDestroy() {
+    super.onDestroy();
+    WigleAndroid.info("service: ondestroy");
+    shutdownNotification();
+  }
+  
+  @Override
+  public void finalize() {
+    WigleAndroid.info("service: finalize");
+    // shutdownNotification();
+  }
+  
+  private void shutdownNotification() {
+    NotificationManager notificationManager = 
+      (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+    notificationManager.cancel( NOTIFICATION_ID );
+  }
+  
+  private void setupNotification() {
+    NotificationManager notificationManager = 
+      (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+    
+    int icon = R.drawable.wiglewifi;
+    CharSequence tickerText = "Wigle Wifi Service";
+    long when = System.currentTimeMillis();
+    Notification notification = new Notification(icon, tickerText, when);
+    
+    Context context = getApplicationContext();
+    CharSequence contentTitle = "Wigle Wifi Service";
+    CharSequence contentText = "Wigle Wifi Service";
+    Intent notificationIntent = new Intent( this, WigleAndroid.class );
+    PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+    
+    notificationManager.notify(NOTIFICATION_ID, notification);
+  }
+  
+}

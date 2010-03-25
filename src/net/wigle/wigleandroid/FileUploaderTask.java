@@ -35,7 +35,8 @@ public class FileUploaderTask extends Thread {
     BAD_USERNAME("Fail", "Username not set"),
     BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
     EXCEPTION("Fail", "Exception"),
-    BAD_LOGIN("Fail", "Login failed, check password?");
+    BAD_LOGIN("Fail", "Login failed, check password?"),
+    UPLOADING("Working...", "Uploading File");
     
     private final String title;
     private final String message;
@@ -61,6 +62,10 @@ public class FileUploaderTask extends Thread {
       @Override
       public void handleMessage(Message msg) {
         Status status = Status.values()[ msg.what ];
+        if ( Status.UPLOADING.equals( status ) ) {
+          pd.setMessage( status.getMessage() );
+          return;
+        }
         pd.dismiss();
         AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
         builder.setCancelable( false );
@@ -163,7 +168,7 @@ public class FileUploaderTask extends Thread {
       fos.close();
       
       // show on the UI
-      pd.setMessage( "Uploading " + linecount + " line file.." );
+      handler.sendEmptyMessage( Status.UPLOADING.ordinal() );
       
       // send file
       FileInputStream fis = hasSD ? new FileInputStream( file ) 
@@ -175,18 +180,15 @@ public class FileUploaderTask extends Thread {
       String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params );
       
       if ( response.indexOf("uploaded successfully") > 0 ) {
-        pd.setMessage( "Success uploading " + linecount + " line file." );
         status = Status.SUCCESS;
         dbHelper.lastUpload( maxId );
       }
       else if ( response.indexOf("does not match login") > 0 ) {
         status = Status.BAD_LOGIN;
-        pd.setMessage( status.getMessage() );
       }
       else {
         WigleAndroid.error("fail: " + response );
         status = Status.FAIL;
-        pd.setMessage( status.getMessage() );
       }
     } 
     catch (FileNotFoundException e) {
@@ -194,13 +196,11 @@ public class FileUploaderTask extends Thread {
       e.printStackTrace();
       WigleAndroid.error( "file problem: " + e );
       status = Status.EXCEPTION;
-      pd.setMessage( status.getMessage() );
     }
     catch ( IOException ex ) {
       ex.printStackTrace();
       WigleAndroid.error( "file problem: " + ex );
       status = Status.EXCEPTION;
-      pd.setMessage( status.getMessage() );
     }
     
     return status;

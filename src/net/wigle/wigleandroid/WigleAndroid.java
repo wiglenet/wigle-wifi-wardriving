@@ -7,9 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -20,6 +22,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +46,7 @@ public class WigleAndroid extends Activity {
     private LocationListener locationListener;
     private Listener gpsStatusListener;
     private DatabaseHelper dbHelper;
+    private Intent serviceIntent;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -64,6 +68,7 @@ public class WigleAndroid extends Activity {
         setContentView(R.layout.main);
         currentNetworks = new ConcurrentHashMap<String,Network>();
         
+        setupService();
         setupDatabase();
         setupUploadButton();
         setupList();
@@ -138,9 +143,14 @@ public class WigleAndroid extends Activity {
             this.startActivity( intent );
             return true;
           case MENU_EXIT:
+            if ( serviceIntent != null ) {
+              // stop the service, so when we die it's both stopped and unbound and will die
+              this.stopService( serviceIntent );
+            }
+            // call over to finish
             finish();
             // actually kill            
-            System.exit( 0 );
+            //System.exit( 0 );
             return true;
         }
         return false;
@@ -198,7 +208,7 @@ public class WigleAndroid extends Activity {
         registerReceiver( new BroadcastReceiver(){
             public void onReceive(Context c, Intent i){
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
-              debug( "networks: " + results.size() );
+              
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
               boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
               if ( showCurrent ) {
@@ -233,8 +243,11 @@ public class WigleAndroid extends Activity {
               
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
-              tv.setText( "Current: " + results.size() + " Run: " + currentNetworks.size()
-                  + " DB: " + dbHelper.getNetworkCount() + " Loc: " + dbHelper.getLocationCount() );
+              String stats = "Current: " + results.size() + " Run: " + currentNetworks.size()
+                + " DB: " + dbHelper.getNetworkCount() + " Loc: " + dbHelper.getLocationCount();
+              tv.setText( stats );
+              
+              // WigleAndroid.info( stats );
               
               // notify
               listAdapter.notifyDataSetChanged();              
@@ -278,6 +291,7 @@ public class WigleAndroid extends Activity {
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
+            // WigleAndroid.info("newlocation: " + newLocation);
             location = newLocation;
             setLocationUI( location );
           }
@@ -302,6 +316,9 @@ public class WigleAndroid extends Activity {
         
         tv = (TextView) findViewById( R.id.LocationTextView03 );
         tv.setText( "+/- " + location.getAccuracy() + "m" );
+        
+        tv = (TextView) findViewById( R.id.LocationTextView04 );
+        tv.setText( "Alt: " + location.getAltitude() + "m" );
       }
     }
     
@@ -312,6 +329,29 @@ public class WigleAndroid extends Activity {
             uploadFile();
           }
         });
+    }
+    
+    private void setupService() {
+      serviceIntent = new Intent( this, WigleService.class );
+
+      ComponentName compName = startService( serviceIntent );
+      if ( compName == null ) {
+        WigleAndroid.error( "startService() failed!" );
+      }
+      else {
+        WigleAndroid.info( "service started ok: " + compName );
+      }
+      
+      ServiceConnection conn = new ServiceConnection(){
+        public void onServiceConnected( ComponentName name, IBinder iBinder) {
+          WigleAndroid.info( name + " service connected" ); 
+        }
+        public void onServiceDisconnected( ComponentName name ) {
+          WigleAndroid.info( name + " service disconnected" );
+        }
+      };
+      int flags = 0;
+      this.bindService(serviceIntent, conn, flags);
     }
     
     private void uploadFile(){

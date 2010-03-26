@@ -5,15 +5,9 @@
 	    android:layout_height="fill_parent"
 	    >
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	    android:orientation="horizontal"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	    >
-	<!-- First row -->    
-	<TextView android:text="ssid" android:id="@+id/ssid" android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"></TextView>	
-</LinearLayout>
+<!-- First row -->    
+<TextView android:text="ssid" android:id="@+id/ssid" android:layout_width="fill_parent" 
+	android:layout_height="wrap_content"></TextView>	
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:orientation="horizontal"
@@ -21,8 +15,10 @@
 	    android:layout_height="fill_parent"
 	    >
 	<!-- Second row -->
-	<TextView android:text="bssid" android:id="@+id/detail" android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"></TextView>	
+	<TextView android:text="level" android:id="@+id/level_string" android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"></TextView>
+	<TextView android:text="detail" android:id="@+id/detail" android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" android:layout_weight="5"></TextView>	
 </LinearLayout>
 
 </LinearLayout>

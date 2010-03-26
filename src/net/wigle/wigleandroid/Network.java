@@ -17,6 +17,10 @@ public class Network {
   private int level;
   private final Integer channel;
   private final String showCapabilities;
+  private String detail;
+  
+  private static final String BAR_STRING = " | ";
+  private static final String DASH_STRING = " - ";
   
   private static final Map<Integer,Integer> freqToChan;
   static {
@@ -129,6 +133,19 @@ public class Network {
   
   public void setLevel( int level ) {
     this.level = level;
+  }
+  
+  public String getDetail() {
+    if ( detail == null ) {
+      Integer chan = channel != null ? channel : frequency;
+      StringBuilder detailBuild = new StringBuilder( 40 );
+      detailBuild.append( BAR_STRING ).append( bssid );
+      detailBuild.append( DASH_STRING ).append( chan );
+      detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
+      detail = detailBuild.toString();
+    }
+    
+    return detail;
   }
 
 }

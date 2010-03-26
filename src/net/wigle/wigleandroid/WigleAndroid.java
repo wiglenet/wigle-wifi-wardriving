@@ -45,6 +45,7 @@ public class WigleAndroid extends Activity {
     private DatabaseHelper dbHelper;
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
+    private String savedStats;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -84,6 +85,10 @@ public class WigleAndroid extends Activity {
           this.dbHelper = retained.dbHelper;
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
+          this.savedStats = retained.savedStats;
+          
+          TextView tv = (TextView) findViewById( R.id.stats );
+          tv.setText( savedStats );
         }
         else {
           runNetworks = new HashSet<String>();
@@ -193,6 +198,8 @@ public class WigleAndroid extends Activity {
       // could be set by nonconfig retain
       if ( dbHelper == null ) {
         dbHelper = new DatabaseHelper();
+        dbHelper.open();
+        dbHelper.start();
       }
       
       dbHelper.checkDB();
@@ -206,6 +213,8 @@ public class WigleAndroid extends Activity {
         listAdapter = new ArrayAdapter<Network>( this, R.layout.row ) {
           @Override
           public View getView( int position, View convertView, ViewGroup parent ) {
+            // long start = System.currentTimeMillis();
+            
             View row;
         
             if ( null == convertView ) {
@@ -221,16 +230,13 @@ public class WigleAndroid extends Activity {
             TextView tv = (TextView) row.findViewById( R.id.ssid );              
             tv.setText( network.getSsid() );
               
-            int channel = network.getChannel() != null ? network.getChannel() : network.getFrequency();
-              
-            tv = (TextView) row.findViewById( R.id.detail ); 
-            StringBuilder detail = new StringBuilder();
-            detail.append( network.getLevel() );
-            detail.append( " | " ).append( network.getBssid() );
-            detail.append( " - " ).append( channel );
-            detail.append( " - " ).append( network.getShowCapabilities() );
-              
-            tv.setText( detail.toString() );
+            tv = (TextView) row.findViewById( R.id.level_string );
+            tv.setText( Integer.toString( network.getLevel() ) );
+            
+            tv = (TextView) row.findViewById( R.id.detail );
+            String det = network.getDetail();
+            tv.setText( det );
+            // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );
         
             return row;
           }
@@ -246,7 +252,8 @@ public class WigleAndroid extends Activity {
         
         // wifi scan listener
         wifiReceiver = new BroadcastReceiver(){
-            public void onReceive(Context c, Intent i){
+            public void onReceive( Context context, Intent intent ){
+              long start = System.currentTimeMillis();
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
               
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
@@ -254,10 +261,24 @@ public class WigleAndroid extends Activity {
               if ( showCurrent ) {
                 listAdapter.clear();
               }
+              
               for ( ScanResult result : results ) {                
                 Network network = new Network( result );
-                runNetworks.add( result.BSSID );
-                listAdapter.add( network );                  
+                boolean added = runNetworks.add( result.BSSID );
+                // don't add if we are showing all the nets and this ain't new
+                if ( showCurrent || added ) {
+                  listAdapter.add( network );  
+                }
+                else {
+                  // not showing current, and not a new thing, go find the network and update the level
+                  // this is O(n), ohwell, that's why showCurrent is the default config.
+                  for ( int index = 0; index < listAdapter.getCount(); index++ ) {
+                    Network testNet = listAdapter.getItem(index);
+                    if ( testNet.getBssid().equals( network.getBssid() ) ) {
+                      testNet.setLevel( result.level );
+                    }
+                  }
+                }
                 
                 if ( location != null && dbHelper != null ) {
                   dbHelper.addObservation( network, location );
@@ -266,14 +287,21 @@ public class WigleAndroid extends Activity {
               
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
-              String stats = "Current: " + results.size() + " Run: " + runNetworks.size()
-                + " DB: " + dbHelper.getNetworkCount() + " Locs: " + dbHelper.getLocationCount();
-              tv.setText( stats );
+              StringBuilder builder = new StringBuilder( 40 );
+              builder.append( "Current: " ).append( results.size() );
+              builder.append( " Run: " ).append( runNetworks.size() );
+              builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
+              builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
+              savedStats = builder.toString();
+              tv.setText( savedStats );
               
-              // WigleAndroid.info( stats );
+              // WigleAndroid.info( savedStats );
               
               // notify
-              listAdapter.notifyDataSetChanged();              
+              listAdapter.notifyDataSetChanged();
+              
+              long now = System.currentTimeMillis();
+              status( "Scan Complete. " + (now - start) + "ms" );
             }
           };
         
@@ -326,9 +354,11 @@ public class WigleAndroid extends Activity {
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
+            // long start = System.currentTimeMillis();
             // WigleAndroid.info("newlocation: " + newLocation);
             location = newLocation;
             setLocationUI( WigleAndroid.this, location );
+            // status( "location done. ms: " + (System.currentTimeMillis() - start ) );
           }
           public void onProviderDisabled( String provider ) {}
           public void onProviderEnabled( String provider ) {}
@@ -412,5 +442,13 @@ public class WigleAndroid extends Activity {
     }
     public static void error( String value ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+    }
+    private int statusCount = 0;
+    public void status( String status ) {
+      statusCount++;
+      status = statusCount + ") " + status;
+      info( status );
+      TextView tv = (TextView) findViewById( R.id.status );
+      tv.setText( status );
     }
 }

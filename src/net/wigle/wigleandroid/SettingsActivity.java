@@ -72,7 +72,7 @@ public class SettingsActivity extends Activity {
       user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "") );
       user.addTextChangedListener( new SetWatcher() {
         public void onTextChanged(String s) {
-          WigleAndroid.debug("user: " + s);
+          // WigleAndroid.debug("user: " + s);
           editor.putString( WigleAndroid.PREF_USERNAME, s.trim() );
           editor.commit();
         } 
@@ -81,7 +81,7 @@ public class SettingsActivity extends Activity {
       pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "") );
       pass.addTextChangedListener( new SetWatcher() {
         public void onTextChanged(String s) {
-          WigleAndroid.debug("pass: " + s);
+          // WigleAndroid.debug("pass: " + s);
           editor.putString( WigleAndroid.PREF_PASSWORD, s.trim() );
           editor.commit();
         } 

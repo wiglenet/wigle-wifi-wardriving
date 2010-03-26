@@ -21,7 +21,8 @@ public class DatabaseHelper {
     + "bssid varchar(20) primary key not null,"
     + "ssid text not null,"
     + "frequency int not null,"
-    + "capabilities text not null"
+    + "capabilities text not null,"
+    + "lasttime long not null"
     + ")";
   
   private static final String LOCATION_TABLE = "location";
@@ -76,8 +77,8 @@ public class DatabaseHelper {
     }
   }
   
-  private void checkDB() {
-    if ( ! db.isOpen() ) {
+  public void checkDB() {
+    if ( db == null || ! db.isOpen() ) {
       WigleAndroid.info( "re-opening db in checkDB" );
       open();
     }
@@ -87,31 +88,30 @@ public class DatabaseHelper {
     checkDB();
     ContentValues values = new ContentValues();
     String[] args = new String[]{ network.getBssid() };    
-    Cursor cursor = db.rawQuery("SELECT bssid FROM network WHERE bssid = ?", args );
-    
+    Cursor cursor = db.rawQuery("SELECT bssid,lasttime FROM network WHERE bssid = ?", args );
+    long lasttime;
     if ( cursor.getCount() == 0 ) {    
-      WigleAndroid.debug("inserting net: " + network.getSsid() );
+      // WigleAndroid.debug("inserting net: " + network.getSsid() );
       
       values.put("bssid", network.getBssid() );
       values.put("ssid", network.getSsid() );
       values.put("frequency", network.getFrequency() );
       values.put("capabilities", network.getCapabilities() );
+      values.put("lasttime", location.getTime() );
       db.replace(NETWORK_TABLE, null, values);
+      
+      lasttime = location.getTime();
     }
-    cursor.close();
-    
-    cursor = db.rawQuery("SELECT time FROM location WHERE bssid = ? ORDER BY _id DESC LIMIT 1", args );
-    long time = 0;
-    if ( cursor.getCount() > 0 ) {
+    else {
       cursor.moveToFirst();
-      time = cursor.getLong(0);
+      lasttime = cursor.getLong(1);
     }
     cursor.close();
     
     long now = System.currentTimeMillis();
     // WigleAndroid.debug("time: " + time + " now: " + now + " ssid: " + network.getSsid() );
-    if ( now - time > LOC_DELAY ) {
-      WigleAndroid.debug("inserting loc: " + network.getSsid() );
+    if ( now - lasttime > LOC_DELAY ) {
+      // WigleAndroid.debug("inserting loc: " + network.getSsid() );
       values.clear();
       values.put("bssid", network.getBssid() );
       values.put("level", network.getLevel() );
@@ -121,6 +121,12 @@ public class DatabaseHelper {
       values.put("accuracy", location.getAccuracy() );
       values.put("time", location.getTime() );
       db.insert( LOCATION_TABLE, null, values );
+      
+      // update the network with the lasttime
+      values.clear();
+      values.put("lasttime", location.getTime() );
+      args = new String[]{ network.getBssid() };
+      db.update( NETWORK_TABLE, values, "bssid = ?", args );
     }
   }
   

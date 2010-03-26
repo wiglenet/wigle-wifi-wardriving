@@ -27,7 +27,7 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView01"
-		android:text="Lat: "
+		android:text="Lat:   (Waiting for GPS..)"
 		/>
 		<TextView  
 		android:layout_width="wrap_content" 

@@ -110,7 +110,7 @@ class HttpFileUploader {
         b.append( (char)ch );
       }
       retval = b.toString();
-      WigleAndroid.debug( "Response: " + retval );
+      // WigleAndroid.debug( "Response: " + retval );
 
       dos.close();
     }

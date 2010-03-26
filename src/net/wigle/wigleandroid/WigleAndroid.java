@@ -1,8 +1,8 @@
 package net.wigle.wigleandroid;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -36,23 +36,25 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class WigleAndroid extends Activity {
-    // private static final String WIFI_LOCK_NAME = "wifilock";
-    private LayoutInflater mInflater;
-    private ArrayAdapter<String> listAdapter;
-    private Map<String,Network> currentNetworks;
+    // state. anything added here should be added to the retain copy-construction
+    private ArrayAdapter<Network> listAdapter;
+    private Set<String> runNetworks;
     private GpsStatus gpsStatus;
     private Location location;
     private Handler wifiTimer;
-    private LocationListener locationListener;
-    private Listener gpsStatusListener;
     private DatabaseHelper dbHelper;
-    private Intent serviceIntent;
+    private ServiceConnection serviceConnection;
+    private AtomicBoolean finishing;
+    
+    // created every time, even after retain
+    private Listener gpsStatusListener;
+    private LocationListener locationListener;
+    private BroadcastReceiver wifiReceiver;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
-    private final AtomicBoolean finishing = new AtomicBoolean( false );
     public static final String ENCODING = "ISO8859_1";
     
     // preferences
@@ -69,7 +71,24 @@ public class WigleAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        currentNetworks = new ConcurrentHashMap<String,Network>();
+        
+        Object stored = getLastNonConfigurationInstance();
+        if ( stored != null && stored instanceof WigleAndroid ) {
+          // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
+          WigleAndroid retained = (WigleAndroid) stored;
+          this.listAdapter = retained.listAdapter;
+          this.runNetworks = retained.runNetworks;
+          this.gpsStatus = retained.gpsStatus;
+          this.location = retained.location;
+          this.wifiTimer = retained.wifiTimer;
+          this.dbHelper = retained.dbHelper;
+          this.serviceConnection = retained.serviceConnection;
+          this.finishing = retained.finishing;
+        }
+        else {
+          runNetworks = new HashSet<String>();
+          finishing = new AtomicBoolean( false );
+        }
         
         setupService();
         setupDatabase();
@@ -80,38 +99,47 @@ public class WigleAndroid extends Activity {
     }
     
     @Override
+    public Object onRetainNonConfigurationInstance() {
+      // return this whole class to copy data from
+      return this;
+    }
+    
+    @Override
     public void onPause() {
-      info( "paused. networks: " + currentNetworks.size() );
+      info( "paused. networks: " + runNetworks.size() );
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "resumed. networks: " + currentNetworks.size() );
+      info( "resumed. networks: " + runNetworks.size() );
       super.onResume();
     }
     
     @Override
     public void onStart() {
-      info( "start. networks: " + currentNetworks.size() );
+      info( "start. networks: " + runNetworks.size() );
       super.onStart();
     }
     
     @Override
     public void onRestart() {
-      info( "restart. networks: " + currentNetworks.size() );
+      info( "restart. networks: " + runNetworks.size() );
       super.onRestart();
     }
     
     @Override
     public void onDestroy() {
-      info( "destroy. networks: " + currentNetworks.size() );
+      info( "destroy. networks: " + runNetworks.size() );
+      this.unregisterReceiver( wifiReceiver );
+      this.unbindService( serviceConnection );
       
       super.onDestroy();
     }
     
     @Override
     public void finish() {
+      info( "finish. networks: " + runNetworks.size() );
       finishing.set( true );
       
       // close the db. not in destroy, because it'll still write after that.
@@ -149,10 +177,9 @@ public class WigleAndroid extends Activity {
             this.startActivity( intent );
             return true;
           case MENU_EXIT:
-            if ( serviceIntent != null ) {
-              // stop the service, so when we die it's both stopped and unbound and will die
-              this.stopService( serviceIntent );
-            }
+            // stop the service, so when we die it's both stopped and unbound and will die
+            Intent serviceIntent = new Intent( this, WigleService.class );
+            this.stopService( serviceIntent );
             // call over to finish
             finish();
             // actually kill            
@@ -163,55 +190,62 @@ public class WigleAndroid extends Activity {
     }
     
     private void setupDatabase() {
-      dbHelper = new DatabaseHelper();
-      dbHelper.open();
+      // could be set by nonconfig retain
+      if ( dbHelper == null ) {
+        dbHelper = new DatabaseHelper();
+      }
+      
+      dbHelper.checkDB();
     }
     
     private void setupList() {
-        mInflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+      final LayoutInflater mInflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         
-        listAdapter = new ArrayAdapter<String>( this, R.layout.row ) {
-            @Override
-            public View getView( int position, View convertView, ViewGroup parent ) {
-              View row;
+      // may have been set by nonconfig retain
+      if ( listAdapter == null ) {
+        listAdapter = new ArrayAdapter<Network>( this, R.layout.row ) {
+          @Override
+          public View getView( int position, View convertView, ViewGroup parent ) {
+            View row;
         
-              if ( null == convertView ) {
-                row = mInflater.inflate( R.layout.row, null );
-              } else {
-                row = convertView;
-              }
-        
-              String bssid = getItem(position);
-              Network network = currentNetworks.get( bssid );
-              
-              TextView tv = (TextView) row.findViewById( R.id.ssid );              
-              tv.setText( network.getSsid() );
-              
-              int channel = network.getChannel() != null ? network.getChannel() : network.getFrequency();
-              
-              tv = (TextView) row.findViewById( R.id.detail ); 
-              StringBuilder detail = new StringBuilder();
-              detail.append( network.getLevel() );
-              detail.append( " | " ).append( network.getBssid() );
-              detail.append( " - " ).append( channel );
-              detail.append( " - " ).append( network.getShowCapabilities() );
-              
-              tv.setText( detail.toString() );
-        
-              return row;
+            if ( null == convertView ) {
+              row = mInflater.inflate( R.layout.row, null );
+            } 
+            else {
+              row = convertView;
             }
-          };
         
-        ListView listView = (ListView) findViewById( R.id.ListView01 );
-        listView.setAdapter( listAdapter ); 
+            Network network = getItem(position);
+            // info( "listing net: " + network.getBssid() );
+              
+            TextView tv = (TextView) row.findViewById( R.id.ssid );              
+            tv.setText( network.getSsid() );
+              
+            int channel = network.getChannel() != null ? network.getChannel() : network.getFrequency();
+              
+            tv = (TextView) row.findViewById( R.id.detail ); 
+            StringBuilder detail = new StringBuilder();
+            detail.append( network.getLevel() );
+            detail.append( " | " ).append( network.getBssid() );
+            detail.append( " - " ).append( channel );
+            detail.append( " - " ).append( network.getShowCapabilities() );
+              
+            tv.setText( detail.toString() );
+        
+            return row;
+          }
+        };
+      }
+               
+      ListView listView = (ListView) findViewById( R.id.ListView01 );
+      listView.setAdapter( listAdapter ); 
     }
     
     private void setupWifi() {
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        
         // wifi scan listener
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        registerReceiver( new BroadcastReceiver(){
+        wifiReceiver = new BroadcastReceiver(){
             public void onReceive(Context c, Intent i){
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
               
@@ -220,36 +254,19 @@ public class WigleAndroid extends Activity {
               if ( showCurrent ) {
                 listAdapter.clear();
               }
-              for ( ScanResult result : results ) {
-                Network network = currentNetworks.get( result.BSSID );
-                if ( network == null ) {
-                  debug( "new network: " + result.SSID );
-                  network = new Network( result );
-                  currentNetworks.put( result.BSSID, network );
-                  listAdapter.add( result.BSSID );                  
-                }
-                else if ( showCurrent ) {
-                  listAdapter.add( result.BSSID );
-                }
-                debug( "network: " + result.SSID + " level: " + result.level );
-                // always set new signal level
-                network.setLevel( result.level );
+              for ( ScanResult result : results ) {                
+                Network network = new Network( result );
+                runNetworks.add( result.BSSID );
+                listAdapter.add( network );                  
+                
                 if ( location != null && dbHelper != null ) {
                   dbHelper.addObservation( network, location );
                 }
               }
               
-              if ( ! showCurrent && listAdapter.getCount() != currentNetworks.size() ) {
-                // the showCurrent must have been on, and is now off, add everything
-                listAdapter.clear();
-                for ( String bssid : currentNetworks.keySet() ) {
-                  listAdapter.add( bssid );
-                }
-              }
-              
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
-              String stats = "Current: " + results.size() + " Run: " + currentNetworks.size()
+              String stats = "Current: " + results.size() + " Run: " + runNetworks.size()
                 + " DB: " + dbHelper.getNetworkCount() + " Locs: " + dbHelper.getLocationCount();
               tv.setText( stats );
               
@@ -258,36 +275,48 @@ public class WigleAndroid extends Activity {
               // notify
               listAdapter.notifyDataSetChanged();              
             }
-          }, intentFilter );
+          };
+        
+        // register
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        this.registerReceiver( wifiReceiver, intentFilter );
         
         // WifiLock wifiLock = wifiManager.createWifiLock( WIFI_LOCK_NAME );
-        // wifiLock.acquire();  
+        // wifiLock.acquire();
         
-        wifiTimer = new Handler();
-        Runnable mUpdateTimeTask = new Runnable() {
-          private static final long period = 1000L;
-          public void run() {              
-              // make sure the app isn't trying to finish
-              if ( ! finishing.get() ) {
-                debug( "timer start scan" );
-                wifiManager.startScan();
-                wifiTimer.postDelayed( this, period );
-              }
-          }
-        };
-        wifiTimer.removeCallbacks(mUpdateTimeTask);
-        wifiTimer.postDelayed(mUpdateTimeTask, 100);
-
-        // starts scan, sends event when done
-        boolean scanOK = wifiManager.startScan();
-        info( "startup finished. wifi scanOK: " + scanOK );        
+        // might not be null on a nonconfig retain
+        if ( wifiTimer == null ) {
+          wifiTimer = new Handler();
+          Runnable mUpdateTimeTask = new Runnable() {
+            private static final long period = 1000L;
+            public void run() {              
+                // make sure the app isn't trying to finish
+                if ( ! finishing.get() ) {
+                  // info( "timer start scan" );
+                  wifiManager.startScan();
+                  wifiTimer.postDelayed( this, period );
+                }
+                else {
+                  info( "finishing timer" );
+                }
+            }
+          };
+          wifiTimer.removeCallbacks(mUpdateTimeTask);
+          wifiTimer.postDelayed(mUpdateTimeTask, 100);
+  
+          // starts scan, sends event when done
+          boolean scanOK = wifiManager.startScan();
+          info( "startup finished. wifi scanOK: " + scanOK );
+        }
     }
     
     private void setupLocation() {
       // set on UI if we already have one
-      setLocationUI( location );
+      setLocationUI( this, location );
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      
       gpsStatusListener = new Listener(){
         public void onGpsStatusChanged( int event ) {
           gpsStatus = locationManager.getGpsStatus( gpsStatus );
@@ -299,7 +328,7 @@ public class WigleAndroid extends Activity {
           public void onLocationChanged( Location newLocation ) {
             // WigleAndroid.info("newlocation: " + newLocation);
             location = newLocation;
-            setLocationUI( location );
+            setLocationUI( WigleAndroid.this, location );
           }
           public void onProviderDisabled( String provider ) {}
           public void onProviderEnabled( String provider ) {}
@@ -312,18 +341,18 @@ public class WigleAndroid extends Activity {
       }
     }
     
-    private void setLocationUI( Location location ) {
+    private static void setLocationUI( Activity activity, Location location ) {
       if ( location != null ) {
-        TextView tv = (TextView) findViewById( R.id.LocationTextView01 );
+        TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
         tv.setText( "Lat: " + (float) location.getLatitude() );
         
-        tv = (TextView) findViewById( R.id.LocationTextView02 );
+        tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
         tv.setText( "Lon: " + (float) location.getLongitude() );
         
-        tv = (TextView) findViewById( R.id.LocationTextView03 );
+        tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
         tv.setText( "+/- " + location.getAccuracy() + "m" );
         
-        tv = (TextView) findViewById( R.id.LocationTextView04 );
+        tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
         tv.setText( "Alt: " + location.getAltitude() + "m" );
       }
     }
@@ -332,37 +361,41 @@ public class WigleAndroid extends Activity {
       Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() {
           public void onClick( View view ) {
-            uploadFile();
+            uploadFile( WigleAndroid.this, dbHelper );
           }
         });
     }
     
     private void setupService() {
-      serviceIntent = new Intent( this, WigleService.class );
-
-      ComponentName compName = startService( serviceIntent );
-      if ( compName == null ) {
-        WigleAndroid.error( "startService() failed!" );
-      }
-      else {
-        WigleAndroid.info( "service started ok: " + compName );
+      Intent serviceIntent = new Intent( this, WigleService.class );
+      
+      // could be set by nonconfig retain
+      if ( serviceConnection == null ) {
+        ComponentName compName = startService( serviceIntent );
+        if ( compName == null ) {
+          WigleAndroid.error( "startService() failed!" );
+        }
+        else {
+          WigleAndroid.info( "service started ok: " + compName );
+        }
+        
+        serviceConnection = new ServiceConnection(){
+          public void onServiceConnected( ComponentName name, IBinder iBinder) {
+            WigleAndroid.info( name + " service connected" ); 
+          }
+          public void onServiceDisconnected( ComponentName name ) {
+            WigleAndroid.info( name + " service disconnected" );
+          }
+        };  
       }
       
-      ServiceConnection conn = new ServiceConnection(){
-        public void onServiceConnected( ComponentName name, IBinder iBinder) {
-          WigleAndroid.info( name + " service connected" ); 
-        }
-        public void onServiceDisconnected( ComponentName name ) {
-          WigleAndroid.info( name + " service disconnected" );
-        }
-      };
       int flags = 0;
-      this.bindService(serviceIntent, conn, flags);
+      this.bindService(serviceIntent, serviceConnection, flags);
     }
     
-    private void uploadFile(){
+    private static void uploadFile( Context context, DatabaseHelper dbHelper ){
       info( "upload file" );
-      FileUploaderTask task = new FileUploaderTask( this, dbHelper );
+      FileUploaderTask task = new FileUploaderTask( context, dbHelper );
       task.start();
     }
     
@@ -375,12 +408,9 @@ public class WigleAndroid extends Activity {
       }
     }
     public static void info( String value ) {
-      Log.i( LOG_TAG, value );
-    }
-    public static void debug( String value ) {
-      Log.d( LOG_TAG, value );
+      Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
     public static void error( String value ) {
-      Log.e( LOG_TAG, value );
+      Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
 }

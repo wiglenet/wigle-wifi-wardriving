@@ -50,7 +50,7 @@ public class DatabaseHelper extends Thread {
     + ")";
   
   private SQLiteDatabase db;
-  private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( 128 );
+  private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( 256 );
   private AtomicBoolean done = new AtomicBoolean(false);
   private AtomicLong networkCount = new AtomicLong();
   private AtomicLong locationCount = new AtomicLong();

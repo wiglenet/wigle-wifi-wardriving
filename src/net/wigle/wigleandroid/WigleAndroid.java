@@ -46,6 +46,7 @@ public class WigleAndroid extends Activity {
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
     private String savedStats;
+    private int scanCount;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -86,6 +87,7 @@ public class WigleAndroid extends Activity {
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
           this.savedStats = retained.savedStats;
+          this.scanCount = retained.scanCount;
           
           TextView tv = (TextView) findViewById( R.id.stats );
           tv.setText( savedStats );
@@ -300,8 +302,10 @@ public class WigleAndroid extends Activity {
               // notify
               listAdapter.notifyDataSetChanged();
               
+              scanCount++;
               long now = System.currentTimeMillis();
-              status( "Scan Complete. " + (now - start) + "ms" );
+              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms" );
+              WigleAndroid.info( "DB Locations: " + dbHelper.getLocationCount() );
             }
           };
         
@@ -443,10 +447,8 @@ public class WigleAndroid extends Activity {
     public static void error( String value ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
-    private int statusCount = 0;
-    public void status( String status ) {
-      statusCount++;
-      status = statusCount + ") " + status;
+
+    private void status( String status ) {
       info( status );
       TextView tv = (TextView) findViewById( R.id.status );
       tv.setText( status );

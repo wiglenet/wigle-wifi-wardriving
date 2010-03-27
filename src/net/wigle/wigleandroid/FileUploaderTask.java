@@ -28,6 +28,27 @@ public class FileUploaderTask extends Thread {
   private final DatabaseHelper dbHelper;
   private final ProgressDialog pd;
   
+  private static final int WRITING_PERCENT_START = 10000;
+  private static final String COMMA = ",";
+  private static final byte[] COMMA_BYTES;
+  private static final byte[] NEWLINE_BYTES;
+  
+  static {
+    byte[] commaBytes = null;
+    byte[] newlineBytes = null;
+    try {
+      commaBytes = COMMA.getBytes( WigleAndroid.ENCODING );
+      newlineBytes = "\n".getBytes( WigleAndroid.ENCODING );
+    }
+    catch ( UnsupportedEncodingException ex ) {
+      WigleAndroid.error( "encoding exception: " + ex );
+    }
+    finally {
+      COMMA_BYTES = commaBytes;
+      NEWLINE_BYTES = newlineBytes;
+    }
+  }  
+  
   private enum Status {
     UNKNOWN("Unknown", "Unknown error"),
     FAIL( "Fail", "Fail" ),
@@ -36,7 +57,8 @@ public class FileUploaderTask extends Thread {
     BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
     EXCEPTION("Fail", "Exception"),
     BAD_LOGIN("Fail", "Login failed, check password?"),
-    UPLOADING("Working...", "Uploading File");
+    UPLOADING("Working...", "Uploading File"),
+    WRITING("Working...", "Writing File ");
     
     private final String title;
     private final String message;
@@ -56,11 +78,17 @@ public class FileUploaderTask extends Thread {
     this.context = context;
     this.dbHelper = dbHelper;
     
-    this.pd = ProgressDialog.show( context, "Working..", "Writing File", true, false );  
+    this.pd = ProgressDialog.show( context, Status.WRITING.title, Status.WRITING.getMessage(), true, false );  
     
     this.handler = new Handler() {
       @Override
       public void handleMessage(Message msg) {
+        if ( msg.what >= WRITING_PERCENT_START ) {
+          int percent = msg.what - WRITING_PERCENT_START;
+          pd.setMessage( Status.WRITING.getMessage() + percent + "%" );
+          return;
+        }
+        
         Status status = Status.values()[ msg.what ];
         if ( Status.UPLOADING.equals( status ) ) {
           pd.setMessage( status.getMessage() );
@@ -139,10 +167,13 @@ public class FileUploaderTask extends Thread {
       // write file
       long maxId = dbHelper.getLastUpload();
       Cursor cursor = dbHelper.networkIterator( maxId );
-      int linecount = 0;
-      if ( cursor.getCount() > 0 ) {
+      int lineCount = 0;
+      int total = cursor.getCount();
+      if ( total > 0 ) {
+        int lastSentPercent = 0;
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-          linecount++;
+          lineCount++;
+          
           // _id,bssid,level,lat,lon,time
           long id = cursor.getLong(0);
           if ( id > maxId ) {
@@ -151,19 +182,40 @@ public class FileUploaderTask extends Thread {
           String bssid = cursor.getString(1);
           Network network = dbHelper.getNetwork( bssid );
           String ssid = network.getSsid();
-          ssid = ssid.replaceAll(",", "_"); // comma isn't a legal ssid character, but just in case
+          if ( ssid.indexOf( COMMA ) >= 0 ) {
+            // comma isn't a legal ssid character, but just in case
+            ssid = ssid.replaceAll( COMMA, "_" ); 
+          }
           // WigleAndroid.debug("writing network: " + ssid );
-  
-          writeFos( fos, network.getBssid(), "," );
-          writeFos( fos, ssid, "," );
-          writeFos( fos, network.getCapabilities(), "," );
-          writeFos( fos, dateFormat.format( new Date( cursor.getLong(7) ) ), "," );
-          writeFos( fos, Integer.toString( network.getChannel() ), "," );
-          writeFos( fos, Integer.toString( cursor.getInt(2) ), "," );
-          writeFos( fos, Double.toString( cursor.getDouble(3) ), "," );
-          writeFos( fos, Double.toString( cursor.getDouble(4) ), "," );
-          writeFos( fos, Double.toString( cursor.getDouble(5) ), "," );
-          writeFos( fos, Double.toString( cursor.getDouble(6) ), "\n" );
+          
+          writeFos( fos, network.getBssid() );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, ssid );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, network.getCapabilities() );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, dateFormat.format( new Date( cursor.getLong(7) ) ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Integer.toString( network.getChannel() ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Integer.toString( cursor.getInt(2) ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Double.toString( cursor.getDouble(3) ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Double.toString( cursor.getDouble(4) ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Double.toString( cursor.getDouble(5) ) );
+          fos.write( COMMA_BYTES );
+          writeFos( fos, Double.toString( cursor.getDouble(6) ) );
+          fos.write( NEWLINE_BYTES );
+          
+          // update UI
+          int percentDone = (lineCount * 100) / total;
+          // only send up to 100 times
+          if ( percentDone > lastSentPercent ) {
+            handler.sendEmptyMessage( WRITING_PERCENT_START + percentDone );
+            lastSentPercent = percentDone;
+          }
         }
       }
       cursor.close();
@@ -208,13 +260,9 @@ public class FileUploaderTask extends Thread {
     return status;
   }
   
-  private void writeFos( OutputStream fos, String... data ) throws IOException, UnsupportedEncodingException {
+  private void writeFos( OutputStream fos, String data ) throws IOException, UnsupportedEncodingException {
     if ( data != null ) {
-      for ( String item : data ) {
-        if ( item != null ) {
-          fos.write( item.getBytes( WigleAndroid.ENCODING ) );
-        }
-      }
+      fos.write( data.getBytes( WigleAndroid.ENCODING ) );
     }
   }
    

@@ -7,6 +7,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,6 +24,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
@@ -30,24 +37,7 @@ public class FileUploaderTask extends Thread {
   
   private static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
-  private static final byte[] COMMA_BYTES;
-  private static final byte[] NEWLINE_BYTES;
-  
-  static {
-    byte[] commaBytes = null;
-    byte[] newlineBytes = null;
-    try {
-      commaBytes = COMMA.getBytes( WigleAndroid.ENCODING );
-      newlineBytes = "\n".getBytes( WigleAndroid.ENCODING );
-    }
-    catch ( UnsupportedEncodingException ex ) {
-      WigleAndroid.error( "encoding exception: " + ex );
-    }
-    finally {
-      COMMA_BYTES = commaBytes;
-      NEWLINE_BYTES = newlineBytes;
-    }
-  }  
+  private static final String NEWLINE = "\n";
   
   private enum Status {
     UNKNOWN("Unknown", "Unknown error"),
@@ -94,7 +84,10 @@ public class FileUploaderTask extends Thread {
           pd.setMessage( status.getMessage() );
           return;
         }
-        pd.dismiss();
+        // make sure we didn't progress dialog this somewhere
+        if ( pd.isShowing() ) {
+          pd.dismiss();
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
         builder.setCancelable( false );
         builder.setTitle( status.getTitle() );
@@ -159,18 +152,25 @@ public class FileUploaderTask extends Thread {
       
       FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
         : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
+
       GZIPOutputStream fos = new GZIPOutputStream( rawFos );
+
+      long start = System.currentTimeMillis();
       // name, version
       writeFos( fos, "WigleWifi-1.0\n" );
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file
-      long maxId = dbHelper.getLastUpload();
+      SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
+      long maxId = prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L );
       Cursor cursor = dbHelper.networkIterator( maxId );
       int lineCount = 0;
       int total = cursor.getCount();
       if ( total > 0 ) {
         int lastSentPercent = 0;
+        CharBuffer charBuffer = CharBuffer.allocate( 256 );
+        ByteBuffer byteBuffer = ByteBuffer.allocate( 256 );
+        CharsetEncoder encoder = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
           lineCount++;
           
@@ -188,26 +188,65 @@ public class FileUploaderTask extends Thread {
           }
           // WigleAndroid.debug("writing network: " + ssid );
           
-          writeFos( fos, network.getBssid() );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, ssid );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, network.getCapabilities() );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, dateFormat.format( new Date( cursor.getLong(7) ) ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Integer.toString( network.getChannel() ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Integer.toString( cursor.getInt(2) ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Double.toString( cursor.getDouble(3) ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Double.toString( cursor.getDouble(4) ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Double.toString( cursor.getDouble(5) ) );
-          fos.write( COMMA_BYTES );
-          writeFos( fos, Double.toString( cursor.getDouble(6) ) );
-          fos.write( NEWLINE_BYTES );
+          // reset the buffers
+          charBuffer.clear();
+          byteBuffer.clear();
+          // fill in the line
+          try {
+            charBuffer.append( network.getBssid() );
+            charBuffer.append( COMMA );
+            charBuffer.append( ssid );
+            charBuffer.append( COMMA );
+            charBuffer.append( network.getCapabilities() );
+            charBuffer.append( COMMA );
+            charBuffer.append( dateFormat.format( new Date( cursor.getLong(7) ) ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Integer.toString( network.getChannel() ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Integer.toString( cursor.getInt(2) ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Double.toString( cursor.getDouble(3) ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Double.toString( cursor.getDouble(4) ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Double.toString( cursor.getDouble(5) ) );
+            charBuffer.append( COMMA );
+            charBuffer.append( Double.toString( cursor.getDouble(6) ) );
+            charBuffer.append( NEWLINE );
+          }
+          catch ( BufferOverflowException ex ) {
+            WigleAndroid.info("buffer overflow: " + ex );
+            // double the buffer
+            charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
+            byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
+            // try again
+            cursor.moveToPrevious();
+            continue;
+          }
+          
+          // tell the encoder to stop here
+          charBuffer.limit( charBuffer.position() );
+          // tell the encoder to start at the beginning
+          charBuffer.position( 0 );
+          
+          // do the encoding
+          encoder.reset();
+          encoder.encode( charBuffer, byteBuffer, true );
+          encoder.flush( byteBuffer );
+          // byteBuffer = encoder.encode( charBuffer );  (old way)
+          
+          // figure out where in the byteBuffer to stop
+          int end = byteBuffer.position();
+          //if ( end == 0 ) {
+            // if doing the encode without giving a long-term byteBuffer (old way), the output
+            // byteBuffer position is zero, and the limit and capacity are how long to write for.
+          //  end = byteBuffer.limit();
+          //}
+          
+          // WigleAndroid.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
+          //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() + " end: " + end
+          //     + " result: " + result );
+          fos.write(byteBuffer.array(), byteBuffer.arrayOffset(), end );
           
           // update UI
           int percentDone = (lineCount * 100) / total;
@@ -220,6 +259,8 @@ public class FileUploaderTask extends Thread {
       }
       cursor.close();
       fos.close();
+      
+      WigleAndroid.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms" );
       
       // show on the UI
       handler.sendEmptyMessage( Status.UPLOADING.ordinal() );
@@ -235,7 +276,11 @@ public class FileUploaderTask extends Thread {
       
       if ( response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
-        dbHelper.lastUpload( maxId );
+        
+        // save in the prefs
+        final Editor editor = prefs.edit();
+        editor.putLong( WigleAndroid.PREF_DB_MARKER, maxId );
+        editor.commit();
       }
       else if ( response.indexOf("does not match login") > 0 ) {
         status = Status.BAD_LOGIN;

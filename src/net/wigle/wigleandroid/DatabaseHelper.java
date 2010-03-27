@@ -42,13 +42,6 @@ public class DatabaseHelper extends Thread {
     + "time long not null"
     + ")";
   
-  private static final String UPLOAD_TABLE = "upload";
-  private static final String UPLOAD_CREATE = 
-    "create table " + UPLOAD_TABLE + " ( "
-    + "key integer primary key not null,"
-    + "lastupload long not null"
-    + ")";
-  
   private SQLiteDatabase db;
   private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( 256 );
   private AtomicBoolean done = new AtomicBoolean(false);
@@ -78,6 +71,7 @@ public class DatabaseHelper extends Thread {
       }
       catch ( InterruptedException ex ) {
         // no worries
+        WigleAndroid.info("db queue take interrupted");
       }
     }
   }
@@ -102,7 +96,6 @@ public class DatabaseHelper extends Thread {
       WigleAndroid.info( "creating tables" );
       db.execSQL(NETWORK_CREATE);
       db.execSQL(LOCATION_CREATE);
-      db.execSQL(UPLOAD_CREATE);
     }
   }
   
@@ -111,6 +104,15 @@ public class DatabaseHelper extends Thread {
    */
   public void close() {
     done.set( true );
+    // interrupt the take, if any
+    this.interrupt();
+    // give time for db to finish any writes
+    int countdown = 50;
+    while ( this.isAlive() && countdown > 0 ) {
+      WigleAndroid.info("db still alive. countdown: " + countdown );
+      WigleAndroid.sleep(100L);
+      countdown--;
+    }
     if ( db.isOpen() ) {
       db.close();
     }
@@ -233,28 +235,6 @@ public class DatabaseHelper extends Thread {
     }
     cursor.close();
     return retval;
-  }
-  
-  public long getLastUpload() {
-    checkDB();
-    Cursor cursor = db.rawQuery("SELECT lastupload FROM " + UPLOAD_TABLE + " WHERE key = 0", null);
-    long maxId = -1L;
-    if ( cursor.getCount() > 0 ) {
-      cursor.moveToFirst();
-      maxId = cursor.getLong(0);
-    }
-    cursor.close();
-    return maxId;
-  }
-  
-  public void lastUpload( long maxId ) {
-    checkDB();
-    WigleAndroid.info("updating lastUpload maxId: " + maxId );
-    
-    ContentValues values = new ContentValues();
-    values.put( "key", 0);
-    values.put("lastupload", maxId);
-    db.replace(UPLOAD_TABLE, null, values);
   }
   
   public Cursor networkIterator( long fromId ) {

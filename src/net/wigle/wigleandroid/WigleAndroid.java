@@ -64,7 +64,9 @@ public class WigleAndroid extends Activity {
     static final String PREF_USERNAME = "username";
     static final String PREF_PASSWORD = "password";
     static final String PREF_SHOW_CURRENT = "showCurrent";
-    static final String PREF_BE_ANONYMOUS= "beAnonymous";
+    static final String PREF_BE_ANONYMOUS = "beAnonymous";
+    static final String PREF_DB_MARKER = "dbMarker";
+    static final String PREF_SCAN_PERIOD = "scanPeriod";
     
     static final String ANONYMOUS = "anonymous";
     
@@ -258,7 +260,7 @@ public class WigleAndroid extends Activity {
               long start = System.currentTimeMillis();
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
               
-              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
+              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
               if ( showCurrent ) {
                 listAdapter.clear();
@@ -305,7 +307,6 @@ public class WigleAndroid extends Activity {
               scanCount++;
               long now = System.currentTimeMillis();
               status( "Scan " + scanCount + " Complete in " + (now - start) + "ms" );
-              WigleAndroid.info( "DB Locations: " + dbHelper.getLocationCount() );
             }
           };
         
@@ -320,13 +321,14 @@ public class WigleAndroid extends Activity {
         // might not be null on a nonconfig retain
         if ( wifiTimer == null ) {
           wifiTimer = new Handler();
+          final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0);
           Runnable mUpdateTimeTask = new Runnable() {
-            private static final long period = 1000L;
             public void run() {              
                 // make sure the app isn't trying to finish
                 if ( ! finishing.get() ) {
                   // info( "timer start scan" );
                   wifiManager.startScan();
+                  long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
                   wifiTimer.postDelayed( this, period );
                 }
                 else {

@@ -8,9 +8,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class SettingsActivity extends Activity {
@@ -93,6 +97,19 @@ public class SettingsActivity extends Activity {
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
               editor.putBoolean( WigleAndroid.PREF_SHOW_CURRENT, isChecked );
               editor.commit();
+          }
+      });
+      
+      // db marker reset button and text
+      final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
+      tv.setText( "Max upload id: " + prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L ) );
+      
+      final Button resetMaxidButton = (Button) findViewById(R.id.reset_maxid_button);
+      resetMaxidButton.setOnClickListener( new OnClickListener() {
+        public void onClick( View buttonView ) {             
+              editor.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
+              editor.commit();
+              tv.setText( "Max upload id: 0" );
           }
       });
   }

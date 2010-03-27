@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     >
 <CheckBox android:id="@+id/be_anonymous"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/be_anonymous" />
 <TextView  
@@ -30,9 +30,41 @@
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
         
+<LinearLayout
+	android:id="@+id/horizontalLine"
+	android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#707070"
+	/> 
+
 <CheckBox android:id="@+id/edit_showcurrent"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
+
+<!-- LinearLayout
+	android:id="@+id/horizontalLine2"
+	android:layout_width="fill_parent"
+	android:layout_height="1dip"
+	android:background="#333333"
+	/--> 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/reset_maxid_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/reset_maxid_button" android:layout_weight="0"></Button>
+	<TextView
+		android:id="@+id/reset_maxid_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/reset_maxid_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
 
 </LinearLayout>

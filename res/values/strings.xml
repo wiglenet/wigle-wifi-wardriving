@@ -8,4 +8,6 @@
     <string name="password">WiGLE Password</string>
     <string name="show_current">Show current networks only</string>
     <string name="be_anonymous">Upload anonymously</string>
+    <string name="reset_maxid_button">Reset DB marker</string>
+    <string name="reset_maxid_text">Latest upload marker:</string>
 </resources>

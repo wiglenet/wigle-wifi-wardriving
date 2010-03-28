@@ -12,10 +12,14 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.FieldPosition;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
@@ -171,6 +175,15 @@ public class FileUploaderTask extends Thread {
         CharBuffer charBuffer = CharBuffer.allocate( 256 );
         ByteBuffer byteBuffer = ByteBuffer.allocate( 256 );
         CharsetEncoder encoder = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
+        NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
+        if ( numberFormat instanceof DecimalFormat ) {
+          DecimalFormat dc = (DecimalFormat) numberFormat;
+          dc.setMaximumFractionDigits( 16 );
+        }
+        StringBuffer stringBuffer = new StringBuffer();
+        FieldPosition fp = new FieldPosition(NumberFormat.INTEGER_FIELD);
+        Date date = new Date();
+        // loop!
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
           lineCount++;
           
@@ -199,19 +212,20 @@ public class FileUploaderTask extends Thread {
             charBuffer.append( COMMA );
             charBuffer.append( network.getCapabilities() );
             charBuffer.append( COMMA );
-            charBuffer.append( dateFormat.format( new Date( cursor.getLong(7) ) ) );
+            date.setTime( cursor.getLong(7) );
+            singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
             charBuffer.append( COMMA );
-            charBuffer.append( Integer.toString( network.getChannel() ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, network.getChannel() );
             charBuffer.append( COMMA );
-            charBuffer.append( Integer.toString( cursor.getInt(2) ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
             charBuffer.append( COMMA );
-            charBuffer.append( Double.toString( cursor.getDouble(3) ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
             charBuffer.append( COMMA );
-            charBuffer.append( Double.toString( cursor.getDouble(4) ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
             charBuffer.append( COMMA );
-            charBuffer.append( Double.toString( cursor.getDouble(5) ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
             charBuffer.append( COMMA );
-            charBuffer.append( Double.toString( cursor.getDouble(6) ) );
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
             charBuffer.append( NEWLINE );
           }
           catch ( BufferOverflowException ex ) {
@@ -309,6 +323,30 @@ public class FileUploaderTask extends Thread {
     if ( data != null ) {
       fos.write( data.getBytes( WigleAndroid.ENCODING ) );
     }
+  }
+  
+  private void singleCopyNumberFormat( NumberFormat numberFormat, StringBuffer stringBuffer, CharBuffer charBuffer,
+      FieldPosition fp, int number ) {
+    stringBuffer.setLength( 0 );
+    numberFormat.format( number, stringBuffer, fp );
+    stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
+    charBuffer.position( charBuffer.position() + stringBuffer.length() );
+  }
+  
+  private void singleCopyNumberFormat( NumberFormat numberFormat, StringBuffer stringBuffer, CharBuffer charBuffer,
+      FieldPosition fp, double number ) {
+    stringBuffer.setLength( 0 );
+    numberFormat.format( number, stringBuffer, fp );
+    stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
+    charBuffer.position( charBuffer.position() + stringBuffer.length() );
+  }
+  
+  private void singleCopyDateFormat( DateFormat dateFormat, StringBuffer stringBuffer, CharBuffer charBuffer,
+      FieldPosition fp, Date date ) {
+    stringBuffer.setLength( 0 );
+    dateFormat.format( date, stringBuffer, fp );
+    stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
+    charBuffer.position( charBuffer.position() + stringBuffer.length() );
   }
    
 }

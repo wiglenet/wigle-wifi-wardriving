@@ -10,4 +10,5 @@
     <string name="be_anonymous">Upload anonymously</string>
     <string name="reset_maxid_button">Reset DB marker</string>
     <string name="reset_maxid_text">Latest upload marker:</string>
+    <string name="period_text">Milliseconds between scans</string>
 </resources>

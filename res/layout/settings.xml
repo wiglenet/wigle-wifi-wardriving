@@ -42,13 +42,6 @@
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
 
-<!-- LinearLayout
-	android:id="@+id/horizontalLine2"
-	android:layout_width="fill_parent"
-	android:layout_height="1dip"
-	android:background="#333333"
-	/--> 
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
@@ -63,6 +56,28 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:text="@string/reset_maxid_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Spinner android:id="@+id/period_spinner"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:drawSelectorOnTop="true"
+		android:paddingTop="0dip"
+		android:paddingBottom="0dip"
+		android:layout_weight="0"
+		/>
+	<TextView
+		android:id="@+id/period_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/period_text"
 		android:layout_weight="5"
 		/>
 </LinearLayout>

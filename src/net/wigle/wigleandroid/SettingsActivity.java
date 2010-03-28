@@ -10,11 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class SettingsActivity extends Activity {
@@ -112,6 +116,35 @@ public class SettingsActivity extends Activity {
               tv.setText( "Max upload id: 0" );
           }
       });
+      
+      // period spinner
+      final Spinner spinner = (Spinner) findViewById( R.id.period_spinner );
+      ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+          this, android.R.layout.simple_spinner_dropdown_item);
+      final long[] periods = new long[]{ 500,1000,2000,5000,10000 };
+      long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, 1000L);
+      int periodIndex = 0;
+      for (int i = 0; i < periods.length; i++) {
+        adapter.add( Long.toString( periods[i] ) );
+        if ( period == periods[i] ) {
+          periodIndex = i;
+        }
+      }
+      
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      spinner.setAdapter(adapter);
+      spinner.setSelection( periodIndex );
+      spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+        public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+          // set pref
+          long period = periods[position];
+          WigleAndroid.info("setting period: " + period );
+          editor.putLong( WigleAndroid.PREF_SCAN_PERIOD, period );
+          editor.commit();
+        }
+        public void onNothingSelected(AdapterView<?> arg0) {}
+        });    
+  
   }
   
   private static final int MENU_RETURN = 12;

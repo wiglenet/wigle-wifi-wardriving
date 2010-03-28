@@ -310,6 +310,12 @@ public class WigleAndroid extends Activity {
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
               
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+              long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
+              if ( period < 1000L ) {
+                // under a second is hard to hit, treat as "continuous", so request scan in here
+                wifiManager.startScan();
+              }
+              
               boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
               if ( showCurrent ) {
                 listAdapter.clear();
@@ -387,6 +393,7 @@ public class WigleAndroid extends Activity {
                   // info( "timer start scan" );
                   wifiManager.startScan();
                   long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                  // WigleAndroid.info("wifitimer: " + period );
                   wifiTimer.postDelayed( this, period );
                 }
                 else {

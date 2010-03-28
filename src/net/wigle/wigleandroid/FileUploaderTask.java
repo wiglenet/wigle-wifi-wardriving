@@ -170,6 +170,8 @@ public class FileUploaderTask extends Thread {
       Cursor cursor = dbHelper.networkIterator( maxId );
       int lineCount = 0;
       int total = cursor.getCount();
+      long fileWriteMillis = 0;
+      long netMillis = 0;
       if ( total > 0 ) {
         int lastSentPercent = 0;
         CharBuffer charBuffer = CharBuffer.allocate( 256 );
@@ -193,7 +195,9 @@ public class FileUploaderTask extends Thread {
             maxId = id;
           }
           String bssid = cursor.getString(1);
+          long netStart = System.currentTimeMillis();
           Network network = dbHelper.getNetwork( bssid );
+          netMillis += System.currentTimeMillis() - netStart;
           String ssid = network.getSsid();
           if ( ssid.indexOf( COMMA ) >= 0 ) {
             // comma isn't a legal ssid character, but just in case
@@ -260,7 +264,9 @@ public class FileUploaderTask extends Thread {
           // WigleAndroid.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
           //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() + " end: " + end
           //     + " result: " + result );
+          long writeStart = System.currentTimeMillis();
           fos.write(byteBuffer.array(), byteBuffer.arrayOffset(), end );
+          fileWriteMillis += System.currentTimeMillis() - writeStart;
           
           // update UI
           int percentDone = (lineCount * 100) / total;
@@ -274,7 +280,8 @@ public class FileUploaderTask extends Thread {
       cursor.close();
       fos.close();
       
-      WigleAndroid.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms" );
+      WigleAndroid.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
+          + fileWriteMillis + " netmillis: " + netMillis );
       
       // show on the UI
       handler.sendEmptyMessage( Status.UPLOADING.ordinal() );

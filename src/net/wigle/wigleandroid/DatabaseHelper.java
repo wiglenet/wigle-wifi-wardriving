@@ -47,6 +47,11 @@ public class DatabaseHelper extends Thread {
   private AtomicBoolean done = new AtomicBoolean(false);
   private AtomicLong networkCount = new AtomicLong();
   private AtomicLong locationCount = new AtomicLong();
+  private ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
+        protected CacheMap<String,Network> initialValue() {
+            return new CacheMap<String,Network>( 16, 32 );
+        }
+  };
   
   public class DBUpdate {
     public Network network;
@@ -221,19 +226,23 @@ public class DatabaseHelper extends Thread {
   }
   
   public Network getNetwork( String bssid ) {
-    checkDB();
-    Network retval = null;
-    String[] args = new String[]{ bssid };
-    Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
-        + " WHERE bssid = ?", args);
-    if ( cursor.getCount() > 0 ) {
-      cursor.moveToFirst();
-      String ssid = cursor.getString(0);
-      int frequency = cursor.getInt(1);
-      String capabilities = cursor.getString(2);
-      retval = new Network( bssid, ssid, frequency, capabilities, 0 );
+    // check cache
+    Network retval = networkCache.get().get( bssid );
+    if ( retval == null ) {
+      checkDB();
+      String[] args = new String[]{ bssid };
+      Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
+          + " WHERE bssid = ?", args);
+      if ( cursor.getCount() > 0 ) {
+        cursor.moveToFirst();
+        String ssid = cursor.getString(0);
+        int frequency = cursor.getInt(1);
+        String capabilities = cursor.getString(2);
+        retval = new Network( bssid, ssid, frequency, capabilities, 0 );
+        networkCache.get().put( bssid, retval );
+      }
+      cursor.close();
     }
-    cursor.close();
     return retval;
   }
   

@@ -5,6 +5,7 @@ distance traveled
 select a net, see observations
 
 --- done ---
+don't upload empty files
 update frequency setting
 distance check before storing
 speed up file writing

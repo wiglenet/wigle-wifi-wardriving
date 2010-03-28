@@ -52,7 +52,8 @@ public class FileUploaderTask extends Thread {
     EXCEPTION("Fail", "Exception"),
     BAD_LOGIN("Fail", "Login failed, check password?"),
     UPLOADING("Working...", "Uploading File"),
-    WRITING("Working...", "Writing File ");
+    WRITING("Working...", "Writing File "),
+    EMPTY_FILE("Doing Nothing", "File would be empty");
     
     private final String title;
     private final String message;
@@ -282,6 +283,11 @@ public class FileUploaderTask extends Thread {
       
       WigleAndroid.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
           + fileWriteMillis + " netmillis: " + netMillis );
+      
+      // don't upload empty files
+      if ( lineCount == 0 ) {
+        return Status.EMPTY_FILE;
+      }
       
       // show on the UI
       handler.sendEmptyMessage( Status.UPLOADING.ordinal() );

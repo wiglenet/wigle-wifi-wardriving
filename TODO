@@ -1,11 +1,11 @@
 --- todo ---
 "upload every n" setting
-update frequency setting
 change upload to ssl
 distance traveled
 select a net, see observations
 
 --- done ---
+update frequency setting
 distance check before storing
 speed up file writing
 store and upload altitude, accuracy

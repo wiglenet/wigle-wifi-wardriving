@@ -157,8 +157,18 @@ public class WigleAndroid extends Activity {
     @Override
     public void onDestroy() {
       info( "destroy. networks: " + runNetworks.size() );
-      this.unregisterReceiver( wifiReceiver );
-      this.unbindService( serviceConnection );
+      try {
+        this.unregisterReceiver( wifiReceiver );
+      }
+      catch ( IllegalArgumentException ex ) {
+        WigleAndroid.info( "wifiReceiver not registered: " + ex );
+      }
+      try {
+        this.unbindService( serviceConnection );
+      }
+      catch ( IllegalArgumentException ex ) {
+        WigleAndroid.info( "serviceConnection not registered: " + ex );
+      }
       
       super.onDestroy();
     }
@@ -178,6 +188,19 @@ public class WigleAndroid extends Activity {
       if ( locationListener != null ) {
         locationManager.removeUpdates( locationListener );
       }
+      
+      try {
+        this.unregisterReceiver( wifiReceiver );
+      }
+      catch ( IllegalArgumentException ex ) {
+        WigleAndroid.info( "wifiReceiver not registered: " + ex );
+      }
+      try {
+        this.unbindService( serviceConnection );
+      }
+      catch ( IllegalArgumentException ex ) {
+        WigleAndroid.info( "serviceConnection not registered: " + ex );
+      }    
       
       super.finish();
     }

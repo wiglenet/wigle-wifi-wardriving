@@ -1,7 +1,11 @@
 package net.wigle.wigleandroid;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,6 +56,7 @@ public class WigleAndroid extends Activity {
     private Listener gpsStatusListener;
     private LocationListener locationListener;
     private BroadcastReceiver wifiReceiver;
+    private NumberFormat numberFormat;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -69,6 +74,13 @@ public class WigleAndroid extends Activity {
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     
     static final String ANONYMOUS = "anonymous";
+    
+    // cache
+    private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
+      protected CacheMap<String,Network> initialValue() {
+          return new CacheMap<String,Network>( 16, 64 );
+      }
+    };
     
     /** Called when the activity is first created. */
     @Override
@@ -97,6 +109,11 @@ public class WigleAndroid extends Activity {
         else {
           runNetworks = new HashSet<String>();
           finishing = new AtomicBoolean( false );
+        }
+        
+        numberFormat = NumberFormat.getNumberInstance( Locale.US );
+        if ( numberFormat instanceof DecimalFormat ) {
+          ((DecimalFormat) numberFormat).setMaximumFractionDigits( 8 );
         }
         
         setupService();
@@ -201,7 +218,7 @@ public class WigleAndroid extends Activity {
     private void setupDatabase() {
       // could be set by nonconfig retain
       if ( dbHelper == null ) {
-        dbHelper = new DatabaseHelper();
+        dbHelper = new DatabaseHelper( this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0) );
         dbHelper.open();
         dbHelper.start();
       }
@@ -215,12 +232,21 @@ public class WigleAndroid extends Activity {
       // may have been set by nonconfig retain
       if ( listAdapter == null ) {
         listAdapter = new ArrayAdapter<Network>( this, R.layout.row ) {
+//          @Override
+//          public boolean areAllItemsEnabled() {
+//            return false;
+//          }
+//          
+//          @Override
+//          public boolean isEnabled( int position ) {
+//            return false;
+//          }
+          
           @Override
           public View getView( int position, View convertView, ViewGroup parent ) {
             // long start = System.currentTimeMillis();
-            
             View row;
-        
+            
             if ( null == convertView ) {
               row = mInflater.inflate( R.layout.row, null );
             } 
@@ -266,10 +292,19 @@ public class WigleAndroid extends Activity {
                 listAdapter.clear();
               }
               
-              for ( ScanResult result : results ) {                
-                Network network = new Network( result );
+              Map<String,Network> networkCache = getNetworkCache();
+              for ( ScanResult result : results ) {
+                Network network = networkCache.get( result.BSSID );
+                if ( network == null ) {
+                  network = new Network( result );
+                  networkCache.put( network.getBssid(), network );
+                }
+                else {
+                  // cache hit, just set the level
+                  network.setLevel( result.level );
+                }
                 boolean added = runNetworks.add( result.BSSID );
-                // don't add if we are showing all the nets and this ain't new
+                // if we're showing current, or this was just added, put on the list
                 if ( showCurrent || added ) {
                   listAdapter.add( network );  
                 }
@@ -377,13 +412,13 @@ public class WigleAndroid extends Activity {
       }
     }
     
-    private static void setLocationUI( Activity activity, Location location ) {
+    private void setLocationUI( Activity activity, Location location ) {
       if ( location != null ) {
         TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
-        tv.setText( "Lat: " + (float) location.getLatitude() );
+        tv.setText( "Lat: " + numberFormat.format( location.getLatitude() ) );
         
         tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
-        tv.setText( "Lon: " + (float) location.getLongitude() );
+        tv.setText( "Lon: " + numberFormat.format( location.getLongitude() ) );
         
         tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
         tv.setText( "+/- " + location.getAccuracy() + "m" );
@@ -435,6 +470,12 @@ public class WigleAndroid extends Activity {
       task.start();
     }
     
+    private void status( String status ) {
+      info( status );
+      TextView tv = (TextView) findViewById( R.id.status );
+      tv.setText( status );
+    }
+    
     public static void sleep( long sleep ) {
       try {
         Thread.sleep( sleep );
@@ -450,9 +491,11 @@ public class WigleAndroid extends Activity {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
 
-    private void status( String status ) {
-      info( status );
-      TextView tv = (TextView) findViewById( R.id.status );
-      tv.setText( status );
+    /**
+     * get the per-thread network LRU cache
+     * @return per-thread network cache
+     */
+    public static Map<String,Network> getNetworkCache() {
+      return networkCache.get();
     }
 }

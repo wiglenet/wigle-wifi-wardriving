@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -15,7 +17,11 @@ import android.location.Location;
  * our database
  */
 public class DatabaseHelper extends Thread {
-  private static final long LOC_DELAY = 10000L;
+  // if in same spot, only log once an hour
+  private static final long SMALL_LOC_DELAY = 1000L * 60L * 60L;
+  // if change is less than these digits, don't bother
+  private static final double SMALL_LATLON_CHANGE = 0.0001D;
+  private static final double BIG_LATLON_CHANGE = 0.001D;
   private static final String DATABASE_NAME = "wiglewifi.sqlite";
   private static final String DATABASE_PATH = "/sdcard/wiglewifi/";
   
@@ -26,7 +32,9 @@ public class DatabaseHelper extends Thread {
     + "ssid text not null,"
     + "frequency int not null,"
     + "capabilities text not null,"
-    + "lasttime long not null"
+    + "lasttime long not null,"
+    + "lastlat double not null,"
+    + "lastlon double not null"
     + ")";
   
   private static final String LOCATION_TABLE = "location";
@@ -47,11 +55,7 @@ public class DatabaseHelper extends Thread {
   private AtomicBoolean done = new AtomicBoolean(false);
   private AtomicLong networkCount = new AtomicLong();
   private AtomicLong locationCount = new AtomicLong();
-  private ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
-        protected CacheMap<String,Network> initialValue() {
-            return new CacheMap<String,Network>( 16, 32 );
-        }
-  };
+  private final SharedPreferences prefs;
   
   public class DBUpdate {
     public Network network;
@@ -59,8 +63,8 @@ public class DatabaseHelper extends Thread {
     public Location location;
   }
   
-  public DatabaseHelper() {
-    // not much here
+  public DatabaseHelper( SharedPreferences prefs ) {
+    this.prefs = prefs;
   }
   
   @Override
@@ -101,6 +105,10 @@ public class DatabaseHelper extends Thread {
       WigleAndroid.info( "creating tables" );
       db.execSQL(NETWORK_CREATE);
       db.execSQL(LOCATION_CREATE);
+      // new database, reset a marker, if any
+      Editor edit = prefs.edit();
+      edit.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
+      edit.commit();
     }
   }
   
@@ -154,8 +162,10 @@ public class DatabaseHelper extends Thread {
     
     ContentValues values = new ContentValues();
     String[] bssidArgs = new String[]{ network.getBssid() };    
-    Cursor cursor = db.rawQuery("SELECT bssid,lasttime FROM network WHERE bssid = ?", bssidArgs );
-    long lasttime;
+    Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+    long lasttime = 0;
+    double lastlat = 0;
+    double lastlon = 0;
     if ( cursor.getCount() == 0 ) {    
       // WigleAndroid.info("inserting net: " + network.getSsid() );
       
@@ -164,23 +174,33 @@ public class DatabaseHelper extends Thread {
       values.put("frequency", network.getFrequency() );
       values.put("capabilities", network.getCapabilities() );
       values.put("lasttime", location.getTime() );
+      values.put("lastlat", location.getLatitude() );
+      values.put("lastlon", location.getLongitude() );
       db.insert(NETWORK_TABLE, null, values);
       
       // update the count
       getNetworkCountFromDB();
       
-      lasttime = location.getTime();
+      // make sure this new network's location is written, don't update lasttime,lastlat,lastlon
     }
     else {
       cursor.moveToFirst();
       lasttime = cursor.getLong(1);
+      lastlat = cursor.getDouble(2);
+      lastlon = cursor.getDouble(3);
     }
     cursor.close();
     
     long now = System.currentTimeMillis();
-    // WigleAndroid.debug("time: " + time + " now: " + now + " ssid: " + network.getSsid() );
-    if ( now - lasttime > LOC_DELAY ) {
-      // WigleAndroid.info("inserting loc: " + network.getSsid() );
+    double latDiff = Math.abs(lastlat - location.getLatitude());
+    double lonDiff = Math.abs(lastlon - location.getLongitude());
+    boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
+    boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
+    // WigleAndroid.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
+    //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
+    //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
+    if ( bigChange || (now - lasttime > SMALL_LOC_DELAY && smallChange) ) {
+      WigleAndroid.info("inserting loc: " + network.getSsid() );
       values.clear();
       values.put("bssid", network.getBssid() );
       values.put("level", update.level );  // make sure to use the level's update, network's is mutable...
@@ -191,9 +211,11 @@ public class DatabaseHelper extends Thread {
       values.put("time", location.getTime() );
       db.insert( LOCATION_TABLE, null, values );
       
-      // update the network with the lasttime
+      // update the network with the lasttime,lastlat,lastlon
       values.clear();
       values.put("lasttime", location.getTime() );
+      values.put("lastlat", location.getLatitude() );
+      values.put("lastlon", location.getLongitude() );
       db.update( NETWORK_TABLE, values, "bssid = ?", bssidArgs );
       
       // update the count
@@ -227,7 +249,7 @@ public class DatabaseHelper extends Thread {
   
   public Network getNetwork( String bssid ) {
     // check cache
-    Network retval = networkCache.get().get( bssid );
+    Network retval = WigleAndroid.getNetworkCache().get( bssid );
     if ( retval == null ) {
       checkDB();
       String[] args = new String[]{ bssid };
@@ -239,7 +261,7 @@ public class DatabaseHelper extends Thread {
         int frequency = cursor.getInt(1);
         String capabilities = cursor.getString(2);
         retval = new Network( bssid, ssid, frequency, capabilities, 0 );
-        networkCache.get().put( bssid, retval );
+        WigleAndroid.getNetworkCache().put( bssid, retval );
       }
       cursor.close();
     }

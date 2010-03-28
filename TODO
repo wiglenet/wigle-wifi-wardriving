@@ -3,8 +3,11 @@
 update frequency setting
 change upload to ssl
 distance traveled
+select a net, see observations
 
 --- done ---
+distance check before storing
+speed up file writing
 store and upload altitude, accuracy
 anonymous checkbox
 service

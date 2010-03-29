@@ -51,7 +51,7 @@ public class DatabaseHelper extends Thread {
     + ")";
   
   private SQLiteDatabase db;
-  private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( 256 );
+  private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( 512 );
   private AtomicBoolean done = new AtomicBoolean(false);
   private AtomicLong networkCount = new AtomicLong();
   private AtomicLong locationCount = new AtomicLong();
@@ -66,6 +66,10 @@ public class DatabaseHelper extends Thread {
   public DatabaseHelper( SharedPreferences prefs ) {
     this.prefs = prefs;
   }
+
+	public int getQueueSize() {
+		return queue.size();
+	}
   
   @Override
   public void run() {

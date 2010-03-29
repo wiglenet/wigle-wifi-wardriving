@@ -370,7 +370,7 @@ public class WigleAndroid extends Activity {
               
               scanCount++;
               long now = System.currentTimeMillis();
-              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms" );
+              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms. DB Queue: " + dbHelper.getQueueSize() );
             }
           };
         

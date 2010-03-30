@@ -53,11 +53,14 @@ public class DatabaseHelper extends Thread {
   
   private SQLiteDatabase db;
   private static final int MAX_QUEUE = 512;
-  private BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
-  private AtomicBoolean done = new AtomicBoolean(false);
-  private AtomicLong networkCount = new AtomicLong();
-  private AtomicLong locationCount = new AtomicLong();
+  private final BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
+  private final AtomicBoolean done = new AtomicBoolean(false);
+  private final AtomicLong networkCount = new AtomicLong();
+  private final AtomicLong locationCount = new AtomicLong();
   private final SharedPreferences prefs;
+  /** used in private addObservation */
+  private final CacheMap<String,Location> previousWrittenLocationsCache = 
+    new CacheMap<String,Location>( 16, 64 );
   
   public class DBUpdate {
     public Network network;
@@ -171,40 +174,51 @@ public class DatabaseHelper extends Thread {
     checkDB();
     Network network = update.network;
     Location location = update.location;
-    
     ContentValues values = new ContentValues();
-    String[] bssidArgs = new String[]{ network.getBssid() };    
-    Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+    String[] bssidArgs = new String[]{ network.getBssid() }; 
+    
     long lasttime = 0;
     double lastlat = 0;
     double lastlon = 0;
     boolean isNew = false;
-    if ( cursor.getCount() == 0 ) {    
-      // WigleAndroid.info("inserting net: " + network.getSsid() );
-      
-      values.put("bssid", network.getBssid() );
-      values.put("ssid", network.getSsid() );
-      values.put("frequency", network.getFrequency() );
-      values.put("capabilities", network.getCapabilities() );
-      values.put("lasttime", location.getTime() );
-      values.put("lastlat", location.getLatitude() );
-      values.put("lastlon", location.getLongitude() );
-      db.insert(NETWORK_TABLE, null, values);
-      
-      // update the count
-      networkCount.incrementAndGet();
-      isNew = true;
-      
-      // make sure this new network's location is written, 
-      // don't update stack lasttime,lastlat,lastlon variables
+    
+    // first try cache
+    Location prevWrittenLocation = previousWrittenLocationsCache.get( network.getBssid() );
+    if ( prevWrittenLocation != null ) {
+      // cache hit!
+      lasttime = prevWrittenLocation.getTime();
+      lastlat = prevWrittenLocation.getLatitude();
+      lastlon = prevWrittenLocation.getLongitude();
     }
     else {
-      cursor.moveToFirst();
-      lasttime = cursor.getLong(1);
-      lastlat = cursor.getDouble(2);
-      lastlon = cursor.getDouble(3);
+      // cache miss, get the last values from the db, if any
+      Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+      if ( cursor.getCount() == 0 ) {    
+        // WigleAndroid.info("inserting net: " + network.getSsid() );
+        values.put("bssid", network.getBssid() );
+        values.put("ssid", network.getSsid() );
+        values.put("frequency", network.getFrequency() );
+        values.put("capabilities", network.getCapabilities() );
+        values.put("lasttime", location.getTime() );
+        values.put("lastlat", location.getLatitude() );
+        values.put("lastlon", location.getLongitude() );
+        db.insert(NETWORK_TABLE, null, values);
+        
+        // update the count
+        networkCount.incrementAndGet();
+        isNew = true;
+        
+        // to make sure this new network's location is written
+        // don't update stack lasttime,lastlat,lastlon variables
+      }
+      else {
+        cursor.moveToFirst();
+        lasttime = cursor.getLong(1);
+        lastlat = cursor.getDouble(2);
+        lastlon = cursor.getDouble(3);
+      }
+      cursor.close();
     }
-    cursor.close();
     
     boolean fastMode = false;
     if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
@@ -236,6 +250,8 @@ public class DatabaseHelper extends Thread {
       
       // update the count
       locationCount.incrementAndGet();
+      // update the cache
+      previousWrittenLocationsCache.put( network.getBssid(), location );
       
       if ( ! isNew ) {
         // update the network with the lasttime,lastlat,lastlon

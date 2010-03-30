@@ -8,7 +8,6 @@ import java.text.NumberFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -77,7 +76,7 @@ public class WigleAndroid extends Activity {
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     
     static final String ANONYMOUS = "anonymous";
-    static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
+    //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     
     // cache
     private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
@@ -341,7 +340,7 @@ public class WigleAndroid extends Activity {
               
               int preQueueSize = dbHelper.getQueueSize();
               
-              Map<String,Network> networkCache = getNetworkCache();
+              CacheMap<String,Network> networkCache = getNetworkCache();
               for ( ScanResult result : results ) {
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
@@ -545,7 +544,7 @@ public class WigleAndroid extends Activity {
      * get the per-thread network LRU cache
      * @return per-thread network cache
      */
-    public static Map<String,Network> getNetworkCache() {
+    public static CacheMap<String,Network> getNetworkCache() {
       return networkCache.get();
     }
     

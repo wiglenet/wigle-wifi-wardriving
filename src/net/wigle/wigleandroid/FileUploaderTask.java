@@ -220,7 +220,11 @@ public class FileUploaderTask extends Thread {
             date.setTime( cursor.getLong(7) );
             singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
             charBuffer.append( COMMA );
-            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, network.getChannel() );
+            Integer channel = network.getChannel();
+            if ( channel == null ) {
+              channel = network.getFrequency();
+            }
+            singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
             charBuffer.append( COMMA );
             singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
             charBuffer.append( COMMA );

@@ -25,20 +25,13 @@ public class Network {
   private static final Map<Integer,Integer> freqToChan;
   static {
     Map<Integer,Integer> freqToChanTemp = new HashMap<Integer,Integer>();
+    for ( int i = 237; i <= 255; i++ ) {
+      freqToChanTemp.put( 2312 + 5 * (i - 237), i );
+    }
     
-    freqToChanTemp.put(2412, 1);
-    freqToChanTemp.put(2417, 2);
-    freqToChanTemp.put(2422, 3);
-    freqToChanTemp.put(2427, 4);
-    freqToChanTemp.put(2432, 5);
-    freqToChanTemp.put(2437, 6);
-    freqToChanTemp.put(2442, 7);
-    freqToChanTemp.put(2447, 8);
-    freqToChanTemp.put(2452, 9);
-    freqToChanTemp.put(2457, 10);
-    freqToChanTemp.put(2462, 11);
-    freqToChanTemp.put(2467, 12);
-    freqToChanTemp.put(2472, 13);
+    for ( int i = 0; i <= 13; i++ ) {
+      freqToChanTemp.put(2407 + (5 * i), i);
+    }
     freqToChanTemp.put(2484, 14);
     
     freqToChanTemp.put(5170, 34);

@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashSet;
@@ -74,6 +77,7 @@ public class WigleAndroid extends Activity {
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     
     static final String ANONYMOUS = "anonymous";
+    static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     
     // cache
     private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
@@ -87,6 +91,20 @@ public class WigleAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+//        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
+//          public void uncaughtException( Thread thread, Throwable throwable ) {
+//            String error = "Thread: " + thread + " throwable: " + throwable;
+//            WigleAndroid.error( error );
+//            throwable.printStackTrace();
+//            
+//            WigleAndroid.writeError( thread, throwable );
+//            
+//            // throw new RuntimeException( error, throwable );
+//            WigleAndroid.this.finish();
+//            System.exit( -1 );
+//          }
+//        });
         
         Object stored = getLastNonConfigurationInstance();
         if ( stored != null && stored instanceof WigleAndroid ) {
@@ -321,6 +339,8 @@ public class WigleAndroid extends Activity {
                 listAdapter.clear();
               }
               
+              int preQueueSize = dbHelper.getQueueSize();
+              
               Map<String,Network> networkCache = getNetworkCache();
               for ( ScanResult result : results ) {
                 Network network = networkCache.get( result.BSSID );
@@ -370,7 +390,7 @@ public class WigleAndroid extends Activity {
               
               scanCount++;
               long now = System.currentTimeMillis();
-              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms. DB Queue: " + dbHelper.getQueueSize() );
+              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms. DB Queue: " + preQueueSize );              
             }
           };
         
@@ -527,5 +547,25 @@ public class WigleAndroid extends Activity {
      */
     public static Map<String,Network> getNetworkCache() {
       return networkCache.get();
+    }
+    
+    public static void writeError( Thread thread, Throwable throwable ) {
+      try {
+        String error = "Thread: " + thread + " throwable: " + throwable;
+        File file = new File("/sdcard/wiglewifi/");
+        file.mkdirs();
+        file = new File("/sdcard/wiglewifi/errorstack_" + System.currentTimeMillis() + ".txt" );
+        if ( ! file.exists() ) {
+          file.createNewFile();
+        }
+        FileOutputStream fos = new FileOutputStream( file );
+        fos.write( error.getBytes( ENCODING ) );
+        throwable.printStackTrace( new PrintStream( fos ) );
+        fos.close();
+      }
+      catch ( Exception ex ) {
+        WigleAndroid.error( "error logging error: " + ex );
+        ex.printStackTrace();
+      }
     }
 }

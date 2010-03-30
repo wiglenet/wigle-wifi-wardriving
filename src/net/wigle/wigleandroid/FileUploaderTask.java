@@ -109,11 +109,21 @@ public class FileUploaderTask extends Thread {
   }
   
   public void run() {
+    try {
+      doRun();
+    }
+    catch ( Throwable throwable ) {
+      WigleAndroid.writeError( Thread.currentThread(), throwable );
+      throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
+    }
+  }
+  
+  private void doRun() {
     SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
     String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
     String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
-    
+
     if ( "".equals( username ) ) {
       // TODO: error
       WigleAndroid.error( "username not defined" );

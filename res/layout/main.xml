@@ -64,7 +64,7 @@
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
-	android:background="#707070"
+	android:background="#A07070"
 	/> 
 <ListView android:id="@+id/ListView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ListView>
 </LinearLayout>

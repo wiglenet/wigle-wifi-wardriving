@@ -3,6 +3,7 @@
 change upload to ssl
 distance traveled
 select a net, see observations
+sort, color by signal strength
 
 --- done ---
 don't upload empty files

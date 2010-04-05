@@ -5,6 +5,13 @@ distance traveled
 select a net, see observations
 sort, color by signal strength
 
+--- user suggested ---
+optional audible notification when an AP is found
+the count of APs in a large font for checking status at a glance
+big indication that GPS has a fix
+option for kml save for checking coverage back at home PC
+option for map showing track covered
+
 --- done ---
 don't upload empty files
 update frequency setting

@@ -4,6 +4,7 @@ change upload to ssl
 distance traveled
 select a net, see observations
 sort, color by signal strength
+fix multiple processes from notification bug
 
 --- user suggested ---
 optional audible notification when an AP is found

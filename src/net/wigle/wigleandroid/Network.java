@@ -17,10 +17,18 @@ public class Network {
   private int level;
   private final Integer channel;
   private final String showCapabilities;
+  private final int crypto;
   private String detail;
   
   private static final String BAR_STRING = " | ";
   private static final String DASH_STRING = " - ";
+  private static final String WPA_CAP = "[WPA";
+  private static final String WEP_CAP = "[WEP";
+  
+  // faster than enums
+  public static final int CRYPTO_NONE = 0;
+  public static final int CRYPTO_WEP = 1;
+  public static final int CRYPTO_WPA = 2;
   
   private static final Map<Integer,Integer> freqToChan;
   static {
@@ -91,6 +99,16 @@ public class Network {
     else {
       this.showCapabilities = null;
     }
+    
+    if ( capabilities.startsWith( WPA_CAP ) ) {
+      crypto = CRYPTO_WPA;
+    }
+    else if ( capabilities.startsWith( WEP_CAP ) ) {
+      crypto = CRYPTO_WEP;
+    }
+    else {
+      crypto = CRYPTO_NONE;
+    }
   }
   
   public String getBssid() {
@@ -126,6 +144,14 @@ public class Network {
   
   public void setLevel( int level ) {
     this.level = level;
+  }
+  
+  /**
+   * get crypto catagory, one of CRYPTO_* defined in this class.
+   * @return integer corresponding to an encryption catagory
+   */
+  public int getCrypto() {
+    return crypto;
   }
   
   public String getDetail() {

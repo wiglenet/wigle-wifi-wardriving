@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -296,6 +297,22 @@ public class WigleAndroid extends Activity {
         
             Network network = getItem(position);
             // info( "listing net: " + network.getBssid() );
+            
+            ImageView ico = (ImageView) row.findViewById( R.id.wepicon );   
+            switch ( network.getCrypto() ) {
+              case Network.CRYPTO_WEP:
+                ico.setImageResource( R.drawable.wep_ico );
+                break;
+              case Network.CRYPTO_WPA:
+                ico.setImageResource( R.drawable.wpa_ico );
+                break;
+              case Network.CRYPTO_NONE:
+                ico.setImageResource( R.drawable.no_ico );
+                break;
+              default:
+                throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
+                    + " in network: " + network );
+            }
               
             TextView tv = (TextView) row.findViewById( R.id.ssid );              
             tv.setText( network.getSsid() );

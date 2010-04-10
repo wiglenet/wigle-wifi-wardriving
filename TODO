@@ -13,6 +13,7 @@ option for map showing track covered
 show device wifi on or not, allow to turn on
 
 --- done ---
+handle losing gps fix
 color by signal strength
 fix multiple processes from notification bug
 sort by signal strength

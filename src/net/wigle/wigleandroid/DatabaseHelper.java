@@ -57,6 +57,7 @@ public class DatabaseHelper extends Thread {
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
+  private final AtomicLong newNetworkCount = new AtomicLong();
   private final SharedPreferences prefs;
   /** used in private addObservation */
   private final CacheMap<String,Location> previousWrittenLocationsCache = 
@@ -220,6 +221,10 @@ public class DatabaseHelper extends Thread {
       cursor.close();
     }
     
+    if ( isNew ) {
+      newNetworkCount.incrementAndGet();
+    }
+    
     boolean fastMode = false;
     if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
       // queue is filling up, go to fast mode, only write new networks or big changes
@@ -263,6 +268,14 @@ public class DatabaseHelper extends Thread {
       }
       
     }
+  }
+  
+  /**
+   * get the number of networks new to the db for this run
+   * @return number of new networks
+   */
+  public long getNewNetworkCount() {
+    return newNetworkCount.get();
   }
   
   public long getNetworkCount() {

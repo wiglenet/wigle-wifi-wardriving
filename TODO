@@ -3,18 +3,19 @@
 change upload to ssl
 distance traveled
 select a net, see observations
-sort, color by signal strength
-fix multiple processes from notification bug
 
 --- user suggested ---
-optional audible notification when an AP is found
 the count of APs in a large font for checking status at a glance
+optional audible notification when an AP is found
 big indication that GPS has a fix
 option for kml save for checking coverage back at home PC
 option for map showing track covered
 show device wifi on or not, allow to turn on
 
 --- done ---
+color by signal strength
+fix multiple processes from notification bug
+sort by signal strength
 crypto icons
 don't upload empty files
 update frequency setting

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +20,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
@@ -67,6 +69,13 @@ public class WigleAndroid extends Activity {
     private static final int MENU_EXIT = 11;
     public static final String ENCODING = "ISO8859_1";
     
+    // color by signal strength
+    public static final int COLOR_1 = Color.rgb( 70, 170,  0);
+    public static final int COLOR_2 = Color.rgb(170, 170,  0);
+    public static final int COLOR_3 = Color.rgb(170,  95, 30);
+    public static final int COLOR_4 = Color.rgb(180,  60, 40);
+    public static final int COLOR_5 = Color.rgb(180,  45, 70);
+    
     // preferences
     static final String SHARED_PREFS = "WiglePrefs";
     static final String PREF_USERNAME = "username";
@@ -83,6 +92,12 @@ public class WigleAndroid extends Activity {
     private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
       protected CacheMap<String,Network> initialValue() {
           return new CacheMap<String,Network>( 16, 64 );
+      }
+    };
+    
+    private static final Comparator<Network> signalCompare = new Comparator<Network>() {
+      public int compare( Network a, Network b ) {
+        return b.getLevel() - a.getLevel();
       }
     };
     
@@ -318,7 +333,23 @@ public class WigleAndroid extends Activity {
             tv.setText( network.getSsid() );
               
             tv = (TextView) row.findViewById( R.id.level_string );
-            tv.setText( Integer.toString( network.getLevel() ) );
+            int level = network.getLevel();
+            if ( level <= -90 ) {
+              tv.setTextColor( COLOR_5 );
+            }
+            else if ( level <= -80 ) {
+              tv.setTextColor( COLOR_4 );
+            }
+            else if ( level <= -70 ) {
+              tv.setTextColor( COLOR_3 );
+            }
+            else if ( level <= -60 ) {
+              tv.setTextColor( COLOR_2 );
+            }
+            else {
+              tv.setTextColor( COLOR_1 );
+            }
+            tv.setText( Integer.toString( level ) );
             
             tv = (TextView) row.findViewById( R.id.detail );
             String det = network.getDetail();
@@ -389,13 +420,17 @@ public class WigleAndroid extends Activity {
                 }
               }
               
+              // sort by signal strength
+              listAdapter.sort( signalCompare );
+              
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
               StringBuilder builder = new StringBuilder( 40 );
-              builder.append( "Current: " ).append( results.size() );
+              builder.append( "Now: " ).append( results.size() );
               builder.append( " Run: " ).append( runNetworks.size() );
+              builder.append( " New: " ).append( dbHelper.getNewNetworkCount() );
               builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
-              builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
+              //builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
               savedStats = builder.toString();
               tv.setText( savedStats );
               

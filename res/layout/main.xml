@@ -17,7 +17,8 @@
     android:layout_height="wrap_content"
     >
     <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
-		android:text="@string/upload_button" android:layout_weight="0"></Button>
+		android:text="@string/upload_button" android:layout_weight="0"
+		android:paddingTop="10px" android:paddingBottom="10px"/>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	    android:orientation="vertical"
 	    android:layout_width="wrap_content"
@@ -28,13 +29,19 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView01"
-		android:text="Lat:   (Waiting for GPS..)"
+		android:text="Lat:   (Waiting for GPS sync..)"
 		/>
 		<TextView  
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView02"
 		android:text="Lon: "
+		/>
+		<TextView  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:id="@+id/LocationTextView03"
+		android:text="Sats: "
 		/>
 	</LinearLayout>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -46,12 +53,17 @@
 		<TextView  
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
-			android:id="@+id/LocationTextView03"
+			android:id="@+id/LocationTextView04"
 			/>
 		<TextView  
 			android:layout_width="wrap_content" 
 			android:layout_height="wrap_content" 
-			android:id="@+id/LocationTextView04"
+			android:id="@+id/LocationTextView05"
+			/>
+		<TextView  
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" 
+			android:id="@+id/LocationTextView06"
 			/>
 		</LinearLayout>
 	</LinearLayout>

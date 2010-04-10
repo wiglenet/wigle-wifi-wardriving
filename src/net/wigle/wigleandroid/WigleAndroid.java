@@ -21,6 +21,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
@@ -68,6 +69,8 @@ public class WigleAndroid extends Activity {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     public static final String ENCODING = "ISO8859_1";
+    private static final String GPS_PROVIDER = "gps";
+    private static final long GPS_TIMEOUT = 15000L;
     
     // color by signal strength
     public static final int COLOR_1 = Color.rgb( 70, 170,  0);
@@ -490,17 +493,31 @@ public class WigleAndroid extends Activity {
       gpsStatusListener = new Listener(){
         public void onGpsStatusChanged( int event ) {
           gpsStatus = locationManager.getGpsStatus( gpsStatus );
+          int satCount = 0;
+          for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
+            if ( sat.usedInFix() ) {
+              satCount++;
+            }
+          }
+          // info( "sats: " + satCount + " event: " + event );
+          if ( location != null && GPS_PROVIDER.equals( location.getProvider() ) ) {
+            long age = System.currentTimeMillis() - location.getTime();
+            // info( "gps age: " + age );
+            if ( age > GPS_TIMEOUT || satCount < 3 ) {
+              // info( "nulling location");
+              location = null;
+              setLocationUI( WigleAndroid.this, location );
+            }
+          }
         } };
       locationManager.addGpsStatusListener( gpsStatusListener );
       
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
-            // long start = System.currentTimeMillis();
-            // WigleAndroid.info("newlocation: " + newLocation);
+            // info("newlocation: " + newLocation);
             location = newLocation;
             setLocationUI( WigleAndroid.this, location );
-            // status( "location done. ms: " + (System.currentTimeMillis() - start ) );
           }
           public void onProviderDisabled( String provider ) {}
           public void onProviderEnabled( String provider ) {}
@@ -514,19 +531,33 @@ public class WigleAndroid extends Activity {
     }
     
     private void setLocationUI( Activity activity, Location location ) {
-      if ( location != null ) {
-        TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
-        tv.setText( "Lat: " + numberFormat.format( location.getLatitude() ) );
+      if ( gpsStatus != null ) {
+        int satCount = 0;
+        for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
+          if ( sat.usedInFix() ) {
+            satCount++;
+          }
+        }
         
-        tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
-        tv.setText( "Lon: " + numberFormat.format( location.getLongitude() ) );
-        
-        tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
-        tv.setText( "+/- " + location.getAccuracy() + "m" );
-        
-        tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
-        tv.setText( "Alt: " + location.getAltitude() + "m" );
+        TextView tv = (TextView) activity.findViewById( R.id.LocationTextView06 );
+        tv.setText( "Sats: " + satCount );
       }
+      
+      TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
+      tv.setText( "Lat: " + (location == null ? "  (Waiting for GPS sync..)" 
+          : numberFormat.format( location.getLatitude() ) ) );
+      
+      tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
+      tv.setText( "Lon: " + (location == null ? "" : numberFormat.format( location.getLongitude() ) ) );
+      
+      tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
+      tv.setText( "Speed: " + (location == null ? "" : numberFormat.format( location.getSpeed() ) ) );
+      
+      tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
+      tv.setText( location == null ? "" : ("+/- " + location.getAccuracy() + "m") );
+      
+      tv = (TextView) activity.findViewById( R.id.LocationTextView05 );
+      tv.setText( location == null ? "" : ("Alt: " + location.getAltitude() + "m") );
     }
     
     private void setupUploadButton() {
@@ -572,7 +603,7 @@ public class WigleAndroid extends Activity {
     }
     
     private void status( String status ) {
-      info( status );
+      // info( status );
       TextView tv = (TextView) findViewById( R.id.status );
       tv.setText( status );
     }

@@ -577,7 +577,7 @@ public class WigleAndroid extends Activity {
       tv.setText( "Lon: " + (location == null ? "" : numberFormat.format( location.getLongitude() ) ) );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
-      tv.setText( "Speed: " + (location == null ? "" : numberFormat.format( location.getSpeed() ) ) );
+      tv.setText( "Speed: " + (location == null ? "" : numberFormat.format( location.getSpeed() * 2.23693629f ) + "mph" ) );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
       tv.setText( location == null ? "" : ("+/- " + location.getAccuracy() + "m") );

@@ -315,7 +315,7 @@ public class FileUploaderTask extends Thread {
       params.put("password", password);
       String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params );
       
-      if ( response.indexOf("uploaded successfully") > 0 ) {
+      if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
         
         // save in the prefs
@@ -323,7 +323,7 @@ public class FileUploaderTask extends Thread {
         editor.putLong( WigleAndroid.PREF_DB_MARKER, maxId );
         editor.commit();
       }
-      else if ( response.indexOf("does not match login") > 0 ) {
+      else if ( response != null && response.indexOf("does not match login") > 0 ) {
         status = Status.BAD_LOGIN;
       }
       else {

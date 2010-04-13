@@ -79,5 +79,5 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	/> 
-<ListView android:id="@+id/ListView01" android:layout_width="wrap_content" android:layout_height="wrap_content"></ListView>
+<ListView android:id="@+id/ListView01" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 </LinearLayout>

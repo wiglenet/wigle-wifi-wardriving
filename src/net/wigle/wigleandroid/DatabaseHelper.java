@@ -12,6 +12,7 @@ import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.os.Environment;
 
 /**
  * our database
@@ -24,7 +25,7 @@ public class DatabaseHelper extends Thread {
   private static final double MEDIUM_LATLON_CHANGE = 0.001D;
   private static final double BIG_LATLON_CHANGE = 0.01D;
   private static final String DATABASE_NAME = "wiglewifi.sqlite";
-  private static final String DATABASE_PATH = "/sdcard/wiglewifi/";
+  private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
   
   private static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
@@ -102,10 +103,8 @@ public class DatabaseHelper extends Thread {
   }
   
   public void open() {
-    File sdCard = new File("/sdcard/");
-    boolean hasSD = sdCard.exists() && sdCard.isDirectory();
     String dbFilename = DATABASE_NAME;
-    if ( hasSD ) {
+    if ( WigleAndroid.hasSD() ) {
       File path = new File( DATABASE_PATH );
       path.mkdirs();
       dbFilename = DATABASE_PATH + DATABASE_NAME;

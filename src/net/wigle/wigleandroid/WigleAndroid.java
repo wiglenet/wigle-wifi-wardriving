@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -30,6 +31,7 @@ import android.location.GpsStatus.Listener;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
@@ -57,6 +59,7 @@ public class WigleAndroid extends Activity {
     private AtomicBoolean finishing;
     private String savedStats;
     private int scanCount;
+    private Long satCountLowTime;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -68,6 +71,7 @@ public class WigleAndroid extends Activity {
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
+    private static final int REQUEST_ENABLE_WIFI = 12;
     public static final String ENCODING = "ISO8859_1";
     private static final String GPS_PROVIDER = "gps";
     private static final long GPS_TIMEOUT = 15000L;
@@ -371,6 +375,11 @@ public class WigleAndroid extends Activity {
     private void setupWifi() {
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         
+        if ( ! wifiManager.isWifiEnabled() ) {
+          Intent enableBtIntent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
+          startActivityForResult( enableBtIntent, REQUEST_ENABLE_WIFI );
+        }
+        
         // wifi scan listener
         wifiReceiver = new BroadcastReceiver(){
             public void onReceive( Context context, Intent intent ){
@@ -429,11 +438,10 @@ public class WigleAndroid extends Activity {
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
               StringBuilder builder = new StringBuilder( 40 );
-              builder.append( "Now: " ).append( results.size() );
-              builder.append( " Run: " ).append( runNetworks.size() );
+              builder.append( "Run: " ).append( runNetworks.size() );
               builder.append( " New: " ).append( dbHelper.getNewNetworkCount() );
               builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
-              //builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
+              builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
               savedStats = builder.toString();
               tv.setText( savedStats );
               
@@ -444,7 +452,7 @@ public class WigleAndroid extends Activity {
               
               scanCount++;
               long now = System.currentTimeMillis();
-              status( "Scan " + scanCount + " Complete in " + (now - start) + "ms. DB Queue: " + preQueueSize );              
+              status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );              
             }
           };
         
@@ -500,16 +508,34 @@ public class WigleAndroid extends Activity {
             }
           }
           // info( "sats: " + satCount + " event: " + event );
-          if ( location != null && GPS_PROVIDER.equals( location.getProvider() ) ) {
+          
+          if ( location == null ) {
+            // set so we see sat count
+            setLocationUI( WigleAndroid.this, location );
+          }
+          else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
             long age = System.currentTimeMillis() - location.getTime();
+            if ( satCount < 3 ) {
+              if ( satCountLowTime == null ) {
+                satCountLowTime = System.currentTimeMillis();
+              }
+            }
+            else {
+              // plenty of sats
+              satCountLowTime = null;
+            }
+            
             // info( "gps age: " + age );
-            if ( age > GPS_TIMEOUT || satCount < 3 ) {
+            if ( age > GPS_TIMEOUT || 
+                (satCountLowTime != null && (System.currentTimeMillis() - satCountLowTime) > GPS_TIMEOUT) ) {
+              
               // info( "nulling location");
               location = null;
               setLocationUI( WigleAndroid.this, location );
             }
           }
-        } };
+        } 
+      };
       locationManager.addGpsStatusListener( gpsStatusListener );
       
       List<String> providers = locationManager.getAllProviders();
@@ -634,20 +660,35 @@ public class WigleAndroid extends Activity {
     public static void writeError( Thread thread, Throwable throwable ) {
       try {
         String error = "Thread: " + thread + " throwable: " + throwable;
-        File file = new File("/sdcard/wiglewifi/");
-        file.mkdirs();
-        file = new File("/sdcard/wiglewifi/errorstack_" + System.currentTimeMillis() + ".txt" );
-        if ( ! file.exists() ) {
-          file.createNewFile();
+        error( error );
+        if ( hasSD() ) {
+          File file = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
+          file.mkdirs();
+          file = new File(Environment.getExternalStorageDirectory().getCanonicalPath() 
+              + "/wiglewifi/errorstack_" + System.currentTimeMillis() + ".txt" );
+          if ( ! file.exists() ) {
+            file.createNewFile();
+          }
+          FileOutputStream fos = new FileOutputStream( file );
+          fos.write( error.getBytes( ENCODING ) );
+          throwable.printStackTrace( new PrintStream( fos ) );
+          fos.close();
         }
-        FileOutputStream fos = new FileOutputStream( file );
-        fos.write( error.getBytes( ENCODING ) );
-        throwable.printStackTrace( new PrintStream( fos ) );
-        fos.close();
       }
       catch ( Exception ex ) {
-        WigleAndroid.error( "error logging error: " + ex );
+        error( "error logging error: " + ex );
         ex.printStackTrace();
       }
+    }
+    
+    public static boolean hasSD() {
+      File sdCard = null;
+      try {
+        sdCard = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/" );
+      }
+      catch ( IOException ex ) {
+        // ohwell
+      }
+      return sdCard != null && sdCard.exists() && sdCard.isDirectory();
     }
 }

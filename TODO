@@ -10,9 +10,13 @@ optional audible notification when an AP is found
 big indication that GPS has a fix
 option for kml save for checking coverage back at home PC
 option for map showing track covered
-show device wifi on or not, allow to turn on
 
 --- done ---
+* 1.2:
+Show device wifi on or not, allow to turn on
+Null check bugs
+Show sats all the time
+
 * 1.1:
 handle losing gps fix
 color by signal strength

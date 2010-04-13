@@ -30,6 +30,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
@@ -147,15 +148,13 @@ public class FileUploaderTask extends Thread {
     
     SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
-    String filepath = "/sdcard/wiglewifi/";
-    
     Status status = Status.UNKNOWN;
     
     try {
-      File sdcard = new File( "/sdcard/" );
-      boolean hasSD = sdcard.exists() && sdcard.isDirectory();
       String openString = filename;
+      boolean hasSD = WigleAndroid.hasSD();
       if ( hasSD ) {
+        String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
         File path = new File( filepath );
         path.mkdirs();
         openString = filepath + filename;
@@ -308,7 +307,7 @@ public class FileUploaderTask extends Thread {
       
       // send file
       FileInputStream fis = hasSD ? new FileInputStream( file ) 
-        : context.openFileInput( filepath );
+        : context.openFileInput( filename );
       Map<String,String> params = new HashMap<String,String>();
       
       params.put("observer", username);

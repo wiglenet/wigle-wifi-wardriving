@@ -65,13 +65,13 @@ public class WigleAndroid extends Activity {
     private Listener gpsStatusListener;
     private LocationListener locationListener;
     private BroadcastReceiver wifiReceiver;
-    private NumberFormat numberFormat;
+    private NumberFormat numberFormat1;
+    private NumberFormat numberFormat8;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
-    private static final int REQUEST_ENABLE_WIFI = 12;
     public static final String ENCODING = "ISO8859_1";
     private static final String GPS_PROVIDER = "gps";
     private static final long GPS_TIMEOUT = 15000L;
@@ -151,9 +151,14 @@ public class WigleAndroid extends Activity {
           finishing = new AtomicBoolean( false );
         }
         
-        numberFormat = NumberFormat.getNumberInstance( Locale.US );
-        if ( numberFormat instanceof DecimalFormat ) {
-          ((DecimalFormat) numberFormat).setMaximumFractionDigits( 8 );
+        numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
+        if ( numberFormat1 instanceof DecimalFormat ) {
+          ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
+        }
+        
+        numberFormat8 = NumberFormat.getNumberInstance( Locale.US );
+        if ( numberFormat8 instanceof DecimalFormat ) {
+          ((DecimalFormat) numberFormat8).setMaximumFractionDigits( 8 );
         }
         
         setupService();
@@ -376,8 +381,8 @@ public class WigleAndroid extends Activity {
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         
         if ( ! wifiManager.isWifiEnabled() ) {
-          Intent enableBtIntent = new Intent(WifiManager.ACTION_PICK_WIFI_NETWORK);
-          startActivityForResult( enableBtIntent, REQUEST_ENABLE_WIFI );
+          // just turn it on
+          wifiManager.setWifiEnabled( true );
         }
         
         // wifi scan listener
@@ -571,19 +576,19 @@ public class WigleAndroid extends Activity {
       
       TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
       tv.setText( "Lat: " + (location == null ? "  (Waiting for GPS sync..)" 
-          : numberFormat.format( location.getLatitude() ) ) );
+          : numberFormat8.format( location.getLatitude() ) ) );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
-      tv.setText( "Lon: " + (location == null ? "" : numberFormat.format( location.getLongitude() ) ) );
+      tv.setText( "Lon: " + (location == null ? "" : numberFormat8.format( location.getLongitude() ) ) );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
-      tv.setText( "Speed: " + (location == null ? "" : numberFormat.format( location.getSpeed() * 2.23693629f ) + "mph" ) );
+      tv.setText( "Speed: " + (location == null ? "" : numberFormat1.format( location.getSpeed() * 2.23693629f ) + "mph" ) );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
-      tv.setText( location == null ? "" : ("+/- " + location.getAccuracy() + "m") );
+      tv.setText( location == null ? "" : ("+/- " + numberFormat1.format( location.getAccuracy() ) + "m") );
       
       tv = (TextView) activity.findViewById( R.id.LocationTextView05 );
-      tv.setText( location == null ? "" : ("Alt: " + location.getAltitude() + "m") );
+      tv.setText( location == null ? "" : ("Alt: " + numberFormat1.format( location.getAltitude() ) + "m") );
     }
     
     private void setupUploadButton() {

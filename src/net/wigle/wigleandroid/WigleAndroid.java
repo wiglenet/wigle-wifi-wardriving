@@ -419,7 +419,12 @@ public class WigleAndroid extends Activity {
                 boolean added = runNetworks.add( result.BSSID );
                 // if we're showing current, or this was just added, put on the list
                 if ( showCurrent || added ) {
-                  listAdapter.add( network );  
+                  listAdapter.add( network );
+                  // load test
+                  // for ( int i = 0; i< 10; i++) {
+                  //  listAdapter.add( network );
+                  // }
+                  
                 }
                 else {
                   // not showing current, and not a new thing, go find the network and update the level

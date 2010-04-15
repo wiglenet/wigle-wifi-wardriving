@@ -8,13 +8,18 @@ turn scan on/off
 
 --- user suggested ---
 the count of APs in a large font for checking status at a glance
-optional audible notification when an AP is found
 big indication that GPS has a fix
 option for kml save for checking coverage back at home PC
 option for map showing track covered
 click on network to connect, with warning about legality
 
 --- done ---
+* 1.3:
+Just turn on wifi if not on
+Optional audible notification when an AP is found
+Optional Text-to-speech of networks found
+Optional Text-to-speech gps gain/lost announcements
+
 * 1.2:
 Show device wifi on or not, allow to turn on
 Null check bugs

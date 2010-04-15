@@ -47,12 +47,15 @@
         android:layout_height="wrap_content"
         android:text="@string/found_sound" />
         
+<CheckBox android:id="@+id/speech_gps"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_gps" />
+        
 <CheckBox android:id="@+id/edit_showcurrent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
-
-
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
@@ -76,8 +79,6 @@
 		/>
 </LinearLayout>
 
-
-        
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"

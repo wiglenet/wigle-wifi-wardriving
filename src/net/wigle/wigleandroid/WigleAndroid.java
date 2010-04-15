@@ -99,6 +99,7 @@ public class WigleAndroid extends Activity {
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     static final String PREF_FOUND_SOUND = "foundSound";
     static final String PREF_SPEECH_PERIOD = "speechPeriod";
+    static final String PREF_SPEECH_GPS = "speechGPS";
     
     static final String ANONYMOUS = "anonymous";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
@@ -460,7 +461,7 @@ public class WigleAndroid extends Activity {
               }
               
               if ( somethingAdded && isRingerOn() ) {
-                boolean play = prefs.getBoolean( PREF_FOUND_SOUND, false );
+                boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
                 if ( play ) {
                   // play sound on something new
                   soundPop.start();
@@ -583,7 +584,12 @@ public class WigleAndroid extends Activity {
               // info( "nulling location");
               location = null;
               setLocationUI( WigleAndroid.this, location );
-              speak( "gps fix lost" );
+              
+              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+              boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
+              if ( speechGPS ) {
+                speak( "gps fix lost" );
+              }
             }
           }
         } 
@@ -595,7 +601,11 @@ public class WigleAndroid extends Activity {
           public void onLocationChanged( Location newLocation ) {
             // info("newlocation: " + newLocation);
             if ( location == null ) {
-              speak( "now have gps fix" );
+              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+              boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
+              if ( speechGPS ) {
+                speak( "now have gps fix" );
+              }
             }
             location = newLocation;
             setLocationUI( WigleAndroid.this, location );

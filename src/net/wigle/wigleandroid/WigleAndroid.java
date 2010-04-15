@@ -28,6 +28,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.GpsStatus.Listener;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -60,6 +62,7 @@ public class WigleAndroid extends Activity {
     private String savedStats;
     private int scanCount;
     private Long satCountLowTime;
+    private MediaPlayer soundPop;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -67,6 +70,9 @@ public class WigleAndroid extends Activity {
     private BroadcastReceiver wifiReceiver;
     private NumberFormat numberFormat1;
     private NumberFormat numberFormat8;
+    private TTS tts;
+    private AudioManager audioManager;
+    private long previousTalkTime = System.currentTimeMillis();
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -91,6 +97,8 @@ public class WigleAndroid extends Activity {
     static final String PREF_BE_ANONYMOUS = "beAnonymous";
     static final String PREF_DB_MARKER = "dbMarker";
     static final String PREF_SCAN_PERIOD = "scanPeriod";
+    static final String PREF_FOUND_SOUND = "foundSound";
+    static final String PREF_SPEECH_PERIOD = "speechPeriod";
     
     static final String ANONYMOUS = "anonymous";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
@@ -142,6 +150,7 @@ public class WigleAndroid extends Activity {
           this.finishing = retained.finishing;
           this.savedStats = retained.savedStats;
           this.scanCount = retained.scanCount;
+          this.soundPop = retained.soundPop;
           
           TextView tv = (TextView) findViewById( R.id.stats );
           tv.setText( savedStats );
@@ -165,6 +174,7 @@ public class WigleAndroid extends Activity {
         setupDatabase();
         setupUploadButton();
         setupList();
+        setupSound();
         setupWifi();
         setupLocation();
     }
@@ -246,6 +256,10 @@ public class WigleAndroid extends Activity {
       catch ( IllegalArgumentException ex ) {
         WigleAndroid.info( "serviceConnection not registered: " + ex );
       }    
+      
+      if ( tts != null ) {
+        tts.shutdown();
+      }
       
       super.finish();
     }
@@ -406,6 +420,7 @@ public class WigleAndroid extends Activity {
               int preQueueSize = dbHelper.getQueueSize();
               
               CacheMap<String,Network> networkCache = getNetworkCache();
+              boolean somethingAdded = false;
               for ( ScanResult result : results ) {
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
@@ -417,6 +432,8 @@ public class WigleAndroid extends Activity {
                   network.setLevel( result.level );
                 }
                 boolean added = runNetworks.add( result.BSSID );
+                somethingAdded |= added;
+                
                 // if we're showing current, or this was just added, put on the list
                 if ( showCurrent || added ) {
                   listAdapter.add( network );
@@ -442,6 +459,14 @@ public class WigleAndroid extends Activity {
                 }
               }
               
+              if ( somethingAdded && isRingerOn() ) {
+                boolean play = prefs.getBoolean( PREF_FOUND_SOUND, false );
+                if ( play ) {
+                  // play sound on something new
+                  soundPop.start();
+                }
+              }
+              
               // sort by signal strength
               listAdapter.sort( signalCompare );
               
@@ -462,7 +487,17 @@ public class WigleAndroid extends Activity {
               
               scanCount++;
               long now = System.currentTimeMillis();
-              status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );              
+              status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
+              
+              long speechPeriod = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, 0L);
+              if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
+                String gps = "";
+                if ( location == null ) {
+                  gps = ", no gps fix";
+                }
+                speak("run " + runNetworks.size() + ", new " + dbHelper.getNewNetworkCount() + gps );
+                previousTalkTime = now;
+              }
             }
           };
         
@@ -500,6 +535,12 @@ public class WigleAndroid extends Activity {
           boolean scanOK = wifiManager.startScan();
           info( "startup finished. wifi scanOK: " + scanOK );
         }
+    }
+    
+    private void speak( String string ) {
+      if ( isRingerOn() && tts != null ) {
+        tts.speak( string );
+      }
     }
     
     private void setupLocation() {
@@ -542,6 +583,7 @@ public class WigleAndroid extends Activity {
               // info( "nulling location");
               location = null;
               setLocationUI( WigleAndroid.this, location );
+              speak( "gps fix lost" );
             }
           }
         } 
@@ -552,6 +594,9 @@ public class WigleAndroid extends Activity {
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
             // info("newlocation: " + newLocation);
+            if ( location == null ) {
+              speak( "now have gps fix" );
+            }
             location = newLocation;
             setLocationUI( WigleAndroid.this, location );
           }
@@ -630,6 +675,26 @@ public class WigleAndroid extends Activity {
       
       int flags = 0;
       this.bindService(serviceIntent, serviceConnection, flags);
+    }
+    
+    private void setupSound() {
+      // could have been retained
+      if ( soundPop == null ) {
+        soundPop = MediaPlayer.create( this, R.raw.pop );
+      }
+      audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+      
+      if ( TTS.hasTTS() ) {
+        tts = new TTS( this );        
+      }
+    }
+    
+    private boolean isRingerOn() {
+      boolean retval = false;
+      if ( audioManager != null ) {
+        retval = audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
+      }
+      return retval;
     }
     
     private static void uploadFile( Context context, DatabaseHelper dbHelper ){

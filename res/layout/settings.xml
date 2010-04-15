@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/scrollview"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<LinearLayout
+	android:id="@+id/linearlayout" 
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -37,28 +42,17 @@
 	android:background="#A07070"
 	/> 
 
+<CheckBox android:id="@+id/found_sound"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/found_sound" />
+        
 <CheckBox android:id="@+id/edit_showcurrent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<Button android:id="@+id/reset_maxid_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/reset_maxid_button" android:layout_weight="0"></Button>
-	<TextView
-		android:id="@+id/reset_maxid_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/reset_maxid_text"
-		android:layout_weight="5"
-		/>
-</LinearLayout>
+
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
@@ -82,4 +76,47 @@
 		/>
 </LinearLayout>
 
+
+        
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Spinner android:id="@+id/speak_spinner"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:drawSelectorOnTop="true"
+		android:paddingTop="0dip"
+		android:paddingBottom="0dip"
+		android:layout_weight="0"
+		/>
+	<TextView
+		android:id="@+id/speak_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/speak_text"
+		android:layout_weight="5"
+		/>
 </LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/reset_maxid_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/reset_maxid_button" android:layout_weight="0"></Button>
+	<TextView
+		android:id="@+id/reset_maxid_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/reset_maxid_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
+</LinearLayout>
+</ScrollView>

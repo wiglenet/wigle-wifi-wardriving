@@ -174,6 +174,8 @@ public class SettingsActivity extends Activity {
       if ( ! TTS.hasTTS() ) {
         // no text to speech :(
         spinner.setEnabled( false );
+        TextView speakText = (TextView) findViewById( R.id.speak_text );
+        speakText.setText("No Text-to-Speech engine");
       }
       adapter = new ArrayAdapter<String>(
           this, android.R.layout.simple_spinner_dropdown_item);

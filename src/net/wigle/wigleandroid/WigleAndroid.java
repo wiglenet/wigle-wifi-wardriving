@@ -605,6 +605,8 @@ public class WigleAndroid extends Activity {
           public void onLocationChanged( Location newLocation ) {
             // info("newlocation: " + newLocation);
             if ( location == null ) {
+              // see if there's a new status to go along with this
+              gpsStatus = locationManager.getGpsStatus( gpsStatus );
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
               if ( speechGPS ) {

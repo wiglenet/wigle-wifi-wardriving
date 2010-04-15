@@ -7,10 +7,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.location.Location;
 import android.os.Environment;
 
@@ -53,6 +55,7 @@ public class DatabaseHelper extends Thread {
     + ")";
   
   private SQLiteDatabase db;
+  private Context context;
   private static final int MAX_QUEUE = 512;
   private final BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final AtomicBoolean done = new AtomicBoolean(false);
@@ -70,8 +73,9 @@ public class DatabaseHelper extends Thread {
     public Location location;
   }
   
-  public DatabaseHelper( SharedPreferences prefs ) {
-    this.prefs = prefs;
+  public DatabaseHelper( Context context ) {    
+    this.context = context;
+    this.prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
   }
 
 	public int getQueueSize() {
@@ -104,7 +108,8 @@ public class DatabaseHelper extends Thread {
   
   public void open() {
     String dbFilename = DATABASE_NAME;
-    if ( WigleAndroid.hasSD() ) {
+    boolean hasSD = WigleAndroid.hasSD();
+    if ( hasSD ) {
       File path = new File( DATABASE_PATH );
       path.mkdirs();
       dbFilename = DATABASE_PATH + DATABASE_NAME;
@@ -115,15 +120,27 @@ public class DatabaseHelper extends Thread {
       doCreate = true;
     }
     WigleAndroid.info("opening: " + dbFilename );
-    db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
+    
+    if ( hasSD ) {
+      db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
+    }
+    else {      
+      db = context.openOrCreateDatabase( dbFilename, MAX_PRIORITY, null );
+    }
+    
     if ( doCreate ) {
       WigleAndroid.info( "creating tables" );
-      db.execSQL(NETWORK_CREATE);
-      db.execSQL(LOCATION_CREATE);
-      // new database, reset a marker, if any
-      Editor edit = prefs.edit();
-      edit.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
-      edit.commit();
+      try {
+        db.execSQL(NETWORK_CREATE);
+        db.execSQL(LOCATION_CREATE);
+        // new database, reset a marker, if any
+        Editor edit = prefs.edit();
+        edit.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
+        edit.commit();
+      }
+      catch ( SQLiteException ex ) {
+        WigleAndroid.error( "sqlite exception: " + ex );
+      }
     }
   }
   

@@ -301,7 +301,7 @@ public class WigleAndroid extends Activity {
     private void setupDatabase() {
       // could be set by nonconfig retain
       if ( dbHelper == null ) {
-        dbHelper = new DatabaseHelper( this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0) );
+        dbHelper = new DatabaseHelper( this );
         dbHelper.open();
         dbHelper.start();
       }
@@ -774,6 +774,6 @@ public class WigleAndroid extends Activity {
       catch ( IOException ex ) {
         // ohwell
       }
-      return sdCard != null && sdCard.exists() && sdCard.isDirectory();
+      return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }
 }

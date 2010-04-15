@@ -19,6 +19,7 @@ Just turn on wifi if not on
 Optional audible notification when an AP is found
 Optional Text-to-speech of networks found
 Optional Text-to-speech gps gain/lost announcements
+Fix fallback to context storage if SD card not available
 
 * 1.2:
 Show device wifi on or not, allow to turn on

@@ -20,6 +20,7 @@ Optional audible notification when an AP is found
 Optional Text-to-speech of networks found
 Optional Text-to-speech gps gain/lost announcements
 Fix fallback to context storage if SD card not available
+Fix 1.5 permission issue (WAKE_LOCK)
 
 * 1.2:
 Show device wifi on or not, allow to turn on

@@ -14,4 +14,5 @@
     <string name="period_text">Milliseconds between scans</string>
     <string name="speak_text">Seconds between audio announcements</string>
     <string name="speech_gps">Announce GPS status changes</string>
+    <string name="mute">Mute</string>
 </resources>

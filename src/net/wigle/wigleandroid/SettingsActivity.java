@@ -178,7 +178,7 @@ public class SettingsActivity extends Activity {
       adapter = new ArrayAdapter<String>(
           this, android.R.layout.simple_spinner_dropdown_item);
       final long[] speechPeriods = new long[]{ 0,5,10,15,30,60,120,300 };
-      period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, 0L);
+      period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, WigleAndroid.DEFAULT_SPEECH_PERIOD );
       periodIndex = 0;
       for (int i = 0; i < speechPeriods.length; i++) {
         adapter.add( Long.toString( speechPeriods[i] ) );

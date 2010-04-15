@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
@@ -100,6 +101,9 @@ public class WigleAndroid extends Activity {
     static final String PREF_FOUND_SOUND = "foundSound";
     static final String PREF_SPEECH_PERIOD = "speechPeriod";
     static final String PREF_SPEECH_GPS = "speechGPS";
+    static final String PREF_MUTED = "muted";
+    
+    static final long DEFAULT_SPEECH_PERIOD = 60L;
     
     static final String ANONYMOUS = "anonymous";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
@@ -460,7 +464,7 @@ public class WigleAndroid extends Activity {
                 }
               }
               
-              if ( somethingAdded && isRingerOn() ) {
+              if ( somethingAdded && ! isMuted() ) {
                 boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
                 if ( play ) {
                   // play sound on something new
@@ -490,7 +494,7 @@ public class WigleAndroid extends Activity {
               long now = System.currentTimeMillis();
               status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
               
-              long speechPeriod = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, 0L);
+              long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
               if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
                 String gps = "";
                 if ( location == null ) {
@@ -539,7 +543,7 @@ public class WigleAndroid extends Activity {
     }
     
     private void speak( String string ) {
-      if ( isRingerOn() && tts != null ) {
+      if ( ! isMuted() && tts != null ) {
         tts.speak( string );
       }
     }
@@ -697,13 +701,43 @@ public class WigleAndroid extends Activity {
       if ( TTS.hasTTS() ) {
         tts = new TTS( this );        
       }
+      
+      final Button mute = (Button) this.findViewById(R.id.mute);
+      final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
+      boolean muted = prefs.getBoolean(PREF_MUTED, false);
+      if ( muted ) {
+        mute.setText("Play");
+      }
+      mute.setOnClickListener(new OnClickListener(){
+        public void onClick( View buttonView ) {
+          boolean muted = prefs.getBoolean(PREF_MUTED, false);
+          muted = ! muted;
+          Editor editor = prefs.edit();
+          editor.putBoolean( PREF_MUTED, muted );
+          editor.commit();
+          
+          if ( muted ) {
+            mute.setText("Play");
+          }
+          else {
+            mute.setText("Mute");
+          }
+        }
+      });
     }
     
+    @SuppressWarnings("unused")
     private boolean isRingerOn() {
       boolean retval = false;
       if ( audioManager != null ) {
         retval = audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
       }
+      return retval;
+    }
+    
+    private boolean isMuted() {
+      boolean retval = this.getSharedPreferences(SHARED_PREFS, 0).getBoolean(PREF_MUTED, false);
+      // info( "ismuted: " + retval );
       return retval;
     }
     

@@ -585,7 +585,7 @@ public class WigleAndroid extends Activity {
             if ( age > GPS_TIMEOUT || 
                 (satCountLowTime != null && (System.currentTimeMillis() - satCountLowTime) > GPS_TIMEOUT) ) {
               
-              // info( "nulling location");
+              info( "nulling location. age: " + age );
               location = null;
               setLocationUI( WigleAndroid.this, location );
               

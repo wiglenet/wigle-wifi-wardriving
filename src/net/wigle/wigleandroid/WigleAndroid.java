@@ -63,6 +63,7 @@ public class WigleAndroid extends Activity {
     private String savedStats;
     private int scanCount;
     private Long satCountLowTime;
+    private Long lastLocationTime;
     private MediaPlayer soundPop;
     
     // created every time, even after retain
@@ -570,7 +571,7 @@ public class WigleAndroid extends Activity {
             setLocationUI( WigleAndroid.this, location );
           }
           else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
-            long age = System.currentTimeMillis() - location.getTime();
+            long age = System.currentTimeMillis() - lastLocationTime; 
             if ( satCount < 3 ) {
               if ( satCountLowTime == null ) {
                 satCountLowTime = System.currentTimeMillis();
@@ -603,17 +604,21 @@ public class WigleAndroid extends Activity {
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
-            // info("newlocation: " + newLocation);
-            if ( location == null ) {
-              // see if there's a new status to go along with this
-              gpsStatus = locationManager.getGpsStatus( gpsStatus );
+            info("newlocation: " + newLocation
+							+ " provider: " + newLocation.getProvider() );
+            if ( location == null && newLocation != null ) {
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
               if ( speechGPS ) {
                 speak( "now have gps fix" );
               }
+              // see if there's a new status to go along with this
+              gpsStatus = locationManager.getGpsStatus( gpsStatus );
             }
             location = newLocation;
+						if ( location != null ) {
+							lastLocationTime = System.currentTimeMillis();
+						}
             setLocationUI( WigleAndroid.this, location );
           }
           public void onProviderDisabled( String provider ) {}

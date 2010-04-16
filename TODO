@@ -5,6 +5,7 @@ distance traveled
 select a net, see observations
 lock screen on, lock UI
 turn scan on/off
+show IEEE octet info
 
 --- user suggested ---
 the count of APs in a large font for checking status at a glance
@@ -14,6 +15,7 @@ option for map showing track covered
 click on network to connect, with warning about legality
 orientation change for settings screen (physical keyboard)
 turn back off wifi if it was off to start with
+turn on gps setting if not on
 
 --- done ---
 * 1.3:

@@ -267,6 +267,11 @@ public class DatabaseHelper extends Thread {
       values.put("altitude", location.getAltitude() );
       values.put("accuracy", location.getAccuracy() );
       values.put("time", location.getTime() );
+      if ( db.isDbLockedByOtherThreads() ) {
+        // this is kinda lame, make this better
+        WigleAndroid.error("db locked by another thread, waiting");
+        WigleAndroid.sleep(1000L);
+      }
       db.insert( LOCATION_TABLE, null, values );
       
       // update the count
@@ -280,6 +285,11 @@ public class DatabaseHelper extends Thread {
         values.put("lasttime", location.getTime() );
         values.put("lastlat", location.getLatitude() );
         values.put("lastlon", location.getLongitude() );
+        if ( db.isDbLockedByOtherThreads() ) {
+          // this is kinda lame, make this better
+          WigleAndroid.error("db locked by another thread, waiting");
+          WigleAndroid.sleep(1000L);
+        }
         db.update( NETWORK_TABLE, values, "bssid = ?", bssidArgs );
       }
       

@@ -13,11 +13,16 @@ big indication that GPS has a fix
 option for kml save for checking coverage back at home PC
 option for map showing track covered
 click on network to connect, with warning about legality
-orientation change for settings screen (physical keyboard)
-turn back off wifi if it was off to start with
-turn on gps setting if not on
 
 --- done ---
+* 1.4:
+hopefully fixed issue with looping gps fix/lost race condition
+db lock bug fix
+orientation change for settings screen (physical keyboard)
+turn back off wifi if it was off to start with
+turn on gps setting if not on (takes to settings screen, can't do automagically)
+notification when wifi locating is off
+
 * 1.3:
 Just turn on wifi if not on
 Optional audible notification when an AP is found

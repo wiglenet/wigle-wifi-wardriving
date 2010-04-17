@@ -197,8 +197,6 @@ public class FileUploaderTask extends Thread {
         Date date = new Date();
         // loop!
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-          lineCount++;
-          
           // _id,bssid,level,lat,lon,time
           long id = cursor.getLong(0);
           if ( id > maxId ) {
@@ -208,6 +206,13 @@ public class FileUploaderTask extends Thread {
           long netStart = System.currentTimeMillis();
           Network network = dbHelper.getNetwork( bssid );
           netMillis += System.currentTimeMillis() - netStart;
+          if ( network == null ) {
+            // weird condition, skipping
+            WigleAndroid.error("network not in database: " + bssid );
+            continue;
+          }
+          
+          lineCount++;
           String ssid = network.getSsid();
           if ( ssid.indexOf( COMMA ) >= 0 ) {
             // comma isn't a legal ssid character, but just in case

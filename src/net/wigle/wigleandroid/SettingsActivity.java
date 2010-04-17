@@ -113,7 +113,7 @@ public class SettingsActivity extends Activity {
       
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-      tv.setText( "Max upload id: " + prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L ) );
+      tv.setText( "Highest uploaded id: " + prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L ) );
       
       final Button resetMaxidButton = (Button) findViewById(R.id.reset_maxid_button);
       resetMaxidButton.setOnClickListener( new OnClickListener() {

@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import static android.location.LocationManager.GPS_PROVIDER;
+import static android.location.LocationManager.NETWORK_PROVIDER;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -37,6 +40,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -49,6 +53,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class WigleAndroid extends Activity {
     // state. anything added here should be added to the retain copy-construction
@@ -81,8 +86,8 @@ public class WigleAndroid extends Activity {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     public static final String ENCODING = "ISO8859_1";
-    private static final String GPS_PROVIDER = "gps";
     private static final long GPS_TIMEOUT = 15000L;
+    private static final long NET_LOC_TIMEOUT = 60000L;
     
     // color by signal strength
     public static final int COLOR_1 = Color.rgb( 70, 170,  0);
@@ -103,6 +108,7 @@ public class WigleAndroid extends Activity {
     static final String PREF_SPEECH_PERIOD = "speechPeriod";
     static final String PREF_SPEECH_GPS = "speechGPS";
     static final String PREF_MUTED = "muted";
+    static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     
@@ -263,6 +269,14 @@ public class WigleAndroid extends Activity {
         WigleAndroid.info( "serviceConnection not registered: " + ex );
       }    
       
+      final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+      boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
+      if ( wifiWasOff ) {
+        // well turn it of now that we're done
+        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled( false );
+      }
+      
       if ( tts != null ) {
         tts.shutdown();
       }
@@ -399,11 +413,20 @@ public class WigleAndroid extends Activity {
     
     private void setupWifi() {
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+        Editor edit = prefs.edit();
         
         if ( ! wifiManager.isWifiEnabled() ) {
+          // save so we can turn it back off when we exit  
+          edit.putBoolean(PREF_WIFI_WAS_OFF, true);
+          
           // just turn it on
           wifiManager.setWifiEnabled( true );
         }
+        else {
+          edit.putBoolean(PREF_WIFI_WAS_OFF, false);
+        }
+        edit.commit();
         
         // wifi scan listener
         wifiReceiver = new BroadcastReceiver(){
@@ -411,7 +434,6 @@ public class WigleAndroid extends Activity {
               long start = System.currentTimeMillis();
               List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
               
-              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
               if ( period < 1000L ) {
                 // under a second is hard to hit, treat as "continuous", so request scan in here
@@ -518,7 +540,6 @@ public class WigleAndroid extends Activity {
         // might not be null on a nonconfig retain
         if ( wifiTimer == null ) {
           wifiTimer = new Handler();
-          final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0);
           Runnable mUpdateTimeTask = new Runnable() {
             public void run() {              
                 // make sure the app isn't trying to finish
@@ -555,6 +576,16 @@ public class WigleAndroid extends Activity {
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
+      if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
+        Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
+        Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
+        startActivity(myIntent);
+      }
+      if ( ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) ) {
+        Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
+            Toast.LENGTH_LONG ).show();
+      }
+      
       gpsStatusListener = new Listener(){
         public void onGpsStatusChanged( int event ) {
           gpsStatus = locationManager.getGpsStatus( gpsStatus );
@@ -570,30 +601,39 @@ public class WigleAndroid extends Activity {
             // set so we see sat count
             setLocationUI( WigleAndroid.this, location );
           }
-          else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
-            long age = System.currentTimeMillis() - lastLocationTime; 
-            if ( satCount < 3 ) {
-              if ( satCountLowTime == null ) {
-                satCountLowTime = System.currentTimeMillis();
+          else {
+            long now = System.currentTimeMillis();
+            long age = now - lastLocationTime;
+            boolean gpsLost = false;
+            
+            if ( location.getProvider().equals( GPS_PROVIDER ) ) {
+              if ( satCount < 3 ) {
+                if ( satCountLowTime == null ) {
+                  satCountLowTime = now;
+                }
               }
-            }
-            else {
-              // plenty of sats
-              satCountLowTime = null;
+              else {
+                // plenty of sats
+                satCountLowTime = null;
+              }
+              gpsLost = satCountLowTime != null && (now - satCountLowTime) > GPS_TIMEOUT;
             }
             
+            // network gets a little more leeway
+            long timeout = location.getProvider().equals( NETWORK_PROVIDER ) ? NET_LOC_TIMEOUT : GPS_TIMEOUT;
+            
             // info( "gps age: " + age );
-            if ( age > GPS_TIMEOUT || 
-                (satCountLowTime != null && (System.currentTimeMillis() - satCountLowTime) > GPS_TIMEOUT) ) {
-              
-              info( "nulling location. age: " + age );
+            if ( age > timeout || gpsLost ) {
+              // info( "nulling location. age: " + age );
               location = null;
               setLocationUI( WigleAndroid.this, location );
+              
+              Toast.makeText( WigleAndroid.this, "Location fix lost", Toast.LENGTH_SHORT ).show();
               
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
               if ( speechGPS ) {
-                speak( "gps fix lost" );
+                speak( "GPS fix lost" );
               }
             }
           }
@@ -604,20 +644,35 @@ public class WigleAndroid extends Activity {
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
-            info("newlocation: " + newLocation
-							+ " provider: " + newLocation.getProvider() );
-            if ( location == null && newLocation != null ) {
+            info("newlocation: " + newLocation + " provider: " + newLocation.getProvider() );
+            
+            long now = System.currentTimeMillis();
+            if ( newLocation.getProvider().equals(NETWORK_PROVIDER) && lastLocationTime != null ) {
+              // see if we have a perfectly good gps provider, if so don't use network provider
+              long age = now - lastLocationTime;
+              if ( location != null && location.getProvider().equals( GPS_PROVIDER )
+                  && age < GPS_TIMEOUT ) {
+                info( "not using network provider: " + newLocation );
+                return;
+              }
+            }
+            
+            // if we had no location but now we do, or the location changed providers, announce it
+            if ( location == null && newLocation != null
+                || (location != null && newLocation != null && ! location.getProvider().equals(newLocation.getProvider() )) ) {
+              Toast.makeText( WigleAndroid.this, "Now have location from \"" + newLocation.getProvider()
+                  + "\"", Toast.LENGTH_SHORT ).show();
               SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
               boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
               if ( speechGPS ) {
-                speak( "now have gps fix" );
+                speak( "Now have location from " + newLocation.getProvider() );
               }
               // see if there's a new status to go along with this
               gpsStatus = locationManager.getGpsStatus( gpsStatus );
             }
             location = newLocation;
 						if ( location != null ) {
-							lastLocationTime = System.currentTimeMillis();
+							lastLocationTime = now;
 						}
             setLocationUI( WigleAndroid.this, location );
           }

@@ -61,6 +61,7 @@ public class WigleAndroid extends Activity {
     private Set<String> runNetworks;
     private GpsStatus gpsStatus;
     private Location location;
+    private Location networkLocation;
     private Handler wifiTimer;
     private DatabaseHelper dbHelper;
     private ServiceConnection serviceConnection;
@@ -69,6 +70,7 @@ public class WigleAndroid extends Activity {
     private int scanCount;
     private Long satCountLowTime;
     private Long lastLocationTime;
+    private Long lastNetworkLocationTime;
     private MediaPlayer soundPop;
     
     // created every time, even after retain
@@ -620,10 +622,31 @@ public class WigleAndroid extends Activity {
             }
             
             // network gets a little more leeway
-            long timeout = location.getProvider().equals( NETWORK_PROVIDER ) ? NET_LOC_TIMEOUT : GPS_TIMEOUT;
+            boolean isNetProvider = location.getProvider().equals( NETWORK_PROVIDER );
+            long timeout = isNetProvider ? NET_LOC_TIMEOUT : GPS_TIMEOUT;
+            gpsLost |= age > timeout;
+
+            if ( ! isNetProvider && gpsLost && networkLocation != null
+								&& lastNetworkLocationTime != null ) {
+              // see if we can jump from gps to network provider
+            	long netAge = now - lastNetworkLocationTime;
+							if ( netAge <= NET_LOC_TIMEOUT ) {
+								// it's good! switch over
+								gpsLost = false;
+								location = networkLocation;
+								lastLocationTime = lastNetworkLocationTime;
+                Toast.makeText( WigleAndroid.this, "Now have location from \"" + networkLocation.getProvider()
+                    + "\"", Toast.LENGTH_SHORT ).show();
+                SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+                boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
+                if ( speechGPS ) {
+                  speak( "Now have location from " + networkLocation.getProvider() );
+                }
+							}
+            }
             
             // info( "gps age: " + age );
-            if ( age > timeout || gpsLost ) {
+            if ( gpsLost ) {
               // info( "nulling location. age: " + age );
               location = null;
               setLocationUI( WigleAndroid.this, location );
@@ -647,13 +670,19 @@ public class WigleAndroid extends Activity {
             info("newlocation: " + newLocation + " provider: " + newLocation.getProvider() );
             
             long now = System.currentTimeMillis();
-            if ( newLocation.getProvider().equals(NETWORK_PROVIDER) && lastLocationTime != null ) {
-              // see if we have a perfectly good gps provider, if so don't use network provider
-              long age = now - lastLocationTime;
-              if ( location != null && location.getProvider().equals( GPS_PROVIDER )
-                  && age < GPS_TIMEOUT ) {
-                info( "not using network provider: " + newLocation );
-                return;
+            if ( newLocation.getProvider().equals(NETWORK_PROVIDER) ) {
+              // save for later, in case we lose gps
+              networkLocation = newLocation;
+              lastNetworkLocationTime = now;
+
+              if ( lastLocationTime != null ) {
+                // see if we have a perfectly good gps provider, if so don't use network provider
+                long age = now - lastLocationTime;
+                if ( location != null && location.getProvider().equals( GPS_PROVIDER )
+                    && age < GPS_TIMEOUT ) {
+                  info( "not using network provider: " + newLocation );
+                  return;
+                }
               }
             }
             
@@ -671,9 +700,9 @@ public class WigleAndroid extends Activity {
               gpsStatus = locationManager.getGpsStatus( gpsStatus );
             }
             location = newLocation;
-						if ( location != null ) {
-							lastLocationTime = now;
-						}
+            if ( location != null ) {
+              lastLocationTime = now;
+            }
             setLocationUI( WigleAndroid.this, location );
           }
           public void onProviderDisabled( String provider ) {}

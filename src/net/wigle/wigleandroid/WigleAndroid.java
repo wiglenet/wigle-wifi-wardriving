@@ -186,6 +186,7 @@ public class WigleAndroid extends Activity {
         
         setupService();
         setupDatabase();
+        setupMaxidDebug();
         setupUploadButton();
         setupList();
         setupSound();
@@ -488,7 +489,7 @@ public class WigleAndroid extends Activity {
                   dbHelper.addObservation( network, location );
                 }
               }
-              
+
               if ( somethingAdded && ! isMuted() ) {
                 boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
                 if ( play ) {
@@ -574,7 +575,7 @@ public class WigleAndroid extends Activity {
     
     private void setupLocation() {
       // set on UI if we already have one
-      setLocationUI( this, location );
+      updateLocationData( (Location) null );
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
@@ -590,76 +591,7 @@ public class WigleAndroid extends Activity {
       
       gpsStatusListener = new Listener(){
         public void onGpsStatusChanged( int event ) {
-          gpsStatus = locationManager.getGpsStatus( gpsStatus );
-          int satCount = 0;
-          for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
-            if ( sat.usedInFix() ) {
-              satCount++;
-            }
-          }
-          // info( "sats: " + satCount + " event: " + event );
-          
-          if ( location == null ) {
-            // set so we see sat count
-            setLocationUI( WigleAndroid.this, location );
-          }
-          else {
-            long now = System.currentTimeMillis();
-            long age = now - lastLocationTime;
-            boolean gpsLost = false;
-            
-            if ( location.getProvider().equals( GPS_PROVIDER ) ) {
-              if ( satCount < 3 ) {
-                if ( satCountLowTime == null ) {
-                  satCountLowTime = now;
-                }
-              }
-              else {
-                // plenty of sats
-                satCountLowTime = null;
-              }
-              gpsLost = satCountLowTime != null && (now - satCountLowTime) > GPS_TIMEOUT;
-            }
-            
-            // network gets a little more leeway
-            boolean isNetProvider = location.getProvider().equals( NETWORK_PROVIDER );
-            long timeout = isNetProvider ? NET_LOC_TIMEOUT : GPS_TIMEOUT;
-            gpsLost |= age > timeout;
-
-            if ( ! isNetProvider && gpsLost && networkLocation != null
-								&& lastNetworkLocationTime != null ) {
-              // see if we can jump from gps to network provider
-            	long netAge = now - lastNetworkLocationTime;
-							if ( netAge <= NET_LOC_TIMEOUT ) {
-								// it's good! switch over
-								gpsLost = false;
-								location = networkLocation;
-								lastLocationTime = lastNetworkLocationTime;
-                Toast.makeText( WigleAndroid.this, "Now have location from \"" + networkLocation.getProvider()
-                    + "\"", Toast.LENGTH_SHORT ).show();
-                SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
-                boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
-                if ( speechGPS ) {
-                  speak( "Now have location from " + networkLocation.getProvider() );
-                }
-							}
-            }
-            
-            // info( "gps age: " + age );
-            if ( gpsLost ) {
-              // info( "nulling location. age: " + age );
-              location = null;
-              setLocationUI( WigleAndroid.this, location );
-              
-              Toast.makeText( WigleAndroid.this, "Location fix lost", Toast.LENGTH_SHORT ).show();
-              
-              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
-              boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
-              if ( speechGPS ) {
-                speak( "GPS fix lost" );
-              }
-            }
-          }
+          updateLocationData( (Location) null );
         } 
       };
       locationManager.addGpsStatusListener( gpsStatusListener );
@@ -667,43 +599,7 @@ public class WigleAndroid extends Activity {
       List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
           public void onLocationChanged( Location newLocation ) {
-            info("newlocation: " + newLocation + " provider: " + newLocation.getProvider() );
-            
-            long now = System.currentTimeMillis();
-            if ( newLocation.getProvider().equals(NETWORK_PROVIDER) ) {
-              // save for later, in case we lose gps
-              networkLocation = newLocation;
-              lastNetworkLocationTime = now;
-
-              if ( lastLocationTime != null ) {
-                // see if we have a perfectly good gps provider, if so don't use network provider
-                long age = now - lastLocationTime;
-                if ( location != null && location.getProvider().equals( GPS_PROVIDER )
-                    && age < GPS_TIMEOUT ) {
-                  info( "not using network provider: " + newLocation );
-                  return;
-                }
-              }
-            }
-            
-            // if we had no location but now we do, or the location changed providers, announce it
-            if ( location == null && newLocation != null
-                || (location != null && newLocation != null && ! location.getProvider().equals(newLocation.getProvider() )) ) {
-              Toast.makeText( WigleAndroid.this, "Now have location from \"" + newLocation.getProvider()
-                  + "\"", Toast.LENGTH_SHORT ).show();
-              SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
-              boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
-              if ( speechGPS ) {
-                speak( "Now have location from " + newLocation.getProvider() );
-              }
-              // see if there's a new status to go along with this
-              gpsStatus = locationManager.getGpsStatus( gpsStatus );
-            }
-            location = newLocation;
-            if ( location != null ) {
-              lastLocationTime = now;
-            }
-            setLocationUI( WigleAndroid.this, location );
+            updateLocationData( newLocation );
           }
           public void onProviderDisabled( String provider ) {}
           public void onProviderEnabled( String provider ) {}
@@ -716,33 +612,139 @@ public class WigleAndroid extends Activity {
       }
     }
     
-    private void setLocationUI( Activity activity, Location location ) {
+    /** newLocation can be null */
+    private void updateLocationData( Location newLocation ) {
+      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      // see if we have new data
+      gpsStatus = locationManager.getGpsStatus( gpsStatus );
+      int satCount = getSatCount();
+      
+      final boolean newOK = newLocation != null;
+      final boolean locOK = locationOK( location, satCount );
+      final long now = System.currentTimeMillis();
+      
+      if ( newOK ) {
+        if ( NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
+          // save for later, in case we lose gps
+          networkLocation = newLocation;
+          lastNetworkLocationTime = now;
+        }
+        else {
+          lastLocationTime = now;
+        }
+      }
+      
+      final boolean netLocOK = locationOK( networkLocation, satCount );
+      
+      boolean wasProviderChange = false;
+      if ( ! locOK ) {
+        if ( newOK ) {
+          location = newLocation;
+          wasProviderChange = true;
+        }
+        else if ( netLocOK ) {
+          location = networkLocation;
+          wasProviderChange = true;
+        }
+        else if ( location != null ) {
+          // transition to null
+          info( "nulling location: " + location );
+          location = null;
+          wasProviderChange = true;
+        }
+      }
+      else if ( locOK && newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
+        if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
+          // this is an upgrade from network to gps
+          wasProviderChange = true;
+        }
+        location = newLocation;
+      }
+      
+      info( "run: " + this.runNetworks.size() + " satCount: " + satCount 
+          + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
+          + " wasProviderChange: " + wasProviderChange
+          + (newOK ? " newProvider: " + newLocation.getProvider() : "")
+          + (locOK ? " locProvider: " + location.getProvider() : "") 
+          + " newLocation: " + newLocation );
+      
+      if ( wasProviderChange ) {
+        String announce = location == null ? "Lost Location" 
+            : "Now have location from \"" + location.getProvider() + "\"";
+        Toast.makeText( WigleAndroid.this, announce, Toast.LENGTH_SHORT ).show();
+        SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+        boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
+        if ( speechGPS ) {
+          speak( announce );
+        }
+      }
+      
+      // update the UI
+      setLocationUI();
+    }
+    
+    private boolean locationOK( final Location location, final int satCount ) {
+      boolean retval = false;
+      long now = System.currentTimeMillis();
+      
+      if ( location == null ) {
+        // bad!
+      }
+      else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
+        if ( satCount < 3 ) {
+          if ( satCountLowTime == null ) {
+            satCountLowTime = now;
+          }
+        }
+        else {
+          // plenty of sats
+          satCountLowTime = null;
+        }
+        boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > GPS_TIMEOUT;
+        gpsLost |= now - lastLocationTime > GPS_TIMEOUT;
+        retval = ! gpsLost;
+      }
+      else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
+        boolean gpsLost = now - lastNetworkLocationTime > NET_LOC_TIMEOUT;
+        retval = ! gpsLost;
+      }
+      
+      return retval;
+    }
+    
+    private int getSatCount() {
+      int satCount = 0;
       if ( gpsStatus != null ) {
-        int satCount = 0;
         for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
           if ( sat.usedInFix() ) {
             satCount++;
           }
         }
-        
-        TextView tv = (TextView) activity.findViewById( R.id.LocationTextView06 );
+      }
+      return satCount;
+    }
+    
+    private void setLocationUI() {
+      if ( gpsStatus != null ) {
+        int satCount = getSatCount();
+        TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
         tv.setText( "Sats: " + satCount );
       }
       
-      TextView tv = (TextView) activity.findViewById( R.id.LocationTextView01 );
+      TextView tv = (TextView) this.findViewById( R.id.LocationTextView01 );
       tv.setText( "Lat: " + (location == null ? "  (Waiting for GPS sync..)" 
           : numberFormat8.format( location.getLatitude() ) ) );
       
-      tv = (TextView) activity.findViewById( R.id.LocationTextView02 );
+      tv = (TextView) this.findViewById( R.id.LocationTextView02 );
       tv.setText( "Lon: " + (location == null ? "" : numberFormat8.format( location.getLongitude() ) ) );
       
-      tv = (TextView) activity.findViewById( R.id.LocationTextView03 );
+      tv = (TextView) this.findViewById( R.id.LocationTextView03 );
       tv.setText( "Speed: " + (location == null ? "" : numberFormat1.format( location.getSpeed() * 2.23693629f ) + "mph" ) );
       
-      tv = (TextView) activity.findViewById( R.id.LocationTextView04 );
+      tv = (TextView) this.findViewById( R.id.LocationTextView04 );
       tv.setText( location == null ? "" : ("+/- " + numberFormat1.format( location.getAccuracy() ) + "m") );
       
-      tv = (TextView) activity.findViewById( R.id.LocationTextView05 );
+      tv = (TextView) this.findViewById( R.id.LocationTextView05 );
       tv.setText( location == null ? "" : ("Alt: " + numberFormat1.format( location.getAltitude() ) + "m") );
     }
     
@@ -900,5 +902,23 @@ public class WigleAndroid extends Activity {
         // ohwell
       }
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
+    }
+    
+    private void setupMaxidDebug() {
+      final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+      long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
+      if ( maxid == -1L ) {
+        // load up the local value
+        dbHelper.getLocationCountFromDB();
+        long loccount = dbHelper.getLocationCount();
+        if ( loccount > 0 ) {
+          // there is no preference set, yet there are locations, this is likely
+          // a developer testing a new install on an old db, so set the pref.
+          info( "setting db marker to: " + loccount );
+          Editor edit = prefs.edit();
+          edit.putLong( PREF_DB_MARKER, loccount );
+          edit.commit();
+        }
+      }
     }
 }

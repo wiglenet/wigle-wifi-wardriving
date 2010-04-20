@@ -319,7 +319,8 @@ public class DatabaseHelper extends Thread {
   public long getLocationCount() {
     return locationCount.get();
   }
-  private void getLocationCountFromDB() {
+  /** careful with threading on this one */
+  public void getLocationCountFromDB() {
     checkDB();
     Cursor cursor = db.rawQuery("select count(*) FROM " + LOCATION_TABLE, null);
     cursor.moveToFirst();

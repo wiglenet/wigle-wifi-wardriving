@@ -34,6 +34,7 @@ import android.location.LocationManager;
 import android.location.GpsStatus.Listener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnErrorListener;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -67,11 +68,12 @@ public class WigleAndroid extends Activity {
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
     private String savedStats;
-    private int scanCount;
+    private long prevNewNetCount;
     private Long satCountLowTime;
     private Long lastLocationTime;
     private Long lastNetworkLocationTime;
     private MediaPlayer soundPop;
+    private MediaPlayer soundNewPop;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -163,8 +165,9 @@ public class WigleAndroid extends Activity {
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
           this.savedStats = retained.savedStats;
-          this.scanCount = retained.scanCount;
+          this.prevNewNetCount = retained.prevNewNetCount;
           this.soundPop = retained.soundPop;
+          this.soundNewPop = retained.soundNewPop;
           
           TextView tv = (TextView) findViewById( R.id.stats );
           tv.setText( savedStats );
@@ -219,6 +222,12 @@ public class WigleAndroid extends Activity {
     }
     
     @Override
+    public void onStop() {
+      info( "stop. networks: " + runNetworks.size() );
+      super.onStop();
+    }
+
+    @Override
     public void onRestart() {
       info( "restart. networks: " + runNetworks.size() );
       super.onRestart();
@@ -231,13 +240,13 @@ public class WigleAndroid extends Activity {
         this.unregisterReceiver( wifiReceiver );
       }
       catch ( IllegalArgumentException ex ) {
-        WigleAndroid.info( "wifiReceiver not registered: " + ex );
+        info( "wifiReceiver not registered: " + ex );
       }
       try {
         this.unbindService( serviceConnection );
       }
       catch ( IllegalArgumentException ex ) {
-        WigleAndroid.info( "serviceConnection not registered: " + ex );
+        info( "serviceConnection not registered: " + ex );
       }
       
       super.onDestroy();
@@ -263,16 +272,16 @@ public class WigleAndroid extends Activity {
         this.unregisterReceiver( wifiReceiver );
       }
       catch ( IllegalArgumentException ex ) {
-        WigleAndroid.info( "wifiReceiver not registered: " + ex );
+        info( "wifiReceiver not registered: " + ex );
       }
       try {
         this.unbindService( serviceConnection );
       }
       catch ( IllegalArgumentException ex ) {
-        WigleAndroid.info( "serviceConnection not registered: " + ex );
+        info( "serviceConnection not registered: " + ex );
       }    
       
-      final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       if ( wifiWasOff ) {
         // well turn it of now that we're done
@@ -416,7 +425,7 @@ public class WigleAndroid extends Activity {
     
     private void setupWifi() {
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
         Editor edit = prefs.edit();
         
         if ( ! wifiManager.isWifiEnabled() ) {
@@ -490,33 +499,51 @@ public class WigleAndroid extends Activity {
                 }
               }
 
-              if ( somethingAdded && ! isMuted() ) {
-                boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
-                if ( play ) {
-                  // play sound on something new
-                  soundPop.start();
+              // check if there are more "New" nets
+              long newNetCount = dbHelper.getNewNetworkCount();
+              boolean newNet = newNetCount > prevNewNetCount;
+              prevNewNetCount = newNetCount;
+              
+              boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
+              if ( play && ! isMuted() ) {
+                if ( newNet ) {
+                  if ( ! soundNewPop.isPlaying() ) {
+                    // play sound on something new
+                    soundNewPop.start();
+                  }
+                  else {
+                    info( "soundNewPop is playing" );
+                  }
+                }
+                else if ( somethingAdded ) {
+                  if ( ! soundPop.isPlaying() ) {
+                    // play sound on something new
+                    soundPop.start();
+                  }
+                  else {
+                    info( "soundPop is playing" );
+                  }
                 }
               }
               
               // sort by signal strength
               listAdapter.sort( signalCompare );
-              
+
               // update stat
               TextView tv = (TextView) findViewById( R.id.stats );
               StringBuilder builder = new StringBuilder( 40 );
               builder.append( "Run: " ).append( runNetworks.size() );
-              builder.append( " New: " ).append( dbHelper.getNewNetworkCount() );
+              builder.append( " New: " ).append( newNetCount );
               builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
               builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
               savedStats = builder.toString();
               tv.setText( savedStats );
               
-              // WigleAndroid.info( savedStats );
+              // info( savedStats );
               
               // notify
               listAdapter.notifyDataSetChanged();
               
-              scanCount++;
               long now = System.currentTimeMillis();
               status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
               
@@ -526,7 +553,7 @@ public class WigleAndroid extends Activity {
                 if ( location == null ) {
                   gps = ", no gps fix";
                 }
-                speak("run " + runNetworks.size() + ", new " + dbHelper.getNewNetworkCount() + gps );
+                speak("run " + runNetworks.size() + ", new " + newNetCount + gps );
                 previousTalkTime = now;
               }
             }
@@ -550,7 +577,7 @@ public class WigleAndroid extends Activity {
                   // info( "timer start scan" );
                   wifiManager.startScan();
                   long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
-                  // WigleAndroid.info("wifitimer: " + period );
+                  // info("wifitimer: " + period );
                   wifiTimer.postDelayed( this, period );
                 }
                 else {
@@ -677,10 +704,13 @@ public class WigleAndroid extends Activity {
       if ( wasProviderChange ) {
         String announce = location == null ? "Lost Location" 
             : "Now have location from \"" + location.getProvider() + "\"";
-        Toast.makeText( WigleAndroid.this, announce, Toast.LENGTH_SHORT ).show();
-        SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+        Toast.makeText( this, announce, Toast.LENGTH_SHORT ).show();
+        SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
         boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
         if ( speechGPS ) {
+          // no quotes or the voice pauses
+          announce = location == null ? "Lost Location" 
+            : "Now have location from " + location.getProvider() + ".";
           speak( announce );
         }
       }
@@ -793,7 +823,10 @@ public class WigleAndroid extends Activity {
     private void setupSound() {
       // could have been retained
       if ( soundPop == null ) {
-        soundPop = MediaPlayer.create( this, R.raw.pop );
+        soundPop = createMediaPlayer( R.raw.pop );
+      }
+      if ( soundNewPop == null ) {
+        soundNewPop = createMediaPlayer( R.raw.newpop );
       }
       audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
       
@@ -823,6 +856,31 @@ public class WigleAndroid extends Activity {
           }
         }
       });
+    }
+
+    private MediaPlayer createMediaPlayer( int soundId ) {
+      MediaPlayer sound = MediaPlayer.create( this, soundId );
+      // try to figure out why sounds stops after a while
+      sound.setOnErrorListener( new OnErrorListener() {
+        public boolean onError( MediaPlayer mp, int what, int extra ) {
+          String whatString = null;
+          switch ( what ) {
+            case MediaPlayer.MEDIA_ERROR_UNKNOWN:
+              whatString = "error unknown";
+              break;
+            case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
+              whatString = "server died";
+              break;
+            default:
+              whatString = "not defined";
+          }
+          info( "media player error \"" + whatString + "\" what: " + what
+            + " extra: " + extra + " mp: " + mp );
+          return false;
+        }
+      } );
+
+      return sound;
     }
     
     @SuppressWarnings("unused")

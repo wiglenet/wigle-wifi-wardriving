@@ -653,12 +653,18 @@ public class WigleAndroid extends Activity {
           wasProviderChange = true;
         }
       }
-      else if ( locOK && newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
+      else if ( newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
         if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
           // this is an upgrade from network to gps
           wasProviderChange = true;
         }
         location = newLocation;
+      }
+      else if ( newOK && NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
+        if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
+          // just a new network provided location over an old one
+          location = newLocation;
+        }
       }
       
       info( "run: " + this.runNetworks.size() + " satCount: " + satCount 
@@ -672,7 +678,7 @@ public class WigleAndroid extends Activity {
         String announce = location == null ? "Lost Location" 
             : "Now have location from \"" + location.getProvider() + "\"";
         Toast.makeText( WigleAndroid.this, announce, Toast.LENGTH_SHORT ).show();
-        SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0);
+        SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
         boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
         if ( speechGPS ) {
           speak( announce );

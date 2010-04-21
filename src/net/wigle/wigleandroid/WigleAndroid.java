@@ -829,6 +829,7 @@ public class WigleAndroid extends Activity {
         soundNewPop = createMediaPlayer( R.raw.newpop );
       }
       audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+      this.setVolumeControlStream(AudioManager.STREAM_MUSIC);  
       
       if ( TTS.hasTTS() ) {
         tts = new TTS( this );        

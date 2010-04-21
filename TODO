@@ -17,6 +17,8 @@ click on network to connect, with warning about legality
 --- done ---
 * 1.5:
 keep around a recent network-provided location for no gap if gps lost
+different sound on new network
+volume controls always change media volume
 
 * 1.4:
 hopefully fixed issue with looping gps fix/lost race condition

@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -38,6 +39,9 @@ public class SettingsActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.settings);
+      
+      // force media volume controls
+      this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
       // don't let the textbox have focus to start with, so we don't see a keyboard right away
       LinearLayout linearLayout = (LinearLayout) findViewById( R.id.linearlayout );

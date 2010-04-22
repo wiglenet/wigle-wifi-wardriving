@@ -22,6 +22,7 @@ volume controls always change "media volume"
 fix back-button not stopping the service as rest of app is shut down
 lock wifi radio on
 popup about turning off wifi notifications if on (no access to auto turn off)
+emulator detection
 
 * 1.4:
 hopefully fixed issue with looping gps fix/lost race condition

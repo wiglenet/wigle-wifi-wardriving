@@ -86,6 +86,7 @@ public class WigleAndroid extends Activity {
     private TTS tts;
     private AudioManager audioManager;
     private long previousTalkTime = System.currentTimeMillis();
+    private boolean inEmulator;
     
     public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -140,6 +141,10 @@ public class WigleAndroid extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
+        inEmulator = id == null;
+        info( "id: '" + id + "' inEmulator: " + inEmulator );
         
 //        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
 //          public void uncaughtException( Thread thread, Throwable throwable ) {
@@ -297,7 +302,8 @@ public class WigleAndroid extends Activity {
       
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
-      if ( wifiWasOff ) {
+      // don't call on emulator, it crashes it
+      if ( wifiWasOff && ! inEmulator ) {
         // well turn it of now that we're done
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled( false );
@@ -454,12 +460,15 @@ public class WigleAndroid extends Activity {
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       Editor edit = prefs.edit();
       
+      
       if ( ! wifiManager.isWifiEnabled() ) {
         // save so we can turn it back off when we exit  
         edit.putBoolean(PREF_WIFI_WAS_OFF, true);
         
-        // just turn it on
-        wifiManager.setWifiEnabled( true );
+        // just turn it on, but not in emulator cuz it crashes it
+        if ( ! inEmulator ) {
+          wifiManager.setWifiEnabled( true );
+        }
       }
       else {
         edit.putBoolean(PREF_WIFI_WAS_OFF, false);
@@ -640,7 +649,8 @@ public class WigleAndroid extends Activity {
         Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
         startActivity(myIntent);
       }
-      if ( ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) ) {
+      // emulator crashes if you ask this
+      if ( ! inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) ) {
         Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
             Toast.LENGTH_LONG ).show();
       }

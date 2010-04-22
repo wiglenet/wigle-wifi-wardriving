@@ -13,29 +13,44 @@ public class WigleService extends Service {
 
   @Override
   public IBinder onBind( Intent intent ) {
+    WigleAndroid.info("service: onbind");
     return null;
   }
   
   @Override
+  public void onRebind( Intent intent ) {
+    WigleAndroid.info("service: onRebind");
+    super.onRebind( intent );
+  }
+
+  @Override
+  public boolean onUnbind( Intent intent ) {
+    WigleAndroid.info("service: onUnbind");
+    shutdownNotification();
+		stopSelf();
+    return super.onUnbind( intent );
+  }
+
+  @Override
   public void onCreate() {
-    super.onCreate();
     WigleAndroid.info("service: oncreate");
     setupNotification();
+    super.onCreate();
   }
   
   @Override
   public void onDestroy() {
-    super.onDestroy();
     WigleAndroid.info("service: ondestroy");
     shutdownNotification();
+    super.onDestroy();
   }
   
   @Override
-  public void finalize() {
-    WigleAndroid.info("service: finalize");
-    // shutdownNotification();
+  public void onLowMemory() {
+    super.onLowMemory();
+    WigleAndroid.info("service: onLowMemory");
   }
-  
+
   private void shutdownNotification() {
     NotificationManager notificationManager = 
       (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );

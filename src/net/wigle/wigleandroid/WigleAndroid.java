@@ -242,6 +242,9 @@ public class WigleAndroid extends Activity {
       catch ( IllegalArgumentException ex ) {
         info( "wifiReceiver not registered: " + ex );
       }
+      // stop the service, so when we die it's both stopped and unbound and will die
+      Intent serviceIntent = new Intent( this, WigleService.class );
+      this.stopService( serviceIntent );
       try {
         this.unbindService( serviceConnection );
       }
@@ -274,6 +277,10 @@ public class WigleAndroid extends Activity {
       catch ( IllegalArgumentException ex ) {
         info( "wifiReceiver not registered: " + ex );
       }
+
+      // stop the service, so when we die it's both stopped and unbound and will die
+      Intent serviceIntent = new Intent( this, WigleService.class );
+      this.stopService( serviceIntent );
       try {
         this.unbindService( serviceConnection );
       }

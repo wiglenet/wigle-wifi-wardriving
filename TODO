@@ -18,7 +18,8 @@ click on network to connect, with warning about legality
 * 1.5:
 keep around a recent network-provided location for no gap if gps lost
 different sound on new network
-volume controls always change media volume
+volume controls always change "media volume"
+fix back-button not stopping the service as rest of app is shut down
 
 * 1.4:
 hopefully fixed issue with looping gps fix/lost race condition

@@ -300,20 +300,23 @@ public class WigleAndroid extends Activity {
         info( "serviceConnection not registered: " + ex );
       }    
       
+      // release the lock before turning wifi off
+      if ( wifiLock != null && wifiLock.isHeld() ) {
+        wifiLock.release();
+      }
+      
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! inEmulator ) {
         // well turn it of now that we're done
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        info( "turning back off wifi" );
         wifiManager.setWifiEnabled( false );
       }
       
       if ( tts != null ) {
         tts.shutdown();
-      }
-      if ( wifiLock != null && wifiLock.isHeld() ) {
-        wifiLock.release();
       }
       
       super.finish();
@@ -459,7 +462,6 @@ public class WigleAndroid extends Activity {
       final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       Editor edit = prefs.edit();
-      
       
       if ( ! wifiManager.isWifiEnabled() ) {
         // save so we can turn it back off when we exit  
@@ -733,12 +735,14 @@ public class WigleAndroid extends Activity {
         }
       }
       
-      info( "run: " + this.runNetworks.size() + " satCount: " + satCount 
+      if ( false ) {
+        info( "run: " + this.runNetworks.size() + " satCount: " + satCount 
           + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
           + " wasProviderChange: " + wasProviderChange
           + (newOK ? " newProvider: " + newLocation.getProvider() : "")
           + (locOK ? " locProvider: " + location.getProvider() : "") 
           + " newLocation: " + newLocation );
+      }
       
       if ( wasProviderChange ) {
         String announce = location == null ? "Lost Location" 

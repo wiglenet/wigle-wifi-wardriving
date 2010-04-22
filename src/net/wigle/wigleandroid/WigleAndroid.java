@@ -37,6 +37,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.net.wifi.WifiManager.WifiLock;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -74,6 +75,7 @@ public class WigleAndroid extends Activity {
     private Long lastNetworkLocationTime;
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
+    private WifiLock wifiLock;
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -117,6 +119,7 @@ public class WigleAndroid extends Activity {
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     
     static final String ANONYMOUS = "anonymous";
+    private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     
     // cache
@@ -168,6 +171,7 @@ public class WigleAndroid extends Activity {
           this.prevNewNetCount = retained.prevNewNetCount;
           this.soundPop = retained.soundPop;
           this.soundNewPop = retained.soundNewPop;
+          this.wifiLock = retained.wifiLock;
           
           TextView tv = (TextView) findViewById( R.id.stats );
           tv.setText( savedStats );
@@ -251,6 +255,9 @@ public class WigleAndroid extends Activity {
       catch ( IllegalArgumentException ex ) {
         info( "serviceConnection not registered: " + ex );
       }
+      if ( wifiLock != null && wifiLock.isHeld() ) {
+        wifiLock.release();
+      }
       
       super.onDestroy();
     }
@@ -298,6 +305,9 @@ public class WigleAndroid extends Activity {
       
       if ( tts != null ) {
         tts.shutdown();
+      }
+      if ( wifiLock != null && wifiLock.isHeld() ) {
+        wifiLock.release();
       }
       
       super.finish();
@@ -431,174 +441,186 @@ public class WigleAndroid extends Activity {
     }
     
     private void setupWifi() {
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-        Editor edit = prefs.edit();
+      // warn about turning off network notification
+      String notifOn = Settings.Secure.getString(getContentResolver(), 
+          Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
+      if ( notifOn != null && "1".equals( notifOn ) ) {
+        Toast.makeText( this, "For best results, unset \"Network notification\" in"
+            + " \"Wireless & networks\"->\"Wi-Fi settings\"", 
+            Toast.LENGTH_LONG ).show();
+      }
+    
+      final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      Editor edit = prefs.edit();
+      
+      if ( ! wifiManager.isWifiEnabled() ) {
+        // save so we can turn it back off when we exit  
+        edit.putBoolean(PREF_WIFI_WAS_OFF, true);
         
-        if ( ! wifiManager.isWifiEnabled() ) {
-          // save so we can turn it back off when we exit  
-          edit.putBoolean(PREF_WIFI_WAS_OFF, true);
-          
-          // just turn it on
-          wifiManager.setWifiEnabled( true );
-        }
-        else {
-          edit.putBoolean(PREF_WIFI_WAS_OFF, false);
-        }
-        edit.commit();
-        
-        // wifi scan listener
-        wifiReceiver = new BroadcastReceiver(){
-            public void onReceive( Context context, Intent intent ){
-              long start = System.currentTimeMillis();
-              List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
+        // just turn it on
+        wifiManager.setWifiEnabled( true );
+      }
+      else {
+        edit.putBoolean(PREF_WIFI_WAS_OFF, false);
+      }
+      edit.commit();
+      
+      // wifi scan listener
+      wifiReceiver = new BroadcastReceiver(){
+          public void onReceive( Context context, Intent intent ){
+            long start = System.currentTimeMillis();
+            List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
+            
+            long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
+            if ( period < 1000L ) {
+              // under a second is hard to hit, treat as "continuous", so request scan in here
+              wifiManager.startScan();
+            }
+            
+            boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
+            if ( showCurrent ) {
+              listAdapter.clear();
+            }
+            
+            int preQueueSize = dbHelper.getQueueSize();
+            
+            CacheMap<String,Network> networkCache = getNetworkCache();
+            boolean somethingAdded = false;
+            for ( ScanResult result : results ) {
+              Network network = networkCache.get( result.BSSID );
+              if ( network == null ) {
+                network = new Network( result );
+                networkCache.put( network.getBssid(), network );
+              }
+              else {
+                // cache hit, just set the level
+                network.setLevel( result.level );
+              }
+              boolean added = runNetworks.add( result.BSSID );
+              somethingAdded |= added;
               
-              long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
-              if ( period < 1000L ) {
-                // under a second is hard to hit, treat as "continuous", so request scan in here
+              // if we're showing current, or this was just added, put on the list
+              if ( showCurrent || added ) {
+                listAdapter.add( network );
+                // load test
+                // for ( int i = 0; i< 10; i++) {
+                //  listAdapter.add( network );
+                // }
+                
+              }
+              else {
+                // not showing current, and not a new thing, go find the network and update the level
+                // this is O(n), ohwell, that's why showCurrent is the default config.
+                for ( int index = 0; index < listAdapter.getCount(); index++ ) {
+                  Network testNet = listAdapter.getItem(index);
+                  if ( testNet.getBssid().equals( network.getBssid() ) ) {
+                    testNet.setLevel( result.level );
+                  }
+                }
+              }
+              
+              if ( location != null && dbHelper != null ) {
+                dbHelper.addObservation( network, location );
+              }
+            }
+
+            // check if there are more "New" nets
+            long newNetCount = dbHelper.getNewNetworkCount();
+            boolean newNet = newNetCount > prevNewNetCount;
+            prevNewNetCount = newNetCount;
+            
+            boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
+            if ( play && ! isMuted() ) {
+              if ( newNet ) {
+                if ( ! soundNewPop.isPlaying() ) {
+                  // play sound on something new
+                  soundNewPop.start();
+                }
+                else {
+                  info( "soundNewPop is playing" );
+                }
+              }
+              else if ( somethingAdded ) {
+                if ( ! soundPop.isPlaying() ) {
+                  // play sound on something new
+                  soundPop.start();
+                }
+                else {
+                  info( "soundPop is playing" );
+                }
+              }
+            }
+            
+            // sort by signal strength
+            listAdapter.sort( signalCompare );
+
+            // update stat
+            TextView tv = (TextView) findViewById( R.id.stats );
+            StringBuilder builder = new StringBuilder( 40 );
+            builder.append( "Run: " ).append( runNetworks.size() );
+            builder.append( " New: " ).append( newNetCount );
+            builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
+            builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
+            savedStats = builder.toString();
+            tv.setText( savedStats );
+            
+            // info( savedStats );
+            
+            // notify
+            listAdapter.notifyDataSetChanged();
+            
+            long now = System.currentTimeMillis();
+            status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
+            
+            long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
+            if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
+              String gps = "";
+              if ( location == null ) {
+                gps = ", no gps fix";
+              }
+              speak("run " + runNetworks.size() + ", new " + newNetCount + gps );
+              previousTalkTime = now;
+            }
+          }
+        };
+      
+      // register
+      IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+      this.registerReceiver( wifiReceiver, intentFilter );
+      
+      if ( wifiLock == null ) {
+        // lock the radio on
+        wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, WIFI_LOCK_NAME );
+        wifiLock.acquire();
+      }
+      
+      // might not be null on a nonconfig retain
+      if ( wifiTimer == null ) {
+        wifiTimer = new Handler();
+        Runnable mUpdateTimeTask = new Runnable() {
+          public void run() {              
+              // make sure the app isn't trying to finish
+              if ( ! finishing.get() ) {
+                // info( "timer start scan" );
                 wifiManager.startScan();
+                long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                // info("wifitimer: " + period );
+                wifiTimer.postDelayed( this, period );
               }
-              
-              boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
-              if ( showCurrent ) {
-                listAdapter.clear();
+              else {
+                info( "finishing timer" );
               }
-              
-              int preQueueSize = dbHelper.getQueueSize();
-              
-              CacheMap<String,Network> networkCache = getNetworkCache();
-              boolean somethingAdded = false;
-              for ( ScanResult result : results ) {
-                Network network = networkCache.get( result.BSSID );
-                if ( network == null ) {
-                  network = new Network( result );
-                  networkCache.put( network.getBssid(), network );
-                }
-                else {
-                  // cache hit, just set the level
-                  network.setLevel( result.level );
-                }
-                boolean added = runNetworks.add( result.BSSID );
-                somethingAdded |= added;
-                
-                // if we're showing current, or this was just added, put on the list
-                if ( showCurrent || added ) {
-                  listAdapter.add( network );
-                  // load test
-                  // for ( int i = 0; i< 10; i++) {
-                  //  listAdapter.add( network );
-                  // }
-                  
-                }
-                else {
-                  // not showing current, and not a new thing, go find the network and update the level
-                  // this is O(n), ohwell, that's why showCurrent is the default config.
-                  for ( int index = 0; index < listAdapter.getCount(); index++ ) {
-                    Network testNet = listAdapter.getItem(index);
-                    if ( testNet.getBssid().equals( network.getBssid() ) ) {
-                      testNet.setLevel( result.level );
-                    }
-                  }
-                }
-                
-                if ( location != null && dbHelper != null ) {
-                  dbHelper.addObservation( network, location );
-                }
-              }
+          }
+        };
+        wifiTimer.removeCallbacks(mUpdateTimeTask);
+        wifiTimer.postDelayed(mUpdateTimeTask, 100);
 
-              // check if there are more "New" nets
-              long newNetCount = dbHelper.getNewNetworkCount();
-              boolean newNet = newNetCount > prevNewNetCount;
-              prevNewNetCount = newNetCount;
-              
-              boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
-              if ( play && ! isMuted() ) {
-                if ( newNet ) {
-                  if ( ! soundNewPop.isPlaying() ) {
-                    // play sound on something new
-                    soundNewPop.start();
-                  }
-                  else {
-                    info( "soundNewPop is playing" );
-                  }
-                }
-                else if ( somethingAdded ) {
-                  if ( ! soundPop.isPlaying() ) {
-                    // play sound on something new
-                    soundPop.start();
-                  }
-                  else {
-                    info( "soundPop is playing" );
-                  }
-                }
-              }
-              
-              // sort by signal strength
-              listAdapter.sort( signalCompare );
-
-              // update stat
-              TextView tv = (TextView) findViewById( R.id.stats );
-              StringBuilder builder = new StringBuilder( 40 );
-              builder.append( "Run: " ).append( runNetworks.size() );
-              builder.append( " New: " ).append( newNetCount );
-              builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
-              builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
-              savedStats = builder.toString();
-              tv.setText( savedStats );
-              
-              // info( savedStats );
-              
-              // notify
-              listAdapter.notifyDataSetChanged();
-              
-              long now = System.currentTimeMillis();
-              status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
-              
-              long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
-              if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-                String gps = "";
-                if ( location == null ) {
-                  gps = ", no gps fix";
-                }
-                speak("run " + runNetworks.size() + ", new " + newNetCount + gps );
-                previousTalkTime = now;
-              }
-            }
-          };
-        
-        // register
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        this.registerReceiver( wifiReceiver, intentFilter );
-        
-        // WifiLock wifiLock = wifiManager.createWifiLock( WIFI_LOCK_NAME );
-        // wifiLock.acquire();
-        
-        // might not be null on a nonconfig retain
-        if ( wifiTimer == null ) {
-          wifiTimer = new Handler();
-          Runnable mUpdateTimeTask = new Runnable() {
-            public void run() {              
-                // make sure the app isn't trying to finish
-                if ( ! finishing.get() ) {
-                  // info( "timer start scan" );
-                  wifiManager.startScan();
-                  long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
-                  // info("wifitimer: " + period );
-                  wifiTimer.postDelayed( this, period );
-                }
-                else {
-                  info( "finishing timer" );
-                }
-            }
-          };
-          wifiTimer.removeCallbacks(mUpdateTimeTask);
-          wifiTimer.postDelayed(mUpdateTimeTask, 100);
-  
-          // starts scan, sends event when done
-          boolean scanOK = wifiManager.startScan();
-          info( "startup finished. wifi scanOK: " + scanOK );
-        }
+        // starts scan, sends event when done
+        boolean scanOK = wifiManager.startScan();
+        info( "startup finished. wifi scanOK: " + scanOK );
+      }
     }
     
     private void speak( String string ) {

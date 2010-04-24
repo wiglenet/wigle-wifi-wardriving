@@ -23,7 +23,13 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
+/**
+ * configure settings
+ */
 public class SettingsActivity extends Activity {
+  
+  private static final int MENU_RETURN = 12;
+  
   /** convenience, just get the darn new string */
   private static abstract class SetWatcher implements TextWatcher {
     public void afterTextChanged(Editable s) {}
@@ -206,8 +212,6 @@ public class SettingsActivity extends Activity {
         public void onNothingSelected(AdapterView<?> arg0) {}
         });    
   }
-  
-  private static final int MENU_RETURN = 12;
   
   /* Creates the menu items */
   @Override

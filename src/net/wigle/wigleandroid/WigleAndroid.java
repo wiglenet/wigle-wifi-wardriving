@@ -92,6 +92,7 @@ public class WigleAndroid extends Activity {
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
+    private static final int MENU_MAP = 12;
     public static final String ENCODING = "ISO8859_1";
     private static final long GPS_TIMEOUT = 15000L;
     private static final long NET_LOC_TIMEOUT = 60000L;
@@ -122,6 +123,12 @@ public class WigleAndroid extends Activity {
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
+    
+    /** XXX: switch to using the service */
+    public static class LameStatic {
+      public Location location; 
+    }
+    public static final LameStatic lameStatic = new LameStatic();
     
     // cache
     private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
@@ -330,6 +337,9 @@ public class WigleAndroid extends Activity {
         
         item = menu.add(0, MENU_SETTINGS, 0, "Settings");
         item.setIcon( android.R.drawable.ic_menu_preferences );
+        
+        item = menu.add(0, MENU_MAP, 0, "Map");
+        item.setIcon( android.R.drawable.ic_menu_mapmode );
         return true;
     }
 
@@ -337,11 +347,18 @@ public class WigleAndroid extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch ( item.getItemId() ) {
-          case MENU_SETTINGS:
-            info("settings");
+          case MENU_SETTINGS: {
+            info("start settings activity");
             Intent intent = new Intent( this, SettingsActivity.class );
             this.startActivity( intent );
             return true;
+          }
+          case MENU_MAP: {
+            info("start map activity");
+            Intent intent = new Intent( this, MappingActivity.class );
+            this.startActivity( intent );
+            return true;
+          }
           case MENU_EXIT:
             // stop the service, so when we die it's both stopped and unbound and will die
             Intent serviceIntent = new Intent( this, WigleService.class );
@@ -735,8 +752,11 @@ public class WigleAndroid extends Activity {
         }
       }
       
-      if ( false ) {
-        info( "run: " + this.runNetworks.size() + " satCount: " + satCount 
+      // for maps. so lame!
+      lameStatic.location = location;
+      
+      if ( wasProviderChange ) {
+        info( "wasProviderChange: run: " + this.runNetworks.size() + " satCount: " + satCount 
           + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
           + " wasProviderChange: " + wasProviderChange
           + (newOK ? " newProvider: " + newLocation.getProvider() : "")

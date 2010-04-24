@@ -20,9 +20,24 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
+        <activity android:name=".MappingActivity"
+                  android:label="@string/mapping_app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
 
     <service android:name=".WigleService" android:enabled="true"
     	android:icon="@drawable/wiglewifi"/>
+    	
+    <service android:name="org.andnav.osm.services.OpenStreetMapTileProviderService"
+        	android:process=":remote"
+            android:label="OpenStreetMapTileProviderService">
+    	<intent-filter>
+        	<action android:name="org.andnav.osm.services.IOpenStreetMapTileProviderService" />
+        </intent-filter>
+    </service>
 </application>
     <uses-sdk android:minSdkVersion="3" />
 

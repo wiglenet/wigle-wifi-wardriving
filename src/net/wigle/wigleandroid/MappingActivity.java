@@ -8,10 +8,12 @@ import org.andnav.osm.views.OpenStreetMapViewController;
 
 import android.app.Activity;
 import android.location.Location;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 /**
  * show a map!
@@ -30,6 +32,9 @@ public class MappingActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.map);
     finishing = new AtomicBoolean( false );
+    
+    // media volume
+    this.setVolumeControlStream(AudioManager.STREAM_MUSIC);  
     
     setupMapView();
     setupTimer();
@@ -55,7 +60,12 @@ public class MappingActivity extends Activity {
               Location location = WigleAndroid.lameStatic.location;
               if ( location != null ) {
                 // WigleAndroid.info( "mapping center location: " + location );
-                mapControl.setCenter( new GeoPoint( location ) );
+                mapControl.animateTo( new GeoPoint( location ) );
+              }
+              String savedStats = WigleAndroid.lameStatic.savedStats;
+              if ( savedStats != null ) {
+                TextView tv = (TextView) findViewById( R.id.stats );
+                tv.setText( savedStats );
               }
               
               long period = 1000L;

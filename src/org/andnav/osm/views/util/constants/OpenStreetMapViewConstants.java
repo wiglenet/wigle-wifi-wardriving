@@ -12,7 +12,7 @@ public interface OpenStreetMapViewConstants {
 	// ===========================================================
 	
 	// FIXME set DEBUGMODE to false
-	public static final boolean DEBUGMODE = true;
+	public static final boolean DEBUGMODE = false;
 	
 	public static final int CACHE_MAPTILECOUNT_DEFAULT = 50;
 	

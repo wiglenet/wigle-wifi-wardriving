@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mainlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/stats"
+    android:text="@string/stats"
+    android:textSize="16sp"
+    />
 
-    <org.andnav.osm.views.OpenStreetMapView
+    <net.wigle.wigleandroid.OpenStreetMapViewWrapper
         android:id="@+id/mapview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -13,4 +21,4 @@
         android:apiKey="Your Maps API Key"
     />
 
-</RelativeLayout>
+</LinearLayout>

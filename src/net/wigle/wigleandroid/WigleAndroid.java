@@ -127,6 +127,7 @@ public class WigleAndroid extends Activity {
     /** XXX: switch to using the service */
     public static class LameStatic {
       public Location location; 
+      public String savedStats;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -592,6 +593,7 @@ public class WigleAndroid extends Activity {
             builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
             savedStats = builder.toString();
             tv.setText( savedStats );
+            WigleAndroid.lameStatic.savedStats = savedStats;
             
             // info( savedStats );
             

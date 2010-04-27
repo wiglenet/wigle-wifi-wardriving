@@ -704,7 +704,7 @@ public class WigleAndroid extends Activity {
       gpsStatus = locationManager.getGpsStatus( gpsStatus );
       int satCount = getSatCount();
       
-      final boolean newOK = newLocation != null;
+      boolean newOK = newLocation != null;
       final boolean locOK = locationOK( location, satCount );
       final long now = System.currentTimeMillis();
       
@@ -716,6 +716,8 @@ public class WigleAndroid extends Activity {
         }
         else {
           lastLocationTime = now;
+          // make sure there's enough sats on this new gps location
+          newOK = locationOK( newLocation, satCount );
         }
       }
       
@@ -724,8 +726,12 @@ public class WigleAndroid extends Activity {
       boolean wasProviderChange = false;
       if ( ! locOK ) {
         if ( newOK ) {
-          location = newLocation;
           wasProviderChange = true;
+          if ( location != null && ! location.getProvider().equals( newLocation.getProvider() ) ) {
+            wasProviderChange = false;
+          }
+          
+          location = newLocation;
         }
         else if ( netLocOK ) {
           location = networkLocation;

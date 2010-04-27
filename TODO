@@ -15,6 +15,9 @@ option for map showing track covered
 click on network to connect, with warning about legality
 
 --- done ---
+* 1.6:
+bugfix on gps<->network flip flopping
+
 * 1.5:
 keep around a recent network-provided location for no gap if gps lost
 different sound on new network

@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.andnav.osm.util.GeoPoint;
-import org.andnav.osm.views.OpenStreetMapView;
 import org.andnav.osm.views.OpenStreetMapViewController;
 
 import android.app.Activity;
@@ -20,7 +19,7 @@ import android.widget.TextView;
  */
 public class MappingActivity extends Activity {
   private OpenStreetMapViewController mapControl;
-  private OpenStreetMapView mapView;
+  private OpenStreetMapViewWrapper mapView;
   private Handler timer;
   private AtomicBoolean finishing;
   
@@ -41,7 +40,7 @@ public class MappingActivity extends Activity {
   }
   
   private void setupMapView() {
-    mapView = (OpenStreetMapView) this.findViewById( R.id.mapview );
+    mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapControl = new OpenStreetMapViewController( mapView );
     mapControl.setCenter( new GeoPoint( 41973076, -87672736 ) );
     mapControl.setZoom( 15 );
@@ -60,7 +59,9 @@ public class MappingActivity extends Activity {
               Location location = WigleAndroid.lameStatic.location;
               if ( location != null ) {
                 // WigleAndroid.info( "mapping center location: " + location );
-                mapControl.animateTo( new GeoPoint( location ) );
+								final GeoPoint locGeoPoint = new GeoPoint( location );
+                mapView.latestLocation( locGeoPoint );
+                mapControl.animateTo( locGeoPoint );
               }
               String savedStats = WigleAndroid.lameStatic.savedStats;
               if ( savedStats != null ) {

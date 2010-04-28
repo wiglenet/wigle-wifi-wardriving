@@ -27,21 +27,21 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
     int color = Color.argb(200, 200, 128, 200);
     trailPaint.setColor( color );
   }
-  
-  @Override
-  public void onDraw( Canvas c ) {
-    super.onDraw( c );
-    
-    final GeoPoint center = this.getMapCenter();
-    
-    if ( trail.isEmpty() || ! trail.getLast().equals( center ) ) {
-      trail.add( center );
+
+	public void latestLocation( GeoPoint loc ) {
+    if ( trail.isEmpty() || ! trail.getLast().equals( loc ) ) {
+      trail.add( loc );
     }
-    
+
     // keep it from getting out of hand
     while ( trail.size() > 1024 ) {
       trail.removeFirst();
     }
+	}
+  
+  @Override
+  public void onDraw( Canvas c ) {
+    super.onDraw( c );
     
     for ( GeoPoint geoPoint : trail ) {
       final Point point = this.getProjection().toMapPixels( geoPoint, null );
@@ -49,6 +49,7 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
     }
     
     // draw center crosshairs
+    final GeoPoint center = this.getMapCenter();
     final Point centerPoint = this.getProjection().toMapPixels( center, null );
     c.drawLine( centerPoint.x, centerPoint.y - 9, centerPoint.x, centerPoint.y + 9, mPaint );
     c.drawLine( centerPoint.x - 9, centerPoint.y, centerPoint.x + 9, centerPoint.y, mPaint );

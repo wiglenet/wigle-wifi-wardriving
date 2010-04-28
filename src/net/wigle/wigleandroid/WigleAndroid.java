@@ -516,41 +516,44 @@ public class WigleAndroid extends Activity {
             
             CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
-            for ( ScanResult result : results ) {
-              Network network = networkCache.get( result.BSSID );
-              if ( network == null ) {
-                network = new Network( result );
-                networkCache.put( network.getBssid(), network );
-              }
-              else {
-                // cache hit, just set the level
-                network.setLevel( result.level );
-              }
-              boolean added = runNetworks.add( result.BSSID );
-              somethingAdded |= added;
-              
-              // if we're showing current, or this was just added, put on the list
-              if ( showCurrent || added ) {
-                listAdapter.add( network );
-                // load test
-                // for ( int i = 0; i< 10; i++) {
-                //  listAdapter.add( network );
-                // }
+            // can be null on shutdown
+            if ( results != null ) {
+              for ( ScanResult result : results ) {
+                Network network = networkCache.get( result.BSSID );
+                if ( network == null ) {
+                  network = new Network( result );
+                  networkCache.put( network.getBssid(), network );
+                }
+                else {
+                  // cache hit, just set the level
+                  network.setLevel( result.level );
+                }
+                boolean added = runNetworks.add( result.BSSID );
+                somethingAdded |= added;
                 
-              }
-              else {
-                // not showing current, and not a new thing, go find the network and update the level
-                // this is O(n), ohwell, that's why showCurrent is the default config.
-                for ( int index = 0; index < listAdapter.getCount(); index++ ) {
-                  Network testNet = listAdapter.getItem(index);
-                  if ( testNet.getBssid().equals( network.getBssid() ) ) {
-                    testNet.setLevel( result.level );
+                // if we're showing current, or this was just added, put on the list
+                if ( showCurrent || added ) {
+                  listAdapter.add( network );
+                  // load test
+                  // for ( int i = 0; i< 10; i++) {
+                  //  listAdapter.add( network );
+                  // }
+                  
+                }
+                else {
+                  // not showing current, and not a new thing, go find the network and update the level
+                  // this is O(n), ohwell, that's why showCurrent is the default config.
+                  for ( int index = 0; index < listAdapter.getCount(); index++ ) {
+                    Network testNet = listAdapter.getItem(index);
+                    if ( testNet.getBssid().equals( network.getBssid() ) ) {
+                      testNet.setLevel( result.level );
+                    }
                   }
                 }
-              }
-              
-              if ( location != null && dbHelper != null ) {
-                dbHelper.addObservation( network, location );
+                
+                if ( location != null && dbHelper != null ) {
+                  dbHelper.addObservation( network, location );
+                }
               }
             }
 
@@ -562,21 +565,21 @@ public class WigleAndroid extends Activity {
             boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
             if ( play && ! isMuted() ) {
               if ( newNet ) {
-                if ( ! soundNewPop.isPlaying() ) {
+                if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
                   // play sound on something new
                   soundNewPop.start();
                 }
                 else {
-                  info( "soundNewPop is playing" );
+                  info( "soundNewPop is playing or null" );
                 }
               }
               else if ( somethingAdded ) {
-                if ( ! soundPop.isPlaying() ) {
+                if ( soundPop != null && ! soundPop.isPlaying() ) {
                   // play sound on something new
                   soundPop.start();
                 }
                 else {
-                  info( "soundPop is playing" );
+                  info( "soundPop is playing or null" );
                 }
               }
             }
@@ -932,6 +935,10 @@ public class WigleAndroid extends Activity {
 
     private MediaPlayer createMediaPlayer( int soundId ) {
       MediaPlayer sound = MediaPlayer.create( this, soundId );
+      if ( sound == null ) {
+        info( "sound null from media player" );
+        return null;
+      }
       // try to figure out why sounds stops after a while
       sound.setOnErrorListener( new OnErrorListener() {
         public boolean onError( MediaPlayer mp, int what, int extra ) {

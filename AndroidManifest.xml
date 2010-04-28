@@ -29,19 +29,19 @@
         </activity>
 
     <service android:name=".WigleService" android:enabled="true"
-    	android:icon="@drawable/wiglewifi"/>
-    	
+      android:icon="@drawable/wiglewifi"/>
+      
     <service android:name="org.andnav.osm.services.OpenStreetMapTileProviderService"
-        	android:process=":remote"
-            android:label="OpenStreetMapTileProviderService"
-    			android:icon="@drawable/wiglewifi">
-    	<intent-filter>
-        	<action android:name="org.andnav.osm.services.IOpenStreetMapTileProviderService" />
-        </intent-filter>
+          android:process=":remote"
+          android:label="OpenStreetMapTileProviderService"
+          android:icon="@drawable/wiglewifi">
+      <intent-filter>
+        <action android:name="org.andnav.osm.services.IOpenStreetMapTileProviderService" />
+      </intent-filter>
     </service>
 </application>
-    <uses-sdk android:minSdkVersion="3" />
 
+<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
 
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>

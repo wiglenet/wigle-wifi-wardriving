@@ -28,9 +28,6 @@
             </intent-filter>
         </activity>
 
-    <service android:name=".WigleService" android:enabled="true"
-      android:icon="@drawable/wiglewifi"/>
-      
     <service android:name="org.andnav.osm.services.OpenStreetMapTileProviderService"
           android:process=":remote"
           android:label="OpenStreetMapTileProviderService"
@@ -39,6 +36,10 @@
         <action android:name="org.andnav.osm.services.IOpenStreetMapTileProviderService" />
       </intent-filter>
     </service>
+
+    <service android:name=".WigleService" android:enabled="true"
+      android:icon="@drawable/wiglewifi"/>
+      
 </application>
 
 <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />

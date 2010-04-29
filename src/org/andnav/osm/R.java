@@ -5,10 +5,10 @@ package org.andnav.osm;
  */
 public final class R {
 
-    public static final class drawable {
-        public static final int person = net.wigle.wigleandroid.R.drawable.person;
-        public static final int direction_arrow = net.wigle.wigleandroid.R.drawable.direction_arrow;
-    }
+    //public static final class drawable {
+        //public static final int person = net.wigle.wigleandroid.R.drawable.person;
+        //public static final int direction_arrow = net.wigle.wigleandroid.R.drawable.direction_arrow;
+    //}
 
     public static final class string {
         public static final int osmarender = net.wigle.wigleandroid.R.string.osmarender;

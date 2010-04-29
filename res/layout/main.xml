@@ -16,7 +16,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-    <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
+    <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="fill_parent" 
 		android:text="@string/upload_button" android:layout_weight="0"
 		android:paddingTop="10px" android:paddingBottom="10px"/>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

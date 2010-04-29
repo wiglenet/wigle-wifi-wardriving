@@ -499,6 +499,7 @@ public class WigleAndroid extends Activity {
       wifiReceiver = new BroadcastReceiver(){
           public void onReceive( Context context, Intent intent ){
             long start = System.currentTimeMillis();
+						// can be null!
             List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
             
             long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
@@ -516,8 +517,10 @@ public class WigleAndroid extends Activity {
             
             CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
+						int resultSize = 0;
             // can be null on shutdown
             if ( results != null ) {
+							resultSize = results.size();
               for ( ScanResult result : results ) {
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
@@ -604,7 +607,7 @@ public class WigleAndroid extends Activity {
             listAdapter.notifyDataSetChanged();
             
             long now = System.currentTimeMillis();
-            status( results.size() + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
+            status( resultSize + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
             
             long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {

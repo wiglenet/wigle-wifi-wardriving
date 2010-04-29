@@ -128,6 +128,7 @@ public class WigleAndroid extends Activity {
     public static class LameStatic {
       public Location location; 
       public String savedStats;
+      public int newForRun;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -518,6 +519,7 @@ public class WigleAndroid extends Activity {
             CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
 						int resultSize = 0;
+						int newForRun = 0;
             // can be null on shutdown
             if ( results != null ) {
 							resultSize = results.size();
@@ -532,6 +534,9 @@ public class WigleAndroid extends Activity {
                   network.setLevel( result.level );
                 }
                 boolean added = runNetworks.add( result.BSSID );
+								if ( added ) {
+									newForRun++;
+								}
                 somethingAdded |= added;
                 
                 // if we're showing current, or this was just added, put on the list
@@ -600,6 +605,7 @@ public class WigleAndroid extends Activity {
             savedStats = builder.toString();
             tv.setText( savedStats );
             WigleAndroid.lameStatic.savedStats = savedStats;
+            WigleAndroid.lameStatic.newForRun = newForRun;
             
             // info( savedStats );
             

@@ -60,7 +60,8 @@ public class MappingActivity extends Activity {
               if ( location != null ) {
                 // WigleAndroid.info( "mapping center location: " + location );
 								final GeoPoint locGeoPoint = new GeoPoint( location );
-                mapView.latestLocation( locGeoPoint );
+                mapView.latestLocation( locGeoPoint,
+              		WigleAndroid.lameStatic.newForRun );
                 mapControl.animateTo( locGeoPoint );
               }
               String savedStats = WigleAndroid.lameStatic.savedStats;

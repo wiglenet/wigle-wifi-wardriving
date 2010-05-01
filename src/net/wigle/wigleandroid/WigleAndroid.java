@@ -11,10 +11,13 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.andnav.osm.util.GeoPoint;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -128,7 +131,15 @@ public class WigleAndroid extends Activity {
     public static class LameStatic {
       public Location location; 
       public String savedStats;
-      public int newForRun;
+      public LinkedHashMap<GeoPoint,Integer> trail = 
+        new LinkedHashMap<GeoPoint,Integer>() {
+          private static final long serialVersionUID = 2010050100L;
+          public boolean removeEldestEntry( Entry<GeoPoint,Integer> entry ) {
+            return size() > 1024;
+          }
+        };
+
+      
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -604,8 +615,22 @@ public class WigleAndroid extends Activity {
             builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
             savedStats = builder.toString();
             tv.setText( savedStats );
+            
+            // set the statics for the map
             WigleAndroid.lameStatic.savedStats = savedStats;
-            WigleAndroid.lameStatic.newForRun = newForRun;
+            if ( newForRun > 0 && location != null ) {
+              synchronized ( lameStatic.trail ) {
+                GeoPoint geoPoint = new GeoPoint( location );
+                Integer points = lameStatic.trail.get( geoPoint );
+                if ( points == null ) {
+                  points = newForRun;
+                }
+                else {
+                  points += newForRun;
+                }
+                lameStatic.trail.put( geoPoint, points );
+              }
+            }
             
             // info( savedStats );
             

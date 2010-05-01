@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import java.util.Map;
-import java.util.LinkedHashMap;
 
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.views.OpenStreetMapView;
@@ -18,14 +17,7 @@ import android.util.AttributeSet;
  */
 public class OpenStreetMapViewWrapper extends OpenStreetMapView {
   
-	private LinkedHashMap<GeoPoint,Integer> trail = 
-	  new LinkedHashMap<GeoPoint,Integer>() {
-			public boolean removeEldestEntry( Entry<GeoPoint,Integer> entry ) {
-				return size() > 1024;
-			}
-		};
-
-  private Paint trailPaint = new Paint();
+	private Paint trailPaint = new Paint();
   
   /**
    * XML Constructor (uses default Renderer)
@@ -36,26 +28,18 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
     trailPaint.setColor( color );
   }
 
-	public void latestLocation( GeoPoint loc, int newForRun ) {
-		synchronized( trail ) {
-    	if ( ! trail.containsKey( loc ) ) {
-    	  trail.put( loc, newForRun );
-    	}
-    }
-	}
-  
-  @Override
+	@Override
   public void onDraw( Canvas c ) {
     super.onDraw( c );
     
-		synchronized( trail ) {
-    	for ( Map.Entry<GeoPoint,Integer> entry : trail.entrySet() ) {
+		synchronized( WigleAndroid.lameStatic.trail ) {
+    	for ( Map.Entry<GeoPoint,Integer> entry : WigleAndroid.lameStatic.trail.entrySet() ) {
 				GeoPoint geoPoint = entry.getKey();
 				int nets = entry.getValue();
+				WigleAndroid.info( "nets: " + nets + " point: " + geoPoint );
 				if ( nets > 0 ) {
     	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
-    	  	c.drawCircle(point.x, point.y, 
-					  (float) Math.sqrt(3 * nets), trailPaint);
+    	  	c.drawCircle(point.x, point.y, nets, trailPaint);
 				}
     	}
 		}

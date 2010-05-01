@@ -100,6 +100,11 @@ public class GeoPoint implements MathConstants, GeoConstants{
 		GeoPoint g = (GeoPoint)obj;
 		return g.mLatitudeE6 == this.mLatitudeE6 && g.mLongitudeE6 == this.mLongitudeE6;
 	}
+	
+	@Override
+  public int hashCode() {
+    return mLatitudeE6 + 31 * mLongitudeE6;
+  }
 
 	// ===========================================================
 	// Methods

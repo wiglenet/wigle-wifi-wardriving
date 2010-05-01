@@ -24,6 +24,8 @@ public class MappingActivity extends Activity {
   private AtomicBoolean finishing;
   
   private static final int MENU_RETURN = 12;
+  private static final int MENU_ZOOM_IN = 13;
+  private static final int MENU_ZOOM_OUT = 14;
   
   /** Called when the activity is first created. */
   @Override
@@ -42,9 +44,9 @@ public class MappingActivity extends Activity {
   private void setupMapView() {
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapControl = new OpenStreetMapViewController( mapView );
-    mapControl.setCenter( new GeoPoint( 41973076, -87672736 ) );
+    mapControl.setCenter( new GeoPoint( 41974000, -87672000 ) );
     mapControl.setZoom( 15 );
-    mapControl.setCenter( new GeoPoint( 41973076, -87672736 ) );
+    mapControl.setCenter( new GeoPoint( 41974000, -87672000 ) );
     
     WigleAndroid.info("done setupMapView");
   }
@@ -60,8 +62,6 @@ public class MappingActivity extends Activity {
               if ( location != null ) {
                 // WigleAndroid.info( "mapping center location: " + location );
 								final GeoPoint locGeoPoint = new GeoPoint( location );
-                mapView.latestLocation( locGeoPoint,
-              		WigleAndroid.lameStatic.newForRun );
                 mapControl.animateTo( locGeoPoint );
               }
               String savedStats = WigleAndroid.lameStatic.savedStats;
@@ -105,6 +105,13 @@ public class MappingActivity extends Activity {
   public boolean onCreateOptionsMenu(Menu menu) {
       MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
       item.setIcon( android.R.drawable.ic_media_previous );
+      
+      item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
+      item.setIcon( android.R.drawable.ic_menu_add );
+      
+      item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
+      item.setIcon( android.R.drawable.ic_menu_revert );
+      
       return true;
   }
 
@@ -115,6 +122,18 @@ public class MappingActivity extends Activity {
         case MENU_RETURN:
           finish();
           return true;
+        case MENU_ZOOM_IN: {
+          int zoom = mapView.getZoomLevel();
+          zoom++;
+          mapControl.setZoom( zoom );
+          return true;
+        }
+        case MENU_ZOOM_OUT: {
+          int zoom = mapView.getZoomLevel();
+          zoom--;
+          mapControl.setZoom( zoom );
+          return true;
+        }
       }
       return false;
   }

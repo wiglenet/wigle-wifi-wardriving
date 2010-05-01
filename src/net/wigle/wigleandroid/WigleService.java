@@ -65,6 +65,7 @@ public class WigleService extends Service {
     CharSequence tickerText = "Wigle Wifi Service";
     long when = System.currentTimeMillis();
     Notification notification = new Notification(icon, tickerText, when);
+    notification.flags |= Notification.FLAG_NO_CLEAR;
     
     Context context = getApplicationContext();
     CharSequence contentTitle = "Wigle Wifi Service";

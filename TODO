@@ -18,6 +18,7 @@ open street map integration (option for map showing track covered)
 check for null media player (to run on archos5)
 check wifi results for null to prevent possible exception on shutdown
 change upload to ssl
+notification now stays around after a clear
 
 * 1.5:
 keep around a recent network-provided location for no gap if gps lost

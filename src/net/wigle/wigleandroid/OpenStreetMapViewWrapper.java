@@ -54,7 +54,8 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
 				int nets = entry.getValue();
 				if ( nets > 0 ) {
     	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
-    	  	c.drawCircle(point.x, point.y, (float) Math.sqrt(nets), trailPaint);
+    	  	c.drawCircle(point.x, point.y, 
+					  (float) Math.sqrt(3 * nets), trailPaint);
 				}
     	}
 		}

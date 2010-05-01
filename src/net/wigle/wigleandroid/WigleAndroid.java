@@ -88,7 +88,7 @@ public class WigleAndroid extends Activity {
     private long previousTalkTime = System.currentTimeMillis();
     private boolean inEmulator;
     
-    public static final String FILE_POST_URL = "http://wigle.net/gps/gps/main/confirmfile/";
+    public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
@@ -1011,6 +1011,10 @@ public class WigleAndroid extends Activity {
     }
     public static void error( String value ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+    }
+
+    public static void error( String value, Throwable t ) {
+        Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
     }
 
     /**

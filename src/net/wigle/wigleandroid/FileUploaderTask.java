@@ -304,7 +304,7 @@ public class FileUploaderTask extends Thread {
       
       // don't upload empty files
       if ( lineCount == 0 ) {
-        return Status.EMPTY_FILE;
+          return Status.EMPTY_FILE;
       }
       
       // show on the UI
@@ -317,7 +317,7 @@ public class FileUploaderTask extends Thread {
       
       params.put("observer", username);
       params.put("password", password);
-      String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params );
+      String response = HttpFileUploader.upload( WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params, context.getResources() );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;

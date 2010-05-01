@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import android.content.res.Resources; 
+
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,7 +21,7 @@ class HttpFileUploader {
   }
 
   public static String upload( String urlString, String filename, String fileParamName,
-      FileInputStream fileInputStream, Map<String,String> params ){
+                               FileInputStream fileInputStream, Map<String,String> params, Resources res ){
     
     URL connectURL = null;
     try{
@@ -50,7 +52,9 @@ class HttpFileUploader {
       conn.setUseCaches(false);
       conn.setInstanceFollowRedirects( false );
       if ( conn instanceof javax.net.ssl.HttpsURLConnection ) {
-        WigleAndroid.info("ssl! can't use yet");
+          SSLConfigurator con = SSLConfigurator.getInstance( res );
+          con.configure( (javax.net.ssl.HttpsURLConnection) conn );
+          WigleAndroid.info("using ssl!");
       }
     
       // Use a post method.

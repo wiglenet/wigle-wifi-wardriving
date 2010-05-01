@@ -44,9 +44,9 @@ public class MappingActivity extends Activity {
   private void setupMapView() {
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapControl = new OpenStreetMapViewController( mapView );
-    mapControl.setCenter( new GeoPoint( 41974000, -87672000 ) );
+    mapControl.setCenter( new GeoPoint( 41950000, -87650000 ) );
     mapControl.setZoom( 15 );
-    mapControl.setCenter( new GeoPoint( 41974000, -87672000 ) );
+    mapControl.setCenter( new GeoPoint( 41950000, -87650000 ) );
     
     WigleAndroid.info("done setupMapView");
   }

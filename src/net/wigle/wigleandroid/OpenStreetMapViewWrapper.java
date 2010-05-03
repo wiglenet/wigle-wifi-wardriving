@@ -43,9 +43,17 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
 				if ( nets > 0 ) {
     	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
     	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
-    	  	c.drawCircle(point.x, point.y, nets, trailPaint);
 				}
     	}
+    	for ( Map.Entry<GeoPoint,Integer> entry : WigleAndroid.lameStatic.trail.entrySet() ) {
+        GeoPoint geoPoint = entry.getKey();
+        int nets = entry.getValue();
+        // WigleAndroid.info( "nets: " + nets + " point: " + geoPoint );
+        if ( nets > 0 ) {
+          final Point point = this.getProjection().toMapPixels( geoPoint, null );
+          c.drawCircle(point.x, point.y, nets, trailPaint);
+        }
+      }
 		}
     
     // draw center crosshairs

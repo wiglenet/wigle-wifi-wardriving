@@ -135,11 +135,9 @@ public class WigleAndroid extends Activity {
         new LinkedHashMap<GeoPoint,Integer>() {
           private static final long serialVersionUID = 2010050100L;
           public boolean removeEldestEntry( Entry<GeoPoint,Integer> entry ) {
-            return size() > 1024;
+            return size() > 256;
           }
         };
-
-      
     }
     public static final LameStatic lameStatic = new LameStatic();
     

@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 public class OpenStreetMapViewWrapper extends OpenStreetMapView {
   
 	private Paint trailPaint = new Paint();
+	private Paint trailBackPaint = new Paint();
   
   /**
    * XML Constructor (uses default Renderer)
@@ -26,6 +27,8 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
     super( context, attrs );
     int color = Color.argb( 200, 200, 128, 200 );
     trailPaint.setColor( color );
+    color = Color.argb( 200, 224, 224, 224 );
+    trailBackPaint.setColor( color );
   }
 
 	@Override
@@ -39,6 +42,7 @@ public class OpenStreetMapViewWrapper extends OpenStreetMapView {
 				// WigleAndroid.info( "nets: " + nets + " point: " + geoPoint );
 				if ( nets > 0 ) {
     	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
+    	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
     	  	c.drawCircle(point.x, point.y, nets, trailPaint);
 				}
     	}

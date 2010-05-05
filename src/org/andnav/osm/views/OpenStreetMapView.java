@@ -391,6 +391,14 @@ public class OpenStreetMapView extends View implements OpenStreetMapConstants,
 		return this.mZoomLevel;
 	}
 
+	/*
+	 * Returns the maximum zoom level for the point currently at the center.
+	 * @return The maximum zoom level for the map's current center.
+	 */
+	public int getMaxZoomLevel() {
+		return getRenderer().ZOOM_MAXLEVEL;
+	}
+
 	public GeoPoint getMapCenter() {
 		return new GeoPoint(getMapCenterLatitudeE6(), getMapCenterLongitudeE6());
 	}
@@ -466,6 +474,8 @@ public class OpenStreetMapView extends View implements OpenStreetMapConstants,
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
 
+	    Log.d(DEBUGTAG, "onTouchEvent(" + event + ")");
+	    
 		/*
 		 * handle multi touch events:
 		 * 1. mask out the action with the ACTION_MASK 
@@ -533,12 +543,10 @@ public class OpenStreetMapView extends View implements OpenStreetMapConstants,
 	private float spreading(final MotionEvent event) {
 		// TODO can do this directly if we upgrade to API level 5
 		try {
-			final int[] zero = new int[] { 0 }; 
-			final int[] one = new int[] { 1 }; 
-			final float x0 = Float.valueOf(MotionEvent_getX.invoke(event, zero).toString());
-			final float x1 = Float.valueOf(MotionEvent_getX.invoke(event, one).toString());
-			final float y0 = Float.valueOf(MotionEvent_getY.invoke(event, zero).toString());
-			final float y1 = Float.valueOf(MotionEvent_getY.invoke(event, one).toString());
+			final float x0 = Float.valueOf(MotionEvent_getX.invoke(event, 0).toString());
+			final float x1 = Float.valueOf(MotionEvent_getX.invoke(event, 1).toString());
+			final float y0 = Float.valueOf(MotionEvent_getY.invoke(event, 0).toString());
+			final float y1 = Float.valueOf(MotionEvent_getY.invoke(event, 1).toString());
 			final float x = x0 - x1;
 			final float y = y0 - y1;
 			return FloatMath.sqrt(x * x + y * y);

@@ -193,12 +193,12 @@ public class OpenStreetMapViewController {
 	 * Zoom in by one zoom level.
 	 */
 	public boolean zoomIn() {
-
-//		final String nextBelowMaptileUrlString = this.mRendererInfo.getTileURLString(Mercator
-//				.getMapTileFromCoordinates(this.mLatitudeE6, this.mLongitudeE6, this.mZoomLevel + 1,
-//						null), this.mZoomLevel + 1);
-//		this.mTileProvider.preCacheTile(nextBelowMaptileUrlString);
-
+		
+		if (mZoomLevel >= mOsmv.getMaxZoomLevel()) {
+			mZoomLevel = mOsmv.getMaxZoomLevel();
+			return false;
+		}
+		
 		mZoomLevel++;
 		final Scaler scaler = mOsmv.mScaler;
 		if (scaler.isFinished()) {
@@ -221,6 +221,12 @@ public class OpenStreetMapViewController {
 	 * Zoom out by one zoom level.
 	 */
 	public boolean zoomOut() {
+		
+		if (mZoomLevel <= 0) {
+			mZoomLevel = 0;
+			return false;
+		}
+		
 		mZoomLevel--;
 		final Scaler scaler = mOsmv.mScaler;
 		if (scaler.isFinished()) {

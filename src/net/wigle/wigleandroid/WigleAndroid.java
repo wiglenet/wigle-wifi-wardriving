@@ -60,7 +60,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class WigleAndroid extends Activity {
+public final class WigleAndroid extends Activity {
     // state. anything added here should be added to the retain copy-construction
     private ArrayAdapter<Network> listAdapter;
     private Set<String> runNetworks;
@@ -142,7 +142,7 @@ public class WigleAndroid extends Activity {
     public static final LameStatic lameStatic = new LameStatic();
     
     // cache
-    private static ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
+    private static final ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
       protected CacheMap<String,Network> initialValue() {
           return new CacheMap<String,Network>( 16, 64 );
       }
@@ -156,11 +156,11 @@ public class WigleAndroid extends Activity {
     
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+    public void onCreate( final Bundle savedInstanceState ) {
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.main );
         
-        String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
+        final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
         inEmulator = id == null;
         info( "id: '" + id + "' inEmulator: " + inEmulator );
         
@@ -178,10 +178,10 @@ public class WigleAndroid extends Activity {
 //          }
 //        });
         
-        Object stored = getLastNonConfigurationInstance();
+        final Object stored = getLastNonConfigurationInstance();
         if ( stored != null && stored instanceof WigleAndroid ) {
           // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-          WigleAndroid retained = (WigleAndroid) stored;
+          final WigleAndroid retained = (WigleAndroid) stored;
           this.listAdapter = retained.listAdapter;
           this.runNetworks = retained.runNetworks;
           this.gpsStatus = retained.gpsStatus;
@@ -196,7 +196,7 @@ public class WigleAndroid extends Activity {
           this.soundNewPop = retained.soundNewPop;
           this.wifiLock = retained.wifiLock;
           
-          TextView tv = (TextView) findViewById( R.id.stats );
+          final TextView tv = (TextView) findViewById( R.id.stats );
           tv.setText( savedStats );
         }
         else {
@@ -266,16 +266,16 @@ public class WigleAndroid extends Activity {
       try {
         this.unregisterReceiver( wifiReceiver );
       }
-      catch ( IllegalArgumentException ex ) {
+      catch ( final IllegalArgumentException ex ) {
         info( "wifiReceiver not registered: " + ex );
       }
       // stop the service, so when we die it's both stopped and unbound and will die
-      Intent serviceIntent = new Intent( this, WigleService.class );
+      final Intent serviceIntent = new Intent( this, WigleService.class );
       this.stopService( serviceIntent );
       try {
         this.unbindService( serviceConnection );
       }
-      catch ( IllegalArgumentException ex ) {
+      catch ( final IllegalArgumentException ex ) {
         info( "serviceConnection not registered: " + ex );
       }
       if ( wifiLock != null && wifiLock.isHeld() ) {
@@ -293,7 +293,7 @@ public class WigleAndroid extends Activity {
       // close the db. not in destroy, because it'll still write after that.
       dbHelper.close();
       
-      LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       if ( gpsStatusListener != null ) {
         locationManager.removeGpsStatusListener( gpsStatusListener );
       }
@@ -304,17 +304,17 @@ public class WigleAndroid extends Activity {
       try {
         this.unregisterReceiver( wifiReceiver );
       }
-      catch ( IllegalArgumentException ex ) {
+      catch ( final IllegalArgumentException ex ) {
         info( "wifiReceiver not registered: " + ex );
       }
 
       // stop the service, so when we die it's both stopped and unbound and will die
-      Intent serviceIntent = new Intent( this, WigleService.class );
+      final Intent serviceIntent = new Intent( this, WigleService.class );
       this.stopService( serviceIntent );
       try {
         this.unbindService( serviceConnection );
       }
-      catch ( IllegalArgumentException ex ) {
+      catch ( final IllegalArgumentException ex ) {
         info( "serviceConnection not registered: " + ex );
       }    
       
@@ -324,7 +324,7 @@ public class WigleAndroid extends Activity {
       }
       
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-      boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
+      final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! inEmulator ) {
         // well turn it of now that we're done
@@ -342,7 +342,7 @@ public class WigleAndroid extends Activity {
     
     /* Creates the menu items */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu( final Menu menu ) {
         MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
         item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
         
@@ -356,23 +356,23 @@ public class WigleAndroid extends Activity {
 
     /* Handles item selections */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
           case MENU_SETTINGS: {
             info("start settings activity");
-            Intent intent = new Intent( this, SettingsActivity.class );
+            final Intent intent = new Intent( this, SettingsActivity.class );
             this.startActivity( intent );
             return true;
           }
           case MENU_MAP: {
             info("start map activity");
-            Intent intent = new Intent( this, MappingActivity.class );
+            final Intent intent = new Intent( this, MappingActivity.class );
             this.startActivity( intent );
             return true;
           }
           case MENU_EXIT:
             // stop the service, so when we die it's both stopped and unbound and will die
-            Intent serviceIntent = new Intent( this, WigleService.class );
+            final Intent serviceIntent = new Intent( this, WigleService.class );
             this.stopService( serviceIntent );
             // call over to finish
             finish();
@@ -411,7 +411,7 @@ public class WigleAndroid extends Activity {
 //          }
           
           @Override
-          public View getView( int position, View convertView, ViewGroup parent ) {
+          public View getView( final int position, final View convertView, final ViewGroup parent ) {
             // long start = System.currentTimeMillis();
             View row;
             
@@ -422,10 +422,10 @@ public class WigleAndroid extends Activity {
               row = convertView;
             }
         
-            Network network = getItem(position);
+            final Network network = getItem(position);
             // info( "listing net: " + network.getBssid() );
             
-            ImageView ico = (ImageView) row.findViewById( R.id.wepicon );   
+            final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );   
             switch ( network.getCrypto() ) {
               case Network.CRYPTO_WEP:
                 ico.setImageResource( R.drawable.wep_ico );
@@ -473,13 +473,13 @@ public class WigleAndroid extends Activity {
         };
       }
                
-      ListView listView = (ListView) findViewById( R.id.ListView01 );
+      final ListView listView = (ListView) findViewById( R.id.ListView01 );
       listView.setAdapter( listAdapter ); 
     }
     
     private void setupWifi() {
       // warn about turning off network notification
-      String notifOn = Settings.Secure.getString(getContentResolver(), 
+      final String notifOn = Settings.Secure.getString(getContentResolver(), 
           Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
       if ( notifOn != null && "1".equals( notifOn ) ) {
         Toast.makeText( this, "For best results, unset \"Network notification\" in"
@@ -489,11 +489,11 @@ public class WigleAndroid extends Activity {
     
       final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-      Editor edit = prefs.edit();
+      final Editor edit = prefs.edit();
       
       if ( ! wifiManager.isWifiEnabled() ) {
         // save so we can turn it back off when we exit  
-        edit.putBoolean(PREF_WIFI_WAS_OFF, true);
+        edit.putBoolean( PREF_WIFI_WAS_OFF, true );
         
         // just turn it on, but not in emulator cuz it crashes it
         if ( ! inEmulator ) {
@@ -501,31 +501,31 @@ public class WigleAndroid extends Activity {
         }
       }
       else {
-        edit.putBoolean(PREF_WIFI_WAS_OFF, false);
+        edit.putBoolean( PREF_WIFI_WAS_OFF, false );
       }
       edit.commit();
       
       // wifi scan listener
       wifiReceiver = new BroadcastReceiver(){
-          public void onReceive( Context context, Intent intent ){
-            long start = System.currentTimeMillis();
+          public void onReceive( final Context context, final Intent intent ){
+            final long start = System.currentTimeMillis();
 						// can be null!
-            List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
+            final List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
             
-            long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
+            final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
             if ( period < 1000L ) {
               // under a second is hard to hit, treat as "continuous", so request scan in here
               wifiManager.startScan();
             }
             
-            boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
+            final boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
             if ( showCurrent ) {
               listAdapter.clear();
             }
             
-            int preQueueSize = dbHelper.getQueueSize();
+            final int preQueueSize = dbHelper.getQueueSize();
             
-            CacheMap<String,Network> networkCache = getNetworkCache();
+            final CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
 						int resultSize = 0;
 						int newForRun = 0;
@@ -542,7 +542,7 @@ public class WigleAndroid extends Activity {
                   // cache hit, just set the level
                   network.setLevel( result.level );
                 }
-                boolean added = runNetworks.add( result.BSSID );
+                final boolean added = runNetworks.add( result.BSSID );
 								if ( added ) {
 									newForRun++;
 								}
@@ -561,7 +561,7 @@ public class WigleAndroid extends Activity {
                   // not showing current, and not a new thing, go find the network and update the level
                   // this is O(n), ohwell, that's why showCurrent is the default config.
                   for ( int index = 0; index < listAdapter.getCount(); index++ ) {
-                    Network testNet = listAdapter.getItem(index);
+                    final Network testNet = listAdapter.getItem(index);
                     if ( testNet.getBssid().equals( network.getBssid() ) ) {
                       testNet.setLevel( result.level );
                     }
@@ -575,11 +575,11 @@ public class WigleAndroid extends Activity {
             }
 
             // check if there are more "New" nets
-            long newNetCount = dbHelper.getNewNetworkCount();
-            boolean newNet = newNetCount > prevNewNetCount;
+            final long newNetCount = dbHelper.getNewNetworkCount();
+            final boolean newNet = newNetCount > prevNewNetCount;
             prevNewNetCount = newNetCount;
             
-            boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
+            final boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
             if ( play && ! isMuted() ) {
               if ( newNet ) {
                 if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
@@ -605,8 +605,8 @@ public class WigleAndroid extends Activity {
             listAdapter.sort( signalCompare );
 
             // update stat
-            TextView tv = (TextView) findViewById( R.id.stats );
-            StringBuilder builder = new StringBuilder( 40 );
+            final TextView tv = (TextView) findViewById( R.id.stats );
+            final StringBuilder builder = new StringBuilder( 40 );
             builder.append( "Run: " ).append( runNetworks.size() );
             builder.append( " New: " ).append( newNetCount );
             builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
@@ -618,7 +618,7 @@ public class WigleAndroid extends Activity {
             WigleAndroid.lameStatic.savedStats = savedStats;
             if ( newForRun > 0 && location != null ) {
               synchronized ( lameStatic.trail ) {
-                GeoPoint geoPoint = new GeoPoint( location );
+                final GeoPoint geoPoint = new GeoPoint( location );
                 Integer points = lameStatic.trail.get( geoPoint );
                 if ( points == null ) {
                   points = newForRun;
@@ -635,10 +635,10 @@ public class WigleAndroid extends Activity {
             // notify
             listAdapter.notifyDataSetChanged();
             
-            long now = System.currentTimeMillis();
+            final long now = System.currentTimeMillis();
             status( resultSize + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
             
-            long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
+            final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
               String gps = "";
               if ( location == null ) {
@@ -651,8 +651,8 @@ public class WigleAndroid extends Activity {
         };
       
       // register
-      IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+      final IntentFilter intentFilter = new IntentFilter();
+      intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
       this.registerReceiver( wifiReceiver, intentFilter );
       
       if ( wifiLock == null ) {
@@ -664,13 +664,13 @@ public class WigleAndroid extends Activity {
       // might not be null on a nonconfig retain
       if ( wifiTimer == null ) {
         wifiTimer = new Handler();
-        Runnable mUpdateTimeTask = new Runnable() {
+        final Runnable mUpdateTimeTask = new Runnable() {
           public void run() {              
               // make sure the app isn't trying to finish
               if ( ! finishing.get() ) {
                 // info( "timer start scan" );
                 wifiManager.startScan();
-                long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
                 // info("wifitimer: " + period );
                 wifiTimer.postDelayed( this, period );
               }
@@ -679,16 +679,16 @@ public class WigleAndroid extends Activity {
               }
           }
         };
-        wifiTimer.removeCallbacks(mUpdateTimeTask);
-        wifiTimer.postDelayed(mUpdateTimeTask, 100);
+        wifiTimer.removeCallbacks( mUpdateTimeTask );
+        wifiTimer.postDelayed( mUpdateTimeTask, 100 );
 
         // starts scan, sends event when done
-        boolean scanOK = wifiManager.startScan();
+        final boolean scanOK = wifiManager.startScan();
         info( "startup finished. wifi scanOK: " + scanOK );
       }
     }
     
-    private void speak( String string ) {
+    private void speak( final String string ) {
       if ( ! isMuted() && tts != null ) {
         tts.speak( string );
       }
@@ -702,7 +702,7 @@ public class WigleAndroid extends Activity {
       
       if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
         Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
-        Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
+        final Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
         startActivity(myIntent);
       }
       // emulator crashes if you ask this
@@ -712,20 +712,20 @@ public class WigleAndroid extends Activity {
       }
       
       gpsStatusListener = new Listener(){
-        public void onGpsStatusChanged( int event ) {
+        public void onGpsStatusChanged( final int event ) {
           updateLocationData( (Location) null );
         } 
       };
       locationManager.addGpsStatusListener( gpsStatusListener );
       
-      List<String> providers = locationManager.getAllProviders();
+      final List<String> providers = locationManager.getAllProviders();
       locationListener = new LocationListener(){
-          public void onLocationChanged( Location newLocation ) {
+          public void onLocationChanged( final Location newLocation ) {
             updateLocationData( newLocation );
           }
-          public void onProviderDisabled( String provider ) {}
-          public void onProviderEnabled( String provider ) {}
-          public void onStatusChanged( String provider, int status, Bundle extras ) {}
+          public void onProviderDisabled( final String provider ) {}
+          public void onProviderEnabled( final String provider ) {}
+          public void onStatusChanged( final String provider, final int status, final Bundle extras ) {}
         };
         
       for ( String provider : providers ) {
@@ -735,11 +735,11 @@ public class WigleAndroid extends Activity {
     }
     
     /** newLocation can be null */
-    private void updateLocationData( Location newLocation ) {
+    private void updateLocationData( final Location newLocation ) {
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       // see if we have new data
       gpsStatus = locationManager.getGpsStatus( gpsStatus );
-      int satCount = getSatCount();
+      final int satCount = getSatCount();
       
       boolean newOK = newLocation != null;
       final boolean locOK = locationOK( location, satCount );
@@ -808,16 +808,16 @@ public class WigleAndroid extends Activity {
       }
       
       if ( wasProviderChange ) {
-        String announce = location == null ? "Lost Location" 
+        final String announce = location == null ? "Lost Location" 
             : "Now have location from \"" + location.getProvider() + "\"";
         Toast.makeText( this, announce, Toast.LENGTH_SHORT ).show();
-        SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-        boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
+        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+        final boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
         if ( speechGPS ) {
           // no quotes or the voice pauses
-          announce = location == null ? "Lost Location" 
+          final String speakAnnounce = location == null ? "Lost Location" 
             : "Now have location from " + location.getProvider() + ".";
-          speak( announce );
+          speak( speakAnnounce );
         }
       }
       
@@ -827,7 +827,7 @@ public class WigleAndroid extends Activity {
     
     private boolean locationOK( final Location location, final int satCount ) {
       boolean retval = false;
-      long now = System.currentTimeMillis();
+      final long now = System.currentTimeMillis();
       
       if ( location == null ) {
         // bad!
@@ -868,8 +868,8 @@ public class WigleAndroid extends Activity {
     
     private void setLocationUI() {
       if ( gpsStatus != null ) {
-        int satCount = getSatCount();
-        TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
+        final int satCount = getSatCount();
+        final TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
         tv.setText( "Sats: " + satCount );
       }
       
@@ -891,20 +891,20 @@ public class WigleAndroid extends Activity {
     }
     
     private void setupUploadButton() {
-      Button button = (Button) findViewById( R.id.upload_button );
+      final Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() {
-          public void onClick( View view ) {
+          public void onClick( final View view ) {
             uploadFile( WigleAndroid.this, dbHelper );
           }
         });
     }
     
     private void setupService() {
-      Intent serviceIntent = new Intent( this, WigleService.class );
+      final Intent serviceIntent = new Intent( this, WigleService.class );
       
       // could be set by nonconfig retain
       if ( serviceConnection == null ) {
-        ComponentName compName = startService( serviceIntent );
+        final ComponentName compName = startService( serviceIntent );
         if ( compName == null ) {
           WigleAndroid.error( "startService() failed!" );
         }
@@ -913,17 +913,17 @@ public class WigleAndroid extends Activity {
         }
         
         serviceConnection = new ServiceConnection(){
-          public void onServiceConnected( ComponentName name, IBinder iBinder) {
+          public void onServiceConnected( final ComponentName name, final IBinder iBinder ) {
             WigleAndroid.info( name + " service connected" ); 
           }
-          public void onServiceDisconnected( ComponentName name ) {
+          public void onServiceDisconnected( final ComponentName name ) {
             WigleAndroid.info( name + " service disconnected" );
           }
         };  
       }
       
       int flags = 0;
-      this.bindService(serviceIntent, serviceConnection, flags);
+      this.bindService( serviceIntent, serviceConnection, flags );
     }
     
     private void setupSound() {
@@ -935,7 +935,8 @@ public class WigleAndroid extends Activity {
         soundNewPop = createMediaPlayer( R.raw.newpop );
       }
       audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-      this.setVolumeControlStream(AudioManager.STREAM_MUSIC);  
+      // make volume change "media"
+      this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
       
       if ( TTS.hasTTS() ) {
         tts = new TTS( this );        
@@ -943,12 +944,12 @@ public class WigleAndroid extends Activity {
       
       final Button mute = (Button) this.findViewById(R.id.mute);
       final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
-      boolean muted = prefs.getBoolean(PREF_MUTED, false);
+      final boolean muted = prefs.getBoolean(PREF_MUTED, false);
       if ( muted ) {
         mute.setText("Play");
       }
       mute.setOnClickListener(new OnClickListener(){
-        public void onClick( View buttonView ) {
+        public void onClick( final View buttonView ) {
           boolean muted = prefs.getBoolean(PREF_MUTED, false);
           muted = ! muted;
           Editor editor = prefs.edit();
@@ -965,15 +966,15 @@ public class WigleAndroid extends Activity {
       });
     }
 
-    private MediaPlayer createMediaPlayer( int soundId ) {
-      MediaPlayer sound = MediaPlayer.create( this, soundId );
+    private MediaPlayer createMediaPlayer( final int soundId ) {
+      final MediaPlayer sound = MediaPlayer.create( this, soundId );
       if ( sound == null ) {
         info( "sound null from media player" );
         return null;
       }
       // try to figure out why sounds stops after a while
       sound.setOnErrorListener( new OnErrorListener() {
-        public boolean onError( MediaPlayer mp, int what, int extra ) {
+        public boolean onError( final MediaPlayer mp, final int what, final int extra ) {
           String whatString = null;
           switch ( what ) {
             case MediaPlayer.MEDIA_ERROR_UNKNOWN:
@@ -1009,34 +1010,34 @@ public class WigleAndroid extends Activity {
       return retval;
     }
     
-    private static void uploadFile( Context context, DatabaseHelper dbHelper ){
+    private static void uploadFile( final Context context, final DatabaseHelper dbHelper ){
       info( "upload file" );
-      FileUploaderTask task = new FileUploaderTask( context, dbHelper );
+      final FileUploaderTask task = new FileUploaderTask( context, dbHelper );
       task.start();
     }
     
     private void status( String status ) {
       // info( status );
-      TextView tv = (TextView) findViewById( R.id.status );
+      final TextView tv = (TextView) findViewById( R.id.status );
       tv.setText( status );
     }
     
-    public static void sleep( long sleep ) {
+    public static void sleep( final long sleep ) {
       try {
         Thread.sleep( sleep );
       }
-      catch ( InterruptedException ex ) {
+      catch ( final InterruptedException ex ) {
         // no worries
       }
     }
-    public static void info( String value ) {
+    public static void info( final String value ) {
       Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
-    public static void error( String value ) {
+    public static void error( final String value ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
 
-    public static void error( String value, Throwable t ) {
+    public static void error( final String value, final Throwable t ) {
         Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
     }
 
@@ -1048,9 +1049,9 @@ public class WigleAndroid extends Activity {
       return networkCache.get();
     }
     
-    public static void writeError( Thread thread, Throwable throwable ) {
+    public static void writeError( final Thread thread, final Throwable throwable ) {
       try {
-        String error = "Thread: " + thread + " throwable: " + throwable;
+        final String error = "Thread: " + thread + " throwable: " + throwable;
         error( error );
         if ( hasSD() ) {
           File file = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
@@ -1060,13 +1061,13 @@ public class WigleAndroid extends Activity {
           if ( ! file.exists() ) {
             file.createNewFile();
           }
-          FileOutputStream fos = new FileOutputStream( file );
+          final FileOutputStream fos = new FileOutputStream( file );
           fos.write( error.getBytes( ENCODING ) );
           throwable.printStackTrace( new PrintStream( fos ) );
           fos.close();
         }
       }
-      catch ( Exception ex ) {
+      catch ( final Exception ex ) {
         error( "error logging error: " + ex );
         ex.printStackTrace();
       }
@@ -1077,7 +1078,7 @@ public class WigleAndroid extends Activity {
       try {
         sdCard = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/" );
       }
-      catch ( IOException ex ) {
+      catch ( final IOException ex ) {
         // ohwell
       }
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
@@ -1085,16 +1086,16 @@ public class WigleAndroid extends Activity {
     
     private void setupMaxidDebug() {
       final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
-      long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
+      final long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
       if ( maxid == -1L ) {
         // load up the local value
         dbHelper.getLocationCountFromDB();
-        long loccount = dbHelper.getLocationCount();
+        final long loccount = dbHelper.getLocationCount();
         if ( loccount > 0 ) {
           // there is no preference set, yet there are locations, this is likely
           // a developer testing a new install on an old db, so set the pref.
           info( "setting db marker to: " + loccount );
-          Editor edit = prefs.edit();
+          final Editor edit = prefs.edit();
           edit.putLong( PREF_DB_MARKER, loccount );
           edit.commit();
         }

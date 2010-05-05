@@ -9,7 +9,7 @@ import android.net.wifi.ScanResult;
 /**
  * network data. not thread-safe.
  */
-public class Network {
+public final class Network {
   private final String bssid;
   private final String ssid;
   private final int frequency;
@@ -80,11 +80,11 @@ public class Network {
    * convenience constructor
    * @param scanResult a result from a wifi scan
    */
-  public Network( ScanResult scanResult ) {
+  public Network( final ScanResult scanResult ) {
     this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities, scanResult.level );
   }
   
-  public Network( String bssid, String ssid, int frequency, String capabilities, int level ) {
+  public Network( final String bssid, final String ssid, final int frequency, final String capabilities, final int level ) {
     
     this.bssid = bssid;
     this.ssid = ssid;
@@ -142,7 +142,7 @@ public class Network {
     return channel;
   }
   
-  public void setLevel( int level ) {
+  public void setLevel( final int level ) {
     this.level = level;
   }
   
@@ -156,8 +156,8 @@ public class Network {
   
   public String getDetail() {
     if ( detail == null ) {
-      Integer chan = channel != null ? channel : frequency;
-      StringBuilder detailBuild = new StringBuilder( 40 );
+      final Integer chan = channel != null ? channel : frequency;
+      final StringBuilder detailBuild = new StringBuilder( 40 );
       detailBuild.append( BAR_STRING ).append( bssid );
       detailBuild.append( DASH_STRING ).append( chan );
       detailBuild.append( DASH_STRING ).append( getShowCapabilities() );

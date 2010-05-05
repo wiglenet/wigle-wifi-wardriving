@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * LRU cache
  */
-public class CacheMap<K,V> extends LinkedHashMap<K,V> {
+public final class CacheMap<K,V> extends LinkedHashMap<K,V> {
   private static final long serialVersionUID = 2010032701L;
   private final int maxEntries;
   

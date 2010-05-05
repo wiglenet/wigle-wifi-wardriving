@@ -12,8 +12,8 @@
     <string name="found_sound">Play sound when new network found</string>
     <string name="reset_maxid_button">Reset DB marker</string>
     <string name="reset_maxid_text">Latest upload marker:</string>
-    <string name="period_text">Milliseconds between scans</string>
-    <string name="speak_text">Seconds between audio announcements</string>
+    <string name="period_text">Seconds between scans</string>
+    <string name="speak_text">Time between audio announcements</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
 </resources>

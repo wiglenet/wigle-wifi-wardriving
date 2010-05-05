@@ -17,7 +17,7 @@ import android.widget.TextView;
 /**
  * show a map!
  */
-public class MappingActivity extends Activity {
+public final class MappingActivity extends Activity {
   private OpenStreetMapViewController mapControl;
   private OpenStreetMapViewWrapper mapView;
   private Handler timer;
@@ -29,13 +29,13 @@ public class MappingActivity extends Activity {
   
   /** Called when the activity is first created. */
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.map);
+  public void onCreate( final Bundle savedInstanceState ) {
+    super.onCreate( savedInstanceState );
+    setContentView( R.layout.map );
     finishing = new AtomicBoolean( false );
     
     // media volume
-    this.setVolumeControlStream(AudioManager.STREAM_MUSIC);  
+    this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
     
     setupMapView();
     setupTimer();
@@ -54,23 +54,23 @@ public class MappingActivity extends Activity {
   private void setupTimer() {
     if ( timer == null ) {
       timer = new Handler();
-      Runnable mUpdateTimeTask = new Runnable() {
+      final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {              
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
-              Location location = WigleAndroid.lameStatic.location;
+              final Location location = WigleAndroid.lameStatic.location;
               if ( location != null ) {
                 // WigleAndroid.info( "mapping center location: " + location );
 								final GeoPoint locGeoPoint = new GeoPoint( location );
                 mapControl.animateTo( locGeoPoint );
               }
-              String savedStats = WigleAndroid.lameStatic.savedStats;
+              final String savedStats = WigleAndroid.lameStatic.savedStats;
               if ( savedStats != null ) {
-                TextView tv = (TextView) findViewById( R.id.stats );
+                final TextView tv = (TextView) findViewById( R.id.stats );
                 tv.setText( savedStats );
               }
               
-              long period = 1000L;
+              final long period = 1000L;
               // info("wifitimer: " + period );
               timer.postDelayed( this, period );
             }
@@ -79,8 +79,8 @@ public class MappingActivity extends Activity {
             }
         }
       };
-      timer.removeCallbacks(mUpdateTimeTask);
-      timer.postDelayed(mUpdateTimeTask, 100);
+      timer.removeCallbacks( mUpdateTimeTask );
+      timer.postDelayed( mUpdateTimeTask, 100 );
     }
   }
     
@@ -102,7 +102,7 @@ public class MappingActivity extends Activity {
   
   /* Creates the menu items */
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+  public boolean onCreateOptionsMenu( final Menu menu ) {
       MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
       item.setIcon( android.R.drawable.ic_media_previous );
       
@@ -117,7 +117,7 @@ public class MappingActivity extends Activity {
 
   /* Handles item selections */
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+  public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_RETURN:
           finish();

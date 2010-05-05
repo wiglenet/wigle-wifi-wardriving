@@ -13,7 +13,7 @@ import java.util.HashMap;
 import android.content.Context;
 
 @SuppressWarnings("unchecked")
-public class TTS {
+public final class TTS {
   private static Class SPEECH_CLASS;
   private static Class LISTENER_CLASS;
 
@@ -97,13 +97,13 @@ public class TTS {
           shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
         }
       }
-      catch ( NoSuchFieldException ex ) {
+      catch ( final NoSuchFieldException ex ) {
         WigleAndroid.error( "no such field: " + ex );
       }
-      catch ( IllegalAccessException ex ) {
+      catch ( final IllegalAccessException ex ) {
         WigleAndroid.error( "illegal in static: " + ex );
       }
-      catch ( NoSuchMethodException ex ) {
+      catch ( final NoSuchMethodException ex ) {
         WigleAndroid.error( "no such method: " + ex );
       }
     }
@@ -114,7 +114,7 @@ public class TTS {
     return SPEECH_CLASS != null;
   }
   
-  public TTS( Context context ) {
+  public TTS( final Context context ) {
     try {
       Constructor construct;
       if (useEyesFree) {
@@ -122,7 +122,7 @@ public class TTS {
       } else {
         construct = SPEECH_CLASS.getConstructor( Context.class, LISTENER_CLASS );
       }
-      InvocationHandler handler = new InvocationHandler() {
+      final InvocationHandler handler = new InvocationHandler() {
         public Object invoke( Object object, Method method, Object[] args ) {
           WigleAndroid.info("invoke: " + method.getName() );
           return null;
@@ -139,21 +139,21 @@ public class TTS {
       //Method setLocation = SPEECH_CLASS.getMethod( "setLanguage", Locale.class );
       //setLocation.invoke( speech, Locale.UK );
     }
-    catch ( NoSuchMethodException ex ) {
+    catch ( final NoSuchMethodException ex ) {
       WigleAndroid.error( "no such method: " + ex );
     }
-    catch ( IllegalAccessException ex ) {
+    catch ( final IllegalAccessException ex ) {
       WigleAndroid.error( "illegal: " + ex );
     }
-    catch ( InstantiationException ex ) {
+    catch ( final InstantiationException ex ) {
       WigleAndroid.error( "instantiation: " + ex );
     }
-    catch ( InvocationTargetException ex ) {
+    catch ( final InvocationTargetException ex ) {
       WigleAndroid.error( "invocation: " + ex );
     }
   }
   
-  public void speak( String string ) {
+  public void speak( final String string ) {
     try {
       // WigleAndroid.info("saying: " + string );
       if ( useEyesFree ) {
@@ -162,10 +162,10 @@ public class TTS {
         speak.invoke( speech, string, QUEUE_ADD, (HashMap<String,String>) null );
       }
     }
-    catch ( IllegalAccessException ex ) {
+    catch ( final IllegalAccessException ex ) {
       WigleAndroid.error( "illegal: " + ex );
     }
-    catch ( InvocationTargetException ex ) {
+    catch ( final InvocationTargetException ex ) {
       WigleAndroid.error( "invocation: " + ex );
     }
   }
@@ -175,10 +175,10 @@ public class TTS {
       // WigleAndroid.info("saying: " + string );
       shutdown.invoke( speech, (Object[])null );
     }
-    catch ( IllegalAccessException ex ) {
+    catch ( final IllegalAccessException ex ) {
       WigleAndroid.error( "illegal: " + ex );
     }
-    catch ( InvocationTargetException ex ) {
+    catch ( final InvocationTargetException ex ) {
       WigleAndroid.error( "invocation: " + ex );
     }
   }

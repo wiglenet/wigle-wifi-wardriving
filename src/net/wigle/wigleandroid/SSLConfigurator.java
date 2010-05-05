@@ -86,7 +86,7 @@ public final class SSLConfigurator {
    * factory method.
    * @return an instance 
    */
-  public static SSLConfigurator getInstance( Resources res ) {
+  public static SSLConfigurator getInstance( final Resources res ) {
      synchronized ( lock ) {
        if ( null == config ) {
           config = new SSLConfigurator( res );
@@ -100,7 +100,7 @@ public final class SSLConfigurator {
    * set the socket factory and verifier for urlConn
    * @param urlConn the HttpsURLConnection to set up
    */
-  public void configure( HttpsURLConnection urlConn ) {
+  public void configure( final HttpsURLConnection urlConn ) {
         urlConn.setSSLSocketFactory( ssf );
         urlConn.setHostnameVerifier( hv );
   }
@@ -110,31 +110,31 @@ public final class SSLConfigurator {
    * do the dirty work.
    * @parma res the android Resources to load the cert via.
    */
-  private boolean setupSSL( Resources res ) {
+  private boolean setupSSL( final Resources res ) {
     boolean result = false;
     try {
 
       // GET CERT GOO FROM R.raw
-      InputStream certstream = res.openRawResource( R.raw.ssl );
+      final InputStream certstream = res.openRawResource( R.raw.ssl );
       
-      CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
+      final CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
 
-      java.security.cert.Certificate cert = cf.generateCertificate( certstream );
+      final java.security.cert.Certificate cert = cf.generateCertificate( certstream );
 
-      KeyStore ks = KeyStore.getInstance( KeyStore.getDefaultType() );
+      final KeyStore ks = KeyStore.getInstance( KeyStore.getDefaultType() );
       ks.load( null, null );
       ks.setCertificateEntry( "wigle.net", cert );
      
-      TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
+      final TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
       tmf.init( ks );
-      SSLContext ssc = SSLContext.getInstance( "TLSv1" );
+      final SSLContext ssc = SSLContext.getInstance( "TLSv1" );
       ssc.init( null, tmf.getTrustManagers(), null );
       ssf = ssc.getSocketFactory();
       hv = new ReflexiveHostnameVerifier( cert ); // XXX: make less dumb
       result = true;  
-    } catch ( IOException e ) {
+    } catch ( final IOException e ) {
         WigleAndroid.error( "Cannot read cert file", e );
-    } catch ( Throwable e) {
+    } catch ( final Throwable e) {
         WigleAndroid.error( "error initializing", e );
     }
     
@@ -149,18 +149,18 @@ public final class SSLConfigurator {
     /** the wigle.net cert */
     private Certificate cert;
   
-    ReflexiveHostnameVerifier( Certificate cert ) {
+    ReflexiveHostnameVerifier( final Certificate cert ) {
       this.cert = cert;
     }
 
     // inherit docs
-    public boolean verify( String hostname, SSLSession session ) {
+    public boolean verify( final String hostname, final SSLSession session ) {
        // we don't care about the hostname.
        
        try {
            // is our expected cert part of the chain?
            return Arrays.asList( session.getPeerCertificates() ).contains( cert );
-       } catch ( SSLPeerUnverifiedException e ) {
+       } catch ( final SSLPeerUnverifiedException e ) {
            WigleAndroid.error( "hostname: '"+hostname+
                                "' dosen't match up with my WiGLE.net certificate. upgrade!\n"+
                                "or contact wigle-admin@wigle.net with this error:", e );

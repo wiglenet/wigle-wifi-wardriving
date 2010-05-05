@@ -26,15 +26,15 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 /**
  * configure settings
  */
-public class SettingsActivity extends Activity {
+public final class SettingsActivity extends Activity {
   
   private static final int MENU_RETURN = 12;
   
   /** convenience, just get the darn new string */
   private static abstract class SetWatcher implements TextWatcher {
-    public void afterTextChanged(Editable s) {}
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    public void afterTextChanged( final Editable s ) {}
+    public void beforeTextChanged( final CharSequence s, final int start, final int count, final int after ) {}
+    public void onTextChanged( final CharSequence s, final int start, final int before, final int count ) {
       onTextChanged( s.toString() ); 
     }
     public abstract void onTextChanged( String s );
@@ -42,26 +42,26 @@ public class SettingsActivity extends Activity {
   
   /** Called when the activity is first created. */
   @Override
-  public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.settings);
+  public void onCreate( final Bundle savedInstanceState) {
+      super.onCreate( savedInstanceState );
+      setContentView( R.layout.settings );
       
       // force media volume controls
-      this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+      this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
 
       // don't let the textbox have focus to start with, so we don't see a keyboard right away
-      LinearLayout linearLayout = (LinearLayout) findViewById( R.id.linearlayout );
+      final LinearLayout linearLayout = (LinearLayout) findViewById( R.id.linearlayout );
       linearLayout.setFocusableInTouchMode(true);
       linearLayout.requestFocus();
       
       // get prefs
-      SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
+      final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
       final Editor editor = prefs.edit();
       
       final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
       final EditText user = (EditText) findViewById(R.id.edit_username);
       final EditText pass = (EditText) findViewById(R.id.edit_password);
-      boolean isAnonymous = prefs.getBoolean( WigleAndroid.PREF_BE_ANONYMOUS, false);
+      final boolean isAnonymous = prefs.getBoolean( WigleAndroid.PREF_BE_ANONYMOUS, false);
       if ( isAnonymous ) {
         user.setEnabled( false );
         pass.setEnabled( false );
@@ -69,7 +69,7 @@ public class SettingsActivity extends Activity {
       
       beAnonymous.setChecked( isAnonymous );
       beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
               editor.putBoolean( WigleAndroid.PREF_BE_ANONYMOUS, isChecked );
               editor.commit();
               
@@ -94,18 +94,18 @@ public class SettingsActivity extends Activity {
           }
       });
       
-      user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "") );
+      user.setText( prefs.getString( WigleAndroid.PREF_USERNAME, "" ) );
       user.addTextChangedListener( new SetWatcher() {
-        public void onTextChanged(String s) {
+        public void onTextChanged( final String s ) {
           // WigleAndroid.debug("user: " + s);
           editor.putString( WigleAndroid.PREF_USERNAME, s.trim() );
           editor.commit();
         } 
       });
       
-      pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "") );
+      pass.setText( prefs.getString( WigleAndroid.PREF_PASSWORD, "" ) );
       pass.addTextChangedListener( new SetWatcher() {
-        public void onTextChanged(String s) {
+        public void onTextChanged( final String s ) {
           // WigleAndroid.debug("pass: " + s);
           editor.putString( WigleAndroid.PREF_PASSWORD, s.trim() );
           editor.commit();
@@ -113,9 +113,9 @@ public class SettingsActivity extends Activity {
       });
       
       final CheckBox showCurrent = (CheckBox) findViewById(R.id.edit_showcurrent);
-      showCurrent.setChecked( prefs.getBoolean( WigleAndroid.PREF_SHOW_CURRENT, true) );
-      showCurrent.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
+      showCurrent.setChecked( prefs.getBoolean( WigleAndroid.PREF_SHOW_CURRENT, true ) );
+      showCurrent.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
               editor.putBoolean( WigleAndroid.PREF_SHOW_CURRENT, isChecked );
               editor.commit();
           }
@@ -125,9 +125,9 @@ public class SettingsActivity extends Activity {
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
       tv.setText( "Highest uploaded id: " + prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L ) );
       
-      final Button resetMaxidButton = (Button) findViewById(R.id.reset_maxid_button);
+      final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
       resetMaxidButton.setOnClickListener( new OnClickListener() {
-        public void onClick( View buttonView ) {             
+        public void onClick( final View buttonView ) {             
               editor.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
               editor.commit();
               tv.setText( "Max upload id: 0" );
@@ -141,30 +141,30 @@ public class SettingsActivity extends Activity {
       final long[] periods = new long[]{ 500,1000,2000,5000,10000 };
       long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, 1000L);
       int periodIndex = 0;
-      for (int i = 0; i < periods.length; i++) {
-        adapter.add( Long.toString( periods[i] ) );
+      for ( int i = 0; i < periods.length; i++ ) {
+        adapter.add( Float.toString( periods[i] / 1000f ) );
         if ( period == periods[i] ) {
           periodIndex = i;
         }
       }
       adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      spinner.setAdapter(adapter);
+      spinner.setAdapter( adapter );
       spinner.setSelection( periodIndex );
       spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-        public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+        public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
           // set pref
-          long period = periods[position];
-          WigleAndroid.info("setting period: " + period );
+          final long period = periods[position];
+          WigleAndroid.info( "setting period: " + period );
           editor.putLong( WigleAndroid.PREF_SCAN_PERIOD, period );
           editor.commit();
         }
-        public void onNothingSelected(AdapterView<?> arg0) {}
+        public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });    
   
       final CheckBox foundSound = (CheckBox) findViewById(R.id.found_sound);
       foundSound.setChecked( prefs.getBoolean( WigleAndroid.PREF_FOUND_SOUND, true) );
-      foundSound.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
+      foundSound.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
               editor.putBoolean( WigleAndroid.PREF_FOUND_SOUND, isChecked );
               editor.commit();
           }
@@ -172,8 +172,8 @@ public class SettingsActivity extends Activity {
       
       final CheckBox speechGPS = (CheckBox) findViewById(R.id.speech_gps);
       speechGPS.setChecked( prefs.getBoolean( WigleAndroid.PREF_SPEECH_GPS, true) );
-      speechGPS.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {             
+      speechGPS.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
               editor.putBoolean( WigleAndroid.PREF_SPEECH_GPS, isChecked );
               editor.commit();
           }
@@ -184,46 +184,47 @@ public class SettingsActivity extends Activity {
       if ( ! TTS.hasTTS() ) {
         // no text to speech :(
         spinner.setEnabled( false );
-        TextView speakText = (TextView) findViewById( R.id.speak_text );
+        final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText("No Text-to-Speech engine");
       }
       adapter = new ArrayAdapter<String>(
-          this, android.R.layout.simple_spinner_dropdown_item);
-      final long[] speechPeriods = new long[]{ 0,5,10,15,30,60,120,300 };
+          this, android.R.layout.simple_spinner_dropdown_item );
+      final long[] speechPeriods = new long[]{ 0,10,15,30,60,120,300,600 };
+      final String[] speechName = new String[]{ "Off","10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min" };
       period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, WigleAndroid.DEFAULT_SPEECH_PERIOD );
       periodIndex = 0;
-      for (int i = 0; i < speechPeriods.length; i++) {
-        adapter.add( Long.toString( speechPeriods[i] ) );
+      for ( int i = 0; i < speechPeriods.length; i++ ) {
+        adapter.add( speechName[i] );
         if ( period == speechPeriods[i] ) {
           periodIndex = i;
         }
       }
-      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-      spinner.setAdapter(adapter);
+      adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+      spinner.setAdapter( adapter );
       spinner.setSelection( periodIndex );
       spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-        public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+        public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
           // set pref
-          long period = speechPeriods[position];
+          final long period = speechPeriods[position];
           WigleAndroid.info("setting period: " + period );
           editor.putLong( WigleAndroid.PREF_SPEECH_PERIOD, period );
           editor.commit();
         }
-        public void onNothingSelected(AdapterView<?> arg0) {}
+        public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });    
   }
   
   /* Creates the menu items */
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-      MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
+  public boolean onCreateOptionsMenu( final Menu menu ) {
+      final MenuItem item = menu.add( 0, MENU_RETURN, 0, "Return" );
       item.setIcon( android.R.drawable.ic_media_previous );
       return true;
   }
 
   /* Handles item selections */
   @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
+  public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_RETURN:
           finish();

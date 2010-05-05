@@ -19,7 +19,7 @@ import android.os.Environment;
 /**
  * our database
  */
-public class DatabaseHelper extends Thread {
+public final class DatabaseHelper extends Thread {
   // if in same spot, only log once an hour
   private static final long SMALL_LOC_DELAY = 1000L * 60L * 60L;
   // if change is less than these digits, don't bother
@@ -55,8 +55,9 @@ public class DatabaseHelper extends Thread {
     + ")";
   
   private SQLiteDatabase db;
-  private Context context;
+  
   private static final int MAX_QUEUE = 512;
+  private final Context context;
   private final BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
@@ -67,13 +68,20 @@ public class DatabaseHelper extends Thread {
   private final CacheMap<String,Location> previousWrittenLocationsCache = 
     new CacheMap<String,Location>( 16, 64 );
   
-  public class DBUpdate {
-    public Network network;
-    public int level;
-    public Location location;
+  /** class for queueing updates to the database */
+  final class DBUpdate {
+    public final Network network;
+    public final int level;
+    public final Location location;
+    
+    public DBUpdate( final Network network, final int level, final Location location ) {
+      this.network = network;
+      this.level = level;
+      this.location = location;
+    }
   }
   
-  public DatabaseHelper( Context context ) {    
+  public DatabaseHelper( final Context context ) {    
     this.context = context;
     this.prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
   }
@@ -91,16 +99,15 @@ public class DatabaseHelper extends Thread {
       
       while ( ! done.get() ) {
         try {
-          DBUpdate update = queue.take();
-          addObservation( update );
+          addObservation( queue.take() );
         }
-        catch ( InterruptedException ex ) {
+        catch ( final InterruptedException ex ) {
           // no worries
           WigleAndroid.info("db queue take interrupted");
         }
       }
     }
-    catch ( Throwable throwable ) {
+    catch ( final Throwable throwable ) {
       WigleAndroid.writeError( Thread.currentThread(), throwable );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
@@ -108,13 +115,13 @@ public class DatabaseHelper extends Thread {
   
   public void open() {
     String dbFilename = DATABASE_NAME;
-    boolean hasSD = WigleAndroid.hasSD();
+    final boolean hasSD = WigleAndroid.hasSD();
     if ( hasSD ) {
       File path = new File( DATABASE_PATH );
       path.mkdirs();
       dbFilename = DATABASE_PATH + DATABASE_NAME;
     }
-    File dbFile = new File( dbFilename );
+    final File dbFile = new File( dbFilename );
     boolean doCreate = false;
     if ( ! dbFile.exists() ) {
       doCreate = true;
@@ -134,11 +141,11 @@ public class DatabaseHelper extends Thread {
         db.execSQL(NETWORK_CREATE);
         db.execSQL(LOCATION_CREATE);
         // new database, reset a marker, if any
-        Editor edit = prefs.edit();
+        final Editor edit = prefs.edit();
         edit.putLong( WigleAndroid.PREF_DB_MARKER, 0L );
         edit.commit();
       }
-      catch ( SQLiteException ex ) {
+      catch ( final SQLiteException ex ) {
         WigleAndroid.error( "sqlite exception: " + ex );
       }
     }
@@ -154,8 +161,8 @@ public class DatabaseHelper extends Thread {
     // give time for db to finish any writes
     int countdown = 50;
     while ( this.isAlive() && countdown > 0 ) {
-      WigleAndroid.info("db still alive. countdown: " + countdown );
-      WigleAndroid.sleep(100L);
+      WigleAndroid.info( "db still alive. countdown: " + countdown );
+      WigleAndroid.sleep( 100L );
       countdown--;
     }
     if ( db.isOpen() ) {
@@ -170,29 +177,26 @@ public class DatabaseHelper extends Thread {
     }
   }
   
-  public void addObservation( Network network, Location location ) {
-    DBUpdate update = new DBUpdate();
-    update.network = network;
-    update.location = location;
-    update.level = network.getLevel();
+  public void addObservation( final Network network, final Location location ) {
+    final DBUpdate update = new DBUpdate( network, network.getLevel(), location );
     boolean complete = false;
     while ( ! complete ) {
       try {
         queue.put( update );
         complete = true;
       }
-      catch ( InterruptedException ex ) {
+      catch ( final InterruptedException ex ) {
         WigleAndroid.info( "interrupted in main addObservation: " + ex ); 
       }
     }
   }
   
-  private void addObservation( DBUpdate update ) {
+  private void addObservation( final DBUpdate update ) {
     checkDB();
-    Network network = update.network;
-    Location location = update.location;
-    ContentValues values = new ContentValues();
-    String[] bssidArgs = new String[]{ network.getBssid() }; 
+    final Network network = update.network;
+    final Location location = update.location;
+    final ContentValues values = new ContentValues();
+    final String[] bssidArgs = new String[]{ network.getBssid() }; 
     
     long lasttime = 0;
     double lastlat = 0;
@@ -200,7 +204,7 @@ public class DatabaseHelper extends Thread {
     boolean isNew = false;
     
     // first try cache
-    Location prevWrittenLocation = previousWrittenLocationsCache.get( network.getBssid() );
+    final Location prevWrittenLocation = previousWrittenLocationsCache.get( network.getBssid() );
     if ( prevWrittenLocation != null ) {
       // cache hit!
       lasttime = prevWrittenLocation.getTime();
@@ -209,7 +213,7 @@ public class DatabaseHelper extends Thread {
     }
     else {
       // cache miss, get the last values from the db, if any
-      Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+      final Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
       if ( cursor.getCount() == 0 ) {    
         // WigleAndroid.info("inserting net: " + network.getSsid() );
         values.put("bssid", network.getBssid() );
@@ -247,16 +251,16 @@ public class DatabaseHelper extends Thread {
       fastMode = true;
     }       
     
-    long now = System.currentTimeMillis();
-    double latDiff = Math.abs(lastlat - location.getLatitude());
-    double lonDiff = Math.abs(lastlon - location.getLongitude());
-    boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
-    boolean mediumChange = latDiff > MEDIUM_LATLON_CHANGE || lonDiff > MEDIUM_LATLON_CHANGE;
-    boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
+    final long now = System.currentTimeMillis();
+    final double latDiff = Math.abs(lastlat - location.getLatitude());
+    final double lonDiff = Math.abs(lastlon - location.getLongitude());
+    final boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
+    final boolean mediumChange = latDiff > MEDIUM_LATLON_CHANGE || lonDiff > MEDIUM_LATLON_CHANGE;
+    final boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
     // WigleAndroid.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
     //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
-    boolean changeWorthy = mediumChange || (now - lasttime > SMALL_LOC_DELAY && smallChange);
+    final boolean changeWorthy = mediumChange || (now - lasttime > SMALL_LOC_DELAY && smallChange);
     if ( isNew || bigChange || (! fastMode && changeWorthy ) ) {
       // WigleAndroid.info("inserting loc: " + network.getSsid() );
       values.clear();
@@ -308,40 +312,40 @@ public class DatabaseHelper extends Thread {
     return networkCount.get();
   }
   private void getNetworkCountFromDB() {
-    checkDB();
-    Cursor cursor = db.rawQuery("select count(*) FROM " + NETWORK_TABLE, null);
-    cursor.moveToFirst();
-    long count = cursor.getLong( 0 );
-    cursor.close();
-    networkCount.set( count );
+    networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
   
   public long getLocationCount() {
     return locationCount.get();
   }
+  
   /** careful with threading on this one */
   public void getLocationCountFromDB() {
-    checkDB();
-    Cursor cursor = db.rawQuery("select count(*) FROM " + LOCATION_TABLE, null);
-    cursor.moveToFirst();
-    long count = cursor.getLong( 0 );
-    cursor.close();
-    locationCount.set( count );
+    locationCount.set( getCountFromDB( LOCATION_TABLE ) );
   }
   
-  public Network getNetwork( String bssid ) {
+  private long getCountFromDB( final String table ) {
+    checkDB();
+    final Cursor cursor = db.rawQuery( "select count(*) FROM " + table, null );
+    cursor.moveToFirst();
+    final long count = cursor.getLong( 0 );
+    cursor.close();
+    return count;
+  }
+  
+  public Network getNetwork( final String bssid ) {
     // check cache
     Network retval = WigleAndroid.getNetworkCache().get( bssid );
     if ( retval == null ) {
       checkDB();
-      String[] args = new String[]{ bssid };
-      Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
+      final String[] args = new String[]{ bssid };
+      final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
           + " WHERE bssid = ?", args);
       if ( cursor.getCount() > 0 ) {
         cursor.moveToFirst();
-        String ssid = cursor.getString(0);
-        int frequency = cursor.getInt(1);
-        String capabilities = cursor.getString(2);
+        final String ssid = cursor.getString(0);
+        final int frequency = cursor.getInt(1);
+        final String capabilities = cursor.getString(2);
         retval = new Network( bssid, ssid, frequency, capabilities, 0 );
         WigleAndroid.getNetworkCache().put( bssid, retval );
       }
@@ -350,11 +354,11 @@ public class DatabaseHelper extends Thread {
     return retval;
   }
   
-  public Cursor networkIterator( long fromId ) {
+  public Cursor networkIterator( final long fromId ) {
     checkDB();
-    WigleAndroid.info("networkIterator fromId: " + fromId );
-    String[] args = new String[]{ Long.toString( fromId ) };
-    return db.rawQuery("SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args);
+    WigleAndroid.info( "networkIterator fromId: " + fromId );
+    final String[] args = new String[]{ Long.toString( fromId ) };
+    return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
   }
   
 }

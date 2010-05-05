@@ -34,25 +34,23 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
   public void onDraw( final Canvas c ) {
     super.onDraw( c );
     
-		synchronized( WigleAndroid.lameStatic.trail ) {
-		  final Set<Map.Entry<GeoPoint,Integer>> entrySet = WigleAndroid.lameStatic.trail.entrySet();
-		  for ( Map.Entry<GeoPoint,Integer> entry : entrySet ) {
-				final GeoPoint geoPoint = entry.getKey();
-				final int nets = entry.getValue();
-				if ( nets > 0 ) {
-    	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
-    	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
-				}
-    	}
-    	for ( Map.Entry<GeoPoint,Integer> entry : entrySet ) {
-        final GeoPoint geoPoint = entry.getKey();
-        final int nets = entry.getValue();
-        if ( nets > 0 ) {
-          final Point point = this.getProjection().toMapPixels( geoPoint, null );
-          c.drawCircle(point.x, point.y, nets, trailPaint);
-        }
+	  final Set<Map.Entry<GeoPoint,Integer>> entrySet = WigleAndroid.lameStatic.trail.entrySet();
+	  for ( Map.Entry<GeoPoint,Integer> entry : entrySet ) {
+			final GeoPoint geoPoint = entry.getKey();
+			final int nets = entry.getValue();
+			if ( nets > 0 ) {
+  	  	final Point point = this.getProjection().toMapPixels( geoPoint, null );
+  	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
+			}
+  	}
+  	for ( Map.Entry<GeoPoint,Integer> entry : entrySet ) {
+      final GeoPoint geoPoint = entry.getKey();
+      final int nets = entry.getValue();
+      if ( nets > 0 ) {
+        final Point point = this.getProjection().toMapPixels( geoPoint, null );
+        c.drawCircle(point.x, point.y, nets, trailPaint);
       }
-		}
+    }
     
     // draw center crosshairs
     final GeoPoint center = this.getMapCenter();

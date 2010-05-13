@@ -5,6 +5,7 @@ import static android.location.LocationManager.NETWORK_PROVIDER;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -27,6 +28,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
@@ -37,6 +39,7 @@ import android.location.GpsStatus.Listener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -275,7 +278,15 @@ public final class WigleAndroid extends Activity {
       if ( wifiLock != null && wifiLock.isHeld() ) {
         wifiLock.release();
       }
-      
+
+      // clean up.
+      if ( soundPop != null ) {
+          soundPop.release();
+      }
+      if ( soundNewPop != null ) {
+          soundNewPop.release();
+      }
+ 
       super.onDestroy();
     }
     
@@ -958,8 +969,13 @@ public final class WigleAndroid extends Activity {
       });
     }
 
+    /** 
+     * create a mediaplayer for a given raw resource id.
+     * @param soundId the R.raw. id for a given sound
+     * @return the mediaplayer for soundId or null if it could not be created.
+     */
     private MediaPlayer createMediaPlayer( final int soundId ) {
-      final MediaPlayer sound = MediaPlayer.create( this, soundId );
+      final MediaPlayer sound = createMp( this, soundId );
       if ( sound == null ) {
         info( "sound null from media player" );
         return null;
@@ -986,6 +1002,102 @@ public final class WigleAndroid extends Activity {
 
       return sound;
     }
+
+    /** 
+     * externalize the file from a given resource id (if it dosen't already exist), write to our dir if there is one.
+     * @param context the context to use
+     * @param resid the resource id
+     * @param name the file name to write out
+     * @return the uri of a file containing resid's resource
+     */
+    private static Uri resToFile( final Context context, final int resid, final String name ) throws IOException {
+        // throw it in our bag of fun.
+        String openString = name;
+        final boolean hasSD = hasSD();
+        if ( hasSD ) {
+            final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
+            final File path = new File( filepath );
+            path.mkdirs();
+            openString = filepath + name;
+        }
+
+        final File f = new File( openString );
+      
+        // see if it exists already
+        if ( ! f.exists() ) { 
+            info("causing "+f.getCanonicalPath()+" to be made");
+            // make it happen:
+            f.createNewFile();
+            
+            InputStream is = null;
+            FileOutputStream fos = null;
+            try {
+                is = context.getResources().openRawResource( resid );
+                if ( hasSD ) {
+                    fos = new FileOutputStream( f );
+                } else { 
+                    // XXX: should this be using openString instead? baroo?
+                    fos = context.openFileOutput( name, Context.MODE_WORLD_READABLE );
+                }
+
+                final byte[] buff = new byte[ 1024 ];
+                int rv = -1;
+                while( ( rv = is.read( buff ) ) > -1 ) {
+                    fos.write( buff, 0, rv );
+                }
+            } finally {
+                if ( fos != null ) {
+                    fos.close();
+                }
+                if ( is != null ) {
+                    is.close();
+                }
+            }
+        }
+        return Uri.fromFile( f );
+    }
+
+    /** 
+     * create a media player (trying several paths if available)
+     * @param context the context to use
+     * @param resid the resource to use
+     * @return the media player for resid (or null if it wasn't creatable)
+     */
+    private static MediaPlayer createMp( final Context context, final int resid ) {
+        try {
+            MediaPlayer mp = MediaPlayer.create( context, resid );
+            // this can fail for many reasons, but android 1.6 on archos5 definitely hates creating from resource
+            if ( mp == null ) {
+                Uri sounduri;
+                // XXX: find a better way? baroo.
+                if ( resid == R.raw.pop ) {
+                    sounduri = resToFile( context, resid, "pop.wav" );
+                } else if ( resid == R.raw.newpop ) {
+                    sounduri = resToFile( context, resid, "newpop.wav" );
+                } else {
+                    info( "unknown raw sound id:"+resid );
+                    return null;
+                }
+                mp = MediaPlayer.create( context, sounduri );
+                // may still end up null
+            }
+
+            return mp;
+        } catch (IOException ex) {
+            error("ioe create failed:", ex);
+            // fall through
+        } catch (IllegalArgumentException ex) {
+            error("iae create failed:", ex);
+           // fall through
+        } catch (SecurityException ex) {
+            error("se create failed:", ex);
+            // fall through
+        } catch ( Resources.NotFoundException ex ) {
+            error("rnfe create failed("+resid+"):", ex );
+        }
+        return null;
+    }
+   
     
     @SuppressWarnings("unused")
     private boolean isRingerOn() {

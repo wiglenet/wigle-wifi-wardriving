@@ -128,8 +128,8 @@ public final class TTS {
           return null;
         }
       };
-      listener = Proxy.newProxyInstance(LISTENER_CLASS.getClassLoader(), 
-          new Class[]{ LISTENER_CLASS }, handler);
+      listener = Proxy.newProxyInstance( LISTENER_CLASS.getClassLoader(), 
+                                         new Class[]{ LISTENER_CLASS }, handler );
       
       if ( useEyesFree ) {
         speech = construct.newInstance( context, listener, true );

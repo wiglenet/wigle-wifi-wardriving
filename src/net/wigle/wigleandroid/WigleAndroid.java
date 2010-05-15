@@ -76,8 +76,11 @@ public final class WigleAndroid extends Activity {
     private String savedStats;
     private long prevNewNetCount;
     private Long satCountLowTime;
-    private Long lastLocationTime;
-    private Long lastNetworkLocationTime;
+
+    // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
+    private Long lastLocationTime = 0L;
+    private Long lastNetworkLocationTime = 0L;
+
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
     private WifiLock wifiLock;
@@ -514,8 +517,8 @@ public final class WigleAndroid extends Activity {
       wifiReceiver = new BroadcastReceiver(){
           public void onReceive( final Context context, final Intent intent ){
             final long start = System.currentTimeMillis();
-						// can be null!
-            final List<ScanResult> results = wifiManager.getScanResults(); // Returns a <list> of scanResults
+
+            final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
             final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
             if ( period < 1000L ) {
@@ -532,11 +535,11 @@ public final class WigleAndroid extends Activity {
             
             final CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
-						int resultSize = 0;
-						int newForRun = 0;
+            int resultSize = 0;
+            int newForRun = 0;
             // can be null on shutdown
             if ( results != null ) {
-							resultSize = results.size();
+              resultSize = results.size();
               for ( ScanResult result : results ) {
                 Network network = networkCache.get( result.BSSID );
                 if ( network == null ) {
@@ -548,9 +551,9 @@ public final class WigleAndroid extends Activity {
                   network.setLevel( result.level );
                 }
                 final boolean added = runNetworks.add( result.BSSID );
-								if ( added ) {
-									newForRun++;
-								}
+                if ( added ) {
+                    newForRun++;
+                }
                 somethingAdded |= added;
                 
                 // if we're showing current, or this was just added, put on the list

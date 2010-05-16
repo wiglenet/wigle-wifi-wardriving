@@ -86,14 +86,12 @@ final class HttpFileUploader {
       byte[] buffer = new byte[bufferSize];
     
       // read file and write it into form...
-      int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-    
-      while (bytesRead > 0) {
+      int bytesRead = -1;
+      while ( ( bytesRead = fileInputStream.read( buffer, 0, bufferSize ) ) > 0 ) {
         WigleAndroid.info( "writing " + bufferSize + " bytes" );
         dos.write(buffer, 0, bufferSize);
         bytesAvailable = fileInputStream.available();
         bufferSize = Math.min(bytesAvailable, maxBufferSize);
-        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
       }
     
       // send multipart form data necesssary after file data...

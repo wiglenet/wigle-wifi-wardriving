@@ -101,7 +101,7 @@ public final class WigleAndroid extends Activity {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_MAP = 12;
-    public static final String ENCODING = "ISO8859_1";
+    public static final String ENCODING = "ISO-8859-1";
     private static final long GPS_TIMEOUT = 15000L;
     private static final long NET_LOC_TIMEOUT = 60000L;
     
@@ -708,7 +708,7 @@ public final class WigleAndroid extends Activity {
       
       if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
         Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
-        final Intent myIntent = new Intent( Settings.ACTION_SECURITY_SETTINGS );
+        final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
         startActivity(myIntent);
       }
       // emulator crashes if you ask this

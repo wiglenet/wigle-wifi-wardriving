@@ -1,14 +1,22 @@
 package net.wigle.wigleandroid;
 
 import android.content.res.Resources; 
+import android.os.Handler;
 
-import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.util.Map;
 
 /**
@@ -20,8 +28,21 @@ final class HttpFileUploader {
   private HttpFileUploader(){
   }
 
+    /** 
+     * upload utility method.
+     *
+     * @param urlString the url to POST the file to
+     * @param filename the filename to use for the post
+     * @param fileParamName the HTML form field name for the file
+     * @param fileInputStream an open file stream to the file to post
+     * @param params form data fields (key and value)
+     * @param res the app resources (needed for looking up SSL cert)
+     * @param handler if non-null gets empty messages with updates on progress
+     * @param filesize guess at filesize for UI callbacks
+     */
   public static String upload( final String urlString, final String filename, final String fileParamName,
-       final FileInputStream fileInputStream, final Map<String,String> params, final Resources res ){
+                               final FileInputStream fileInputStream, final Map<String,String> params, 
+                               final Resources res, final Handler handler, final long filesize ) {
     
     URL connectURL = null;
     try{
@@ -40,8 +61,12 @@ final class HttpFileUploader {
       //------------------ CLIENT REQUEST
     
       WigleAndroid.info("Creating url connection");
+
       // Open a HTTP connection to the URL
-    
+      CharsetEncoder enc = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
+      CharBuffer cbuff = CharBuffer.allocate( 1024 );
+      ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
+
       final HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
     
       // Allow Inputs
@@ -61,48 +86,57 @@ final class HttpFileUploader {
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Connection", "Keep-Alive");
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-      final DataOutputStream dos = new DataOutputStream( conn.getOutputStream() );
+
+      WritableByteChannel wbc = Channels.newChannel( conn.getOutputStream() );
       
+      StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
       for ( Map.Entry<String, String> entry : params.entrySet() ) {
-        dos.writeBytes( twoHyphens + boundary + lineEnd );
-        dos.writeBytes( "Content-Disposition: form-data; name=\""+ entry.getKey() + "\"" + lineEnd );
-        dos.writeBytes( lineEnd );
-        dos.writeBytes( entry.getValue() );
-        dos.writeBytes( lineEnd );
+        header.append( twoHyphens + boundary + lineEnd );
+        header.append( "Content-Disposition: form-data; name=\""+ entry.getKey() + "\"" + lineEnd );
+        header.append( lineEnd );
+        header.append( entry.getValue() );
+        header.append( lineEnd );
       }
       
-      dos.writeBytes( twoHyphens + boundary + lineEnd );
-      dos.writeBytes( "Content-Disposition: form-data; name=\"" + fileParamName 
-          + "\";filename=\"" + filename +"\"" + lineEnd );
-      dos.writeBytes( "Content-Type: application/octet_stream" + lineEnd );
-      dos.writeBytes( lineEnd);
-    
-      WigleAndroid.info( "Headers are written" );
-    
-      // create a buffer of maximum size
-      int bytesAvailable = fileInputStream.available();
-      final int maxBufferSize = 1024;
-      int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-      byte[] buffer = new byte[bufferSize];
-    
-      // read file and write it into form...
-      int bytesRead = -1;
-      while ( ( bytesRead = fileInputStream.read( buffer, 0, bufferSize ) ) > 0 ) {
-        WigleAndroid.info( "writing " + bufferSize + " bytes" );
-        dos.write(buffer, 0, bufferSize);
-        bytesAvailable = fileInputStream.available();
-        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+      header.append( twoHyphens + boundary + lineEnd );
+      header.append( "Content-Disposition: form-data; name=\"" + fileParamName 
+                     + "\";filename=\"" + filename +"\"" + lineEnd );
+      header.append( "Content-Type: application/octet_stream" + lineEnd );
+      header.append( lineEnd );
+
+      writeString( wbc, header.toString(), enc, cbuff, bbuff );
+
+      WigleAndroid.info( "Headers are written ("+header.length()+")" );
+      int percentDone = ( (int)header.length() * 100) / (int)filesize;
+      if ( handler != null ) {
+          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
       }
+
     
+      FileChannel fc = fileInputStream.getChannel();
+      long byteswritten = fc.transferTo( 0, Integer.MAX_VALUE, wbc ); // transfer it all. the integer cap is reasonable.
+      WigleAndroid.info( "transferred "+byteswritten+" of "+filesize );
+      percentDone = ((int)byteswritten * 100) / (int)filesize;
+
+      // only send it the once... if we want to to send updates out to the ui:
+      // hook on a wraper to the writeable byte channel, which of course would bugger the transfer() native call
+      if ( handler != null ) {
+          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+      }
+
       // send multipart form data necesssary after file data...
-      dos.writeBytes(lineEnd);
-      dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-    
+      header.setLength( 0 ); // clear()
+      header.append(lineEnd);
+      header.append(twoHyphens + boundary + twoHyphens + lineEnd);
+      writeString( wbc, header.toString(), enc, cbuff, bbuff );
+
       // close streams
       WigleAndroid.info( "File is written" );
+      wbc.close();
+      fc.close();
       fileInputStream.close();
-      dos.flush();
     
+      // this is dirty.  dirty.
       final InputStream is = conn.getInputStream();
       // retrieve the response from server
       int ch;
@@ -113,8 +147,6 @@ final class HttpFileUploader {
       }
       retval = b.toString();
       // WigleAndroid.debug( "Response: " + retval );
-
-      dos.close();
     }
     catch ( final MalformedURLException ex ) {
       WigleAndroid.error( ex.toString() );
@@ -125,5 +157,37 @@ final class HttpFileUploader {
     
     return retval;
   }
+
+    /**
+     * write a string out to a byte channel.
+     *
+     * @param wbc the byte channel to write to 
+     * @param str the string to write
+     * @param enc the cbc encoder to use, will be reset
+     * @param cbuff the scratch charbuffer, will be cleared 
+     * @param bbuff the scratch bytebuffer, will be cleared
+     */
+    private static void writeString( WritableByteChannel wbc, String str, CharsetEncoder enc, CharBuffer cbuff, ByteBuffer bbuff ) throws IOException {
+        // clear existing state
+        cbuff.clear();
+        bbuff.clear();
+        enc.reset();
+
+        cbuff.put( str );
+        cbuff.flip(); 
+
+        if ( CoderResult.UNDERFLOW != enc.encode( cbuff, bbuff, true ) ) {
+            throw new IOException("encode fail");
+        }
+        if ( CoderResult.UNDERFLOW != enc.flush( bbuff ) ) {
+            throw new IOException("flush fail");
+        }
+        bbuff.flip();
+
+        int remaining = bbuff.remaining();
+        while ( remaining > 0 ) {
+            remaining -= wbc.write( bbuff ); 
+        }
+    }
   
 }

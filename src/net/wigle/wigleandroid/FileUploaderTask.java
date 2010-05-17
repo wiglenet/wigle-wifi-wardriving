@@ -40,7 +40,7 @@ public final class FileUploaderTask extends Thread {
   private final DatabaseHelper dbHelper;
   private final ProgressDialog pd;
   
-  private static final int WRITING_PERCENT_START = 10000;
+  static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
   
@@ -52,7 +52,7 @@ public final class FileUploaderTask extends Thread {
     BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
     EXCEPTION("Fail", "Exception"),
     BAD_LOGIN("Fail", "Login failed, check password?"),
-    UPLOADING("Working...", "Uploading File"),
+    UPLOADING("Working...", "Uploading File "),
     WRITING("Working...", "Writing File "),
     EMPTY_FILE("Doing Nothing", "File would be empty");
     
@@ -74,21 +74,30 @@ public final class FileUploaderTask extends Thread {
     this.context = context;
     this.dbHelper = dbHelper;
     
-    this.pd = ProgressDialog.show( context, Status.WRITING.title, Status.WRITING.getMessage(), true, false );  
+    this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false );  
     
     this.handler = new Handler() {
+            private String msg_text = "";
       @Override
       public void handleMessage( final Message msg ) {
         if ( msg.what >= WRITING_PERCENT_START ) {
           final int percent = msg.what - WRITING_PERCENT_START;
-          pd.setMessage( Status.WRITING.getMessage() + percent + "%" );
+          pd.setMessage( msg_text + percent + "%" );
+          pd.setProgress( percent * 100 );
           return;
         }
         
         final Status status = Status.values()[ msg.what ];
         if ( Status.UPLOADING.equals( status ) ) {
-          pd.setMessage( status.getMessage() );
-          return;
+            //          pd.setMessage( status.getMessage() );
+            msg_text = status.getMessage();
+            pd.setProgress(0);
+            return;
+        }
+        if ( Status.WRITING.equals( status ) ) {
+            msg_text = status.getMessage();
+            pd.setProgress(0);
+            return;
         }
         // make sure we didn't progress dialog this somewhere
         if ( pd.isShowing() ) {
@@ -183,10 +192,14 @@ public final class FileUploaderTask extends Thread {
       long fileWriteMillis = 0;
       long netMillis = 0;
       
+      handler.sendEmptyMessage( Status.WRITING.ordinal() );
+
+      int bytecount = 0;
+
       if ( total > 0 ) {
         int lastSentPercent = 0;
         CharBuffer charBuffer = CharBuffer.allocate( 256 );
-        ByteBuffer byteBuffer = ByteBuffer.allocate( 256 );
+        ByteBuffer byteBuffer = ByteBuffer.allocate( 256 ); // this ensures hasArray() is true
         final CharsetEncoder encoder = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
         final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
         if ( numberFormat instanceof DecimalFormat ) {
@@ -262,11 +275,9 @@ public final class FileUploaderTask extends Thread {
             continue;
           }
           
-          // tell the encoder to stop here
-          charBuffer.limit( charBuffer.position() );
-          // tell the encoder to start at the beginning
-          charBuffer.position( 0 );
-          
+          // tell the encoder to stop here and to start at the beginning
+          charBuffer.flip();
+
           // do the encoding
           encoder.reset();
           encoder.encode( charBuffer, byteBuffer, true );
@@ -275,6 +286,7 @@ public final class FileUploaderTask extends Thread {
           
           // figure out where in the byteBuffer to stop
           final int end = byteBuffer.position();
+          final int offset = byteBuffer.arrayOffset();
           //if ( end == 0 ) {
             // if doing the encode without giving a long-term byteBuffer (old way), the output
             // byteBuffer position is zero, and the limit and capacity are how long to write for.
@@ -285,9 +297,11 @@ public final class FileUploaderTask extends Thread {
           //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() + " end: " + end
           //     + " result: " + result );
           final long writeStart = System.currentTimeMillis();
-          fos.write(byteBuffer.array(), byteBuffer.arrayOffset(), end );
+          fos.write(byteBuffer.array(), offset, end+offset );
           fileWriteMillis += System.currentTimeMillis() - writeStart;
-          
+
+          bytecount += end;
+
           // update UI
           final int percentDone = (lineCount * 100) / total;
           // only send up to 100 times
@@ -310,7 +324,12 @@ public final class FileUploaderTask extends Thread {
       
       // show on the UI
       handler.sendEmptyMessage( Status.UPLOADING.ordinal() );
-      
+
+      long filesize = file.length();
+      if ( filesize <= 0 ) {
+          filesize = bytecount; // as an upper bound
+      }
+
       // send file
       final FileInputStream fis = hasSD ? new FileInputStream( file ) 
         : context.openFileInput( filename );
@@ -319,7 +338,8 @@ public final class FileUploaderTask extends Thread {
       params.put("observer", username);
       params.put("password", password);
       final String response = HttpFileUploader.upload( 
-          WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, params, context.getResources() );
+                                                      WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, 
+                                                      params, context.getResources(), handler, filesize );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
@@ -333,7 +353,11 @@ public final class FileUploaderTask extends Thread {
         status = Status.BAD_LOGIN;
       }
       else {
-        WigleAndroid.error("fail: " + response );
+          if ( response.trim().equals( "" ) ) {
+              WigleAndroid.error("fail: no response from server" );
+          } else {
+              WigleAndroid.error("fail: " + response );
+          }
         status = Status.FAIL;
       }
     } 

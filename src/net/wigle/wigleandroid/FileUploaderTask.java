@@ -353,7 +353,7 @@ public final class FileUploaderTask extends Thread {
         status = Status.BAD_LOGIN;
       }
       else {
-          if ( response.trim().equals( "" ) ) {
+          if ( response != null && response.trim().equals( "" ) ) {
               WigleAndroid.error("fail: no response from server" );
           } else {
               WigleAndroid.error("fail: " + response );

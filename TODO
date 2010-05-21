@@ -13,6 +13,15 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
+* 1.7:
+npe bugfixes
+upload code cleanup
+don't let hardware keyboard changes restart the app
+externalize sounds for MediaPlayer calls that fail on the archos5
+better labels on settings dropdowns
+more effecient and better looking map bubbles
+add support for TTS in android 1.5 via TTS Extended if present, TTS_library_stub.jar is the supporting libs for that package
+
 * 1.6:
 bugfix on gps<->network flip flopping
 open street map integration (option for map showing track covered)

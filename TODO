@@ -19,7 +19,7 @@ upload code cleanup
 don't let hardware keyboard changes restart the app
 externalize sounds for MediaPlayer calls that fail on the archos5
 better labels on settings dropdowns
-more effecient and better looking map bubbles
+more efficient and better looking map bubbles
 add support for TTS in android 1.5 via TTS Extended if present, TTS_library_stub.jar is the supporting libs for that package
 
 * 1.6:

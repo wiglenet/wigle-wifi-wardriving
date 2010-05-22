@@ -28,6 +28,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.GpsSatellite;
@@ -389,6 +390,14 @@ public final class WigleAndroid extends Activity {
             return true;
         }
         return false;
+    }
+
+    // why is this even here? this is retarded. via:
+    // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
+    @Override
+    public void onConfigurationChanged(final Configuration  newConfig) {
+        super.onConfigurationChanged( newConfig );
+        setContentView( R.layout.main );
     }
     
     private void setupDatabase() {

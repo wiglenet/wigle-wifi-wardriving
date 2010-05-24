@@ -5,10 +5,12 @@ package org.andnav.osm;
  */
 public final class R {
 
-    //public static final class drawable {
+    public static final class drawable {
         //public static final int person = net.wigle.wigleandroid.R.drawable.person;
         //public static final int direction_arrow = net.wigle.wigleandroid.R.drawable.direction_arrow;
-    //}
+      public static final int marker_default = net.wigle.wigleandroid.R.drawable.marker_default;
+      public static final int marker_default_focused_base = net.wigle.wigleandroid.R.drawable.marker_default_focused_base;
+    }
 
     public static final class string {
         public static final int osmarender = net.wigle.wigleandroid.R.string.osmarender;
@@ -22,6 +24,7 @@ public final class R {
         public static final int hills = net.wigle.wigleandroid.R.string.hills;
         public static final int cloudmade_small = net.wigle.wigleandroid.R.string.cloudmade_small;
         public static final int cloudmade_standard = net.wigle.wigleandroid.R.string.cloudmade_standard;
+        public static final int unknown = net.wigle.wigleandroid.R.string.unknown;
     }
 
 }

@@ -16,4 +16,5 @@
     <string name="speak_text">Time between audio announcements</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
+    <string name="unknown">Unknown</string>
 </resources>

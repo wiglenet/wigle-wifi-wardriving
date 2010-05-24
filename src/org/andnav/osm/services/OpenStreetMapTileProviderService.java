@@ -25,8 +25,7 @@ public class OpenStreetMapTileProviderService extends Service implements OpenStr
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mFileSystemProvider = new OpenStreetMapTileFilesystemProvider(
-				this.getBaseContext(), FS_CACHE_SIZE);
+		mFileSystemProvider = new OpenStreetMapTileFilesystemProvider(getBaseContext());
 	}
 	
 	@Override
@@ -81,7 +80,7 @@ public class OpenStreetMapTileProviderService extends Service implements OpenStr
 	 * The IRemoteInterface is defined through IDL
 	 */
 	private final IOpenStreetMapTileProviderService.Stub mBinder = new IOpenStreetMapTileProviderService.Stub() {
-		//@Override
+		@Override
 		public void requestMapTile(int rendererID, int zoomLevel, int tileX,
 				int tileY, IOpenStreetMapTileProviderCallback callback)
 				throws RemoteException {

@@ -530,8 +530,8 @@ public final class WigleAndroid extends Activity {
             final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
             final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
-            if ( period < 1000L ) {
-              // under a second is hard to hit, treat as "continuous", so request scan in here
+            if ( period == 0 ) {
+              // treat as "continuous", so request scan in here
               wifiManager.startScan();
             }
             
@@ -685,7 +685,12 @@ public final class WigleAndroid extends Activity {
               if ( ! finishing.get() ) {
                 // info( "timer start scan" );
                 wifiManager.startScan();
-                final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                // check if set to "continuous"
+                if ( period == 0L ) {
+                  // set to default here, as a scan will also be requested on the scan result listener
+                  period = 1000L;
+                }
                 // info("wifitimer: " + period );
                 wifiTimer.postDelayed( this, period );
               }

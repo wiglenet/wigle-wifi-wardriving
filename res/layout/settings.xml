@@ -66,16 +66,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:drawSelectorOnTop="true"
-		android:paddingTop="0dip"
-		android:paddingBottom="0dip"
-		android:layout_weight="0"
+		android:layout_weight="1"
+		android:prompt="@string/period_text"
 		/>
 	<TextView
 		android:id="@+id/period_text"  
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:text="@string/period_text"
-		android:layout_weight="5"
+		android:layout_weight="2"
 		/>
 </LinearLayout>
 
@@ -88,16 +87,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:drawSelectorOnTop="true"
-		android:paddingTop="0dip"
-		android:paddingBottom="0dip"
-		android:layout_weight="0"
+		android:layout_weight="1"
+		android:prompt="@string/speak_text"
 		/>
 	<TextView
 		android:id="@+id/speak_text"  
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:text="@string/speak_text"
-		android:layout_weight="5"
+		android:layout_weight="2"
 		/>
 </LinearLayout>
 

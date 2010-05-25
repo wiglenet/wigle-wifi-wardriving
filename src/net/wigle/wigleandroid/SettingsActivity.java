@@ -137,17 +137,18 @@ public final class SettingsActivity extends Activity {
       // period spinner
       Spinner spinner = (Spinner) findViewById( R.id.period_spinner );
       ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-          this, android.R.layout.simple_spinner_dropdown_item);
-      final long[] periods = new long[]{ 500,1000,2000,5000,10000 };
+          this, android.R.layout.simple_spinner_item);
+      final long[] periods = new long[]{ 0,500,1000,2000,5000,10000 };
+      final String[] periodName = new String[]{ "Nonstop","0.5 sec","1 sec","2 sec","5 sec","10 sec" };
       long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, 1000L);
       int periodIndex = 0;
       for ( int i = 0; i < periods.length; i++ ) {
-        adapter.add( Float.toString( periods[i] / 1000f ) );
+        adapter.add( periodName[i] );
         if ( period == periods[i] ) {
           periodIndex = i;
         }
       }
-      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
       spinner.setAdapter( adapter );
       spinner.setSelection( periodIndex );
       spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
@@ -188,7 +189,7 @@ public final class SettingsActivity extends Activity {
         speakText.setText("No Text-to-Speech engine");
       }
       adapter = new ArrayAdapter<String>(
-          this, android.R.layout.simple_spinner_dropdown_item );
+          this, android.R.layout.simple_spinner_item );
       final long[] speechPeriods = new long[]{ 0,10,15,30,60,120,300,600 };
       final String[] speechName = new String[]{ "Off","10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min" };
       period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, WigleAndroid.DEFAULT_SPEECH_PERIOD );

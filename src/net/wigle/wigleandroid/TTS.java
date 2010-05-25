@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.content.Context;
 
@@ -51,6 +52,7 @@ public final class TTS {
   private static int QUEUE_ADD;
   private static Method speak;
   private static Method shutdown;
+  private static Method setlanguage;
   
   private Object speech;
   private Object listener;
@@ -90,11 +92,13 @@ public final class TTS {
           speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, String[].class );
           shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
           QUEUE_ADD = 1;
+          setlanguage = SPEECH_CLASS.getMethod( "setLanguage", String.class ); 
         } else {
           QUEUE_FLUSH = SPEECH_CLASS.getDeclaredField("QUEUE_FLUSH").getInt(null);
           QUEUE_ADD = SPEECH_CLASS.getDeclaredField("QUEUE_ADD").getInt(null);
           speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, HashMap.class );
           shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
+          setlanguage = SPEECH_CLASS.getMethod( "setLanguage", Locale.class ); 
         }
       }
       catch ( final NoSuchFieldException ex ) {
@@ -125,6 +129,8 @@ public final class TTS {
       final InvocationHandler handler = new InvocationHandler() {
         public Object invoke( Object object, Method method, Object[] args ) {
           WigleAndroid.info("invoke: " + method.getName() );
+          // call our init to set the language to engrish.
+          onInit();
           return null;
         }
       };
@@ -133,11 +139,11 @@ public final class TTS {
       
       if ( useEyesFree ) {
         speech = construct.newInstance( context, listener, true );
+        // hrm. do we need this?
+        // PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("toggle_use_default_tts_settings",0).commit();
       } else {
         speech = construct.newInstance( context, listener );
       }
-      //Method setLocation = SPEECH_CLASS.getMethod( "setLanguage", Locale.class );
-      //setLocation.invoke( speech, Locale.UK );
     }
     catch ( final NoSuchMethodException ex ) {
       WigleAndroid.error( "no such method: " + ex );
@@ -150,6 +156,21 @@ public final class TTS {
     }
     catch ( final InvocationTargetException ex ) {
       WigleAndroid.error( "invocation: " + ex );
+    }
+  }
+
+  public void onInit() {
+    try {
+      if ( useEyesFree ) {
+        setlanguage.invoke( speech, "en-US" ); // english, motherfucker. do you speak it? // XXX: should this be "eng-USA" ?
+      } else {
+        setlanguage.invoke( speech, Locale.US ); // english, motherfucker. do you speak it?
+      }
+      //      WigleAndroid.info("should be talkin' english now");
+    } catch ( final IllegalAccessException ex ) {
+      WigleAndroid.error( "init illegal: " + ex );
+    } catch ( final InvocationTargetException ex ) {
+      WigleAndroid.error( "init invocation: " + ex );
     }
   }
   

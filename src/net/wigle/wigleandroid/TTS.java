@@ -53,6 +53,7 @@ public final class TTS {
   private static Method speak;
   private static Method shutdown;
   private static Method setlanguage;
+  private static Method getlanguage;
   
   private Object speech;
   private Object listener;
@@ -99,6 +100,7 @@ public final class TTS {
           speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, HashMap.class );
           shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
           setlanguage = SPEECH_CLASS.getMethod( "setLanguage", Locale.class ); 
+          getlanguage = SPEECH_CLASS.getMethod( "getLanguage", new Class[]{} ); 
         }
       }
       catch ( final NoSuchFieldException ex ) {
@@ -164,7 +166,24 @@ public final class TTS {
       if ( useEyesFree ) {
         setlanguage.invoke( speech, "en-US" ); // english, motherfucker. do you speak it? // XXX: should this be "eng-USA" ?
       } else {
-        setlanguage.invoke( speech, Locale.US ); // english, motherfucker. do you speak it?
+        Object loc = getlanguage.invoke( speech );
+        boolean doLanguage = true;
+        if ( loc != null && loc instanceof Locale ) {
+          Locale locale = (Locale) loc;
+          // these are cool, no need to change
+          if ( Locale.US.equals( locale ) 
+              || Locale.CANADA.equals( locale )
+              || Locale.UK.equals( locale ) 
+              || Locale.ENGLISH.equals( locale.getLanguage() )
+              || "eng".equals( locale.getLanguage() )) {
+            doLanguage = false;
+          }
+          WigleAndroid.info("locale: " + locale + " doLanguage: " + doLanguage + " lang: " + locale.getLanguage() );
+        }
+        
+        if ( doLanguage ) {
+          setlanguage.invoke( speech, Locale.US ); // english, motherfucker. do you speak it?
+        }
       }
       //      WigleAndroid.info("should be talkin' english now");
     } catch ( final IllegalAccessException ex ) {

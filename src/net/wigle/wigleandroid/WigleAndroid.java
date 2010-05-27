@@ -76,7 +76,7 @@ public final class WigleAndroid extends Activity {
     private AtomicBoolean finishing;
     private String savedStats;
     private long prevNewNetCount;
-    private Long satCountLowTime;
+    private Long satCountLowTime = 0L;
 
     // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
     private Long lastLocationTime = 0L;
@@ -530,13 +530,12 @@ public final class WigleAndroid extends Activity {
 
             final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
+            long nonstopScanRequestTime = Long.MIN_VALUE;
             final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
             if ( period == 0 ) {
               // treat as "continuous", so request scan in here
               wifiManager.startScan();
-              if ( scanRequestTime <= 0 ) {
-                scanRequestTime = System.currentTimeMillis();
-              }
+              nonstopScanRequestTime = System.currentTimeMillis();
             }
             
             final boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
@@ -659,10 +658,10 @@ public final class WigleAndroid extends Activity {
               // wasn't set, set to now
               scanRequestTime = now;
             }
-            status( resultSize + " scanned " + (now - scanRequestTime) + "ms, process " 
+            status( resultSize + " scan " + (now - scanRequestTime) + "ms, process " 
                 + (now - start) + "ms. DB Q: " + preQueueSize );
-            // we've shown it, reset it
-            scanRequestTime = Long.MIN_VALUE;
+            // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
+            scanRequestTime = nonstopScanRequestTime;
             
             final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {

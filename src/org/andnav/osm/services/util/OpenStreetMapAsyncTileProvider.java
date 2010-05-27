@@ -173,7 +173,7 @@ public abstract class OpenStreetMapAsyncTileProvider implements OpenStreetMapSer
 					loadTile(tile, this);
 				} catch (final CantContinueException e) {
 					Log.i(debugtag(), "Tile loader can't continue");
-					clearQueue();
+					clearQueue(); // causes npe in linkedhashmap :( -bobzilla
 				} catch (final Throwable e) {
 					Log.e(debugtag(), "Error downloading tile: " + tile, e);
 				}

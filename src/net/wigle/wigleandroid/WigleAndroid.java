@@ -81,6 +81,7 @@ public final class WigleAndroid extends Activity {
     // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
     private Long lastLocationTime = 0L;
     private Long lastNetworkLocationTime = 0L;
+    private long scanRequestTime = Long.MIN_VALUE;
 
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
@@ -533,6 +534,9 @@ public final class WigleAndroid extends Activity {
             if ( period == 0 ) {
               // treat as "continuous", so request scan in here
               wifiManager.startScan();
+              if ( scanRequestTime <= 0 ) {
+                scanRequestTime = System.currentTimeMillis();
+              }
             }
             
             final boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
@@ -651,7 +655,14 @@ public final class WigleAndroid extends Activity {
             listAdapter.notifyDataSetChanged();
             
             final long now = System.currentTimeMillis();
-            status( resultSize + " scanned in " + (now - start) + "ms. DB Queue: " + preQueueSize );
+            if ( scanRequestTime <= 0 ) {
+              // wasn't set, set to now
+              scanRequestTime = now;
+            }
+            status( resultSize + " scanned " + (now - scanRequestTime) + "ms, process " 
+                + (now - start) + "ms. DB Q: " + preQueueSize );
+            // we've shown it, reset it
+            scanRequestTime = Long.MIN_VALUE;
             
             final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
@@ -685,6 +696,9 @@ public final class WigleAndroid extends Activity {
               if ( ! finishing.get() ) {
                 // info( "timer start scan" );
                 wifiManager.startScan();
+                if ( scanRequestTime <= 0 ) {
+                  scanRequestTime = System.currentTimeMillis();
+                }
                 long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
                 // check if set to "continuous"
                 if ( period == 0L ) {
@@ -704,6 +718,9 @@ public final class WigleAndroid extends Activity {
 
         // starts scan, sends event when done
         final boolean scanOK = wifiManager.startScan();
+        if ( scanRequestTime <= 0 ) {
+          scanRequestTime = System.currentTimeMillis();
+        }
         info( "startup finished. wifi scanOK: " + scanOK );
       }
     }

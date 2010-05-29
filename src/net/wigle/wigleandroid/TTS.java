@@ -174,7 +174,7 @@ public final class TTS {
           if ( Locale.US.equals( locale ) 
               || Locale.CANADA.equals( locale )
               || Locale.UK.equals( locale ) 
-              || Locale.ENGLISH.equals( locale.getLanguage() )
+              || Locale.ENGLISH.getLanguage().equals( locale.getLanguage() )
               || "eng".equals( locale.getLanguage() )) {
             doLanguage = false;
           }

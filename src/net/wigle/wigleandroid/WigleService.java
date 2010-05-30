@@ -65,7 +65,7 @@ public final class WigleService extends Service {
     final CharSequence tickerText = "Wigle Wifi Service";
     final long when = System.currentTimeMillis();
     final Notification notification = new Notification( icon, tickerText, when );
-    notification.flags |= Notification.FLAG_NO_CLEAR;
+    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
     
     final Context context = getApplicationContext();
     final Intent notificationIntent = new Intent( this, WigleAndroid.class );

@@ -28,6 +28,13 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
+        <activity android:name=".DashboardActivity"
+                  android:label="@string/dashboard_app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
 
     <service android:name="org.andnav.osm.services.OpenStreetMapTileProviderService"
           android:process=":remote"

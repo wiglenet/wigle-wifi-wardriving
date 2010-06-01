@@ -70,6 +70,7 @@ public final class WigleAndroid extends Activity {
     private GpsStatus gpsStatus;
     private Location location;
     private Location networkLocation;
+    private Location prevGpsLocation;
     private Handler wifiTimer;
     private DatabaseHelper dbHelper;
     private ServiceConnection serviceConnection;
@@ -103,6 +104,7 @@ public final class WigleAndroid extends Activity {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_MAP = 12;
+    private static final int MENU_DASH = 13;
     public static final String ENCODING = "ISO-8859-1";
     private static final long GPS_TIMEOUT = 15000L;
     private static final long NET_LOC_TIMEOUT = 60000L;
@@ -127,6 +129,8 @@ public final class WigleAndroid extends Activity {
     static final String PREF_SPEECH_GPS = "speechGPS";
     static final String PREF_MUTED = "muted";
     static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
+    static final String PREF_DISTANCE_RUN = "distRun";
+    static final String PREF_DISTANCE_TOTAL = "distTotal";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     
@@ -140,6 +144,8 @@ public final class WigleAndroid extends Activity {
       public String savedStats;
       public ConcurrentLinkedHashMap<GeoPoint,Integer> trail = 
         new ConcurrentLinkedHashMap<GeoPoint,Integer>( 512 );
+      public int runNets;
+      public long newNets;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -204,6 +210,12 @@ public final class WigleAndroid extends Activity {
         else {
           runNetworks = new HashSet<String>();
           finishing = new AtomicBoolean( false );
+          
+          // new run, reset
+          final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+          Editor edit = prefs.edit();
+          edit.putFloat( PREF_DISTANCE_RUN, 0f );
+          edit.commit();
         }
         
         numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
@@ -353,15 +365,19 @@ public final class WigleAndroid extends Activity {
     /* Creates the menu items */
     @Override
     public boolean onCreateOptionsMenu( final Menu menu ) {
-        MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
-        item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+      MenuItem item = menu.add(0, MENU_DASH, 0, "Dashboard");
+      item.setIcon( android.R.drawable.ic_menu_info_details );
+      
+      item = menu.add(0, MENU_MAP, 0, "Map");
+      item.setIcon( android.R.drawable.ic_menu_mapmode );
+      
+      item = menu.add(0, MENU_EXIT, 0, "Exit");
+      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
         
-        item = menu.add(0, MENU_SETTINGS, 0, "Settings");
-        item.setIcon( android.R.drawable.ic_menu_preferences );
+      item = menu.add(0, MENU_SETTINGS, 0, "Settings");
+      item.setIcon( android.R.drawable.ic_menu_preferences );
         
-        item = menu.add(0, MENU_MAP, 0, "Map");
-        item.setIcon( android.R.drawable.ic_menu_mapmode );
-        return true;
+      return true;
     }
 
     /* Handles item selections */
@@ -377,6 +393,12 @@ public final class WigleAndroid extends Activity {
           case MENU_MAP: {
             info("start map activity");
             final Intent intent = new Intent( this, MappingActivity.class );
+            this.startActivity( intent );
+            return true;
+          }
+          case MENU_DASH: {
+            info("start dashboard activity");
+            final Intent intent = new Intent( this, DashboardActivity.class );
             this.startActivity( intent );
             return true;
           }
@@ -636,6 +658,8 @@ public final class WigleAndroid extends Activity {
             
             // set the statics for the map
             WigleAndroid.lameStatic.savedStats = savedStats;
+            WigleAndroid.lameStatic.runNets = runNetworks.size();
+            WigleAndroid.lameStatic.newNets = newNetCount;
             if ( newForRun > 0 && location != null ) {
               final GeoPoint geoPoint = new GeoPoint( location );
               Integer points = lameStatic.trail.get( geoPoint );
@@ -662,6 +686,24 @@ public final class WigleAndroid extends Activity {
                 + (now - start) + "ms. DB Q: " + preQueueSize );
             // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
             scanRequestTime = nonstopScanRequestTime;
+            
+            // do distance calcs
+            if ( location != null && prevGpsLocation != null
+                && GPS_PROVIDER.equals( location.getProvider() ) ) {
+              
+              float dist = location.distanceTo( prevGpsLocation );
+              info( "dist: " + dist );
+              if ( dist > 0f ) {
+                final Editor edit = prefs.edit();
+                edit.putFloat( PREF_DISTANCE_RUN,
+                    dist + prefs.getFloat( PREF_DISTANCE_RUN, 0f ) );
+                edit.putFloat( PREF_DISTANCE_TOTAL,
+                    dist + prefs.getFloat( PREF_DISTANCE_TOTAL, 0f ) );
+                edit.commit();
+              }
+            }
+            // set for next time
+            prevGpsLocation = location;
             
             final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {

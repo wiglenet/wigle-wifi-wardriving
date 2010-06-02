@@ -10,7 +10,7 @@
     android:layout_height="wrap_content" 
     android:id="@+id/newnets"
     android:textSize="32sp"
-    android:textColor="#46AA00"
+    android:textColor="#AAEE50"
     />
     
     <TextView
@@ -19,6 +19,14 @@
     android:id="@+id/runnets"
     android:textSize="32sp"
     android:textColor="#AAAA00"
+    />
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/gpsstatus"
+    android:textSize="32sp"
+    android:textColor="#46AA00"
     />
     
     <LinearLayout
@@ -42,5 +50,10 @@
     android:textSize="24sp"
     />
 
-
+	<TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/queuesize"
+    android:textSize="24sp"
+    />
 </LinearLayout>

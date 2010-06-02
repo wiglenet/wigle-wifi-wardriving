@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.location.Location;
 import android.util.AttributeSet;
 
 /**
@@ -52,10 +53,14 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
       }
     }
     
-    // draw center crosshairs
-    final GeoPoint center = this.getMapCenter();
-    final Point centerPoint = this.getProjection().toMapPixels( center, null );
-    c.drawLine( centerPoint.x, centerPoint.y - 9, centerPoint.x, centerPoint.y + 9, mPaint );
-    c.drawLine( centerPoint.x - 9, centerPoint.y, centerPoint.x + 9, centerPoint.y, mPaint );
+    // draw user crosshairs
+    //final GeoPoint center = this.getMapCenter();
+    Location location = WigleAndroid.lameStatic.location;
+    if ( location != null ) {
+      final GeoPoint user = new GeoPoint( location );
+      final Point centerPoint = this.getProjection().toMapPixels( user, null );
+      c.drawLine( centerPoint.x - 9, centerPoint.y - 9, centerPoint.x + 9, centerPoint.y + 9, mPaint );
+      c.drawLine( centerPoint.x - 9, centerPoint.y + 9, centerPoint.x + 9, centerPoint.y - 9, mPaint );
+    }
   }
 }

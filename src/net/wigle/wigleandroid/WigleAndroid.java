@@ -146,6 +146,7 @@ public final class WigleAndroid extends Activity {
         new ConcurrentLinkedHashMap<GeoPoint,Integer>( 512 );
       public int runNets;
       public long newNets;
+      public int preQueueSize;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -566,6 +567,7 @@ public final class WigleAndroid extends Activity {
             }
             
             final int preQueueSize = dbHelper.getQueueSize();
+            final boolean fastMode = dbHelper.isFastMode();
             
             final CacheMap<String,Network> networkCache = getNetworkCache();
             boolean somethingAdded = false;
@@ -611,7 +613,16 @@ public final class WigleAndroid extends Activity {
                 }
                 
                 if ( location != null && dbHelper != null ) {
-                  dbHelper.addObservation( network, location );
+                  // if in fast mode, only add new-for-run stuff to the db queue
+                  if ( false && fastMode && ! added ) {
+                    info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
+                  }
+                  else {
+                    // loop for stress-testing
+                    // for ( int i = 0; i < 10; i++ ) {
+                    dbHelper.addObservation( network, location );
+                    // }
+                  }
                 }
               }
             }
@@ -660,6 +671,7 @@ public final class WigleAndroid extends Activity {
             WigleAndroid.lameStatic.savedStats = savedStats;
             WigleAndroid.lameStatic.runNets = runNetworks.size();
             WigleAndroid.lameStatic.newNets = newNetCount;
+            WigleAndroid.lameStatic.preQueueSize = preQueueSize;
             if ( newForRun > 0 && location != null ) {
               final GeoPoint geoPoint = new GeoPoint( location );
               Integer points = lameStatic.trail.get( geoPoint );
@@ -692,7 +704,7 @@ public final class WigleAndroid extends Activity {
                 && GPS_PROVIDER.equals( location.getProvider() ) ) {
               
               float dist = location.distanceTo( prevGpsLocation );
-              info( "dist: " + dist );
+              // info( "dist: " + dist );
               if ( dist > 0f ) {
                 final Editor edit = prefs.edit();
                 edit.putFloat( PREF_DISTANCE_RUN,
@@ -711,7 +723,13 @@ public final class WigleAndroid extends Activity {
               if ( location == null ) {
                 gps = ", no gps fix";
               }
-              speak("run " + runNetworks.size() + ", new " + newNetCount + gps );
+              String queue = "";
+              if ( preQueueSize > 0 ) {
+                queue = ", queue " + preQueueSize;
+              }
+              float dist = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
+              String miles = ". From " + numberFormat1.format( dist / 1609.344f ) + " miles";
+              speak("run " + runNetworks.size() + ", new " + newNetCount + gps + queue + miles );
               previousTalkTime = now;
             }
           }

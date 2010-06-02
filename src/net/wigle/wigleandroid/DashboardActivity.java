@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -71,6 +72,17 @@ public class DashboardActivity extends Activity {
     
     updateDist( R.id.rundist, WigleAndroid.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, WigleAndroid.PREF_DISTANCE_TOTAL, "Total Distance: " );
+    
+    tv = (TextView) findViewById( R.id.queuesize );
+    tv.setText( "DB Queue: " + WigleAndroid.lameStatic.preQueueSize );
+    
+    tv = (TextView) findViewById( R.id.gpsstatus );
+    Location location = WigleAndroid.lameStatic.location;
+    String gpsStatus = "No Location!";
+    if ( location != null ) {
+      gpsStatus = location.getProvider();
+    }
+    tv.setText( "Loc: " + gpsStatus );
   }
   
   private void updateDist( int id, String pref, String title ) {

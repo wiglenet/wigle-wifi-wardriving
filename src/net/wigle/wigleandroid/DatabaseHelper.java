@@ -177,18 +177,25 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  public void addObservation( final Network network, final Location location ) {
+  public boolean addObservation( final Network network, final Location location ) {
     final DBUpdate update = new DBUpdate( network, network.getLevel(), location );
-    boolean complete = false;
-    while ( ! complete ) {
-      try {
-        queue.put( update );
-        complete = true;
-      }
-      catch ( final InterruptedException ex ) {
-        WigleAndroid.info( "interrupted in main addObservation: " + ex ); 
-      }
+    // data is lost if queue is full!
+    final boolean added = queue.offer( update );
+    if ( ! added ) {
+      WigleAndroid.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
     }
+    return added;
+    
+//    boolean complete = false;
+//    while ( ! complete ) {
+//      try {
+//        queue.put( update );
+//        complete = true;
+//      }
+//      catch ( final InterruptedException ex ) {
+//        WigleAndroid.info( "interrupted in main addObservation: " + ex ); 
+//      }
+//    }
   }
   
   private void addObservation( final DBUpdate update ) {
@@ -196,7 +203,8 @@ public final class DatabaseHelper extends Thread {
     final Network network = update.network;
     final Location location = update.location;
     final ContentValues values = new ContentValues();
-    final String[] bssidArgs = new String[]{ network.getBssid() }; 
+    final String bssid = network.getBssid();
+    final String[] bssidArgs = new String[]{ bssid }; 
     
     long lasttime = 0;
     double lastlat = 0;
@@ -204,26 +212,31 @@ public final class DatabaseHelper extends Thread {
     boolean isNew = false;
     
     // first try cache
-    final Location prevWrittenLocation = previousWrittenLocationsCache.get( network.getBssid() );
+    final Location prevWrittenLocation = previousWrittenLocationsCache.get( bssid );
     if ( prevWrittenLocation != null ) {
       // cache hit!
       lasttime = prevWrittenLocation.getTime();
       lastlat = prevWrittenLocation.getLatitude();
       lastlon = prevWrittenLocation.getLongitude();
+      // WigleAndroid.info( "db cache hit. bssid: " + network.getBssid() );
     }
     else {
       // cache miss, get the last values from the db, if any
-      final Cursor cursor = db.rawQuery("SELECT bssid,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
-      if ( cursor.getCount() == 0 ) {    
-        // WigleAndroid.info("inserting net: " + network.getSsid() );
-        values.put("bssid", network.getBssid() );
+      long start = System.currentTimeMillis();
+      final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+      logTime( start, "db network queried " + bssid );
+      if ( cursor.getCount() == 0 ) {
+        values.put("bssid", bssid );
         values.put("ssid", network.getSsid() );
         values.put("frequency", network.getFrequency() );
         values.put("capabilities", network.getCapabilities() );
         values.put("lasttime", location.getTime() );
         values.put("lastlat", location.getLatitude() );
         values.put("lastlon", location.getLongitude() );
+        
+        start = System.currentTimeMillis();
         db.insert(NETWORK_TABLE, null, values);
+        logTime( start, "db network inserted " + bssid );
         
         // update the count
         networkCount.incrementAndGet();
@@ -233,10 +246,11 @@ public final class DatabaseHelper extends Thread {
         // don't update stack lasttime,lastlat,lastlon variables
       }
       else {
+        // WigleAndroid.info("db using cursor values: " + network.getBssid() );
         cursor.moveToFirst();
-        lasttime = cursor.getLong(1);
-        lastlat = cursor.getDouble(2);
-        lastlon = cursor.getDouble(3);
+        lasttime = cursor.getLong(0);
+        lastlat = cursor.getDouble(1);
+        lastlon = cursor.getDouble(2);
       }
       cursor.close();
     }
@@ -245,11 +259,7 @@ public final class DatabaseHelper extends Thread {
       newNetworkCount.incrementAndGet();
     }
     
-    boolean fastMode = false;
-    if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
-      // queue is filling up, go to fast mode, only write new networks or big changes
-      fastMode = true;
-    }       
+    final boolean fastMode = isFastMode();
     
     final long now = System.currentTimeMillis();
     final double latDiff = Math.abs(lastlat - location.getLatitude());
@@ -261,10 +271,11 @@ public final class DatabaseHelper extends Thread {
     //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
     final boolean changeWorthy = mediumChange || (now - lasttime > SMALL_LOC_DELAY && smallChange);
+
     if ( isNew || bigChange || (! fastMode && changeWorthy ) ) {
       // WigleAndroid.info("inserting loc: " + network.getSsid() );
       values.clear();
-      values.put("bssid", network.getBssid() );
+      values.put("bssid", bssid );
       values.put("level", update.level );  // make sure to use the update's level, network's is mutable...
       values.put("lat", location.getLatitude() );
       values.put("lon", location.getLongitude() );
@@ -273,15 +284,17 @@ public final class DatabaseHelper extends Thread {
       values.put("time", location.getTime() );
       if ( db.isDbLockedByOtherThreads() ) {
         // this is kinda lame, make this better
-        WigleAndroid.error("db locked by another thread, waiting");
+        WigleAndroid.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid );
         WigleAndroid.sleep(1000L);
       }
+      long start = System.currentTimeMillis();
       db.insert( LOCATION_TABLE, null, values );
+      logTime( start, "db location inserted " + bssid );
       
       // update the count
       locationCount.incrementAndGet();
       // update the cache
-      previousWrittenLocationsCache.put( network.getBssid(), location );
+      previousWrittenLocationsCache.put( bssid, location );
       
       if ( ! isNew ) {
         // update the network with the lasttime,lastlat,lastlon
@@ -291,13 +304,33 @@ public final class DatabaseHelper extends Thread {
         values.put("lastlon", location.getLongitude() );
         if ( db.isDbLockedByOtherThreads() ) {
           // this is kinda lame, make this better
-          WigleAndroid.error("db locked by another thread, waiting");
+          WigleAndroid.error( "db locked by another thread, waiting to net update. bssid: " + bssid );
           WigleAndroid.sleep(1000L);
         }
+        start = System.currentTimeMillis();
         db.update( NETWORK_TABLE, values, "bssid = ?", bssidArgs );
+        logTime( start, "db network updated" );
       }
-      
     }
+    else {
+      // WigleAndroid.info( "db network not changeworthy: " + bssid );
+    }
+  }
+  
+  private void logTime( long start, String string ) {
+    long diff = System.currentTimeMillis() - start;
+    if ( diff > 150L ) {
+      WigleAndroid.info( string + " in " + diff + " ms" );
+    }
+  }
+  
+  public boolean isFastMode() {
+    boolean fastMode = false;
+    if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
+      // queue is filling up, go to fast mode, only write new networks or big changes
+      fastMode = true;
+    }
+    return fastMode;
   }
   
   /**

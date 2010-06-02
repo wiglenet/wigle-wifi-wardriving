@@ -4,6 +4,7 @@ select a net, see observations
 lock screen on, lock UI
 turn scan on/off
 show IEEE octet info
+english/metric toggle
 
 --- user suggested ---
 option for kml save for checking coverage back at home PC
@@ -14,6 +15,8 @@ network list sorting options
 * 1.8 (unreleased):
 add dashboard (count of APs in a large font for checking status at a glance)
 distance traveled (on dashboard)
+better handling of db queue, can't block gui, fastmode also on producer side
+menu to toggle map lock-on
 
 * 1.7:
 npe bugfixes

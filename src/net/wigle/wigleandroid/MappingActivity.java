@@ -22,10 +22,12 @@ public final class MappingActivity extends Activity {
   private OpenStreetMapViewWrapper mapView;
   private Handler timer;
   private AtomicBoolean finishing;
+  private boolean locked = true;
   
   private static final int MENU_RETURN = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;
+  private static final int MENU_TOGGLE_LOCK = 15;
   
   /** Called when the activity is first created. */
   @Override
@@ -59,7 +61,7 @@ public final class MappingActivity extends Activity {
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
               final Location location = WigleAndroid.lameStatic.location;
-              if ( location != null ) {
+              if ( location != null && locked ) {
                 // WigleAndroid.info( "mapping center location: " + location );
 								final GeoPoint locGeoPoint = new GeoPoint( location );
                 mapControl.animateTo( locGeoPoint );
@@ -103,14 +105,17 @@ public final class MappingActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
-      item.setIcon( android.R.drawable.ic_media_previous );
-      
-      item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
+      MenuItem item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
       item.setIcon( android.R.drawable.ic_menu_add );
       
       item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
       item.setIcon( android.R.drawable.ic_menu_revert );
+      
+      item = menu.add(0, MENU_RETURN, 0, "Return");
+      item.setIcon( android.R.drawable.ic_media_previous );
+      
+      item = menu.add(0, MENU_TOGGLE_LOCK, 0, "Toggle Lock-on");
+      item.setIcon( android.R.drawable.ic_menu_mapmode );
       
       return true;
   }
@@ -134,6 +139,9 @@ public final class MappingActivity extends Activity {
           mapControl.setZoom( zoom );
           return true;
         }
+        case MENU_TOGGLE_LOCK:
+          locked = ! locked;
+          return true;
       }
       return false;
   }

@@ -17,6 +17,11 @@ add dashboard (count of APs in a large font for checking status at a glance)
 distance traveled (on dashboard)
 better handling of db queue, can't block gui, fastmode also on producer side
 menu to toggle map lock-on
+more keyboard slider "fixes"
+add "nonstop" wifi option, splitting that behavior out of the 500ms one
+show how long the scan took vs processed. allow more times for scan frequency
+fix dropdown layout issues
+set tts language, only if it's something non-english
 
 * 1.7:
 npe bugfixes

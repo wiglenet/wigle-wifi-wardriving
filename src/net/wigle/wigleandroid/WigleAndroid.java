@@ -419,9 +419,9 @@ public final class WigleAndroid extends Activity {
     // why is this even here? this is retarded. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
-    public void onConfigurationChanged(final Configuration  newConfig) {
-        super.onConfigurationChanged( newConfig );
-        setContentView( R.layout.main );
+    public void onConfigurationChanged( final Configuration newConfig ) {
+      super.onConfigurationChanged( newConfig );
+      setContentView( R.layout.main );
     }
     
     private void setupDatabase() {
@@ -457,7 +457,7 @@ public final class WigleAndroid extends Activity {
             View row;
             
             if ( null == convertView ) {
-              row = mInflater.inflate( R.layout.row, null );
+              row = mInflater.inflate( R.layout.row, parent, false );
             } 
             else {
               row = convertView;
@@ -700,22 +700,23 @@ public final class WigleAndroid extends Activity {
             scanRequestTime = nonstopScanRequestTime;
             
             // do distance calcs
-            if ( location != null && prevGpsLocation != null
-                && GPS_PROVIDER.equals( location.getProvider() ) ) {
-              
-              float dist = location.distanceTo( prevGpsLocation );
-              // info( "dist: " + dist );
-              if ( dist > 0f ) {
-                final Editor edit = prefs.edit();
-                edit.putFloat( PREF_DISTANCE_RUN,
-                    dist + prefs.getFloat( PREF_DISTANCE_RUN, 0f ) );
-                edit.putFloat( PREF_DISTANCE_TOTAL,
-                    dist + prefs.getFloat( PREF_DISTANCE_TOTAL, 0f ) );
-                edit.commit();
+            if ( location != null && GPS_PROVIDER.equals( location.getProvider() ) ) {
+              if ( prevGpsLocation != null ) {
+                float dist = location.distanceTo( prevGpsLocation );
+                // info( "dist: " + dist );
+                if ( dist > 0f ) {
+                  final Editor edit = prefs.edit();
+                  edit.putFloat( PREF_DISTANCE_RUN,
+                      dist + prefs.getFloat( PREF_DISTANCE_RUN, 0f ) );
+                  edit.putFloat( PREF_DISTANCE_TOTAL,
+                      dist + prefs.getFloat( PREF_DISTANCE_TOTAL, 0f ) );
+                  edit.commit();
+                }
               }
+              
+              // set for next time
+              prevGpsLocation = location;
             }
-            // set for next time
-            prevGpsLocation = location;
             
             final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {

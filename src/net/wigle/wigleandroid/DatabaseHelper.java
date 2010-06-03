@@ -1,7 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.io.File;
-import java.util.concurrent.BlockingQueue;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -28,6 +28,9 @@ public final class DatabaseHelper extends Thread {
   private static final double BIG_LATLON_CHANGE = 0.01D;
   private static final String DATABASE_NAME = "wiglewifi.sqlite";
   private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
+  
+  private static final long QUEUE_CULL_TIMEOUT = 10000L;
+  private long prevQueueCullTime = 0L;
   
   private static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
@@ -58,7 +61,7 @@ public final class DatabaseHelper extends Thread {
   
   private static final int MAX_QUEUE = 512;
   private final Context context;
-  private final BlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
+  private final LinkedBlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
@@ -73,11 +76,13 @@ public final class DatabaseHelper extends Thread {
     public final Network network;
     public final int level;
     public final Location location;
+    public final boolean newForRun;
     
-    public DBUpdate( final Network network, final int level, final Location location ) {
+    public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun ) {
       this.network = network;
       this.level = level;
       this.location = location;
+      this.newForRun = newForRun;
     }
   }
   
@@ -177,25 +182,31 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  public boolean addObservation( final Network network, final Location location ) {
-    final DBUpdate update = new DBUpdate( network, network.getLevel(), location );
+  public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
+    final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun );
     // data is lost if queue is full!
-    final boolean added = queue.offer( update );
+    boolean added = queue.offer( update );
     if ( ! added ) {
       WigleAndroid.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
+      if ( System.currentTimeMillis() - prevQueueCullTime > QUEUE_CULL_TIMEOUT ) {
+        WigleAndroid.info("culling queue. size: " + queue.size() );
+        // go thru the queue, cull out anything not newForRun
+        for ( Iterator<DBUpdate> it = queue.iterator(); it.hasNext(); ) {
+          final DBUpdate val = it.next();
+          if ( ! val.newForRun ) {
+            it.remove();
+          }
+        }
+        WigleAndroid.info("culled queue. size now: " + queue.size() );
+        added = queue.offer( update );
+        if ( ! added ) {
+          WigleAndroid.info( "queue still full, couldn't add: " + network.getBssid() );
+        }
+        prevQueueCullTime = System.currentTimeMillis();
+      }
+      
     }
     return added;
-    
-//    boolean complete = false;
-//    while ( ! complete ) {
-//      try {
-//        queue.put( update );
-//        complete = true;
-//      }
-//      catch ( final InterruptedException ex ) {
-//        WigleAndroid.info( "interrupted in main addObservation: " + ex ); 
-//      }
-//    }
   }
   
   private void addObservation( final DBUpdate update ) {

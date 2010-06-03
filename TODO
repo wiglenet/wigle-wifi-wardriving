@@ -12,7 +12,7 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
-* 1.8 (unreleased):
+* 1.8
 add dashboard (count of APs in a large font for checking status at a glance)
 distance traveled (on dashboard)
 better handling of db queue, can't block gui, fastmode also on producer side

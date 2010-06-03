@@ -614,13 +614,13 @@ public final class WigleAndroid extends Activity {
                 
                 if ( location != null && dbHelper != null ) {
                   // if in fast mode, only add new-for-run stuff to the db queue
-                  if ( false && fastMode && ! added ) {
+                  if ( fastMode && ! added ) {
                     info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
                   }
                   else {
                     // loop for stress-testing
                     // for ( int i = 0; i < 10; i++ ) {
-                    dbHelper.addObservation( network, location );
+                    dbHelper.addObservation( network, location, added );
                     // }
                   }
                 }

@@ -1,3 +1,6 @@
+// -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+// vim:ts=2:sw=2:tw=80:et
+
 package net.wigle.wigleandroid;
 
 import static android.location.LocationManager.GPS_PROVIDER;
@@ -614,17 +617,23 @@ public final class WigleAndroid extends Activity {
                   }
                 }
                 
-                if ( location != null && dbHelper != null ) {
-                  // if in fast mode, only add new-for-run stuff to the db queue
-                  if ( fastMode && ! added ) {
-                    info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
-                  }
-                  else {
-                    // loop for stress-testing
-                    // for ( int i = 0; i < 10; i++ ) {
-                    dbHelper.addObservation( network, location, added );
-                    // }
-                  }
+                
+                if ( dbHelper != null ) {
+                    if ( location != null  ) {
+                        // if in fast mode, only add new-for-run stuff to the db queue
+                        if ( fastMode && ! added ) {
+                            info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
+                        }
+                        else {
+                            // loop for stress-testing
+                            // for ( int i = 0; i < 10; i++ ) {
+                            dbHelper.addObservation( network, location, added );
+                            // }
+                        }
+                    } else {
+                        // no location
+                        dbHelper.pendingObservation( network, added );
+                    }
                 }
               }
             }
@@ -908,9 +917,7 @@ public final class WigleAndroid extends Activity {
           + (newOK ? " newProvider: " + newLocation.getProvider() : "")
           + (locOK ? " locProvider: " + location.getProvider() : "") 
           + " newLocation: " + newLocation );
-      }
-      
-      if ( wasProviderChange ) {
+
         final String announce = location == null ? "Lost Location" 
             : "Now have location from \"" + location.getProvider() + "\"";
         Toast.makeText( this, announce, Toast.LENGTH_SHORT ).show();
@@ -921,6 +928,16 @@ public final class WigleAndroid extends Activity {
           final String speakAnnounce = location == null ? "Lost Location" 
             : "Now have location from " + location.getProvider() + ".";
           speak( speakAnnounce );
+        }
+
+        if ( location == null ) {
+            if ( prevGpsLocation != null ) {
+              dbHelper.lastLocation( prevGpsLocation );
+              info("set last location for lerping");
+            }
+        } else {
+          int count = dbHelper.recoverLocations( location );
+          info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
         }
       }
       

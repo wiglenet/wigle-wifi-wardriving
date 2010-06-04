@@ -1,3 +1,6 @@
+// -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+// vim:ts=2:sw=2:tw=80:et
+
 package net.wigle.wigleandroid;
 
 import java.io.File;
@@ -17,7 +20,7 @@ import android.location.Location;
 import android.os.Environment;
 
 /**
- * our database
+ * our database helper, makes a great data meal.
  */
 public final class DatabaseHelper extends Thread {
   // if in same spot, only log once an hour
@@ -62,10 +65,15 @@ public final class DatabaseHelper extends Thread {
   private static final int MAX_QUEUE = 512;
   private final Context context;
   private final LinkedBlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
+  private final LinkedBlockingQueue<DBPending> pending = new LinkedBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
   private final AtomicLong newNetworkCount = new AtomicLong();
+
+  private Location lastLoc = null;
+  private long lastLocWhen = 0L;
+
   private final SharedPreferences prefs;
   /** used in private addObservation */
   private final CacheMap<String,Location> previousWrittenLocationsCache = 
@@ -85,10 +93,26 @@ public final class DatabaseHelper extends Thread {
       this.newForRun = newForRun;
     }
   }
-  
+
+  /** holder for updates which we'll attempt to interpolate based on timing */
+  final class DBPending {
+    public final Network network;
+    public final int level;
+    public final boolean newForRun;
+    public final long when;
+
+    public DBPending( final Network network, final int level, final boolean newForRun ) {
+      this.network = network;
+      this.level = level;
+      this.newForRun = newForRun;
+      this.when = System.currentTimeMillis();
+    }
+  }
+
   public DatabaseHelper( final Context context ) {    
     this.context = context;
     this.prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
+    setName("db-worker");
   }
 
 	public int getQueueSize() {
@@ -183,7 +207,10 @@ public final class DatabaseHelper extends Thread {
   }
   
   public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
-    final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun );
+    return addObservation( network, network.getLevel(), location, newForRun );
+  }
+  private boolean addObservation( final Network network, final int level, final Location location, final boolean newForRun ) {
+    final DBUpdate update = new DBUpdate( network, level, location, newForRun );
     // data is lost if queue is full!
     boolean added = queue.offer( update );
     if ( ! added ) {
@@ -327,6 +354,149 @@ public final class DatabaseHelper extends Thread {
       // WigleAndroid.info( "db network not changeworthy: " + bssid );
     }
   }
+
+
+  /* 
+   * GPS location interpolation strategy:
+   * 
+   *  . keep track of last seen GPS location, either on location updates,
+   *    or when we lose a fix (the current approach)
+   *    we record both the location, and when the sample was taken.
+   * 
+   *  . when we do not have a location, keep a "pending" list of observations, 
+   *    by recording the network information, and a timestamp.
+   *
+   *  . when we regain a GPS fix, perform two linear interpolations, 
+   *    one for lat and one for lon, based on the time between the lost and 
+   *    regained:
+   *
+   * 
+   *   lat
+   *    | L
+   *    |    ?1
+   *    |    ?2
+   *    |        F
+   *    +--------- lon
+   *
+   *   lost gps at location L (time t0), found gps at location F (time t1), 
+   *   where are "?1" and "?2" at? 
+   * 
+   *   (t is the time we're interploating for, X is lat/lon):
+   *      ?.X = L.X + ( t - t0 ) ( ( F.X - L.X ) / ( t1 - t0 ) )
+   * 
+   *   we know when all four points were sampled, so we can make a broad 
+   *   (i.e. bad) assumption that we moved from L to F at a constant rate 
+   *   and along a linear path, and fill in the blanks.
+   * 
+   *   this approach can be improved (perhaps) with inertial data from 
+   *   the accelerometer.
+   *
+   *   downsides: . this only interpolates, no extrapolation for early 
+   *                observations before a GPS fix, or late observations after
+   *                a loss but before location is found again. it is no more 
+   *                lossy than previous behavior, which discarded these 
+   *                observations entirely.
+   *              . in-memory queue, so we're tossing pending observations if 
+   *                the app lifecycles.
+   *              . still subject to a "hotel-lobby" effect, where you enter and
+   *                exit a large gps-occluded zone via the same door, which 
+   *                degenerates to a point observation.
+   */
+
+  /** 
+   * mark the last known location where we had a gps fix, when losing it. 
+   * you can call this all the time, or just on transitions.
+   * call order should be lastLocation() -&gt; 0 or more pendingObservation()  -&gt; recoverLocations()
+   * @param loc the location we last saw a gps at, assumed to be "now".
+   */
+  public void lastLocation( final Location loc ) {
+    lastLoc = loc;
+    lastLocWhen = System.currentTimeMillis();
+  }
+
+  /** 
+   * enqueue a pending observation. 
+   * if called after lastLocation: when recoverLocations is called, these pending observations will have 
+   * their locations backfilled and then they'll be added to the database.
+   * 
+   * @param network the mutable network, will have it's level saved out.
+   * @param newForRun was this new for the run?
+   * @return was the pending observation enqueued
+   */
+  public boolean pendingObservation( final Network network, final boolean newForRun ) {
+    if ( lastLoc != null ) {
+      // modify this to check age at some point on failure. or offer a flush method. or.. something
+      return pending.offer( new DBPending( network, network.getLevel(), newForRun ) );
+    } else {
+      return false;
+    }
+  }
+
+  /** 
+   *  walk any pending observations, lerp from last to recover to fill in their location details, add to the real queue.
+   *
+   * @param loc where we picked up a gps fix again
+   * @return how many locations were recovered.
+   */
+  public int recoverLocations( final Location loc ) {
+    int count = 0;
+    long locWhen = System.currentTimeMillis();
+
+    if ( ( lastLoc != null ) && ( ! pending.isEmpty() ) ) { 
+      final float accuracy = loc.distanceTo( lastLoc );
+
+      if ( locWhen <= lastLocWhen ) { // prevent divide by 0
+        locWhen = lastLocWhen + 1;
+      }
+
+      final long d_time = locWhen - lastLocWhen;
+      WigleAndroid.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "ms" );
+      // walk the locations and 
+      // lerp! y = y0 + (t - t0)((y1-y0)/(t1-t0))
+      // y = y0 + (t - lastLocWhen)((y1-y0)/d_time);
+      final double lat0 = lastLoc.getLatitude();
+      final double lon0 = lastLoc.getLongitude();
+      final double d_lat = loc.getLatitude() - lat0;
+      final double d_lon = loc.getLongitude() - lon0;
+      final double lat_ratio = d_lat/d_time;
+      final double lon_ratio = d_lon/d_time;
+
+      for ( DBPending pend = pending.poll(); pend != null; pend = pending.poll() ) {
+
+        final long tdiff = pend.when - lastLocWhen ;
+
+        // do lat lerp:
+        final double lerp_lat = lat0 + ( tdiff * lat_ratio );
+        
+        // do lon lerp
+        final double lerp_lon = lon0 + ( tdiff * lon_ratio );
+
+        Location lerpLoc = new Location( "lerp" );
+        lerpLoc.setLatitude( lerp_lat );
+        lerpLoc.setLongitude( lerp_lon );
+        lerpLoc.setAccuracy( accuracy );
+
+        // pull this once we're happy.
+        WigleAndroid.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
+
+        // throw it on the queue!
+        if ( addObservation( pend.network, pend.level, lerpLoc, pend.newForRun ) ) {
+          count++;
+        } else {
+          WigleAndroid.info( "failed to add "+pend );
+        }
+        // XXX: altitude? worth it?
+      }
+      // return
+    }
+
+    lastLoc = null;
+    return count;
+  }
+
+
+
+
   
   private void logTime( long start, String string ) {
     long diff = System.currentTimeMillis() - start;

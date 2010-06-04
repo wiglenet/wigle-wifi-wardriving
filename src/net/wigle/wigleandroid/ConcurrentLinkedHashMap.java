@@ -3,21 +3,21 @@ package net.wigle.wigleandroid;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * try to be all things to all people. concurrent, with a remove-eldest feature, except during put, 
+ * try to be all things to all people. a remove-eldest feature, concurrent except during put, 
  * which is usually single-threaded in this app anyway.
  * @param <K> key
  * @param <V> value
  */
 public final class ConcurrentLinkedHashMap<K,V> {
   private final ConcurrentHashMap<K,V> map;
-  private final ConcurrentLinkedQueue<K> queue;
+  private final LinkedBlockingQueue<K> queue;
   private int count = 0;
   
   private final int maxSize;
-  private static final Object WRITE_LOCK = new Object();
+  private final Object WRITE_LOCK = new Object();
   
   public ConcurrentLinkedHashMap() {
     this( Integer.MAX_VALUE );
@@ -25,7 +25,7 @@ public final class ConcurrentLinkedHashMap<K,V> {
   
   public ConcurrentLinkedHashMap( final int maxSize ) {
     map = new ConcurrentHashMap<K,V>();
-    queue = new ConcurrentLinkedQueue<K>();
+    queue = new LinkedBlockingQueue<K>();
     this.maxSize = maxSize;
   }
   
@@ -33,7 +33,7 @@ public final class ConcurrentLinkedHashMap<K,V> {
     V previous = null;
     synchronized( WRITE_LOCK ) {
       previous = map.put(key, value);
-      if ( previous != null ) {
+      if ( previous == null ) {
         // new key! add to queue
         queue.add( key );
         // check if this puts us over
@@ -55,6 +55,10 @@ public final class ConcurrentLinkedHashMap<K,V> {
     return map.get( key );
   }
   
+  /** 
+   * make sure this is only used for reading (we only use it for reading currently.) the map is concurrent safe, but it will bugger 
+   * our internal accounting for size() if the set is mutated
+   */
   public Set<Map.Entry<K,V>> entrySet() {
     return map.entrySet();
   }

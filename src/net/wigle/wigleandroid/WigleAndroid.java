@@ -857,6 +857,10 @@ public final class WigleAndroid extends Activity {
         }
       }
       
+      if ( inEmulator && newLocation != null ) {
+        newOK = true; 
+      }
+      
       final boolean netLocOK = locationOK( networkLocation, satCount );
       
       boolean wasProviderChange = false;

@@ -171,7 +171,9 @@ public final class WigleAndroid extends Activity {
         
         final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
         inEmulator = id == null;
-        info( "id: '" + id + "' inEmulator: " + inEmulator );
+        inEmulator |= "sdk".equals( android.os.Build.PRODUCT );
+        inEmulator |= "google_sdk".equals( android.os.Build.PRODUCT );
+        info( "id: '" + id + "' inEmulator: " + inEmulator + " product: " + android.os.Build.PRODUCT );
         
 //        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
 //          public void uncaughtException( Thread thread, Throwable throwable ) {

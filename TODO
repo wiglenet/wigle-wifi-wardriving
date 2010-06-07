@@ -12,6 +12,10 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
+* 1.9 (not released yet)
+fix UI on G1 keyboard slide
+fix leak in storage for map drawing
+
 * 1.8
 add dashboard (count of APs in a large font for checking status at a glance)
 distance traveled (on dashboard)

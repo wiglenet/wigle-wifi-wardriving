@@ -246,6 +246,7 @@ public final class WigleAndroid extends Activity {
     
     @Override
     public Object onRetainNonConfigurationInstance() {
+      info( "onRetainNonConfigurationInstance" );
       // return this whole class to copy data from
       return this;
     }
@@ -427,6 +428,13 @@ public final class WigleAndroid extends Activity {
     public void onConfigurationChanged( final Configuration newConfig ) {
       super.onConfigurationChanged( newConfig );
       setContentView( R.layout.main );
+      info( "on config change" );
+      
+      // have to redo linkages/listeners
+      setupUploadButton();
+      setupMuteButton();
+      final ListView listView = (ListView) findViewById( R.id.ListView01 );
+      listView.setAdapter( listAdapter ); 
     }
     
     private void setupDatabase() {
@@ -1062,6 +1070,10 @@ public final class WigleAndroid extends Activity {
         tts = new TTS( this );        
       }
       
+      setupMuteButton();
+    }
+     
+    private void setupMuteButton() {
       final Button mute = (Button) this.findViewById(R.id.mute);
       final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);

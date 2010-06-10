@@ -15,6 +15,7 @@ network list sorting options
 * 1.9 (not released yet)
 fix UI on G1 keyboard slide
 fix leak in storage for map drawing
+detailed errors in UI on file upload exceptions
 
 * 1.8
 add dashboard (count of APs in a large font for checking status at a glance)

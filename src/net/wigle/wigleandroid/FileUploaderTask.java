@@ -30,6 +30,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -43,6 +44,7 @@ public final class FileUploaderTask extends Thread {
   static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
+  private static final String ERROR = "error";
   
   private enum Status {
     UNKNOWN("Unknown", "Unknown error"),
@@ -106,7 +108,14 @@ public final class FileUploaderTask extends Thread {
         final AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
         builder.setCancelable( false );
         builder.setTitle( status.getTitle() );
-        builder.setMessage( status.getMessage() );
+        Bundle bundle = msg.peekData();
+        if ( bundle == null ) {
+          builder.setMessage( status.getMessage() );
+        }
+        else {
+          String error = bundle.getString( ERROR );
+          builder.setMessage( status.getMessage() + " Error: " + error );
+        }
         final AlertDialog ad = builder.create();
         ad.setButton( "OK", new DialogInterface.OnClickListener() {
           public void onClick( final DialogInterface dialog, final int which ) {
@@ -133,7 +142,8 @@ public final class FileUploaderTask extends Thread {
     final String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
     final String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
-
+    Bundle bundle = new Bundle();
+    
     if ( "".equals( username ) ) {
       // TODO: error
       WigleAndroid.error( "username not defined" );
@@ -145,14 +155,23 @@ public final class FileUploaderTask extends Thread {
       status = Status.BAD_PASSWORD;
     }
     else {
-      status = doUpload( username, password );
+      status = doUpload( username, password, bundle );
     }
 
     // tell the gui thread
-    handler.sendEmptyMessage( status.ordinal() );
+    String error = bundle.getString( ERROR );
+    if ( error == null ) { 
+      handler.sendEmptyMessage( status.ordinal() );
+    }
+    else {
+      Message msg = new Message();
+      msg.what = status.ordinal();
+      msg.setData(bundle);
+      handler.sendMessage(msg);
+    }
   }
   
-  private Status doUpload( final String username, final String password ) {    
+  private Status doUpload( final String username, final String password, final Bundle bundle ) {    
     final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
@@ -160,6 +179,8 @@ public final class FileUploaderTask extends Thread {
     Status status = Status.UNKNOWN;
     
     try {
+      // if ( true ) { throw new IOException( "oh noe" ); }
+      
       String openString = filename;
       final boolean hasSD = WigleAndroid.hasSD();
       if ( hasSD ) {
@@ -366,11 +387,19 @@ public final class FileUploaderTask extends Thread {
       e.printStackTrace();
       WigleAndroid.error( "file problem: " + e );
       status = Status.EXCEPTION;
+      bundle.putString( ERROR, "file problem: " + e );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "file problem: " + ex );
+      WigleAndroid.error( "io problem: " + ex );
       status = Status.EXCEPTION;
+      bundle.putString( ERROR, "io problem: " + ex );
+    }
+    catch ( final Exception ex ) {
+      ex.printStackTrace();
+      WigleAndroid.error( "ex problem: " + ex );
+      status = Status.EXCEPTION;
+      bundle.putString( ERROR, "ex problem: " + ex );
     }
     
     return status;

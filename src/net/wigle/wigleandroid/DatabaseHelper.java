@@ -4,8 +4,10 @@
 package net.wigle.wigleandroid;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -34,6 +36,7 @@ public final class DatabaseHelper extends Thread {
   
   private static final long QUEUE_CULL_TIMEOUT = 10000L;
   private long prevQueueCullTime = 0L;
+  private long prevPendingQueueCullTime = 0L;
   
   private static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
@@ -99,7 +102,7 @@ public final class DatabaseHelper extends Thread {
     public final Network network;
     public final int level;
     public final boolean newForRun;
-    public final long when;
+    public final long when; // in MS
 
     public DBPending( final Network network, final int level, final boolean newForRun ) {
       this.network = network;
@@ -426,7 +429,41 @@ public final class DatabaseHelper extends Thread {
   public boolean pendingObservation( final Network network, final boolean newForRun ) {
     if ( lastLoc != null ) {
       // modify this to check age at some point on failure. or offer a flush method. or.. something
-      return pending.offer( new DBPending( network, network.getLevel(), newForRun ) );
+      DBPending update = new DBPending( network, network.getLevel(), newForRun );
+      boolean added = pending.offer( update );
+      if ( ! added ) {
+        if ( System.currentTimeMillis() - prevPendingQueueCullTime > QUEUE_CULL_TIMEOUT ) {
+          WigleAndroid.info("culling pending queue. size: " + pending.size() );
+          // go thru the queue, cull out anything not newForRun
+          for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
+            final DBPending val = it.next();
+            if ( ! val.newForRun ) {
+              it.remove();
+            }
+          }
+          WigleAndroid.info("culled pending queue. size now: " + pending.size() );
+          added = pending.offer( update );
+          if ( ! added ) {
+            WigleAndroid.info( "pending queue still full, couldn't add: " + network.getBssid() );
+            // go thru the queue, squash dups.
+            HashSet<String> bssids = new HashSet<String>();
+            for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
+              final DBPending val = it.next();
+              if ( ! bssids.add( val.network.getBssid() ) ) {
+                it.remove();
+              }
+            }
+            bssids.clear();
+            
+            added = pending.offer( update );
+            if ( ! added ) {
+              WigleAndroid.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
+            }
+          }
+          prevPendingQueueCullTime = System.currentTimeMillis();
+        }
+      }
+      return added;
     } else {
       return false;
     }
@@ -449,8 +486,8 @@ public final class DatabaseHelper extends Thread {
         locWhen = lastLocWhen + 1;
       }
 
-      final long d_time = locWhen - lastLocWhen;
-      WigleAndroid.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "ms" );
+      final long d_time = MILLISECONDS.toSeconds( locWhen - lastLocWhen );
+      WigleAndroid.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
       // walk the locations and 
       // lerp! y = y0 + (t - t0)((y1-y0)/(t1-t0))
       // y = y0 + (t - lastLocWhen)((y1-y0)/d_time);
@@ -463,7 +500,7 @@ public final class DatabaseHelper extends Thread {
 
       for ( DBPending pend = pending.poll(); pend != null; pend = pending.poll() ) {
 
-        final long tdiff = pend.when - lastLocWhen ;
+        final long tdiff = MILLISECONDS.toSeconds( pend.when - lastLocWhen );
 
         // do lat lerp:
         final double lerp_lat = lat0 + ( tdiff * lat_ratio );
@@ -477,7 +514,7 @@ public final class DatabaseHelper extends Thread {
         lerpLoc.setAccuracy( accuracy );
 
         // pull this once we're happy.
-        WigleAndroid.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
+        //        WigleAndroid.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
 
         // throw it on the queue!
         if ( addObservation( pend.network, pend.level, lerpLoc, pend.newForRun ) ) {

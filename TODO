@@ -12,10 +12,11 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
-* 1.9 (not released yet)
+* 1.9
 fix UI on G1 keyboard slide
 fix leak in storage for map drawing
 detailed errors in UI on file upload exceptions
+keep pending networks on short duration gps outtages
 
 * 1.8
 add dashboard (count of APs in a large font for checking status at a glance)

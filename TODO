@@ -13,6 +13,9 @@ network list sorting options
 no sound during a phone call
 
 --- done ---
+* 1.10 (unreleased)
+swap out LinkedBlockingQueue, which has issues on Android < 2.0
+
 * 1.9
 fix UI on G1 keyboard slide
 fix leak in storage for map drawing

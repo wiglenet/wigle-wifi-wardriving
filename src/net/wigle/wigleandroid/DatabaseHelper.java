@@ -6,7 +6,7 @@ package net.wigle.wigleandroid;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -67,8 +67,8 @@ public final class DatabaseHelper extends Thread {
   
   private static final int MAX_QUEUE = 512;
   private final Context context;
-  private final LinkedBlockingQueue<DBUpdate> queue = new LinkedBlockingQueue<DBUpdate>( MAX_QUEUE );
-  private final LinkedBlockingQueue<DBPending> pending = new LinkedBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
+  private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<DBUpdate>( MAX_QUEUE );
+  private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();

@@ -8,8 +8,8 @@ import static android.location.LocationManager.NETWORK_PROVIDER;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -53,6 +53,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -102,6 +104,7 @@ public final class WigleAndroid extends Activity {
     private AudioManager audioManager;
     private long previousTalkTime = System.currentTimeMillis();
     private boolean inEmulator;
+    private boolean isPhoneActive;
     
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -1072,6 +1075,28 @@ public final class WigleAndroid extends Activity {
         tts = new TTS( this );        
       }
       
+      TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+      if ( tele != null ) {
+        tele.listen(new PhoneStateListener() {
+          @Override
+          public void onCallStateChanged( int state, String incomingNumber ) {
+            switch ( state ) {
+              case TelephonyManager.CALL_STATE_IDLE:
+                isPhoneActive = false;
+                info( "setting phone inactive. state: " + state );
+                break;
+              case TelephonyManager.CALL_STATE_RINGING:
+              case TelephonyManager.CALL_STATE_OFFHOOK:
+                isPhoneActive = true;
+                info( "setting phone active. state: " + state );
+                break;
+              default:
+                info( "unhandled call state: " + state );
+            }
+          }
+        }, PhoneStateListener.LISTEN_CALL_STATE );
+      }
+      
       setupMuteButton();
     }
      
@@ -1240,6 +1265,10 @@ public final class WigleAndroid extends Activity {
     }
     
     private boolean isMuted() {
+      if ( isPhoneActive ) {
+        // always be quiet when the phone is active
+        return true;
+      }
       boolean retval = this.getSharedPreferences(SHARED_PREFS, 0).getBoolean(PREF_MUTED, false);
       // info( "ismuted: " + retval );
       return retval;

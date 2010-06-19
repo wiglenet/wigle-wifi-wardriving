@@ -115,6 +115,7 @@ public final class WigleAndroid extends Activity {
     public static final String ENCODING = "ISO-8859-1";
     private static final long GPS_TIMEOUT = 15000L;
     private static final long NET_LOC_TIMEOUT = 60000L;
+    private static final float MIN_DISTANCE_ACCURACY = 32f;
     
     // color by signal strength
     public static final int COLOR_1 = Color.rgb( 70, 170,  0);
@@ -724,7 +725,8 @@ public final class WigleAndroid extends Activity {
             scanRequestTime = nonstopScanRequestTime;
             
             // do distance calcs
-            if ( location != null && GPS_PROVIDER.equals( location.getProvider() ) ) {
+            if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
+                && location.getAccuracy() <= MIN_DISTANCE_ACCURACY ) {
               if ( prevGpsLocation != null ) {
                 float dist = location.distanceTo( prevGpsLocation );
                 // info( "dist: " + dist );

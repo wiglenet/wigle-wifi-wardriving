@@ -15,6 +15,7 @@ network list sorting options
 * 1.10 (unreleased)
 swap out LinkedBlockingQueue, which has issues on Android < 2.0
 mute sound when a phone call is active
+accuracy <= 32 meters to modify the distance
 
 * 1.9
 fix UI on G1 keyboard slide

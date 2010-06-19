@@ -12,7 +12,7 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
-* 1.10 (unreleased)
+* 1.10
 swap out LinkedBlockingQueue, which has issues on Android < 2.0
 mute sound when a phone call is active
 accuracy <= 32 meters to modify the distance

@@ -3,17 +3,14 @@ package org.andnav.osm.views.util;
 
 import java.io.File;
 
-import org.andnav.osm.services.IOpenStreetMapTileProviderService;
 import org.andnav.osm.tileprovider.OpenStreetMapTile;
 import org.andnav.osm.views.util.constants.OpenStreetMapViewConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.util.Log;
 
 /**
  * 
@@ -21,6 +18,8 @@ import android.util.Log;
  * 
  */
 public abstract class OpenStreetMapTileProvider implements OpenStreetMapViewConstants {
+	
+	private static final Logger logger = LoggerFactory.getLogger(OpenStreetMapTileProvider.class);
 	
 	protected final OpenStreetMapTileCache mTileCache;
 	protected final Handler mDownloadFinishedHandler;
@@ -30,30 +29,6 @@ public abstract class OpenStreetMapTileProvider implements OpenStreetMapViewCons
 		mDownloadFinishedHandler = pDownloadFinishedListener;
 	}
 
-	/**
-	 * Get a tile provider.
-	 * If a tile provider service exists then it will use the service,
-	 * otherwise it'll use a direct tile provider that doesn't use a service
-	 * @param pContext
-	 * @param pDownloadFinishedListener
-	 * @return
-	 */
-	public static OpenStreetMapTileProvider getInstance(final Context pContext,
-			final Handler pDownloadFinishedListener) {
-		final Intent intent = new Intent(IOpenStreetMapTileProviderService.class.getName());
-		final ResolveInfo ri = pContext.getPackageManager().resolveService(intent, 0);
-		if (ri == null) {
-			Log.i(DEBUGTAG, "Service not found - using direct tile provider");
-			return new OpenStreetMapTileProviderDirect(pDownloadFinishedListener);
-		} else {
-			Log.i(DEBUGTAG, "Using tile provider service");
-			return new OpenStreetMapTileProviderService(pContext, pDownloadFinishedListener);
-			// XXX Perhaps we should pass the Intent or the class name (action) into
-			//     this constructor since we do the same again in there.
-			//     That will also give the option of specifying something else.
-		}
-	}
-	
 	public void mapTileRequestCompleted(final OpenStreetMapTile pTile, final String pTilePath) {
 
 		// if the tile path has been returned, add the tile to the cache
@@ -67,11 +42,11 @@ public abstract class OpenStreetMapTileProvider implements OpenStreetMapViewCons
 					try {
 						new File(pTilePath).delete();
 					} catch (Throwable e) {
-						Log.e(DEBUGTAG, "Error deleting invalid file: " + pTilePath, e);
+						logger.error("Error deleting invalid file: " + pTilePath, e);
 					}
 				}
 			} catch (final OutOfMemoryError e) {
-				Log.e(DEBUGTAG, "OutOfMemoryError putting tile in cache: " + pTile);
+				logger.error("OutOfMemoryError putting tile in cache: " + pTile);
 				mTileCache.clear();
 				System.gc();
 			}
@@ -81,7 +56,7 @@ public abstract class OpenStreetMapTileProvider implements OpenStreetMapViewCons
 		mDownloadFinishedHandler.sendEmptyMessage(OpenStreetMapTile.MAPTILE_SUCCESS_ID);
 
 		if (DEBUGMODE)
-			Log.d(DEBUGTAG, "MapTile request complete: " + pTile);
+			logger.debug("MapTile request complete: " + pTile);
 	}	
 	
 	public void ensureCapacity(final int aCapacity) {

@@ -1,5 +1,7 @@
 package org.andnav.osm.views.overlay;
 
+import org.andnav.osm.DefaultResourceProxyImpl;
+import org.andnav.osm.ResourceProxy;
 import org.andnav.osm.tileprovider.OpenStreetMapTile;
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.util.MyMath;
@@ -7,7 +9,11 @@ import org.andnav.osm.views.OpenStreetMapView;
 import org.andnav.osm.views.OpenStreetMapView.OpenStreetMapViewProjection;
 import org.andnav.osm.views.util.OpenStreetMapRendererInfo;
 import org.andnav.osm.views.util.OpenStreetMapTileProvider;
+import org.andnav.osm.views.util.OpenStreetMapTileProviderDirect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,10 +21,11 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 public class OpenStreetMapTilesOverlay extends OpenStreetMapViewOverlay {
 
+	private static final Logger logger = LoggerFactory.getLogger(OpenStreetMapTilesOverlay.class);
+	
 	protected OpenStreetMapView mOsmv;
 	protected OpenStreetMapRendererInfo mRendererInfo;
 
@@ -26,13 +33,24 @@ public class OpenStreetMapTilesOverlay extends OpenStreetMapViewOverlay {
 	protected final OpenStreetMapTileProvider mTileProvider;
 	protected final Paint mPaint = new Paint();
 
-	public OpenStreetMapTilesOverlay(final OpenStreetMapView aOsmv,
+	public OpenStreetMapTilesOverlay(
+			final OpenStreetMapView aOsmv,
 			final OpenStreetMapRendererInfo aRendererInfo,
-			final OpenStreetMapTileProvider aTileProvider) {
+			final OpenStreetMapTileProvider aTileProvider,
+			final Context aContext) {
+		this(aOsmv, aRendererInfo, aTileProvider, new DefaultResourceProxyImpl(aContext));
+	}
+	
+	public OpenStreetMapTilesOverlay(
+			final OpenStreetMapView aOsmv,
+			final OpenStreetMapRendererInfo aRendererInfo,
+			final OpenStreetMapTileProvider aTileProvider,
+			final ResourceProxy pResourceProxy) {
+		super(pResourceProxy);
 		this.mOsmv = aOsmv;
 		this.mRendererInfo = aRendererInfo;
 		if(aTileProvider == null)
-			mTileProvider = OpenStreetMapTileProvider.getInstance(mOsmv.getContext(), new SimpleInvalidationHandler());
+			mTileProvider = new OpenStreetMapTileProviderDirect(new SimpleInvalidationHandler());
 		else
 			this.mTileProvider = aTileProvider;
 	}
@@ -59,7 +77,7 @@ public class OpenStreetMapTilesOverlay extends OpenStreetMapViewOverlay {
 	protected void onDraw(Canvas c, OpenStreetMapView osmv) {
 
 		if(DEBUGMODE)
-			Log.v(DEBUGTAG, "onDraw");
+			logger.trace("onDraw");
 
 		/*
 		 * Do some calculations and drag attributes to local variables to save

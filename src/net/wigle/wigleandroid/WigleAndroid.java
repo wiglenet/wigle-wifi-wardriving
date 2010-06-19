@@ -47,6 +47,7 @@ import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -177,6 +178,7 @@ public final class WigleAndroid extends Activity {
         inEmulator |= "sdk".equals( android.os.Build.PRODUCT );
         inEmulator |= "google_sdk".equals( android.os.Build.PRODUCT );
         info( "id: '" + id + "' inEmulator: " + inEmulator + " product: " + android.os.Build.PRODUCT );
+        info( "release: '" + Build.VERSION.RELEASE + "'" );
         
 //        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
 //          public void uncaughtException( Thread thread, Throwable throwable ) {

@@ -1,9 +1,12 @@
 // Created by plusminus on 20:32:01 - 27.09.2008
 package org.andnav.osm.views.overlay;
 
+import org.andnav.osm.DefaultResourceProxyImpl;
+import org.andnav.osm.ResourceProxy;
 import org.andnav.osm.views.OpenStreetMapView;
 import org.andnav.osm.views.util.constants.OpenStreetMapViewConstants;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -26,10 +29,20 @@ public abstract class OpenStreetMapViewOverlay implements OpenStreetMapViewConst
 	// Fields
 	// ===========================================================
 
+	protected final ResourceProxy mResourceProxy;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
+	public OpenStreetMapViewOverlay(final Context ctx) {
+		mResourceProxy = new DefaultResourceProxyImpl(ctx);
+	}
+	
+	public OpenStreetMapViewOverlay(final ResourceProxy pResourceProxy) {
+		mResourceProxy = pResourceProxy;
+	}
+	
 	// ===========================================================
 	// Getter & Setter
 	// ===========================================================

@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.andnav.osm.views.util.OpenStreetMapRendererInfo;
-
-import android.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -17,12 +17,13 @@ import android.util.Log;
  *
  */
 public class OpenStreetMapTileFilesystemProvider extends OpenStreetMapAsyncTileProvider {
+	
 	// ===========================================================
 	// Constants
 	// ===========================================================
 
-	final static String DEBUGTAG = "OSM_FS_PROVIDER";
-
+	private static final Logger logger = LoggerFactory.getLogger(OpenStreetMapTileFilesystemProvider.class);
+	
 	// ===========================================================
 	// Fields
 	// ===========================================================
@@ -52,8 +53,8 @@ public class OpenStreetMapTileFilesystemProvider extends OpenStreetMapAsyncTileP
 	// ===========================================================
 
 	@Override
-	protected String debugtag() {
-		return DEBUGTAG;
+	protected String threadGroupName() {
+		return "filesystem";
 	}
 
 	@Override
@@ -117,17 +118,17 @@ public class OpenStreetMapTileFilesystemProvider extends OpenStreetMapAsyncTileP
 			try {
 				if (tileFile.exists()) {
 					if (DEBUGMODE)
-						Log.d(DEBUGTAG, "Loaded tile: " + aTile);
+						logger.debug("Loaded tile: " + aTile);
 					tileLoaded(aTile, tileFile.getPath(), true);
 				} else {
 					if (DEBUGMODE)
-						Log.d(DEBUGTAG, "Tile not exist, request for download: " + aTile);
+						logger.debug("Tile not exist, request for download: " + aTile);
 					mTileDownloader.loadMapTileAsync(aTile);
 					// don't refresh the screen because there's nothing new
 					tileLoaded(aTile, null, false);
 				}
 			} catch (final Throwable e) {
-				Log.e(DEBUGTAG, "Error loading tile", e);
+				logger.error("Error loading tile", e);
 				tileLoaded(aTile, null, false);
 			}
 		}

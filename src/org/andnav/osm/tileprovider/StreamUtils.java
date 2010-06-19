@@ -6,11 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamUtils {
+	
 	// ===========================================================
 	// Constants
 	// ===========================================================
+	
+	private static final Logger logger = LoggerFactory.getLogger(StreamUtils.class);
 	
 	public static final int IO_BUFFER_SIZE = 8 * 1024;
 
@@ -21,6 +26,12 @@ public class StreamUtils {
 	// ===========================================================
 	// Constructors
 	// ===========================================================
+
+	/**
+	 * This is a utility class with only static members.
+	 */
+	private StreamUtils() {
+	}
 
 	// ===========================================================
 	// Getter & Setter
@@ -61,7 +72,7 @@ public class StreamUtils {
 			try {
 				stream.close();
 			} catch (IOException e) {
-				android.util.Log.e("IO", "Could not close stream", e);
+				logger.error("IO", "Could not close stream", e);
 			}
 		}
 	} 

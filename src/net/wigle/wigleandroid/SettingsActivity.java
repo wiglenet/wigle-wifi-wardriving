@@ -171,6 +171,15 @@ public final class SettingsActivity extends Activity {
           }
       });
       
+      final CheckBox foundNewSound = (CheckBox) findViewById(R.id.found_new_sound);
+      foundNewSound.setChecked( prefs.getBoolean( WigleAndroid.PREF_FOUND_NEW_SOUND, true) );
+      foundNewSound.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
+              editor.putBoolean( WigleAndroid.PREF_FOUND_NEW_SOUND, isChecked );
+              editor.commit();
+          }
+      });
+      
       final CheckBox speechGPS = (CheckBox) findViewById(R.id.speech_gps);
       speechGPS.setChecked( prefs.getBoolean( WigleAndroid.PREF_SPEECH_GPS, true) );
       speechGPS.setOnCheckedChangeListener( new OnCheckedChangeListener() {

@@ -46,6 +46,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/found_sound" />
+   
+<CheckBox android:id="@+id/found_new_sound"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/found_new_sound" />
         
 <CheckBox android:id="@+id/speech_gps"
         android:layout_width="fill_parent"

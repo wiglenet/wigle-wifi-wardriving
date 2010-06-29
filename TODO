@@ -12,6 +12,11 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
+* 1.11
+map target easier to see
+change sounds from wav to ogg to avoid snap sound after playing
+seperate configs for new network in run vs. database
+
 * 1.10
 swap out LinkedBlockingQueue, which has issues on Android < 2.0
 mute sound when a phone call is active

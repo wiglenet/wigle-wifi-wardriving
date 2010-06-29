@@ -133,6 +133,7 @@ public final class WigleAndroid extends Activity {
     static final String PREF_DB_MARKER = "dbMarker";
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     static final String PREF_FOUND_SOUND = "foundSound";
+    static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
     static final String PREF_SPEECH_PERIOD = "speechPeriod";
     static final String PREF_SPEECH_GPS = "speechGPS";
     static final String PREF_MUTED = "muted";
@@ -657,9 +658,11 @@ public final class WigleAndroid extends Activity {
             final boolean newNet = newNetCount > prevNewNetCount;
             prevNewNetCount = newNetCount;
             
-            final boolean play = prefs.getBoolean( PREF_FOUND_SOUND, true );
-            if ( play && ! isMuted() ) {
-              if ( newNet ) {
+            
+            if ( ! isMuted() ) {
+              final boolean playRun = prefs.getBoolean( PREF_FOUND_SOUND, true );
+              final boolean playNew = prefs.getBoolean( PREF_FOUND_NEW_SOUND, true );
+              if ( newNet && playNew ) {
                 if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
                   // play sound on something new
                   soundNewPop.start();
@@ -668,7 +671,7 @@ public final class WigleAndroid extends Activity {
                   info( "soundNewPop is playing or null" );
                 }
               }
-              else if ( somethingAdded ) {
+              else if ( somethingAdded && playRun ) {
                 if ( soundPop != null && ! soundPop.isPlaying() ) {
                   // play sound on something new
                   soundPop.start();

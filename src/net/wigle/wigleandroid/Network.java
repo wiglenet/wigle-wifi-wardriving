@@ -94,7 +94,7 @@ public final class Network {
     this.channel = freqToChan.get( frequency );
     
     if ( capabilities.length() > 16 ) {
-      this.showCapabilities = capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1...]");
+      this.showCapabilities = capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1]");
     }
     else {
       this.showCapabilities = null;

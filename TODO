@@ -5,17 +5,21 @@ lock screen on, lock UI
 turn scan on/off
 show IEEE octet info
 english/metric toggle
+mapping options (new|all, open|crypto|all)
+minimap in dashboard? list of ssids?
 
 --- user suggested ---
 option for kml save for checking coverage back at home PC
 click on network to connect, with warning about legality
 network list sorting options
+map directional indicator
 
 --- done ---
 * 1.11
 map target easier to see
 change sounds from wav to ogg to avoid snap sound after playing
 seperate configs for new network in run vs. database
+visible network count in dashboard
 
 * 1.10
 swap out LinkedBlockingQueue, which has issues on Android < 2.0

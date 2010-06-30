@@ -155,6 +155,7 @@ public final class WigleAndroid extends Activity {
         new ConcurrentLinkedHashMap<GeoPoint,Integer>( 512 );
       public int runNets;
       public long newNets;
+      public int currNets;
       public int preQueueSize;
     }
     public static final LameStatic lameStatic = new LameStatic();
@@ -699,6 +700,7 @@ public final class WigleAndroid extends Activity {
             WigleAndroid.lameStatic.savedStats = savedStats;
             WigleAndroid.lameStatic.runNets = runNetworks.size();
             WigleAndroid.lameStatic.newNets = newNetCount;
+            WigleAndroid.lameStatic.currNets = resultSize;
             WigleAndroid.lameStatic.preQueueSize = preQueueSize;
             if ( newForRun > 0 && location != null ) {
               final GeoPoint geoPoint = new GeoPoint( location );

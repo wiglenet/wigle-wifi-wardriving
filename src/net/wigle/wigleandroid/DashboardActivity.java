@@ -70,6 +70,9 @@ public class DashboardActivity extends Activity {
     tv = (TextView) findViewById( R.id.newnets );
     tv.setText( "New Nets: " + WigleAndroid.lameStatic.newNets );
     
+    tv = (TextView) findViewById( R.id.currnets );
+    tv.setText( "Visible Nets: " + WigleAndroid.lameStatic.currNets );
+    
     updateDist( R.id.rundist, WigleAndroid.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, WigleAndroid.PREF_DISTANCE_TOTAL, "Total Distance: " );
     

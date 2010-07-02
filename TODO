@@ -17,7 +17,7 @@ map directional indicator
 * 1.11
 map target easier to see
 change sounds from wav to ogg to avoid snap sound after playing
-seperate configs for new network in run vs. database
+seperate audio configs for new network in run vs. database
 visible network count in dashboard
 add new for run vs. db option in map
 better upload failure info in UI

@@ -69,7 +69,7 @@ public final class TTS {
     if ( SPEECH_CLASS == null ) {
         try {
           SPEECH_CLASS = Class.forName("com.google.tts.TTS"); // naboo foxes, TTS out for the jedi!
-            useEyesFree = true;
+          useEyesFree = true;
         } catch ( ClassNotFoundException ex ) {
             // don't have it
         }

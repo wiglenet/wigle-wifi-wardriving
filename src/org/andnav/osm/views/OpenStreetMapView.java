@@ -41,6 +41,8 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
+import net.wigle.wigleandroid.ZoomButtonsController;
+import net.wigle.wigleandroid.ZoomButtonsController.OnZoomListener;
 
 public class OpenStreetMapView extends View implements OpenStreetMapViewConstants {
 
@@ -112,6 +114,9 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	private int mMiniMapOverriddenVisibility = NOT_SET;
 	private int mMiniMapZoomDiff = NOT_SET;
 
+	private ZoomButtonsController mZoomController;
+	private boolean mEnableZoomController = false;
+
 	private ResourceProxy mResourceProxy;
 
 	// ===========================================================
@@ -128,6 +133,8 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		this.mScaler = new Scaler(context, new LinearInterpolator());
 		this.mMapOverlay = new OpenStreetMapTilesOverlay(this, aRendererInfo, aTileProvider, mResourceProxy);
 		mOverlays.add(this.mMapOverlay);
+		this.mZoomController = new ZoomButtonsController(this);
+		this.mZoomController.setOnZoomListener(new OpenStreetMapViewZoomListener());
 	}
 
 	/**
@@ -495,7 +502,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
-
+	  if ( DEBUGMODE )
 	    logger.debug("onTouchEvent(" + event + ")");
 
 		/*
@@ -651,6 +658,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 	@Override
 	protected void onDetachedFromWindow() {
+		this.mZoomController.setVisible(false);
 		this.mMapOverlay.detach();
 		super.onDetachedFromWindow();
 	}
@@ -678,6 +686,8 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	// ===========================================================
 
 	private void checkZoomButtons() {
+		this.mZoomController.setZoomInEnabled(canZoomIn());
+		this.mZoomController.setZoomOutEnabled(canZoomOut());
 	}
 
 	private int[] getCenterMapTileCoords() {
@@ -707,6 +717,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	}
 
 	public void setBuiltInZoomControls(boolean on) {
+		this.mEnableZoomController = on;
 		this.checkZoomButtons();
 	}
 
@@ -961,6 +972,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 		@Override
 		public boolean onDown(MotionEvent e) {
+			mZoomController.setVisible(mEnableZoomController);
 			return true;
 		}
 
@@ -992,6 +1004,20 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		}
 
 	}
+
+	private class OpenStreetMapViewZoomListener implements OnZoomListener {
+    	@Override
+    	public void onZoom(boolean zoomIn) {
+    		if(zoomIn) {
+    		  getController().setZoom( getZoomLevel() + 1 );
+    		}
+    		else {
+    		  getController().setZoom( getZoomLevel() - 1 );
+    		}
+    	}
+    	@Override
+    	public void onVisibilityChanged(boolean visible) {}
+    }
 
 	class Scaler {
 

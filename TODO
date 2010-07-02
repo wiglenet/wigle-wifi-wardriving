@@ -21,6 +21,7 @@ seperate configs for new network in run vs. database
 visible network count in dashboard
 add new for run vs. db option in map
 better upload failure info in UI
+reflection ZoomButtonsController to support on android 1.5 and up in map
 
 * 1.10
 swap out LinkedBlockingQueue, which has issues on Android < 2.0

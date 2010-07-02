@@ -105,6 +105,7 @@ public final class WigleAndroid extends Activity {
     private long previousTalkTime = System.currentTimeMillis();
     private boolean inEmulator;
     private boolean isPhoneActive;
+    private int pendingCount = 0;
     
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -140,6 +141,7 @@ public final class WigleAndroid extends Activity {
     static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     static final String PREF_DISTANCE_RUN = "distRun";
     static final String PREF_DISTANCE_TOTAL = "distTotal";
+    static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     
@@ -147,12 +149,16 @@ public final class WigleAndroid extends Activity {
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     
-    /** XXX: switch to using the service */
+    /** cross-activity communication */
+    public static class TrailStat {
+      public int newForRun = 0;
+      public int newForDB = 0;
+    }
     public static class LameStatic {
       public Location location; 
       public String savedStats;
-      public ConcurrentLinkedHashMap<GeoPoint,Integer> trail = 
-        new ConcurrentLinkedHashMap<GeoPoint,Integer>( 512 );
+      public ConcurrentLinkedHashMap<GeoPoint,TrailStat> trail = 
+        new ConcurrentLinkedHashMap<GeoPoint,TrailStat>( 512 );
       public int runNets;
       public long newNets;
       public int currNets;
@@ -568,6 +574,7 @@ public final class WigleAndroid extends Activity {
       edit.commit();
       
       // wifi scan listener
+      // this receiver is the main workhorse of the entire app
       wifiReceiver = new BroadcastReceiver(){
           public void onReceive( final Context context, final Intent intent ){
             final long start = System.currentTimeMillis();
@@ -656,14 +663,14 @@ public final class WigleAndroid extends Activity {
 
             // check if there are more "New" nets
             final long newNetCount = dbHelper.getNewNetworkCount();
-            final boolean newNet = newNetCount > prevNewNetCount;
+            final long newNetDiff = newNetCount - prevNewNetCount;
             prevNewNetCount = newNetCount;
             
             
             if ( ! isMuted() ) {
               final boolean playRun = prefs.getBoolean( PREF_FOUND_SOUND, true );
               final boolean playNew = prefs.getBoolean( PREF_FOUND_NEW_SOUND, true );
-              if ( newNet && playNew ) {
+              if ( newNetDiff > 0 && playNew ) {
                 if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
                   // play sound on something new
                   soundNewPop.start();
@@ -702,16 +709,30 @@ public final class WigleAndroid extends Activity {
             WigleAndroid.lameStatic.newNets = newNetCount;
             WigleAndroid.lameStatic.currNets = resultSize;
             WigleAndroid.lameStatic.preQueueSize = preQueueSize;
-            if ( newForRun > 0 && location != null ) {
-              final GeoPoint geoPoint = new GeoPoint( location );
-              Integer points = lameStatic.trail.get( geoPoint );
-              if ( points == null ) {
-                points = newForRun;
+            
+            if ( newForRun > 0 ) {
+              if ( location == null ) {
+                // save for later
+                pendingCount += newForRun;
               }
               else {
-                points += newForRun;
+                final GeoPoint geoPoint = new GeoPoint( location );
+                TrailStat trailStat = lameStatic.trail.get( geoPoint );
+                if ( trailStat == null ) {
+                  trailStat = new TrailStat();
+                  lameStatic.trail.put( geoPoint, trailStat );
+                }
+                trailStat.newForRun += newForRun;
+                trailStat.newForDB += newNetDiff;
+                
+                // add any pendings
+                // don't go crazy
+                if ( pendingCount > 25 ) {
+                  pendingCount = 25;
+                }
+                trailStat.newForRun += pendingCount;
+                pendingCount = 0;
               }
-              lameStatic.trail.put( geoPoint, points );
             }
             
             // info( savedStats );

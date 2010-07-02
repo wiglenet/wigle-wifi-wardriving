@@ -6,6 +6,8 @@ import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.views.OpenStreetMapViewController;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -23,11 +25,13 @@ public final class MappingActivity extends Activity {
   private Handler timer;
   private AtomicBoolean finishing;
   private boolean locked = true;
+  private boolean firstMove = true;
   
   private static final int MENU_RETURN = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;
   private static final int MENU_TOGGLE_LOCK = 15;
+  private static final int MENU_TOGGLE_NEWDB = 16;
   
   /** Called when the activity is first created. */
   @Override
@@ -64,7 +68,13 @@ public final class MappingActivity extends Activity {
               if ( location != null && locked ) {
                 // WigleAndroid.info( "mapping center location: " + location );
 								final GeoPoint locGeoPoint = new GeoPoint( location );
-                mapControl.animateTo( locGeoPoint );
+								if ( firstMove ) {
+								  mapControl.setCenter( locGeoPoint );
+								  firstMove = false;
+								}
+								else {
+								  mapControl.animateTo( locGeoPoint );
+								}
               }
               final String savedStats = WigleAndroid.lameStatic.savedStats;
               if ( savedStats != null ) {
@@ -114,8 +124,16 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_RETURN, 0, "Return");
       item.setIcon( android.R.drawable.ic_media_previous );
       
-      item = menu.add(0, MENU_TOGGLE_LOCK, 0, "Toggle Lock-on");
+      String name = locked ? "Turn Off Lockon" : "Turn On Lockon";
+      item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
       item.setIcon( android.R.drawable.ic_menu_mapmode );
+      
+      final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
+      final boolean showNewDBOnly = prefs.getBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, false );
+      String nameDB = showNewDBOnly ? "Show Run&New" : "Show New Only";
+      item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
+      item.setIcon( android.R.drawable.ic_menu_edit );
+      
       
       return true;
   }
@@ -124,9 +142,10 @@ public final class MappingActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
-        case MENU_RETURN:
+        case MENU_RETURN: {
           finish();
           return true;
+        }
         case MENU_ZOOM_IN: {
           int zoom = mapView.getZoomLevel();
           zoom++;
@@ -139,9 +158,23 @@ public final class MappingActivity extends Activity {
           mapControl.setZoom( zoom );
           return true;
         }
-        case MENU_TOGGLE_LOCK:
+        case MENU_TOGGLE_LOCK: {
           locked = ! locked;
+          String name = locked ? "Turn Off Lock-on" : "Turn On Lock-on";
+          item.setTitle( name );
           return true;
+        }
+        case MENU_TOGGLE_NEWDB: {
+          final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
+          final boolean showNewDBOnly = ! prefs.getBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, false );
+          Editor edit = prefs.edit();
+          edit.putBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
+          edit.commit();
+          
+          String name = showNewDBOnly ? "Show Run&New" : "Show New Only";
+          item.setTitle( name );
+          return true;
+        }
       }
       return false;
   }

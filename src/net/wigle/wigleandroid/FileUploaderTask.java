@@ -79,7 +79,8 @@ public final class FileUploaderTask extends Thread {
     this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false );  
     
     this.handler = new Handler() {
-            private String msg_text = "";
+      private String msg_text = "";
+      
       @Override
       public void handleMessage( final Message msg ) {
         if ( msg.what >= WRITING_PERCENT_START ) {
@@ -91,15 +92,15 @@ public final class FileUploaderTask extends Thread {
         
         final Status status = Status.values()[ msg.what ];
         if ( Status.UPLOADING.equals( status ) ) {
-            //          pd.setMessage( status.getMessage() );
-            msg_text = status.getMessage();
-            pd.setProgress(0);
-            return;
+          //          pd.setMessage( status.getMessage() );
+          msg_text = status.getMessage();
+          pd.setProgress(0);
+          return;
         }
         if ( Status.WRITING.equals( status ) ) {
-            msg_text = status.getMessage();
-            pd.setProgress(0);
-            return;
+          msg_text = status.getMessage();
+          pd.setProgress(0);
+          return;
         }
         // make sure we didn't progress dialog this somewhere
         if ( pd.isShowing() ) {
@@ -374,11 +375,15 @@ public final class FileUploaderTask extends Thread {
         status = Status.BAD_LOGIN;
       }
       else {
-          if ( response != null && response.trim().equals( "" ) ) {
-              WigleAndroid.error("fail: no response from server" );
-          } else {
-              WigleAndroid.error("fail: " + response );
-          }
+        String error = null;
+        if ( response != null && response.trim().equals( "" ) ) {
+          error = "fail: no response from server";
+        } 
+        else {
+          error = "fail: " + response;
+        }
+        WigleAndroid.error( error );
+        bundle.putString( ERROR, error );
         status = Status.FAIL;
       }
     } 

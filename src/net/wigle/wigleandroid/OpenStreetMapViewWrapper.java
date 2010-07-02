@@ -47,7 +47,7 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     trailPaint.setColor( Color.argb( 128, 200, 128, 200 ) );
     trailPaint.setStyle( Style.FILL );
     
-    trailBackPaint.setColor( Color.argb( 128, 244, 150, 150 ) );
+    trailBackPaint.setColor( Color.argb( 128, 224, 224, 224 ) );
     trailBackPaint.setStyle( Style.STROKE );
     trailBackPaint.setStrokeWidth( 2f );
   }

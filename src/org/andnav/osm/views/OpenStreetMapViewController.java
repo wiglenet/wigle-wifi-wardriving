@@ -4,29 +4,22 @@ package org.andnav.osm.views;
 import org.andnav.osm.util.BoundingBoxE6;
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.util.Point;
-import org.andnav.osm.views.OpenStreetMapView.Scaler;
 import org.andnav.osm.views.util.Mercator;
 import org.andnav.osm.views.util.MyMath;
 import org.andnav.osm.views.util.constants.MathConstants;
+import org.andnav.osm.views.util.constants.OpenStreetMapViewConstants;
 
 /**
  * 
  * @author Nicolas Gramlich
  * TODO use same interface as google maps controller
  */
-public class OpenStreetMapViewController {
+public class OpenStreetMapViewController implements OpenStreetMapViewConstants {
+	
 	// ===========================================================
 	// Constants
 	// ===========================================================
 	
-	public static final int ANIMATION_SMOOTHNESS_LOW = 4;
-	public static final int ANIMATION_SMOOTHNESS_DEFAULT = 10;
-	public static final int ANIMATION_SMOOTHNESS_HIGH = 20;		
-
-	public static final int ANIMATION_DURATION_SHORT = 500;
-	public static final int ANIMATION_DURATION_DEFAULT = 1000;
-	public static final int ANIMATION_DURATION_LONG = 2000;
-
 	// ===========================================================
 	// Fields
 	// ===========================================================
@@ -89,7 +82,7 @@ public class OpenStreetMapViewController {
 		final int y = mOsmv.getScrollY();
 		final Point p = Mercator.projectGeoPoint(point, this.mOsmv.getPixelZoomLevel(), null);
 		final int worldSize_2 = this.mOsmv.getWorldSizePx()/2;
-		mOsmv.mScroller.startScroll(x, y, p.x - worldSize_2 - x, p.y - worldSize_2 - y, ANIMATION_DURATION_DEFAULT);
+		mOsmv.getScroller().startScroll(x, y, p.x - worldSize_2 - x, p.y - worldSize_2 - y, ANIMATION_DURATION_DEFAULT);
 		mOsmv.postInvalidate();
 	}
 	
@@ -190,20 +183,7 @@ public class OpenStreetMapViewController {
 	 * Zoom in by one zoom level.
 	 */
 	public boolean zoomIn() {
-
-		if (mOsmv.canZoomIn()) {
-			final Scaler scaler = mOsmv.mScaler;
-			if (scaler.isFinished()) {
-				scaler.startScale(1.0f, 2.0f, ANIMATION_DURATION_SHORT);
-				mOsmv.postInvalidate();
-			} else {
-				scaler.extendDuration(ANIMATION_DURATION_SHORT);
-				scaler.setFinalScale(scaler.getFinalScale() * 2.0f);
-			}
-			return true;
-		} else {
-			return false;
-		}
+		return mOsmv.zoomIn();
 	}
 	
 	public boolean zoomInFixing(int xPixel, int yPixel) {
@@ -215,20 +195,7 @@ public class OpenStreetMapViewController {
 	 * Zoom out by one zoom level.
 	 */
 	public boolean zoomOut() {
-
-		if (mOsmv.canZoomOut()) {
-			final Scaler scaler = mOsmv.mScaler;
-			if (scaler.isFinished()) {
-				scaler.startScale(1.0f, 0.5f, ANIMATION_DURATION_SHORT);
-				mOsmv.postInvalidate();
-			} else {
-				scaler.extendDuration(ANIMATION_DURATION_SHORT);
-				scaler.setFinalScale(scaler.getFinalScale() * 0.5f);
-			}
-			return true;
-		} else {
-			return false;
-		}
+		return mOsmv.zoomOut();
 	}
 
 	public boolean zoomOutFixing(int xPixel, int yPixel) {
@@ -236,14 +203,6 @@ public class OpenStreetMapViewController {
 		return zoomOut();
 	}
 
-	// TODO what is this method supposed to do?
-	void onScalingFinished() {
-	}
-	
-	// TODO what is this method supposed to do?
-	void onScrollingFinished() {
-	}
-	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================

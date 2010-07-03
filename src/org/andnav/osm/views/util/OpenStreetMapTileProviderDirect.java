@@ -1,5 +1,6 @@
 package org.andnav.osm.views.util;
 
+import org.andnav.osm.tileprovider.CloudmadeException;
 import org.andnav.osm.tileprovider.IOpenStreetMapTileProviderCallback;
 import org.andnav.osm.tileprovider.OpenStreetMapTile;
 import org.andnav.osm.tileprovider.OpenStreetMapTileFilesystemProvider;
@@ -14,10 +15,12 @@ public class OpenStreetMapTileProviderDirect extends OpenStreetMapTileProvider i
 	private static final Logger logger = LoggerFactory.getLogger(OpenStreetMapTileProviderDirect.class);
 	
 	private final OpenStreetMapTileFilesystemProvider mFileSystemProvider;
+	private final String mCloudmadeKey;
 
-	public OpenStreetMapTileProviderDirect(final Handler pDownloadFinishedListener) {
+	public OpenStreetMapTileProviderDirect(final Handler pDownloadFinishedListener, final String aCloudmadeKey) {
 		super(pDownloadFinishedListener);
 		mFileSystemProvider = new OpenStreetMapTileFilesystemProvider(this);
+		mCloudmadeKey = aCloudmadeKey;
 	}
 
 	@Override
@@ -36,5 +39,13 @@ public class OpenStreetMapTileProviderDirect extends OpenStreetMapTileProvider i
 			mFileSystemProvider.loadMapTileAsync(pTile);
 			return null;
 		}
+	}
+
+	@Override
+	public String getCloudmadeKey() throws CloudmadeException {
+		if (mCloudmadeKey == null || mCloudmadeKey.length() == 0) {
+			throw new CloudmadeException("Error getting Cloudmade key");
+		}
+		return mCloudmadeKey;
 	}
 }

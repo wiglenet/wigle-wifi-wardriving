@@ -1,12 +1,12 @@
 // Created by plusminus on 17:45:56 - 25.09.2008
 package org.andnav.osm.views;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.andnav.osm.DefaultResourceProxyImpl;
 import org.andnav.osm.ResourceProxy;
+import org.andnav.osm.tileprovider.util.CloudmadeUtil;
 import org.andnav.osm.util.BoundingBoxE6;
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.views.overlay.OpenStreetMapTilesOverlay;
@@ -16,27 +16,28 @@ import org.andnav.osm.views.util.Mercator;
 import org.andnav.osm.views.util.OpenStreetMapRendererInfo;
 import org.andnav.osm.views.util.OpenStreetMapTileProvider;
 import org.andnav.osm.views.util.constants.OpenStreetMapViewConstants;
+import org.metalev.multitouch.controller.MultiTouchController;
+import org.metalev.multitouch.controller.MultiTouchController.MultiTouchObjectCanvas;
+import org.metalev.multitouch.controller.MultiTouchController.PointInfo;
+import org.metalev.multitouch.controller.MultiTouchController.PositionAndScale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.Bitmap.Config;
-import android.graphics.Paint.Style;
 import android.util.AttributeSet;
-import android.util.FloatMath;
 import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
@@ -44,7 +45,7 @@ import android.widget.Scroller;
 import net.wigle.wigleandroid.ZoomButtonsController;
 import net.wigle.wigleandroid.ZoomButtonsController.OnZoomListener;
 
-public class OpenStreetMapView extends View implements OpenStreetMapViewConstants {
+public class OpenStreetMapView extends View implements OpenStreetMapViewConstants, MultiTouchObjectCanvas<Object> {
 
 	// ===========================================================
 	// Constants
@@ -57,59 +58,34 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	final static String BUNDLE_SCROLL_X = "org.andnav.osm.views.OpenStreetMapView.SCROLL_X";
 	final static String BUNDLE_SCROLL_Y = "org.andnav.osm.views.OpenStreetMapView.SCROLL_Y";
 	final static String BUNDLE_ZOOM_LEVEL = "org.andnav.osm.views.OpenStreetMapView.ZOOM";
-
-	private static final int MULTI_NONE = 0;
-	private static final int MULTI_ACTIVE = 1;
-	private static final int MULTI_HANDLED = 2;
-
-	private float mPointerDownDistance; /* distance for a ACTION_POINTER_DOWN MotionEvent */
-	private int mMultiMode = MULTI_NONE;  /* if we are in after an ACTION_POINTER_DOWN */
-
-	// get API level 5 MotionEvent constants by reflection
-	// TODO can remove this stuff if we upgrade to API level 5
-	private static int ACTION_MASK = 255;
-	private static int ACTION_POINTER_DOWN = 5;
-	private static int ACTION_POINTER_UP = 6;
-	private static Method MotionEvent_getX;
-	private static Method MotionEvent_getY;
-	static {
-		final MotionEvent me = MotionEvent.obtain(0, 0, 0, 0f, 0f, 0);
-		try {
-			ACTION_MASK = MotionEvent.class.getField("ACTION_MASK").getInt(me);
-		} catch (final Exception e) {}
-		try {
-			ACTION_POINTER_DOWN = MotionEvent.class.getField("ACTION_POINTER_DOWN").getInt(me);
-		} catch (final Exception e) {}
-		try {
-			ACTION_POINTER_UP = MotionEvent.class.getField("ACTION_POINTER_UP").getInt(me);
-		} catch (final Exception e) {}
-		try {
-			MotionEvent_getX = MotionEvent.class.getMethod("getX", new Class[] { int.class });
-		} catch (final Exception e) {}
-		try {
-			MotionEvent_getY = MotionEvent.class.getMethod("getY", new Class[] { int.class });
-		} catch (final Exception e) {}
-	}
+	
+	private static final double ZOOM_SENSITIVITY = 1.3;
+	private static final double ZOOM_LOG_BASE_INV = 1.0 / Math.log(2.0 / ZOOM_SENSITIVITY);
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
 
-	protected int mZoomLevel = 0;								/** Current zoom level for map tiles */
-	protected final List<OpenStreetMapViewOverlay> mOverlays = new ArrayList<OpenStreetMapViewOverlay>();
+	/** Current zoom level for map tiles */
+	private int mZoomLevel = 0;
+	private int mBaseZoomLevel = mZoomLevel;
+	
+	/** The zoom level to set in view when the zoom animation has finished */
+	private int mTargetZoomLevel = mZoomLevel;
 
-	protected Bitmap mBackBuffer;
-	protected Canvas mBackCanvas;
-	protected Matrix mTrans = new Matrix();
-	protected final Paint mPaint = new Paint();
+	private final List<OpenStreetMapViewOverlay> mOverlays = new ArrayList<OpenStreetMapViewOverlay>();
+
+	private final Paint mPaint = new Paint();
 	private OpenStreetMapViewProjection mProjection;
 
 	private OpenStreetMapView mMiniMap, mMaxiMap;
 	private final OpenStreetMapTilesOverlay mMapOverlay;
 
 	private final GestureDetector mGestureDetector = new GestureDetector(new OpenStreetMapViewGestureDetectorListener());
-	final Scroller mScroller;							/** Handles map scrolling */
-	final Scaler mScaler;
+	
+	/** Handles map scrolling */
+	private final Scroller mScroller;							
+	private final Scaler mScaler;
 	private OpenStreetMapViewController mController;
 	private int mMiniMapOverriddenVisibility = NOT_SET;
 	private int mMiniMapZoomDiff = NOT_SET;
@@ -119,29 +95,55 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 	private ResourceProxy mResourceProxy;
 
+	private MultiTouchController<Object> mMultiTouchController;
+	private float mRelativeScale = 1.0f;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	private OpenStreetMapView(final Context context, AttributeSet attrs,
-			final OpenStreetMapRendererInfo aRendererInfo,
-			final OpenStreetMapTileProvider aTileProvider) {
+	private OpenStreetMapView(
+			final Context context, 
+			final AttributeSet attrs,
+			final OpenStreetMapRendererInfo rendererInfo,
+			final OpenStreetMapTileProvider tileProvider) {
 		super(context, attrs);
 		mResourceProxy = new DefaultResourceProxyImpl(context);
 		this.mController = new OpenStreetMapViewController(this);
 		this.mScroller = new Scroller(context);
 		this.mScaler = new Scaler(context, new LinearInterpolator());
-		this.mMapOverlay = new OpenStreetMapTilesOverlay(this, aRendererInfo, aTileProvider, mResourceProxy);
+		this.mMapOverlay = new OpenStreetMapTilesOverlay(this, getRendererInfo(rendererInfo, attrs), tileProvider, getCloudmadeKey(context), mResourceProxy);
 		mOverlays.add(this.mMapOverlay);
 		this.mZoomController = new ZoomButtonsController(this);
 		this.mZoomController.setOnZoomListener(new OpenStreetMapViewZoomListener());
 	}
 
+	private OpenStreetMapRendererInfo getRendererInfo(final OpenStreetMapRendererInfo rendererInfo, final AttributeSet attrs) {
+		if (rendererInfo != null) {
+			logger.info("Using renderer specified in constructor: " + rendererInfo);
+			return rendererInfo;
+		}
+
+		final String renderer = attrs.getAttributeValue(null, "renderer");
+		if (renderer != null) {
+			try {
+				final OpenStreetMapRendererInfo r = OpenStreetMapRendererInfo.valueOf(renderer);
+				logger.info("Using renderer specified in layout attributes: " + r);
+				return r;
+			} catch (final IllegalArgumentException e) {
+				logger.warn("Invalid renderer specified in layout attributes: " + renderer);
+			}
+		}
+
+		logger.info("Using default renderer : " + DEFAULTRENDERER);
+		return DEFAULTRENDERER;
+	}
+	
 	/**
 	 * Constructor used by XML layout resource (uses default renderer).
 	 */
-	public OpenStreetMapView(Context context, AttributeSet attrs) {
-		this(context, attrs, DEFAULTRENDERER, null);
+	public OpenStreetMapView(Context context, AttributeSet attrs) {		
+		this(context, attrs, null, null);
 	}
 
 	/**
@@ -161,7 +163,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	 * @param context
 	 */
 	public OpenStreetMapView(final Context context) {
-		this(context, null, DEFAULTRENDERER, null);
+		this(context, null, null, null);
 	}
 
 	/**
@@ -188,9 +190,9 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	/**
 	 * This MapView takes control of the {@link OpenStreetMapView} passed as
 	 * parameter.<br />
-	 * I.e. it zoomes it to x levels less than itself and centers it the same
+	 * I.e. it zooms it to x levels less than itself and centers it the same
 	 * coords.<br />
-	 * Its pretty usefull when the MiniMap uses the same TileProvider.
+	 * Its pretty useful when the MiniMap uses the same TileProvider.
 	 *
 	 * @see OpenStreetMapView.OpenStreetMapView(
 	 * @param aOsmvMinimap
@@ -244,7 +246,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		this.mMiniMapOverriddenVisibility = aVisiblity;
 	}
 
-	protected void setMaxiMap(final OpenStreetMapView aOsmvMaxiMap) {
+	private void setMaxiMap(final OpenStreetMapView aOsmvMaxiMap) {
 		this.mMaxiMap = aOsmvMaxiMap;
 	}
 
@@ -261,6 +263,10 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		return this.mOverlays;
 	}
 
+	public Scroller getScroller() {
+		return mScroller;
+	}
+	
 	public double getLatitudeSpan() {
 		return this.getDrawnBoundingBoxE6().getLongitudeSpanE6() / 1E6;
 	}
@@ -282,13 +288,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	}
 
 	public BoundingBoxE6 getVisibleBoundingBoxE6() {
-//		final ViewParent parent = this.getParent();
-//		if(parent instanceof RotateView){
-//			final RotateView par = (RotateView)parent;
-//			return getBoundingBox(par.getMeasuredWidth(), par.getMeasuredHeight());
-//		}else{
-			return getBoundingBox(this.getWidth(), this.getHeight());
-//		}
+		return getBoundingBox(this.getWidth(), this.getHeight());
 	}
 
 	private BoundingBoxE6 getBoundingBox(final int pViewWidth, final int pViewHeight){
@@ -312,19 +312,15 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		return mProjection;
 	}
 
-	public void setMapCenter(final GeoPoint aCenter) {
+	void setMapCenter(final GeoPoint aCenter) {
 		this.setMapCenter(aCenter.getLatitudeE6(), aCenter.getLongitudeE6());
 	}
-//
-//	public void setMapCenter(final double aLatitude, final double aLongitude) {
-//		this.setMapCenter((int) (aLatitude * 1E6), (int) (aLongitude * 1E6));
-//	}
-//
-	public void setMapCenter(final int aLatitudeE6, final int aLongitudeE6) {
+
+	void setMapCenter(final int aLatitudeE6, final int aLongitudeE6) {
 		this.setMapCenter(aLatitudeE6, aLongitudeE6, true);
 	}
 
-	protected void setMapCenter(final int aLatitudeE6, final int aLongitudeE6,
+	void setMapCenter(final int aLatitudeE6, final int aLongitudeE6,
 			final boolean doPassFurther) {
 		if (doPassFurther && this.mMiniMap != null)
 			this.mMiniMap.setMapCenter(aLatitudeE6, aLongitudeE6, false);
@@ -356,7 +352,19 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	 *            between 0 (equator) and 18/19(closest), depending on the
 	 *            Renderer chosen.
 	 */
-	protected int setZoomLevel(final int aZoomLevel) {
+	int setZoomLevel(final int aZoomLevel) {
+		int z = setZoomLevelMT(aZoomLevel);
+		resetMTZoom();
+		mTargetZoomLevel = z;
+		return z;
+	}
+	
+	private void resetMTZoom() {
+		mRelativeScale = 1.0f; // reset MT scale
+		this.mBaseZoomLevel = this.mZoomLevel + 1; // reset MT base zoom		
+	}
+
+	private int setZoomLevelMT(final int aZoomLevel) {
 		final int minZoomLevel = this.mMapOverlay.getRendererInfo().ZOOM_MINLEVEL;
 		final int maxZoomLevel = this.mMapOverlay.getRendererInfo().ZOOM_MAXLEVEL;
 		final int newZoomLevel = Math.max(minZoomLevel, Math.min(maxZoomLevel, aZoomLevel));
@@ -377,6 +385,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		}
 
 		this.mZoomLevel = newZoomLevel;
+		this.mTargetZoomLevel = newZoomLevel;
 		this.checkZoomButtons();
 
 		if(newZoomLevel > curZoomLevel)
@@ -385,7 +394,7 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 			scrollTo(getScrollX()>>(curZoomLevel-newZoomLevel), getScrollY()>>(curZoomLevel-newZoomLevel));
 
 		// TODO snap for all snappables
-		Point snapPoint = new Point();
+		final Point snapPoint = new Point();
 		mProjection = new OpenStreetMapViewProjection();
 		for (OpenStreetMapViewOverlay osmvo : this.mOverlays) {
 			if (osmvo instanceof Snappable &&
@@ -395,14 +404,15 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		}
 		return this.mZoomLevel;
 	}
-
+	
 	/**
 	 * Get the current ZoomLevel for the map tiles.
 	 * @return the current ZoomLevel between 0 (equator) and 18/19(closest),
 	 *         depending on the Renderer chosen.
 	 */
 	public int getZoomLevel() {
-		return this.mZoomLevel;
+		// return the current zoom level, even if we're still animating towards it
+		return mTargetZoomLevel;
 	}
 
 	/*
@@ -422,6 +432,48 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		return mZoomLevel > 0;
 	}
 	
+	/**
+	 * Zoom in by one zoom level.
+	 */
+	boolean zoomIn() {
+
+		if (canZoomIn()) {
+			if (mScaler.isFinished()) {
+				mTargetZoomLevel = mZoomLevel + 1;
+				mScaler.startScale(1.0f, 2.0f, ANIMATION_DURATION_SHORT);
+				postInvalidate();
+			} else {
+				mTargetZoomLevel++;
+				mScaler.extendDuration(ANIMATION_DURATION_SHORT);
+				mScaler.setFinalScale(mScaler.getFinalScale() * 2.0f);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Zoom out by one zoom level.
+	 */
+	boolean zoomOut() {
+
+		if (canZoomOut()) {
+			if (mScaler.isFinished()) {
+				mTargetZoomLevel = mZoomLevel - 1;
+				mScaler.startScale(1.0f, 0.5f, ANIMATION_DURATION_SHORT);
+				postInvalidate();
+			} else {
+				mTargetZoomLevel--;
+				mScaler.extendDuration(ANIMATION_DURATION_SHORT);
+				mScaler.setFinalScale(mScaler.getFinalScale() * 0.5f);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	public GeoPoint getMapCenter() {
 		return new GeoPoint(getMapCenterLatitudeE6(), getMapCenterLongitudeE6());
 	}
@@ -502,92 +554,50 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
-	  if ( DEBUGMODE )
+
 	    logger.debug("onTouchEvent(" + event + ")");
 
-		/*
-		 * handle multi touch events:
-		 * 1. mask out the action with the ACTION_MASK
-		 * 2. measure the spreading
-		 * 3. on ACTION_POINTER_DOWN remember the spreading in the
-		 *    pointerDownDistance and set multiDown mode to ACTIVE
-		 * 4. on first move changing the spreading by a
-		 *    factor of 2 or a factor of 0.5 increase or
-		 *    decrease the zoom level
-		 *    switch off multiDown mode and set it to HANDLED
-		 * 5. on ACTION_POINTER_UP also switch off the multiDown mode
-		 * 6. in any of these cases: claim the event handled and
-		 *    return true
-		 */
-		final int action = event.getAction() & ACTION_MASK;
-
-		if (action == ACTION_POINTER_DOWN) {
-			mPointerDownDistance = spreading(event);
-			mMultiMode = MULTI_ACTIVE;
-			return true;
-		} else if (action == ACTION_POINTER_UP) {
-			mMultiMode = MULTI_NONE;
-			return true;
-		} else if (mMultiMode != MULTI_NONE) {
-			if (mMultiMode == MULTI_ACTIVE && action == MotionEvent.ACTION_MOVE) {
-				final float pointerUpDistance = spreading(event);
-
-				if (pointerUpDistance > 2 * mPointerDownDistance) {
-					mMultiMode = MULTI_HANDLED;
-					setZoomLevel(mZoomLevel + 1);
-				} else if (pointerUpDistance < 0.5 * mPointerDownDistance) {
-					setZoomLevel(mZoomLevel - 1);
-					mMultiMode = MULTI_HANDLED;
-				}
+		for (final OpenStreetMapViewOverlay osmvo : this.mOverlays)
+			if (osmvo.onTouchEvent(event, this))
+			{
+			    logger.debug("overlay handled onTouchEvent");
+				return true;
 			}
+		
+		if (mMultiTouchController != null && mMultiTouchController.onTouchEvent(event)) {
+		    logger.debug("mMultiTouchController handled onTouchEvent");
 			return true;
 		}
 
-		for (OpenStreetMapViewOverlay osmvo : this.mOverlays)
-			if (osmvo.onTouchEvent(event, this))
-				return true;
-
-		if (this.mGestureDetector.onTouchEvent(event))
+		if (mGestureDetector.onTouchEvent(event)) {
+		    logger.debug("mGestureDetector handled onTouchEvent");
 			return true;
+		}
 
-		return super.onTouchEvent(event);
+		boolean r = super.onTouchEvent(event);
+		if (r) {
+			logger.debug("super handled onTouchEvent");
+		} else {
+			logger.debug("no-one handled onTouchEvent");
+		}
+		return r;
 	}
 
 	@Override
 	public void computeScroll() {
 		if (mScroller.computeScrollOffset()) {
-//			int oldX = getScrollX();
-//			int oldY = getScrollY();
-//			int x = mScroller.getCurrX();
-//			int y = mScroller.getCurrY();
-//			if (x != oldX || y != oldY)
 			if (mScroller.isFinished())
-				mController.onScrollingFinished();
+				setZoomLevel(mTargetZoomLevel);
 			else
 				scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
 			postInvalidate();	// Keep on drawing until the animation has finished.
 		}
 	}
 
-	private float spreading(final MotionEvent event) {
-		// TODO can do this directly if we upgrade to API level 5
-		try {
-			final float x0 = Float.valueOf(MotionEvent_getX.invoke(event, 0).toString());
-			final float x1 = Float.valueOf(MotionEvent_getX.invoke(event, 1).toString());
-			final float y0 = Float.valueOf(MotionEvent_getY.invoke(event, 0).toString());
-			final float y1 = Float.valueOf(MotionEvent_getY.invoke(event, 1).toString());
-			final float x = x0 - x1;
-			final float y = y0 - y1;
-			return FloatMath.sqrt(x * x + y * y);
-		} catch(final Exception e) {
-			return 1;
-		}
-	}
-
 	private void computeScale() {
 		if (mScaler.computeScale()) {
 			if (mScaler.isFinished())
-				mController.onScalingFinished();
+				setZoomLevel(mTargetZoomLevel);
 			else
 				postInvalidate();
 		}
@@ -599,19 +609,6 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 		x %= worldSize;
 		y %= worldSize;
 		super.scrollTo(x, y);
-	}
-
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		if(this.mBackBuffer != null) {
-			// XXX this doesn't seem to help - createBitmap can still get OOME 
-			this.mBackBuffer.recycle();
-			this.mBackBuffer = null;
-			// XXX perhaps adding a gc here will help
-		}
-		this.mBackBuffer = Bitmap.createBitmap(w, h, Config.ARGB_8888);
-		this.mBackCanvas = new Canvas(this.mBackBuffer);
-		super.onSizeChanged(w, h, oldw, oldh);
 	}
 
 	@Override
@@ -685,6 +682,14 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	// Methods
 	// ===========================================================
 
+	// NB: this method will be called even if we don't use Cloudmade
+	//     because we only have the context in the constructor
+	//     the alternative would be to only get it when needed, 
+	//     but that would mean keeping a handle on the context
+	private String getCloudmadeKey(final Context aContext) {
+		return CloudmadeUtil.getCloudmadeKey(aContext);
+	}
+
 	private void checkZoomButtons() {
 		this.mZoomController.setZoomInEnabled(canZoomIn());
 		this.mZoomController.setZoomOutEnabled(canZoomOut());
@@ -719,6 +724,10 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	public void setBuiltInZoomControls(boolean on) {
 		this.mEnableZoomController = on;
 		this.checkZoomButtons();
+	}
+
+	public void setMultiTouchControls(boolean on) {
+		mMultiTouchController = on ? new MultiTouchController<Object>(this, false) : null;
 	}
 
 	// ===========================================================
@@ -978,9 +987,10 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-			final int worldSize = getWorldSizePx();
-			mScroller.fling(getScrollX(), getScrollY(), (int)-velocityX, (int)-velocityY, -worldSize, worldSize, -worldSize, worldSize);
-			return true;
+//			final int worldSize = getWorldSizePx();
+//			mScroller.fling(getScrollX(), getScrollY(), (int)-velocityX, (int)-velocityY, -worldSize, worldSize, -worldSize, worldSize);
+//			return true;
+			return false;
 		}
 
 		@Override
@@ -1006,172 +1016,223 @@ public class OpenStreetMapView extends View implements OpenStreetMapViewConstant
 	}
 
 	private class OpenStreetMapViewZoomListener implements OnZoomListener {
-    	@Override
-    	public void onZoom(boolean zoomIn) {
-    		if(zoomIn) {
-    		  getController().setZoom( getZoomLevel() + 1 );
-    		}
-    		else {
-    		  getController().setZoom( getZoomLevel() - 1 );
-    		}
-    	}
-    	@Override
-    	public void onVisibilityChanged(boolean visible) {}
-    }
+		@Override
+		public void onZoom(boolean zoomIn) {
+			if(zoomIn)
+				getController().zoomIn();
+			else
+				getController().zoomOut();
+		}
+		@Override
+		public void onVisibilityChanged(boolean visible) {}
+	}
 
-	class Scaler {
+	private class Scaler {
 
-	    private float mStartScale;
-	    private float mFinalScale;
-	    private float mCurrScale;
+		private float mStartScale;
+		private float mFinalScale;
+		private float mCurrScale;
 
-	    private long mStartTime;
-	    private int mDuration;
-	    private float mDurationReciprocal;
-	    private float mDeltaScale;
-	    private boolean mFinished;
-	    private Interpolator mInterpolator;
+		private long mStartTime;
+		private int mDuration;
+		private float mDurationReciprocal;
+		private float mDeltaScale;
+		private boolean mFinished;
+		private Interpolator mInterpolator;
 
-	    /**
-	     * Create a Scaler with the specified interpolator.
-	     */
-	    public Scaler(Context context, Interpolator interpolator) {
-	        mFinished = true;
-	        mInterpolator = interpolator;
-	    }
+		/**
+		 * Create a Scaler with the specified interpolator.
+		 */
+		public Scaler(Context context, Interpolator interpolator) {
+			mFinished = true;
+			mInterpolator = interpolator;
+		}
 
-	    /**
-	     *
-	     * Returns whether the scaler has finished scaling.
-	     *
-	     * @return True if the scaler has finished scaling, false otherwise.
-	     */
-	    public final boolean isFinished() {
-	        return mFinished;
-	    }
+		/**
+		 *
+		 * Returns whether the scaler has finished scaling.
+		 *
+		 * @return True if the scaler has finished scaling, false otherwise.
+		 */
+		public final boolean isFinished() {
+			return mFinished;
+		}
 
-	    /**
-	     * Force the finished field to a particular value.
-	     *
-	     * @param finished The new finished value.
-	     */
-	    public final void forceFinished(boolean finished) {
-	        mFinished = finished;
-	    }
+		/**
+		 * Force the finished field to a particular value.
+		 *
+		 * @param finished The new finished value.
+		 */
+		public final void forceFinished(boolean finished) {
+			mFinished = finished;
+		}
 
-	    /**
-	     * Returns how long the scale event will take, in milliseconds.
-	     *
-	     * @return The duration of the scale in milliseconds.
-	     */
-	    public final int getDuration() {
-	        return mDuration;
-	    }
+		/**
+		 * Returns how long the scale event will take, in milliseconds.
+		 *
+		 * @return The duration of the scale in milliseconds.
+		 */
+		public final int getDuration() {
+			return mDuration;
+		}
 
-	    /**
-	     * Returns the current scale factor.
-	     *
-	     * @return The new scale factor.
-	     */
-	    public final float getCurrScale() {
-	        return mCurrScale;
-	    }
+		/**
+		 * Returns the current scale factor.
+		 *
+		 * @return The new scale factor.
+		 */
+		public final float getCurrScale() {
+			return mCurrScale;
+		}
 
-	    /**
-	     * Returns the start scale factor.
-	     *
-	     * @return The start scale factor.
-	     */
-	    public final float getStartScale() {
-	        return mStartScale;
-	    }
+		/**
+		 * Returns the start scale factor.
+		 *
+		 * @return The start scale factor.
+		 */
+		public final float getStartScale() {
+			return mStartScale;
+		}
 
-	    /**
-	     * Returns where the scale will end.
-	     *
-	     * @return The final scale factor.
-	     */
-	    public final float getFinalScale() {
-	        return mFinalScale;
-	    }
+		/**
+		 * Returns where the scale will end.
+		 *
+		 * @return The final scale factor.
+		 */
+		public final float getFinalScale() {
+			return mFinalScale;
+		}
 
-	    /**
-	     * Sets the final scale for this scaler.
-	     *
-	     * @param newScale The new scale factor.
-	     */
-	    public void setFinalScale(float newScale) {
+		/**
+		 * Sets the final scale for this scaler.
+		 *
+		 * @param newScale The new scale factor.
+		 */
+		public void setFinalScale(float newScale) {
 			mFinalScale = newScale;
 			mDeltaScale = mFinalScale - mStartScale;
-	        mFinished = false;
-	    }
+			mFinished = false;
+		}
 
 
 		/**
-	     * Call this when you want to know the new scale.  If it returns true,
-	     * the animation is not yet finished.
-	     */
-	    public boolean computeScale() {
-	        if (mFinished) {
-	        	mCurrScale = 1.0f;
-	            return false;
-	        }
+		 * Call this when you want to know the new scale.  If it returns true,
+		 * the animation is not yet finished.
+		 */
+		public boolean computeScale() {
+			if (mFinished) {
+				mCurrScale = 1.0f;
+				return false;
+			}
 
-	        int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+			int timePassed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
 
-	        if (timePassed < mDuration) {
-                float x = (float)timePassed * mDurationReciprocal;
+			if (timePassed < mDuration) {
+				float x = (float)timePassed * mDurationReciprocal;
 
-                x = mInterpolator.getInterpolation(x);
+				x = mInterpolator.getInterpolation(x);
 
-                mCurrScale = mStartScale + x * mDeltaScale;
-                if (mCurrScale == mFinalScale)
-                    mFinished = true;
+				mCurrScale = mStartScale + x * mDeltaScale;
+				if (mCurrScale == mFinalScale)
+					mFinished = true;
 
-	        } else {
-	            mCurrScale = mFinalScale;
-	            mFinished = true;
-	        }
-	        return true;
-	    }
+			} else {
+				mCurrScale = mFinalScale;
+				mFinished = true;
+			}
+			return true;
+		}
 
-	    /**
-	     * Start scaling by providing the starting scale and the final scale.
-	     *
-	     * @param startX Starting horizontal scroll offset in pixels. Positive
-	     *        numbers will scroll the content to the left.
-	     * @param startY Starting vertical scroll offset in pixels. Positive numbers
-	     *        will scroll the content up.
-	     * @param dx Horizontal distance to travel. Positive numbers will scroll the
-	     *        content to the left.
-	     * @param dy Vertical distance to travel. Positive numbers will scroll the
-	     *        content up.
-	     * @param duration Duration of the scroll in milliseconds.
-	     */
-	    public void startScale(float startScale, float finalScale, int duration) {
-	        mFinished = false;
-	        mDuration = duration;
-	        mStartTime = AnimationUtils.currentAnimationTimeMillis();
-	        mStartScale = startScale;
-	        mFinalScale = finalScale;
-	        mDeltaScale = finalScale - startScale;
-	        mDurationReciprocal = 1.0f / (float) mDuration;
-	    }
+		/**
+		 * Start scaling by providing the starting scale and the final scale.
+		 *
+		 * @param startX Starting horizontal scroll offset in pixels. Positive
+		 *        numbers will scroll the content to the left.
+		 * @param startY Starting vertical scroll offset in pixels. Positive numbers
+		 *        will scroll the content up.
+		 * @param dx Horizontal distance to travel. Positive numbers will scroll the
+		 *        content to the left.
+		 * @param dy Vertical distance to travel. Positive numbers will scroll the
+		 *        content up.
+		 * @param duration Duration of the scroll in milliseconds.
+		 */
+		public void startScale(float startScale, float finalScale, int duration) {
+			mFinished = false;
+			mDuration = duration;
+			mStartTime = AnimationUtils.currentAnimationTimeMillis();
+			mStartScale = startScale;
+			mFinalScale = finalScale;
+			mDeltaScale = finalScale - startScale;
+			mDurationReciprocal = 1.0f / (float) mDuration;
+		}
 
-	    /**
-	     * Extend the scale animation. This allows a running animation to scale
-	     * further and longer, when used with {@link #setFinalScale(float)}.
-	     *
-	     * @param extend Additional time to scale in milliseconds.
-	     * @see #setFinalScale(float)
-	     */
-	    public void extendDuration(int extend) {
-	        int passed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
-	        mDuration = passed + extend;
-	        mDurationReciprocal = 1.0f / (float)mDuration;
-	        mFinished = false;
-	    }
+		/**
+		 * Extend the scale animation. This allows a running animation to scale
+		 * further and longer, when used with {@link #setFinalScale(float)}.
+		 *
+		 * @param extend Additional time to scale in milliseconds.
+		 * @see #setFinalScale(float)
+		 */
+		public void extendDuration(int extend) {
+			int passed = (int)(AnimationUtils.currentAnimationTimeMillis() - mStartTime);
+			mDuration = passed + extend;
+			mDurationReciprocal = 1.0f / (float)mDuration;
+			mFinished = false;
+		}
 
 	}
 
+	// ===========================================================
+	// Implementation of MultiTouchObjectCanvas
+	// ===========================================================
+
+	@Override
+	public Object getDraggableObjectAtPoint(final PointInfo pt) {
+		return this;
+	}
+
+	@Override
+	public void getPositionAndScale(final Object obj, final PositionAndScale objPosAndScaleOut) {
+		objPosAndScaleOut.set(0, 0, true, mRelativeScale, false, 0, 0, false, 0);
+	}
+
+	@Override
+	public void selectObject(final Object obj, final PointInfo pt) {
+	}
+
+	@Override
+	public boolean setPositionAndScale(final Object obj, final PositionAndScale aNewObjPosAndScale, final PointInfo aTouchPoint) {
+		
+		// Get new relative scale
+		float newRelativeScale = aNewObjPosAndScale.getScale();
+
+		// Update map scale
+		float scaleDiff = (float) (Math.log(newRelativeScale) * ZOOM_LOG_BASE_INV);
+		int targetZoom = this.mBaseZoomLevel - 1 + (int) Math.round(scaleDiff);
+		if (targetZoom > this.mMapOverlay.getRendererInfo().ZOOM_MAXLEVEL) {
+			newRelativeScale = mRelativeScale;
+		}
+		if (targetZoom < 0) {
+			newRelativeScale = mRelativeScale;
+		}
+		
+		// Update relative scale
+		mRelativeScale = newRelativeScale;
+
+		// Move and zoom map
+		if (this.mZoomLevel > targetZoom) { // currZoom > targetZoom
+			if (canZoomOut())
+				this.setZoomLevelMT(this.mZoomLevel - 1);
+			else
+				return false; // zoom too low
+		}
+		if (this.mZoomLevel < targetZoom) { // currZoom < targetZoom
+			if (canZoomIn())
+				this.setZoomLevelMT(this.mZoomLevel + 1);
+			else
+				return false; // zoom too high
+		}
+		invalidate();
+		return true;
+	}
 }

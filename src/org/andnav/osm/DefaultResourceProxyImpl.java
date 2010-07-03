@@ -3,16 +3,20 @@ package org.andnav.osm;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
 public class DefaultResourceProxyImpl implements ResourceProxy {
 
+	private static final Logger logger = LoggerFactory.getLogger(DefaultResourceProxyImpl.class);
+	
 	private DisplayMetrics mDisplayMetrics;
 
 	/**
@@ -23,11 +27,8 @@ public class DefaultResourceProxyImpl implements ResourceProxy {
 	 */
 	public DefaultResourceProxyImpl(final Context pContext) {
 		if (pContext != null) {
-			mDisplayMetrics = new DisplayMetrics();
-			final WindowManager wm = (WindowManager) pContext.getSystemService(Context.WINDOW_SERVICE);
-			if (wm != null) {
-				wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-			}
+			mDisplayMetrics = pContext.getResources().getDisplayMetrics();
+			logger.debug("mDisplayMetrics=" + mDisplayMetrics);
 		}
 	}
 	
@@ -43,6 +44,7 @@ public class DefaultResourceProxyImpl implements ResourceProxy {
 		case hills : return "Hills";
 		case cloudmade_small : return "Cloudmade (small tiles)";
 		case cloudmade_standard : return "Cloudmade (Standard tiles)";
+		case cloudmade_alternative : return "Cloudmade (Alternative tiles)";
 		case unknown : return "Unknown";
 		default : throw new IllegalArgumentException();
 		}
@@ -56,15 +58,14 @@ public class DefaultResourceProxyImpl implements ResourceProxy {
 			if (is == null) {
 				throw new IllegalArgumentException();
 			}
-			
-//			if (mDisplayMetrics != null && ! Build.VERSION.RELEASE.equals("1.5") ) {
-//				final BitmapFactory.Options options = new BitmapFactory.Options();
-//				options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-//				options.inTargetDensity = mDisplayMetrics.densityDpi;
-//				return BitmapFactory.decodeStream(is, null, options);
-//			} else {
+			if (mDisplayMetrics != null) {
+				final BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
+				options.inTargetDensity = mDisplayMetrics.densityDpi;
+				return BitmapFactory.decodeStream(is, null, options);
+			} else {
 				return BitmapFactory.decodeStream(is);
-//			}
+			}
 		} finally {
 			if (is != null) {
 				try {

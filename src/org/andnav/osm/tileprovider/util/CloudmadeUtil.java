@@ -3,6 +3,7 @@ package org.andnav.osm.tileprovider.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 
 import org.andnav.osm.tileprovider.CloudmadeException;
 import org.apache.http.HttpResponse;
@@ -36,9 +37,16 @@ public class CloudmadeUtil {
 	 */
 	public static String getCloudmadeKey(final Context aContext) {
 
-		final ApplicationInfo info = aContext.getApplicationInfo();
+		ApplicationInfo info = null;
+		try {
+		  Method getAppInfo = Context.class.getMethod( "getApplicationInfo" );
+		  info = (ApplicationInfo) getAppInfo.invoke( aContext );
+		}
+		catch ( Exception ex ) {
+		  logger.info("getApplictionInfo not supported");
+		}
 
-		if (info.metaData != null) {
+		if (info != null && info.metaData != null) {
 			final String key = info.metaData.getString(CLOUDMADE_KEY);
 			if (key != null && key.trim().length() > 0) {
 				logger.info("Cloudmade key from info: " + key);
@@ -48,7 +56,7 @@ public class CloudmadeUtil {
 
 		final PackageManager pm = aContext.getPackageManager();
 		try {
-			final ApplicationInfo info2 = pm.getApplicationInfo(info.packageName, PackageManager.GET_META_DATA);
+			final ApplicationInfo info2 = pm.getApplicationInfo(aContext.getPackageName(), PackageManager.GET_META_DATA);
 			if (info2.metaData != null) {
 				final String key = info2.metaData.getString(CLOUDMADE_KEY);
 				if (key != null && key.trim().length() > 0) {

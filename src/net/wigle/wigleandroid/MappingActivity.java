@@ -50,6 +50,7 @@ public final class MappingActivity extends Activity {
   private void setupMapView() {
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapView.setBuiltInZoomControls( true );
+    mapView.setMultiTouchControls( true );
     mapControl = new OpenStreetMapViewController( mapView );
     mapControl.setCenter( new GeoPoint( 41950000, -87650000 ) );
     mapControl.setZoom( 15 );

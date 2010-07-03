@@ -2,6 +2,7 @@ package org.andnav.osm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +59,8 @@ public class DefaultResourceProxyImpl implements ResourceProxy {
 			if (is == null) {
 				throw new IllegalArgumentException();
 			}
-			if (mDisplayMetrics != null) {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inDensity = DisplayMetrics.DENSITY_DEFAULT;
-				options.inTargetDensity = mDisplayMetrics.densityDpi;
+			final BitmapFactory.Options options = getBitmapOptions();
+			if (mDisplayMetrics != null && options != null) {
 				return BitmapFactory.decodeStream(is, null, options);
 			} else {
 				return BitmapFactory.decodeStream(is);
@@ -74,6 +73,26 @@ public class DefaultResourceProxyImpl implements ResourceProxy {
 				}
 			}
 		}
+	}
+	
+	private BitmapFactory.Options getBitmapOptions() {
+	  BitmapFactory.Options options = null;
+	  try {
+  	  Field density = BitmapFactory.Options.class.getDeclaredField("DENSITY_DEFAULT");
+  	  Field inDensity = BitmapFactory.Options.class.getDeclaredField("inDensity");
+  	  Field inTargetDensity = BitmapFactory.Options.class.getDeclaredField("inTargetDensity");
+  	  Field targetDensity = DisplayMetrics.class.getDeclaredField("densityDpi");
+  	  options = new BitmapFactory.Options();
+      inDensity.setInt( options, density.getInt( null ) );
+      inTargetDensity.setInt( options, targetDensity.getInt( mDisplayMetrics ) );
+	  }
+	  catch ( IllegalAccessException ex ) {
+	    // ignore
+	  }
+    catch ( NoSuchFieldException ex ) {
+      // ignore
+    }
+    return options;
 	}
 
 	@Override

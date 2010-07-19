@@ -19,6 +19,7 @@
         android:layout_height="fill_parent"
         android:clickable="true"
         android:apiKey="Your Maps API Key"
+        renderer="MAPNIK"
     />
 
 </LinearLayout>

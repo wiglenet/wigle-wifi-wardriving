@@ -69,7 +69,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class WigleAndroid extends Activity {
+public final class WigleAndroid extends Activity implements FileUploaderListener {
     // state. anything added here should be added to the retain copy-construction
     private ArrayAdapter<Network> listAdapter;
     private Set<String> runNetworks;
@@ -81,6 +81,7 @@ public final class WigleAndroid extends Activity {
     private DatabaseHelper dbHelper;
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
+    private AtomicBoolean uploading;
     private String savedStats;
     private long prevNewNetCount;
     private Long satCountLowTime = 0L;
@@ -218,6 +219,7 @@ public final class WigleAndroid extends Activity {
           this.dbHelper = retained.dbHelper;
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
+          this.uploading = retained.uploading;
           this.savedStats = retained.savedStats;
           this.prevNewNetCount = retained.prevNewNetCount;
           this.soundPop = retained.soundPop;
@@ -230,6 +232,7 @@ public final class WigleAndroid extends Activity {
         else {
           runNetworks = new HashSet<String>();
           finishing = new AtomicBoolean( false );
+          uploading = new AtomicBoolean( false );
           
           // new run, reset
           final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
@@ -585,7 +588,7 @@ public final class WigleAndroid extends Activity {
             final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
             if ( period == 0 ) {
               // treat as "continuous", so request scan in here
-              wifiManager.startScan();
+              doWifiScan( wifiManager );
               nonstopScanRequestTime = System.currentTimeMillis();
             }
             
@@ -807,7 +810,7 @@ public final class WigleAndroid extends Activity {
               // make sure the app isn't trying to finish
               if ( ! finishing.get() ) {
                 // info( "timer start scan" );
-                wifiManager.startScan();
+                doWifiScan( wifiManager );
                 if ( scanRequestTime <= 0 ) {
                   scanRequestTime = System.currentTimeMillis();
                 }
@@ -829,12 +832,34 @@ public final class WigleAndroid extends Activity {
         wifiTimer.postDelayed( mUpdateTimeTask, 100 );
 
         // starts scan, sends event when done
-        final boolean scanOK = wifiManager.startScan();
+        final boolean scanOK = doWifiScan( wifiManager );
         if ( scanRequestTime <= 0 ) {
           scanRequestTime = System.currentTimeMillis();
         }
         info( "startup finished. wifi scanOK: " + scanOK );
       }
+    }
+    
+    /**
+     * FileUploaderListener interface
+     */
+    public void uploadComplete() {
+      uploading.set( false );
+      info( "uploading complete" );
+      // start a scan to get the ball rolling again if this is non-stop mode
+      final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+      doWifiScan( wifiManager );
+    }
+    
+    private boolean doWifiScan( WifiManager wifiManager ) {
+      boolean retval = false;
+      if ( uploading.get() ) {
+        info( "uploading, not scanning for now" );
+      }
+      else {
+        retval = wifiManager.startScan();
+      }
+      return retval;
     }
     
     private void speak( final String string ) {
@@ -1055,7 +1080,8 @@ public final class WigleAndroid extends Activity {
       final Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() {
           public void onClick( final View view ) {
-            uploadFile( WigleAndroid.this, dbHelper );
+            uploading.set( true );
+            uploadFile( dbHelper );
           }
         });
     }
@@ -1302,9 +1328,9 @@ public final class WigleAndroid extends Activity {
       return retval;
     }
     
-    private static void uploadFile( final Context context, final DatabaseHelper dbHelper ){
+    private void uploadFile( final DatabaseHelper dbHelper ){
       info( "upload file" );
-      final FileUploaderTask task = new FileUploaderTask( context, dbHelper );
+      final FileUploaderTask task = new FileUploaderTask( this, dbHelper, this );
       task.start();
     }
     

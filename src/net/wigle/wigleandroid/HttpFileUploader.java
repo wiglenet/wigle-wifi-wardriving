@@ -56,6 +56,7 @@ final class HttpFileUploader {
     final String twoHyphens = "--";
     final String boundary = "*****";
     String retval = null;
+    HttpURLConnection conn = null;
 
     try {
       //------------------ CLIENT REQUEST
@@ -67,8 +68,8 @@ final class HttpFileUploader {
       CharBuffer cbuff = CharBuffer.allocate( 1024 );
       ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
 
-      final HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
-    
+      conn = (HttpURLConnection) connectURL.openConnection();
+      
       // Allow Inputs
       conn.setDoInput(true);
       // Allow Outputs
@@ -79,14 +80,19 @@ final class HttpFileUploader {
       if ( conn instanceof javax.net.ssl.HttpsURLConnection ) {
           final SSLConfigurator con = SSLConfigurator.getInstance( res );
           con.configure( (javax.net.ssl.HttpsURLConnection) conn );
-          WigleAndroid.info("using ssl!");
+          WigleAndroid.info("using ssl! conn: " + conn);
       }
-    
+      
       // Use a post method.
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Connection", "Keep-Alive");
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
 
+      // connect
+      WigleAndroid.info( "about to connect" );
+      conn.connect();
+      WigleAndroid.info( "connected" );
+      
       WritableByteChannel wbc = Channels.newChannel( conn.getOutputStream() );
       
       StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
@@ -111,17 +117,16 @@ final class HttpFileUploader {
       if ( handler != null ) {
           handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
       }
-
     
       FileChannel fc = fileInputStream.getChannel();
       long byteswritten = fc.transferTo( 0, Integer.MAX_VALUE, wbc ); // transfer it all. the integer cap is reasonable.
-      WigleAndroid.info( "transferred "+byteswritten+" of "+filesize );
+      WigleAndroid.info( "transferred " + byteswritten + " of " + filesize );
       percentDone = ((int)byteswritten * 100) / (int)filesize;
 
       // only send it the once... if we want to to send updates out to the ui:
-      // hook on a wraper to the writeable byte channel, which of course would bugger the transfer() native call
+      // hook on a wrapper to the writeable byte channel, which of course would bugger the transfer() native call
       if ( handler != null ) {
-          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+        handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
       }
 
       // send multipart form data necesssary after file data...
@@ -135,6 +140,9 @@ final class HttpFileUploader {
       wbc.close();
       fc.close();
       fileInputStream.close();
+      
+      int responseCode = conn.getResponseCode();
+      WigleAndroid.info( "connection response code: " + responseCode );
     
       // this is dirty.  dirty.
       final InputStream is = conn.getInputStream();
@@ -149,10 +157,18 @@ final class HttpFileUploader {
       // WigleAndroid.debug( "Response: " + retval );
     }
     catch ( final MalformedURLException ex ) {
-      WigleAndroid.error( ex.toString() );
+      WigleAndroid.error( "HttpFileUploader: " + ex.toString() );
+      retval = ex.toString();
     }  
     catch ( final IOException ioe ) {
-      WigleAndroid.error( ioe.toString() );
+      WigleAndroid.error( "HttpFileUploader: " + ioe.toString() );
+      retval = ioe.toString();
+    }
+    finally {
+      if ( conn != null ) {
+        WigleAndroid.info( "conn disconnect" );
+        conn.disconnect();
+      }
     }
     
     return retval;

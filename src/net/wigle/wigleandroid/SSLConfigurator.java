@@ -101,8 +101,8 @@ public final class SSLConfigurator {
    * @param urlConn the HttpsURLConnection to set up
    */
   public void configure( final HttpsURLConnection urlConn ) {
-        urlConn.setSSLSocketFactory( ssf );
-        urlConn.setHostnameVerifier( hv );
+    urlConn.setSSLSocketFactory( ssf );
+    urlConn.setHostnameVerifier( hv );
   }
 
 
@@ -159,7 +159,9 @@ public final class SSLConfigurator {
        
        try {
            // is our expected cert part of the chain?
-           return Arrays.asList( session.getPeerCertificates() ).contains( cert );
+           boolean retval = Arrays.asList( session.getPeerCertificates() ).contains( cert );
+           WigleAndroid.info( "cert verify: " + retval );
+           return retval;
        } catch ( final SSLPeerUnverifiedException e ) {
            WigleAndroid.error( "hostname: '"+hostname+
                                "' dosen't match up with my WiGLE.net certificate. upgrade!\n"+

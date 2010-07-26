@@ -40,6 +40,7 @@ public final class FileUploaderTask extends Thread {
   private final Handler handler;
   private final DatabaseHelper dbHelper;
   private final ProgressDialog pd;
+  private final FileUploaderListener listener;
   
   static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
@@ -72,9 +73,20 @@ public final class FileUploaderTask extends Thread {
     }
   }
   
-  public FileUploaderTask( final Context context, final DatabaseHelper dbHelper ) {
+  public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener ) {
+    if ( context == null ) {
+      throw new IllegalArgumentException( "context is null" );
+    }
+    if ( dbHelper == null ) {
+      throw new IllegalArgumentException( "dbHelper is null" );
+    }
+    if ( listener == null ) {
+      throw new IllegalArgumentException( "listener is null" );
+    }
+    
     this.context = context;
     this.dbHelper = dbHelper;
+    this.listener = listener;
     
     this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false );  
     
@@ -135,6 +147,10 @@ public final class FileUploaderTask extends Thread {
     catch ( final Throwable throwable ) {
       WigleAndroid.writeError( Thread.currentThread(), throwable );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
+    }
+    finally {
+      // tell the listener
+      listener.uploadComplete();
     }
   }
   
@@ -341,7 +357,8 @@ public final class FileUploaderTask extends Thread {
       
       // don't upload empty files
       if ( lineCount == 0 ) {
-          return Status.EMPTY_FILE;
+// put this back on before release!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        return Status.EMPTY_FILE;
       }
       
       // show on the UI
@@ -349,7 +366,7 @@ public final class FileUploaderTask extends Thread {
 
       long filesize = file.length();
       if ( filesize <= 0 ) {
-          filesize = bytecount; // as an upper bound
+        filesize = bytecount; // as an upper bound
       }
 
       // send file
@@ -377,10 +394,10 @@ public final class FileUploaderTask extends Thread {
       else {
         String error = null;
         if ( response != null && response.trim().equals( "" ) ) {
-          error = "fail: no response from server";
+          error = "no response from server";
         } 
         else {
-          error = "fail: " + response;
+          error = "response: " + response;
         }
         WigleAndroid.error( error );
         bundle.putString( ERROR, error );

@@ -16,7 +16,9 @@ stop phone from sleeping on dashboard screen
 
 --- done ---
 * 1.12
+fix file upload error message on popup
 force update map draw when lockon is off
+keep config and centerpoint for map activity on a screen rotation
 
 * 1.11
 map target easier to see

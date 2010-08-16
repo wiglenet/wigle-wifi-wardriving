@@ -357,8 +357,7 @@ public final class FileUploaderTask extends Thread {
       
       // don't upload empty files
       if ( lineCount == 0 ) {
-// put this back on before release!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        return Status.EMPTY_FILE;
+        return Status.EMPTY_FILE;
       }
       
       // show on the UI

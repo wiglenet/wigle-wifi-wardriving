@@ -29,6 +29,7 @@ public final class MappingActivity extends Activity {
   private Location previousLocation;
   private int previousRunNets;
   
+  private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_RETURN = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;
@@ -45,18 +46,43 @@ public final class MappingActivity extends Activity {
     // media volume
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
     
-    setupMapView();
+    final Object stored = getLastNonConfigurationInstance();
+    GeoPoint oldCenter = null;
+    if ( stored != null && stored instanceof MappingActivity ) {
+      // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
+      final MappingActivity retained = (MappingActivity) stored;
+      this.locked = retained.locked;
+      this.firstMove = retained.firstMove;
+      oldCenter = retained.mapView.getMapCenter();
+    }
+    
+    setupMapView( oldCenter );
     setupTimer();
   }
   
-  private void setupMapView() {
+  @Override
+  public Object onRetainNonConfigurationInstance() {
+    WigleAndroid.info( "MappingActivity: onRetainNonConfigurationInstance" );
+    // return this whole class to copy data from
+    return this;
+  }
+  
+  private void setupMapView( final GeoPoint oldCenter ) {
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapView.setBuiltInZoomControls( true );
     mapView.setMultiTouchControls( true );
     mapControl = new OpenStreetMapViewController( mapView );
-    mapControl.setCenter( new GeoPoint( 41950000, -87650000 ) );
+    GeoPoint centerPoint = DEFAULT_POINT;
+    final Location location = WigleAndroid.lameStatic.location;
+    if ( oldCenter != null ) {
+      centerPoint = oldCenter;
+    }
+    else if ( location != null ) {
+      centerPoint = new GeoPoint( location );
+    }
+    mapControl.setCenter( centerPoint );
     mapControl.setZoom( 15 );
-    mapControl.setCenter( new GeoPoint( 41950000, -87650000 ) );
+    mapControl.setCenter( centerPoint );
     
     WigleAndroid.info("done setupMapView");
   }

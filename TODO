@@ -15,6 +15,9 @@ map directional indicator
 stop phone from sleeping on dashboard screen
 
 --- done ---
+* 1.12
+force update map draw when lockon is off
+
 * 1.11
 map target easier to see
 change sounds from wav to ogg to avoid snap sound after playing

@@ -26,6 +26,8 @@ public final class MappingActivity extends Activity {
   private AtomicBoolean finishing;
   private boolean locked = true;
   private boolean firstMove = true;
+  private Location previousLocation;
+  private int previousRunNets;
   
   private static final int MENU_RETURN = 12;
   private static final int MENU_ZOOM_IN = 13;
@@ -67,17 +69,27 @@ public final class MappingActivity extends Activity {
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
               final Location location = WigleAndroid.lameStatic.location;
-              if ( location != null && locked ) {
-                // WigleAndroid.info( "mapping center location: " + location );
-								final GeoPoint locGeoPoint = new GeoPoint( location );
-								if ( firstMove ) {
-								  mapControl.setCenter( locGeoPoint );
-								  firstMove = false;
-								}
-								else {
-								  mapControl.animateTo( locGeoPoint );
-								}
+              if ( location != null ) {
+                if ( locked ) {
+                  // WigleAndroid.info( "mapping center location: " + location );
+  								final GeoPoint locGeoPoint = new GeoPoint( location );
+  								if ( firstMove ) {
+  								  mapControl.setCenter( locGeoPoint );
+  								  firstMove = false;
+  								}
+  								else {
+  								  mapControl.animateTo( locGeoPoint );
+  								}
+                }
+                else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude() 
+                    || previousLocation.getLongitude() != location.getLongitude() 
+                    || previousRunNets != WigleAndroid.lameStatic.runNets) {
+                  // location or nets have changed, update the view
+                  mapView.postInvalidate();
+                }
               }
+              previousLocation = location;
+              previousRunNets = WigleAndroid.lameStatic.runNets;
               final String savedStats = WigleAndroid.lameStatic.savedStats;
               if ( savedStats != null ) {
                 final TextView tv = (TextView) findViewById( R.id.stats );

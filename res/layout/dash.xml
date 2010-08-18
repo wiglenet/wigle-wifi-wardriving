@@ -3,7 +3,8 @@
     android:id="@+id/mainlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true" >
     
 	<TextView
     android:layout_width="fill_parent" 

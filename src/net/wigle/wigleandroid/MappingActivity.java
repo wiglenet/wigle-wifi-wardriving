@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.views.OpenStreetMapViewController;
+import org.andnav.osm.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -28,6 +29,7 @@ public final class MappingActivity extends Activity {
   private boolean firstMove = true;
   private Location previousLocation;
   private int previousRunNets;
+  private MyLocationOverlay mMyLocationOverlay = null;
   
   private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_RETURN = 12;
@@ -68,9 +70,17 @@ public final class MappingActivity extends Activity {
   }
   
   private void setupMapView( final GeoPoint oldCenter ) {
+    // view
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapView.setBuiltInZoomControls( true );
     mapView.setMultiTouchControls( true );
+    
+    // my location overlay
+    mMyLocationOverlay = new MyLocationOverlay(this, mapView);
+    mMyLocationOverlay.setLocationUpdateMinTime( WigleAndroid.LOCATION_UPDATE_INTERVAL );
+    mapView.getOverlays().add(mMyLocationOverlay);
+    
+    // controller
     mapControl = new OpenStreetMapViewController( mapView );
     GeoPoint centerPoint = DEFAULT_POINT;
     final Location location = WigleAndroid.lameStatic.location;
@@ -150,6 +160,24 @@ public final class MappingActivity extends Activity {
     finishing.set( true );
     
     super.onDestroy();
+  }
+  
+  @Override
+  public void onPause() {
+    WigleAndroid.info( "pause mapping." );
+    mMyLocationOverlay.disableMyLocation();
+    mMyLocationOverlay.disableCompass();
+    
+    super.onPause();
+  }
+  
+  @Override
+  public void onResume() {
+    WigleAndroid.info( "resume mapping." );
+    mMyLocationOverlay.enableCompass();
+    mMyLocationOverlay.enableMyLocation();
+    
+    super.onResume();
   }
   
   /* Creates the menu items */

@@ -24,6 +24,8 @@ import java.util.Map;
  * Read more: http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html#ixzz0iqTJF7SV
  */
 final class HttpFileUploader {
+  private static final String WEB_ENCODING = "UTF-8";
+  
   /** don't allow construction */
   private HttpFileUploader(){
   }
@@ -46,10 +48,10 @@ final class HttpFileUploader {
     
     URL connectURL = null;
     try{
-      connectURL = new URL(urlString);
+      connectURL = new URL( urlString );
     }
     catch( Exception ex ){
-      WigleAndroid.error("MALFORMATED URL: " + ex);
+      WigleAndroid.error( "MALFORMATED URL: " + ex, ex );
     }
     
     final String lineEnd = "\r\n";
@@ -64,7 +66,7 @@ final class HttpFileUploader {
       WigleAndroid.info("Creating url connection");
 
       // Open a HTTP connection to the URL
-      CharsetEncoder enc = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
+      CharsetEncoder enc = Charset.forName( WEB_ENCODING ).newEncoder();
       CharBuffer cbuff = CharBuffer.allocate( 1024 );
       ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
 
@@ -97,7 +99,7 @@ final class HttpFileUploader {
       
       StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
       for ( Map.Entry<String, String> entry : params.entrySet() ) {
-        header.append( twoHyphens + boundary + lineEnd );
+        header.append( twoHyphens ).append( boundary ).append( lineEnd );
         header.append( "Content-Disposition: form-data; name=\""+ entry.getKey() + "\"" + lineEnd );
         header.append( lineEnd );
         header.append( entry.getValue() );
@@ -110,9 +112,10 @@ final class HttpFileUploader {
       header.append( "Content-Type: application/octet_stream" + lineEnd );
       header.append( lineEnd );
 
+      WigleAndroid.info( "About to write headers, length: " + header.length() );
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
-      WigleAndroid.info( "Headers are written ("+header.length()+")" );
+      WigleAndroid.info( "Headers are written, length: " + header.length() );
       int percentDone = ( (int)header.length() * 100) / (int)filesize;
       if ( handler != null ) {
           handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
@@ -157,11 +160,11 @@ final class HttpFileUploader {
       // WigleAndroid.debug( "Response: " + retval );
     }
     catch ( final MalformedURLException ex ) {
-      WigleAndroid.error( "HttpFileUploader: " + ex.toString() );
+      WigleAndroid.error( "HttpFileUploader: " + ex, ex );
       retval = ex.toString();
     }  
     catch ( final IOException ioe ) {
-      WigleAndroid.error( "HttpFileUploader: " + ioe.toString() );
+      WigleAndroid.error( "HttpFileUploader: " + ioe, ioe );
       retval = ioe.toString();
     }
     finally {
@@ -192,11 +195,13 @@ final class HttpFileUploader {
         cbuff.put( str );
         cbuff.flip(); 
 
-        if ( CoderResult.UNDERFLOW != enc.encode( cbuff, bbuff, true ) ) {
-            throw new IOException("encode fail");
+        CoderResult result = enc.encode( cbuff, bbuff, true );
+        if ( CoderResult.UNDERFLOW != result ) {
+            throw new IOException( "encode fail. result: " + result + " cbuff: " + cbuff + " bbuff: " + bbuff );
         }
-        if ( CoderResult.UNDERFLOW != enc.flush( bbuff ) ) {
-            throw new IOException("flush fail");
+        result = enc.flush( bbuff );
+        if ( CoderResult.UNDERFLOW != result ) {
+            throw new IOException( "flush fail. result: " + result + " bbuff: " + bbuff );
         }
         bbuff.flip();
 

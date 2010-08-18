@@ -136,9 +136,9 @@ public final class SSLConfigurator {
       hv = new ReflexiveHostnameVerifier( cert ); // XXX: make less dumb
       result = true;  
     } catch ( final IOException e ) {
-        WigleAndroid.error( "Cannot read cert file", e );
+        WigleAndroid.error( "Cannot read cert file: " + e, e );
     } catch ( final Throwable e) {
-        WigleAndroid.error( "error initializing", e );
+        WigleAndroid.error( "error initializing: " + e, e );
     }
     
     return result;
@@ -169,7 +169,7 @@ public final class SSLConfigurator {
        } catch ( final SSLPeerUnverifiedException e ) {
            WigleAndroid.error( "hostname: '"+hostname+
                                "' dosen't match up with my WiGLE.net certificate. upgrade!\n"+
-                               "or contact wigle-admin@wigle.net with this error:", e );
+                               "or contact wigle-admin@wigle.net with this error:" + e, e );
          return false;
        }
     }

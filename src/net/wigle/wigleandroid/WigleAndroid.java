@@ -145,6 +145,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
+    static final long LOCATION_UPDATE_INTERVAL = 1000L;
     
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
@@ -305,6 +306,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         this.unregisterReceiver( wifiReceiver );
       }
       catch ( final IllegalArgumentException ex ) {
+        // don't bother with trace on this
         info( "wifiReceiver not registered: " + ex );
       }
       // stop the service, so when we die it's both stopped and unbound and will die
@@ -314,6 +316,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         this.unbindService( serviceConnection );
       }
       catch ( final IllegalArgumentException ex ) {
+        // don't bother with trace on this
         info( "serviceConnection not registered: " + ex );
       }
       if ( wifiLock != null && wifiLock.isHeld() ) {
@@ -361,7 +364,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         this.unbindService( serviceConnection );
       }
       catch ( final IllegalArgumentException ex ) {
-        info( "serviceConnection not registered: " + ex );
+        info( "serviceConnection not registered: " + ex, ex );
       }    
       
       // release the lock before turning wifi off
@@ -904,7 +907,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         
       for ( String provider : providers ) {
         info( "provider: " + provider );
-        locationManager.requestLocationUpdates( provider, 1000L, 0, locationListener );
+        locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, locationListener );
       }
     }
     
@@ -1294,16 +1297,16 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
 
             return mp;
         } catch (IOException ex) {
-            error("ioe create failed:", ex);
+            error("ioe create failed: " + ex, ex);
             // fall through
         } catch (IllegalArgumentException ex) {
-            error("iae create failed:", ex);
+            error("iae create failed: " + ex, ex);
            // fall through
         } catch (SecurityException ex) {
-            error("se create failed:", ex);
+            error("se create failed: " + ex, ex);
             // fall through
         } catch ( Resources.NotFoundException ex ) {
-            error("rnfe create failed("+resid+"):", ex );
+            error("rnfe create failed("+resid+"): " + ex, ex );
         }
         return null;
     }
@@ -1355,8 +1358,11 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
 
+    public static void info( final String value, final Throwable t ) {
+      Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
+    }
     public static void error( final String value, final Throwable t ) {
-        Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
+      Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
     }
 
     /**
@@ -1370,7 +1376,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     public static void writeError( final Thread thread, final Throwable throwable ) {
       try {
         final String error = "Thread: " + thread + " throwable: " + throwable;
-        error( error );
+        error( error, throwable );
         if ( hasSD() ) {
           File file = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
           file.mkdirs();
@@ -1386,7 +1392,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         }
       }
       catch ( final Exception ex ) {
-        error( "error logging error: " + ex );
+        error( "error logging error: " + ex, ex );
         ex.printStackTrace();
       }
     }
@@ -1398,6 +1404,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       }
       catch ( final IOException ex ) {
         // ohwell
+        WigleAndroid.info( "no sd card apparently: " + ex, ex );
       }
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }

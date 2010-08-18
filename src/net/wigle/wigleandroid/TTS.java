@@ -104,13 +104,13 @@ public final class TTS {
         }
       }
       catch ( final NoSuchFieldException ex ) {
-        WigleAndroid.error( "no such field: " + ex );
+        WigleAndroid.error( "no such field: " + ex, ex );
       }
       catch ( final IllegalAccessException ex ) {
-        WigleAndroid.error( "illegal in static: " + ex );
+        WigleAndroid.error( "illegal in static: " + ex, ex );
       }
       catch ( final NoSuchMethodException ex ) {
-        WigleAndroid.error( "no such method: " + ex );
+        WigleAndroid.error( "no such method: " + ex, ex );
       }
     }
     
@@ -148,16 +148,16 @@ public final class TTS {
       }
     }
     catch ( final NoSuchMethodException ex ) {
-      WigleAndroid.error( "no such method: " + ex );
+      WigleAndroid.error( "no such method: " + ex, ex );
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex );
+      WigleAndroid.error( "illegal: " + ex, ex );
     }
     catch ( final InstantiationException ex ) {
-      WigleAndroid.error( "instantiation: " + ex );
+      WigleAndroid.error( "instantiation: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex );
+      WigleAndroid.error( "invocation: " + ex, ex );
     }
   }
 
@@ -187,9 +187,9 @@ public final class TTS {
       }
       //      WigleAndroid.info("should be talkin' english now");
     } catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "init illegal: " + ex );
+      WigleAndroid.error( "init illegal: " + ex, ex );
     } catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "init invocation: " + ex );
+      WigleAndroid.error( "init invocation: " + ex, ex );
     }
   }
   
@@ -203,10 +203,10 @@ public final class TTS {
       }
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex );
+      WigleAndroid.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex );
+      WigleAndroid.error( "invocation: " + ex, ex );
     }
   }
   
@@ -216,10 +216,10 @@ public final class TTS {
       shutdown.invoke( speech, (Object[])null );
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex );
+      WigleAndroid.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex );
+      WigleAndroid.error( "invocation: " + ex, ex );
     }
   }
 

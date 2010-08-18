@@ -178,7 +178,7 @@ public final class DatabaseHelper extends Thread {
         edit.commit();
       }
       catch ( final SQLiteException ex ) {
-        WigleAndroid.error( "sqlite exception: " + ex );
+        WigleAndroid.error( "sqlite exception: " + ex, ex );
       }
     }
   }

@@ -304,7 +304,7 @@ public final class FileUploaderTask extends Thread {
             charBuffer.append( NEWLINE );
           }
           catch ( BufferOverflowException ex ) {
-            WigleAndroid.info("buffer overflow: " + ex );
+            WigleAndroid.info("buffer overflow: " + ex, ex );
             // double the buffer
             charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
             byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
@@ -404,21 +404,20 @@ public final class FileUploaderTask extends Thread {
       }
     } 
     catch ( final FileNotFoundException e ) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
-      WigleAndroid.error( "file problem: " + e );
+      WigleAndroid.error( "file problem: " + e, e );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "file problem: " + e );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "io problem: " + ex );
+      WigleAndroid.error( "io problem: " + ex, ex );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "ex problem: " + ex );
+      WigleAndroid.error( "ex problem: " + ex, ex );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "ex problem: " + ex );
     }

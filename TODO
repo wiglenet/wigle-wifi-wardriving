@@ -11,14 +11,22 @@ minimap in dashboard? list of ssids?
 option for kml save for checking coverage back at home PC
 click on network to connect, with warning about legality
 network list sorting options
-map directional indicator
-stop phone from sleeping on dashboard screen
 
 --- done ---
+* 1.13
+file upload to UTF-8 encoding
+device will no longer go to sleep when on dashboard
+update osmdroid map library: 
+  adds compass
+  double-tap zoom
+  stops occasional npe
+  map directional indicator
+
 * 1.12
 fix file upload error message on popup
 force update map draw when lockon is off
 keep config and centerpoint for map activity on a screen rotation
+stop scanning when trying to upload
 
 * 1.11
 map target easier to see

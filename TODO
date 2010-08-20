@@ -13,6 +13,11 @@ click on network to connect, with warning about legality
 network list sorting options
 
 --- done ---
+* 1.14 (unreleased)
+back button acts like home instead of killing app
+tell user turning on/off wifi
+previous run distance on dashboard
+
 * 1.13
 file upload to UTF-8 encoding
 device will no longer go to sleep when on dashboard

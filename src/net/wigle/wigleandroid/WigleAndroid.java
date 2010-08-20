@@ -56,6 +56,7 @@ import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -142,6 +143,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     static final String PREF_DISTANCE_RUN = "distRun";
     static final String PREF_DISTANCE_TOTAL = "distTotal";
+    static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
@@ -237,8 +239,10 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           
           // new run, reset
           final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+          final float prevRun = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
           Editor edit = prefs.edit();
           edit.putFloat( PREF_DISTANCE_RUN, 0f );
+          edit.putFloat( PREF_DISTANCE_PREV_RUN, prevRun );
           edit.commit();
         }
         
@@ -252,14 +256,23 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           ((DecimalFormat) numberFormat8).setMaximumFractionDigits( 8 );
         }
         
+        info( "setupService" );
         setupService();
+        info( "setupDatabase" );
         setupDatabase();
+        info( "setupMaxidDebug" );
         setupMaxidDebug();
+        info( "setupUploadButton" );
         setupUploadButton();
+        info( "setupList" );
         setupList();
+        info( "setupSound" );
         setupSound();
+        info( "setupWifi" );
         setupWifi();
+        info( "setupLocation" );
         setupLocation();
+        info( "setup complete" );
     }
     
     @Override
@@ -297,6 +310,16 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     public void onRestart() {
       info( "restart. networks: " + runNetworks.size() );
       super.onRestart();
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+      if (keyCode == KeyEvent.KEYCODE_BACK) {
+        info( "onKeyDown: treating back like home, not quitting app" );
+        moveTaskToBack(true);
+        return true;
+      }
+      return super.onKeyDown(keyCode, event);
     }
     
     @Override
@@ -376,6 +399,9 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! inEmulator ) {
+        // tell user, cuz this takes a little while
+        Toast.makeText( this, "Turning WiFi back off", Toast.LENGTH_SHORT ).show();
+        
         // well turn it of now that we're done
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         info( "turning back off wifi" );
@@ -565,13 +591,21 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
       
+      // keep track of for later
+      boolean turnedWifiOn = false;
       if ( ! wifiManager.isWifiEnabled() ) {
+        // tell user, cuz this takes a little while
+        Toast.makeText( this, "Turning on WiFi", Toast.LENGTH_LONG ).show();
+        
         // save so we can turn it back off when we exit  
         edit.putBoolean( PREF_WIFI_WAS_OFF, true );
         
         // just turn it on, but not in emulator cuz it crashes it
         if ( ! inEmulator ) {
+          info( "turning on wifi");
           wifiManager.setWifiEnabled( true );
+          info( "wifi on");
+          turnedWifiOn = true;
         }
       }
       else {
@@ -579,6 +613,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       }
       edit.commit();
       
+      info( "new BroadcastReceiver");
       // wifi scan listener
       // this receiver is the main workhorse of the entire app
       wifiReceiver = new BroadcastReceiver(){
@@ -795,11 +830,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         };
       
       // register
+      info( "register BroadcastReceiver");
       final IntentFilter intentFilter = new IntentFilter();
       intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
       this.registerReceiver( wifiReceiver, intentFilter );
       
       if ( wifiLock == null ) {
+        info( "lock wifi radio on");
         // lock the radio on
         wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, WIFI_LOCK_NAME );
         wifiLock.acquire();
@@ -807,6 +844,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       
       // might not be null on a nonconfig retain
       if ( wifiTimer == null ) {
+        info( "create wifi timer" );
         wifiTimer = new Handler();
         final Runnable mUpdateTimeTask = new Runnable() {
           public void run() {              
@@ -834,12 +872,19 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         wifiTimer.removeCallbacks( mUpdateTimeTask );
         wifiTimer.postDelayed( mUpdateTimeTask, 100 );
 
-        // starts scan, sends event when done
-        final boolean scanOK = doWifiScan( wifiManager );
-        if ( scanRequestTime <= 0 ) {
-          scanRequestTime = System.currentTimeMillis();
+        if ( turnedWifiOn ) {
+          info( "not immediately running wifi scan, since it was just turned on"
+              + " it will block for a few seconds and fail anyway");
         }
-        info( "startup finished. wifi scanOK: " + scanOK );
+        else {
+          info( "start first wifi scan");
+          // starts scan, sends event when done
+          final boolean scanOK = doWifiScan( wifiManager );
+          if ( scanRequestTime <= 0 ) {
+            scanRequestTime = System.currentTimeMillis();
+          }
+          info( "startup finished. wifi scanOK: " + scanOK );
+        }
       }
     }
     

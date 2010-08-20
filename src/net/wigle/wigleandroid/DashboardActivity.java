@@ -75,6 +75,7 @@ public class DashboardActivity extends Activity {
     
     updateDist( R.id.rundist, WigleAndroid.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, WigleAndroid.PREF_DISTANCE_TOTAL, "Total Distance: " );
+    updateDist( R.id.prevrundist, WigleAndroid.PREF_DISTANCE_PREV_RUN, "Previous Run: " );
     
     tv = (TextView) findViewById( R.id.queuesize );
     tv.setText( "DB Queue: " + WigleAndroid.lameStatic.preQueueSize );
@@ -88,7 +89,7 @@ public class DashboardActivity extends Activity {
     tv.setText( "Loc: " + gpsStatus );
   }
   
-  private void updateDist( int id, String pref, String title ) {
+  private void updateDist( final int id, final String pref, final String title ) {
     final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
     
     float dist = prefs.getFloat( pref, 0f );

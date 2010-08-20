@@ -57,11 +57,19 @@
     android:id="@+id/totaldist"
     android:textSize="24sp"
     />
-
+    
 	<TextView
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:id="@+id/queuesize"
     android:textSize="24sp"
+    />
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/prevrundist"
+    android:textSize="24sp"
+    android:textColor="#909090"
     />
 </LinearLayout>

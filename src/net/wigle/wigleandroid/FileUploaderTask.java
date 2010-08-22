@@ -145,7 +145,7 @@ public final class FileUploaderTask extends Thread {
       doRun();
     }
     catch ( final Throwable throwable ) {
-      WigleAndroid.writeError( Thread.currentThread(), throwable );
+      WigleAndroid.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
     }
     finally {

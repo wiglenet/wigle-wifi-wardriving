@@ -5,6 +5,7 @@
     <string name="settings_app_name">WiGLE WiFi - Settings</string>
     <string name="mapping_app_name">WiGLE WiFi - Open Street Map</string>
     <string name="dashboard_app_name">WiGLE WiFi - Dashboard</string>
+    <string name="error_report_name">WiGLE WiFi - Most Recent Error Report</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>

@@ -140,7 +140,7 @@ public final class DatabaseHelper extends Thread {
       }
     }
     catch ( final Throwable throwable ) {
-      WigleAndroid.writeError( Thread.currentThread(), throwable );
+      WigleAndroid.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
   }

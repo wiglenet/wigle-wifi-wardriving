@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
@@ -29,6 +30,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 public final class SettingsActivity extends Activity {
   
   private static final int MENU_RETURN = 12;
+  private static final int MENU_ERROR_REPORT = 13;
   
   /** convenience, just get the darn new string */
   private static abstract class SetWatcher implements TextWatcher {
@@ -227,8 +229,12 @@ public final class SettingsActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      final MenuItem item = menu.add( 0, MENU_RETURN, 0, "Return" );
+      MenuItem item = menu.add( 0, MENU_RETURN, 0, "Return" );
       item.setIcon( android.R.drawable.ic_media_previous );
+      
+      item = menu.add( 0, MENU_ERROR_REPORT, 0, "Error Report" );
+      item.setIcon( android.R.drawable.ic_menu_report_image );
+      
       return true;
   }
 
@@ -239,6 +245,10 @@ public final class SettingsActivity extends Activity {
         case MENU_RETURN:
           finish();
           return true;
+        case MENU_ERROR_REPORT:
+          final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
+          this.startActivity( errorReportIntent );
+          break;
       }
       return false;
   }

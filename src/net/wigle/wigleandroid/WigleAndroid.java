@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.andnav.osm.util.GeoPoint;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,6 +36,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -39,6 +46,7 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.location.GpsStatus.Listener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -119,6 +127,8 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     private static final long GPS_TIMEOUT = 15000L;
     private static final long NET_LOC_TIMEOUT = 60000L;
     private static final float MIN_DISTANCE_ACCURACY = 32f;
+    static final String ERROR_STACK_FILENAME = "errorstack";
+    static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     
     // color by signal strength
     public static final int COLOR_1 = Color.rgb( 70, 170,  0);
@@ -196,19 +206,59 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         info( "id: '" + id + "' inEmulator: " + inEmulator + " product: " + android.os.Build.PRODUCT );
         info( "release: '" + Build.VERSION.RELEASE + "'" );
         
-//        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
-//          public void uncaughtException( Thread thread, Throwable throwable ) {
-//            String error = "Thread: " + thread + " throwable: " + throwable;
-//            WigleAndroid.error( error );
-//            throwable.printStackTrace();
-//            
-//            WigleAndroid.writeError( thread, throwable );
-//            
-//            // throw new RuntimeException( error, throwable );
-//            WigleAndroid.this.finish();
-//            System.exit( -1 );
-//          }
-//        });
+        // set up pending email intent to email stacktrace logs if needed
+        final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
+        errorReportIntent.putExtra( ERROR_REPORT_DO_EMAIL, true );
+        final PendingIntent pendingIntent = PendingIntent.getActivity(getBaseContext(), 0,
+            errorReportIntent, errorReportIntent.getFlags() );
+      
+        // do some of our own error handling, write a file with the stack
+        // todo: allow users to upload these stacks somewhere
+        final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
+        
+        Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
+          public void uncaughtException( Thread thread, Throwable throwable ) {
+            String error = "Thread: " + thread + " throwable: " + throwable;
+            WigleAndroid.error( error );
+            throwable.printStackTrace();
+            
+            WigleAndroid.writeError( thread, throwable, WigleAndroid.this );
+            
+            // this doesn't seem to work. maybe we can get an out-of-app context to use?
+//            Toast.makeText( WigleAndroid.this.getBaseContext(), "error: " + throwable, Toast.LENGTH_LONG ).show();
+            
+            // notification just blocks forever
+//            String ns = Context.NOTIFICATION_SERVICE;
+//            final NotificationManager notificationManager = (NotificationManager) getSystemService(ns);
+//            int icon = R.drawable.wiglewifi;
+//            CharSequence tickerText = "error: ";
+//            long when = System.currentTimeMillis();
+//            final Notification notification = new Notification(icon, tickerText, when);
+//            final int HELLO_ID = 1;
+//            notificationManager.notify(HELLO_ID, notification);
+            
+            // try setting up an email to send. but it just blocks forever too
+//            final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+//            emailIntent .setType("plain/text");
+//            emailIntent .putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"});
+//            emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT, "error");
+//            emailIntent .putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error: " + throwable );
+//            WigleAndroid.this.getApplicationContext().startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+            
+            // these won't affect the pendingIntent. sigh.
+//            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error2: " + throwable );
+//            chooserIntent.putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error3: " + throwable);
+            // set the email intent to go off in a few seconds
+            AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            mgr.set( AlarmManager.RTC, System.currentTimeMillis() + 2000, pendingIntent );
+
+            // give it to the regular handler
+            origHandler.uncaughtException( thread, throwable );
+          }
+        });
+        
+        // test the error reporting
+        // if( true ){ throw new RuntimeException( "weee" ); }
         
         final Object stored = getLastNonConfigurationInstance();
         if ( stored != null && stored instanceof WigleAndroid ) {
@@ -461,8 +511,6 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             this.stopService( serviceIntent );
             // call over to finish
             finish();
-            // actually kill            
-            //System.exit( 0 );
             return true;
         }
         return false;
@@ -922,7 +970,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
-      if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
+      // check if there is a gps
+      final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
+      if ( locProvider == null ) {
+        Toast.makeText( this, "No GPS detected in device!", Toast.LENGTH_LONG ).show();
+      }
+      else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
+        // gps exists, but isn't on
         Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
         final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
         startActivity(myIntent);
@@ -1418,7 +1472,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       return networkCache.get();
     }
     
-    public static void writeError( final Thread thread, final Throwable throwable ) {
+    public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {
       try {
         final String error = "Thread: " + thread + " throwable: " + throwable;
         error( error, throwable );
@@ -1426,11 +1480,47 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           File file = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
           file.mkdirs();
           file = new File(Environment.getExternalStorageDirectory().getCanonicalPath() 
-              + "/wiglewifi/errorstack_" + System.currentTimeMillis() + ".txt" );
+              + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt" );
+          error( "Writing stackfile to: " + file.getCanonicalPath() + "/" + file.getName() );
           if ( ! file.exists() ) {
             file.createNewFile();
           }
           final FileOutputStream fos = new FileOutputStream( file );
+          
+          try {
+            StringBuilder builder = new StringBuilder( "WigleWifi error log - " );
+            SimpleDateFormat format = new SimpleDateFormat();
+            builder.append( format.format( new Date() ) ).append( "\n" );
+            final PackageManager pm = context.getPackageManager();
+            final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            builder.append( "versionName: " ).append( pi.versionName ).append( "\n" );
+            builder.append( "packageName: " ).append( pi.packageName ).append( "\n" );
+            builder.append( "MODEL: " ).append( android.os.Build.MODEL ).append( "\n" );
+            builder.append( "RELEASE: " ).append( android.os.Build.VERSION.RELEASE ).append( "\n" );
+          
+            builder.append( "BOARD: " ).append( android.os.Build.BOARD ).append( "\n" );
+            builder.append( "BRAND: " ).append( android.os.Build.BRAND ).append( "\n" );
+            // android 1.6 android.os.Build.CPU_ABI;
+            builder.append( "DEVICE: " ).append( android.os.Build.DEVICE ).append( "\n" );
+            builder.append( "DISPLAY: " ).append( android.os.Build.DISPLAY ).append( "\n" );
+            builder.append( "FINGERPRINT: " ).append( android.os.Build.FINGERPRINT ).append( "\n" );
+            builder.append( "HOST: " ).append( android.os.Build.HOST ).append( "\n" );
+            builder.append( "ID: " ).append( android.os.Build.ID ).append( "\n" );
+            // android 1.6: android.os.Build.MANUFACTURER;
+            builder.append( "PRODUCT: " ).append( android.os.Build.PRODUCT ).append( "\n" );
+            builder.append( "TAGS: " ).append( android.os.Build.TAGS ).append( "\n" );
+            builder.append( "TIME: " ).append( android.os.Build.TIME ).append( "\n" );
+            builder.append( "TYPE: " ).append( android.os.Build.TYPE ).append( "\n" );
+            builder.append( "USER: " ).append( android.os.Build.USER ).append( "\n" );
+            
+            // write to file
+            fos.write( builder.toString().getBytes( ENCODING ) );
+          }
+          catch ( Throwable er ) {
+            // ohwell
+            error( "error getting data for error: " + er, er );
+          }
+          
           fos.write( error.getBytes( ENCODING ) );
           throwable.printStackTrace( new PrintStream( fos ) );
           fos.close();

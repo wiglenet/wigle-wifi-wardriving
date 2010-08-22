@@ -35,6 +35,13 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
+        <activity android:name=".ErrorReportActivity"
+                  android:label="@string/error_report_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
 
     <service android:name=".WigleService" android:enabled="true"
       android:icon="@drawable/wiglewifi"/>

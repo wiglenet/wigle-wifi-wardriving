@@ -19,6 +19,8 @@ shut off when battery is at chosen percentage
 back button acts like home instead of killing app
 tell user turning on/off wifi
 previous run distance on dashboard
+uncaught error handling, can email report
+view most recent error from settings menu
 
 * 1.13
 file upload to UTF-8 encoding

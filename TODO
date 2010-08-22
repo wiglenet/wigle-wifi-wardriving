@@ -21,6 +21,7 @@ tell user turning on/off wifi
 previous run distance on dashboard
 uncaught error handling, can email report
 view most recent error from settings menu
+update osmdroid, fixes some compass drawing oddities
 
 * 1.13
 file upload to UTF-8 encoding

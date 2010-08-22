@@ -21,7 +21,9 @@ import android.widget.TextView;
  */
 public class ErrorReportActivity extends Activity {
   private static final int MENU_EXIT = 11;
+  private static final int MENU_EMAIL = 12;
   private boolean fromFailure = false;
+  private String stack;
   
   @Override
   public void onCreate( final Bundle savedInstanceState) {
@@ -29,7 +31,7 @@ public class ErrorReportActivity extends Activity {
     setContentView( R.layout.error );
     
     // get stack from file
-    String stack = getLatestStack();
+    stack = getLatestStack();
     
     // set on view
     TextView tv = (TextView) findViewById( R.id.errorreport );
@@ -45,7 +47,7 @@ public class ErrorReportActivity extends Activity {
   }
   
   private String getLatestStack() {
-    StringBuilder builder = new StringBuilder();
+    StringBuilder builder = new StringBuilder( "No Error Report found" );
     try {
       File fileDir = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
       if ( ! fileDir.canRead() || ! fileDir.isDirectory() ) {
@@ -70,6 +72,7 @@ public class ErrorReportActivity extends Activity {
           String filePath = fileDir.getCanonicalPath() + "/" + latestFilename;
           BufferedReader reader = new BufferedReader( new FileReader( filePath ) );
           String line = reader.readLine();
+          builder.setLength( 0 );
           while ( line != null ) {
             builder.append( line ).append( "\n" );
             line = reader.readLine();
@@ -107,6 +110,9 @@ public class ErrorReportActivity extends Activity {
       item.setIcon( android.R.drawable.ic_media_previous );
     }
     
+    MenuItem item = menu.add(0, MENU_EMAIL, 0, "Email Report");
+    item.setIcon( android.R.drawable.ic_menu_send );
+    
     return true;
   }
   
@@ -116,6 +122,9 @@ public class ErrorReportActivity extends Activity {
       switch ( item.getItemId() ) {
         case MENU_EXIT:
           finish();
+          return true;
+        case MENU_EMAIL:
+          setupEmail( stack );
           return true;
       }
       return false;

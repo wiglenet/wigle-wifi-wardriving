@@ -22,6 +22,7 @@ previous run distance on dashboard
 uncaught error handling, can email report
 view most recent error from settings menu
 update osmdroid, fixes some compass drawing oddities
+icon when network has WPS fixed
 
 * 1.13
 file upload to UTF-8 encoding

@@ -100,10 +100,10 @@ public final class Network {
       this.showCapabilities = null;
     }
     
-    if ( capabilities.startsWith( WPA_CAP ) ) {
+    if ( capabilities.indexOf( WPA_CAP ) >= 0 ) {
       crypto = CRYPTO_WPA;
     }
-    else if ( capabilities.startsWith( WEP_CAP ) ) {
+    else if ( capabilities.indexOf( WEP_CAP ) >= 0 ) {
       crypto = CRYPTO_WEP;
     }
     else {

@@ -161,6 +161,11 @@ public final class DatabaseHelper extends Thread {
           // no worries
           WigleAndroid.info("db queue take interrupted");
         }
+        finally {
+          if ( db != null && db.inTransaction() ) {
+            db.endTransaction();
+          }
+        }
       }
     }
     catch ( final Throwable throwable ) {

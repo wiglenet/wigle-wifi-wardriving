@@ -68,10 +68,11 @@ public final class WigleService extends Service {
     notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
     
     // make the notification be blue, where supported
-    notification.ledARGB = 0xff0000ff;
-    notification.ledOnMS = 300;
-    notification.ledOffMS = 1000;
-    notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+    // on second thought, this might just be annoying
+    // notification.ledARGB = 0xff0000ff;
+    // notification.ledOnMS = 300;
+    // notification.ledOffMS = 1000;
+    // notification.flags |= Notification.FLAG_SHOW_LIGHTS;
     
     final Context context = getApplicationContext();
     final Intent notificationIntent = new Intent( this, WigleAndroid.class );

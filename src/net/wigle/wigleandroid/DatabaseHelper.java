@@ -3,11 +3,14 @@
 
 package net.wigle.wigleandroid;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -66,6 +69,7 @@ public final class DatabaseHelper extends Thread {
   private SQLiteDatabase db;
   
   private static final int MAX_QUEUE = 512;
+  private static final int MAX_DRAIN = 512; // seems to work fine slurping the whole darn thing
   private final Context context;
   private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
@@ -129,9 +133,29 @@ public final class DatabaseHelper extends Thread {
       getNetworkCountFromDB();
       getLocationCountFromDB();
       
+      final List<DBUpdate> drain = new ArrayList<DBUpdate>();
       while ( ! done.get() ) {
         try {
-          addObservation( queue.take() );
+          drain.clear();
+          drain.add( queue.take() );
+          final long startTime = System.currentTimeMillis();
+          if ( MAX_DRAIN > 1 ) {
+            // try to drain some more
+            queue.drainTo( drain, MAX_DRAIN - 1 );
+          }
+          final int drainSize = drain.size();
+          
+          // do a transaction for everything
+          db.beginTransaction();
+          for ( int i = 0; i < drainSize; i++ ) {
+            addObservation( drain.get( i ), drainSize );
+          }
+          db.setTransactionSuccessful();
+          db.endTransaction();
+          final long delay = System.currentTimeMillis() - startTime;
+          if ( delay > 100L ) {
+            WigleAndroid.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
+          }
         }
         catch ( final InterruptedException ex ) {
           // no worries
@@ -239,7 +263,7 @@ public final class DatabaseHelper extends Thread {
     return added;
   }
   
-  private void addObservation( final DBUpdate update ) {
+  private void addObservation( final DBUpdate update, final int drainSize ) {
     checkDB();
     final Network network = update.network;
     final Location location = update.location;
@@ -277,7 +301,7 @@ public final class DatabaseHelper extends Thread {
         
         start = System.currentTimeMillis();
         db.insert(NETWORK_TABLE, null, values);
-        logTime( start, "db network inserted " + bssid );
+        logTime( start, "db network inserted: " + bssid + " drainSize: " + drainSize );
         
         // update the count
         networkCount.incrementAndGet();
@@ -325,12 +349,13 @@ public final class DatabaseHelper extends Thread {
       values.put("time", location.getTime() );
       if ( db.isDbLockedByOtherThreads() ) {
         // this is kinda lame, make this better
-        WigleAndroid.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid );
+        WigleAndroid.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid
+            + " drainSize: " + drainSize );
         WigleAndroid.sleep(1000L);
       }
       long start = System.currentTimeMillis();
       db.insert( LOCATION_TABLE, null, values );
-      logTime( start, "db location inserted " + bssid );
+      logTime( start, "db location inserted: " + bssid + " drainSize: " + drainSize );
       
       // update the count
       locationCount.incrementAndGet();
@@ -345,7 +370,8 @@ public final class DatabaseHelper extends Thread {
         values.put("lastlon", location.getLongitude() );
         if ( db.isDbLockedByOtherThreads() ) {
           // this is kinda lame, make this better
-          WigleAndroid.error( "db locked by another thread, waiting to net update. bssid: " + bssid );
+          WigleAndroid.error( "db locked by another thread, waiting to net update. bssid: " + bssid
+              + " drainSize: " + drainSize );
           WigleAndroid.sleep(1000L);
         }
         start = System.currentTimeMillis();
@@ -531,10 +557,6 @@ public final class DatabaseHelper extends Thread {
     return count;
   }
 
-
-
-
-  
   private void logTime( long start, String string ) {
     long diff = System.currentTimeMillis() - start;
     if ( diff > 150L ) {

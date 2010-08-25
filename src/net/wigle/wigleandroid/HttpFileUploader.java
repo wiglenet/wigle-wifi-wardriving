@@ -1,11 +1,10 @@
 package net.wigle.wigleandroid;
 
-import android.content.res.Resources; 
-import android.os.Handler;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -18,6 +17,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Map;
+
+import android.content.res.Resources;
+import android.os.Handler;
 
 /**
  * Based on   http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html
@@ -89,13 +91,39 @@ final class HttpFileUploader {
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Connection", "Keep-Alive");
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+      
+      // chunk large stuff
+      conn.setChunkedStreamingMode( 32*1024 );
+      // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
+      conn.setRequestProperty("Transfer-Encoding", "chunked");
 
       // connect
       WigleAndroid.info( "about to connect" );
       conn.connect();
       WigleAndroid.info( "connected" );
       
-      WritableByteChannel wbc = Channels.newChannel( conn.getOutputStream() );
+      OutputStream connOutputStream = conn.getOutputStream();
+      if ( true ) {
+        // reflect out the chunking info
+        for ( Method meth : connOutputStream.getClass().getMethods() ) {
+          // WigleAndroid.info("meth: " + meth.getName() );
+          try {
+            if ( "isCached".equals(meth.getName()) || "isChunked".equals(meth.getName())) {
+              Boolean val = (Boolean) meth.invoke( connOutputStream, (Object[]) null );
+              WigleAndroid.info( meth.getName() + " " + val );
+            }
+            else if ( "size".equals( meth.getName())) {
+              Integer val = (Integer) meth.invoke( connOutputStream, (Object[]) null );
+              WigleAndroid.info( meth.getName() + " " + val );
+            }
+          }
+          catch ( Exception ex ) {
+            WigleAndroid.error("ex: " + ex, ex );
+          }
+        }
+      }
+      
+      WritableByteChannel wbc = Channels.newChannel( connOutputStream );
       
       StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
       for ( Map.Entry<String, String> entry : params.entrySet() ) {
@@ -146,18 +174,18 @@ final class HttpFileUploader {
       
       int responseCode = conn.getResponseCode();
       WigleAndroid.info( "connection response code: " + responseCode );
-    
-      // this is dirty.  dirty.
+
+      // read the response
       final InputStream is = conn.getInputStream();
-      // retrieve the response from server
       int ch;
-    
-      final StringBuffer b = new StringBuffer();
-      while( ( ch = is.read() ) != -1 ) {
-        b.append( (char)ch );
+      final StringBuilder b = new StringBuilder();
+      final byte[] buffer = new byte[1024];
+      
+      while( ( ch = is.read( buffer ) ) != -1 ) {
+        b.append( new String( buffer, 0, ch ) );
       }
       retval = b.toString();
-      // WigleAndroid.debug( "Response: " + retval );
+      // WigleAndroid.info( "Response: " + retval );
     }
     catch ( final MalformedURLException ex ) {
       WigleAndroid.error( "HttpFileUploader: " + ex, ex );

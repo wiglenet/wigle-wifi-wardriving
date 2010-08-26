@@ -163,7 +163,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
     
     /** cross-activity communication */
     public static class TrailStat {

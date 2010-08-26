@@ -34,6 +34,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 
 public final class FileUploaderTask extends Thread {
   private final Context context;
@@ -46,6 +47,7 @@ public final class FileUploaderTask extends Thread {
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
   private static final String ERROR = "error";
+  private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   
   private enum Status {
     UNKNOWN("Unknown", "Unknown error"),
@@ -142,6 +144,9 @@ public final class FileUploaderTask extends Thread {
   
   public void run() {
     try {
+      WigleAndroid.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
+      Process.setThreadPriority( UPLOAD_PRIORITY );
+      
       doRun();
     }
     catch ( final Throwable throwable ) {

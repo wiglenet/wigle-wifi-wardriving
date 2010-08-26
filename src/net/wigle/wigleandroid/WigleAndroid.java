@@ -57,6 +57,7 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -162,6 +163,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
+    static final boolean DEBUG = true;
     
     /** cross-activity communication */
     public static class TrailStat {
@@ -199,12 +201,16 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         super.onCreate( savedInstanceState );
         setContentView( R.layout.main );
         
+        if ( DEBUG ) {
+          Debug.startMethodTracing("wigle");
+        }
+        
         final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
         inEmulator = id == null;
         inEmulator |= "sdk".equals( android.os.Build.PRODUCT );
         inEmulator |= "google_sdk".equals( android.os.Build.PRODUCT );
         info( "id: '" + id + "' inEmulator: " + inEmulator + " product: " + android.os.Build.PRODUCT );
-        info( "release: '" + Build.VERSION.RELEASE + "'" );
+        info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + DEBUG );
         
         // set up pending email intent to email stacktrace logs if needed
         final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
@@ -375,6 +381,11 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     @Override
     public void onDestroy() {
       info( "destroy. networks: " + runNetworks.size() );
+      
+      if ( DEBUG ) {
+        Debug.stopMethodTracing();
+      }
+
       try {
         this.unregisterReceiver( wifiReceiver );
       }

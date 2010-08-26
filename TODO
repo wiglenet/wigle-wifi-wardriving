@@ -17,6 +17,10 @@ kismet drone support
 some response/info/stat about uploaded files
 
 --- done ---
+* 1.15
+more db optimization (more precompiled statements, temp_store=memory, 
+  journal_mode=persist, count_changes=false, background thread priority)
+
 * 1.14
 back button acts like home instead of killing app
 tell user turning on/off wifi

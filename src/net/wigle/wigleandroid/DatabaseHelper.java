@@ -14,15 +14,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
 import android.os.Environment;
+import android.os.Process;
 
 /**
  * our database helper, makes a great data meal.
@@ -36,10 +37,15 @@ public final class DatabaseHelper extends Thread {
   private static final double BIG_LATLON_CHANGE = 0.01D;
   private static final String DATABASE_NAME = "wiglewifi.sqlite";
   private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
+  private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   
   private static final long QUEUE_CULL_TIMEOUT = 10000L;
   private long prevQueueCullTime = 0L;
   private long prevPendingQueueCullTime = 0L;
+  
+  private SQLiteStatement insertNetwork;
+  private SQLiteStatement insertLocation;
+  private SQLiteStatement updateNetwork;
   
   private static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
@@ -129,7 +135,11 @@ public final class DatabaseHelper extends Thread {
   @Override
   public void run() {
     try {
-      WigleAndroid.info( "starting db thread" );    
+      WigleAndroid.info( "starting db thread" );
+      
+      WigleAndroid.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
+      Process.setThreadPriority( DB_PRIORITY );
+      
       getNetworkCountFromDB();
       getLocationCountFromDB();
       
@@ -210,6 +220,28 @@ public final class DatabaseHelper extends Thread {
         WigleAndroid.error( "sqlite exception: " + ex, ex );
       }
     }
+    
+    // VACUUM turned off, this takes a long long time (20 min), and has little effect since we're not using DELETE
+    // WigleAndroid.info("Vacuuming db");
+    // db.execSQL( "VACUUM" );
+    // WigleAndroid.info("Vacuuming done");
+    
+    // we don't need to know how many we wrote
+    db.execSQL( "PRAGMA count_changes = false" );
+    // keep transactions in memory until committed
+    db.execSQL( "PRAGMA temp_store = MEMORY" );
+    // keep around the journal file, don't create and delete a ton of times
+    db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null );
+    
+    // compile statements
+    insertNetwork = db.compileStatement( "INSERT INTO network"
+        + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon) VALUES (?,?,?,?,?,?,?)" );
+    
+    insertLocation = db.compileStatement( "INSERT INTO location"
+        + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
+    
+    updateNetwork = db.compileStatement( "UPDATE network SET"
+        + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
   }
   
   /**
@@ -272,7 +304,6 @@ public final class DatabaseHelper extends Thread {
     checkDB();
     final Network network = update.network;
     final Location location = update.location;
-    final ContentValues values = new ContentValues();
     final String bssid = network.getBssid();
     final String[] bssidArgs = new String[]{ bssid }; 
     
@@ -293,19 +324,21 @@ public final class DatabaseHelper extends Thread {
     else {
       // cache miss, get the last values from the db, if any
       long start = System.currentTimeMillis();
+      // SELECT: can't precompile, as it has more than 1 result value
       final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
       logTime( start, "db network queried " + bssid );
       if ( cursor.getCount() == 0 ) {
-        values.put("bssid", bssid );
-        values.put("ssid", network.getSsid() );
-        values.put("frequency", network.getFrequency() );
-        values.put("capabilities", network.getCapabilities() );
-        values.put("lasttime", location.getTime() );
-        values.put("lastlat", location.getLatitude() );
-        values.put("lastlon", location.getLongitude() );
+        insertNetwork.bindString( 1, bssid );
+        insertNetwork.bindString( 2, network.getSsid() );
+        insertNetwork.bindLong( 3, network.getFrequency() );
+        insertNetwork.bindString( 4, network.getCapabilities() );
+        insertNetwork.bindLong( 5, location.getTime() );
+        insertNetwork.bindDouble( 6, location.getLatitude() );
+        insertNetwork.bindDouble( 7, location.getLongitude() );
         
         start = System.currentTimeMillis();
-        db.insert(NETWORK_TABLE, null, values);
+        // INSERT
+        insertNetwork.execute();
         logTime( start, "db network inserted: " + bssid + " drainSize: " + drainSize );
         
         // update the count
@@ -341,17 +374,21 @@ public final class DatabaseHelper extends Thread {
     //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
     final boolean changeWorthy = mediumChange || (now - lasttime > SMALL_LOC_DELAY && smallChange);
+    
+    if ( WigleAndroid.DEBUG ) {
+      // do lots of inserts when debug is on
+      isNew = true;
+    }
 
     if ( isNew || bigChange || (! fastMode && changeWorthy ) ) {
       // WigleAndroid.info("inserting loc: " + network.getSsid() );
-      values.clear();
-      values.put("bssid", bssid );
-      values.put("level", update.level );  // make sure to use the update's level, network's is mutable...
-      values.put("lat", location.getLatitude() );
-      values.put("lon", location.getLongitude() );
-      values.put("altitude", location.getAltitude() );
-      values.put("accuracy", location.getAccuracy() );
-      values.put("time", location.getTime() );
+      insertLocation.bindString( 1, bssid );
+      insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...
+      insertLocation.bindDouble( 3, location.getLatitude() );
+      insertLocation.bindDouble( 4, location.getLongitude() );
+      insertLocation.bindDouble( 5, location.getAltitude() );
+      insertLocation.bindDouble( 6, location.getAccuracy() );
+      insertLocation.bindLong( 7, location.getTime() );
       if ( db.isDbLockedByOtherThreads() ) {
         // this is kinda lame, make this better
         WigleAndroid.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid
@@ -359,7 +396,8 @@ public final class DatabaseHelper extends Thread {
         WigleAndroid.sleep(1000L);
       }
       long start = System.currentTimeMillis();
-      db.insert( LOCATION_TABLE, null, values );
+      // INSERT
+      insertLocation.execute();
       logTime( start, "db location inserted: " + bssid + " drainSize: " + drainSize );
       
       // update the count
@@ -369,10 +407,10 @@ public final class DatabaseHelper extends Thread {
       
       if ( ! isNew ) {
         // update the network with the lasttime,lastlat,lastlon
-        values.clear();
-        values.put("lasttime", location.getTime() );
-        values.put("lastlat", location.getLatitude() );
-        values.put("lastlon", location.getLongitude() );
+        updateNetwork.bindLong( 1, location.getTime() );
+        updateNetwork.bindDouble( 2, location.getLatitude() );
+        updateNetwork.bindDouble( 3, location.getLongitude() );
+        updateNetwork.bindString( 4, bssid );
         if ( db.isDbLockedByOtherThreads() ) {
           // this is kinda lame, make this better
           WigleAndroid.error( "db locked by another thread, waiting to net update. bssid: " + bssid
@@ -380,7 +418,8 @@ public final class DatabaseHelper extends Thread {
           WigleAndroid.sleep(1000L);
         }
         start = System.currentTimeMillis();
-        db.update( NETWORK_TABLE, values, "bssid = ?", bssidArgs );
+        // UPDATE
+        updateNetwork.execute();
         logTime( start, "db network updated" );
       }
     }

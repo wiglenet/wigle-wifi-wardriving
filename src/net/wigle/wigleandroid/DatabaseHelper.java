@@ -149,21 +149,26 @@ public final class DatabaseHelper extends Thread {
           drain.clear();
           drain.add( queue.take() );
           final long startTime = System.currentTimeMillis();
+          
+          // do a transaction for everything
+          db.beginTransaction();
+          addObservation( drain.get( 0 ), 1 );
+          // give other thread some time
+          Thread.yield();
+          // now that we've taken care of the one, see if there's more we can do in this transaction
           if ( MAX_DRAIN > 1 ) {
             // try to drain some more
             queue.drainTo( drain, MAX_DRAIN - 1 );
           }
           final int drainSize = drain.size();
-          
-          // do a transaction for everything
-          db.beginTransaction();
-          for ( int i = 0; i < drainSize; i++ ) {
+          for ( int i = 1; i < drainSize; i++ ) {
             addObservation( drain.get( i ), drainSize );
           }
           db.setTransactionSuccessful();
           db.endTransaction();
+          
           final long delay = System.currentTimeMillis() - startTime;
-          if ( delay > 100L ) {
+          if ( delay > 100L || WigleAndroid.DEBUG ) {
             WigleAndroid.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
           }
         }

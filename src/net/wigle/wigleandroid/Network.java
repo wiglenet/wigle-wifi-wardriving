@@ -86,24 +86,24 @@ public final class Network {
   
   public Network( final String bssid, final String ssid, final int frequency, final String capabilities, final int level ) {
     
-    this.bssid = bssid;
-    this.ssid = ssid;
+    this.bssid = ( bssid == null ) ? "" : bssid;
+    this.ssid = ( ssid == null ) ? "" : ssid;
     this.frequency = frequency;
-    this.capabilities = capabilities;
+    this.capabilities = ( capabilities == null ) ? "" : capabilities;
     this.level = level;
     this.channel = freqToChan.get( frequency );
     
-    if ( capabilities.length() > 16 ) {
-      this.showCapabilities = capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1]");
+    if ( this.capabilities.length() > 16 ) {
+      this.showCapabilities = this.capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1]");
     }
     else {
       this.showCapabilities = null;
     }
     
-    if ( capabilities.indexOf( WPA_CAP ) >= 0 ) {
+    if ( this.capabilities.indexOf( WPA_CAP ) >= 0 ) {
       crypto = CRYPTO_WPA;
     }
-    else if ( capabilities.indexOf( WEP_CAP ) >= 0 ) {
+    else if ( this.capabilities.indexOf( WEP_CAP ) >= 0 ) {
       crypto = CRYPTO_WEP;
     }
     else {

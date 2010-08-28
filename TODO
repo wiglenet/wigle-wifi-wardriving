@@ -20,6 +20,8 @@ some response/info/stat about uploaded files
 * 1.15
 more db optimization (more precompiled statements, temp_store=memory, 
   journal_mode=persist, count_changes=false, background thread priority)
+added ACCESS_COARSE_LOCATION which some devices seem to want (not just FINE)
+patch some threading issues in osmdroid
 
 * 1.14
 back button acts like home instead of killing app

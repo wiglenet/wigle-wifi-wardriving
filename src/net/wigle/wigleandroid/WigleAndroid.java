@@ -1016,8 +1016,10 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         };
         
       for ( String provider : providers ) {
-        info( "provider: " + provider );
-        locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, locationListener );
+        info( "available provider: " + provider );
+        if ( ! "passive".equals( provider ) ) {
+          locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, locationListener );
+        }
       }
     }
     

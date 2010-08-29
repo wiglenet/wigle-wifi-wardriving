@@ -311,7 +311,7 @@ public final class DatabaseHelper extends Thread {
   /**
    * close db, shut down thread
    */
-  public synchronized void close() {
+  public void close() {
     done.set( true );
     // interrupt the take, if any
     this.interrupt();
@@ -321,9 +321,12 @@ public final class DatabaseHelper extends Thread {
       WigleAndroid.info( "db still alive. countdown: " + countdown );
       WigleAndroid.sleep( 100L );
       countdown--;
+      this.interrupt();
     }
-    if ( db.isOpen() ) {
-      db.close();
+    synchronized ( this ) { 
+      if ( db.isOpen() ) {
+        db.close();
+      }
     }
   }
   

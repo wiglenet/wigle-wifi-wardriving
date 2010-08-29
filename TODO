@@ -24,14 +24,14 @@ added ACCESS_COARSE_LOCATION which some devices seem to want (not just FINE)
 patch some threading issues in osmdroid
 take care of null network values on insert
 lock down db open/close issues
-show db exceptions to users in a dialog
+show db sqlite exceptions to users in a dialog (disk full, disk i/o error, etc)
 
 * 1.14
 back button acts like home instead of killing app
 tell user turning on/off wifi
 previous run distance on dashboard
 uncaught error handling, can email report
-view most recent error from settings menu
+view most recent error stack from settings menu
 update osmdroid, fixes some compass drawing oddities
 icon when network has WPS fixed
 improve db performance (transaction overhead)

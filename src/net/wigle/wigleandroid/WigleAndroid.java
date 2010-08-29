@@ -546,7 +546,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       // could be set by nonconfig retain
       if ( dbHelper == null ) {
         dbHelper = new DatabaseHelper( this );
-        dbHelper.open();
+        dbHelper.checkDB();
         dbHelper.start();
       }
       

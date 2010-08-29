@@ -189,7 +189,7 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  public void open() {
+  private void open() {
     String dbFilename = DATABASE_NAME;
     final boolean hasSD = WigleAndroid.hasSD();
     if ( hasSD ) {
@@ -252,7 +252,7 @@ public final class DatabaseHelper extends Thread {
   /**
    * close db, shut down thread
    */
-  public void close() {
+  public synchronized void close() {
     done.set( true );
     // interrupt the take, if any
     this.interrupt();
@@ -268,7 +268,7 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  public void checkDB() {
+  public synchronized void checkDB() {
     if ( db == null || ! db.isOpen() ) {
       WigleAndroid.info( "re-opening db in checkDB" );
       open();

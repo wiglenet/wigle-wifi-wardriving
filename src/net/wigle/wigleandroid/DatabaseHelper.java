@@ -14,7 +14,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -22,7 +24,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Process;
 
 /**
@@ -76,6 +81,8 @@ public final class DatabaseHelper extends Thread {
   
   private static final int MAX_QUEUE = 512;
   private static final int MAX_DRAIN = 512; // seems to work fine slurping the whole darn thing
+  private static final String ERROR = "error";
+  private static final String EXCEPTION = "exception";
   private final Context context;
   private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
@@ -86,8 +93,9 @@ public final class DatabaseHelper extends Thread {
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
-
+  private final Handler deathHandler;
   private final SharedPreferences prefs;
+  
   /** used in private addObservation */
   private final CacheMap<String,Location> previousWrittenLocationsCache = 
     new CacheMap<String,Location>( 16, 64 );
@@ -126,6 +134,37 @@ public final class DatabaseHelper extends Thread {
     this.context = context;
     this.prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
     setName("db-worker");
+    
+
+    this.deathHandler = new Handler() {  
+      @Override
+      public void handleMessage( final Message msg ) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder( context );
+        builder.setCancelable( false );
+        builder.setTitle( "Fatal DB Problem" );
+        Bundle bundle = msg.peekData();
+        Exception ex = null;
+        if ( bundle == null ) {
+          builder.setMessage( "Nothing in bundle" );
+        }
+        else {
+          String error = bundle.getString( ERROR );
+          builder.setMessage( "Error: " + error );
+          ex = (Exception) bundle.getSerializable( EXCEPTION );
+        }
+        final Exception finalEx = ex;
+        final AlertDialog ad = builder.create();
+        ad.setButton( "OK, Shutdown", new DialogInterface.OnClickListener() {
+          public void onClick( final DialogInterface dialog, final int which ) {
+            dialog.dismiss();
+            if ( finalEx != null ) {
+              throw new RuntimeException( "rethrowing db exception: " + finalEx, finalEx );
+            }
+            return;
+          } }); 
+        ad.show();
+      }
+     };
   }
 
 	public int getQueueSize() {
@@ -140,8 +179,14 @@ public final class DatabaseHelper extends Thread {
       WigleAndroid.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
       Process.setThreadPriority( DB_PRIORITY );
       
-      getNetworkCountFromDB();
-      getLocationCountFromDB();
+      try {
+        getNetworkCountFromDB();
+        getLocationCountFromDB();
+      }
+      catch ( SQLiteException ex ) {
+        WigleAndroid.error( "exception getting counts from db: " + ex, ex );
+        deathDialog( "counts db: " + ex, ex );
+      }
       
       final List<DBUpdate> drain = new ArrayList<DBUpdate>();
       while ( ! done.get() ) {
@@ -176,6 +221,10 @@ public final class DatabaseHelper extends Thread {
           // no worries
           WigleAndroid.info("db queue take interrupted");
         }
+        catch ( SQLiteException ex ) {
+          WigleAndroid.error( "exception in db run loop: " + ex, ex );
+          deathDialog( "runloop db: " + ex, ex );
+        }
         finally {
           if ( db != null && db.inTransaction() ) {
             db.endTransaction();
@@ -187,6 +236,16 @@ public final class DatabaseHelper extends Thread {
       WigleAndroid.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
+  }
+  
+  private void deathDialog( String message, Exception ex ) {
+    // send message to the handler that will get this dialog on the activity thread
+    final Bundle bundle = new Bundle();
+    bundle.putString( ERROR, message );
+    bundle.putSerializable( EXCEPTION, ex );
+    final Message msg = new Message();
+    msg.setData(bundle);
+    deathHandler.sendMessage(msg);
   }
   
   private void open() {

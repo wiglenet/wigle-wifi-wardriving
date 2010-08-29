@@ -164,7 +164,7 @@ public final class FileUploaderTask extends Thread {
     final String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
     final String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
-    Bundle bundle = new Bundle();
+    final Bundle bundle = new Bundle();
     
     if ( "".equals( username ) ) {
       // TODO: error
@@ -186,7 +186,7 @@ public final class FileUploaderTask extends Thread {
       handler.sendEmptyMessage( status.ordinal() );
     }
     else {
-      Message msg = new Message();
+      final Message msg = new Message();
       msg.what = status.ordinal();
       msg.setData(bundle);
       handler.sendMessage(msg);

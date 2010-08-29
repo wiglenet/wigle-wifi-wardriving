@@ -136,6 +136,21 @@ public final class SettingsActivity extends Activity {
           }
       });
       
+      // db marker maxout button and text
+      final TextView maxtv = (TextView) findViewById( R.id.maxout_maxid_text );
+      final long maxDB = prefs.getLong( WigleAndroid.PREF_MAX_DB, 0L );
+      maxtv.setText( "Max id at startup: " + maxDB );
+      
+      final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
+      maxoutMaxidButton.setOnClickListener( new OnClickListener() {
+        public void onClick( final View buttonView ) {             
+              editor.putLong( WigleAndroid.PREF_DB_MARKER, maxDB );
+              editor.commit();
+              // set the text on the other button
+              tv.setText( "Max upload id: " + maxDB );
+          }
+      });
+      
       // period spinner
       Spinner spinner = (Spinner) findViewById( R.id.period_spinner );
       ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -225,23 +240,7 @@ public final class SettingsActivity extends Activity {
         public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });   
       
-      final CheckBox chunking = (CheckBox) findViewById(R.id.chunking);
-      chunking.setChecked( prefs.getBoolean( WigleAndroid.PREF_CHUNKING, true) );
-      chunking.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
-              editor.putBoolean( WigleAndroid.PREF_CHUNKING, isChecked );
-              editor.commit();
-          }
-      });
       
-      final CheckBox utf8 = (CheckBox) findViewById(R.id.utf8);
-      utf8.setChecked( prefs.getBoolean( WigleAndroid.PREF_UTF8, true) );
-      utf8.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
-              editor.putBoolean( WigleAndroid.PREF_UTF8, isChecked );
-              editor.commit();
-          }
-      });
   }
   
   /* Creates the menu items */

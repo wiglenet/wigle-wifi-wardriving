@@ -145,6 +145,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_SHOW_CURRENT = "showCurrent";
     static final String PREF_BE_ANONYMOUS = "beAnonymous";
     static final String PREF_DB_MARKER = "dbMarker";
+    static final String PREF_MAX_DB = "maxDbMarker";
     static final String PREF_SCAN_PERIOD = "scanPeriod";
     static final String PREF_FOUND_SOUND = "foundSound";
     static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
@@ -1562,18 +1563,21 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     private void setupMaxidDebug() {
       final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
       final long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
-      if ( maxid == -1L ) {
-        // load up the local value
-        dbHelper.getLocationCountFromDB();
-        final long loccount = dbHelper.getLocationCount();
+      // load up the local value
+      dbHelper.getLocationCountFromDB();
+      final long loccount = dbHelper.getLocationCount();
+      
+      final Editor edit = prefs.edit();
+      edit.putLong( PREF_MAX_DB, loccount );
+      
+      if ( maxid == -1L ) {    
         if ( loccount > 0 ) {
           // there is no preference set, yet there are locations, this is likely
           // a developer testing a new install on an old db, so set the pref.
           info( "setting db marker to: " + loccount );
-          final Editor edit = prefs.edit();
           edit.putLong( PREF_DB_MARKER, loccount );
-          edit.commit();
         }
       }
+      edit.commit();
     }
 }

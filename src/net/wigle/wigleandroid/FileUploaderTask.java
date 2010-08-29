@@ -390,6 +390,7 @@ public final class FileUploaderTask extends Thread {
         // save in the prefs
         final Editor editor = prefs.edit();
         editor.putLong( WigleAndroid.PREF_DB_MARKER, maxId );
+        editor.putLong( WigleAndroid.PREF_MAX_DB, maxId );
         editor.commit();
       }
       else if ( response != null && response.indexOf("does not match login") > 0 ) {

@@ -13,13 +13,13 @@
     <string name="be_anonymous">Upload anonymously</string>
     <string name="found_sound">Play sound when network found in run</string>
     <string name="found_new_sound">Play sound when new network in DB</string>    
-    <string name="reset_maxid_button">Reset DB marker</string>
+    <string name="reset_maxid_button">Zero DB marker</string>
     <string name="reset_maxid_text">Latest upload marker:</string>
+    <string name="maxout_maxid_button">Maxout DB marker</string>
+    <string name="maxout_maxid_text">Set marker to:</string>
     <string name="period_text">Time between wifi scans</string>
     <string name="speak_text">Time between audio speech</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
-    <string name="unknown">Unknown</string>
-    <string name="chunking_checkbox">Use upload chunking</string>
-    <string name="utf8_checkbox">Use UTF-8 in uploads (vs 8859-1)</string>
+    <string name="unknown">Unknown</string>    
 </resources>

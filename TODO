@@ -17,6 +17,9 @@ kismet drone support
 some response/info/stat about uploaded files
 
 --- done ---
+* 1.16
+fix db close stall
+
 * 1.15
 more db optimization (more precompiled statements, temp_store=memory, 
   journal_mode=persist, count_changes=false, background thread priority)

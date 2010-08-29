@@ -408,21 +408,24 @@ public final class FileUploaderTask extends Thread {
         status = Status.FAIL;
       }
     } 
-    catch ( final FileNotFoundException e ) {
-      e.printStackTrace();
-      WigleAndroid.error( "file problem: " + e, e );
+    catch ( final FileNotFoundException ex ) {
+      ex.printStackTrace();
+      WigleAndroid.error( "file problem: " + ex, ex );
+      WigleAndroid.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "file problem: " + e );
+      bundle.putString( ERROR, "file problem: " + ex );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
       WigleAndroid.error( "io problem: " + ex, ex );
+      WigleAndroid.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       WigleAndroid.error( "ex problem: " + ex, ex );
+      WigleAndroid.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "ex problem: " + ex );
     }

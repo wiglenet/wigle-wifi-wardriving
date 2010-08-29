@@ -104,6 +104,12 @@
 		/>
 </LinearLayout>
 
+<LinearLayout
+	android:id="@+id/horizontalLine2"
+	android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#A07070"
+	/> 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
@@ -121,6 +127,17 @@
 		android:layout_weight="5"
 		/>
 </LinearLayout>
+
+<CheckBox android:id="@+id/chunking"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/chunking_checkbox" />
+
+<CheckBox android:id="@+id/utf8"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/utf8_checkbox" />
+
 
 </LinearLayout>
 </ScrollView>

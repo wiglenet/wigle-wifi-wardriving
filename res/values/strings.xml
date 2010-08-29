@@ -12,7 +12,7 @@
     <string name="show_current">Show current networks only</string>
     <string name="be_anonymous">Upload anonymously</string>
     <string name="found_sound">Play sound when network found in run</string>
-    <string name="found_new_sound">Play sound when new network in DB</string>
+    <string name="found_new_sound">Play sound when new network in DB</string>    
     <string name="reset_maxid_button">Reset DB marker</string>
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="period_text">Time between wifi scans</string>
@@ -20,4 +20,6 @@
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
     <string name="unknown">Unknown</string>
+    <string name="chunking_checkbox">Use upload chunking</string>
+    <string name="utf8_checkbox">Use UTF-8 in uploads (vs 8859-1)</string>
 </resources>

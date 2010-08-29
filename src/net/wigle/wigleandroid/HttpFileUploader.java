@@ -18,6 +18,8 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Map;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Handler;
 
@@ -26,7 +28,8 @@ import android.os.Handler;
  * Read more: http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html#ixzz0iqTJF7SV
  */
 final class HttpFileUploader {
-  private static final String WEB_ENCODING = "UTF-8";
+  private static final String ENCODING_UTF8 = "UTF-8";
+  private static final String ENCODING_8859 = "ISO-8859-1";
   
   /** don't allow construction */
   private HttpFileUploader(){
@@ -46,7 +49,8 @@ final class HttpFileUploader {
      */
   public static String upload( final String urlString, final String filename, final String fileParamName,
                                final FileInputStream fileInputStream, final Map<String,String> params, 
-                               final Resources res, final Handler handler, final long filesize ) {
+                               final Resources res, final Handler handler, final long filesize,
+                               final Context context ) {
     
     URL connectURL = null;
     try{
@@ -66,9 +70,11 @@ final class HttpFileUploader {
       //------------------ CLIENT REQUEST
     
       WigleAndroid.info("Creating url connection");
+      final SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
 
       // Open a HTTP connection to the URL
-      CharsetEncoder enc = Charset.forName( WEB_ENCODING ).newEncoder();
+      final String encoding = prefs.getBoolean( WigleAndroid.PREF_UTF8, true) ? ENCODING_UTF8 : ENCODING_8859;
+      CharsetEncoder enc = Charset.forName( encoding ).newEncoder();
       CharBuffer cbuff = CharBuffer.allocate( 1024 );
       ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
 
@@ -92,10 +98,12 @@ final class HttpFileUploader {
       conn.setRequestProperty("Connection", "Keep-Alive");
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
       
-      // chunk large stuff
-      conn.setChunkedStreamingMode( 32*1024 );
-      // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
-      conn.setRequestProperty("Transfer-Encoding", "chunked");
+      if ( prefs.getBoolean( WigleAndroid.PREF_CHUNKING, true) ) {
+        // chunk large stuff
+        conn.setChunkedStreamingMode( 32*1024 );
+        // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
+        conn.setRequestProperty("Transfer-Encoding", "chunked");
+      }
 
       // connect
       WigleAndroid.info( "about to connect" );
@@ -189,10 +197,12 @@ final class HttpFileUploader {
     }
     catch ( final MalformedURLException ex ) {
       WigleAndroid.error( "HttpFileUploader: " + ex, ex );
+      WigleAndroid.writeError(Thread.currentThread(), ex, context);
       retval = ex.toString();
     }  
     catch ( final IOException ioe ) {
       WigleAndroid.error( "HttpFileUploader: " + ioe, ioe );
+      WigleAndroid.writeError(Thread.currentThread(), ioe, context);
       retval = ioe.toString();
     }
     finally {

@@ -381,8 +381,8 @@ public final class FileUploaderTask extends Thread {
       params.put("observer", username);
       params.put("password", password);
       final String response = HttpFileUploader.upload( 
-                                                      WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, 
-                                                      params, context.getResources(), handler, filesize );
+        WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, 
+        params, context.getResources(), handler, filesize, context );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;

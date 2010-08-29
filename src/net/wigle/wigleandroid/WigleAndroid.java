@@ -156,6 +156,8 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_DISTANCE_TOTAL = "distTotal";
     static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
+    static final String PREF_CHUNKING = "chunking";
+    static final String PREF_UTF8 = "utf8";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     static final long LOCATION_UPDATE_INTERVAL = 1000L;

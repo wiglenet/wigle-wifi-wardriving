@@ -223,7 +223,25 @@ public final class SettingsActivity extends Activity {
           editor.commit();
         }
         public void onNothingSelected( final AdapterView<?> arg0 ) {}
-        });    
+        });   
+      
+      final CheckBox chunking = (CheckBox) findViewById(R.id.chunking);
+      chunking.setChecked( prefs.getBoolean( WigleAndroid.PREF_CHUNKING, true) );
+      chunking.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
+              editor.putBoolean( WigleAndroid.PREF_CHUNKING, isChecked );
+              editor.commit();
+          }
+      });
+      
+      final CheckBox utf8 = (CheckBox) findViewById(R.id.utf8);
+      utf8.setChecked( prefs.getBoolean( WigleAndroid.PREF_UTF8, true) );
+      utf8.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
+              editor.putBoolean( WigleAndroid.PREF_UTF8, isChecked );
+              editor.commit();
+          }
+      });
   }
   
   /* Creates the menu items */

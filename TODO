@@ -19,6 +19,8 @@ some response/info/stat about uploaded files
 --- done ---
 * 1.16
 fix db close stall
+write stackfile in additional catches
+allow user to toggle chunking and utf8 (for debugging)
 
 * 1.15
 more db optimization (more precompiled statements, temp_store=memory, 

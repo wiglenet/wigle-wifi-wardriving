@@ -17,6 +17,10 @@ kismet drone support
 some response/info/stat about uploaded files
 
 --- done ---
+* 1.17 (unreleased)
+remove unneeded chunking and utf8 settings
+add maxout db marker button to settings
+
 * 1.16
 fix db close stall
 write stackfile in additional catches

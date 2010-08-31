@@ -19,7 +19,6 @@ import java.nio.charset.CoderResult;
 import java.util.Map;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Handler;
 
@@ -28,8 +27,7 @@ import android.os.Handler;
  * Read more: http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html#ixzz0iqTJF7SV
  */
 final class HttpFileUploader {
-  private static final String ENCODING_UTF8 = "UTF-8";
-  private static final String ENCODING_8859 = "ISO-8859-1";
+  private static final String ENCODING = "UTF-8";
   
   /** don't allow construction */
   private HttpFileUploader(){
@@ -70,11 +68,9 @@ final class HttpFileUploader {
       //------------------ CLIENT REQUEST
     
       WigleAndroid.info("Creating url connection");
-      final SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
-
+      
       // Open a HTTP connection to the URL
-      final String encoding = prefs.getBoolean( WigleAndroid.PREF_UTF8, true) ? ENCODING_UTF8 : ENCODING_8859;
-      CharsetEncoder enc = Charset.forName( encoding ).newEncoder();
+      CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
       CharBuffer cbuff = CharBuffer.allocate( 1024 );
       ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
 
@@ -98,13 +94,11 @@ final class HttpFileUploader {
       conn.setRequestProperty("Connection", "Keep-Alive");
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
       
-      if ( prefs.getBoolean( WigleAndroid.PREF_CHUNKING, true) ) {
-        // chunk large stuff
-        conn.setChunkedStreamingMode( 32*1024 );
-        // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
-        conn.setRequestProperty("Transfer-Encoding", "chunked");
-      }
-
+      // chunk large stuff
+      conn.setChunkedStreamingMode( 32*1024 );
+      // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
+      conn.setRequestProperty("Transfer-Encoding", "chunked");
+    
       // connect
       WigleAndroid.info( "about to connect" );
       conn.connect();

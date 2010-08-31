@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.andnav.osm.util.GeoPoint;
+import org.andnav.osm.views.OpenStreetMapView;
 import org.andnav.osm.views.OpenStreetMapViewController;
 import org.andnav.osm.views.overlay.MyLocationOverlay;
 
@@ -15,6 +16,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -23,6 +25,7 @@ import android.widget.TextView;
 public final class MappingActivity extends Activity {
   private OpenStreetMapViewController mapControl;
   private OpenStreetMapViewWrapper mapView;
+  private OpenStreetMapView miniMapView;
   private Handler timer;
   private AtomicBoolean finishing;
   private boolean locked = true;
@@ -93,6 +96,26 @@ public final class MappingActivity extends Activity {
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( 15 );
     mapControl.setCenter( centerPoint );
+    
+    // MiniMap (not used, waiting for osmdroid to fix issue 30, synching the two maps
+    if ( false ){
+      // Create another OpenStreetMapView, that will act as the MiniMap for the 'MainMap'. They will share the TileProvider.
+      miniMapView = new OpenStreetMapView( this, mapView.getRenderer(), mapView );
+      miniMapView.setBuiltInZoomControls( false );
+      mapView.setMultiTouchControls( true );
+      
+      final int zoomDiff = 3; // Use OpenStreetMapViewConstants.NOT_SET to disable autozooming of this minimap
+      this.mapView.setMiniMap(miniMapView, zoomDiff);
+
+      // Create RelativeLayout.LayoutParams that position the MiniMap on the top-right corner of the RelativeLayout.
+      RelativeLayout.LayoutParams minimapParams = new RelativeLayout.LayoutParams(90, 90);
+      minimapParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+      minimapParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+      minimapParams.setMargins(5,5,5,5);
+      
+      RelativeLayout rl = (RelativeLayout) this.findViewById( R.id.map_rl );
+      rl.addView(miniMapView, minimapParams);
+    }
     
     WigleAndroid.info("done setupMapView");
   }

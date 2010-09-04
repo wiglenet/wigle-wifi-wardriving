@@ -157,7 +157,7 @@ public final class SettingsActivity extends Activity {
           this, android.R.layout.simple_spinner_item);
       final long[] periods = new long[]{ 0,50,250,500,1000,2000,5000,10000 };
       final String[] periodName = new String[]{ "Nonstop","50 ms","250ms","500 ms","1 sec","2 sec","5 sec","10 sec" };
-      long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, 1000L);
+      long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, WigleAndroid.SCAN_DEFAULT );
       int periodIndex = 0;
       for ( int i = 0; i < periods.length; i++ ) {
         adapter.add( periodName[i] );

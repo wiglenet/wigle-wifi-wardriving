@@ -160,6 +160,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     static final long LOCATION_UPDATE_INTERVAL = 1000L;
+    static final long SCAN_DEFAULT = 2000L;
     
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
@@ -683,7 +684,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
             long nonstopScanRequestTime = Long.MIN_VALUE;
-            final long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L );
+            final long period = prefs.getLong( PREF_SCAN_PERIOD, SCAN_DEFAULT );
             if ( period == 0 ) {
               // treat as "continuous", so request scan in here
               doWifiScan( wifiManager );
@@ -915,7 +916,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
                 if ( scanRequestTime <= 0 ) {
                   scanRequestTime = System.currentTimeMillis();
                 }
-                long period = prefs.getLong( PREF_SCAN_PERIOD, 1000L);
+                long period = prefs.getLong( PREF_SCAN_PERIOD, SCAN_DEFAULT );
                 // check if set to "continuous"
                 if ( period == 0L ) {
                   // set to default here, as a scan will also be requested on the scan result listener

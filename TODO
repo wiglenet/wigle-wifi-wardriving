@@ -15,6 +15,8 @@ network list sorting options
 shut off when battery is at chosen percentage
 kismet drone support
 some response/info/stat about uploaded files
+remember previous location for when we don't have one
+update service notificaton string with some stats
 
 --- done ---
 * 1.17 (unreleased)

@@ -93,6 +93,18 @@ public final class MappingActivity extends Activity {
     else if ( location != null ) {
       centerPoint = new GeoPoint( location );
     }
+    else if ( previousLocation != null ) {
+      centerPoint = new GeoPoint( previousLocation );
+    }
+    else {
+      // ok, try the saved prefs
+      final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
+      float lat = prefs.getFloat( WigleAndroid.PREF_PREV_LAT, Float.MIN_VALUE );
+      float lon = prefs.getFloat( WigleAndroid.PREF_PREV_LON, Float.MIN_VALUE );
+      if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
+        centerPoint = new GeoPoint( lat, lon );
+      }
+    }
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( 15 );
     mapControl.setCenter( centerPoint );
@@ -146,8 +158,10 @@ public final class MappingActivity extends Activity {
                   // location or nets have changed, update the view
                   mapView.postInvalidate();
                 }
+                // set if location isn't null
+                previousLocation = location;
               }
-              previousLocation = location;
+              
               previousRunNets = WigleAndroid.lameStatic.runNets;
               final String savedStats = WigleAndroid.lameStatic.savedStats;
               if ( savedStats != null ) {

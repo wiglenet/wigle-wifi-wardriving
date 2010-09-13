@@ -15,13 +15,14 @@ network list sorting options
 shut off when battery is at chosen percentage
 kismet drone support
 some response/info/stat about uploaded files
-remember previous location for when we don't have one
 update service notificaton string with some stats
 
 --- done ---
 * 1.17 (unreleased)
 remove unneeded chunking and utf8 settings
 add maxout db marker button to settings
+fix ssid encoding short-circuit bug
+remember previous location for when we don't have one for mapping
 
 * 1.16
 fix db close stall

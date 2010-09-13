@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CodingErrorAction;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
@@ -244,6 +245,8 @@ public final class FileUploaderTask extends Thread {
         CharBuffer charBuffer = CharBuffer.allocate( 256 );
         ByteBuffer byteBuffer = ByteBuffer.allocate( 256 ); // this ensures hasArray() is true
         final CharsetEncoder encoder = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
+        // don't stop when a goofy character is found
+        encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
         final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
         if ( numberFormat instanceof DecimalFormat ) {
           final DecimalFormat dc = (DecimalFormat) numberFormat;
@@ -284,6 +287,7 @@ public final class FileUploaderTask extends Thread {
           try {
             charBuffer.append( network.getBssid() );
             charBuffer.append( COMMA );
+            // ssid = "ronan stephens’s iMac";
             charBuffer.append( ssid );
             charBuffer.append( COMMA );
             charBuffer.append( network.getCapabilities() );

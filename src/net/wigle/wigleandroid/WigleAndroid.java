@@ -157,6 +157,8 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_DISTANCE_TOTAL = "distTotal";
     static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
+    static final String PREF_PREV_LAT = "prevLat";
+    static final String PREF_PREV_LON = "prevLon";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     static final long LOCATION_UPDATE_INTERVAL = 1000L;
@@ -420,10 +422,25 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       super.onDestroy();
     }
     
+    private void saveLocation() {
+      // save our location for use on later runs
+      if ( this.location != null ) {
+        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+        final Editor edit = prefs.edit();
+        // there is no putDouble
+        edit.putFloat( PREF_PREV_LAT, (float) location.getLatitude() );
+        edit.putFloat( PREF_PREV_LON, (float) location.getLongitude() );
+        edit.commit();
+      }
+    }
+    
     @Override
     public void finish() {
       info( "finish. networks: " + runNetworks.size() );
       finishing.set( true );
+      
+      // save our location for later runs
+      saveLocation();
       
       // close the db. not in destroy, because it'll still write after that.
       dbHelper.close();
@@ -1082,6 +1099,10 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           wasProviderChange = true;
         }
         location = newLocation;
+        if ( wasProviderChange ) {
+          // save it in prefs
+          saveLocation();
+        }
       }
       else if ( newOK && NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
         if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {

@@ -323,9 +323,19 @@ public final class DatabaseHelper extends Thread {
       countdown--;
       this.interrupt();
     }
-    synchronized ( this ) { 
-      if ( db.isOpen() ) {
-        db.close();
+    
+    countdown = 50;
+    while ( db.isOpen() && countdown > 0 ) {
+      try {
+        synchronized ( this ) { 
+          if ( db.isOpen() ) {
+            db.close();
+          }
+        }
+      }
+      catch ( SQLiteException ex ) {
+        WigleAndroid.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
+        WigleAndroid.sleep( 100L );
       }
     }
   }

@@ -23,6 +23,7 @@ update service notificaton string with some stats
 remove unneeded chunking and utf8 settings
 add maxout db marker button to settings
 fix ssid encoding short-circuit bug
+fix db close race condition exception
 remember previous location for when we don't have one for mapping
 
 * 1.16

@@ -6,7 +6,6 @@
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name" android:debuggable="false">
         <activity android:name=".WigleAndroid"
                   android:label="@string/app_name"
-                  android:screenOrientation="portrait"
                   android:launchMode="singleTask"
                   android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>

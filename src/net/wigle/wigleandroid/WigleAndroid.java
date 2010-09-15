@@ -147,6 +147,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_DB_MARKER = "dbMarker";
     static final String PREF_MAX_DB = "maxDbMarker";
     static final String PREF_SCAN_PERIOD = "scanPeriod";
+    static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
     static final String PREF_FOUND_SOUND = "foundSound";
     static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
     static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -437,6 +438,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     @Override
     public void finish() {
       info( "finish. networks: " + runNetworks.size() );
+      speak( "done." );
       finishing.set( true );
       
       // save our location for later runs
@@ -489,6 +491,10 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       }
       
       if ( tts != null ) {
+        if ( ! isMuted() ) {
+          // give time for the above "done" to be said
+          sleep( 250 );
+        }
         tts.shutdown();
       }
       
@@ -701,7 +707,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
             long nonstopScanRequestTime = Long.MIN_VALUE;
-            final long period = prefs.getLong( PREF_SCAN_PERIOD, SCAN_DEFAULT );
+            final long period = prefs.getLong( chooseScanPref(), SCAN_DEFAULT );
             if ( period == 0 ) {
               // treat as "continuous", so request scan in here
               doWifiScan( wifiManager );
@@ -933,7 +939,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
                 if ( scanRequestTime <= 0 ) {
                   scanRequestTime = System.currentTimeMillis();
                 }
-                long period = prefs.getLong( PREF_SCAN_PERIOD, SCAN_DEFAULT );
+                long period = prefs.getLong( chooseScanPref(), SCAN_DEFAULT );
                 // check if set to "continuous"
                 if ( period == 0L ) {
                   // set to default here, as a scan will also be requested on the scan result listener
@@ -964,6 +970,15 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           info( "startup finished. wifi scanOK: " + scanOK );
         }
       }
+    }
+    
+    private String chooseScanPref() {
+      String retval = PREF_SCAN_PERIOD;
+      // if over 5 mph
+      if ( location != null && location.getSpeed() >= 2.2352f ) {
+        retval = PREF_SCAN_PERIOD_FAST;
+      }
+      return retval;
     }
     
     /**

@@ -151,34 +151,10 @@ public final class SettingsActivity extends Activity {
           }
       });
       
-      // period spinner
-      Spinner spinner = (Spinner) findViewById( R.id.period_spinner );
-      ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-          this, android.R.layout.simple_spinner_item);
-      final long[] periods = new long[]{ 0,50,250,500,1000,2000,5000,10000 };
-      final String[] periodName = new String[]{ "Nonstop","50 ms","250ms","500 ms","1 sec","2 sec","5 sec","10 sec" };
-      long period = prefs.getLong( WigleAndroid.PREF_SCAN_PERIOD, WigleAndroid.SCAN_DEFAULT );
-      int periodIndex = 0;
-      for ( int i = 0; i < periods.length; i++ ) {
-        adapter.add( periodName[i] );
-        if ( period == periods[i] ) {
-          periodIndex = i;
-        }
-      }
-      adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-      spinner.setAdapter( adapter );
-      spinner.setSelection( periodIndex );
-      spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-        public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-          // set pref
-          final long period = periods[position];
-          WigleAndroid.info( "setting period: " + period );
-          editor.putLong( WigleAndroid.PREF_SCAN_PERIOD, period );
-          editor.commit();
-        }
-        public void onNothingSelected( final AdapterView<?> arg0 ) {}
-        });    
-  
+      // period spinners
+      doScanSpinner( R.id.period_spinner, WigleAndroid.PREF_SCAN_PERIOD );
+      doScanSpinner( R.id.periodfast_spinner, WigleAndroid.PREF_SCAN_PERIOD_FAST );
+      
       final CheckBox foundSound = (CheckBox) findViewById(R.id.found_sound);
       foundSound.setChecked( prefs.getBoolean( WigleAndroid.PREF_FOUND_SOUND, true) );
       foundSound.setOnCheckedChangeListener( new OnCheckedChangeListener() {
@@ -207,19 +183,19 @@ public final class SettingsActivity extends Activity {
       });
       
       // speach spinner
-      spinner = (Spinner) findViewById( R.id.speak_spinner );
+      Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
       if ( ! TTS.hasTTS() ) {
         // no text to speech :(
         spinner.setEnabled( false );
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText("No Text-to-Speech engine");
       }
-      adapter = new ArrayAdapter<String>(
+      ArrayAdapter<String> adapter = new ArrayAdapter<String>(
           this, android.R.layout.simple_spinner_item );
-      final long[] speechPeriods = new long[]{ 0,10,15,30,60,120,300,600 };
-      final String[] speechName = new String[]{ "Off","10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min" };
-      period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, WigleAndroid.DEFAULT_SPEECH_PERIOD );
-      periodIndex = 0;
+      final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,1800,0 };
+      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min","30 min","Off" };
+      long period = prefs.getLong( WigleAndroid.PREF_SPEECH_PERIOD, WigleAndroid.DEFAULT_SPEECH_PERIOD );
+      int periodIndex = 0;
       for ( int i = 0; i < speechPeriods.length; i++ ) {
         adapter.add( speechName[i] );
         if ( period == speechPeriods[i] ) {
@@ -241,6 +217,38 @@ public final class SettingsActivity extends Activity {
         });   
       
       
+  }
+  
+  private void doScanSpinner( final int id, final String pref ) {
+    final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
+    final Editor editor = prefs.edit();
+    
+    Spinner spinner = (Spinner) findViewById( id );
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        this, android.R.layout.simple_spinner_item);
+    final long[] periods = new long[]{ 0,50,250,500,1000,2000,5000,10000,30000 };
+    final String[] periodName = new String[]{ "Nonstop","50 ms","250ms","500 ms","1 sec","2 sec","5 sec","10 sec","30 sec" };
+    long period = prefs.getLong( pref, WigleAndroid.SCAN_DEFAULT );
+    int periodIndex = 0;
+    for ( int i = 0; i < periods.length; i++ ) {
+      adapter.add( periodName[i] );
+      if ( period == periods[i] ) {
+        periodIndex = i;
+      }
+    }
+    adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+    spinner.setAdapter( adapter );
+    spinner.setSelection( periodIndex );
+    spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+      public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+        // set pref
+        final long period = periods[position];
+        WigleAndroid.info( "setting period: " + period );
+        editor.putLong( pref, period );
+        editor.commit();
+      }
+      public void onNothingSelected( final AdapterView<?> arg0 ) {}
+      });
   }
   
   /* Creates the menu items */

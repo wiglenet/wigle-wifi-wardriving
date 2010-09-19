@@ -204,7 +204,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        setContentView( R.layout.main );
+        setContentView( R.layout.list );
         
         if ( DEBUG ) {
           Debug.startMethodTracing("wigle");
@@ -557,7 +557,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
       super.onConfigurationChanged( newConfig );
-      setContentView( R.layout.main );
+      setContentView( R.layout.list );
       info( "on config change" );
       
       // have to redo linkages/listeners

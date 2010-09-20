@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
+import android.widget.TextView;
 
 public class MainActivity extends TabActivity {
   static final String TAB_LIST = "list";
@@ -18,7 +20,7 @@ public class MainActivity extends TabActivity {
     setContentView(R.layout.main);
 
     TabHost tabHost = getTabHost();  // The activity TabHost
-    TabHost.TabSpec spec;  // Resusable TabSpec for each tab
+    TabHost.TabSpec spec;  // Reusable TabSpec for each tab
     Intent intent;  // Reusable Intent for each tab
 
     // Create an Intent to launch an Activity for the tab (to be reused)
@@ -44,8 +46,21 @@ public class MainActivity extends TabActivity {
     
     // force shrink the tabs
     for ( int i = 0; i < tabHost.getTabWidget().getChildCount(); i++ ) {
-      ViewGroup.LayoutParams param = tabHost.getTabWidget().getChildAt( i ).getLayoutParams();
-      param.height = 45;
+      View view = tabHost.getTabWidget().getChildAt( i );
+      int height = 50;
+//      if ( view instanceof ViewGroup ) {
+//        ViewGroup vg = (ViewGroup) view;
+//        if ( vg.getChildCount() > 1 ) {
+//          View child = vg.getChildAt( 1 );
+//          WigleAndroid.info( "child: " + child );
+//          if ( child instanceof TextView ) {
+//            height = child.getMeasuredHeight();
+//            WigleAndroid.info( "height: " + height );
+//          }
+//        }
+//      }
+      ViewGroup.LayoutParams param = view.getLayoutParams();
+      param.height = height;
     }
 
     tabHost.setCurrentTabByTag( TAB_LIST );

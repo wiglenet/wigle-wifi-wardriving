@@ -6,6 +6,7 @@ turn scan on/off
 show IEEE octet info
 english/metric toggle
 minimap in dashboard? list of ssids?
+seen-networks map tile overlays
 
 --- user suggested ---
 option for kml save for checking coverage back at home PC
@@ -16,11 +17,8 @@ kismet drone support
 some response/info/stat about uploaded files
 update service notificaton string with some stats
 
---- priority items ---
-seen-networks map tile overlays
-
 --- done ---
-* 1.17 (unreleased)
+* 1.17
 remove unneeded chunking and utf8 settings
 add maxout db marker button to settings
 fix ssid encoding short-circuit bug

@@ -187,13 +187,14 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     }
     public static class LameStatic {
       public Location location; 
-      public String savedStats;
       public ConcurrentLinkedHashMap<GeoPoint,TrailStat> trail = 
         new ConcurrentLinkedHashMap<GeoPoint,TrailStat>( 512 );
       public int runNets;
       public long newNets;
       public int currNets;
       public int preQueueSize;
+      public long dbNets;
+      public long dbLocs;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -307,8 +308,14 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           this.soundNewPop = retained.soundNewPop;
           this.wifiLock = retained.wifiLock;
           
-          final TextView tv = (TextView) findViewById( R.id.stats );
-          tv.setText( savedStats );
+          final int runNets = runNetworks == null ? 0 : runNetworks.size();
+          TextView tv = (TextView) findViewById( R.id.stats_run );
+          tv.setText( "Run: " + runNets );
+          tv = (TextView) findViewById( R.id.stats_new );
+          tv.setText( "New: " + prevNewNetCount );
+          tv = (TextView) findViewById( R.id.stats_dbnets );
+          tv.setText( "DB: " + WigleAndroid.lameStatic.dbNets );
+          
         }
         else {
           runNetworks = new HashSet<String>();
@@ -608,6 +615,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       // may have been set by nonconfig retain
       if ( listAdapter == null ) {
         listAdapter = new ArrayAdapter<Network>( this, R.layout.row ) {
+          // separators aren't drawn if we do this
 //          @Override
 //          public boolean areAllItemsEnabled() {
 //            return false;
@@ -842,22 +850,24 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             // sort by signal strength
             listAdapter.sort( signalCompare );
 
+            final long dbNets = dbHelper.getNetworkCount();
+            final long dbLocs = dbHelper.getLocationCount();
+            
             // update stat
-            final TextView tv = (TextView) findViewById( R.id.stats );
-            final StringBuilder builder = new StringBuilder( 40 );
-            builder.append( "Run: " ).append( runNetworks.size() );
-            builder.append( " New: " ).append( newNetCount );
-            builder.append( " DB: " ).append( dbHelper.getNetworkCount() );
-            builder.append( " Locs: " ).append( dbHelper.getLocationCount() );
-            savedStats = builder.toString();
-            tv.setText( savedStats );
+            TextView tv = (TextView) findViewById( R.id.stats_run );
+            tv.setText( "Run: " + runNetworks.size() );
+            tv = (TextView) findViewById( R.id.stats_new );
+            tv.setText( "New: " + newNetCount );
+            tv = (TextView) findViewById( R.id.stats_dbnets );
+            tv.setText( "DB: " + dbNets );
             
             // set the statics for the map
-            WigleAndroid.lameStatic.savedStats = savedStats;
             WigleAndroid.lameStatic.runNets = runNetworks.size();
             WigleAndroid.lameStatic.newNets = newNetCount;
             WigleAndroid.lameStatic.currNets = resultSize;
             WigleAndroid.lameStatic.preQueueSize = preQueueSize;
+            WigleAndroid.lameStatic.dbNets = dbNets;
+            WigleAndroid.lameStatic.dbLocs = dbLocs;
             
             if ( newForRun > 0 ) {
               if ( location == null ) {
@@ -894,8 +904,9 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
               // wasn't set, set to now
               scanRequestTime = now;
             }
-            status( resultSize + " scan " + (now - scanRequestTime) + "ms, process " 
-                + (now - start) + "ms. DB Q: " + preQueueSize );
+            final String status = resultSize + " scanned in " + (now - scanRequestTime) + "ms. DB Queue: " + preQueueSize;
+            tv = (TextView) findViewById( R.id.status );
+            tv.setText( status );
             // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
             scanRequestTime = nonstopScanRequestTime;
             
@@ -1559,12 +1570,6 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       info( "upload file" );
       final FileUploaderTask task = new FileUploaderTask( this, dbHelper, this );
       task.start();
-    }
-    
-    private void status( String status ) {
-      // info( status );
-      final TextView tv = (TextView) findViewById( R.id.status );
-      tv.setText( status );
     }
     
     public static void sleep( final long sleep ) {

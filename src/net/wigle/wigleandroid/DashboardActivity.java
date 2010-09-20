@@ -81,6 +81,12 @@ public class DashboardActivity extends Activity {
     tv = (TextView) findViewById( R.id.queuesize );
     tv.setText( "DB Queue: " + WigleAndroid.lameStatic.preQueueSize );
     
+    tv = (TextView) findViewById( R.id.dbNets );
+    tv.setText( "DB Nets: " + WigleAndroid.lameStatic.dbNets );
+    
+    tv = (TextView) findViewById( R.id.dbLocs );
+    tv.setText( "DB Locations: " + WigleAndroid.lameStatic.dbLocs );
+    
     tv = (TextView) findViewById( R.id.gpsstatus );
     Location location = WigleAndroid.lameStatic.location;
     String gpsStatus = "No Location!";

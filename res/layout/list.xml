@@ -4,13 +4,34 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
 <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/stats"
-    android:text="@string/stats"
+    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:id="@+id/stats_run"
     android:textSize="16sp"
+    android:layout_weight="1"
+    android:textColor="#AAAA00"
     />
+<TextView
+    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:id="@+id/stats_new"
+    android:textSize="16sp"
+    android:layout_weight="1"
+    android:textColor="#AAEE50"
+    android:text="@string/stats"
+    />
+<TextView
+    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:id="@+id/stats_dbnets"
+    android:textSize="16sp"
+    android:layout_weight="1"
+    />
+</LinearLayout>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"

@@ -164,11 +164,13 @@ public final class MappingActivity extends Activity {
               }
               
               previousRunNets = WigleAndroid.lameStatic.runNets;
-              final String savedStats = WigleAndroid.lameStatic.savedStats;
-              if ( savedStats != null ) {
-                final TextView tv = (TextView) findViewById( R.id.stats );
-                tv.setText( savedStats );
-              }
+              
+              TextView tv = (TextView) findViewById( R.id.stats_run );
+              tv.setText( "Run: " + WigleAndroid.lameStatic.runNets );
+              tv = (TextView) findViewById( R.id.stats_new );
+              tv.setText( "New: " + WigleAndroid.lameStatic.newNets );
+              tv = (TextView) findViewById( R.id.stats_dbnets );
+              tv.setText( "DB: " + WigleAndroid.lameStatic.dbNets );
               
               final long period = 1000L;
               // info("wifitimer: " + period );

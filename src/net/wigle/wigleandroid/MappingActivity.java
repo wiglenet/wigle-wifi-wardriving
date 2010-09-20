@@ -14,6 +14,7 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
@@ -248,7 +249,7 @@ public final class MappingActivity extends Activity {
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_RETURN: {
-          finish();
+          MainActivity.switchTab( this, MainActivity.TAB_LIST );
           return true;
         }
         case MENU_ZOOM_IN: {
@@ -282,6 +283,19 @@ public final class MappingActivity extends Activity {
         }
       }
       return false;
+  }
+  
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_BACK) {
+      WigleAndroid.info( "onKeyDown: treating back like home, not quitting app" );
+      moveTaskToBack(true);
+      if ( getParent() != null ) {
+        getParent().moveTaskToBack( true );
+      }
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
   }
   
 }

@@ -28,6 +28,7 @@ import org.andnav.osm.util.GeoPoint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -345,31 +346,31 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     
     @Override
     public void onPause() {
-      info( "paused. networks: " + runNetworks.size() );
+      info( "LIST: paused. networks: " + runNetworks.size() );
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "resumed. networks: " + runNetworks.size() );
+      info( "LIST: resumed. networks: " + runNetworks.size() );
       super.onResume();
     }
     
     @Override
     public void onStart() {
-      info( "start. networks: " + runNetworks.size() );
+      info( "LIST: start. networks: " + runNetworks.size() );
       super.onStart();
     }
     
     @Override
     public void onStop() {
-      info( "stop. networks: " + runNetworks.size() );
+      info( "LIST: stop. networks: " + runNetworks.size() );
       super.onStop();
     }
 
     @Override
     public void onRestart() {
-      info( "restart. networks: " + runNetworks.size() );
+      info( "LIST: restart. networks: " + runNetworks.size() );
       super.onRestart();
     }
     
@@ -378,6 +379,9 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       if (keyCode == KeyEvent.KEYCODE_BACK) {
         info( "onKeyDown: treating back like home, not quitting app" );
         moveTaskToBack(true);
+        if ( getParent() != null ) {
+          getParent().moveTaskToBack( true );
+        }
         return true;
       }
       return super.onKeyDown(keyCode, event);
@@ -385,7 +389,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     
     @Override
     public void onDestroy() {
-      info( "destroy. networks: " + runNetworks.size() );
+      info( "LIST: destroy. networks: " + runNetworks.size() );
       
       if ( DEBUG ) {
         Debug.stopMethodTracing();
@@ -525,26 +529,20 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         switch ( item.getItemId() ) {
           case MENU_SETTINGS: {
             info("start settings activity");
-            final Intent intent = new Intent( this, SettingsActivity.class );
-            this.startActivity( intent );
+            MainActivity.switchTab( this, MainActivity.TAB_SETTINGS );
             return true;
           }
           case MENU_MAP: {
             info("start map activity");
-            final Intent intent = new Intent( this, MappingActivity.class );
-            this.startActivity( intent );
+            MainActivity.switchTab( this, MainActivity.TAB_MAP );
             return true;
           }
           case MENU_DASH: {
             info("start dashboard activity");
-            final Intent intent = new Intent( this, DashboardActivity.class );
-            this.startActivity( intent );
+            MainActivity.switchTab( this, MainActivity.TAB_MAP );
             return true;
           }
           case MENU_EXIT:
-            // stop the service, so when we die it's both stopped and unbound and will die
-            final Intent serviceIntent = new Intent( this, WigleService.class );
-            this.stopService( serviceIntent );
             // call over to finish
             finish();
             return true;

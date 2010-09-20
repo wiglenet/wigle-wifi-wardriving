@@ -8,6 +8,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -243,7 +244,7 @@ public final class SettingsActivity extends Activity {
       public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
         // set pref
         final long period = periods[position];
-        WigleAndroid.info( "setting period: " + period );
+        WigleAndroid.info( pref + " setting period: " + period );
         editor.putLong( pref, period );
         editor.commit();
       }
@@ -268,7 +269,7 @@ public final class SettingsActivity extends Activity {
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_RETURN:
-          finish();
+          MainActivity.switchTab( this, MainActivity.TAB_LIST );
           return true;
         case MENU_ERROR_REPORT:
           final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
@@ -276,6 +277,19 @@ public final class SettingsActivity extends Activity {
           break;
       }
       return false;
+  }
+  
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_BACK) {
+      WigleAndroid.info( "onKeyDown: treating back like home, not quitting app" );
+      moveTaskToBack(true);
+      if ( getParent() != null ) {
+        getParent().moveTaskToBack( true );
+      }
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
   }
   
 }

@@ -79,7 +79,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class WigleAndroid extends Activity implements FileUploaderListener {
+public final class ListActivity extends Activity implements FileUploaderListener {
     // *** state. anything added here should be added to the retain copy-construction ***
     private ArrayAdapter<Network> listAdapter;
     private Set<String> runNetworks;
@@ -241,13 +241,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
           public void uncaughtException( Thread thread, Throwable throwable ) {
             String error = "Thread: " + thread + " throwable: " + throwable;
-            WigleAndroid.error( error );
+            ListActivity.error( error );
             throwable.printStackTrace();
             
-            WigleAndroid.writeError( thread, throwable, WigleAndroid.this );
+            ListActivity.writeError( thread, throwable, ListActivity.this );
             
             // this doesn't seem to work. maybe we can get an out-of-app context to use?
-//            Toast.makeText( WigleAndroid.this.getBaseContext(), "error: " + throwable, Toast.LENGTH_LONG ).show();
+//            Toast.makeText( ListActivity.this.getBaseContext(), "error: " + throwable, Toast.LENGTH_LONG ).show();
             
             // notification just blocks forever
 //            String ns = Context.NOTIFICATION_SERVICE;
@@ -265,7 +265,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
 //            emailIntent .putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"});
 //            emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT, "error");
 //            emailIntent .putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error: " + throwable );
-//            WigleAndroid.this.getApplicationContext().startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+//            ListActivity.this.getApplicationContext().startActivity(Intent.createChooser(emailIntent, "Send mail..."));
             
             // these won't affect the pendingIntent. sigh.
 //            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error2: " + throwable );
@@ -283,9 +283,9 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         // if( true ){ throw new RuntimeException( "weee" ); }
         
         final Object stored = getLastNonConfigurationInstance();
-        if ( stored != null && stored instanceof WigleAndroid ) {
+        if ( stored != null && stored instanceof ListActivity ) {
           // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-          final WigleAndroid retained = (WigleAndroid) stored;
+          final ListActivity retained = (ListActivity) stored;
           this.listAdapter = retained.listAdapter;
           this.runNetworks = retained.runNetworks;
           this.gpsStatus = retained.gpsStatus;
@@ -314,7 +314,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           tv = (TextView) findViewById( R.id.stats_new );
           tv.setText( "New: " + prevNewNetCount );
           tv = (TextView) findViewById( R.id.stats_dbnets );
-          tv.setText( "DB: " + WigleAndroid.lameStatic.dbNets );
+          tv.setText( "DB: " + ListActivity.lameStatic.dbNets );
           
         }
         else {
@@ -734,7 +734,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       // this receiver is the main workhorse of the entire app
       wifiReceiver = new BroadcastReceiver(){
           public void onReceive( final Context context, final Intent intent ){
-            final long start = System.currentTimeMillis();
+            // final long start = System.currentTimeMillis();
 
             final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
             
@@ -862,12 +862,12 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             tv.setText( "DB: " + dbNets );
             
             // set the statics for the map
-            WigleAndroid.lameStatic.runNets = runNetworks.size();
-            WigleAndroid.lameStatic.newNets = newNetCount;
-            WigleAndroid.lameStatic.currNets = resultSize;
-            WigleAndroid.lameStatic.preQueueSize = preQueueSize;
-            WigleAndroid.lameStatic.dbNets = dbNets;
-            WigleAndroid.lameStatic.dbLocs = dbLocs;
+            ListActivity.lameStatic.runNets = runNetworks.size();
+            ListActivity.lameStatic.newNets = newNetCount;
+            ListActivity.lameStatic.currNets = resultSize;
+            ListActivity.lameStatic.preQueueSize = preQueueSize;
+            ListActivity.lameStatic.dbNets = dbNets;
+            ListActivity.lameStatic.dbLocs = dbLocs;
             
             if ( newForRun > 0 ) {
               if ( location == null ) {
@@ -1326,18 +1326,18 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       if ( serviceConnection == null ) {
         final ComponentName compName = startService( serviceIntent );
         if ( compName == null ) {
-          WigleAndroid.error( "startService() failed!" );
+          ListActivity.error( "startService() failed!" );
         }
         else {
-          WigleAndroid.info( "service started ok: " + compName );
+          ListActivity.info( "service started ok: " + compName );
         }
         
         serviceConnection = new ServiceConnection(){
           public void onServiceConnected( final ComponentName name, final IBinder iBinder ) {
-            WigleAndroid.info( name + " service connected" ); 
+            ListActivity.info( name + " service connected" ); 
           }
           public void onServiceDisconnected( final ComponentName name ) {
-            WigleAndroid.info( name + " service disconnected" );
+            ListActivity.info( name + " service disconnected" );
           }
         };  
       }
@@ -1669,13 +1669,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       }
       catch ( final IOException ex ) {
         // ohwell
-        WigleAndroid.info( "no sd card apparently: " + ex, ex );
+        ListActivity.info( "no sd card apparently: " + ex, ex );
       }
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }
     
     private void setupMaxidDebug() {
-      final SharedPreferences prefs = WigleAndroid.this.getSharedPreferences( SHARED_PREFS, 0 );
+      final SharedPreferences prefs = ListActivity.this.getSharedPreferences( SHARED_PREFS, 0 );
       final long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
       // load up the local value
       dbHelper.getLocationCountFromDB();

@@ -3,7 +3,7 @@ package net.wigle.wigleandroid;
 import java.util.Map;
 import java.util.Set;
 
-import net.wigle.wigleandroid.WigleAndroid.TrailStat;
+import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.andnav.osm.util.GeoPoint;
 import org.andnav.osm.views.OpenStreetMapView;
@@ -57,11 +57,11 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     super.onDraw( c );
     
     OpenStreetMapViewProjection proj = this.getProjection();
-	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = WigleAndroid.lameStatic.trail.entrySet();
+	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
 	  Point point = null;
-	  final SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
-    final boolean showNewDBOnly = prefs.getBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, false );
+	  final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     
 	  if ( ! showNewDBOnly ) {
   	  for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
@@ -90,7 +90,7 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     }
     
     // draw user crosshairs
-    Location location = WigleAndroid.lameStatic.location;
+    Location location = ListActivity.lameStatic.location;
     if ( location != null ) {
       final GeoPoint user = new GeoPoint( location );
       point = proj.toMapPixels( user, point );

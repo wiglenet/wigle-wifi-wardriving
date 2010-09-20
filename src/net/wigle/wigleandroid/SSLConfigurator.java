@@ -101,10 +101,10 @@ public final class SSLConfigurator {
    * @param urlConn the HttpsURLConnection to set up
    */
   public void configure( final HttpsURLConnection urlConn ) {
-    WigleAndroid.info( "ssl configure" );
+    ListActivity.info( "ssl configure" );
     urlConn.setSSLSocketFactory( ssf );
     urlConn.setHostnameVerifier( hv );
-    WigleAndroid.info( "ssl configure done" );
+    ListActivity.info( "ssl configure done" );
   }
 
 
@@ -113,7 +113,7 @@ public final class SSLConfigurator {
    * @parma res the android Resources to load the cert via.
    */
   private boolean setupSSL( final Resources res ) {
-    WigleAndroid.info( "setupSSL" );
+    ListActivity.info( "setupSSL" );
     boolean result = false;
     try {
 
@@ -136,9 +136,9 @@ public final class SSLConfigurator {
       hv = new ReflexiveHostnameVerifier( cert ); // XXX: make less dumb
       result = true;  
     } catch ( final IOException e ) {
-        WigleAndroid.error( "Cannot read cert file: " + e, e );
+        ListActivity.error( "Cannot read cert file: " + e, e );
     } catch ( final Throwable e) {
-        WigleAndroid.error( "error initializing: " + e, e );
+        ListActivity.error( "error initializing: " + e, e );
     }
     
     return result;
@@ -154,20 +154,20 @@ public final class SSLConfigurator {
   
     ReflexiveHostnameVerifier( final Certificate cert ) {
       this.cert = cert;
-      WigleAndroid.info( "new verifier, cert" );
+      ListActivity.info( "new verifier, cert" );
     }
 
     // inherit docs
     public boolean verify( final String hostname, final SSLSession session ) {
        // we don't care about the hostname.
-      WigleAndroid.info( "cert verify hostname: " + hostname );
+      ListActivity.info( "cert verify hostname: " + hostname );
        try {
            // is our expected cert part of the chain?
            boolean retval = Arrays.asList( session.getPeerCertificates() ).contains( cert );
-           WigleAndroid.info( "cert verify: " + retval );
+           ListActivity.info( "cert verify: " + retval );
            return retval;
        } catch ( final SSLPeerUnverifiedException e ) {
-           WigleAndroid.error( "hostname: '"+hostname+
+           ListActivity.error( "hostname: '"+hostname+
                                "' dosen't match up with my WiGLE.net certificate. upgrade!\n"+
                                "or contact wigle-admin@wigle.net with this error:" + e, e );
          return false;

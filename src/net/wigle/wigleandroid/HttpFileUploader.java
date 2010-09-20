@@ -55,7 +55,7 @@ final class HttpFileUploader {
       connectURL = new URL( urlString );
     }
     catch( Exception ex ){
-      WigleAndroid.error( "MALFORMATED URL: " + ex, ex );
+      ListActivity.error( "MALFORMATED URL: " + ex, ex );
     }
     
     final String lineEnd = "\r\n";
@@ -67,7 +67,7 @@ final class HttpFileUploader {
     try {
       //------------------ CLIENT REQUEST
     
-      WigleAndroid.info("Creating url connection");
+      ListActivity.info("Creating url connection");
       
       // Open a HTTP connection to the URL
       CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
@@ -86,7 +86,7 @@ final class HttpFileUploader {
       if ( conn instanceof javax.net.ssl.HttpsURLConnection ) {
           final SSLConfigurator con = SSLConfigurator.getInstance( res );
           con.configure( (javax.net.ssl.HttpsURLConnection) conn );
-          WigleAndroid.info("using ssl! conn: " + conn);
+          ListActivity.info("using ssl! conn: " + conn);
       }
       
       // Use a post method.
@@ -100,27 +100,27 @@ final class HttpFileUploader {
       conn.setRequestProperty("Transfer-Encoding", "chunked");
     
       // connect
-      WigleAndroid.info( "about to connect" );
+      ListActivity.info( "about to connect" );
       conn.connect();
-      WigleAndroid.info( "connected" );
+      ListActivity.info( "connected" );
       
       OutputStream connOutputStream = conn.getOutputStream();
       if ( true ) {
         // reflect out the chunking info
         for ( Method meth : connOutputStream.getClass().getMethods() ) {
-          // WigleAndroid.info("meth: " + meth.getName() );
+          // ListActivity.info("meth: " + meth.getName() );
           try {
             if ( "isCached".equals(meth.getName()) || "isChunked".equals(meth.getName())) {
               Boolean val = (Boolean) meth.invoke( connOutputStream, (Object[]) null );
-              WigleAndroid.info( meth.getName() + " " + val );
+              ListActivity.info( meth.getName() + " " + val );
             }
             else if ( "size".equals( meth.getName())) {
               Integer val = (Integer) meth.invoke( connOutputStream, (Object[]) null );
-              WigleAndroid.info( meth.getName() + " " + val );
+              ListActivity.info( meth.getName() + " " + val );
             }
           }
           catch ( Exception ex ) {
-            WigleAndroid.error("ex: " + ex, ex );
+            ListActivity.error("ex: " + ex, ex );
           }
         }
       }
@@ -142,10 +142,10 @@ final class HttpFileUploader {
       header.append( "Content-Type: application/octet_stream" + lineEnd );
       header.append( lineEnd );
 
-      WigleAndroid.info( "About to write headers, length: " + header.length() );
+      ListActivity.info( "About to write headers, length: " + header.length() );
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
-      WigleAndroid.info( "Headers are written, length: " + header.length() );
+      ListActivity.info( "Headers are written, length: " + header.length() );
       int percentDone = ( (int)header.length() * 100) / (int)filesize;
       if ( handler != null ) {
           handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
@@ -153,7 +153,7 @@ final class HttpFileUploader {
     
       FileChannel fc = fileInputStream.getChannel();
       long byteswritten = fc.transferTo( 0, Integer.MAX_VALUE, wbc ); // transfer it all. the integer cap is reasonable.
-      WigleAndroid.info( "transferred " + byteswritten + " of " + filesize );
+      ListActivity.info( "transferred " + byteswritten + " of " + filesize );
       percentDone = ((int)byteswritten * 100) / (int)filesize;
 
       // only send it the once... if we want to to send updates out to the ui:
@@ -169,13 +169,13 @@ final class HttpFileUploader {
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
       // close streams
-      WigleAndroid.info( "File is written" );
+      ListActivity.info( "File is written" );
       wbc.close();
       fc.close();
       fileInputStream.close();
       
       int responseCode = conn.getResponseCode();
-      WigleAndroid.info( "connection response code: " + responseCode );
+      ListActivity.info( "connection response code: " + responseCode );
 
       // read the response
       final InputStream is = conn.getInputStream();
@@ -187,21 +187,21 @@ final class HttpFileUploader {
         b.append( new String( buffer, 0, ch ) );
       }
       retval = b.toString();
-      // WigleAndroid.info( "Response: " + retval );
+      // ListActivity.info( "Response: " + retval );
     }
     catch ( final MalformedURLException ex ) {
-      WigleAndroid.error( "HttpFileUploader: " + ex, ex );
-      WigleAndroid.writeError(Thread.currentThread(), ex, context);
+      ListActivity.error( "HttpFileUploader: " + ex, ex );
+      ListActivity.writeError(Thread.currentThread(), ex, context);
       retval = ex.toString();
     }  
     catch ( final IOException ioe ) {
-      WigleAndroid.error( "HttpFileUploader: " + ioe, ioe );
-      WigleAndroid.writeError(Thread.currentThread(), ioe, context);
+      ListActivity.error( "HttpFileUploader: " + ioe, ioe );
+      ListActivity.writeError(Thread.currentThread(), ioe, context);
       retval = ioe.toString();
     }
     finally {
       if ( conn != null ) {
-        WigleAndroid.info( "conn disconnect" );
+        ListActivity.info( "conn disconnect" );
         conn.disconnect();
       }
     }

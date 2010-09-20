@@ -13,19 +13,19 @@ public final class WigleService extends Service {
 
   @Override
   public IBinder onBind( final Intent intent ) {
-    WigleAndroid.info( "service: onbind" );
+    ListActivity.info( "service: onbind" );
     return null;
   }
   
   @Override
   public void onRebind( final Intent intent ) {
-    WigleAndroid.info( "service: onRebind" );
+    ListActivity.info( "service: onRebind" );
     super.onRebind( intent );
   }
 
   @Override
   public boolean onUnbind( final Intent intent ) {
-    WigleAndroid.info( "service: onUnbind" );
+    ListActivity.info( "service: onUnbind" );
     shutdownNotification();
 		stopSelf();
     return super.onUnbind( intent );
@@ -33,14 +33,14 @@ public final class WigleService extends Service {
 
   @Override
   public void onCreate() {
-    WigleAndroid.info( "service: oncreate" );
+    ListActivity.info( "service: oncreate" );
     setupNotification();
     super.onCreate();
   }
   
   @Override
   public void onDestroy() {
-    WigleAndroid.info( "service: ondestroy" );
+    ListActivity.info( "service: ondestroy" );
     shutdownNotification();
     super.onDestroy();
   }
@@ -48,7 +48,7 @@ public final class WigleService extends Service {
   @Override
   public void onLowMemory() {
     super.onLowMemory();
-    WigleAndroid.info( "service: onLowMemory" );
+    ListActivity.info( "service: onLowMemory" );
   }
 
   private void shutdownNotification() {
@@ -75,7 +75,7 @@ public final class WigleService extends Service {
     // notification.flags |= Notification.FLAG_SHOW_LIGHTS;
     
     final Context context = getApplicationContext();
-    final Intent notificationIntent = new Intent( this, WigleAndroid.class );
+    final Intent notificationIntent = new Intent( this, ListActivity.class );
     final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
     notification.setLatestEventInfo( context, tickerText, tickerText, contentIntent );
     

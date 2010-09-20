@@ -23,13 +23,13 @@ public class SpeechActivity extends Activity {
     // force media volume controls
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
     
-    final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
-    doButton( prefs, R.id.speech_run, WigleAndroid.PREF_SPEAK_RUN );
-    doButton( prefs, R.id.speech_new, WigleAndroid.PREF_SPEAK_NEW );
-    doButton( prefs, R.id.speech_queue, WigleAndroid.PREF_SPEAK_QUEUE );
-    doButton( prefs, R.id.speech_miles, WigleAndroid.PREF_SPEAK_MILES );
-    doButton( prefs, R.id.speech_time, WigleAndroid.PREF_SPEAK_TIME );
-    doButton( prefs, R.id.speech_battery, WigleAndroid.PREF_SPEAK_BATTERY );
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    doButton( prefs, R.id.speech_run, ListActivity.PREF_SPEAK_RUN );
+    doButton( prefs, R.id.speech_new, ListActivity.PREF_SPEAK_NEW );
+    doButton( prefs, R.id.speech_queue, ListActivity.PREF_SPEAK_QUEUE );
+    doButton( prefs, R.id.speech_miles, ListActivity.PREF_SPEAK_MILES );
+    doButton( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
+    doButton( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
   }
   
   private void doButton( final SharedPreferences prefs, final int id, final String pref ) {

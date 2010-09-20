@@ -38,7 +38,7 @@ public class ErrorReportActivity extends Activity {
     tv.setText( stack );
     
     Intent intent = getIntent();
-    boolean doEmail = intent.getBooleanExtra( WigleAndroid.ERROR_REPORT_DO_EMAIL, false );
+    boolean doEmail = intent.getBooleanExtra( ListActivity.ERROR_REPORT_DO_EMAIL, false );
     if ( doEmail ) {
       fromFailure = true;
       // setup email sending
@@ -51,23 +51,23 @@ public class ErrorReportActivity extends Activity {
     try {
       File fileDir = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
       if ( ! fileDir.canRead() || ! fileDir.isDirectory() ) {
-        WigleAndroid.error( "file is not readable or not a directory. fileDir: " + fileDir );
+        ListActivity.error( "file is not readable or not a directory. fileDir: " + fileDir );
       }
       else {
         String[] files = fileDir.list();
         if ( files == null ) {
-          WigleAndroid.error( "no files in dir: " + fileDir );
+          ListActivity.error( "no files in dir: " + fileDir );
         }
         else {
           String latestFilename = null;
           for ( String filename : files ) {
-            if ( filename.startsWith( WigleAndroid.ERROR_STACK_FILENAME ) ) {
+            if ( filename.startsWith( ListActivity.ERROR_STACK_FILENAME ) ) {
               if ( latestFilename == null || filename.compareTo( latestFilename ) > 0 ) {
                 latestFilename = filename;
               }
             }
           }
-          WigleAndroid.info( "latest filename: " + latestFilename );
+          ListActivity.info( "latest filename: " + latestFilename );
           
           String filePath = fileDir.getCanonicalPath() + "/" + latestFilename;
           BufferedReader reader = new BufferedReader( new FileReader( filePath ) );
@@ -81,14 +81,14 @@ public class ErrorReportActivity extends Activity {
       }
     }
     catch ( IOException ex ) {
-      WigleAndroid.error( "error reading stack file: " + ex, ex );
+      ListActivity.error( "error reading stack file: " + ex, ex );
     }
     
     return builder.toString();
   }
   
   private void setupEmail( String stack ) {
-    WigleAndroid.info( "ErrorReport onCreate" );
+    ListActivity.info( "ErrorReport onCreate" );
     final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
     emailIntent.setType( "plain/text" );
     emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"} );

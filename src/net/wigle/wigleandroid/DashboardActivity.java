@@ -55,7 +55,7 @@ public class DashboardActivity extends Activity {
               timer.postDelayed( this, period );
             }
             else {
-              WigleAndroid.info( "finishing mapping timer" );
+              ListActivity.info( "finishing mapping timer" );
             }
         }
       };
@@ -66,29 +66,29 @@ public class DashboardActivity extends Activity {
   
   private void updateUI() {
     TextView tv = (TextView) findViewById( R.id.runnets );
-    tv.setText( "Run Nets: " + WigleAndroid.lameStatic.runNets );
+    tv.setText( "Run Nets: " + ListActivity.lameStatic.runNets );
     
     tv = (TextView) findViewById( R.id.newnets );
-    tv.setText( "New Nets: " + WigleAndroid.lameStatic.newNets );
+    tv.setText( "New Nets: " + ListActivity.lameStatic.newNets );
     
     tv = (TextView) findViewById( R.id.currnets );
-    tv.setText( "Visible Nets: " + WigleAndroid.lameStatic.currNets );
+    tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );
     
-    updateDist( R.id.rundist, WigleAndroid.PREF_DISTANCE_RUN, "Run Distance: " );
-    updateDist( R.id.totaldist, WigleAndroid.PREF_DISTANCE_TOTAL, "Total Distance: " );
-    updateDist( R.id.prevrundist, WigleAndroid.PREF_DISTANCE_PREV_RUN, "Previous Run: " );
+    updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, "Run Distance: " );
+    updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, "Total Distance: " );
+    updateDist( R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, "Previous Run: " );
     
     tv = (TextView) findViewById( R.id.queuesize );
-    tv.setText( "DB Queue: " + WigleAndroid.lameStatic.preQueueSize );
+    tv.setText( "DB Queue: " + ListActivity.lameStatic.preQueueSize );
     
     tv = (TextView) findViewById( R.id.dbNets );
-    tv.setText( "DB Nets: " + WigleAndroid.lameStatic.dbNets );
+    tv.setText( "DB Nets: " + ListActivity.lameStatic.dbNets );
     
     tv = (TextView) findViewById( R.id.dbLocs );
-    tv.setText( "DB Locations: " + WigleAndroid.lameStatic.dbLocs );
+    tv.setText( "DB Locations: " + ListActivity.lameStatic.dbLocs );
     
     tv = (TextView) findViewById( R.id.gpsstatus );
-    Location location = WigleAndroid.lameStatic.location;
+    Location location = ListActivity.lameStatic.location;
     String gpsStatus = "No Location!";
     if ( location != null ) {
       gpsStatus = location.getProvider();
@@ -97,7 +97,7 @@ public class DashboardActivity extends Activity {
   }
   
   private void updateDist( final int id, final String pref, final String title ) {
-    final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     float dist = prefs.getFloat( pref, 0f );
     String distString = null;
@@ -115,7 +115,7 @@ public class DashboardActivity extends Activity {
   
   @Override
   public void finish() {
-    WigleAndroid.info( "finish dash." );
+    ListActivity.info( "finish dash." );
     finishing.set( true );
     
     super.finish();
@@ -123,7 +123,7 @@ public class DashboardActivity extends Activity {
   
   @Override
   public void onDestroy() {
-    WigleAndroid.info( "destroy dash." );
+    ListActivity.info( "destroy dash." );
     finishing.set( true );
     
     super.onDestroy();
@@ -152,7 +152,7 @@ public class DashboardActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     if (keyCode == KeyEvent.KEYCODE_BACK) {
-      WigleAndroid.info( "onKeyDown: not quitting app on back" );
+      ListActivity.info( "onKeyDown: not quitting app on back" );
       MainActivity.switchTab( this, MainActivity.TAB_LIST );
       return true;
     }

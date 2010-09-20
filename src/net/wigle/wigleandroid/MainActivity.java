@@ -23,7 +23,7 @@ public class MainActivity extends TabActivity {
     Intent intent;  // Reusable Intent for each tab
 
     // Create an Intent to launch an Activity for the tab (to be reused)
-    intent = new Intent().setClass(this, WigleAndroid.class);
+    intent = new Intent().setClass(this, ListActivity.class);
     spec = tabHost.newTabSpec( TAB_LIST ).setIndicator("List")
                   .setContent(intent);
     tabHost.addTab(spec);
@@ -51,10 +51,10 @@ public class MainActivity extends TabActivity {
 //        ViewGroup vg = (ViewGroup) view;
 //        if ( vg.getChildCount() > 1 ) {
 //          View child = vg.getChildAt( 1 );
-//          WigleAndroid.info( "child: " + child );
+//          ListActivity.info( "child: " + child );
 //          if ( child instanceof TextView ) {
 //            height = child.getMeasuredHeight();
-//            WigleAndroid.info( "height: " + height );
+//            ListActivity.info( "height: " + height );
 //          }
 //        }
 //      }
@@ -79,43 +79,43 @@ public class MainActivity extends TabActivity {
   
   @Override
   public void onDestroy() {
-    WigleAndroid.info( "MAIN: destroy." );
+    ListActivity.info( "MAIN: destroy." );
     super.onDestroy();
   }
   
   @Override
   public void onPause() {
-    WigleAndroid.info( "MAIN: pause." );
+    ListActivity.info( "MAIN: pause." );
     super.onPause();
   }
   
   @Override
   public void onResume() {
-    WigleAndroid.info( "MAIN: resume." );
+    ListActivity.info( "MAIN: resume." );
     super.onResume();
   }
   
   @Override
   public void onStart() {
-    WigleAndroid.info( "MAIN: start." );
+    ListActivity.info( "MAIN: start." );
     super.onStart();
   }
   
   @Override
   public void onStop() {
-    WigleAndroid.info( "MAIN: stop." );
+    ListActivity.info( "MAIN: stop." );
     super.onStop();
   }
   
   @Override
   public void onRestart() {
-    WigleAndroid.info( "MAIN: restart." );
+    ListActivity.info( "MAIN: restart." );
     super.onRestart();
   }
   
   @Override
   public void finish() {
-    WigleAndroid.info( "MAIN: finish." );
+    ListActivity.info( "MAIN: finish." );
     super.finish();
   }
   

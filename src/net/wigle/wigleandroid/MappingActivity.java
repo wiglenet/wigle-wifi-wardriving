@@ -68,7 +68,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public Object onRetainNonConfigurationInstance() {
-    WigleAndroid.info( "MappingActivity: onRetainNonConfigurationInstance" );
+    ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
     // return this whole class to copy data from
     return this;
   }
@@ -81,13 +81,13 @@ public final class MappingActivity extends Activity {
     
     // my location overlay
     mMyLocationOverlay = new MyLocationOverlay(this, mapView);
-    mMyLocationOverlay.setLocationUpdateMinTime( WigleAndroid.LOCATION_UPDATE_INTERVAL );
+    mMyLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
     mapView.getOverlays().add(mMyLocationOverlay);
     
     // controller
     mapControl = new OpenStreetMapViewController( mapView );
     GeoPoint centerPoint = DEFAULT_POINT;
-    final Location location = WigleAndroid.lameStatic.location;
+    final Location location = ListActivity.lameStatic.location;
     if ( oldCenter != null ) {
       centerPoint = oldCenter;
     }
@@ -99,9 +99,9 @@ public final class MappingActivity extends Activity {
     }
     else {
       // ok, try the saved prefs
-      final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
-      float lat = prefs.getFloat( WigleAndroid.PREF_PREV_LAT, Float.MIN_VALUE );
-      float lon = prefs.getFloat( WigleAndroid.PREF_PREV_LON, Float.MIN_VALUE );
+      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
+      float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
       if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
         centerPoint = new GeoPoint( lat, lon );
       }
@@ -130,7 +130,7 @@ public final class MappingActivity extends Activity {
       rl.addView(miniMapView, minimapParams);
     }
     
-    WigleAndroid.info("done setupMapView");
+    ListActivity.info("done setupMapView");
   }
   
   private void setupTimer() {
@@ -140,10 +140,10 @@ public final class MappingActivity extends Activity {
         public void run() {              
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
-              final Location location = WigleAndroid.lameStatic.location;
+              final Location location = ListActivity.lameStatic.location;
               if ( location != null ) {
                 if ( locked ) {
-                  // WigleAndroid.info( "mapping center location: " + location );
+                  // ListActivity.info( "mapping center location: " + location );
   								final GeoPoint locGeoPoint = new GeoPoint( location );
   								if ( firstMove ) {
   								  mapControl.setCenter( locGeoPoint );
@@ -155,7 +155,7 @@ public final class MappingActivity extends Activity {
                 }
                 else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude() 
                     || previousLocation.getLongitude() != location.getLongitude() 
-                    || previousRunNets != WigleAndroid.lameStatic.runNets) {
+                    || previousRunNets != ListActivity.lameStatic.runNets) {
                   // location or nets have changed, update the view
                   mapView.postInvalidate();
                 }
@@ -163,21 +163,21 @@ public final class MappingActivity extends Activity {
                 previousLocation = location;
               }
               
-              previousRunNets = WigleAndroid.lameStatic.runNets;
+              previousRunNets = ListActivity.lameStatic.runNets;
               
               TextView tv = (TextView) findViewById( R.id.stats_run );
-              tv.setText( "Run: " + WigleAndroid.lameStatic.runNets );
+              tv.setText( "Run: " + ListActivity.lameStatic.runNets );
               tv = (TextView) findViewById( R.id.stats_new );
-              tv.setText( "New: " + WigleAndroid.lameStatic.newNets );
+              tv.setText( "New: " + ListActivity.lameStatic.newNets );
               tv = (TextView) findViewById( R.id.stats_dbnets );
-              tv.setText( "DB: " + WigleAndroid.lameStatic.dbNets );
+              tv.setText( "DB: " + ListActivity.lameStatic.dbNets );
               
               final long period = 1000L;
               // info("wifitimer: " + period );
               timer.postDelayed( this, period );
             }
             else {
-              WigleAndroid.info( "finishing mapping timer" );
+              ListActivity.info( "finishing mapping timer" );
             }
         }
       };
@@ -188,7 +188,7 @@ public final class MappingActivity extends Activity {
     
   @Override
   public void finish() {
-    WigleAndroid.info( "finish mapping." );
+    ListActivity.info( "finish mapping." );
     finishing.set( true );
     
     super.finish();
@@ -196,7 +196,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public void onDestroy() {
-    WigleAndroid.info( "destroy mapping." );
+    ListActivity.info( "destroy mapping." );
     finishing.set( true );
     
     super.onDestroy();
@@ -204,7 +204,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public void onPause() {
-    WigleAndroid.info( "pause mapping." );
+    ListActivity.info( "pause mapping." );
     mMyLocationOverlay.disableMyLocation();
     mMyLocationOverlay.disableCompass();
     
@@ -213,7 +213,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public void onResume() {
-    WigleAndroid.info( "resume mapping." );
+    ListActivity.info( "resume mapping." );
     mMyLocationOverlay.enableCompass();
     mMyLocationOverlay.enableMyLocation();
     
@@ -236,8 +236,8 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
       item.setIcon( android.R.drawable.ic_menu_mapmode );
       
-      final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
-      final boolean showNewDBOnly = prefs.getBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, false );
+      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
       String nameDB = showNewDBOnly ? "Show Run&New" : "Show New Only";
       item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
       item.setIcon( android.R.drawable.ic_menu_edit );
@@ -273,10 +273,10 @@ public final class MappingActivity extends Activity {
           return true;
         }
         case MENU_TOGGLE_NEWDB: {
-          final SharedPreferences prefs = this.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0 );
-          final boolean showNewDBOnly = ! prefs.getBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, false );
+          final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+          final boolean showNewDBOnly = ! prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
           Editor edit = prefs.edit();
-          edit.putBoolean( WigleAndroid.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
+          edit.putBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
           edit.commit();
           
           String name = showNewDBOnly ? "Show Run&New" : "Show New Only";
@@ -290,7 +290,7 @@ public final class MappingActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     if (keyCode == KeyEvent.KEYCODE_BACK) {
-      WigleAndroid.info( "onKeyDown: not quitting app on back" );
+      ListActivity.info( "onKeyDown: not quitting app on back" );
       MainActivity.switchTab( this, MainActivity.TAB_LIST );
       return true;
     }

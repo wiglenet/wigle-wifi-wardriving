@@ -79,7 +79,7 @@ public final class TTS {
       try {
         for ( Class clazz : SPEECH_CLASS.getClasses() ) {
           String cname =  clazz.getCanonicalName();
-          WigleAndroid.info("class: " +cname );
+          ListActivity.info("class: " +cname );
           if ( "android.speech.tts.TextToSpeech.OnInitListener".equals( cname )
                ||
                ( useEyesFree && "com.google.tts.TTS.InitListener".equals( cname ) ) 
@@ -104,13 +104,13 @@ public final class TTS {
         }
       }
       catch ( final NoSuchFieldException ex ) {
-        WigleAndroid.error( "no such field: " + ex, ex );
+        ListActivity.error( "no such field: " + ex, ex );
       }
       catch ( final IllegalAccessException ex ) {
-        WigleAndroid.error( "illegal in static: " + ex, ex );
+        ListActivity.error( "illegal in static: " + ex, ex );
       }
       catch ( final NoSuchMethodException ex ) {
-        WigleAndroid.error( "no such method: " + ex, ex );
+        ListActivity.error( "no such method: " + ex, ex );
       }
     }
     
@@ -130,7 +130,7 @@ public final class TTS {
       }
       final InvocationHandler handler = new InvocationHandler() {
         public Object invoke( Object object, Method method, Object[] args ) {
-          WigleAndroid.info("invoke: " + method.getName() );
+          ListActivity.info("invoke: " + method.getName() );
           // call our init to set the language to engrish.
           onInit();
           return null;
@@ -148,16 +148,16 @@ public final class TTS {
       }
     }
     catch ( final NoSuchMethodException ex ) {
-      WigleAndroid.error( "no such method: " + ex, ex );
+      ListActivity.error( "no such method: " + ex, ex );
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex, ex );
+      ListActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InstantiationException ex ) {
-      WigleAndroid.error( "instantiation: " + ex, ex );
+      ListActivity.error( "instantiation: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex, ex );
+      ListActivity.error( "invocation: " + ex, ex );
     }
   }
 
@@ -178,24 +178,24 @@ public final class TTS {
               || "eng".equals( locale.getLanguage() )) {
             doLanguage = false;
           }
-          WigleAndroid.info("locale: " + locale + " doLanguage: " + doLanguage + " lang: " + locale.getLanguage() );
+          ListActivity.info("locale: " + locale + " doLanguage: " + doLanguage + " lang: " + locale.getLanguage() );
         }
         
         if ( doLanguage ) {
           setlanguage.invoke( speech, Locale.US ); // english, motherfucker. do you speak it?
         }
       }
-      //      WigleAndroid.info("should be talkin' english now");
+      //      ListActivity.info("should be talkin' english now");
     } catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "init illegal: " + ex, ex );
+      ListActivity.error( "init illegal: " + ex, ex );
     } catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "init invocation: " + ex, ex );
+      ListActivity.error( "init invocation: " + ex, ex );
     }
   }
   
   public void speak( final String string ) {
     try {
-      // WigleAndroid.info("saying: " + string );
+      // ListActivity.info("saying: " + string );
       if ( useEyesFree ) {
         speak.invoke( speech, string, QUEUE_ADD, params );
       } else {
@@ -203,23 +203,23 @@ public final class TTS {
       }
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex, ex );
+      ListActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex, ex );
+      ListActivity.error( "invocation: " + ex, ex );
     }
   }
   
   public void shutdown() {
     try {
-      // WigleAndroid.info("saying: " + string );
+      // ListActivity.info("saying: " + string );
       shutdown.invoke( speech, (Object[])null );
     }
     catch ( final IllegalAccessException ex ) {
-      WigleAndroid.error( "illegal: " + ex, ex );
+      ListActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      WigleAndroid.error( "invocation: " + ex, ex );
+      ListActivity.error( "invocation: " + ex, ex );
     }
   }
 

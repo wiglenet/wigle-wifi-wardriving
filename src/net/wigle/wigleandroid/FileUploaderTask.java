@@ -145,13 +145,13 @@ public final class FileUploaderTask extends Thread {
   
   public void run() {
     try {
-      WigleAndroid.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
+      ListActivity.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
       Process.setThreadPriority( UPLOAD_PRIORITY );
       
       doRun();
     }
     catch ( final Throwable throwable ) {
-      WigleAndroid.writeError( Thread.currentThread(), throwable, context );
+      ListActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
     }
     finally {
@@ -161,20 +161,20 @@ public final class FileUploaderTask extends Thread {
   }
   
   private void doRun() {
-    final SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
-    final String username = prefs.getString( WigleAndroid.PREF_USERNAME, "" );
-    final String password = prefs.getString( WigleAndroid.PREF_PASSWORD, "" );
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
+    final String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
     final Bundle bundle = new Bundle();
     
     if ( "".equals( username ) ) {
       // TODO: error
-      WigleAndroid.error( "username not defined" );
+      ListActivity.error( "username not defined" );
       status = Status.BAD_USERNAME;
     }
-    else if ( "".equals( password ) && ! WigleAndroid.ANONYMOUS.equals( username.toLowerCase() ) ) {
+    else if ( "".equals( password ) && ! ListActivity.ANONYMOUS.equals( username.toLowerCase() ) ) {
       // TODO: error
-      WigleAndroid.error( "password not defined and username isn't 'anonymous'" );
+      ListActivity.error( "password not defined and username isn't 'anonymous'" );
       status = Status.BAD_PASSWORD;
     }
     else {
@@ -205,7 +205,7 @@ public final class FileUploaderTask extends Thread {
       // if ( true ) { throw new IOException( "oh noe" ); }
       
       String openString = filename;
-      final boolean hasSD = WigleAndroid.hasSD();
+      final boolean hasSD = ListActivity.hasSD();
       if ( hasSD ) {
         final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
         final File path = new File( filepath );
@@ -228,8 +228,8 @@ public final class FileUploaderTask extends Thread {
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file
-      final SharedPreferences prefs = context.getSharedPreferences( WigleAndroid.SHARED_PREFS, 0);
-      long maxId = prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L );
+      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
       final Cursor cursor = dbHelper.networkIterator( maxId );
       int lineCount = 0;
       final int total = cursor.getCount();
@@ -244,7 +244,7 @@ public final class FileUploaderTask extends Thread {
         int lastSentPercent = 0;
         CharBuffer charBuffer = CharBuffer.allocate( 256 );
         ByteBuffer byteBuffer = ByteBuffer.allocate( 256 ); // this ensures hasArray() is true
-        final CharsetEncoder encoder = Charset.forName( WigleAndroid.ENCODING ).newEncoder();
+        final CharsetEncoder encoder = Charset.forName( ListActivity.ENCODING ).newEncoder();
         // don't stop when a goofy character is found
         encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
         final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -268,7 +268,7 @@ public final class FileUploaderTask extends Thread {
           netMillis += System.currentTimeMillis() - netStart;
           if ( network == null ) {
             // weird condition, skipping
-            WigleAndroid.error("network not in database: " + bssid );
+            ListActivity.error("network not in database: " + bssid );
             continue;
           }
           
@@ -278,7 +278,7 @@ public final class FileUploaderTask extends Thread {
             // comma isn't a legal ssid character, but just in case
             ssid = ssid.replaceAll( COMMA, "_" ); 
           }
-          // WigleAndroid.debug("writing network: " + ssid );
+          // ListActivity.debug("writing network: " + ssid );
           
           // reset the buffers
           charBuffer.clear();
@@ -313,7 +313,7 @@ public final class FileUploaderTask extends Thread {
             charBuffer.append( NEWLINE );
           }
           catch ( BufferOverflowException ex ) {
-            WigleAndroid.info("buffer overflow: " + ex, ex );
+            ListActivity.info("buffer overflow: " + ex, ex );
             // double the buffer
             charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
             byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
@@ -340,7 +340,7 @@ public final class FileUploaderTask extends Thread {
           //  end = byteBuffer.limit();
           //}
           
-          // WigleAndroid.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
+          // ListActivity.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
           //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() + " end: " + end
           //     + " result: " + result );
           final long writeStart = System.currentTimeMillis();
@@ -361,7 +361,7 @@ public final class FileUploaderTask extends Thread {
       cursor.close();
       fos.close();
       
-      WigleAndroid.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
+      ListActivity.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
           + fileWriteMillis + " netmillis: " + netMillis );
       
       // don't upload empty files
@@ -385,7 +385,7 @@ public final class FileUploaderTask extends Thread {
       params.put("observer", username);
       params.put("password", password);
       final String response = HttpFileUploader.upload( 
-        WigleAndroid.FILE_POST_URL, filename, "stumblefile", fis, 
+        ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
         params, context.getResources(), handler, filesize, context );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
@@ -393,8 +393,8 @@ public final class FileUploaderTask extends Thread {
         
         // save in the prefs
         final Editor editor = prefs.edit();
-        editor.putLong( WigleAndroid.PREF_DB_MARKER, maxId );
-        editor.putLong( WigleAndroid.PREF_MAX_DB, maxId );
+        editor.putLong( ListActivity.PREF_DB_MARKER, maxId );
+        editor.putLong( ListActivity.PREF_MAX_DB, maxId );
         editor.commit();
       }
       else if ( response != null && response.indexOf("does not match login") > 0 ) {
@@ -408,29 +408,29 @@ public final class FileUploaderTask extends Thread {
         else {
           error = "response: " + response;
         }
-        WigleAndroid.error( error );
+        ListActivity.error( error );
         bundle.putString( ERROR, error );
         status = Status.FAIL;
       }
     } 
     catch ( final FileNotFoundException ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "file problem: " + ex, ex );
-      WigleAndroid.writeError( this, ex, context );
+      ListActivity.error( "file problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "file problem: " + ex );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "io problem: " + ex, ex );
-      WigleAndroid.writeError( this, ex, context );
+      ListActivity.error( "io problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
-      WigleAndroid.error( "ex problem: " + ex, ex );
-      WigleAndroid.writeError( this, ex, context );
+      ListActivity.error( "ex problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "ex problem: " + ex );
     }
@@ -440,7 +440,7 @@ public final class FileUploaderTask extends Thread {
   
   private void writeFos( final OutputStream fos, final String data ) throws IOException, UnsupportedEncodingException {
     if ( data != null ) {
-      fos.write( data.getBytes( WigleAndroid.ENCODING ) );
+      fos.write( data.getBytes( ListActivity.ENCODING ) );
     }
   }
   

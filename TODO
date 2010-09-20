@@ -20,7 +20,8 @@ update service notificaton string with some stats
 --- done ---
 * 1.18
 Force old activity name to use the new tab activity, some devices don't seem to
-  update what activity is launched when changed in the manifest.
+  update what activity is launched when changed in the manifest. It should 
+  never launch without the tabs at the top!
 
 * 1.17
 remove unneeded chunking and utf8 settings

@@ -17,7 +17,6 @@ some response/info/stat about uploaded files
 update service notificaton string with some stats
 
 --- priority items ---
-submenu for announcement options: run, new, queue, miles, time, battery
 seen-networks map tile overlays
 
 --- done ---
@@ -31,6 +30,7 @@ allow main screen orientation changes
 announce "done" when app is shutdown, to alert in cases where the OS kills it
 scan speeds based on movement speed (different setting for above/below 5mph)
 tabbed layout
+submenu for announcement options: run, new, queue, miles, time, battery
 
 * 1.16
 fix db close stall

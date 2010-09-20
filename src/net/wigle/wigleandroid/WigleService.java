@@ -75,7 +75,7 @@ public final class WigleService extends Service {
     // notification.flags |= Notification.FLAG_SHOW_LIGHTS;
     
     final Context context = getApplicationContext();
-    final Intent notificationIntent = new Intent( this, ListActivity.class );
+    final Intent notificationIntent = new Intent( this, MainActivity.class );
     final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
     notification.setLatestEventInfo( context, tickerText, tickerText, contentIntent );
     

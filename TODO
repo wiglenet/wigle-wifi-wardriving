@@ -18,6 +18,9 @@ some response/info/stat about uploaded files
 update service notificaton string with some stats
 
 --- done ---
+* 1.20
+Launch correct activity from service notification
+
 * 1.19
 Old activity launches new activity rather than subclass
 

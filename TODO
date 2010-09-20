@@ -18,6 +18,10 @@ some response/info/stat about uploaded files
 update service notificaton string with some stats
 
 --- done ---
+* 1.18
+Force old activity name to use the new tab activity, some devices don't seem to
+  update what activity is launched when changed in the manifest.
+
 * 1.17
 remove unneeded chunking and utf8 settings
 add maxout db marker button to settings

@@ -476,7 +476,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
         info( "LIST: finish called twice!" );
       }
 
-      speak( "done." );
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      if ( prefs.getLong( PREF_SPEECH_PERIOD, 0 ) > 0 ) {
+        speak( "done." );
+      }
       
       // save our location for later runs
       saveLocation();
@@ -514,7 +517,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
         wifiLock.release();
       }
       
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! inEmulator ) {

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TabHost;
 
-public class MainActivity extends TabActivity {
+public final class MainActivity extends TabActivity {
   static final String TAB_LIST = "list";
   static final String TAB_MAP = "map";
   static final String TAB_DASH = "dash";

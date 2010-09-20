@@ -18,6 +18,9 @@ some response/info/stat about uploaded files
 update service notificaton string with some stats
 
 --- done ---
+* 1.19
+Old activity launches new activity rather than subclass
+
 * 1.18
 Force old activity name to use the new tab activity, some devices don't seem to
   update what activity is launched when changed in the manifest. It should 

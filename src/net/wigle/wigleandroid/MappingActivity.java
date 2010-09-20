@@ -288,11 +288,8 @@ public final class MappingActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     if (keyCode == KeyEvent.KEYCODE_BACK) {
-      WigleAndroid.info( "onKeyDown: treating back like home, not quitting app" );
-      moveTaskToBack(true);
-      if ( getParent() != null ) {
-        getParent().moveTaskToBack( true );
-      }
+      WigleAndroid.info( "onKeyDown: not quitting app on back" );
+      MainActivity.switchTab( this, MainActivity.TAB_LIST );
       return true;
     }
     return super.onKeyDown(keyCode, event);

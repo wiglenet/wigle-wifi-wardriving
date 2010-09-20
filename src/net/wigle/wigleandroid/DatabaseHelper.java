@@ -295,7 +295,7 @@ public final class DatabaseHelper extends Thread {
     // keep transactions in memory until committed
     db.execSQL( "PRAGMA temp_store = MEMORY" );
     // keep around the journal file, don't create and delete a ton of times
-    db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null );
+    db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null ).close();
     
     // compile statements
     insertNetwork = db.compileStatement( "INSERT INTO network"
@@ -327,7 +327,16 @@ public final class DatabaseHelper extends Thread {
     countdown = 50;
     while ( db.isOpen() && countdown > 0 ) {
       try {
-        synchronized ( this ) { 
+        synchronized ( this ) {
+          if ( insertNetwork != null ) {
+            insertNetwork.close();
+          }
+          if ( insertLocation != null ) {
+            insertLocation.close();
+          }
+          if ( updateNetwork != null ) {
+            updateNetwork.close();
+          }
           if ( db.isOpen() ) {
             db.close();
           }

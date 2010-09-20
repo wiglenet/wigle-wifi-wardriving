@@ -9,10 +9,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<CheckBox android:id="@+id/be_anonymous"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/be_anonymous" />
+
 <TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
@@ -34,7 +31,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
-        
+ <CheckBox android:id="@+id/be_anonymous"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/be_anonymous" />       
 <LinearLayout
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
@@ -124,6 +124,10 @@
 		android:layout_weight="2"
 		/>
 </LinearLayout>
+
+<Button android:id="@+id/speech_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
+		android:text="@string/speech_button" android:layout_weight="0"
+		android:paddingTop="10px" android:paddingBottom="10px"/>
 
 <LinearLayout
 	android:id="@+id/horizontalLine2"

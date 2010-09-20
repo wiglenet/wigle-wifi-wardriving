@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/scrollview"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<LinearLayout
+	android:id="@+id/linearlayout" 
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView android:id="@+id/speech_text"
+	android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/speech_text" />
+        
+<!-- run, new, queue, miles, time, battery -->
+<CheckBox android:id="@+id/speech_run"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_run" />
+<CheckBox android:id="@+id/speech_new"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_new" />
+<CheckBox android:id="@+id/speech_queue"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_queue" />
+<CheckBox android:id="@+id/speech_miles"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_miles" />
+<CheckBox android:id="@+id/speech_time"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_time" />
+<CheckBox android:id="@+id/speech_battery"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_battery" />
+
+</LinearLayout>
+</ScrollView>

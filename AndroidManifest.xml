@@ -17,7 +17,7 @@
                   android:launchMode="singleTask"
                   android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+            	<action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
@@ -53,6 +53,14 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
+        <activity android:name=".SpeechActivity"
+                  android:label="@string/speech_name"
+                  android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
 
     <service android:name=".WigleService" android:enabled="true"
       android:icon="@drawable/wiglewifi"/>
@@ -69,4 +77,5 @@
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 <uses-permission android:name="android.permission.WAKE_LOCK"/>
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 </manifest> 

@@ -18,7 +18,6 @@ update service notificaton string with some stats
 
 --- priority items ---
 submenu for announcement options: run, new, queue, miles, time, battery
-tabbed layout?
 seen-networks map tile overlays
 
 --- done ---
@@ -31,6 +30,7 @@ remember previous location for when we don't have one for mapping
 allow main screen orientation changes
 announce "done" when app is shutdown, to alert in cases where the OS kills it
 scan speeds based on movement speed (different setting for above/below 5mph)
+tabbed layout
 
 * 1.16
 fix db close stall

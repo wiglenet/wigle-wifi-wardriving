@@ -28,7 +28,6 @@ import org.andnav.osm.util.GeoPoint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.TabActivity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -81,7 +80,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public final class WigleAndroid extends Activity implements FileUploaderListener {
-    // state. anything added here should be added to the retain copy-construction
+    // *** state. anything added here should be added to the retain copy-construction ***
     private ArrayAdapter<Network> listAdapter;
     private Set<String> runNetworks;
     private GpsStatus gpsStatus;
@@ -96,6 +95,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     private String savedStats;
     private long prevNewNetCount;
     private Long satCountLowTime = 0L;
+    private int batteryLevel = -1;
 
     // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
     private Long lastLocationTime = 0L;
@@ -105,6 +105,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
     private WifiLock wifiLock;
+    // *** end of state that must be added to the retain copy-constructor ***
     
     // created every time, even after retain
     private Listener gpsStatusListener;
@@ -112,6 +113,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     private BroadcastReceiver wifiReceiver;
     private NumberFormat numberFormat1;
     private NumberFormat numberFormat8;
+    private SimpleDateFormat timeFormat;
     private TTS tts;
     private AudioManager audioManager;
     private long previousTalkTime = System.currentTimeMillis();
@@ -161,6 +163,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     static final String PREF_PREV_LAT = "prevLat";
     static final String PREF_PREV_LON = "prevLon";
+    // what to speak on announcements
+    static final String PREF_SPEAK_RUN = "speakRun";
+    static final String PREF_SPEAK_NEW = "speakNew";
+    static final String PREF_SPEAK_QUEUE = "speakQueue";
+    static final String PREF_SPEAK_MILES = "speakMiles";
+    static final String PREF_SPEAK_TIME = "speakTime";
+    static final String PREF_SPEAK_BATTERY = "speakBattery";
     
     static final long DEFAULT_SPEECH_PERIOD = 60L;
     static final long LOCATION_UPDATE_INTERVAL = 1000L;
@@ -287,6 +296,13 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           this.uploading = retained.uploading;
           this.savedStats = retained.savedStats;
           this.prevNewNetCount = retained.prevNewNetCount;
+          this.satCountLowTime = retained.satCountLowTime;
+          this.batteryLevel = retained.batteryLevel;
+          
+          this.lastLocationTime = retained.lastLocationTime;
+          this.lastNetworkLocationTime = retained.lastNetworkLocationTime;
+          this.scanRequestTime = retained.scanRequestTime;
+          
           this.soundPop = retained.soundPop;
           this.soundNewPop = retained.soundNewPop;
           this.wifiLock = retained.wifiLock;
@@ -318,6 +334,9 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           ((DecimalFormat) numberFormat8).setMaximumFractionDigits( 8 );
         }
         
+        // for speech
+        timeFormat = new SimpleDateFormat( "h mm aa" );
+        
         info( "setupService" );
         setupService();
         info( "setupDatabase" );
@@ -334,6 +353,8 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
         setupWifi();
         info( "setupLocation" );
         setupLocation();
+        info( "setupBattery" );
+        setupBattery();
         info( "setup complete" );
     }
     
@@ -441,9 +462,14 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
     
     @Override
     public void finish() {
-      info( "finish. networks: " + runNetworks.size() );
+      info( "LIST: finish. networks: " + runNetworks.size() );
+      
+      final boolean wasFinishing = finishing.getAndSet( true );
+      if ( wasFinishing ) {
+        info( "LIST: finish called twice!" );
+      }
+
       speak( "done." );
-      finishing.set( true );
       
       // save our location for later runs
       saveLocation();
@@ -895,18 +921,7 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
             
             final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
             if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-              String gps = "";
-              if ( location == null ) {
-                gps = ", no gps fix";
-              }
-              String queue = "";
-              if ( preQueueSize > 0 ) {
-                queue = ", queue " + preQueueSize;
-              }
-              float dist = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
-              String miles = ". From " + numberFormat1.format( dist / 1609.344f ) + " miles";
-              speak("run " + runNetworks.size() + ", new " + newNetCount + gps + queue + miles );
-              previousTalkTime = now;
+              doAnnouncement( preQueueSize, newNetCount, now );
             }
           }
         };
@@ -968,6 +983,62 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
           info( "startup finished. wifi scanOK: " + scanOK );
         }
       }
+    }
+    
+    /**
+     * Computes the battery level by registering a receiver to the intent triggered 
+     * by a battery status/level change.
+     */
+    private void setupBattery() {
+      BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+          context.unregisterReceiver(this);
+          int rawlevel = intent.getIntExtra("level", -1);
+          int scale = intent.getIntExtra("scale", -1);
+          int level = -1;
+          if (rawlevel >= 0 && scale > 0) {
+            level = (rawlevel * 100) / scale;
+          }
+          batteryLevel = level;
+        }
+      };
+      IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+      registerReceiver(batteryLevelReceiver, batteryLevelFilter);
+    }
+
+    
+    private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      StringBuilder builder = new StringBuilder();
+      
+      if ( location == null ) {
+        builder.append( "no gps fix, " );
+      }
+      
+      // run, new, queue, miles, time, battery
+      if ( prefs.getBoolean( PREF_SPEAK_RUN, true ) ) {
+        builder.append( "run " ).append( runNetworks.size() ).append( ", " );
+      }
+      if ( prefs.getBoolean( PREF_SPEAK_NEW, true ) ) {
+        builder.append( "new " ).append( newNetCount ).append( ", " );
+      }
+      if ( preQueueSize > 0 && prefs.getBoolean( PREF_SPEAK_QUEUE, true ) ) {
+        builder.append( "queue " ).append( preQueueSize ).append( ", " );
+      }
+      if ( prefs.getBoolean( PREF_SPEAK_MILES, true ) ) {
+        final float dist = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
+        builder.append( "from " ).append( numberFormat1.format( dist / 1609.344f ) ).append( " miles, " );
+      }
+      if ( prefs.getBoolean( PREF_SPEAK_TIME, true ) ) {
+        builder.append( timeFormat.format( new Date() ) ).append( ", " );
+      }
+      if ( batteryLevel >= 0 && prefs.getBoolean( PREF_SPEAK_BATTERY, true ) ) {
+        builder.append( "battery " ).append( batteryLevel ).append( " percent, " );
+      }
+      
+      info( "speak: " + builder.toString() );
+      speak( builder.toString() );
+      previousTalkTime = now;
     }
     
     private String chooseScanPref() {
@@ -1277,7 +1348,12 @@ public final class WigleAndroid extends Activity implements FileUploaderListener
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
       
       if ( TTS.hasTTS() ) {
-        tts = new TTS( this );        
+        // this has to have the parent activity, for whatever wacky reasons
+        Activity context = this.getParent();
+        if ( context == null ) {
+          context = this;
+        }
+        tts = new TTS( context );        
       }
       
       TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);

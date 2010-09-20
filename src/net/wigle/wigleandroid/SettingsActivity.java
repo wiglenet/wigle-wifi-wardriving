@@ -124,6 +124,14 @@ public final class SettingsActivity extends Activity {
           }
       });
       
+      final Button button = (Button) findViewById( R.id.speech_button );
+      button.setOnClickListener( new OnClickListener() {
+          public void onClick( final View view ) {
+            final Intent errorReportIntent = new Intent( SettingsActivity.this, SpeechActivity.class );
+            SettingsActivity.this.startActivity( errorReportIntent );
+          }
+        });
+      
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
       tv.setText( "Highest uploaded id: " + prefs.getLong( WigleAndroid.PREF_DB_MARKER, 0L ) );
@@ -282,11 +290,8 @@ public final class SettingsActivity extends Activity {
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     if (keyCode == KeyEvent.KEYCODE_BACK) {
-      WigleAndroid.info( "onKeyDown: treating back like home, not quitting app" );
-      moveTaskToBack(true);
-      if ( getParent() != null ) {
-        getParent().moveTaskToBack( true );
-      }
+      WigleAndroid.info( "onKeyDown: not quitting app on back" );
+      MainActivity.switchTab( this, MainActivity.TAB_LIST );
       return true;
     }
     return super.onKeyDown(keyCode, event);

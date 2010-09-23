@@ -18,6 +18,11 @@ some response/info/stat about uploaded files
 update service notificaton string with some stats
 
 --- done ---
+* 1.21
+Fix bugs related to orientation change on the List activity (broadcast receiver)
+Make uploads work on device with no sdcard
+Update osmdroid map library
+
 * 1.20
 Launch correct activity from service notification
 

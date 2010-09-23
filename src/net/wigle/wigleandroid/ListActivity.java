@@ -15,20 +15,20 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
+import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.WifiReceiver;
 
 import org.andnav.osm.util.GeoPoint;
 
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -40,19 +40,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.location.GpsStatus.Listener;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
@@ -66,60 +60,41 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public final class ListActivity extends Activity implements FileUploaderListener {
     // *** state. anything added here should be added to the retain copy-construction ***
-    private ArrayAdapter<Network> listAdapter;
-    private Set<String> runNetworks;
-    private GpsStatus gpsStatus;
-    private Location location;
-    private Location networkLocation;
-    private Location prevGpsLocation;
+    private NetworkListAdapter listAdapter;
     private Handler wifiTimer;
     private DatabaseHelper dbHelper;
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
     private AtomicBoolean uploading;
-    private String savedStats;
-    private long prevNewNetCount;
-    private Long satCountLowTime = 0L;
-    private int batteryLevel = -1;
-
-    // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
-    private Long lastLocationTime = 0L;
-    private Long lastNetworkLocationTime = 0L;
-    private long scanRequestTime = Long.MIN_VALUE;
 
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
     private WifiLock wifiLock;
-    // *** end of state that must be added to the retain copy-constructor ***
     
-    // created every time, even after retain
-    private Listener gpsStatusListener;
-    private LocationListener locationListener;
-    private BroadcastReceiver wifiReceiver;
+    private GPSListener gpsListener;
+    private WifiReceiver wifiReceiver;
     private NumberFormat numberFormat1;
     private NumberFormat numberFormat8;
-    private SimpleDateFormat timeFormat;
+
     private TTS tts;
     private AudioManager audioManager;
-    private long previousTalkTime = System.currentTimeMillis();
+
     private boolean inEmulator;
     private boolean isPhoneActive;
-    private int pendingCount = 0;
+    
+    private BatteryLevelReceiver batteryLevelReceiver;
+    // *** end of state that must be added to the retain copy-constructor ***
     
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -128,52 +103,43 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final int MENU_MAP = 12;
     private static final int MENU_DASH = 13;
     public static final String ENCODING = "ISO-8859-1";
-    private static final long GPS_TIMEOUT = 15000L;
-    private static final long NET_LOC_TIMEOUT = 60000L;
-    private static final float MIN_DISTANCE_ACCURACY = 32f;
+    public static final float MIN_DISTANCE_ACCURACY = 32f;
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     
-    // color by signal strength
-    public static final int COLOR_1 = Color.rgb( 70, 170,  0);
-    public static final int COLOR_2 = Color.rgb(170, 170,  0);
-    public static final int COLOR_3 = Color.rgb(170,  95, 30);
-    public static final int COLOR_4 = Color.rgb(180,  60, 40);
-    public static final int COLOR_5 = Color.rgb(180,  45, 70);
-    
     // preferences
-    static final String SHARED_PREFS = "WiglePrefs";
-    static final String PREF_USERNAME = "username";
-    static final String PREF_PASSWORD = "password";
-    static final String PREF_SHOW_CURRENT = "showCurrent";
-    static final String PREF_BE_ANONYMOUS = "beAnonymous";
-    static final String PREF_DB_MARKER = "dbMarker";
-    static final String PREF_MAX_DB = "maxDbMarker";
-    static final String PREF_SCAN_PERIOD = "scanPeriod";
-    static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
-    static final String PREF_FOUND_SOUND = "foundSound";
-    static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
-    static final String PREF_SPEECH_PERIOD = "speechPeriod";
-    static final String PREF_SPEECH_GPS = "speechGPS";
-    static final String PREF_MUTED = "muted";
-    static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
-    static final String PREF_DISTANCE_RUN = "distRun";
-    static final String PREF_DISTANCE_TOTAL = "distTotal";
-    static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
-    static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
-    static final String PREF_PREV_LAT = "prevLat";
-    static final String PREF_PREV_LON = "prevLon";
+    public static final String SHARED_PREFS = "WiglePrefs";
+    public static final String PREF_USERNAME = "username";
+    public static final String PREF_PASSWORD = "password";
+    public static final String PREF_SHOW_CURRENT = "showCurrent";
+    public static final String PREF_BE_ANONYMOUS = "beAnonymous";
+    public static final String PREF_DB_MARKER = "dbMarker";
+    public static final String PREF_MAX_DB = "maxDbMarker";
+    public static final String PREF_SCAN_PERIOD = "scanPeriod";
+    public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
+    public static final String PREF_FOUND_SOUND = "foundSound";
+    public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
+    public static final String PREF_SPEECH_PERIOD = "speechPeriod";
+    public static final String PREF_SPEECH_GPS = "speechGPS";
+    public static final String PREF_MUTED = "muted";
+    public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
+    public static final String PREF_DISTANCE_RUN = "distRun";
+    public static final String PREF_DISTANCE_TOTAL = "distTotal";
+    public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
+    public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
+    public static final String PREF_PREV_LAT = "prevLat";
+    public static final String PREF_PREV_LON = "prevLon";
     // what to speak on announcements
-    static final String PREF_SPEAK_RUN = "speakRun";
-    static final String PREF_SPEAK_NEW = "speakNew";
-    static final String PREF_SPEAK_QUEUE = "speakQueue";
-    static final String PREF_SPEAK_MILES = "speakMiles";
-    static final String PREF_SPEAK_TIME = "speakTime";
-    static final String PREF_SPEAK_BATTERY = "speakBattery";
+    public static final String PREF_SPEAK_RUN = "speakRun";
+    public static final String PREF_SPEAK_NEW = "speakNew";
+    public static final String PREF_SPEAK_QUEUE = "speakQueue";
+    public static final String PREF_SPEAK_MILES = "speakMiles";
+    public static final String PREF_SPEAK_TIME = "speakTime";
+    public static final String PREF_SPEAK_BATTERY = "speakBattery";
     
-    static final long DEFAULT_SPEECH_PERIOD = 60L;
-    static final long LOCATION_UPDATE_INTERVAL = 1000L;
-    static final long SCAN_DEFAULT = 2000L;
+    public static final long DEFAULT_SPEECH_PERIOD = 60L;
+    public static final long LOCATION_UPDATE_INTERVAL = 1000L;
+    public static final long SCAN_DEFAULT = 2000L;
     
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
@@ -205,12 +171,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     };
     
-    private static final Comparator<Network> signalCompare = new Comparator<Network>() {
-      public int compare( Network a, Network b ) {
-        return b.getLevel() - a.getLevel();
-      }
-    };
-    
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
@@ -235,7 +195,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
             errorReportIntent, errorReportIntent.getFlags() );
       
         // do some of our own error handling, write a file with the stack
-        // todo: allow users to upload these stacks somewhere
         final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
         
         Thread.setDefaultUncaughtExceptionHandler( new Thread.UncaughtExceptionHandler(){
@@ -245,31 +204,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
             throwable.printStackTrace();
             
             ListActivity.writeError( thread, throwable, ListActivity.this );
-            
-            // this doesn't seem to work. maybe we can get an out-of-app context to use?
-//            Toast.makeText( ListActivity.this.getBaseContext(), "error: " + throwable, Toast.LENGTH_LONG ).show();
-            
-            // notification just blocks forever
-//            String ns = Context.NOTIFICATION_SERVICE;
-//            final NotificationManager notificationManager = (NotificationManager) getSystemService(ns);
-//            int icon = R.drawable.wiglewifi;
-//            CharSequence tickerText = "error: ";
-//            long when = System.currentTimeMillis();
-//            final Notification notification = new Notification(icon, tickerText, when);
-//            final int HELLO_ID = 1;
-//            notificationManager.notify(HELLO_ID, notification);
-            
-            // try setting up an email to send. but it just blocks forever too
-//            final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-//            emailIntent .setType("plain/text");
-//            emailIntent .putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"});
-//            emailIntent .putExtra(android.content.Intent.EXTRA_SUBJECT, "error");
-//            emailIntent .putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error: " + throwable );
-//            ListActivity.this.getApplicationContext().startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-            
-            // these won't affect the pendingIntent. sigh.
-//            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error2: " + throwable );
-//            chooserIntent.putExtra(android.content.Intent.EXTRA_TEXT, "WigleWifi error3: " + throwable);
             // set the email intent to go off in a few seconds
             AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mgr.set( AlarmManager.RTC, System.currentTimeMillis() + 2000, pendingIntent );
@@ -287,38 +221,33 @@ public final class ListActivity extends Activity implements FileUploaderListener
           // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
           final ListActivity retained = (ListActivity) stored;
           this.listAdapter = retained.listAdapter;
-          this.runNetworks = retained.runNetworks;
-          this.gpsStatus = retained.gpsStatus;
-          this.location = retained.location;
           this.wifiTimer = retained.wifiTimer;
           this.dbHelper = retained.dbHelper;
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
           this.uploading = retained.uploading;
-          this.savedStats = retained.savedStats;
-          this.prevNewNetCount = retained.prevNewNetCount;
-          this.satCountLowTime = retained.satCountLowTime;
-          this.batteryLevel = retained.batteryLevel;
-          
-          this.lastLocationTime = retained.lastLocationTime;
-          this.lastNetworkLocationTime = retained.lastNetworkLocationTime;
-          this.scanRequestTime = retained.scanRequestTime;
           
           this.soundPop = retained.soundPop;
           this.soundNewPop = retained.soundNewPop;
           this.wifiLock = retained.wifiLock;
           
-          final int runNets = runNetworks == null ? 0 : runNetworks.size();
-          TextView tv = (TextView) findViewById( R.id.stats_run );
-          tv.setText( "Run: " + runNets );
-          tv = (TextView) findViewById( R.id.stats_new );
-          tv.setText( "New: " + prevNewNetCount );
-          tv = (TextView) findViewById( R.id.stats_dbnets );
-          tv.setText( "DB: " + ListActivity.lameStatic.dbNets );
+          this.gpsListener = retained.gpsListener;
+          this.wifiReceiver = retained.wifiReceiver;
+          this.numberFormat1 = retained.numberFormat1;
+          this.numberFormat8 = retained.numberFormat8;
+          this.tts = retained.tts;
+          this.audioManager = retained.audioManager;
+          this.inEmulator = retained.inEmulator;
+          this.isPhoneActive = retained.isPhoneActive;
+          this.batteryLevelReceiver = retained.batteryLevelReceiver;
           
+          // tell those that need it that we have a new context
+          gpsListener.setListActivity( this );
+          wifiReceiver.setListActivity( this );
+          setNetCountUI( this, wifiReceiver.getRunNetworkCount(), dbHelper.getNewNetworkCount(), 
+              ListActivity.lameStatic.dbNets );
         }
         else {
-          runNetworks = new HashSet<String>();
           finishing = new AtomicBoolean( false );
           uploading = new AtomicBoolean( false );
           
@@ -331,18 +260,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
           edit.commit();
         }
         
-        numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
-        if ( numberFormat1 instanceof DecimalFormat ) {
-          ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
+        if ( numberFormat1 == null ) {
+          numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
+          if ( numberFormat1 instanceof DecimalFormat ) {
+            ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
+          }
         }
         
-        numberFormat8 = NumberFormat.getNumberInstance( Locale.US );
-        if ( numberFormat8 instanceof DecimalFormat ) {
-          ((DecimalFormat) numberFormat8).setMaximumFractionDigits( 8 );
+        if ( numberFormat8 == null ) {
+          numberFormat8 = NumberFormat.getNumberInstance( Locale.US );
+          if ( numberFormat8 instanceof DecimalFormat ) {
+            ((DecimalFormat) numberFormat8).setMaximumFractionDigits( 8 );
+          }
         }
-        
-        // for speech
-        timeFormat = new SimpleDateFormat( "h mm aa" );
         
         info( "setupService" );
         setupService();
@@ -365,6 +295,61 @@ public final class ListActivity extends Activity implements FileUploaderListener
         info( "setup complete" );
     }
     
+    public static void setNetCountUI( final Activity activity, final int runNetworks, 
+        final long prevNewNetCount, final long dbNets ) {
+      
+      TextView tv = (TextView) activity.findViewById( R.id.stats_run );
+      tv.setText( "Run: " + runNetworks );
+      tv = (TextView) activity.findViewById( R.id.stats_new );
+      tv.setText( "New: " + prevNewNetCount );
+      tv = (TextView) activity.findViewById( R.id.stats_dbnets );
+      tv.setText( "DB: " + dbNets );
+    }
+    
+    public boolean inEmulator() {
+      return inEmulator;
+    }
+    
+    public DatabaseHelper getDBHelper() {
+      return dbHelper;
+    }
+    
+    public BatteryLevelReceiver getBatteryLevelReceiver() {
+      return batteryLevelReceiver;
+    }
+    
+    public GPSListener getGPSListener() {
+      return gpsListener;
+    }
+    
+    public boolean isFinishing() {
+      return finishing.get();
+    }
+    
+    public boolean isUploading() {
+      return uploading.get();
+    }
+    
+    public void playNewNetSound() {
+      if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
+        // play sound on something new
+        soundNewPop.start();
+      }
+      else {
+        ListActivity.info( "soundNewPop is playing or null" );
+      }
+    }
+    
+    public void playRunNetSound() {
+      if ( soundPop != null && ! soundPop.isPlaying() ) {
+        // play sound on something new
+        soundPop.start();
+      }
+      else {
+        ListActivity.info( "soundPop is playing or null" );
+      }
+    }
+    
     @Override
     public Object onRetainNonConfigurationInstance() {
       info( "onRetainNonConfigurationInstance" );
@@ -374,31 +359,31 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     @Override
     public void onPause() {
-      info( "LIST: paused. networks: " + runNetworks.size() );
+      info( "LIST: paused. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "LIST: resumed. networks: " + runNetworks.size() );
+      info( "LIST: resumed. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onResume();
     }
     
     @Override
     public void onStart() {
-      info( "LIST: start. networks: " + runNetworks.size() );
+      info( "LIST: start. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onStart();
     }
     
     @Override
     public void onStop() {
-      info( "LIST: stop. networks: " + runNetworks.size() );
+      info( "LIST: stop. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onStop();
     }
 
     @Override
     public void onRestart() {
-      info( "LIST: restart. networks: " + runNetworks.size() );
+      info( "LIST: restart. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onRestart();
     }
     
@@ -417,59 +402,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     @Override
     public void onDestroy() {
-      info( "LIST: destroy. networks: " + runNetworks.size() );
-      
-      if ( DEBUG ) {
-        Debug.stopMethodTracing();
-      }
-
-      try {
-        this.unregisterReceiver( wifiReceiver );
-      }
-      catch ( final IllegalArgumentException ex ) {
-        // don't bother with trace on this
-        info( "wifiReceiver not registered: " + ex );
-      }
-      // stop the service, so when we die it's both stopped and unbound and will die
-      final Intent serviceIntent = new Intent( this, WigleService.class );
-      this.stopService( serviceIntent );
-      try {
-        this.unbindService( serviceConnection );
-      }
-      catch ( final IllegalArgumentException ex ) {
-        // don't bother with trace on this
-        info( "serviceConnection not registered: " + ex );
-      }
-      if ( wifiLock != null && wifiLock.isHeld() ) {
-        wifiLock.release();
-      }
-
-      // clean up.
-      if ( soundPop != null ) {
-          soundPop.release();
-      }
-      if ( soundNewPop != null ) {
-          soundNewPop.release();
-      }
- 
+      info( "LIST: destroy. networks: " + wifiReceiver.getRunNetworkCount() );
       super.onDestroy();
-    }
-    
-    private void saveLocation() {
-      // save our location for use on later runs
-      if ( this.location != null ) {
-        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-        final Editor edit = prefs.edit();
-        // there is no putDouble
-        edit.putFloat( PREF_PREV_LAT, (float) location.getLatitude() );
-        edit.putFloat( PREF_PREV_LON, (float) location.getLongitude() );
-        edit.commit();
-      }
     }
     
     @Override
     public void finish() {
-      info( "LIST: finish. networks: " + runNetworks.size() );
+      info( "LIST: finish. networks: " + wifiReceiver.getRunNetworkCount() );
       
       final boolean wasFinishing = finishing.getAndSet( true );
       if ( wasFinishing ) {
@@ -482,17 +421,15 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
       
       // save our location for later runs
-      saveLocation();
+      gpsListener.saveLocation();
       
       // close the db. not in destroy, because it'll still write after that.
       dbHelper.close();
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-      if ( gpsStatusListener != null ) {
-        locationManager.removeGpsStatusListener( gpsStatusListener );
-      }
-      if ( locationListener != null ) {
-        locationManager.removeUpdates( locationListener );
+      if ( gpsListener != null ) {
+        locationManager.removeGpsStatusListener( gpsListener );
+        locationManager.removeUpdates( gpsListener );
       }
       
       try {
@@ -535,6 +472,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
           sleep( 250 );
         }
         tts.shutdown();
+      }
+      
+      
+      if ( DEBUG ) {
+        Debug.stopMethodTracing();
+      }
+
+      // clean up.
+      if ( soundPop != null ) {
+        soundPop.release();
+      }
+      if ( soundNewPop != null ) {
+        soundNewPop.release();
       }
       
       super.finish();
@@ -612,83 +562,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     private void setupList() {
-      final LayoutInflater mInflater = (LayoutInflater) getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        
       // may have been set by nonconfig retain
       if ( listAdapter == null ) {
-        listAdapter = new ArrayAdapter<Network>( this, R.layout.row ) {
-          // separators aren't drawn if we do this
-//          @Override
-//          public boolean areAllItemsEnabled() {
-//            return false;
-//          }
-//          
-//          @Override
-//          public boolean isEnabled( int position ) {
-//            return false;
-//          }
-          
-          @Override
-          public View getView( final int position, final View convertView, final ViewGroup parent ) {
-            // long start = System.currentTimeMillis();
-            View row;
-            
-            if ( null == convertView ) {
-              row = mInflater.inflate( R.layout.row, parent, false );
-            } 
-            else {
-              row = convertView;
-            }
-        
-            final Network network = getItem(position);
-            // info( "listing net: " + network.getBssid() );
-            
-            final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );   
-            switch ( network.getCrypto() ) {
-              case Network.CRYPTO_WEP:
-                ico.setImageResource( R.drawable.wep_ico );
-                break;
-              case Network.CRYPTO_WPA:
-                ico.setImageResource( R.drawable.wpa_ico );
-                break;
-              case Network.CRYPTO_NONE:
-                ico.setImageResource( R.drawable.no_ico );
-                break;
-              default:
-                throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
-                    + " in network: " + network );
-            }
-              
-            TextView tv = (TextView) row.findViewById( R.id.ssid );              
-            tv.setText( network.getSsid() );
-              
-            tv = (TextView) row.findViewById( R.id.level_string );
-            int level = network.getLevel();
-            if ( level <= -90 ) {
-              tv.setTextColor( COLOR_5 );
-            }
-            else if ( level <= -80 ) {
-              tv.setTextColor( COLOR_4 );
-            }
-            else if ( level <= -70 ) {
-              tv.setTextColor( COLOR_3 );
-            }
-            else if ( level <= -60 ) {
-              tv.setTextColor( COLOR_2 );
-            }
-            else {
-              tv.setTextColor( COLOR_1 );
-            }
-            tv.setText( Integer.toString( level ) );
-            
-            tv = (TextView) row.findViewById( R.id.detail );
-            String det = network.getDetail();
-            tv.setText( det );
-            // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );
-        
-            return row;
-          }
-        };
+        listAdapter = new NetworkListAdapter( this, R.layout.row );
       }
                
       final ListView listView = (ListView) findViewById( R.id.ListView01 );
@@ -699,7 +575,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       // warn about turning off network notification
       final String notifOn = Settings.Secure.getString(getContentResolver(), 
           Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
-      if ( notifOn != null && "1".equals( notifOn ) ) {
+      if ( notifOn != null && "1".equals( notifOn ) && wifiReceiver == null ) {
         Toast.makeText( this, "For best results, unset \"Network notification\" in"
             + " \"Wireless & networks\"->\"Wi-Fi settings\"", 
             Toast.LENGTH_LONG ).show();
@@ -731,270 +607,25 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
       edit.commit();
       
-      info( "new BroadcastReceiver");
-      // wifi scan listener
-      // this receiver is the main workhorse of the entire app
-      wifiReceiver = new BroadcastReceiver(){
-          public void onReceive( final Context context, final Intent intent ){
-            // final long start = System.currentTimeMillis();
-
-            final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
-            
-            long nonstopScanRequestTime = Long.MIN_VALUE;
-            final long period = prefs.getLong( chooseScanPref(), SCAN_DEFAULT );
-            if ( period == 0 ) {
-              // treat as "continuous", so request scan in here
-              doWifiScan( wifiManager );
-              nonstopScanRequestTime = System.currentTimeMillis();
-            }
-            
-            final boolean showCurrent = prefs.getBoolean( PREF_SHOW_CURRENT, true );
-            if ( showCurrent ) {
-              listAdapter.clear();
-            }
-            
-            final int preQueueSize = dbHelper.getQueueSize();
-            final boolean fastMode = dbHelper.isFastMode();
-            
-            final CacheMap<String,Network> networkCache = getNetworkCache();
-            boolean somethingAdded = false;
-            int resultSize = 0;
-            int newForRun = 0;
-            // can be null on shutdown
-            if ( results != null ) {
-              resultSize = results.size();
-              for ( ScanResult result : results ) {
-                Network network = networkCache.get( result.BSSID );
-                if ( network == null ) {
-                  network = new Network( result );
-                  networkCache.put( network.getBssid(), network );
-                }
-                else {
-                  // cache hit, just set the level
-                  network.setLevel( result.level );
-                }
-                final boolean added = runNetworks.add( result.BSSID );
-                if ( added ) {
-                    newForRun++;
-                }
-                somethingAdded |= added;
-                
-                // if we're showing current, or this was just added, put on the list
-                if ( showCurrent || added ) {
-                  listAdapter.add( network );
-                  // load test
-                  // for ( int i = 0; i< 10; i++) {
-                  //  listAdapter.add( network );
-                  // }
-                  
-                }
-                else {
-                  // not showing current, and not a new thing, go find the network and update the level
-                  // this is O(n), ohwell, that's why showCurrent is the default config.
-                  for ( int index = 0; index < listAdapter.getCount(); index++ ) {
-                    final Network testNet = listAdapter.getItem(index);
-                    if ( testNet.getBssid().equals( network.getBssid() ) ) {
-                      testNet.setLevel( result.level );
-                    }
-                  }
-                }
-                
-                
-                if ( dbHelper != null ) {
-                    if ( location != null  ) {
-                        // if in fast mode, only add new-for-run stuff to the db queue
-                        if ( fastMode && ! added ) {
-                            info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
-                        }
-                        else {
-                            // loop for stress-testing
-                            // for ( int i = 0; i < 10; i++ ) {
-                            dbHelper.addObservation( network, location, added );
-                            // }
-                        }
-                    } else {
-                        // no location
-                        dbHelper.pendingObservation( network, added );
-                    }
-                }
-              }
-            }
-
-            // check if there are more "New" nets
-            final long newNetCount = dbHelper.getNewNetworkCount();
-            final long newNetDiff = newNetCount - prevNewNetCount;
-            prevNewNetCount = newNetCount;
-            
-            
-            if ( ! isMuted() ) {
-              final boolean playRun = prefs.getBoolean( PREF_FOUND_SOUND, true );
-              final boolean playNew = prefs.getBoolean( PREF_FOUND_NEW_SOUND, true );
-              if ( newNetDiff > 0 && playNew ) {
-                if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
-                  // play sound on something new
-                  soundNewPop.start();
-                }
-                else {
-                  info( "soundNewPop is playing or null" );
-                }
-              }
-              else if ( somethingAdded && playRun ) {
-                if ( soundPop != null && ! soundPop.isPlaying() ) {
-                  // play sound on something new
-                  soundPop.start();
-                }
-                else {
-                  info( "soundPop is playing or null" );
-                }
-              }
-            }
-            
-            // sort by signal strength
-            listAdapter.sort( signalCompare );
-
-            final long dbNets = dbHelper.getNetworkCount();
-            final long dbLocs = dbHelper.getLocationCount();
-            
-            // update stat
-            TextView tv = (TextView) findViewById( R.id.stats_run );
-            tv.setText( "Run: " + runNetworks.size() );
-            tv = (TextView) findViewById( R.id.stats_new );
-            tv.setText( "New: " + newNetCount );
-            tv = (TextView) findViewById( R.id.stats_dbnets );
-            tv.setText( "DB: " + dbNets );
-            
-            // set the statics for the map
-            ListActivity.lameStatic.runNets = runNetworks.size();
-            ListActivity.lameStatic.newNets = newNetCount;
-            ListActivity.lameStatic.currNets = resultSize;
-            ListActivity.lameStatic.preQueueSize = preQueueSize;
-            ListActivity.lameStatic.dbNets = dbNets;
-            ListActivity.lameStatic.dbLocs = dbLocs;
-            
-            if ( newForRun > 0 ) {
-              if ( location == null ) {
-                // save for later
-                pendingCount += newForRun;
-              }
-              else {
-                final GeoPoint geoPoint = new GeoPoint( location );
-                TrailStat trailStat = lameStatic.trail.get( geoPoint );
-                if ( trailStat == null ) {
-                  trailStat = new TrailStat();
-                  lameStatic.trail.put( geoPoint, trailStat );
-                }
-                trailStat.newForRun += newForRun;
-                trailStat.newForDB += newNetDiff;
-                
-                // add any pendings
-                // don't go crazy
-                if ( pendingCount > 25 ) {
-                  pendingCount = 25;
-                }
-                trailStat.newForRun += pendingCount;
-                pendingCount = 0;
-              }
-            }
-            
-            // info( savedStats );
-            
-            // notify
-            listAdapter.notifyDataSetChanged();
-            
-            final long now = System.currentTimeMillis();
-            if ( scanRequestTime <= 0 ) {
-              // wasn't set, set to now
-              scanRequestTime = now;
-            }
-            final String status = resultSize + " scanned in " + (now - scanRequestTime) + "ms. DB Queue: " + preQueueSize;
-            tv = (TextView) findViewById( R.id.status );
-            tv.setText( status );
-            // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
-            scanRequestTime = nonstopScanRequestTime;
-            
-            // do distance calcs
-            if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
-                && location.getAccuracy() <= MIN_DISTANCE_ACCURACY ) {
-              if ( prevGpsLocation != null ) {
-                float dist = location.distanceTo( prevGpsLocation );
-                // info( "dist: " + dist );
-                if ( dist > 0f ) {
-                  final Editor edit = prefs.edit();
-                  edit.putFloat( PREF_DISTANCE_RUN,
-                      dist + prefs.getFloat( PREF_DISTANCE_RUN, 0f ) );
-                  edit.putFloat( PREF_DISTANCE_TOTAL,
-                      dist + prefs.getFloat( PREF_DISTANCE_TOTAL, 0f ) );
-                  edit.commit();
-                }
-              }
-              
-              // set for next time
-              prevGpsLocation = location;
-            }
-            
-            final long speechPeriod = prefs.getLong( PREF_SPEECH_PERIOD, DEFAULT_SPEECH_PERIOD );
-            if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-              doAnnouncement( preQueueSize, newNetCount, now );
-            }
-          }
-        };
-      
-      // register
-      info( "register BroadcastReceiver");
-      final IntentFilter intentFilter = new IntentFilter();
-      intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
-      this.registerReceiver( wifiReceiver, intentFilter );
+      if ( wifiReceiver == null ) {
+        info( "new wifiReceiver");
+        // wifi scan listener
+        // this receiver is the main workhorse of the entire app
+        wifiReceiver = new WifiReceiver( this, dbHelper, listAdapter );
+        wifiReceiver.setupWifiTimer( turnedWifiOn );
+        
+        // register
+        info( "register BroadcastReceiver");
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
+        this.registerReceiver( wifiReceiver, intentFilter );
+      }
       
       if ( wifiLock == null ) {
         info( "lock wifi radio on");
         // lock the radio on
         wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, WIFI_LOCK_NAME );
         wifiLock.acquire();
-      }
-      
-      // might not be null on a nonconfig retain
-      if ( wifiTimer == null ) {
-        info( "create wifi timer" );
-        wifiTimer = new Handler();
-        final Runnable mUpdateTimeTask = new Runnable() {
-          public void run() {              
-              // make sure the app isn't trying to finish
-              if ( ! finishing.get() ) {
-                // info( "timer start scan" );
-                doWifiScan( wifiManager );
-                if ( scanRequestTime <= 0 ) {
-                  scanRequestTime = System.currentTimeMillis();
-                }
-                long period = prefs.getLong( chooseScanPref(), SCAN_DEFAULT );
-                // check if set to "continuous"
-                if ( period == 0L ) {
-                  // set to default here, as a scan will also be requested on the scan result listener
-                  period = 1000L;
-                }
-                // info("wifitimer: " + period );
-                wifiTimer.postDelayed( this, period );
-              }
-              else {
-                info( "finishing timer" );
-              }
-          }
-        };
-        wifiTimer.removeCallbacks( mUpdateTimeTask );
-        wifiTimer.postDelayed( mUpdateTimeTask, 100 );
-
-        if ( turnedWifiOn ) {
-          info( "not immediately running wifi scan, since it was just turned on"
-              + " it will block for a few seconds and fail anyway");
-        }
-        else {
-          info( "start first wifi scan");
-          // starts scan, sends event when done
-          final boolean scanOK = doWifiScan( wifiManager );
-          if ( scanRequestTime <= 0 ) {
-            scanRequestTime = System.currentTimeMillis();
-          }
-          info( "startup finished. wifi scanOK: " + scanOK );
-        }
       }
     }
     
@@ -1003,64 +634,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
      * by a battery status/level change.
      */
     private void setupBattery() {
-      BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-          context.unregisterReceiver(this);
-          int rawlevel = intent.getIntExtra("level", -1);
-          int scale = intent.getIntExtra("scale", -1);
-          int level = -1;
-          if (rawlevel >= 0 && scale > 0) {
-            level = (rawlevel * 100) / scale;
-          }
-          batteryLevel = level;
-        }
-      };
-      IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-      registerReceiver(batteryLevelReceiver, batteryLevelFilter);
-    }
-
-    
-    private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-      StringBuilder builder = new StringBuilder();
-      
-      if ( location == null ) {
-        builder.append( "no gps fix, " );
+      if ( batteryLevelReceiver == null ) {
+        batteryLevelReceiver = new BatteryLevelReceiver();
+        IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryLevelReceiver, batteryLevelFilter);
       }
-      
-      // run, new, queue, miles, time, battery
-      if ( prefs.getBoolean( PREF_SPEAK_RUN, true ) ) {
-        builder.append( "run " ).append( runNetworks.size() ).append( ", " );
-      }
-      if ( prefs.getBoolean( PREF_SPEAK_NEW, true ) ) {
-        builder.append( "new " ).append( newNetCount ).append( ", " );
-      }
-      if ( preQueueSize > 0 && prefs.getBoolean( PREF_SPEAK_QUEUE, true ) ) {
-        builder.append( "queue " ).append( preQueueSize ).append( ", " );
-      }
-      if ( prefs.getBoolean( PREF_SPEAK_MILES, true ) ) {
-        final float dist = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
-        builder.append( "from " ).append( numberFormat1.format( dist / 1609.344f ) ).append( " miles, " );
-      }
-      if ( prefs.getBoolean( PREF_SPEAK_TIME, true ) ) {
-        builder.append( timeFormat.format( new Date() ) ).append( ", " );
-      }
-      if ( batteryLevel >= 0 && prefs.getBoolean( PREF_SPEAK_BATTERY, true ) ) {
-        builder.append( "battery " ).append( batteryLevel ).append( " percent, " );
-      }
-      
-      info( "speak: " + builder.toString() );
-      speak( builder.toString() );
-      previousTalkTime = now;
-    }
-    
-    private String chooseScanPref() {
-      String retval = PREF_SCAN_PERIOD;
-      // if over 5 mph
-      if ( location != null && location.getSpeed() >= 2.2352f ) {
-        retval = PREF_SCAN_PERIOD_FAST;
-      }
-      return retval;
     }
     
     /**
@@ -1070,30 +648,20 @@ public final class ListActivity extends Activity implements FileUploaderListener
       uploading.set( false );
       info( "uploading complete" );
       // start a scan to get the ball rolling again if this is non-stop mode
-      final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-      doWifiScan( wifiManager );
+      wifiReceiver.doWifiScan();
     }
     
-    private boolean doWifiScan( WifiManager wifiManager ) {
-      boolean retval = false;
-      if ( uploading.get() ) {
-        info( "uploading, not scanning for now" );
-      }
-      else {
-        retval = wifiManager.startScan();
-      }
-      return retval;
-    }
-    
-    private void speak( final String string ) {
+    public void speak( final String string ) {
       if ( ! isMuted() && tts != null ) {
         tts.speak( string );
       }
     }
     
     private void setupLocation() {
-      // set on UI if we already have one
-      updateLocationData( (Location) null );
+      if ( gpsListener != null ) {
+        // set on UI if we already have one
+        setLocationUI( gpsListener.getSatCount() );
+      }
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
@@ -1109,192 +677,32 @@ public final class ListActivity extends Activity implements FileUploaderListener
         startActivity(myIntent);
       }
       // emulator crashes if you ask this
-      if ( ! inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) ) {
+      if ( ! inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) && gpsListener == null ) {
         Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
             Toast.LENGTH_LONG ).show();
       }
-      
-      gpsStatusListener = new Listener(){
-        public void onGpsStatusChanged( final int event ) {
-          updateLocationData( (Location) null );
-        } 
-      };
-      locationManager.addGpsStatusListener( gpsStatusListener );
-      
-      final List<String> providers = locationManager.getAllProviders();
-      locationListener = new LocationListener(){
-          public void onLocationChanged( final Location newLocation ) {
-            updateLocationData( newLocation );
-          }
-          public void onProviderDisabled( final String provider ) {}
-          public void onProviderEnabled( final String provider ) {}
-          public void onStatusChanged( final String provider, final int status, final Bundle extras ) {}
-        };
-        
-      for ( String provider : providers ) {
-        info( "available provider: " + provider );
-        if ( ! "passive".equals( provider ) ) {
-          locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, locationListener );
-        }
-      }
-    }
-    
-    /** newLocation can be null */
-    private void updateLocationData( final Location newLocation ) {
-      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-      // see if we have new data
-      gpsStatus = locationManager.getGpsStatus( gpsStatus );
-      final int satCount = getSatCount();
-      
-      boolean newOK = newLocation != null;
-      final boolean locOK = locationOK( location, satCount );
-      final long now = System.currentTimeMillis();
-      
-      if ( newOK ) {
-        if ( NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
-          // save for later, in case we lose gps
-          networkLocation = newLocation;
-          lastNetworkLocationTime = now;
-        }
-        else {
-          lastLocationTime = now;
-          // make sure there's enough sats on this new gps location
-          newOK = locationOK( newLocation, satCount );
-        }
-      }
-      
-      if ( inEmulator && newLocation != null ) {
-        newOK = true; 
-      }
-      
-      final boolean netLocOK = locationOK( networkLocation, satCount );
-      
-      boolean wasProviderChange = false;
-      if ( ! locOK ) {
-        if ( newOK ) {
-          wasProviderChange = true;
-          if ( location != null && ! location.getProvider().equals( newLocation.getProvider() ) ) {
-            wasProviderChange = false;
-          }
-          
-          location = newLocation;
-        }
-        else if ( netLocOK ) {
-          location = networkLocation;
-          wasProviderChange = true;
-        }
-        else if ( location != null ) {
-          // transition to null
-          info( "nulling location: " + location );
-          location = null;
-          wasProviderChange = true;
-        }
-      }
-      else if ( newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
-        if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
-          // this is an upgrade from network to gps
-          wasProviderChange = true;
-        }
-        location = newLocation;
-        if ( wasProviderChange ) {
-          // save it in prefs
-          saveLocation();
-        }
-      }
-      else if ( newOK && NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
-        if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
-          // just a new network provided location over an old one
-          location = newLocation;
-        }
-      }
-      
-      // for maps. so lame!
-      lameStatic.location = location;
-      
-      if ( wasProviderChange ) {
-        info( "wasProviderChange: run: " + this.runNetworks.size() + " satCount: " + satCount 
-          + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
-          + " wasProviderChange: " + wasProviderChange
-          + (newOK ? " newProvider: " + newLocation.getProvider() : "")
-          + (locOK ? " locProvider: " + location.getProvider() : "") 
-          + " newLocation: " + newLocation );
 
-        final String announce = location == null ? "Lost Location" 
-            : "Now have location from \"" + location.getProvider() + "\"";
-        Toast.makeText( this, announce, Toast.LENGTH_SHORT ).show();
-        final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-        final boolean speechGPS = prefs.getBoolean( PREF_SPEECH_GPS, true );
-        if ( speechGPS ) {
-          // no quotes or the voice pauses
-          final String speakAnnounce = location == null ? "Lost Location" 
-            : "Now have location from " + location.getProvider() + ".";
-          speak( speakAnnounce );
-        }
-
-        if ( location == null ) {
-            if ( prevGpsLocation != null ) {
-              dbHelper.lastLocation( prevGpsLocation );
-              info("set last location for lerping");
-            }
-        } else {
-          int count = dbHelper.recoverLocations( location );
-          info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
-        }
-      }
+      if ( gpsListener == null ) {
+        gpsListener = new GPSListener( this );
+        locationManager.addGpsStatusListener( gpsListener );
       
-      // update the UI
-      setLocationUI();
-    }
-    
-    private boolean locationOK( final Location location, final int satCount ) {
-      boolean retval = false;
-      final long now = System.currentTimeMillis();
-      
-      if ( location == null ) {
-        // bad!
-      }
-      else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
-        if ( satCount < 3 ) {
-          if ( satCountLowTime == null ) {
-            satCountLowTime = now;
-          }
-        }
-        else {
-          // plenty of sats
-          satCountLowTime = null;
-        }
-        boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > GPS_TIMEOUT;
-        gpsLost |= now - lastLocationTime > GPS_TIMEOUT;
-        retval = ! gpsLost;
-      }
-      else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
-        boolean gpsLost = now - lastNetworkLocationTime > NET_LOC_TIMEOUT;
-        retval = ! gpsLost;
-      }
-      
-      return retval;
-    }
-    
-    private int getSatCount() {
-      int satCount = 0;
-      if ( gpsStatus != null ) {
-        for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
-          if ( sat.usedInFix() ) {
-            satCount++;
+        final List<String> providers = locationManager.getAllProviders();
+        for ( String provider : providers ) {
+          info( "available provider: " + provider );
+          if ( ! "passive".equals( provider ) ) {
+            locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, gpsListener );
           }
         }
       }
-      return satCount;
     }
     
-    private void setLocationUI() {
-      if ( gpsStatus != null ) {
-        final int satCount = getSatCount();
-        final TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
-        tv.setText( "Sats: " + satCount );
-      }
+    public void setLocationUI( final int satCount ) {
+      TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
+      tv.setText( "Sats: " + satCount );
       
-      TextView tv = (TextView) this.findViewById( R.id.LocationTextView01 );
+      final Location location = gpsListener.getLocation();
+      
+      tv = (TextView) this.findViewById( R.id.LocationTextView01 );
       tv.setText( "Lat: " + (location == null ? "  (Waiting for GPS sync..)" 
           : numberFormat8.format( location.getLatitude() ) ) );
       
@@ -1356,11 +764,17 @@ public final class ListActivity extends Activity implements FileUploaderListener
       if ( soundNewPop == null ) {
         soundNewPop = createMediaPlayer( R.raw.newpop );
       }
-      audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+      if ( audioManager == null ) {
+        audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+      }
       // make volume change "media"
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
       
       if ( TTS.hasTTS() ) {
+        // don't reuse an old one, has to be on *this* context
+        if ( tts != null ) {
+          tts.shutdown();
+        }
         // this has to have the parent activity, for whatever wacky reasons
         Activity context = this.getParent();
         if ( context == null ) {
@@ -1558,7 +972,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       return retval;
     }
     
-    private boolean isMuted() {
+    public boolean isMuted() {
       if ( isPhoneActive ) {
         // always be quiet when the phone is active
         return true;

@@ -206,15 +206,16 @@ public final class FileUploaderTask extends Thread {
       
       String openString = filename;
       final boolean hasSD = ListActivity.hasSD();
+      File file = null;
       if ( hasSD ) {
         final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
         final File path = new File( filepath );
         path.mkdirs();
         openString = filepath + filename;
-      }
-      final File file = new File( openString );
-      if ( ! file.exists() ) {
-        file.createNewFile();
+        file = new File( openString );
+        if ( ! file.exists() && hasSD ) {
+          file.createNewFile();
+        }
       }
       
       final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
@@ -372,7 +373,7 @@ public final class FileUploaderTask extends Thread {
       // show on the UI
       handler.sendEmptyMessage( Status.UPLOADING.ordinal() );
 
-      long filesize = file.length();
+      long filesize = file != null ? file.length() : 0L;
       if ( filesize <= 0 ) {
         filesize = bytecount; // as an upper bound
       }

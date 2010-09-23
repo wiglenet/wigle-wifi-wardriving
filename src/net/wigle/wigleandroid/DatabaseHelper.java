@@ -635,7 +635,7 @@ public final class DatabaseHelper extends Thread {
     int count = 0;
     long locWhen = System.currentTimeMillis();
 
-    if ( ( lastLoc != null ) && ( ! pending.isEmpty() ) ) { 
+    if ( ( lastLoc != null ) && ( ! pending.isEmpty() ) ) {
       final float accuracy = loc.distanceTo( lastLoc );
 
       if ( locWhen <= lastLocWhen ) { // prevent divide by 0
@@ -681,13 +681,14 @@ public final class DatabaseHelper extends Thread {
         // XXX: altitude? worth it?
       }
       // return
+      ListActivity.info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
     }
 
     lastLoc = null;
     return count;
   }
 
-  private void logTime( long start, String string ) {
+  private void logTime( final long start, final String string ) {
     long diff = System.currentTimeMillis() - start;
     if ( diff > 150L ) {
       ListActivity.info( string + " in " + diff + " ms" );

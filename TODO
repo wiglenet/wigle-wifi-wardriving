@@ -19,7 +19,9 @@ update service notificaton string with some stats
 
 --- done ---
 * 1.21
-Fix bugs related to orientation change on the List activity (broadcast receiver)
+Large refactor to fix bugs related to orientation change on the List activity:
+  IllegalArgumentException: View not attached to window manager
+  IllegalStateException: android.media.MediaPlayer.isPlaying
 Make uploads work on device with no sdcard
 Update osmdroid map library
 

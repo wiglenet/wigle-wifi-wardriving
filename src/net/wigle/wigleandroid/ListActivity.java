@@ -77,22 +77,16 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private ServiceConnection serviceConnection;
     private AtomicBoolean finishing;
     private AtomicBoolean uploading;
-
     private MediaPlayer soundPop;
     private MediaPlayer soundNewPop;
     private WifiLock wifiLock;
-    
     private GPSListener gpsListener;
     private WifiReceiver wifiReceiver;
     private NumberFormat numberFormat1;
     private NumberFormat numberFormat8;
-
     private TTS tts;
-    private AudioManager audioManager;
-
     private boolean inEmulator;
     private boolean isPhoneActive;
-    
     private BatteryLevelReceiver batteryLevelReceiver;
     // *** end of state that must be added to the retain copy-constructor ***
     
@@ -226,17 +220,14 @@ public final class ListActivity extends Activity implements FileUploaderListener
           this.serviceConnection = retained.serviceConnection;
           this.finishing = retained.finishing;
           this.uploading = retained.uploading;
-          
           this.soundPop = retained.soundPop;
           this.soundNewPop = retained.soundNewPop;
           this.wifiLock = retained.wifiLock;
-          
           this.gpsListener = retained.gpsListener;
           this.wifiReceiver = retained.wifiReceiver;
           this.numberFormat1 = retained.numberFormat1;
           this.numberFormat8 = retained.numberFormat8;
           this.tts = retained.tts;
-          this.audioManager = retained.audioManager;
           this.inEmulator = retained.inEmulator;
           this.isPhoneActive = retained.isPhoneActive;
           this.batteryLevelReceiver = retained.batteryLevelReceiver;
@@ -332,8 +323,14 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     public void playNewNetSound() {
       if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
-        // play sound on something new
-        soundNewPop.start();
+        try {
+          // play sound on something new
+          soundNewPop.start();
+        }
+        catch ( IllegalStateException ex ) {
+          // ohwell, likely already playing
+          info( "exception trying to play sound: " + ex );
+        }
       }
       else {
         ListActivity.info( "soundNewPop is playing or null" );
@@ -342,8 +339,14 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     public void playRunNetSound() {
       if ( soundPop != null && ! soundPop.isPlaying() ) {
-        // play sound on something new
-        soundPop.start();
+        try {
+          // play sound on something new
+          soundPop.start();
+        }
+        catch ( IllegalStateException ex ) {
+          // ohwell, likely already playing
+          info( "exception trying to play sound: " + ex );
+        }
       }
       else {
         ListActivity.info( "soundPop is playing or null" );
@@ -764,9 +767,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       if ( soundNewPop == null ) {
         soundNewPop = createMediaPlayer( R.raw.newpop );
       }
-      if ( audioManager == null ) {
-        audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-      }
+
       // make volume change "media"
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
       
@@ -962,16 +963,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
         return null;
     }
    
-    
-    @SuppressWarnings("unused")
-    private boolean isRingerOn() {
-      boolean retval = false;
-      if ( audioManager != null ) {
-        retval = audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
-      }
-      return retval;
-    }
-    
     public boolean isMuted() {
       if ( isPhoneActive ) {
         // always be quiet when the phone is active

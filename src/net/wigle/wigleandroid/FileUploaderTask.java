@@ -119,7 +119,13 @@ public final class FileUploaderTask extends Thread {
         }
         // make sure we didn't progress dialog this somewhere
         if ( pd.isShowing() ) {
-          pd.dismiss();
+          try {
+            pd.dismiss();
+          }
+          catch ( IllegalArgumentException ex ) {
+            // guess it wasn't there anyways
+            ListActivity.info( "exception dismissing dialog: " + ex );
+          }
         }
         final AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
         builder.setCancelable( false );

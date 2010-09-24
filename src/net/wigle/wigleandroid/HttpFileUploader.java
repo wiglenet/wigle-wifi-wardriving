@@ -120,6 +120,7 @@ final class HttpFileUploader {
             }
           }
           catch ( Exception ex ) {
+            // this block is just for logging, so don't splode if it has a problem
             ListActivity.error("ex: " + ex, ex );
           }
         }

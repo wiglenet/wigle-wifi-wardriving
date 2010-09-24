@@ -200,7 +200,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
             ListActivity.writeError( thread, throwable, ListActivity.this );
             // set the email intent to go off in a few seconds
             AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            mgr.set( AlarmManager.RTC, System.currentTimeMillis() + 2000, pendingIntent );
+            mgr.set( AlarmManager.RTC, System.currentTimeMillis() + 5000, pendingIntent );
 
             // give it to the regular handler
             origHandler.uncaughtException( thread, throwable );
@@ -322,34 +322,34 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     public void playNewNetSound() {
-      if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
-        try {
+      try {
+        if ( soundNewPop != null && ! soundNewPop.isPlaying() ) {
           // play sound on something new
           soundNewPop.start();
         }
-        catch ( IllegalStateException ex ) {
-          // ohwell, likely already playing
-          info( "exception trying to play sound: " + ex );
+        else {
+          ListActivity.info( "soundNewPop is playing or null" );
         }
       }
-      else {
-        ListActivity.info( "soundNewPop is playing or null" );
+      catch ( IllegalStateException ex ) {
+        // ohwell, likely already playing
+        info( "exception trying to play sound: " + ex );
       }
     }
     
     public void playRunNetSound() {
-      if ( soundPop != null && ! soundPop.isPlaying() ) {
-        try {
+      try {
+        if ( soundPop != null && ! soundPop.isPlaying() ) {
           // play sound on something new
           soundPop.start();
-        }
-        catch ( IllegalStateException ex ) {
-          // ohwell, likely already playing
-          info( "exception trying to play sound: " + ex );
+        }  
+        else {
+          ListActivity.info( "soundPop is playing or null" );
         }
       }
-      else {
-        ListActivity.info( "soundPop is playing or null" );
+      catch ( IllegalStateException ex ) {
+        // ohwell, likely already playing
+        info( "exception trying to play sound: " + ex );
       }
     }
     

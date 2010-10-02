@@ -26,6 +26,7 @@ public final class MappingActivity extends Activity {
     private boolean locked = true;
     private boolean firstMove = true;
     private GeoPoint oldCenter = null;
+    private int oldZoom = Integer.MIN_VALUE;
   }
   private final State state = new State();
   
@@ -56,28 +57,31 @@ public final class MappingActivity extends Activity {
     
     final Object stored = getLastNonConfigurationInstance();
     GeoPoint oldCenter = null;
+    int oldZoom = Integer.MIN_VALUE;
     if ( stored != null && stored instanceof State ) {
       // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
       final State retained = (State) stored;
       state.locked = retained.locked;
       state.firstMove = retained.firstMove;
       oldCenter = retained.oldCenter;
+      oldZoom = retained.oldZoom;
     }
     
-    setupMapView( oldCenter );
+    setupMapView( oldCenter, oldZoom );
     setupTimer();
   }
   
   @Override
   public Object onRetainNonConfigurationInstance() {
     ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
-    // save the map center
+    // save the map info
     state.oldCenter = mapView.getMapCenter();
+    state.oldZoom = mapView.getZoomLevel();
     // return state class to copy data from
     return state;
   }
   
-  private void setupMapView( final GeoPoint oldCenter ) {
+  private void setupMapView( final GeoPoint oldCenter, final int oldZoom ) {
     // view
     mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
     mapView.setBuiltInZoomControls( true );
@@ -110,8 +114,12 @@ public final class MappingActivity extends Activity {
         centerPoint = new GeoPoint( lat, lon );
       }
     }
+    int zoom = 16;
+    if ( oldZoom >= 0 ) {
+      zoom = oldZoom;
+    }
     mapControl.setCenter( centerPoint );
-    mapControl.setZoom( 15 );
+    mapControl.setZoom( zoom );
     mapControl.setCenter( centerPoint );
     
     ListActivity.info("done setupMapView");

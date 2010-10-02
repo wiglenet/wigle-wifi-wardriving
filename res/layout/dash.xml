@@ -17,7 +17,7 @@
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:id="@+id/newnets"
-    android:textSize="32sp"
+    android:textSize="48sp"
     android:textColor="#AAEE50"
     />
     
@@ -25,7 +25,7 @@
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:id="@+id/runnets"
-    android:textSize="32sp"
+    android:textSize="48sp"
     android:textColor="#AAAA00"
     />
     

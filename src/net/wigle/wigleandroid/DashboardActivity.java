@@ -66,10 +66,10 @@ public class DashboardActivity extends Activity {
   
   private void updateUI() {
     TextView tv = (TextView) findViewById( R.id.runnets );
-    tv.setText( "Run Nets: " + ListActivity.lameStatic.runNets );
+    tv.setText( ListActivity.lameStatic.runNets + " Run");
     
     tv = (TextView) findViewById( R.id.newnets );
-    tv.setText( "New Nets: " + ListActivity.lameStatic.newNets );
+    tv.setText( ListActivity.lameStatic.newNets + " New" );
     
     tv = (TextView) findViewById( R.id.currnets );
     tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );

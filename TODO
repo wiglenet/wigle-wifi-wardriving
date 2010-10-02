@@ -11,13 +11,24 @@ seen-networks map tile overlays
 --- user suggested ---
 option for kml save for checking coverage back at home PC
 click on network to connect, with warning about legality
-network list sorting options
+network list sorting options (time found)
+network list filtering options (new only)
 shut off when battery is at chosen percentage
 kismet drone support
 some response/info/stat about uploaded files
 update service notificaton string with some stats
+try tabs on bottom in landscape mode
+confirm dialog on upload button
+remember zoom level on map
+show new networks since last upload
 
 --- done ---
+* 1.23
+Clean up memory leaks on orientation change in our code and osmdroid
+Catch a BadTokenException when a dialog tries to show on a gone window
+Larger counts on dashboard
+Remember map zoom level on orientation change
+
 * 1.22
 Take care of another mediaplayer bug
 

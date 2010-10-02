@@ -178,7 +178,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
         
         // do some of our own error handling, write a file with the stack
         final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
-
         if ( ! (origHandler instanceof WigleUncaughtExceptionHandler) ) {
           Thread.setDefaultUncaughtExceptionHandler( 
               new WigleUncaughtExceptionHandler( this.getApplicationContext(), origHandler ) ); 

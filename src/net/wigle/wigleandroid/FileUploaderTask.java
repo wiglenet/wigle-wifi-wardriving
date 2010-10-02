@@ -30,6 +30,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
@@ -216,6 +218,8 @@ public final class FileUploaderTask extends Thread {
     
     try {
       // if ( true ) { throw new IOException( "oh noe" ); }
+      final PackageManager pm = applictionContext.getPackageManager();
+      final PackageInfo pi = pm.getPackageInfo(applictionContext.getPackageName(), 0);
       
       String openString = filename;
       final boolean hasSD = ListActivity.hasSD();
@@ -238,7 +242,15 @@ public final class FileUploaderTask extends Thread {
 
       final long start = System.currentTimeMillis();
       // name, version
-      writeFos( fos, "WigleWifi-1.0\n" );
+      writeFos( fos, "WigleWifi-1.1"
+          + ",appRelease=" + pi.versionName
+          + ",model=" + android.os.Build.MODEL
+          + ",release=" + android.os.Build.VERSION.RELEASE
+          + ",device=" + android.os.Build.DEVICE
+          + ",display=" + android.os.Build.DISPLAY
+          + ",board=" + android.os.Build.BOARD
+          + ",brand=" + android.os.Build.BRAND
+          + "\n" );
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file

@@ -212,9 +212,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
         }
         
         final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
+
+        // DO NOT turn these into |=, they will cause older dalvik verifiers to freak out
         state.inEmulator = id == null;
-        state.inEmulator |= "sdk".equals( android.os.Build.PRODUCT );
-        state.inEmulator |= "google_sdk".equals( android.os.Build.PRODUCT );
+        state.inEmulator =  state.inEmulator || "sdk".equals( android.os.Build.PRODUCT );
+        state.inEmulator = state.inEmulator || "google_sdk".equals( android.os.Build.PRODUCT );
+
         info( "id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT );
         info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + DEBUG );
         

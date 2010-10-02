@@ -36,9 +36,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.view.WindowManager;
 
 public final class FileUploaderTask extends Thread {
-  private final Context context;
+  private final Context applictionContext;
   private final Handler handler;
   private final DatabaseHelper dbHelper;
   private final ProgressDialog pd;
@@ -87,7 +88,7 @@ public final class FileUploaderTask extends Thread {
       throw new IllegalArgumentException( "listener is null" );
     }
     
-    this.context = context;
+    this.applictionContext = context.getApplicationContext();
     this.dbHelper = dbHelper;
     this.listener = listener;
     
@@ -127,7 +128,8 @@ public final class FileUploaderTask extends Thread {
             ListActivity.info( "exception dismissing dialog: " + ex );
           }
         }
-        final AlertDialog.Builder builder = new AlertDialog.Builder( FileUploaderTask.this.context );
+        // Activity context
+        final AlertDialog.Builder builder = new AlertDialog.Builder( context );
         builder.setCancelable( false );
         builder.setTitle( status.getTitle() );
         Bundle bundle = msg.peekData();
@@ -144,7 +146,12 @@ public final class FileUploaderTask extends Thread {
             dialog.dismiss();
             return;
           } }); 
-        ad.show();
+        try {
+          ad.show();
+        }
+        catch ( WindowManager.BadTokenException ex ) {
+          ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+        }
       }
      };
   }
@@ -157,7 +164,7 @@ public final class FileUploaderTask extends Thread {
       doRun();
     }
     catch ( final Throwable throwable ) {
-      ListActivity.writeError( Thread.currentThread(), throwable, context );
+      ListActivity.writeError( Thread.currentThread(), throwable, applictionContext );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
     }
     finally {
@@ -167,7 +174,7 @@ public final class FileUploaderTask extends Thread {
   }
   
   private void doRun() {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = applictionContext.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
     final String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
@@ -225,7 +232,7 @@ public final class FileUploaderTask extends Thread {
       }
       
       final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
-        : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
+        : applictionContext.openFileOutput( filename, Context.MODE_WORLD_READABLE );
 
       final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
 
@@ -235,7 +242,7 @@ public final class FileUploaderTask extends Thread {
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file
-      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      final SharedPreferences prefs = applictionContext.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
       long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
       final Cursor cursor = dbHelper.networkIterator( maxId );
       int lineCount = 0;
@@ -386,14 +393,14 @@ public final class FileUploaderTask extends Thread {
 
       // send file
       final FileInputStream fis = hasSD ? new FileInputStream( file ) 
-        : context.openFileInput( filename );
+        : applictionContext.openFileInput( filename );
       final Map<String,String> params = new HashMap<String,String>();
       
       params.put("observer", username);
       params.put("password", password);
       final String response = HttpFileUploader.upload( 
         ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
-        params, context.getResources(), handler, filesize, context );
+        params, applictionContext.getResources(), handler, filesize, applictionContext );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
@@ -423,21 +430,21 @@ public final class FileUploaderTask extends Thread {
     catch ( final FileNotFoundException ex ) {
       ex.printStackTrace();
       ListActivity.error( "file problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, applictionContext );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "file problem: " + ex );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
       ListActivity.error( "io problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, applictionContext );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, applictionContext );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "ex problem: " + ex );
     }

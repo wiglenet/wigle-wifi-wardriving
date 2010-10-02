@@ -22,8 +22,6 @@ import android.util.AttributeSet;
  * wrap the open street map view, to allow setting overlays
  */
 public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
-  private final Context context;
-  
   private final Paint crossBackPaint = new Paint();
   private final Paint crossPaint = new Paint();
   private final Paint trailBackPaint = new Paint();
@@ -35,7 +33,6 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
    */
   public OpenStreetMapViewWrapper( final Context context, final AttributeSet attrs ) {
     super( context, attrs );
-    this.context = context;
     
     crossPaint.setColor( Color.argb( 255, 0, 0, 0 ) );
     crossBackPaint.setColor( Color.argb( 128, 30, 250, 30 ) );
@@ -60,7 +57,7 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
 	  Point point = null;
-	  final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+	  final SharedPreferences prefs = this.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     
 	  if ( ! showNewDBOnly ) {

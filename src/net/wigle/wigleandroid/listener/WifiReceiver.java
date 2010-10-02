@@ -36,7 +36,7 @@ import android.widget.TextView;
 public class WifiReceiver extends BroadcastReceiver {
   private ListActivity listActivity;
   private final DatabaseHelper dbHelper;
-  private final NetworkListAdapter listAdapter;
+  private NetworkListAdapter listAdapter;
   private SimpleDateFormat timeFormat;
   private NumberFormat numberFormat1;
   
@@ -68,8 +68,12 @@ public class WifiReceiver extends BroadcastReceiver {
     }
   }
   
-  public void setListActivity( ListActivity listActivity ) {
+  public void setListActivity( final ListActivity listActivity ) {
     this.listActivity = listActivity;
+  }
+  
+  public void setListAdapter( final NetworkListAdapter listAdapter ) {
+    this.listAdapter = listAdapter;
   }
   
   public int getRunNetworkCount() {

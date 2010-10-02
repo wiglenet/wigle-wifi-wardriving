@@ -131,7 +131,7 @@ public final class DatabaseHelper extends Thread {
   }
 
   public DatabaseHelper( final Context context ) {    
-    this.context = context;
+    this.context = context.getApplicationContext();
     this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     setName("db-worker");
     

@@ -51,6 +51,8 @@ public final class FileUploaderTask extends Thread {
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
   private static final String ERROR = "error";
+  private static final String FILENAME = "filename";
+  private static final String FILEPATH = "filepath";
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   
   private enum Status {
@@ -135,12 +137,28 @@ public final class FileUploaderTask extends Thread {
         builder.setCancelable( false );
         builder.setTitle( status.getTitle() );
         Bundle bundle = msg.peekData();
+        String filename = "";
+        if ( bundle != null ) {
+          String filepath = bundle.getString( FILEPATH );
+          filepath = filepath == null ? "" : filepath + "\n";
+          filename = bundle.getString( FILENAME );
+          if ( filename != null ) {
+            // just don't show the gz
+            final int index = filename.indexOf( ".gz" );
+            if ( index > 0 ) {
+              filename = filename.substring( 0, index );
+            }
+          }
+          filename = "\n\nFile location:\n" + filepath + filename;
+        }
+        
         if ( bundle == null ) {
-          builder.setMessage( status.getMessage() );
+          builder.setMessage( status.getMessage() + filename );
         }
         else {
           String error = bundle.getString( ERROR );
-          builder.setMessage( status.getMessage() + " Error: " + error );
+          error = error == null ? "" : " Error: " + error;
+          builder.setMessage( status.getMessage() + error + filename );
         }
         final AlertDialog ad = builder.create();
         ad.setButton( "OK", new DialogInterface.OnClickListener() {
@@ -197,16 +215,14 @@ public final class FileUploaderTask extends Thread {
     }
 
     // tell the gui thread
-    String error = bundle.getString( ERROR );
-    if ( error == null ) { 
-      handler.sendEmptyMessage( status.ordinal() );
-    }
-    else {
-      final Message msg = new Message();
-      msg.what = status.ordinal();
-      msg.setData(bundle);
-      handler.sendMessage(msg);
-    }
+    sendBundledMessage( handler, status.ordinal(), bundle );
+  }
+  
+  private static void sendBundledMessage( Handler handler, int what, Bundle bundle ) {
+    final Message msg = new Message();
+    msg.what = what;
+    msg.setData(bundle);
+    handler.sendMessage(msg);
   }
   
   private Status doUpload( final String username, final String password, final Bundle bundle ) {    
@@ -224,6 +240,7 @@ public final class FileUploaderTask extends Thread {
       String openString = filename;
       final boolean hasSD = ListActivity.hasSD();
       File file = null;
+      bundle.putString( FILENAME, filename );
       if ( hasSD ) {
         final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
         final File path = new File( filepath );
@@ -233,6 +250,8 @@ public final class FileUploaderTask extends Thread {
         if ( ! file.exists() && hasSD ) {
           file.createNewFile();
         }
+        bundle.putString( FILEPATH, filepath );
+        bundle.putString( FILENAME, filename );
       }
       
       final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
@@ -262,7 +281,7 @@ public final class FileUploaderTask extends Thread {
       long fileWriteMillis = 0;
       long netMillis = 0;
       
-      handler.sendEmptyMessage( Status.WRITING.ordinal() );
+      sendBundledMessage( handler, Status.WRITING.ordinal(), bundle );
 
       int bytecount = 0;
 
@@ -379,7 +398,7 @@ public final class FileUploaderTask extends Thread {
           final int percentDone = (lineCount * 100) / total;
           // only send up to 100 times
           if ( percentDone > lastSentPercent ) {
-            handler.sendEmptyMessage( WRITING_PERCENT_START + percentDone );
+            sendBundledMessage( handler, WRITING_PERCENT_START + percentDone, bundle );
             lastSentPercent = percentDone;
           }
         }
@@ -396,7 +415,7 @@ public final class FileUploaderTask extends Thread {
       }
       
       // show on the UI
-      handler.sendEmptyMessage( Status.UPLOADING.ordinal() );
+      sendBundledMessage( handler, Status.UPLOADING.ordinal(), bundle );
 
       long filesize = file != null ? file.length() : 0L;
       if ( filesize <= 0 ) {

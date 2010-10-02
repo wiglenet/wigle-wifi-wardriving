@@ -9,7 +9,6 @@ minimap in dashboard? list of ssids?
 seen-networks map tile overlays
 
 --- user suggested ---
-option for kml save for checking coverage back at home PC
 click on network to connect, with warning about legality
 network list sorting options (time found)
 network list filtering options (new only)
@@ -22,7 +21,16 @@ confirm dialog on upload button
 remember zoom level on map
 show new networks since last upload
 
+--- priority ---
+separate export button, not all users realize that files uploaded are written to
+  the sdcard and are easy to use csv's
+option for kml save for checking coverage back at home PC
+
 --- done ---
+* 1.24 (unreleased)
+Work around insane verifier bug in old dalvik vm's, on an inner class |=
+Show location and name of file written on upload
+
 * 1.23
 Clean up memory leaks on orientation change in our code and osmdroid
 Catch a BadTokenException when a dialog tries to show on a gone window

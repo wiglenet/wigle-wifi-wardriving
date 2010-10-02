@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.andnav.osm.util.GeoPoint;
-import org.andnav.osm.views.OpenStreetMapView;
 import org.andnav.osm.views.OpenStreetMapViewController;
 import org.andnav.osm.views.overlay.MyLocationOverlay;
 
@@ -17,23 +16,26 @@ import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
  * show a map!
  */
 public final class MappingActivity extends Activity {
+  private static class State {
+    private boolean locked = true;
+    private boolean firstMove = true;
+    private GeoPoint oldCenter = null;
+  }
+  private final State state = new State();
+  
   private OpenStreetMapViewController mapControl;
   private OpenStreetMapViewWrapper mapView;
-  private OpenStreetMapView miniMapView;
   private Handler timer;
   private AtomicBoolean finishing;
-  private boolean locked = true;
-  private boolean firstMove = true;
   private Location previousLocation;
   private int previousRunNets;
-  private MyLocationOverlay mMyLocationOverlay = null;
+  private MyLocationOverlay myLocationOverlay = null;
   
   private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_RETURN = 12;
@@ -54,12 +56,12 @@ public final class MappingActivity extends Activity {
     
     final Object stored = getLastNonConfigurationInstance();
     GeoPoint oldCenter = null;
-    if ( stored != null && stored instanceof MappingActivity ) {
+    if ( stored != null && stored instanceof State ) {
       // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-      final MappingActivity retained = (MappingActivity) stored;
-      this.locked = retained.locked;
-      this.firstMove = retained.firstMove;
-      oldCenter = retained.mapView.getMapCenter();
+      final State retained = (State) stored;
+      state.locked = retained.locked;
+      state.firstMove = retained.firstMove;
+      oldCenter = retained.oldCenter;
     }
     
     setupMapView( oldCenter );
@@ -69,8 +71,10 @@ public final class MappingActivity extends Activity {
   @Override
   public Object onRetainNonConfigurationInstance() {
     ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
-    // return this whole class to copy data from
-    return this;
+    // save the map center
+    state.oldCenter = mapView.getMapCenter();
+    // return state class to copy data from
+    return state;
   }
   
   private void setupMapView( final GeoPoint oldCenter ) {
@@ -80,9 +84,9 @@ public final class MappingActivity extends Activity {
     mapView.setMultiTouchControls( true );
     
     // my location overlay
-    mMyLocationOverlay = new MyLocationOverlay(this, mapView);
-    mMyLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
-    mapView.getOverlays().add(mMyLocationOverlay);
+    myLocationOverlay = new MyLocationOverlay(this.getApplicationContext(), mapView);
+    myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
+    mapView.getOverlays().add(myLocationOverlay);
     
     // controller
     mapControl = new OpenStreetMapViewController( mapView );
@@ -110,26 +114,6 @@ public final class MappingActivity extends Activity {
     mapControl.setZoom( 15 );
     mapControl.setCenter( centerPoint );
     
-    // MiniMap (not used, waiting for osmdroid to fix issue 30, synching the two maps
-    if ( false ){
-      // Create another OpenStreetMapView, that will act as the MiniMap for the 'MainMap'. They will share the TileProvider.
-      miniMapView = new OpenStreetMapView( this, mapView.getRenderer(), mapView );
-      miniMapView.setBuiltInZoomControls( false );
-      mapView.setMultiTouchControls( true );
-      
-      final int zoomDiff = 3; // Use OpenStreetMapViewConstants.NOT_SET to disable autozooming of this minimap
-      this.mapView.setMiniMap(miniMapView, zoomDiff);
-
-      // Create RelativeLayout.LayoutParams that position the MiniMap on the top-right corner of the RelativeLayout.
-      RelativeLayout.LayoutParams minimapParams = new RelativeLayout.LayoutParams(90, 90);
-      minimapParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-      minimapParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-      minimapParams.setMargins(5,5,5,5);
-      
-      RelativeLayout rl = (RelativeLayout) this.findViewById( R.id.map_rl );
-      rl.addView(miniMapView, minimapParams);
-    }
-    
     ListActivity.info("done setupMapView");
   }
   
@@ -142,12 +126,12 @@ public final class MappingActivity extends Activity {
             if ( ! finishing.get() ) {
               final Location location = ListActivity.lameStatic.location;
               if ( location != null ) {
-                if ( locked ) {
+                if ( state.locked ) {
                   // ListActivity.info( "mapping center location: " + location );
   								final GeoPoint locGeoPoint = new GeoPoint( location );
-  								if ( firstMove ) {
+  								if ( state.firstMove ) {
   								  mapControl.setCenter( locGeoPoint );
-  								  firstMove = false;
+  								  state.firstMove = false;
   								}
   								else {
   								  mapControl.animateTo( locGeoPoint );
@@ -205,8 +189,8 @@ public final class MappingActivity extends Activity {
   @Override
   public void onPause() {
     ListActivity.info( "pause mapping." );
-    mMyLocationOverlay.disableMyLocation();
-    mMyLocationOverlay.disableCompass();
+    myLocationOverlay.disableMyLocation();
+    myLocationOverlay.disableCompass();
     
     super.onPause();
   }
@@ -214,8 +198,8 @@ public final class MappingActivity extends Activity {
   @Override
   public void onResume() {
     ListActivity.info( "resume mapping." );
-    mMyLocationOverlay.enableCompass();
-    mMyLocationOverlay.enableMyLocation();
+    myLocationOverlay.enableCompass();
+    myLocationOverlay.enableMyLocation();
     
     super.onResume();
   }
@@ -232,7 +216,7 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_RETURN, 0, "Return");
       item.setIcon( android.R.drawable.ic_media_previous );
       
-      String name = locked ? "Turn Off Lockon" : "Turn On Lockon";
+      String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
       item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
       item.setIcon( android.R.drawable.ic_menu_mapmode );
       
@@ -267,8 +251,8 @@ public final class MappingActivity extends Activity {
           return true;
         }
         case MENU_TOGGLE_LOCK: {
-          locked = ! locked;
-          String name = locked ? "Turn Off Lock-on" : "Turn On Lock-on";
+          state.locked = ! state.locked;
+          String name = state.locked ? "Turn Off Lock-on" : "Turn On Lock-on";
           item.setTitle( name );
           return true;
         }

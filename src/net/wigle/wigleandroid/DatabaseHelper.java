@@ -758,11 +758,18 @@ public final class DatabaseHelper extends Thread {
     return retval;
   }
   
-  public Cursor networkIterator( final long fromId ) {
+  public Cursor locationIterator( final long fromId ) {
     checkDB();
-    ListActivity.info( "networkIterator fromId: " + fromId );
+    ListActivity.info( "locationIterator fromId: " + fromId );
     final String[] args = new String[]{ Long.toString( fromId ) };
     return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
+  }
+  
+  public Cursor networkIterator() {
+    checkDB();
+    ListActivity.info( "networkIterator" );
+    final String[] args = new String[]{};
+    return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
   }
   
 }

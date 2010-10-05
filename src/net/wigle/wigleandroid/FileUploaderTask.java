@@ -275,7 +275,7 @@ public final class FileUploaderTask extends Thread {
       // write file
       final SharedPreferences prefs = applictionContext.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
       long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
-      final Cursor cursor = dbHelper.networkIterator( maxId );
+      final Cursor cursor = dbHelper.locationIterator( maxId );
       int lineCount = 0;
       final int total = cursor.getCount();
       long fileWriteMillis = 0;
@@ -483,7 +483,7 @@ public final class FileUploaderTask extends Thread {
     return status;
   }
   
-  private void writeFos( final OutputStream fos, final String data ) throws IOException, UnsupportedEncodingException {
+  public static void writeFos( final OutputStream fos, final String data ) throws IOException, UnsupportedEncodingException {
     if ( data != null ) {
       fos.write( data.getBytes( ListActivity.ENCODING ) );
     }

@@ -132,6 +132,15 @@ public final class SettingsActivity extends Activity {
           }
         });
       
+      final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
+      kmlExportButton.setOnClickListener( new OnClickListener() {
+        public void onClick( final View buttonView ) {        
+          // actually need this Activity context, for dialogs
+          KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper );
+          kmlWriter.start();
+        }
+      });
+      
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
       tv.setText( "Highest uploaded id: " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );

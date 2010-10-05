@@ -129,6 +129,24 @@
 		android:text="@string/speech_button" android:layout_weight="0"
 		android:paddingTop="10px" android:paddingBottom="10px"/>
 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/kml_export_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/kml_export_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/kml_export_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/kml_export_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
 <LinearLayout
 	android:id="@+id/horizontalLine2"
 	android:layout_width="fill_parent"

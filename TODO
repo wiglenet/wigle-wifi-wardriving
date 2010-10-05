@@ -28,7 +28,7 @@ option for kml save for checking coverage back at home PC
 
 --- done ---
 * 1.24 (unreleased)
-Work around insane verifier bug in old dalvik vm's, on an inner class |=
+Work around insane verifier bug in old dalvik vm's, on inner class |= operator
 Show location and name of file written on upload
 
 * 1.23

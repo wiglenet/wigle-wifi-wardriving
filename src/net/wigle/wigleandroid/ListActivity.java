@@ -156,6 +156,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       public int preQueueSize;
       public long dbNets;
       public long dbLocs;
+      public DatabaseHelper dbHelper;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -528,6 +529,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         state.dbHelper = new DatabaseHelper( this.getApplicationContext() );
         state.dbHelper.checkDB();
         state.dbHelper.start();
+        lameStatic.dbHelper = state.dbHelper;
       }
       
       state.dbHelper.checkDB();

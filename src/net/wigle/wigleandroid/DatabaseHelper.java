@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.view.WindowManager;
 
 /**
  * our database helper, makes a great data meal.
@@ -94,7 +95,7 @@ public final class DatabaseHelper extends Thread {
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
-  private final Handler deathHandler;
+  private final DeathHandler deathHandler;
   private final SharedPreferences prefs;
   
   /** used in private addObservation */
@@ -135,37 +136,56 @@ public final class DatabaseHelper extends Thread {
     this.context = context.getApplicationContext();
     this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     setName("db-worker");
+    this.deathHandler = new DeathHandler( context ); 
+  }
     
-
-    this.deathHandler = new Handler() {  
-      @Override
-      public void handleMessage( final Message msg ) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder( context );
-        builder.setCancelable( false );
-        builder.setTitle( "Fatal DB Problem" );
-        Bundle bundle = msg.peekData();
-        Exception ex = null;
-        if ( bundle == null ) {
-          builder.setMessage( "Nothing in bundle" );
-        }
-        else {
-          String error = bundle.getString( ERROR );
-          builder.setMessage( "Error: " + error );
-          ex = (Exception) bundle.getSerializable( EXCEPTION );
-        }
-        final Exception finalEx = ex;
-        final AlertDialog ad = builder.create();
-        ad.setButton( "OK, Shutdown", new DialogInterface.OnClickListener() {
-          public void onClick( final DialogInterface dialog, final int which ) {
-            dialog.dismiss();
-            if ( finalEx != null ) {
-              throw new RuntimeException( "rethrowing db exception: " + finalEx, finalEx );
-            }
-            return;
-          } }); 
+  private class DeathHandler extends Handler {    
+    private Context context;
+    public DeathHandler( Context context ) {
+      this.context = context;
+    }
+    
+    public void setContext( Context context ) {
+      this.context = context;
+    }
+    
+    @Override
+    public void handleMessage( final Message msg ) {
+      final AlertDialog.Builder builder = new AlertDialog.Builder( context );
+      builder.setCancelable( false );
+      builder.setTitle( "Fatal DB Problem" );
+      Bundle bundle = msg.peekData();
+      Exception ex = null;
+      if ( bundle == null ) {
+        builder.setMessage( "Nothing in bundle" );
+      }
+      else {
+        String error = bundle.getString( ERROR );
+        builder.setMessage( "Error: " + error );
+        ex = (Exception) bundle.getSerializable( EXCEPTION );
+      }
+      final Exception finalEx = ex;
+      final AlertDialog ad = builder.create();
+      ad.setButton( "OK, Shutdown", new DialogInterface.OnClickListener() {
+        public void onClick( final DialogInterface dialog, final int which ) {
+          dialog.dismiss();
+          if ( finalEx != null ) {
+            throw new RuntimeException( "rethrowing db exception: " + finalEx, finalEx );
+          }
+          return;
+        } }); 
+      
+      try {
         ad.show();
       }
-     };
+      catch ( WindowManager.BadTokenException windowEx ) {
+        ListActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
+      }
+    }
+  }
+  
+  public void setContext( Context context ) {
+    deathHandler.setContext( context );
   }
 
 	public int getQueueSize() {

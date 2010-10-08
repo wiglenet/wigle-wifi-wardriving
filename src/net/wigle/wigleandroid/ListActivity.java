@@ -195,6 +195,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
           // tell those that need it that we have a new context
           state.gpsListener.setListActivity( this );
           state.wifiReceiver.setListActivity( this );
+          state.dbHelper.setContext( this );
           setNetCountUI( this, state.wifiReceiver.getRunNetworkCount(), state.dbHelper.getNewNetworkCount(), 
               ListActivity.lameStatic.dbNets );
         }

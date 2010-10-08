@@ -93,7 +93,7 @@ public class KmlWriter extends Thread {
 
       lineCount++;
       if ( (lineCount % 1000) == 0 ) {
-        ListActivity.info("lineCount: " + lineCount );
+        ListActivity.info("lineCount: " + lineCount + " of " + total );
       }
 if ( lineCount > 10000) {
   break;

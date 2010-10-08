@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -257,9 +258,11 @@ public final class DatabaseHelper extends Thread {
       dbFilename = DATABASE_PATH + DATABASE_NAME;
     }
     final File dbFile = new File( dbFilename );
-    boolean doCreate = false;
+    boolean doCreateNetwork = false;
+    boolean doCreateLocation = false;
     if ( ! dbFile.exists() ) {
-      doCreate = true;
+      doCreateNetwork = true;
+      doCreateLocation = true;
     }
     ListActivity.info("opening: " + dbFilename );
     
@@ -270,10 +273,35 @@ public final class DatabaseHelper extends Thread {
       db = context.openOrCreateDatabase( dbFilename, MAX_PRIORITY, null );
     }
     
-    if ( doCreate ) {
-      ListActivity.info( "creating tables" );
+    try {
+      db.rawQuery( "SELECT count(*) FROM network", (String[]) null ).close();
+    }
+    catch ( final SQLiteException ex ) {
+      ListActivity.info("exception selecting from network, try to create. ex: " + ex );
+      doCreateNetwork = true;
+    }
+    
+    try {
+      db.rawQuery( "SELECT count(*) FROM location", (String[]) null ).close();
+    }
+    catch ( final SQLiteException ex ) {
+      ListActivity.info("exception selecting from location, try to create. ex: " + ex );
+      doCreateLocation = true;
+    }
+    
+    if ( doCreateNetwork ) {
+      ListActivity.info( "creating network table" );
       try {
         db.execSQL(NETWORK_CREATE);
+      }
+      catch ( final SQLiteException ex ) {
+        ListActivity.error( "sqlite exception: " + ex, ex );
+      }
+    }
+    
+    if ( doCreateLocation ) {
+      ListActivity.info( "creating location table" );
+      try {
         db.execSQL(LOCATION_CREATE);
         // new database, reset a marker, if any
         final Editor edit = prefs.edit();
@@ -441,7 +469,13 @@ public final class DatabaseHelper extends Thread {
         lastlat = cursor.getDouble(1);
         lastlon = cursor.getDouble(2);
       }
-      cursor.close();
+      try {
+        cursor.close();
+      }
+      catch ( NoSuchElementException ex ) {
+        // weird error cropping up
+        ListActivity.info("the weird close-cursor exception: " + ex );
+      }
     }
     
     if ( isNew ) {

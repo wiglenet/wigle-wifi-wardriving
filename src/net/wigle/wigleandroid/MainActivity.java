@@ -14,6 +14,8 @@ public final class MainActivity extends TabActivity {
   static final String TAB_DASH = "dash";
   static final String TAB_SETTINGS = "setings";
   
+  private ListActivity listActivity;
+  
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
@@ -46,7 +48,7 @@ public final class MainActivity extends TabActivity {
     // force shrink the tabs
     for ( int i = 0; i < tabHost.getTabWidget().getChildCount(); i++ ) {
       View view = tabHost.getTabWidget().getChildAt( i );
-      int height = 50;
+      int height = 56;
 //      if ( view instanceof ViewGroup ) {
 //        ViewGroup vg = (ViewGroup) view;
 //        if ( vg.getChildCount() > 1 ) {
@@ -74,6 +76,36 @@ public final class MainActivity extends TabActivity {
     final Activity parent = activity.getParent();
     if ( parent != null && parent instanceof TabActivity ) {
       ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
+    }
+  }
+  
+  static MainActivity getMainActivity( Activity activity ) {
+    final Activity parent = activity.getParent();    
+    if ( parent != null && parent instanceof MainActivity ) {
+      return (MainActivity) parent;
+    }
+    return null;
+  }
+  
+  /**
+   * For now, we need a handle to the list activity to FINISH HIM.
+   * Eventually the MainActivity might handle all the services and listeners and things
+   * @param listActivity
+   */
+  public void setListActivity( final ListActivity listActivity ) {
+    this.listActivity = listActivity;
+  }
+  
+  public static void finishListActivity( final Activity activity ) {
+    MainActivity main = getMainActivity( activity );
+    if ( main != null ) {
+      main.finishListActivity();
+    }
+  }
+  
+  private void finishListActivity() {
+    if ( listActivity != null ) {
+      listActivity.finish();
     }
   }
   

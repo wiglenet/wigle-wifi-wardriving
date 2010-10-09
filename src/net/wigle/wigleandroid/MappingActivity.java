@@ -39,7 +39,7 @@ public final class MappingActivity extends Activity {
   private MyLocationOverlay myLocationOverlay = null;
   
   private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
-  private static final int MENU_RETURN = 12;
+  private static final int MENU_EXIT = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;
   private static final int MENU_TOGGLE_LOCK = 15;
@@ -90,6 +90,7 @@ public final class MappingActivity extends Activity {
     // my location overlay
     myLocationOverlay = new MyLocationOverlay(this.getApplicationContext(), mapView);
     myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
+    myLocationOverlay.setDrawAccuracyEnabled( false );
     mapView.getOverlays().add(myLocationOverlay);
     
     // controller
@@ -221,8 +222,8 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
       item.setIcon( android.R.drawable.ic_menu_revert );
       
-      item = menu.add(0, MENU_RETURN, 0, "Return");
-      item.setIcon( android.R.drawable.ic_media_previous );
+      item = menu.add(0, MENU_EXIT, 0, "Exit");
+      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
       
       String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
       item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
@@ -242,8 +243,9 @@ public final class MappingActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
-        case MENU_RETURN: {
-          MainActivity.switchTab( this, MainActivity.TAB_LIST );
+        case MENU_EXIT: {
+          MainActivity.finishListActivity( this );
+          finish();
           return true;
         }
         case MENU_ZOOM_IN: {

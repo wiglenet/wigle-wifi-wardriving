@@ -41,11 +41,13 @@ import android.os.Process;
 import android.view.WindowManager;
 
 public final class FileUploaderTask extends Thread {
-  private final Context applictionContext;
+  private Context context;
   private final Handler handler;
   private final DatabaseHelper dbHelper;
-  private final ProgressDialog pd;
+  private ProgressDialog pd;
   private final FileUploaderListener listener;
+  private AlertDialog ad;
+  private final Object lock = new Object();
   
   static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
@@ -92,88 +94,129 @@ public final class FileUploaderTask extends Thread {
       throw new IllegalArgumentException( "listener is null" );
     }
     
-    this.applictionContext = context.getApplicationContext();
+    this.context = context;
     this.dbHelper = dbHelper;
     this.listener = listener;
     
-    this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false );  
+    // set with activity context, sets up the progress dialog
+    this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false );
     
     this.handler = new Handler() {
       private String msg_text = "";
       
       @Override
       public void handleMessage( final Message msg ) {
-        if ( msg.what >= WRITING_PERCENT_START ) {
-          final int percent = msg.what - WRITING_PERCENT_START;
-          pd.setMessage( msg_text + percent + "%" );
-          pd.setProgress( percent * 100 );
-          return;
-        }
-        
-        final Status status = Status.values()[ msg.what ];
-        if ( Status.UPLOADING.equals( status ) ) {
-          //          pd.setMessage( status.getMessage() );
-          msg_text = status.getMessage();
-          pd.setProgress(0);
-          return;
-        }
-        if ( Status.WRITING.equals( status ) ) {
-          msg_text = status.getMessage();
-          pd.setProgress(0);
-          return;
-        }
-        // make sure we didn't progress dialog this somewhere
-        if ( pd.isShowing() ) {
-          try {
-            pd.dismiss();
+        synchronized ( lock ) {
+          if ( msg.what >= WRITING_PERCENT_START ) {
+            final int percent = msg.what - WRITING_PERCENT_START;
+            pd.setMessage( msg_text + percent + "%" );
+            pd.setProgress( percent * 100 );
+            return;
           }
-          catch ( IllegalArgumentException ex ) {
-            // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing dialog: " + ex );
+          
+          final Status status = Status.values()[ msg.what ];
+          if ( Status.UPLOADING.equals( status ) ) {
+            //          pd.setMessage( status.getMessage() );
+            msg_text = status.getMessage();
+            pd.setProgress(0);
+            return;
           }
-        }
-        // Activity context
-        final AlertDialog.Builder builder = new AlertDialog.Builder( context );
-        builder.setCancelable( false );
-        builder.setTitle( status.getTitle() );
-        Bundle bundle = msg.peekData();
-        String filename = "";
-        if ( bundle != null ) {
-          String filepath = bundle.getString( FILEPATH );
-          filepath = filepath == null ? "" : filepath + "\n";
-          filename = bundle.getString( FILENAME );
-          if ( filename != null ) {
-            // just don't show the gz
-            final int index = filename.indexOf( ".gz" );
-            if ( index > 0 ) {
-              filename = filename.substring( 0, index );
+          if ( Status.WRITING.equals( status ) ) {
+            msg_text = status.getMessage();
+            pd.setProgress(0);
+            return;
+          }
+          // make sure we didn't progress dialog this somewhere
+          if ( pd != null && pd.isShowing() ) {
+            try {
+              pd.dismiss();
+              pd = null;
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              ListActivity.info( "exception dismissing dialog: " + ex );
             }
           }
-          filename = "\n\nFile location:\n" + filepath + filename;
-        }
-        
-        if ( bundle == null ) {
-          builder.setMessage( status.getMessage() + filename );
-        }
-        else {
-          String error = bundle.getString( ERROR );
-          error = error == null ? "" : " Error: " + error;
-          builder.setMessage( status.getMessage() + error + filename );
-        }
-        final AlertDialog ad = builder.create();
-        ad.setButton( "OK", new DialogInterface.OnClickListener() {
-          public void onClick( final DialogInterface dialog, final int which ) {
-            dialog.dismiss();
-            return;
-          } }); 
-        try {
-          ad.show();
-        }
-        catch ( WindowManager.BadTokenException ex ) {
-          ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+          // Activity context
+          buildAlertDialog( msg, status );
         }
       }
      };
+  }
+  
+  private void buildAlertDialog( final Message msg, final Status status ) {
+    final AlertDialog.Builder builder = new AlertDialog.Builder( context );
+    builder.setCancelable( false );
+    builder.setTitle( status.getTitle() );
+    Bundle bundle = msg.peekData();
+    String filename = "";
+    if ( bundle != null ) {
+      String filepath = bundle.getString( FILEPATH );
+      filepath = filepath == null ? "" : filepath + "\n";
+      filename = bundle.getString( FILENAME );
+      if ( filename != null ) {
+        // just don't show the gz
+        final int index = filename.indexOf( ".gz" );
+        if ( index > 0 ) {
+          filename = filename.substring( 0, index );
+        }
+      }
+      filename = "\n\nFile location:\n" + filepath + filename;
+    }
+    
+    if ( bundle == null ) {
+      builder.setMessage( status.getMessage() + filename );
+    }
+    else {
+      String error = bundle.getString( ERROR );
+      error = error == null ? "" : " Error: " + error;
+      builder.setMessage( status.getMessage() + error + filename );
+    }
+    ad = builder.create();
+    ad.setButton( "OK", new DialogInterface.OnClickListener() {
+      public void onClick( final DialogInterface dialog, final int which ) {
+        try {
+          dialog.dismiss();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          ListActivity.info( "exception dismissing alert dialog: " + ex );
+        }
+        return;
+      } }); 
+    try {
+      ad.show();
+    }
+    catch ( WindowManager.BadTokenException ex ) {
+      ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+    }
+  }
+  
+  public  void setContext( final Context context ) {
+    synchronized ( lock ) {
+      this.context = context;
+      
+      if ( pd != null && pd.isShowing() ) {
+        try {
+          pd.dismiss();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          ListActivity.info( "exception dismissing progress dialog: " + ex );
+        }
+        this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, false ); 
+      }
+      
+      if ( ad != null && ad.isShowing() ) {
+        try {
+          ad.dismiss();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          ListActivity.info( "exception dismissing alert dialog: " + ex );
+        }
+      }
+    }
   }
   
   public void run() {
@@ -184,7 +227,7 @@ public final class FileUploaderTask extends Thread {
       doRun();
     }
     catch ( final Throwable throwable ) {
-      ListActivity.writeError( Thread.currentThread(), throwable, applictionContext );
+      ListActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
     }
     finally {
@@ -194,7 +237,7 @@ public final class FileUploaderTask extends Thread {
   }
   
   private void doRun() {
-    final SharedPreferences prefs = applictionContext.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
     final String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
@@ -234,8 +277,8 @@ public final class FileUploaderTask extends Thread {
     
     try {
       // if ( true ) { throw new IOException( "oh noe" ); }
-      final PackageManager pm = applictionContext.getPackageManager();
-      final PackageInfo pi = pm.getPackageInfo(applictionContext.getPackageName(), 0);
+      final PackageManager pm = context.getPackageManager();
+      final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
       
       String openString = filename;
       final boolean hasSD = ListActivity.hasSD();
@@ -255,7 +298,7 @@ public final class FileUploaderTask extends Thread {
       }
       
       final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
-        : applictionContext.openFileOutput( filename, Context.MODE_WORLD_READABLE );
+        : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
 
       final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
 
@@ -273,7 +316,7 @@ public final class FileUploaderTask extends Thread {
       // header
       writeFos( fos, "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n" );
       // write file
-      final SharedPreferences prefs = applictionContext.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
       long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
       final Cursor cursor = dbHelper.locationIterator( maxId );
       int lineCount = 0;
@@ -424,14 +467,14 @@ public final class FileUploaderTask extends Thread {
 
       // send file
       final FileInputStream fis = hasSD ? new FileInputStream( file ) 
-        : applictionContext.openFileInput( filename );
+        : context.openFileInput( filename );
       final Map<String,String> params = new HashMap<String,String>();
       
       params.put("observer", username);
       params.put("password", password);
       final String response = HttpFileUploader.upload( 
         ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
-        params, applictionContext.getResources(), handler, filesize, applictionContext );
+        params, context.getResources(), handler, filesize, context );
       
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
@@ -461,21 +504,21 @@ public final class FileUploaderTask extends Thread {
     catch ( final FileNotFoundException ex ) {
       ex.printStackTrace();
       ListActivity.error( "file problem: " + ex, ex );
-      ListActivity.writeError( this, ex, applictionContext );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "file problem: " + ex );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
       ListActivity.error( "io problem: " + ex, ex );
-      ListActivity.writeError( this, ex, applictionContext );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, applictionContext );
+      ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( ERROR, "ex problem: " + ex );
     }

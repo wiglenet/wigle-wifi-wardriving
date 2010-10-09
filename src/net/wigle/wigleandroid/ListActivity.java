@@ -85,11 +85,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
       private boolean inEmulator;
       private BatteryLevelReceiver batteryLevelReceiver;
       private PhoneState phoneState;
+      private FileUploaderTask fileUploaderTask;
     }
     private State state;
     // *** end of state that is retained ***
     
     private NetworkListAdapter listAdapter;
+    private String previousStatus;
     
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     private static final String LOG_TAG = "wigle";
@@ -177,6 +179,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
           Debug.startMethodTracing("wigle");
         }
         
+        // set ourselves for later finishing by other activities
+        MainActivity main = MainActivity.getMainActivity( this );
+        if ( main != null ) {
+          main.setListActivity( this );
+        }
+        
         // do some of our own error handling, write a file with the stack
         final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
         if ( ! (origHandler instanceof WigleUncaughtExceptionHandler) ) {
@@ -196,8 +204,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
           state.gpsListener.setListActivity( this );
           state.wifiReceiver.setListActivity( this );
           state.dbHelper.setContext( this );
-          setNetCountUI( this, state.wifiReceiver.getRunNetworkCount(), state.dbHelper.getNewNetworkCount(), 
-              ListActivity.lameStatic.dbNets );
+          if ( state.fileUploaderTask != null ) {
+            state.fileUploaderTask.setContext( this );
+          }
         }
         else {
           state = new State();
@@ -255,18 +264,32 @@ public final class ListActivity extends Activity implements FileUploaderListener
         setupLocation();
         info( "setupBattery" );
         setupBattery();
+        info( "setNetCountUI" );
+        setNetCountUI();
+        info( "setStatusUI" );
+        setStatusUI( (String) null );
         info( "setup complete" );
     }
     
-    public static void setNetCountUI( final Activity activity, final int runNetworks, 
-        final long prevNewNetCount, final long dbNets ) {
-      
-      TextView tv = (TextView) activity.findViewById( R.id.stats_run );
-      tv.setText( "Run: " + runNetworks );
-      tv = (TextView) activity.findViewById( R.id.stats_new );
-      tv.setText( "New: " + prevNewNetCount );
-      tv = (TextView) activity.findViewById( R.id.stats_dbnets );
-      tv.setText( "DB: " + dbNets );
+    public void setNetCountUI() {
+      TextView tv = (TextView) findViewById( R.id.stats_run );
+      tv.setText( "Run: " + state.wifiReceiver.getRunNetworkCount() );
+      tv = (TextView) findViewById( R.id.stats_new );
+      tv.setText( "New: " + state.dbHelper.getNewNetworkCount() );
+      tv = (TextView) findViewById( R.id.stats_dbnets );
+      tv.setText( "DB: " + state.dbHelper.getNetworkCount() );
+    }
+    
+    public void setStatusUI( String status ) {
+      if ( status == null ) {
+        status = previousStatus;
+      }
+      if ( status != null ) {
+        // keep around a previous, for orientation changes
+        previousStatus = status;
+        final TextView tv = (TextView) findViewById( R.id.status );
+        tv.setText( status );
+      }
     }
     
     public boolean inEmulator() {
@@ -522,6 +545,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       setupUploadButton();
       setupMuteButton();
       setupList();
+      state.wifiReceiver.setListAdapter( listAdapter );
+      setNetCountUI();
+      setLocationUI();
+      setStatusUI( previousStatus );
     }
     
     private void setupDatabase() {
@@ -624,6 +651,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       info( "uploading complete" );
       // start a scan to get the ball rolling again if this is non-stop mode
       state.wifiReceiver.doWifiScan();
+      state.fileUploaderTask = null;
     }
     
     public void speak( final String string ) {
@@ -633,10 +661,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     private void setupLocation() {
-      if ( state.gpsListener != null ) {
-        // set on UI if we already have one
-        setLocationUI( state.gpsListener.getSatCount() );
-      }
+      // set on UI if we already have one
+      setLocationUI();
       
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
@@ -671,9 +697,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
-    public void setLocationUI( final int satCount ) {
+    public void setLocationUI() {
+      if ( state.gpsListener == null ) {
+        return;
+      }
+      
       TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
-      tv.setText( "Sats: " + satCount );
+      tv.setText( "Sats: " + state.gpsListener.getSatCount() );
       
       final Location location = state.gpsListener.getLocation();
       
@@ -931,8 +961,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private void uploadFile( final DatabaseHelper dbHelper ){
       info( "upload file" );
       // actually need this Activity context, for dialogs
-      final FileUploaderTask task = new FileUploaderTask( this, dbHelper, this );
-      task.start();
+      state.fileUploaderTask = new FileUploaderTask( this, dbHelper, this );
+      state.fileUploaderTask.start();
     }
     
     public static void sleep( final long sleep ) {

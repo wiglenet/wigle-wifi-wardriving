@@ -17,7 +17,6 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
-import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.andnav.osm.util.GeoPoint;
@@ -31,7 +30,6 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
-import android.widget.TextView;
 
 public class WifiReceiver extends BroadcastReceiver {
   private ListActivity listActivity;
@@ -191,7 +189,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final long dbLocs = dbHelper.getLocationCount();
     
     // update stat
-    ListActivity.setNetCountUI( listActivity, runNetworks.size(), newNetCount, dbNets );
+    listActivity.setNetCountUI();
     
     // set the statics for the map
     ListActivity.lameStatic.runNets = runNetworks.size();
@@ -237,8 +235,7 @@ public class WifiReceiver extends BroadcastReceiver {
       scanRequestTime = now;
     }
     final String status = resultSize + " scanned in " + (now - scanRequestTime) + "ms. DB Queue: " + preQueueSize;
-    final TextView tv = (TextView) listActivity.findViewById( R.id.status );
-    tv.setText( status );
+    listActivity.setStatusUI( status );
     // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
     scanRequestTime = nonstopScanRequestTime;
     

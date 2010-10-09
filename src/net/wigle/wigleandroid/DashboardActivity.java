@@ -21,7 +21,8 @@ public class DashboardActivity extends Activity {
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
   
-  private static final int MENU_RETURN = 12;
+  private static final int MENU_EXIT = 11;
+  private static final int MENU_LIST = 12;
   
   /** Called when the activity is first created. */
   @Override
@@ -132,17 +133,24 @@ public class DashboardActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
-      item.setIcon( android.R.drawable.ic_media_previous );
-      
-      return true;
+    MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        
+    item = menu.add(0, MENU_LIST, 0, "List");
+    item.setIcon( android.R.drawable.ic_menu_sort_by_size  );
+    
+    return true;
   }
 
   /* Handles item selections */
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
-        case MENU_RETURN:
+        case MENU_EXIT:
+          MainActivity.finishListActivity( this );
+          finish();
+          return true;
+        case MENU_LIST:
           MainActivity.switchTab( this, MainActivity.TAB_LIST );
           return true;
       }

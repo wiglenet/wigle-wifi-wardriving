@@ -6,7 +6,8 @@
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name" android:debuggable="false">
     	<activity android:name=".MainActivity" android:label="@string/app_name"
           		  android:theme="@android:style/Theme.NoTitleBar"
-          		  android:launchMode="singleTask">
+          		  android:launchMode="singleTask"
+          		  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -15,7 +16,8 @@
         <!-- have this available too for backwards compatibility -->
         <activity android:name=".WigleAndroid" android:label="@string/app_name"
           		  android:theme="@android:style/Theme.NoTitleBar"
-          		  android:launchMode="singleTask">
+          		  android:launchMode="singleTask"
+          		  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -32,7 +34,8 @@
         </activity>
         <activity android:name=".SettingsActivity"
                   android:label="@string/settings_app_name"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -40,7 +43,8 @@
         </activity>
         <activity android:name=".MappingActivity"
                   android:label="@string/mapping_app_name"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -48,7 +52,8 @@
         </activity>
         <activity android:name=".DashboardActivity"
                   android:label="@string/dashboard_app_name"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -56,7 +61,8 @@
         </activity>
         <activity android:name=".ErrorReportActivity"
                   android:label="@string/error_report_name"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -64,7 +70,8 @@
         </activity>
         <activity android:name=".SpeechActivity"
                   android:label="@string/speech_name"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />

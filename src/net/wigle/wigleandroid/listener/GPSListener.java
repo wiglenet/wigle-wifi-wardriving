@@ -142,7 +142,7 @@ public class GPSListener implements Listener, LocationListener {
     }
     
     // update the UI
-    listActivity.setLocationUI( getSatCount() );
+    listActivity.setLocationUI();
   }
   
   private boolean locationOK( final Location location, final int satCount ) {

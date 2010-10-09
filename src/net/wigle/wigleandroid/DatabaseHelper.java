@@ -168,7 +168,13 @@ public final class DatabaseHelper extends Thread {
       final AlertDialog ad = builder.create();
       ad.setButton( "OK, Shutdown", new DialogInterface.OnClickListener() {
         public void onClick( final DialogInterface dialog, final int which ) {
-          dialog.dismiss();
+          try {
+            dialog.dismiss();
+          }
+          catch ( Exception ex ) {
+            // guess it wasn't there anyways
+            ListActivity.info( "exception dismissing alert dialog: " + ex );
+          }
           if ( finalEx != null ) {
             throw new RuntimeException( "rethrowing db exception: " + finalEx, finalEx );
           }

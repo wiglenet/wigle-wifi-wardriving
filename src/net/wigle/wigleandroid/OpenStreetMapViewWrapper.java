@@ -60,18 +60,28 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
 	  final SharedPreferences prefs = this.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     
+    // if zoomed in past 16, give a little boost to circle size
+    float boost = 16 - this.getZoomLevel();
+    boost *= 0.25f;
+    boost += 1f;
+    if ( boost < 1f ) {
+      boost = 1f;
+    }
+    
 	  if ( ! showNewDBOnly ) {
   	  for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-  			final int nets = entry.getValue().newForRun;
+  			int nets = entry.getValue().newForRun;
   			if ( nets > 0 ) {
+  			  nets *= boost;
     	  	point = proj.toMapPixels( entry.getKey(), point );
     	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
   			}
     	}
   
     	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-        final int nets = entry.getValue().newForRun;
+        int nets = entry.getValue().newForRun;
         if ( nets > 0 ) {
+          nets *= boost;
           point = proj.toMapPixels( entry.getKey(), point );
           c.drawCircle(point.x, point.y, nets + 1, trailPaint);
         }
@@ -79,8 +89,10 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
 	  }
 
   	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      final int nets = entry.getValue().newForDB;
+      int nets = entry.getValue().newForDB;
       if ( nets > 0 ) {
+        nets *= boost;
+        ListActivity.info("newForDb:" + nets);
         point = proj.toMapPixels( entry.getKey(), point );
         c.drawCircle(point.x, point.y, nets + 1, trailDBPaint);
       }
@@ -91,8 +103,8 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     if ( location != null ) {
       final GeoPoint user = new GeoPoint( location );
       point = proj.toMapPixels( user, point );
-      c.drawLine( point.x - 9, point.y - 9, point.x + 9, point.y + 9, crossBackPaint );
-      c.drawLine( point.x - 9, point.y + 9, point.x + 9, point.y - 9, crossBackPaint );
+      // c.drawLine( point.x - 9, point.y - 9, point.x + 9, point.y + 9, crossBackPaint );
+      // c.drawLine( point.x - 9, point.y + 9, point.x + 9, point.y - 9, crossBackPaint );
       c.drawLine( point.x - 9, point.y - 9, point.x + 9, point.y + 9, crossPaint );
       c.drawLine( point.x - 9, point.y + 9, point.x + 9, point.y - 9, crossPaint );
     }

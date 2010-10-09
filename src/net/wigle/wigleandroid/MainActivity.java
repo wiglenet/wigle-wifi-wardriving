@@ -1,11 +1,14 @@
 package net.wigle.wigleandroid;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TabHost;
 
 public final class MainActivity extends TabActivity {
@@ -48,18 +51,7 @@ public final class MainActivity extends TabActivity {
     // force shrink the tabs
     for ( int i = 0; i < tabHost.getTabWidget().getChildCount(); i++ ) {
       View view = tabHost.getTabWidget().getChildAt( i );
-      int height = 56;
-//      if ( view instanceof ViewGroup ) {
-//        ViewGroup vg = (ViewGroup) view;
-//        if ( vg.getChildCount() > 1 ) {
-//          View child = vg.getChildAt( 1 );
-//          ListActivity.info( "child: " + child );
-//          if ( child instanceof TextView ) {
-//            height = child.getMeasuredHeight();
-//            ListActivity.info( "height: " + height );
-//          }
-//        }
-//      }
+      int height = 60;
       ViewGroup.LayoutParams param = view.getLayoutParams();
       param.height = height;
     }
@@ -76,6 +68,51 @@ public final class MainActivity extends TabActivity {
     final Activity parent = activity.getParent();
     if ( parent != null && parent instanceof TabActivity ) {
       ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
+    }
+  }
+  
+  public static interface Doer {
+    public void execute();
+  }
+  
+  static void createConfirmation( final Activity activity, final String message, final Doer doer ) {
+    final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+    builder.setCancelable( true );
+    builder.setTitle( "Confirmation" );
+    builder.setMessage( message );
+    AlertDialog ad = builder.create();
+    // ok
+    ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+      public void onClick( final DialogInterface dialog, final int which ) {
+        try {
+          dialog.dismiss();
+          doer.execute();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          ListActivity.info( "exception dismissing alert dialog: " + ex );
+        }
+        return;
+      } }); 
+    
+    // cancel
+    ad.setButton( DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+      public void onClick( final DialogInterface dialog, final int which ) {
+        try {
+          dialog.dismiss();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          ListActivity.info( "exception dismissing alert dialog: " + ex );
+        }
+        return;
+      } }); 
+    
+    try {
+      ad.show();
+    }
+    catch ( WindowManager.BadTokenException ex ) {
+      ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
     }
   }
   

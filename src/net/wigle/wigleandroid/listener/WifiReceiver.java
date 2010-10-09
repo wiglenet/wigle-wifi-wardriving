@@ -57,6 +57,7 @@ public class WifiReceiver extends BroadcastReceiver {
     this.listActivity = listActivity;
     this.dbHelper = dbHelper;
     this.listAdapter = listAdapter;
+    ListActivity.lameStatic.runNetworks = runNetworks;
     
     // formats for speech
     timeFormat = new SimpleDateFormat( "h mm aa" );

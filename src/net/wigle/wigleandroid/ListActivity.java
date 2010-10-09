@@ -18,8 +18,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
@@ -159,6 +161,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       public long dbNets;
       public long dbLocs;
       public DatabaseHelper dbHelper;
+      public Set<String> runNetworks;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -728,8 +731,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() {
           public void onClick( final View view ) {
-            state.uploading.set( true );
-            uploadFile( state.dbHelper );
+            MainActivity.createConfirmation( ListActivity.this, "Upload File?", new Doer() {
+              @Override
+              public void execute() {                
+                state.uploading.set( true );
+                uploadFile( state.dbHelper );
+              }
+            } );
           }
         });
     }

@@ -166,7 +166,7 @@ public final class DatabaseHelper extends Thread {
       }
       final Exception finalEx = ex;
       final AlertDialog ad = builder.create();
-      ad.setButton( "OK, Shutdown", new DialogInterface.OnClickListener() {
+      ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {
         public void onClick( final DialogInterface dialog, final int which ) {
           try {
             dialog.dismiss();
@@ -830,6 +830,13 @@ public final class DatabaseHelper extends Thread {
     ListActivity.info( "networkIterator" );
     final String[] args = new String[]{};
     return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
+  }
+  
+  public Cursor getSingleNetwork( final String bssid ) {
+    checkDB();
+    final String[] args = new String[]{bssid};
+    return db.rawQuery( 
+        "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", args );
   }
   
 }

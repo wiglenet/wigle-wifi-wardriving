@@ -4,24 +4,34 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Process;
 
 public class KmlWriter extends Thread {
-  private static final String FILENAME = "filename";
-  private static final String FILEPATH = "filepath";
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
+  private static final int WRITING_DONE = 10;
   
   private final Context applicationContext;
   private final DatabaseHelper dbHelper;
+  private final Set<String> networks;
+  private final Handler handler;
   
   public KmlWriter( final Context context, final DatabaseHelper dbHelper ) {
+    this( context, dbHelper, (Set<String>) null );
+  }
+  
+  public KmlWriter( final Context context, final DatabaseHelper dbHelper, final Set<String> networks ) {
     if ( context == null ) {
       throw new IllegalArgumentException( "context is null" );
     }
@@ -31,6 +41,17 @@ public class KmlWriter extends Thread {
     
     this.applicationContext = context.getApplicationContext();
     this.dbHelper = dbHelper;
+    // make a safe local copy
+    this.networks = (networks == null) ? null : new HashSet<String>( networks );
+    
+    this.handler = new Handler() {
+      @Override
+      public void handleMessage( final Message msg ) {
+        if ( msg.what == WRITING_DONE ) {
+          FileUploaderTask.buildAlertDialog( context, msg, FileUploaderTask.Status.WRITE_SUCCESS );        }
+        }
+    };
+
   }
   
   private boolean writeKml( Bundle bundle ) throws FileNotFoundException, IOException {
@@ -59,7 +80,51 @@ public class KmlWriter extends Thread {
         + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href></Icon></IconStyle></Style>"
         + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href></Icon></IconStyle></Style>"
         + "<Folder><name>Wifi Networks</name>\n" );
-    final Cursor cursor = dbHelper.networkIterator();
+    
+    boolean retval = false;
+    
+    Cursor cursor = null;
+    if ( true ) {
+      try {
+        if ( this.networks == null ) {
+          cursor = dbHelper.networkIterator();    
+          retval = writeKmlFromCursor( fos, cursor, dateFormat );
+        }
+        else {
+          for ( String network : networks ) {
+            // ListActivity.info( "network: " + network );
+            cursor = dbHelper.getSingleNetwork( network ); 
+            // avoiding |= operator cuz of old validator wierdness
+            retval = writeKmlFromCursor( fos, cursor, dateFormat ) || retval;
+            cursor.close();
+            cursor = null;
+          }
+        }
+      }
+      finally {
+        if ( cursor != null ) {
+          cursor.close();
+        }
+      }
+    } 
+    
+    fos.close();    
+    
+    bundle.putString( FileUploaderTask.FILEPATH, filepath );
+    bundle.putString( FileUploaderTask.FILENAME, filename );
+    ListActivity.info( "done with kml export" );
+    
+    // tell gui
+    Message message = new Message();
+    message.what = WRITING_DONE;
+    message.setData( bundle );
+    handler.sendMessage( message );
+    
+    return retval;
+  }
+  
+  private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat ) 
+      throws IOException {
     int lineCount = 0;
     final int total = cursor.getCount();
     for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
@@ -80,10 +145,14 @@ public class KmlWriter extends Thread {
       if ( capabilities.indexOf("WPA") >= 0 ) {
         style = "red";
       }
-      String ssidFiltered = new String( ssid.getBytes( ListActivity.ENCODING ) );
-      ssidFiltered = ssidFiltered.replaceAll("[^\\w", "");
       
-      FileUploaderTask.writeFos( fos, "<Placemark>\n<name><![CDATA[" + ssidFiltered + "]]></name>\n" );
+      // not unicode. ha ha for them!
+      byte[] ssidFiltered = ssid.getBytes( ListActivity.ENCODING );
+      filterIllegalXml( ssidFiltered );
+      
+      FileUploaderTask.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
+      fos.write( ssidFiltered );
+      FileUploaderTask.writeFos( fos, "]]></name>\n" );
       FileUploaderTask.writeFos( fos, "<description><![CDATA[BSSID: <b>" + bssid + "</b><br/>"
           + "Capabilities: <b>" + capabilities + "</b><br/>Frequency: <b>" + frequency + "</b><br/>"
           + "Timestamp: <b>" + lasttime + "</b><br/>Date: <b>" + date + "</b>]]></description><styleUrl>#" + style + "</styleUrl>\n" );
@@ -95,22 +164,33 @@ public class KmlWriter extends Thread {
       if ( (lineCount % 1000) == 0 ) {
         ListActivity.info("lineCount: " + lineCount + " of " + total );
       }
-if ( lineCount > 10000) {
-  break;
-}
+      // if ( lineCount > 10000) {
+      //  break;
+      // }
     }
     FileUploaderTask.writeFos( fos, "</Folder>\n</Document></kml>" );
     
-    cursor.close();
-    fos.close();    
-    
-    bundle.putString( FILEPATH, filepath );
-    bundle.putString( FILENAME, filename );
-    ListActivity.info( "done with kml export" );
     return true;
   }
   
+  private void filterIllegalXml( byte[] data ) {
+    for ( int i = 0; i < data.length; i++ ) {
+      byte current = data[i];
+      // (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
+      if ( (current >= 0x00 && current <= 0x08) ||
+           (current >= 0x0B && current <= 0x1F) ||
+           (current >= 0x7F && current <= 0x84) ||
+           (current >= 0x86 && current <= 0x9F)
+          ) {
+        data[i] = ' ';
+      }
+    }
+  }
+  
   public void run() {
+    // set thread name
+    setName( "KmlWriter-" + getName() );
+    
     try {
       ListActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
       Process.setThreadPriority( UPLOAD_PRIORITY );
@@ -120,7 +200,7 @@ if ( lineCount > 10000) {
     }
     catch ( final Throwable throwable ) {
       ListActivity.writeError( Thread.currentThread(), throwable, applicationContext );
-      throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
+      throw new RuntimeException( "KmlWriter throwable: " + throwable, throwable );
     }
     finally {
       // tell the listener

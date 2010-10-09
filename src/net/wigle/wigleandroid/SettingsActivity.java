@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import net.wigle.wigleandroid.MainActivity.Doer;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -133,12 +134,32 @@ public final class SettingsActivity extends Activity {
           }
         });
       
+      final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
+      kmlRunExportButton.setOnClickListener( new OnClickListener() {
+        public void onClick( final View buttonView ) {  
+          MainActivity.createConfirmation( SettingsActivity.this, "Export run to KML?", new Doer() {
+            @Override
+            public void execute() {
+              // actually need this Activity context, for dialogs
+              KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper, 
+                  ListActivity.lameStatic.runNetworks );
+              kmlWriter.start();
+            }
+          } );
+        }
+      });
+      
       final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
       kmlExportButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {        
-          // actually need this Activity context, for dialogs
-          KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper );
-          kmlWriter.start();
+        public void onClick( final View buttonView ) {  
+          MainActivity.createConfirmation( SettingsActivity.this, "Export DB to KML?", new Doer() {
+            @Override
+            public void execute() {
+              // actually need this Activity context, for dialogs
+              KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper );
+              kmlWriter.start();
+            }
+          } );
         }
       });
       
@@ -148,11 +169,16 @@ public final class SettingsActivity extends Activity {
       
       final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
       resetMaxidButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {             
+        public void onClick( final View buttonView ) {    
+          MainActivity.createConfirmation( SettingsActivity.this, "Zero out DB marker?", new Doer() {
+            @Override
+            public void execute() {          
               editor.putLong( ListActivity.PREF_DB_MARKER, 0L );
               editor.commit();
               tv.setText( "Max upload id: 0" );
-          }
+            }
+          } );
+        }
       });
       
       // db marker maxout button and text
@@ -162,13 +188,18 @@ public final class SettingsActivity extends Activity {
       
       final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
       maxoutMaxidButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {             
+        public void onClick( final View buttonView ) { 
+          MainActivity.createConfirmation( SettingsActivity.this, "Max out DB marker?", new Doer() {
+            @Override
+            public void execute() {
               editor.putLong( ListActivity.PREF_DB_MARKER, maxDB );
               editor.commit();
               // set the text on the other button
               tv.setText( "Max upload id: " + maxDB );
-          }
-      });
+            } 
+          } );
+        }
+      } );
       
       // period spinners
       doScanSpinner( R.id.period_spinner, ListActivity.PREF_SCAN_PERIOD );

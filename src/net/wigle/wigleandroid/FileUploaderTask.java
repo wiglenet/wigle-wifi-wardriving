@@ -56,15 +56,16 @@ public final class FileUploaderTask extends Thread {
   static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
-  private static final String ERROR = "error";
-  private static final String FILENAME = "filename";
-  private static final String FILEPATH = "filepath";
+  public static final String ERROR = "error";
+  public static final String FILENAME = "filename";
+  public static final String FILEPATH = "filepath";
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   
-  private enum Status {
+  public static enum Status {
     UNKNOWN("Unknown", "Unknown error"),
     FAIL( "Fail", "Fail" ),
     SUCCESS( "Success", "Upload Successful"),
+    WRITE_SUCCESS( "Success", "Write Successful"),
     BAD_USERNAME("Fail", "Username not set"),
     BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
     EXCEPTION("Fail", "Exception"),
@@ -147,7 +148,7 @@ public final class FileUploaderTask extends Thread {
             }
           }
           // Activity context
-          buildAlertDialog( msg, status );
+          ad = buildAlertDialog( context, msg, status );
         }
       }
      };
@@ -164,7 +165,7 @@ public final class FileUploaderTask extends Thread {
       });
   }
   
-  private void buildAlertDialog( final Message msg, final Status status ) {
+  public static AlertDialog buildAlertDialog( final Context context, final Message msg, final Status status ) {
     final AlertDialog.Builder builder = new AlertDialog.Builder( context );
     builder.setCancelable( false );
     builder.setTitle( status.getTitle() );
@@ -176,7 +177,11 @@ public final class FileUploaderTask extends Thread {
       filename = bundle.getString( FILENAME );
       if ( filename != null ) {
         // just don't show the gz
-        final int index = filename.indexOf( ".gz" );
+        int index = filename.indexOf( ".gz" );
+        if ( index > 0 ) {
+          filename = filename.substring( 0, index );
+        }
+        index = filename.indexOf( ".kml" );
         if ( index > 0 ) {
           filename = filename.substring( 0, index );
         }
@@ -192,8 +197,8 @@ public final class FileUploaderTask extends Thread {
       error = error == null ? "" : " Error: " + error;
       builder.setMessage( status.getMessage() + error + filename );
     }
-    ad = builder.create();
-    ad.setButton( "OK", new DialogInterface.OnClickListener() {
+    AlertDialog ad = builder.create();
+    ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
       public void onClick( final DialogInterface dialog, final int which ) {
         try {
           dialog.dismiss();
@@ -210,6 +215,8 @@ public final class FileUploaderTask extends Thread {
     catch ( WindowManager.BadTokenException ex ) {
       ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
     }
+    
+    return ad;
   }
   
   public  void setContext( final Context context ) {
@@ -240,6 +247,9 @@ public final class FileUploaderTask extends Thread {
   }
   
   public void run() {
+    // set thread name
+    setName( "FileUploaderTask-" + getName() );
+    
     try {
       ListActivity.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
       Process.setThreadPriority( UPLOAD_PRIORITY );

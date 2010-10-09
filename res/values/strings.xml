@@ -18,8 +18,10 @@
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="maxout_maxid_button">Maxout DB marker</string>
     <string name="maxout_maxid_text">Set marker to:</string>
-    <string name="kml_export_button">KML Export</string>
-    <string name="kml_export_text">Export entire DB</string>
+    <string name="kml_run_export_button">KML Export Run</string>
+    <string name="kml_run_export_text">Export current run</string>
+    <string name="kml_export_button">KML Export DB</string>
+    <string name="kml_export_text">Export entire DB</string>    
     <string name="period_text">Time between wifi scans &lt;5mph</string>
     <string name="periodfast_text">Time between wifi scans &gt;5mph</string>
     <string name="speak_text">Time between audio speech</string>

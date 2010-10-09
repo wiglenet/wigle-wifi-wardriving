@@ -27,6 +27,12 @@ separate export button, not all users realize that files uploaded are written to
 option for kml save for checking coverage back at home PC
 
 --- done ---
+* 1.25 (unreleased)
+Fix more orientation change issues, around dialogs
+Exit from menu on any tab
+Remove osmdroid accuracy bubble which looked like the new networks circle
+Make file upload cancellable (with back button)
+
 * 1.24 (unreleased)
 Work around insane verifier bug in old dalvik vm's, on inner class |= operator
 Show location and name of file written on upload

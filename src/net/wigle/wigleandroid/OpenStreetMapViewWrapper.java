@@ -92,7 +92,6 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
       int nets = entry.getValue().newForDB;
       if ( nets > 0 ) {
         nets *= boost;
-        ListActivity.info("newForDb:" + nets);
         point = proj.toMapPixels( entry.getKey(), point );
         c.drawCircle(point.x, point.y, nets + 1, trailDBPaint);
       }

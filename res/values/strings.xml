@@ -27,7 +27,9 @@
     <string name="speak_text">Time between audio speech</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
-    <string name="unknown">Unknown</string>    
+    <string name="unknown">Unknown</string>
+    <string name="sort_text">Sort Options</string>
+    <string name="listdialog_button">OK</string>    
     <string name="speech_button">Speech Configuration Screen &gt;&gt;</string>
     <string name="speech_text">Audio speech will include:</string>
     <string name="speech_run">Nets for run</string>

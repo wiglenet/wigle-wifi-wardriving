@@ -46,9 +46,39 @@ public class WifiReceiver extends BroadcastReceiver {
   private final Set<String> runNetworks = new HashSet<String>();
   private long prevNewNetCount;
   
+  public static final int SIGNAL_COMPARE = 10;
+  public static final int CHANNEL_COMPARE = 11;
+  public static final int CRYPTO_COMPARE = 12;
+  public static final int FIND_TIME_COMPARE = 13;
+  public static final int SSID_COMPARE = 14;
+  
   private static final Comparator<Network> signalCompare = new Comparator<Network>() {
     public int compare( Network a, Network b ) {
       return b.getLevel() - a.getLevel();
+    }
+  };
+  
+  private static final Comparator<Network> channelCompare = new Comparator<Network>() {
+    public int compare( Network a, Network b ) {
+      return a.getFrequency() - b.getFrequency();
+    }
+  };
+  
+  private static final Comparator<Network> cryptoCompare = new Comparator<Network>() {
+    public int compare( Network a, Network b ) {
+      return b.getCrypto() - a.getCrypto();
+    }
+  };
+  
+  private static final Comparator<Network> findTimeCompare = new Comparator<Network>() {
+    public int compare( Network a, Network b ) {
+      return (int) (b.getConstructionTime() - a.getConstructionTime());
+    }
+  };
+  
+  private static final Comparator<Network> ssidCompare = new Comparator<Network>() {
+    public int compare( Network a, Network b ) {
+      return a.getSsid().compareTo( b.getSsid() );
     }
   };
   
@@ -183,8 +213,26 @@ public class WifiReceiver extends BroadcastReceiver {
       }
     }
     
-    // sort by signal strength
-    listAdapter.sort( signalCompare );
+    final int sort = prefs.getInt(ListActivity.PREF_LIST_SORT, SIGNAL_COMPARE);
+    Comparator<Network> comparator = signalCompare;
+    switch ( sort ) {
+      case SIGNAL_COMPARE:
+        comparator = signalCompare;
+        break;
+      case CHANNEL_COMPARE:
+        comparator = channelCompare;
+        break;
+      case CRYPTO_COMPARE:
+        comparator = cryptoCompare;
+        break;
+      case FIND_TIME_COMPARE:
+        comparator = findTimeCompare;
+        break;
+      case SSID_COMPARE:
+        comparator = ssidCompare;
+        break;
+    }
+    listAdapter.sort( comparator );
 
     final long dbNets = dbHelper.getNetworkCount();
     final long dbLocs = dbHelper.getLocationCount();

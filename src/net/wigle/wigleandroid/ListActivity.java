@@ -30,6 +30,7 @@ import net.wigle.wigleandroid.listener.WifiReceiver;
 import org.andnav.osm.util.GeoPoint;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -64,10 +65,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemSelectedListener;
 
 public final class ListActivity extends Activity implements FileUploaderListener {
     // *** state that is retained ***
@@ -100,7 +105,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_MAP = 12;
-    private static final int MENU_DASH = 13;
+    private static final int MENU_SORT = 13;
+    private static final int SORT_DIALOG = 100;
+    
     public static final String ENCODING = "ISO-8859-1";
     public static final float MIN_DISTANCE_ACCURACY = 32f;
     static final String ERROR_STACK_FILENAME = "errorstack";
@@ -128,6 +135,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     public static final String PREF_PREV_LAT = "prevLat";
     public static final String PREF_PREV_LON = "prevLon";
+    public static final String PREF_LIST_SORT = "listSort";
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW = "speakNew";
@@ -494,8 +502,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     /* Creates the menu items */
     @Override
     public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_DASH, 0, "Dashboard");
-      item.setIcon( android.R.drawable.ic_menu_info_details );
+      MenuItem item = menu.add(0, MENU_SORT, 0, "Sort Options");
+      item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
       
       item = menu.add(0, MENU_MAP, 0, "Map");
       item.setIcon( android.R.drawable.ic_menu_mapmode );
@@ -523,9 +531,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
             MainActivity.switchTab( this, MainActivity.TAB_MAP );
             return true;
           }
-          case MENU_DASH: {
-            info("start dashboard activity");
-            MainActivity.switchTab( this, MainActivity.TAB_MAP );
+          case MENU_SORT: {
+            info("sort dialog");
+            showDialog( SORT_DIALOG );
             return true;
           }
           case MENU_EXIT:
@@ -534,6 +542,69 @@ public final class ListActivity extends Activity implements FileUploaderListener
             return true;
         }
         return false;
+    }
+    
+    @Override
+    public Dialog onCreateDialog( int which ) {
+      switch ( which ) {
+        case SORT_DIALOG:
+          final Dialog dialog = new Dialog( this );
+  
+          dialog.setContentView( R.layout.listdialog );
+          dialog.setTitle( "Sort Options" );
+  
+          TextView text = (TextView) dialog.findViewById( R.id.text );
+          text.setText( "Sort List By:" );
+          
+          final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
+          final Editor editor = prefs.edit();
+          
+          Spinner spinner = (Spinner) dialog.findViewById( R.id.sort_spinner );
+          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+              this, android.R.layout.simple_spinner_item);
+          final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
+              WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+          final String[] listSortName = new String[]{ "Channel","Crypto","Found Time","Signal","SSID" };
+          int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+          int periodIndex = 0;
+          for ( int i = 0; i < listSorts.length; i++ ) {
+            adapter.add( listSortName[i] );
+            if ( listSort == listSorts[i] ) {
+              periodIndex = i;
+            }
+          }
+          adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+          spinner.setAdapter( adapter );
+          spinner.setSelection( periodIndex );
+          spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+              // set pref
+              final int listSort = listSorts[position];
+              ListActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+              editor.putInt( PREF_LIST_SORT, listSort );
+              editor.commit();
+            }
+            public void onNothingSelected( final AdapterView<?> arg0 ) {}
+            });
+          
+          Button ok = (Button) dialog.findViewById( R.id.listdialog_button );
+          ok.setOnClickListener( new OnClickListener() {
+              public void onClick( final View buttonView ) {  
+                try {
+                  dialog.dismiss();
+                }
+                catch ( Exception ex ) {
+                  // guess it wasn't there anyways
+                  info( "exception dismissing sort dialog: " + ex );
+                }
+              }
+            } );
+          
+          return dialog;
+        default:
+          error( "unhandled dialog: " + which );
+      }
+      return null;
     }
 
     // why is this even here? this is retarded. via:

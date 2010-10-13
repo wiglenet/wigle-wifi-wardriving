@@ -10,7 +10,6 @@ seen-networks map tile overlays
 
 --- user suggested ---
 click on network to connect, with warning about legality
-network list sorting options (time found)
 network list filtering options (new only)
 shut off when battery is at chosen percentage
 kismet drone support
@@ -21,6 +20,10 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.26 (unreleased)
+Network list sorting options
+Remove a debug log message on maps
+
 * 1.25
 Fix more orientation change issues, around dialogs
 Exit from menu on any tab

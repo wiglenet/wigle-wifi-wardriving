@@ -19,6 +19,7 @@ public final class Network {
   private final String showCapabilities;
   private final int crypto;
   private String detail;
+  private final long constructionTime = System.currentTimeMillis();
   
   private static final String BAR_STRING = " | ";
   private static final String DASH_STRING = " - ";
@@ -147,11 +148,15 @@ public final class Network {
   }
   
   /**
-   * get crypto catagory, one of CRYPTO_* defined in this class.
-   * @return integer corresponding to an encryption catagory
+   * get crypto category, one of CRYPTO_* defined in this class.
+   * @return integer corresponding to an encryption category
    */
   public int getCrypto() {
     return crypto;
+  }
+  
+  public long getConstructionTime() {
+    return constructionTime;
   }
   
   public String getDetail() {

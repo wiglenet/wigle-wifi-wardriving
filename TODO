@@ -25,6 +25,7 @@ show new networks since last upload
 Network list sorting options
 Remove a debug log message on maps
 Confirmation dialog around setting anonymous
+Fix KML export on run to only have one footer
 
 * 1.25
 Fix more orientation change issues, around dialogs

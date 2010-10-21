@@ -74,6 +74,7 @@ public class KmlWriter extends Thread {
     }
     
     FileOutputStream fos = new FileOutputStream( file );
+    // header
     FileUploaderTask.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
         + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
         + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red-dot.png</href></Icon></IconStyle></Style>"
@@ -83,6 +84,7 @@ public class KmlWriter extends Thread {
     
     boolean retval = false;
     
+    // body
     Cursor cursor = null;
     if ( true ) {
       try {
@@ -107,6 +109,8 @@ public class KmlWriter extends Thread {
         }
       }
     } 
+    // footer
+    FileUploaderTask.writeFos( fos, "</Folder>\n</Document></kml>" );
     
     fos.close();    
     
@@ -168,7 +172,6 @@ public class KmlWriter extends Thread {
       //  break;
       // }
     }
-    FileUploaderTask.writeFos( fos, "</Folder>\n</Document></kml>" );
     
     return true;
   }

@@ -21,7 +21,7 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
-* 1.26 (unreleased)
+* 1.26
 Network list sorting options
 Remove a debug log message on maps
 Confirmation dialog around setting anonymous

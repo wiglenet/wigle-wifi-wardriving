@@ -7,6 +7,7 @@ show IEEE octet info
 english/metric toggle
 minimap in dashboard? list of ssids?
 seen-networks map tile overlays
+confirm dialog around anonymous button
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -23,6 +24,7 @@ show new networks since last upload
 * 1.26 (unreleased)
 Network list sorting options
 Remove a debug log message on maps
+Confirmation dialog around setting anonymous
 
 * 1.25
 Fix more orientation change issues, around dialogs

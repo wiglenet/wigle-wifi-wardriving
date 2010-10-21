@@ -271,11 +271,16 @@ public final class FileUploaderTask extends Thread {
   
   private void doRun() throws InterruptedException {
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    final String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
+    String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
+    String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
     Status status = Status.UNKNOWN;
     final Bundle bundle = new Bundle();
     
+    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+      username = ListActivity.ANONYMOUS;
+      password = "";
+    }
+        
     if ( "".equals( username ) ) {
       // TODO: error
       ListActivity.error( "username not defined" );

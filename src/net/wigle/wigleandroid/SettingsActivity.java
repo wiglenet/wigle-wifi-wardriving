@@ -74,30 +74,40 @@ public final class SettingsActivity extends Activity {
       
       beAnonymous.setChecked( isAnonymous );
       beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
+          public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) { 
+            if ( isChecked == prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+              // this would cause no change, bail
+              return;
+            }
+            
+            if ( isChecked ) {
+              // turn off until confirmed
+              buttonView.setChecked( false );
+              // confirm
+              MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", new Doer() {
+                @Override
+                public void execute() {
+                  // turn anonymous
+                  user.setEnabled( false );
+                  pass.setEnabled( false );
+                  
+                  editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
+                  editor.commit();
+                  
+                  buttonView.setChecked( true );
+                }
+              });
+            }
+            else {
+              // unset anonymous
+              user.setEnabled( true );
+              pass.setEnabled( true );
+              
               editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
               editor.commit();
-              
-              if ( isChecked ) {
-                // turn anonymous
-                user.setEnabled( false );
-                pass.setEnabled( false );
-                user.setText( ListActivity.ANONYMOUS );
-                pass.setText( "" );
-                editor.putString( ListActivity.PREF_USERNAME, ListActivity.ANONYMOUS );
-                editor.putString( ListActivity.PREF_PASSWORD, "" );
-              }
-              else {
-                // unset anonymous
-                user.setEnabled( true );
-                pass.setEnabled( true );
-                user.setText( "" );
-                pass.setText( "" );
-                editor.putString( ListActivity.PREF_USERNAME, "" );
-                editor.putString( ListActivity.PREF_PASSWORD, "" );
-              }
+            }
           }
-      });
+        });
       
       user.setText( prefs.getString( ListActivity.PREF_USERNAME, "" ) );
       user.addTextChangedListener( new SetWatcher() {

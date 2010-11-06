@@ -119,6 +119,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_PASSWORD = "password";
     public static final String PREF_SHOW_CURRENT = "showCurrent";
     public static final String PREF_BE_ANONYMOUS = "beAnonymous";
+    public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";
     public static final String PREF_MAX_DB = "maxDbMarker";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";

@@ -31,10 +31,17 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
- <CheckBox android:id="@+id/be_anonymous"
+
+<CheckBox android:id="@+id/be_anonymous"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/be_anonymous" />       
+        android:text="@string/be_anonymous" />
+
+<CheckBox android:id="@+id/donate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/donate" />       
+       
 <LinearLayout
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"

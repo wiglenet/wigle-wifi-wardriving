@@ -63,6 +63,49 @@ public final class SettingsActivity extends Activity {
       final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
       final Editor editor = prefs.edit();
       
+      // donate
+      final CheckBox donate = (CheckBox) findViewById(R.id.donate);
+      final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
+      
+      donate.setChecked( isDonate );
+      if ( isDonate ) {
+        eraseDonate();
+      }
+      donate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+          public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) { 
+            if ( isChecked == prefs.getBoolean( ListActivity.PREF_DONATE, false) ) {
+              // this would cause no change, bail
+              return;
+            }
+            
+            if ( isChecked ) {
+              // turn off until confirmed
+              buttonView.setChecked( false );
+              // confirm
+              MainActivity.createConfirmation( SettingsActivity.this, 
+                  "Donate data to WiGLE?\n\n"
+                  + "Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.", 
+                  new Doer() {
+                @Override
+                public void execute() {
+                  editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+                  editor.commit();
+                                    
+                  buttonView.setChecked( true );
+                  // poof
+                  buttonView.setEnabled( false );
+                  buttonView.setVisibility( View.GONE );
+                }
+              });
+            }
+            else {
+              editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+              editor.commit();
+            }
+          }
+        });
+      
+      // anonymous
       final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
       final EditText user = (EditText) findViewById(R.id.edit_username);
       final EditText pass = (EditText) findViewById(R.id.edit_password);
@@ -277,6 +320,26 @@ public final class SettingsActivity extends Activity {
         });   
       
       
+  }
+  
+  @Override
+  public void onResume() {
+    ListActivity.info( "resume settings." );
+    
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    // donate
+    final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
+    if ( isDonate ) {
+      eraseDonate();
+    }
+    
+    super.onResume();
+  }
+  
+  private void eraseDonate() {
+    final CheckBox donate = (CheckBox) findViewById(R.id.donate);
+    donate.setEnabled(false);
+    donate.setVisibility(View.GONE);
   }
   
   private void doScanSpinner( final int id, final String pref ) {

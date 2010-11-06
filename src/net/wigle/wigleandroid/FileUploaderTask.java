@@ -346,7 +346,7 @@ public final class FileUploaderTask extends Thread {
       long maxId = writeFile( fos, bundle, countStats );      
       
       // don't upload empty files
-      if ( countStats.lineCount == 0 ) {
+      if ( countStats.lineCount == 0 && ! "bobzilla".equals(username) ) {
         return Status.EMPTY_FILE;
       }
       
@@ -365,15 +365,26 @@ public final class FileUploaderTask extends Thread {
       
       params.put("observer", username);
       params.put("password", password);
+      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      if ( prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+        params.put("donate","on");
+      }
       final String response = HttpFileUploader.upload( 
         ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
         params, context.getResources(), handler, filesize, context );
       
+      if ( ! prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+        if ( response != null && response.indexOf("donate=Y") > 0 ) {
+          final Editor editor = prefs.edit();
+          editor.putBoolean( ListActivity.PREF_DONATE, true );
+          editor.commit();
+        }
+      }
+      
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
         
-        // save in the prefs
-        final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+        // save in the prefs        
         final Editor editor = prefs.edit();
         editor.putLong( ListActivity.PREF_DB_MARKER, maxId );
         editor.putLong( ListActivity.PREF_MAX_DB, maxId );

@@ -12,6 +12,7 @@
     <string name="password">WiGLE Password</string>
     <string name="show_current">Show current networks only</string>
     <string name="be_anonymous">Upload anonymously</string>
+    <string name="donate">Donate data: Allow commercial use</string>
     <string name="found_sound">Play sound when network found in run</string>
     <string name="found_new_sound">Play sound when new network in DB</string>    
     <string name="reset_maxid_button">Zero DB marker</string>

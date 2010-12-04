@@ -106,6 +106,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final int MENU_EXIT = 11;
     private static final int MENU_MAP = 12;
     private static final int MENU_SORT = 13;
+    private static final int MENU_SCAN = 14;
     private static final int SORT_DIALOG = 100;
     
     public static final String ENCODING = "ISO-8859-1";
@@ -137,6 +138,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_PREV_LAT = "prevLat";
     public static final String PREF_PREV_LON = "prevLon";
     public static final String PREF_LIST_SORT = "listSort";
+    public static final String PREF_SCAN_RUNNING = "scanRunning";
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW = "speakNew";
@@ -328,6 +330,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
       return state.uploading.get();
     }
     
+    public boolean isScanning() {
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      return prefs.getBoolean( PREF_SCAN_RUNNING, true );
+    }
+    
     public void playNewNetSound() {
       try {
         if ( state.soundNewPop != null && ! state.soundNewPop.isPlaying() ) {
@@ -512,6 +519,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       item = menu.add(0, MENU_EXIT, 0, "Exit");
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
         
+      final String scan = isScanning() ? "Off" : "On";
+      item = menu.add(0, MENU_SCAN, 0, "Scan " + scan);
+      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
+      
       item = menu.add(0, MENU_SETTINGS, 0, "Settings");
       item.setIcon( android.R.drawable.ic_menu_preferences );
         
@@ -537,12 +548,36 @@ public final class ListActivity extends Activity implements FileUploaderListener
             showDialog( SORT_DIALOG );
             return true;
           }
+          case MENU_SCAN: {
+            boolean scanning = ! isScanning();
+            final Editor edit = this.getSharedPreferences( SHARED_PREFS, 0 ).edit();
+            edit.putBoolean(PREF_SCAN_RUNNING, scanning);
+            edit.commit();
+            String name = scanning ? "Scan Off" : "Scan On";
+            item.setTitle( name );
+            item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
+            handleScanChange();
+            return true;
+          }
           case MENU_EXIT:
             // call over to finish
             finish();
             return true;
         }
         return false;
+    }
+    
+    private void handleScanChange() {
+      if ( isScanning() ) {
+        // turn on location updates
+        this.setLocationUpdates(LOCATION_UPDATE_INTERVAL, 0f);
+        setStatusUI( "Scanning Turned On" );
+      }
+      else {
+        // turn off location updates
+        this.setLocationUpdates(0L, 0f);
+        setStatusUI( "Scanning Turned Off" );
+      }
     }
     
     @Override
@@ -759,15 +794,31 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
 
       if ( state.gpsListener == null ) {
+        // force a listener to be created
+        handleScanChange();
+      }
+    }
+    
+    /**
+     * resets the gps listener to the requested update time and distance.
+     * an updateIntervalMillis of <= 0 will not register for updates. 
+     */
+    private void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
+      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+      if ( state.gpsListener == null ) {
         state.gpsListener = new GPSListener( this );
         locationManager.addGpsStatusListener( state.gpsListener );
+      }
+
+      // remove any old requests
+      locationManager.removeUpdates( state.gpsListener );
       
-        final List<String> providers = locationManager.getAllProviders();
-        for ( String provider : providers ) {
-          info( "available provider: " + provider );
-          if ( ! "passive".equals( provider ) ) {
-            locationManager.requestLocationUpdates( provider, LOCATION_UPDATE_INTERVAL, 0, state.gpsListener );
-          }
+      final List<String> providers = locationManager.getAllProviders();
+      for ( String provider : providers ) {
+        info( "available provider: " + provider );
+        if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
+          locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
         }
       }
     }
@@ -783,8 +834,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Location location = state.gpsListener.getLocation();
       
       tv = (TextView) this.findViewById( R.id.LocationTextView01 );
-      tv.setText( "Lat: " + (location == null ? "  (Waiting for GPS sync..)" 
-          : state.numberFormat8.format( location.getLatitude() ) ) );
+      String latText = "";
+      if ( location == null ) {
+        if ( isScanning() ) {
+          latText = "  (Waiting for GPS sync..)";
+        }
+        else {
+          latText = "  (Scanning Turned Off)";
+        }
+      }
+      else {
+        latText = state.numberFormat8.format( location.getLatitude() );
+      }
+      tv.setText( "Lat: " + latText );
       
       tv = (TextView) this.findViewById( R.id.LocationTextView02 );
       tv.setText( "Lon: " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );

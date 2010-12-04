@@ -2,7 +2,6 @@
 "upload every n" setting
 select a net, see observations
 lock screen on, lock UI
-turn scan on/off
 show IEEE octet info
 english/metric toggle
 minimap in dashboard? list of ssids?
@@ -21,6 +20,11 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.27
+Can turn scanning on/off via menu option
+Donate data button
+Spoken times like 9:02 will be "nine oh two"
+
 * 1.26
 Network list sorting options
 Remove a debug log message on maps

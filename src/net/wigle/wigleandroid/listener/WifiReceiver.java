@@ -292,7 +292,7 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( location == null ) {
       if ( prevGpsLocation != null ) {
         dbHelper.lastLocation( prevGpsLocation );
-        ListActivity.info("set last location for lerping");
+        // ListActivity.info("set last location for lerping");
       }
     } 
     else {
@@ -348,7 +348,9 @@ public class WifiReceiver extends BroadcastReceiver {
       builder.append( "from " ).append( numberFormat1.format( dist / 1609.344f ) ).append( " miles, " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
-      builder.append( timeFormat.format( new Date() ) ).append( ", " );
+      String time = timeFormat.format( new Date() );      
+      time = time.replace(" 0", " oh ");
+      builder.append( time ).append( ", " );
     }
     final int batteryLevel = listActivity.getBatteryLevelReceiver().getBatteryLevel();
     if ( batteryLevel >= 0 && prefs.getBoolean( ListActivity.PREF_SPEAK_BATTERY, true ) ) {
@@ -423,8 +425,13 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( listActivity.isUploading() ) {
       ListActivity.info( "uploading, not scanning for now" );
     }
-    else {
+    else if (listActivity.isScanning()){
       retval = wifiManager.startScan();
+    }
+    else {
+      listActivity.setNetCountUI();
+      listActivity.setLocationUI();
+      listActivity.setStatusUI( "Scanning Turned Off" );
     }
     return retval;
   }

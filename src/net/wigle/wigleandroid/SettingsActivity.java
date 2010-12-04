@@ -295,8 +295,8 @@ public final class SettingsActivity extends Activity {
       }
       ArrayAdapter<String> adapter = new ArrayAdapter<String>(
           this, android.R.layout.simple_spinner_item );
-      final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,1800,0 };
-      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min","30 min","Off" };
+      final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,900,1800,0 };
+      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min","15 min","30 min","Off" };
       long period = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );
       int periodIndex = 0;
       for ( int i = 0; i < speechPeriods.length; i++ ) {

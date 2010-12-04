@@ -37,6 +37,10 @@ public class GPSListener implements Listener, LocationListener {
   }
   
   public void onGpsStatusChanged( final int event ) {
+    if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
+      gpsStatus = null;
+      location = null;
+    }
     updateLocationData( (Location) null );
   } 
   

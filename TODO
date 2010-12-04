@@ -24,6 +24,8 @@ show new networks since last upload
 Can turn scanning on/off via menu option
 Donate data button
 Spoken times like 9:02 will be "nine oh two"
+Tie location update intervals to scanning period, if over a second. Should
+  help battery life for those set to scan more slowly.
 
 * 1.26
 Network list sorting options

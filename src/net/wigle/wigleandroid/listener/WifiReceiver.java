@@ -45,6 +45,7 @@ public class WifiReceiver extends BroadcastReceiver {
   private long previousTalkTime = System.currentTimeMillis();
   private final Set<String> runNetworks = new HashSet<String>();
   private long prevNewNetCount;
+  private long prevScanPeriod;
   
   public static final int SIGNAL_COMPARE = 10;
   public static final int CHANNEL_COMPARE = 11;
@@ -117,11 +118,19 @@ public class WifiReceiver extends BroadcastReceiver {
     
     long nonstopScanRequestTime = Long.MIN_VALUE;
     final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final long period = prefs.getLong( chooseScanPref(), ListActivity.SCAN_DEFAULT );
+    final long period = getScanPeriod();
     if ( period == 0 ) {
       // treat as "continuous", so request scan in here
       doWifiScan();
       nonstopScanRequestTime = System.currentTimeMillis();
+    }
+    if ( period != prevScanPeriod && listActivity.isScanning() ) {
+      if ( period >= ListActivity.LOCATION_UPDATE_INTERVAL ) {
+        // update our location scanning speed
+        ListActivity.info("setting location updates to: " + period);
+        listActivity.setLocationUpdates(period, 0f);
+      }
+      prevScanPeriod = period;
     }
     
     final boolean showCurrent = prefs.getBoolean( ListActivity.PREF_SHOW_CURRENT, true );
@@ -375,8 +384,7 @@ public class WifiReceiver extends BroadcastReceiver {
               if ( scanRequestTime <= 0 ) {
                 scanRequestTime = System.currentTimeMillis();
               }
-              final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-              long period = prefs.getLong( chooseScanPref(), ListActivity.SCAN_DEFAULT );
+              long period = getScanPeriod();
               // check if set to "continuous"
               if ( period == 0L ) {
                 // set to default here, as a scan will also be requested on the scan result listener
@@ -409,14 +417,16 @@ public class WifiReceiver extends BroadcastReceiver {
     }
   }
   
-  private String chooseScanPref() {
-    String retval = ListActivity.PREF_SCAN_PERIOD;
+  public long getScanPeriod() {
+    final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    
+    String scanPref = ListActivity.PREF_SCAN_PERIOD;
     // if over 5 mph
     final Location location = listActivity.getGPSListener().getLocation();
     if ( location != null && location.getSpeed() >= 2.2352f ) {
-      retval = ListActivity.PREF_SCAN_PERIOD_FAST;
+      scanPref = ListActivity.PREF_SCAN_PERIOD_FAST;
     }
-    return retval;
+    return prefs.getLong( scanPref, ListActivity.SCAN_DEFAULT );    
   }
   
   public boolean doWifiScan() {
@@ -429,9 +439,12 @@ public class WifiReceiver extends BroadcastReceiver {
       retval = wifiManager.startScan();
     }
     else {
+      // scanning is off. since we're the only timer, update the UI
       listActivity.setNetCountUI();
       listActivity.setLocationUI();
       listActivity.setStatusUI( "Scanning Turned Off" );
+      // keep the scan times from getting huge
+      scanRequestTime = System.currentTimeMillis();
     }
     return retval;
   }

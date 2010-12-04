@@ -432,11 +432,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
         info( "LIST: finish called twice!" );
       }
 
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-      if ( prefs.getLong( PREF_SPEECH_PERIOD, 0 ) > 0 ) {
-        speak( "done." );
-      }
-      
       // save our location for later runs
       state.gpsListener.saveLocation();
       
@@ -471,6 +466,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         state.wifiLock.release();
       }
       
+      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
       final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! state.inEmulator ) {
@@ -568,7 +564,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     private void handleScanChange() {
-      if ( isScanning() ) {
+      final boolean isScanning = isScanning();
+      info("handleScanChange: isScanning now: " + isScanning );
+      if ( isScanning ) {
         // turn on location updates
         this.setLocationUpdates(LOCATION_UPDATE_INTERVAL, 0f);
         setStatusUI( "Scanning Turned On" );
@@ -577,6 +575,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         // turn off location updates
         this.setLocationUpdates(0L, 0f);
         setStatusUI( "Scanning Turned Off" );
+        state.gpsListener.handleScanStop();
       }
     }
     
@@ -803,9 +802,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
      * resets the gps listener to the requested update time and distance.
      * an updateIntervalMillis of <= 0 will not register for updates. 
      */
-    private void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
+    public void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
+      
       if ( state.gpsListener == null ) {
         state.gpsListener = new GPSListener( this );
         locationManager.addGpsStatusListener( state.gpsListener );
@@ -816,7 +815,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       final List<String> providers = locationManager.getAllProviders();
       for ( String provider : providers ) {
-        info( "available provider: " + provider );
+        info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );
         if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
           locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
         }

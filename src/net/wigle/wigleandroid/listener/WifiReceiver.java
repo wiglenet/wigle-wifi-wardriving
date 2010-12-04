@@ -125,11 +125,11 @@ public class WifiReceiver extends BroadcastReceiver {
       nonstopScanRequestTime = System.currentTimeMillis();
     }
     if ( period != prevScanPeriod && listActivity.isScanning() ) {
-      if ( period >= ListActivity.LOCATION_UPDATE_INTERVAL ) {
-        // update our location scanning speed
-        ListActivity.info("setting location updates to: " + period);
-        listActivity.setLocationUpdates(period, 0f);
-      }
+      long setPeriod = Math.max(period, ListActivity.LOCATION_UPDATE_INTERVAL); 
+      // update our location scanning speed
+      ListActivity.info("setting location updates to: " + setPeriod);
+      listActivity.setLocationUpdates(setPeriod, 0f);
+
       prevScanPeriod = period;
     }
     

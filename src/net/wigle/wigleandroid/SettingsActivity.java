@@ -312,7 +312,7 @@ public final class SettingsActivity extends Activity {
         public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
           // set pref
           final long period = speechPeriods[position];
-          ListActivity.info("setting period: " + period );
+          ListActivity.info("setting speech period: " + period );
           editor.putLong( ListActivity.PREF_SPEECH_PERIOD, period );
           editor.commit();
         }
@@ -367,7 +367,7 @@ public final class SettingsActivity extends Activity {
       public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
         // set pref
         final long period = periods[position];
-        ListActivity.info( pref + " setting period: " + period );
+        ListActivity.info( pref + " setting scan period: " + period );
         editor.putLong( pref, period );
         editor.commit();
       }

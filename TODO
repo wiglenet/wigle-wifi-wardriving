@@ -20,6 +20,9 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.28
+Fix post-upload threading issue
+
 * 1.27
 Can turn scanning on/off via menu option
 Donate data button

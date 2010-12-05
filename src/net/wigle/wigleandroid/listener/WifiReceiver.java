@@ -429,7 +429,19 @@ public class WifiReceiver extends BroadcastReceiver {
     return prefs.getLong( scanPref, ListActivity.SCAN_DEFAULT );    
   }
   
-  public boolean doWifiScan() {
+  public void scheduleScan() {
+    wifiTimer.post(new Runnable() {
+      public void run() {
+        doWifiScan();
+      }
+    });    
+  }
+  
+  /**
+   * only call this from a Handler
+   * @return
+   */
+  private boolean doWifiScan() {
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
     boolean retval = false;
     if ( listActivity.isUploading() ) {

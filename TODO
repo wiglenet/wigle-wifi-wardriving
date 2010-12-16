@@ -21,7 +21,8 @@ show new networks since last upload
 
 --- done ---
 * 1.29
-Setting to adjust gps scan rate manually
+Added a setting to allow adjustment gps scan rate manually
+Update osmdroid
 
 * 1.28
 Fix post-upload threading issue
@@ -33,6 +34,7 @@ Spoken times like 9:02 will be "nine oh two"
 Tie location update intervals to scanning period, if over a second. Should
   help battery life for those set to scan more slowly.
 More scan and speech period options
+Update osmdroid
 
 * 1.26
 Network list sorting options

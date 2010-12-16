@@ -25,7 +25,7 @@
     <string name="kml_export_text">Export entire DB</string>    
     <string name="period_text">Time between wifi scans &lt;5mph</string>
     <string name="periodfast_text">Time between wifi scans &gt;5mph</string>
-    <string name="gps_text">Time between gps scans</string>
+    <string name="gps_text">Time between GPS updates</string>
     <string name="speak_text">Time between audio speech</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>

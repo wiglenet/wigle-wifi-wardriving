@@ -20,6 +20,9 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.29
+Setting to adjust gps scan rate manually
+
 * 1.28
 Fix post-upload threading issue
 

@@ -255,8 +255,12 @@ public final class SettingsActivity extends Activity {
       } );
       
       // period spinners
-      doScanSpinner( R.id.period_spinner, ListActivity.PREF_SCAN_PERIOD );
-      doScanSpinner( R.id.periodfast_spinner, ListActivity.PREF_SCAN_PERIOD_FAST );
+      doScanSpinner( R.id.period_spinner, 
+          ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, "Nonstop" );
+      doScanSpinner( R.id.periodfast_spinner, 
+          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_DEFAULT, "Nonstop" );
+      doScanSpinner( R.id.gps_spinner, 
+          ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, "Tie to Wifi Scan Period" );
       
       final CheckBox foundSound = (CheckBox) findViewById(R.id.found_sound);
       foundSound.setChecked( prefs.getBoolean( ListActivity.PREF_FOUND_SOUND, true) );
@@ -342,7 +346,7 @@ public final class SettingsActivity extends Activity {
     donate.setVisibility(View.GONE);
   }
   
-  private void doScanSpinner( final int id, final String pref ) {
+  private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
     
@@ -350,9 +354,9 @@ public final class SettingsActivity extends Activity {
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
         this, android.R.layout.simple_spinner_item);
     final long[] periods = new long[]{ 0,50,250,500,1000,2000,3000,4000,5000,10000,30000,60000 };
-    final String[] periodName = new String[]{ "Nonstop","50 ms","250ms","500 ms","1 sec","2 sec","3 sec","4 sec","5 sec",
+    final String[] periodName = new String[]{ zeroName,"50 ms","250ms","500 ms","1 sec","2 sec","3 sec","4 sec","5 sec",
         "10 sec","30 sec","1 min" };
-    long period = prefs.getLong( pref, ListActivity.SCAN_DEFAULT );
+    long period = prefs.getLong( pref, spinDefault );
     int periodIndex = 0;
     for ( int i = 0; i < periods.length; i++ ) {
       adapter.add( periodName[i] );

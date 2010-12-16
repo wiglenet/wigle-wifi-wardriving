@@ -82,7 +82,11 @@
       android:icon="@drawable/wiglewifi"/>
       
 </application>
-
+<supports-screens android:anyDensity="true"
+   	android:smallScreens="true"
+   	android:normalScreens="true"
+   	android:largeScreens="true"
+/>
 <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
 
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>

@@ -124,13 +124,18 @@ public class WifiReceiver extends BroadcastReceiver {
       doWifiScan();
       nonstopScanRequestTime = System.currentTimeMillis();
     }
-    if ( period != prevScanPeriod && listActivity.isScanning() ) {
-      long setPeriod = Math.max(period, ListActivity.LOCATION_UPDATE_INTERVAL); 
+    final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
+    long setPeriod = prefPeriod;
+    if (setPeriod == 0 ){
+      setPeriod = Math.max(period, ListActivity.LOCATION_UPDATE_INTERVAL); 
+    }
+    
+    if ( setPeriod != prevScanPeriod && listActivity.isScanning() ) {
       // update our location scanning speed
       ListActivity.info("setting location updates to: " + setPeriod);
       listActivity.setLocationUpdates(setPeriod, 0f);
 
-      prevScanPeriod = period;
+      prevScanPeriod = setPeriod;
     }
     
     final boolean showCurrent = prefs.getBoolean( ListActivity.PREF_SHOW_CURRENT, true );

@@ -14,25 +14,25 @@ public final class WigleService extends Service {
   private static final int NOTIFICATION_ID = 1;
   
   private GuardThread guardThread;
+  private AtomicBoolean done = new AtomicBoolean( false );
   
   private class GuardThread extends Thread {
-    private AtomicBoolean done = new AtomicBoolean(false);
-    
     public GuardThread() {      
     }
     
     public void run() {
       Thread.currentThread().setName( "GuardThread-" + Thread.currentThread().getName() );
       while ( ! done.get() ) {
-        ListActivity.sleep(15000L);
+        ListActivity.sleep( 15000L );
         setupNotification();
       }
       ListActivity.info("GuardThread done");
-    }
-    
-    public void setDone() {
-      done.set( true );
-    }
+    }    
+  }
+  
+  private void setDone() {
+    done.set( true );
+    guardThread.interrupt();
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class WigleService extends Service {
   public void onDestroy() {
     ListActivity.info( "service: onDestroy" );
     shutdownNotification();
-    guardThread.setDone();
+    setDone();
     super.onDestroy();
   }
   
@@ -100,7 +100,6 @@ public final class WigleService extends Service {
   
   private void handleCommand( Intent intent ) {
     ListActivity.info( "service: handleCommand: intent: " + intent );
-
   }
 
   private void shutdownNotification() {
@@ -110,27 +109,29 @@ public final class WigleService extends Service {
   }
   
   private void setupNotification() {
-    final NotificationManager notificationManager = 
-      (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
-    
-    final int icon = R.drawable.wiglewifi;
-    final long when = System.currentTimeMillis();
-    final String title = "Wigle Wifi Service";
-    final Notification notification = new Notification( icon, title, when );
-    notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
-    final Context context = getApplicationContext();
-    final Intent notificationIntent = new Intent( this, MainActivity.class );
-    final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
-    final long dbNets = ListActivity.lameStatic.dbNets;
-    String text = "Waiting for info...";
-    if ( dbNets > 0 ) {
-      text = "Run: " + ListActivity.lameStatic.runNets
-        + "  New: " + ListActivity.lameStatic.newNets + "  DB: " + dbNets;
-    }      
-    notification.setLatestEventInfo( context, title, text, contentIntent );
-    
-    notificationManager.notify( NOTIFICATION_ID, notification );
+    if ( ! done.get() ) {
+      final NotificationManager notificationManager = 
+        (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+      
+      final int icon = R.drawable.wiglewifi;
+      final long when = System.currentTimeMillis();
+      final String title = "Wigle Wifi Service";
+      final Notification notification = new Notification( icon, title, when );
+      notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
+  
+      final Context context = getApplicationContext();
+      final Intent notificationIntent = new Intent( this, MainActivity.class );
+      final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
+      final long dbNets = ListActivity.lameStatic.dbNets;
+      String text = "Waiting for info...";
+      if ( dbNets > 0 ) {
+        text = "Run: " + ListActivity.lameStatic.runNets
+          + "  New: " + ListActivity.lameStatic.newNets + "  DB: " + dbNets;
+      }      
+      notification.setLatestEventInfo( context, title, text, contentIntent );
+      
+      notificationManager.notify( NOTIFICATION_ID, notification );
+    }
   }
   
 }

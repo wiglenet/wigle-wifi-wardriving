@@ -6,7 +6,6 @@ show IEEE octet info
 english/metric toggle
 minimap in dashboard? list of ssids?
 seen-networks map tile overlays
-confirm dialog around anonymous button
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -14,12 +13,17 @@ network list filtering options (new only)
 shut off when battery is at chosen percentage
 kismet drone support
 some response/info/stat about uploaded files
-update service notificaton string with some stats
 try tabs on bottom in landscape mode
 remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.30
+Fix binding of app to service, should help stay alive when in background
+If scanning is on, but no response from wifi manager after 90 seconds, the wifi
+  in the OS is probably jammed, so restart it (with audio and toast warning)
+Update service notificaton string with some stats occasionally
+
 * 1.29
 Added a setting to allow adjustment gps scan rate manually
 Update osmdroid

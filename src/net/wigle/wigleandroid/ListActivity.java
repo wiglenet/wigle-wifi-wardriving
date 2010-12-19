@@ -123,6 +123,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";
     public static final String PREF_MAX_DB = "maxDbMarker";
+    public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
     public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
     public static final String GPS_SCAN_PERIOD = "gpsPeriod";
@@ -456,7 +457,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Intent serviceIntent = new Intent( this, WigleService.class );
       this.stopService( serviceIntent );
       try {
-        this.unbindService( state.serviceConnection );
+        // have to use the app context to bind to the service, cuz we're in tabs
+        getApplicationContext().unbindService( state.serviceConnection );
       }
       catch ( final IllegalArgumentException ex ) {
         info( "serviceConnection not registered: " + ex, ex );
@@ -571,12 +573,18 @@ public final class ListActivity extends Activity implements FileUploaderListener
         // turn on location updates
         this.setLocationUpdates(LOCATION_UPDATE_INTERVAL, 0f);
         setStatusUI( "Scanning Turned On" );
+        if ( ! state.wifiLock.isHeld() ){
+          state.wifiLock.acquire();
+        }
       }
       else {
         // turn off location updates
         this.setLocationUpdates(0L, 0f);
         setStatusUI( "Scanning Turned Off" );
         state.gpsListener.handleScanStop();
+        if ( state.wifiLock.isHeld() ){
+          state.wifiLock.release();
+        }
       }
     }
     
@@ -878,27 +886,30 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     private void setupService() {
       // could be set by nonconfig retain
-      if ( state.serviceConnection == null ) {
+      if ( state.serviceConnection == null ) {        
         final Intent serviceIntent = new Intent( this.getApplicationContext(), WigleService.class );
         final ComponentName compName = startService( serviceIntent );
         if ( compName == null ) {
-          ListActivity.error( "startService() failed!" );
+          error( "startService() failed!" );
         }
         else {
-          ListActivity.info( "service started ok: " + compName );
+          info( "service started ok: " + compName );
         }
         
         state.serviceConnection = new ServiceConnection() {
           public void onServiceConnected( final ComponentName name, final IBinder iBinder ) {
-            ListActivity.info( name + " service connected" ); 
+            info( name + " service connected" ); 
           }
           public void onServiceDisconnected( final ComponentName name ) {
-            ListActivity.info( name + " service disconnected" );
+            info( name + " service disconnected" );
           }
         };  
       
         int flags = 0;
-        this.bindService( serviceIntent, state.serviceConnection, flags );
+        // have to use the app context to bind to the service, cuz we're in tabs
+        // http://code.google.com/p/android/issues/detail?id=2483#c2
+        final boolean bound = getApplicationContext().bindService( serviceIntent, state.serviceConnection, flags );
+        info( "service bound: " + bound );        
       }
     }
     
@@ -1118,12 +1129,18 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static void info( final String value ) {
       Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
+    public static void warn( final String value ) {
+      Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+    }
     public static void error( final String value ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
     }
 
     public static void info( final String value, final Throwable t ) {
       Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
+    }
+    public static void warn( final String value, final Throwable t ) {
+      Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
     }
     public static void error( final String value, final Throwable t ) {
       Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );

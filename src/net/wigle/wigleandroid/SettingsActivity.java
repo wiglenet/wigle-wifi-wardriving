@@ -255,6 +255,8 @@ public final class SettingsActivity extends Activity {
       } );
       
       // period spinners
+      doScanSpinner( R.id.periodstill_spinner, 
+          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_DEFAULT, "Nonstop" );
       doScanSpinner( R.id.period_spinner, 
           ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, "Nonstop" );
       doScanSpinner( R.id.periodfast_spinner, 
@@ -297,33 +299,11 @@ public final class SettingsActivity extends Activity {
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText("No Text-to-Speech engine");
       }
-      ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-          this, android.R.layout.simple_spinner_item );
       final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,900,1800,0 };
-      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec","1 min","2 min","5 min","10 min","15 min","30 min","Off" };
-      long period = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );
-      int periodIndex = 0;
-      for ( int i = 0; i < speechPeriods.length; i++ ) {
-        adapter.add( speechName[i] );
-        if ( period == speechPeriods[i] ) {
-          periodIndex = i;
-        }
-      }
-      adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-      spinner.setAdapter( adapter );
-      spinner.setSelection( periodIndex );
-      spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-        public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-          // set pref
-          final long period = speechPeriods[position];
-          ListActivity.info("setting speech period: " + period );
-          editor.putLong( ListActivity.PREF_SPEECH_PERIOD, period );
-          editor.commit();
-        }
-        public void onNothingSelected( final AdapterView<?> arg0 ) {}
-        });   
-      
-      
+      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec",
+          "1 min","2 min","5 min","10 min","15 min","30 min","Off" };
+      doSpinner( R.id.speak_spinner, 
+          ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );            
   }
   
   @Override
@@ -347,15 +327,22 @@ public final class SettingsActivity extends Activity {
   }
   
   private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
+    final long[] periods = new long[]{ 0,50,250,500,1000,2000,3000,4000,5000,10000,30000,60000 };
+    final String[] periodName = new String[]{ zeroName,"50 ms","250ms","500 ms","1 sec","2 sec","3 sec","4 sec","5 sec",
+        "10 sec","30 sec","1 min" };
+    doSpinner(id, pref, spinDefault, periods, periodName);
+  }
+  
+  private void doSpinner( final int id, final String pref, final long spinDefault, 
+      final long[] periods, final String[] periodName ) {
+    
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
     
     Spinner spinner = (Spinner) findViewById( id );
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
         this, android.R.layout.simple_spinner_item);
-    final long[] periods = new long[]{ 0,50,250,500,1000,2000,3000,4000,5000,10000,30000,60000 };
-    final String[] periodName = new String[]{ zeroName,"50 ms","250ms","500 ms","1 sec","2 sec","3 sec","4 sec","5 sec",
-        "10 sec","30 sec","1 min" };
+    
     long period = prefs.getLong( pref, spinDefault );
     int periodIndex = 0;
     for ( int i = 0; i < periods.length; i++ ) {

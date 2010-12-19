@@ -30,6 +30,7 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.widget.Toast;
 
 public class WifiReceiver extends BroadcastReceiver {
   private ListActivity listActivity;
@@ -41,6 +42,8 @@ public class WifiReceiver extends BroadcastReceiver {
   private Handler wifiTimer;
   private Location prevGpsLocation;
   private long scanRequestTime = Long.MIN_VALUE;
+  private long lastScanResponseTime = Long.MIN_VALUE;
+  private long lastWifiUnjamTime = Long.MIN_VALUE;
   private int pendingCount = 0;
   private long previousTalkTime = System.currentTimeMillis();
   private final Set<String> runNetworks = new HashSet<String>();
@@ -52,6 +55,10 @@ public class WifiReceiver extends BroadcastReceiver {
   public static final int CRYPTO_COMPARE = 12;
   public static final int FIND_TIME_COMPARE = 13;
   public static final int SSID_COMPARE = 14;
+  
+  // a minute and a half without a scan is probably bad, since max setting is a minute
+  private static final long LAST_SCAN_TIME_THRESH = 90000L;
+  private static final long WIFI_UNJAM_PERIOD = 30000L;
   
   private static final Comparator<Network> signalCompare = new Comparator<Network>() {
     public int compare( Network a, Network b ) {
@@ -112,6 +119,7 @@ public class WifiReceiver extends BroadcastReceiver {
   
   @Override
   public void onReceive( final Context context, final Intent intent ){
+    lastScanResponseTime = System.currentTimeMillis();
     // final long start = System.currentTimeMillis();
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
     final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
@@ -362,7 +370,8 @@ public class WifiReceiver extends BroadcastReceiver {
       builder.append( "from " ).append( numberFormat1.format( dist / 1609.344f ) ).append( " miles, " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
-      String time = timeFormat.format( new Date() );      
+      String time = timeFormat.format( new Date() );
+      time = time.replace(" 00", " oh clock");
       time = time.replace(" 0", " oh ");
       builder.append( time ).append( ", " );
     }
@@ -431,6 +440,9 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( location != null && location.getSpeed() >= 2.2352f ) {
       scanPref = ListActivity.PREF_SCAN_PERIOD_FAST;
     }
+    else if ( location == null || location.getSpeed() < 0.1f ) {
+      scanPref = ListActivity.PREF_SCAN_PERIOD_STILL;
+    }
     return prefs.getLong( scanPref, ListActivity.SCAN_DEFAULT );    
   }
   
@@ -447,6 +459,7 @@ public class WifiReceiver extends BroadcastReceiver {
    * @return
    */
   private boolean doWifiScan() {
+    // ListActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
     boolean retval = false;
     if ( listActivity.isUploading() ) {
@@ -454,6 +467,26 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     else if (listActivity.isScanning()){
       retval = wifiManager.startScan();
+      final long now = System.currentTimeMillis();
+      if ( lastScanResponseTime < 0 ) {
+        // use now, since we made a request
+        lastScanResponseTime = now;
+      }
+      else {
+        final long sinceLastScan = now - lastScanResponseTime;
+        if ( sinceLastScan > LAST_SCAN_TIME_THRESH ) {
+          ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
+          if ( lastWifiUnjamTime < 0 || now - lastWifiUnjamTime > WIFI_UNJAM_PERIOD ) {
+            Toast.makeText( listActivity, 
+                "Wifi appears jammed, Turning off, and then on, WiFi.", Toast.LENGTH_LONG ).show();
+            wifiManager.setWifiEnabled(false);
+            wifiManager.setWifiEnabled(true);    
+            lastWifiUnjamTime = now;
+            listActivity.speak("Warning, latest wifi scan completed " 
+                + (sinceLastScan / 1000L) + " seconds ago. Restarting wifi.");
+          }
+        }
+      }
     }
     else {
       // scanning is off. since we're the only timer, update the UI

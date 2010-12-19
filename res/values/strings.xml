@@ -22,9 +22,10 @@
     <string name="kml_run_export_button">KML Export Run</string>
     <string name="kml_run_export_text">Export current run</string>
     <string name="kml_export_button">KML Export DB</string>
-    <string name="kml_export_text">Export entire DB</string>    
-    <string name="period_text">Time between wifi scans &lt;5mph</string>
-    <string name="periodfast_text">Time between wifi scans &gt;5mph</string>
+    <string name="kml_export_text">Export entire DB</string>
+    <string name="periodstill_text">Time between wifi scans 0 mph</string>    
+    <string name="period_text">Time between wifi scans &lt;5 mph</string>
+    <string name="periodfast_text">Time between wifi scans &gt;5 mph</string>
     <string name="gps_text">Time between GPS updates</string>
     <string name="speak_text">Time between audio speech</string>
     <string name="speech_gps">Announce GPS status changes</string>

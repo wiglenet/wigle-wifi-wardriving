@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Notification;
@@ -15,6 +17,20 @@ public final class WigleService extends Service {
   
   private GuardThread guardThread;
   private AtomicBoolean done = new AtomicBoolean( false );
+  
+  // copied from javadoc
+  @SuppressWarnings("unchecked")
+  private static final Class[] mStartForegroundSignature = new Class[] {
+    int.class, Notification.class};
+  @SuppressWarnings("unchecked")
+  private static final Class[] mStopForegroundSignature = new Class[] {
+    boolean.class};
+
+  private NotificationManager mNM;
+  private Method mStartForeground;
+  private Method mStopForeground;
+  private Object[] mStartForegroundArgs = new Object[2];
+  private Object[] mStopForegroundArgs = new Object[1];
   
   private class GuardThread extends Thread {
     public GuardThread() {      
@@ -58,6 +74,17 @@ public final class WigleService extends Service {
   @Override
   public void onCreate() {
     ListActivity.info( "service: onCreate" );
+    
+    mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+    try {
+        mStartForeground = getClass().getMethod("startForeground",
+                mStartForegroundSignature);
+        mStopForeground = getClass().getMethod("stopForeground",
+                mStopForegroundSignature);
+    } catch (NoSuchMethodException e) {
+        // Running on an older platform.
+        mStartForeground = mStopForeground = null;
+    }    
     setupNotification();
     
     // don't use guard thread
@@ -69,6 +96,7 @@ public final class WigleService extends Service {
   @Override
   public void onDestroy() {
     ListActivity.info( "service: onDestroy" );
+    // Make sure our notification is gone.
     shutdownNotification();
     setDone();
     super.onDestroy();
@@ -103,16 +131,11 @@ public final class WigleService extends Service {
   }
 
   private void shutdownNotification() {
-    final NotificationManager notificationManager = 
-      (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
-    notificationManager.cancel( NOTIFICATION_ID );
+    stopForegroundCompat( NOTIFICATION_ID );
   }
   
   private void setupNotification() {
     if ( ! done.get() ) {
-      final NotificationManager notificationManager = 
-        (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
-      
       final int icon = R.drawable.wiglewifi;
       final long when = System.currentTimeMillis();
       final String title = "Wigle Wifi Service";
@@ -130,8 +153,60 @@ public final class WigleService extends Service {
       }      
       notification.setLatestEventInfo( context, title, text, contentIntent );
       
-      notificationManager.notify( NOTIFICATION_ID, notification );
+      startForegroundCompat( NOTIFICATION_ID, notification );
     }
+  }
+  
+  /**
+   * This is a wrapper around the new startForeground method, using the older
+   * APIs if it is not available.
+   */
+  private void startForegroundCompat(int id, Notification notification) {
+    // If we have the new startForeground API, then use it.
+    if (mStartForeground != null) {
+        mStartForegroundArgs[0] = Integer.valueOf(id);
+        mStartForegroundArgs[1] = notification;
+        try {
+            mStartForeground.invoke(this, mStartForegroundArgs);
+        } catch (InvocationTargetException e) {
+            // Should not happen.
+            ListActivity.warn("Unable to invoke startForeground", e);
+        } catch (IllegalAccessException e) {
+            // Should not happen.
+            ListActivity.warn("Unable to invoke startForeground", e);
+        }
+        return;
+    }
+
+    // Fall back on the old API.
+    setForeground(true);
+    mNM.notify(id, notification);
+}
+
+  /**
+   * This is a wrapper around the new stopForeground method, using the older
+   * APIs if it is not available.
+   */
+  private void stopForegroundCompat(int id) {
+    // If we have the new stopForeground API, then use it.
+    if (mStopForeground != null) {
+        mStopForegroundArgs[0] = Boolean.TRUE;
+        try {
+            mStopForeground.invoke(this, mStopForegroundArgs);
+        } catch (InvocationTargetException e) {
+            // Should not happen.
+            ListActivity.warn("Unable to invoke stopForeground", e);
+        } catch (IllegalAccessException e) {
+            // Should not happen.
+            ListActivity.warn("Unable to invoke stopForeground", e);
+        }
+        return;
+    }
+
+    // Fall back on the old API.  Note to cancel BEFORE changing the
+    // foreground state, since we could be killed at that point.
+    mNM.cancel(id);
+    setForeground(false);
   }
   
 }

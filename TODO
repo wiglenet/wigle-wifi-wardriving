@@ -20,12 +20,14 @@ show new networks since last upload
 --- done ---
 * 1.30
 Fix binding of app to service, should help stay alive when in background
+Use setForeground service api, if supported, to increase service priority
+Update service's notificaton with some stats occasionally
 If scanning is on, but no response from wifi manager after 90 seconds, the wifi
   in the OS is probably jammed, so restart it (with audio and toast warning)
-Update service notificaton string with some stats occasionally
+Added a setting to allow adjustment of wifi scan rate when still (0 mph)
 
 * 1.29
-Added a setting to allow adjustment gps scan rate manually
+Added a setting to allow adjustment of gps scan rate manually
 Update osmdroid
 
 * 1.28

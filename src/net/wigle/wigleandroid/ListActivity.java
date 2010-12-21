@@ -151,7 +151,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     public static final long DEFAULT_SPEECH_PERIOD = 60L;
     public static final long LOCATION_UPDATE_INTERVAL = 1000L;
+    public static final long SCAN_STILL_DEFAULT = 3000L;
     public static final long SCAN_DEFAULT = 2000L;
+    public static final long SCAN_FAST_DEFAULT = 1000L;
     
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";

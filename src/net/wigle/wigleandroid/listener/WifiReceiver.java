@@ -435,15 +435,18 @@ public class WifiReceiver extends BroadcastReceiver {
     final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     String scanPref = ListActivity.PREF_SCAN_PERIOD;
+    long defaultRate = ListActivity.SCAN_DEFAULT;
     // if over 5 mph
     final Location location = listActivity.getGPSListener().getLocation();
     if ( location != null && location.getSpeed() >= 2.2352f ) {
       scanPref = ListActivity.PREF_SCAN_PERIOD_FAST;
+      defaultRate = ListActivity.SCAN_FAST_DEFAULT;
     }
     else if ( location == null || location.getSpeed() < 0.1f ) {
       scanPref = ListActivity.PREF_SCAN_PERIOD_STILL;
+      defaultRate = ListActivity.SCAN_STILL_DEFAULT;
     }
-    return prefs.getLong( scanPref, ListActivity.SCAN_DEFAULT );    
+    return prefs.getLong( scanPref, defaultRate );    
   }
   
   public void scheduleScan() {

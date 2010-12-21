@@ -256,11 +256,11 @@ public final class SettingsActivity extends Activity {
       
       // period spinners
       doScanSpinner( R.id.periodstill_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_DEFAULT, "Nonstop" );
+          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_STILL_DEFAULT, "Nonstop" );
       doScanSpinner( R.id.period_spinner, 
           ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, "Nonstop" );
       doScanSpinner( R.id.periodfast_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_DEFAULT, "Nonstop" );
+          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_FAST_DEFAULT, "Nonstop" );
       doScanSpinner( R.id.gps_spinner, 
           ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, "Tie to Wifi Scan Period" );
       

@@ -467,6 +467,8 @@ public class WifiReceiver extends BroadcastReceiver {
     boolean retval = false;
     if ( listActivity.isUploading() ) {
       ListActivity.info( "uploading, not scanning for now" );
+      // reset this
+      lastScanResponseTime = Long.MIN_VALUE;
     }
     else if (listActivity.isScanning()){
       retval = wifiManager.startScan();
@@ -498,6 +500,8 @@ public class WifiReceiver extends BroadcastReceiver {
       listActivity.setStatusUI( "Scanning Turned Off" );
       // keep the scan times from getting huge
       scanRequestTime = System.currentTimeMillis();
+      // reset this
+      lastScanResponseTime = Long.MIN_VALUE;
     }
     return retval;
   }

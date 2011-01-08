@@ -13,10 +13,12 @@ import java.util.Locale;
 import java.util.Set;
 
 import net.wigle.wigleandroid.CacheMap;
+import net.wigle.wigleandroid.DashboardActivity;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
+import net.wigle.wigleandroid.NetworkType;
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.andnav.osm.util.GeoPoint;
@@ -30,6 +32,9 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.telephony.CellLocation;
+import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.widget.Toast;
 
 public class WifiReceiver extends BroadcastReceiver {
@@ -341,10 +346,58 @@ public class WifiReceiver extends BroadcastReceiver {
       prevGpsLocation = location;
     }
     
+    recordCellInfo(location);
+    
     final long speechPeriod = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
       doAnnouncement( preQueueSize, newNetCount, now );
     }
+  }
+  
+  private void recordCellInfo(final Location location) {
+    TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
+    if ( tele != null ) {
+      CellLocation cellLocation = tele.getCellLocation();
+      if ( cellLocation instanceof GsmCellLocation ) {
+        GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
+        //dbHelper.recordCellInfo(location, gsmCellLocation)
+        PhoneState phoneState = listActivity.getPhoneState();
+        int strength = 0;
+//        String operatorAlphaLong = "";
+        if (phoneState != null) {
+          strength = phoneState.getStrength();
+//          ServiceState serviceState = phoneState.getServiceState();
+//          // ListActivity.info( "serviceState: " + serviceState );
+//          if ( serviceState != null ) {
+//            operatorAlphaLong = serviceState.getOperatorAlphaLong();            
+//          }
+        }
+        
+        if (false){
+          ListActivity.info( "----------------" );
+          ListActivity.info( "lac: " + gsmCellLocation.getLac() );
+          ListActivity.info( "cid: " + gsmCellLocation.getCid() );
+          ListActivity.info( "operator: " + tele.getNetworkOperator() ); 
+          ListActivity.info( "operator iso: " + tele.getNetworkCountryIso() );
+          ListActivity.info( "operator name: " + tele.getNetworkOperatorName() ); 
+          ListActivity.info( "strength: " + strength );
+          ListActivity.info( "location: " + location );
+        }
+        
+        final String bssid = Integer.toHexString( Integer.parseInt( tele.getNetworkOperator() ) )
+            + "_" + Integer.toHexString( gsmCellLocation.getLac() )
+            + "_" + Integer.toHexString( gsmCellLocation.getCid() );
+        final String ssid = tele.getNetworkOperatorName();
+        
+        final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
+        
+        Network network = networkCache.get( bssid );
+        if ( network == null ) {
+          network = new Network( bssid, ssid, 0, "", strength, NetworkType.GSM );
+          networkCache.put( network.getBssid(), network );
+        }
+      }
+    }    
   }
   
   private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {
@@ -367,7 +420,8 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_MILES, true ) ) {
       final float dist = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
-      builder.append( "from " ).append( numberFormat1.format( dist / 1609.344f ) ).append( " miles, " );
+      final String distString = DashboardActivity.metersToString(numberFormat1, listActivity, dist);
+      builder.append( "from " ).append( distString );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
       String time = timeFormat.format( new Date() );

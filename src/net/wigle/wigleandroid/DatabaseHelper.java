@@ -810,7 +810,9 @@ public final class DatabaseHelper extends Thread {
         final String ssid = cursor.getString(0);
         final int frequency = cursor.getInt(1);
         final String capabilities = cursor.getString(2);
-        retval = new Network( bssid, ssid, frequency, capabilities, 0 );
+        // final NetworkType type = NetworkType.meh( cursor.getString(3) );
+        final NetworkType type = NetworkType.WIFI;
+        retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
         ListActivity.getNetworkCache().put( bssid, retval );
       }
       cursor.close();

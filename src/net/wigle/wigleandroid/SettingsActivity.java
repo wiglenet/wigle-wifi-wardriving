@@ -179,6 +179,15 @@ public final class SettingsActivity extends Activity {
           }
       });
       
+      final CheckBox useMetric = (CheckBox) findViewById(R.id.use_metric);
+      useMetric.setChecked( prefs.getBoolean( ListActivity.PREF_METRIC, false ) );
+      useMetric.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
+              editor.putBoolean( ListActivity.PREF_METRIC, isChecked );
+              editor.commit();
+          }
+      });
+      
       final Button button = (Button) findViewById( R.id.speech_button );
       button.setOnClickListener( new OnClickListener() {
           public void onClick( final View view ) {

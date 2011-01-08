@@ -18,6 +18,9 @@ remember zoom level on map
 show new networks since last upload
 
 --- done ---
+* 1.32
+Added setting to use english or metric units
+
 * 1.30
 Fix binding of app to service, should help stay alive when in background
 Use setForeground service api, if supported, to increase service priority

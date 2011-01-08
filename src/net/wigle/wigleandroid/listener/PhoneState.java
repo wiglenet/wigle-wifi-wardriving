@@ -1,11 +1,16 @@
 package net.wigle.wigleandroid.listener;
 
 import net.wigle.wigleandroid.ListActivity;
+import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
+import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 
 public class PhoneState extends PhoneStateListener {
   private boolean isPhoneActive = false;
+  private int strength = 0;
+  private ServiceState serviceState;
   
   @Override
   public void onCallStateChanged( int state, String incomingNumber ) {
@@ -23,8 +28,37 @@ public class PhoneState extends PhoneStateListener {
         ListActivity.info( "unhandled call state: " + state );
     }
   }
- 
+  
+  @Override
+  public void onServiceStateChanged(ServiceState serviceState) {
+    // ListActivity.info("serviceState: " + serviceState);
+    this.serviceState = serviceState;
+  }
+  
+  @Override
+  public void onSignalStrengthChanged(final int asu) {
+    // ListActivity.info("strength: " + asu);
+    strength = asu;
+  }
+  
+  @Override
+  public void onCellLocationChanged(CellLocation cellLoc){    
+    if ( cellLoc instanceof GsmCellLocation) {
+      GsmCellLocation gsmCell = (GsmCellLocation) cellLoc;
+      ListActivity.info("cell location changed: gsm Cid: " + gsmCell.getCid());
+      ListActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());
+    }
+  }
+  
   public boolean isPhoneActive() {
     return isPhoneActive;
+  }
+  
+  public int getStrength() {
+    return strength;
+  }
+  
+  public ServiceState getServiceState() {
+    return serviceState;
   }
 }

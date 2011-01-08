@@ -141,6 +141,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_PREV_LON = "prevLon";
     public static final String PREF_LIST_SORT = "listSort";
     public static final String PREF_SCAN_RUNNING = "scanRunning";
+    public static final String PREF_METRIC = "metric";
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW = "speakNew";
@@ -326,6 +327,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       return state.gpsListener;
     }
     
+    public PhoneState getPhoneState() {
+      return state.phoneState;
+    }
+    
     public boolean isFinishing() {
       return state.finishing.get();
     }
@@ -482,6 +487,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         info( "turning back off wifi" );
         wifiManager.setWifiEnabled( false );
+      }
+      
+      TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
+      if ( tele != null && state.phoneState != null ) {
+        tele.listen( state.phoneState, PhoneStateListener.LISTEN_NONE );
       }
       
       if ( state.tts != null ) {
@@ -799,8 +809,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
       // emulator crashes if you ask this
       if ( ! state.inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) && state.gpsListener == null ) {
-        Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
-            Toast.LENGTH_LONG ).show();
+        //Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
+        //    Toast.LENGTH_LONG ).show();
       }
 
       if ( state.gpsListener == null ) {
@@ -862,13 +872,29 @@ public final class ListActivity extends Activity implements FileUploaderListener
       tv.setText( "Lon: " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
       
       tv = (TextView) this.findViewById( R.id.LocationTextView03 );
-      tv.setText( "Speed: " + (location == null ? "" : state.numberFormat1.format( location.getSpeed() * 2.23693629f ) + "mph" ) );
+      tv.setText( "Speed: " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
       
       tv = (TextView) this.findViewById( R.id.LocationTextView04 );
       tv.setText( location == null ? "" : ("+/- " + state.numberFormat1.format( location.getAccuracy() ) + "m") );
       
       tv = (TextView) this.findViewById( R.id.LocationTextView05 );
       tv.setText( location == null ? "" : ("Alt: " + state.numberFormat1.format( location.getAltitude() ) + "m") );
+    }
+    
+    public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
+        final float metersPerSecond ) {
+      
+      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
+      
+      String retval = null;
+      if ( metric ) {
+        retval = numberFormat.format( metersPerSecond * 3.6 ) + " kmph";
+      }
+      else {
+        retval = numberFormat.format( metersPerSecond * 2.23693629f ) + " mph";
+      }
+      return retval;
     }
     
     private void setupUploadButton() {
@@ -943,7 +969,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
       TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
       if ( tele != null && state.phoneState == null ) {
         state.phoneState = new PhoneState();
-        tele.listen( state.phoneState, PhoneStateListener.LISTEN_CALL_STATE );
+        tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
+            | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH );
       }
       
       setupMuteButton();

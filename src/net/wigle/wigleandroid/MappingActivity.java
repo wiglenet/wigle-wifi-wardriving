@@ -207,7 +207,7 @@ public final class MappingActivity extends Activity {
   @Override
   public void onResume() {
     ListActivity.info( "resume mapping." );
-    myLocationOverlay.enableCompass();
+    myLocationOverlay.enableCompass();    
     myLocationOverlay.enableMyLocation();
     
     super.onResume();

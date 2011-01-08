@@ -68,6 +68,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
+        
+<CheckBox android:id="@+id/use_metric"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_metric" />
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"

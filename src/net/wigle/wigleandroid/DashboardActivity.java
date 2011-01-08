@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.media.AudioManager;
@@ -101,17 +102,31 @@ public class DashboardActivity extends Activity {
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     float dist = prefs.getFloat( pref, 0f );
-    String distString = null;
-    // english? metric? we've got the f'in gun!
-    if ( dist > 1000f ) {
-      distString = numberFormat.format( dist / 1609.344f ) + " miles";
+    final String distString = metersToString( numberFormat, this, dist );
+    final TextView tv = (TextView) findViewById( id );
+    tv.setText( title + distString );    
+  }
+  
+  public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters ) {
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
+    
+    String retval = null;
+    if ( meters > 1000f ) {
+      if ( metric ) {
+        retval = numberFormat.format( meters / 1000f ) + " km";
+      }
+      else {
+        retval = numberFormat.format( meters / 1609.344f ) + " miles";
+      }
+    }
+    else if ( metric ){
+      retval = numberFormat.format( meters ) + " meters";
     }
     else {
-      distString = numberFormat.format( dist ) + " meters";
+      retval = numberFormat.format( meters * 3.2808399f  ) + " feet";
     }
-    final TextView tv = (TextView) findViewById( id );
-    tv.setText( title + distString );
-    
+    return retval;
   }
   
   @Override

@@ -18,6 +18,8 @@ public final class Network {
   private final Integer channel;
   private final String showCapabilities;
   private final int crypto;
+  private final NetworkType type;
+  
   private String detail;
   private final long constructionTime = System.currentTimeMillis();
   
@@ -82,16 +84,19 @@ public final class Network {
    * @param scanResult a result from a wifi scan
    */
   public Network( final ScanResult scanResult ) {
-    this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities, scanResult.level );
+    this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities, 
+        scanResult.level, NetworkType.WIFI );
   }
   
-  public Network( final String bssid, final String ssid, final int frequency, final String capabilities, final int level ) {
+  public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+      final int level, final NetworkType type ) {
     
     this.bssid = ( bssid == null ) ? "" : bssid;
     this.ssid = ( ssid == null ) ? "" : ssid;
     this.frequency = frequency;
     this.capabilities = ( capabilities == null ) ? "" : capabilities;
     this.level = level;
+    this.type = type;
     this.channel = freqToChan.get( frequency );
     
     if ( this.capabilities.length() > 16 ) {
@@ -137,6 +142,10 @@ public final class Network {
 
   public int getLevel() {
     return level;
+  }
+  
+  public NetworkType getType() {
+    return type;
   }
   
   public Integer getChannel() {

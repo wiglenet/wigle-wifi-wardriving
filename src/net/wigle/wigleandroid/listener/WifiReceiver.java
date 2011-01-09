@@ -225,7 +225,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     // check if there are more "New" nets
-    final long newNetCount = dbHelper.getNewNetworkCount();
+    final long newNetCount = dbHelper.getNewNetworkWifiCount();
     final long newNetDiff = newNetCount - prevNewNetCount;
     prevNewNetCount = newNetCount;
     
@@ -261,7 +261,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     listAdapter.sort( comparator );
 
-    final long dbNets = dbHelper.getNetworkCount();
+    final long dbNets = dbHelper.getNetworkWifiCount();
     final long dbLocs = dbHelper.getLocationCount();
     
     // update stat
@@ -376,7 +376,7 @@ public class WifiReceiver extends BroadcastReceiver {
       else if ( cellLocation instanceof GsmCellLocation ) {
         GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
         bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
-        type = NetworkType.CDMA;
+        type = NetworkType.GSM;
       }
       
       if ( bssid != null ) {
@@ -400,11 +400,15 @@ public class WifiReceiver extends BroadcastReceiver {
         final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
         
         Network network = networkCache.get( bssid );
+        boolean newForRun = false;
         if ( network == null ) {
           network = new Network( bssid, ssid, 0, capabilities, strength, type );
           networkCache.put( network.getBssid(), network );
+          newForRun = true;
         }
-        //dbHelper.recordCellInfo(location, gsmCellLocation)
+        if ( location != null ) {
+          dbHelper.addObservation(network, location, newForRun);
+        }
       }
     }    
   }

@@ -293,9 +293,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
       TextView tv = (TextView) findViewById( R.id.stats_run );
       tv.setText( "Run: " + state.wifiReceiver.getRunNetworkCount() );
       tv = (TextView) findViewById( R.id.stats_new );
-      tv.setText( "New: " + state.dbHelper.getNewNetworkCount() );
+      tv.setText( "New: " + state.dbHelper.getNewNetworkWifiCount() );
       tv = (TextView) findViewById( R.id.stats_dbnets );
-      tv.setText( "DB: " + state.dbHelper.getNetworkCount() );
+      tv.setText( "DB: " + state.dbHelper.getNetworkWifiCount() );
     }
     
     public void setStatusUI( String status ) {

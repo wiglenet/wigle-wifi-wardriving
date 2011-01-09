@@ -57,20 +57,21 @@ public final class DatabaseHelper extends Thread {
   private static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
     "create table " + NETWORK_TABLE + " ( "
-    + "bssid varchar(20) primary key not null,"
+    + "bssid text primary key not null,"
     + "ssid text not null,"
     + "frequency int not null,"
     + "capabilities text not null,"
     + "lasttime long not null,"
     + "lastlat double not null,"
-    + "lastlon double not null"
+    + "lastlon double not null,"
+    + "type text not null default '" + NetworkType.WIFI.getCode() + "'"
     + ")";
   
   private static final String LOCATION_TABLE = "location";
   private static final String LOCATION_CREATE =
     "create table " + LOCATION_TABLE + " ( "
     + "_id integer primary key autoincrement,"
-    + "bssid varchar(20) not null,"
+    + "bssid text not null,"
     + "level integer not null,"
     + "lat double not null,"
     + "lon double not null,"
@@ -89,9 +90,9 @@ public final class DatabaseHelper extends Thread {
   private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
   private final AtomicBoolean done = new AtomicBoolean(false);
-  private final AtomicLong networkCount = new AtomicLong();
+  private final AtomicLong networkWifiCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
-  private final AtomicLong newNetworkCount = new AtomicLong();
+  private final AtomicLong newNetworkWifiCount = new AtomicLong();
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
@@ -207,8 +208,10 @@ public final class DatabaseHelper extends Thread {
       Process.setThreadPriority( DB_PRIORITY );
       
       try {
-        getNetworkCountFromDB();
+        getNetworkWifiCountFromDB();
         getLocationCountFromDB();
+        ListActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
+        ListActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
       }
       catch ( SQLiteException ex ) {
         ListActivity.error( "exception getting counts from db: " + ex, ex );
@@ -319,6 +322,10 @@ public final class DatabaseHelper extends Thread {
       ListActivity.info( "creating network table" );
       try {
         db.execSQL(NETWORK_CREATE);
+        if ( db.getVersion() == 0 ) {
+          // only diff to version 1 is the "type" column in network table
+          db.setVersion(1);
+        }
       }
       catch ( final SQLiteException ex ) {
         ListActivity.error( "sqlite exception: " + ex, ex );
@@ -351,9 +358,19 @@ public final class DatabaseHelper extends Thread {
     // keep around the journal file, don't create and delete a ton of times
     db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null ).close();
     
+    ListActivity.info( "database version: " + db.getVersion() );
+    if ( db.getVersion() == 0 ) {
+      ListActivity.info("upgrading db from 0 to 1");
+      db.execSQL( "ALTER TABLE network ADD COLUMN type text not null default '" + NetworkType.WIFI.getCode() + "'" );
+      db.setVersion(1);
+    }
+    
+    // index the type
+    db.execSQL("CREATE INDEX IF NOT EXISTS type ON network (type)");
+    
     // compile statements
     insertNetwork = db.compileStatement( "INSERT INTO network"
-        + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon) VALUES (?,?,?,?,?,?,?)" );
+        + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type) VALUES (?,?,?,?,?,?,?,?)" );
     
     insertLocation = db.compileStatement( "INSERT INTO location"
         + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
@@ -475,6 +492,7 @@ public final class DatabaseHelper extends Thread {
         insertNetwork.bindLong( 5, location.getTime() );
         insertNetwork.bindDouble( 6, location.getLatitude() );
         insertNetwork.bindDouble( 7, location.getLongitude() );
+        insertNetwork.bindString( 8, network.getType().getCode() );
         
         start = System.currentTimeMillis();
         // INSERT
@@ -482,7 +500,7 @@ public final class DatabaseHelper extends Thread {
         logTime( start, "db network inserted: " + bssid + " drainSize: " + drainSize );
         
         // update the count
-        networkCount.incrementAndGet();
+        networkWifiCount.incrementAndGet();
         isNew = true;
         
         // to make sure this new network's location is written
@@ -504,8 +522,8 @@ public final class DatabaseHelper extends Thread {
       }
     }
     
-    if ( isNew ) {
-      newNetworkCount.incrementAndGet();
+    if ( isNew && NetworkType.WIFI.equals(network.getType()) ) {
+      newNetworkWifiCount.incrementAndGet();
     }
     
     final boolean fastMode = isFastMode();
@@ -768,16 +786,20 @@ public final class DatabaseHelper extends Thread {
    * get the number of networks new to the db for this run
    * @return number of new networks
    */
-  public long getNewNetworkCount() {
-    return newNetworkCount.get();
+  public long getNewNetworkWifiCount() {
+    return newNetworkWifiCount.get();
   }
   
-  public long getNetworkCount() {
-    return networkCount.get();
+  public long getNetworkWifiCount() {
+    return networkWifiCount.get();
   }
   
-  private void getNetworkCountFromDB() {
-    networkCount.set( getCountFromDB( NETWORK_TABLE ) );
+  private void getNetworkWifiCountFromDB() {
+    networkWifiCount.set( getNetworkCountFromDB( NetworkType.WIFI ) );
+  }
+  
+  private long getNetworkCountFromDB(NetworkType type) {
+    return getCountFromDB( NETWORK_TABLE + " WHERE type = '" + type.getCode() + "'" );
   }
   
   public long getLocationCount() {
@@ -822,15 +844,14 @@ public final class DatabaseHelper extends Thread {
     if ( retval == null ) {
       checkDB();
       final String[] args = new String[]{ bssid };
-      final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities FROM " + NETWORK_TABLE 
+      final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type FROM " + NETWORK_TABLE 
           + " WHERE bssid = ?", args);
       if ( cursor.getCount() > 0 ) {
         cursor.moveToFirst();
         final String ssid = cursor.getString(0);
         final int frequency = cursor.getInt(1);
         final String capabilities = cursor.getString(2);
-        // final NetworkType type = NetworkType.meh( cursor.getString(3) );
-        final NetworkType type = NetworkType.WIFI;
+        final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
         retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
         ListActivity.getNetworkCache().put( bssid, retval );
       }

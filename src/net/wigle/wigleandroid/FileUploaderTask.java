@@ -469,7 +469,7 @@ public final class FileUploaderTask extends Thread {
     final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
     
     // name, version, header
-    final String header = "WigleWifi-1.1"
+    final String header = "WigleWifi-1.2"
         + ",appRelease=" + pi.versionName
         + ",model=" + android.os.Build.MODEL
         + ",release=" + android.os.Build.VERSION.RELEASE
@@ -478,7 +478,7 @@ public final class FileUploaderTask extends Thread {
         + ",board=" + android.os.Build.BOARD
         + ",brand=" + android.os.Build.BRAND
         + "\n" 
-        + "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters\n";
+        + "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
     writeFos( fos, header );
     
     // assume header is all byte per char
@@ -557,6 +557,8 @@ public final class FileUploaderTask extends Thread {
           singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
           charBuffer.append( COMMA );
           singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
+          charBuffer.append( COMMA );
+          charBuffer.append( network.getType().name() );          
           charBuffer.append( NEWLINE );
         }
         catch ( BufferOverflowException ex ) {

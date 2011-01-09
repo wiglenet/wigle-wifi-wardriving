@@ -775,6 +775,7 @@ public final class DatabaseHelper extends Thread {
   public long getNetworkCount() {
     return networkCount.get();
   }
+  
   private void getNetworkCountFromDB() {
     networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
@@ -783,9 +784,27 @@ public final class DatabaseHelper extends Thread {
     return locationCount.get();
   }
   
-  /** careful with threading on this one */
-  public void getLocationCountFromDB() {
-    locationCount.set( getCountFromDB( LOCATION_TABLE ) );
+  private void getLocationCountFromDB() {
+    final long count = getCountFromDB( LOCATION_TABLE );
+    locationCount.set( count );
+    setupMaxidDebug( count );
+  }
+  
+  private void setupMaxidDebug( final long locCount ) {
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final long maxid = prefs.getLong( ListActivity.PREF_DB_MARKER, -1L );
+    final Editor edit = prefs.edit();
+    edit.putLong( ListActivity.PREF_MAX_DB, locCount );
+    
+    if ( maxid == -1L ) {    
+      if ( locCount > 0 ) {
+        // there is no preference set, yet there are locations, this is likely
+        // a developer testing a new install on an old db, so set the pref.
+        ListActivity.info( "setting db marker to: " + locCount );
+        edit.putLong( ListActivity.PREF_DB_MARKER, locCount );
+      }
+    }
+    edit.commit();
   }
   
   private long getCountFromDB( final String table ) {

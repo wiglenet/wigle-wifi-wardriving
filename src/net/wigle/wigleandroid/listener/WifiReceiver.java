@@ -357,45 +357,54 @@ public class WifiReceiver extends BroadcastReceiver {
   private void recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
     if ( tele != null ) {
+      String bssid = null;
+      NetworkType type = null;
+      
       CellLocation cellLocation = tele.getCellLocation();
-      if ( cellLocation instanceof GsmCellLocation ) {
+      if ( cellLocation.getClass().getSimpleName().equals("CdmaCellLocation") ) {
+        try {
+          final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
+          final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);
+          final int baseStationId = (Integer) cellLocation.getClass().getMethod("getBaseStationId").invoke(cellLocation);
+          bssid = systemId + "_" + networkId + "_" + baseStationId;
+          type = NetworkType.CDMA;
+        }
+        catch ( Exception ex ) {
+          ListActivity.error("cdma reflection exception: " + ex);
+        }        
+      }
+      else if ( cellLocation instanceof GsmCellLocation ) {
         GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-        //dbHelper.recordCellInfo(location, gsmCellLocation)
-        PhoneState phoneState = listActivity.getPhoneState();
+        bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
+        type = NetworkType.CDMA;
+      }
+      
+      if ( bssid != null ) {
+        final String ssid = tele.getNetworkOperatorName();
+        final String capabilities = tele.getNetworkCountryIso();
+        
         int strength = 0;
-//        String operatorAlphaLong = "";
+        PhoneState phoneState = listActivity.getPhoneState();
         if (phoneState != null) {
           strength = phoneState.getStrength();
-//          ServiceState serviceState = phoneState.getServiceState();
-//          // ListActivity.info( "serviceState: " + serviceState );
-//          if ( serviceState != null ) {
-//            operatorAlphaLong = serviceState.getOperatorAlphaLong();            
-//          }
         }
         
-        if (false){
-          ListActivity.info( "----------------" );
-          ListActivity.info( "lac: " + gsmCellLocation.getLac() );
-          ListActivity.info( "cid: " + gsmCellLocation.getCid() );
-          ListActivity.info( "operator: " + tele.getNetworkOperator() ); 
-          ListActivity.info( "operator iso: " + tele.getNetworkCountryIso() );
-          ListActivity.info( "operator name: " + tele.getNetworkOperatorName() ); 
+        if ( false ) {
+          ListActivity.info( "bssid: " + bssid );        
           ListActivity.info( "strength: " + strength );
+          ListActivity.info( "ssid: " + ssid ); 
+          ListActivity.info( "capabilities: " + capabilities );           
           ListActivity.info( "location: " + location );
         }
-        
-        final String bssid = Integer.toHexString( Integer.parseInt( tele.getNetworkOperator() ) )
-            + "_" + Integer.toHexString( gsmCellLocation.getLac() )
-            + "_" + Integer.toHexString( gsmCellLocation.getCid() );
-        final String ssid = tele.getNetworkOperatorName();
-        
+                
         final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
         
         Network network = networkCache.get( bssid );
         if ( network == null ) {
-          network = new Network( bssid, ssid, 0, "", strength, NetworkType.GSM );
+          network = new Network( bssid, ssid, 0, capabilities, strength, type );
           networkCache.put( network.getBssid(), network );
         }
+        //dbHelper.recordCellInfo(location, gsmCellLocation)
       }
     }    
   }

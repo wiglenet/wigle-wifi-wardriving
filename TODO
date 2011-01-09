@@ -20,6 +20,9 @@ show new networks since last upload
 --- done ---
 * 1.32
 Added setting to use english or metric units
+Added "New Nets Since Upload" to Dashboard
+Improved startup time by delaying location count query
+Allow installation on SD card
 
 * 1.30
 Fix binding of app to service, should help stay alive when in background

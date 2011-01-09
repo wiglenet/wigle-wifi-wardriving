@@ -9,7 +9,7 @@ import android.telephony.gsm.GsmCellLocation;
 
 public class PhoneState extends PhoneStateListener {
   private boolean isPhoneActive = false;
-  private int strength = 0;
+  protected int strength = 0;
   private ServiceState serviceState;
   
   @Override
@@ -42,8 +42,11 @@ public class PhoneState extends PhoneStateListener {
   }
   
   @Override
-  public void onCellLocationChanged(CellLocation cellLoc){    
-    if ( cellLoc instanceof GsmCellLocation) {
+  public void onCellLocationChanged(CellLocation cellLoc){  
+    if ( cellLoc.getClass().getSimpleName().equals("CdmaCellLocation") ) {
+      ListActivity.info("cell location changed: cdma: " + cellLoc);
+    }
+    else if ( cellLoc instanceof GsmCellLocation) {
       GsmCellLocation gsmCell = (GsmCellLocation) cellLoc;
       ListActivity.info("cell location changed: gsm Cid: " + gsmCell.getCid());
       ListActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());

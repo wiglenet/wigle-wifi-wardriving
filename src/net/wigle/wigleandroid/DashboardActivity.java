@@ -76,6 +76,9 @@ public class DashboardActivity extends Activity {
     tv = (TextView) findViewById( R.id.currnets );
     tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );
     
+    tv = (TextView) findViewById( R.id.newNetsSinceUpload );
+    tv.setText( "New Nets Since Upload: " + newNetsSinceUpload() );        
+    
     updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, "Total Distance: " );
     updateDist( R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, "Previous Run: " );
@@ -88,7 +91,7 @@ public class DashboardActivity extends Activity {
     
     tv = (TextView) findViewById( R.id.dbLocs );
     tv.setText( "DB Locations: " + ListActivity.lameStatic.dbLocs );
-    
+        
     tv = (TextView) findViewById( R.id.gpsstatus );
     Location location = ListActivity.lameStatic.location;
     String gpsStatus = "No Location!";
@@ -96,6 +99,16 @@ public class DashboardActivity extends Activity {
       gpsStatus = location.getProvider();
     }
     tv.setText( "Loc: " + gpsStatus );
+  }
+  
+  private long newNetsSinceUpload() {
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final long uploaded = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+    long newSinceUpload = ListActivity.lameStatic.dbLocs - uploaded;
+    if ( newSinceUpload < 0 ) {
+      newSinceUpload = 0;
+    }
+    return newSinceUpload;
   }
   
   private void updateDist( final int id, final String pref, final String title ) {

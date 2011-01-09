@@ -25,6 +25,7 @@ import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
+import net.wigle.wigleandroid.listener.PhoneStateFactory;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 
 import org.andnav.osm.util.GeoPoint;
@@ -269,8 +270,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
         setupService();
         info( "setupDatabase" );
         setupDatabase();
-        info( "setupMaxidDebug" );
-        setupMaxidDebug();
         info( "setupUploadButton" );
         setupUploadButton();
         info( "setupList" );
@@ -968,9 +967,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
       if ( tele != null && state.phoneState == null ) {
-        state.phoneState = new PhoneState();
+        state.phoneState = PhoneStateFactory.createPhoneState();
+        final int signal_strengths = 256;
         tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
-            | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH );
+            | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH | signal_strengths );
       }
       
       setupMuteButton();
@@ -1253,26 +1253,5 @@ public final class ListActivity extends Activity implements FileUploaderListener
         ListActivity.info( "no sd card apparently: " + ex, ex );
       }
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
-    }
-    
-    private void setupMaxidDebug() {
-      final SharedPreferences prefs = ListActivity.this.getSharedPreferences( SHARED_PREFS, 0 );
-      final long maxid = prefs.getLong( PREF_DB_MARKER, -1L );
-      // load up the local value
-      state.dbHelper.getLocationCountFromDB();
-      final long loccount = state.dbHelper.getLocationCount();
-      
-      final Editor edit = prefs.edit();
-      edit.putLong( PREF_MAX_DB, loccount );
-      
-      if ( maxid == -1L ) {    
-        if ( loccount > 0 ) {
-          // there is no preference set, yet there are locations, this is likely
-          // a developer testing a new install on an old db, so set the pref.
-          info( "setting db marker to: " + loccount );
-          edit.putLong( PREF_DB_MARKER, loccount );
-        }
-      }
-      edit.commit();
-    }
+    }        
 }

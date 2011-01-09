@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.wigle.wigleandroid"
       android:versionCode="32"
-      android:versionName="1.32">
+      android:versionName="1.32"
+      android:installLocation="auto">
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name" android:debuggable="false">
     	<activity android:name=".MainActivity" android:label="@string/app_name"
           		  android:theme="@android:style/Theme.NoTitleBar"
@@ -87,7 +88,7 @@
    	android:normalScreens="true"
    	android:largeScreens="true"
 />
-<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8" />
 
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>

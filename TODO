@@ -22,6 +22,7 @@ Improved startup time by delaying location count query
 Allow installation on SD card
 Record and upload cell tower observations
 Make sure last scan response time is set to stop wifi locked up false positives
+Downgraded osmdroid to r509 until can figure out why they load slower now
 
 * 1.30
 Fix binding of app to service, should help stay alive when in background

@@ -3,8 +3,6 @@
 select a net, see observations
 lock screen on, lock UI
 show IEEE octet info
-english/metric toggle
-minimap in dashboard? list of ssids?
 seen-networks map tile overlays
 
 --- user suggested ---
@@ -15,7 +13,6 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 remember zoom level on map
-show new networks since last upload
 
 --- done ---
 * 1.32

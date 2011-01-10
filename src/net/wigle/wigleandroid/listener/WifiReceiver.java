@@ -356,7 +356,7 @@ public class WifiReceiver extends BroadcastReceiver {
   
   private void recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
-    if ( tele != null ) {
+    if ( tele != null && tele.getCellLocation() != null ) {
       String bssid = null;
       NetworkType type = null;
       

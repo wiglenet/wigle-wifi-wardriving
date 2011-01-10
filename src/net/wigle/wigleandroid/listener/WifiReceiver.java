@@ -356,12 +356,15 @@ public class WifiReceiver extends BroadcastReceiver {
   
   private void recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
-    if ( tele != null && tele.getCellLocation() != null ) {
+    if ( tele != null ) {
       String bssid = null;
       NetworkType type = null;
       
       CellLocation cellLocation = tele.getCellLocation();
-      if ( cellLocation.getClass().getSimpleName().equals("CdmaCellLocation") ) {
+      if ( cellLocation == null ) {
+        // ignore
+      }
+      else if ( cellLocation.getClass().getSimpleName().equals("CdmaCellLocation") ) {
         try {
           final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
           final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);

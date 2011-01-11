@@ -61,8 +61,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
       }
     }
     else {
-      // until we get some cdma/gsm icons
-      ico.setImageResource(0);
+      ico.setImageResource( R.drawable.tower_ico );
     }
       
     TextView tv = (TextView) row.findViewById( R.id.ssid ); 

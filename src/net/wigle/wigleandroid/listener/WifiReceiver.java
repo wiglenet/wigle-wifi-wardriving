@@ -397,6 +397,10 @@ public class WifiReceiver extends BroadcastReceiver {
           strength = phoneState.getStrength();
         }
         
+        if ( NetworkType.GSM.equals(type) ) {
+          strength = gsmRssiMagicDecoderRing( strength );
+        }
+        
         if ( false ) {
           ListActivity.info( "bssid: " + bssid );        
           ListActivity.info( "strength: " + strength );
@@ -414,6 +418,9 @@ public class WifiReceiver extends BroadcastReceiver {
           networkCache.put( network.getBssid(), network );
           newForRun = true;
         }
+        else {
+          network.setLevel(strength);
+        }
         if ( location != null ) {
           dbHelper.addObservation(network, location, newForRun);
         }
@@ -421,6 +428,19 @@ public class WifiReceiver extends BroadcastReceiver {
     }   
     
     return network;
+  }
+  
+  private int gsmRssiMagicDecoderRing( int strength ) {
+    int retval = -113;
+    if ( strength == 99 ) {
+      // unknown
+      retval = -113;
+    }
+    else {
+      retval = ((strength - 31) * 2) - 51;
+    }
+    // ListActivity.info("strength: " + strength + " retval: " + retval);
+    return retval;
   }
   
   private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {

@@ -365,8 +365,8 @@ public final class DatabaseHelper extends Thread {
       db.setVersion(1);
     }
     
-    // index the type
-    db.execSQL("CREATE INDEX IF NOT EXISTS type ON network (type)");
+    // drop index, was never publically released
+    db.execSQL("DROP INDEX IF EXISTS type");
     
     // compile statements
     insertNetwork = db.compileStatement( "INSERT INTO network"

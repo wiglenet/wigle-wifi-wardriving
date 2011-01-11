@@ -240,6 +240,12 @@ public class WifiReceiver extends BroadcastReceiver {
       }
     }
     
+    final Network cellNetwork = recordCellInfo(location);
+    if (cellNetwork != null && showCurrent) {
+      listAdapter.add(cellNetwork);
+      resultSize++;
+    }    
+    
     final int sort = prefs.getInt(ListActivity.PREF_LIST_SORT, SIGNAL_COMPARE);
     Comparator<Network> comparator = signalCompare;
     switch ( sort ) {
@@ -346,16 +352,15 @@ public class WifiReceiver extends BroadcastReceiver {
       prevGpsLocation = location;
     }
     
-    recordCellInfo(location);
-    
     final long speechPeriod = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
       doAnnouncement( preQueueSize, newNetCount, now );
     }
   }
   
-  private void recordCellInfo(final Location location) {
+  private Network recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
+    Network network = null;
     if ( tele != null ) {
       String bssid = null;
       NetworkType type = null;
@@ -402,7 +407,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 
         final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
         
-        Network network = networkCache.get( bssid );
+        network = networkCache.get( bssid );
         boolean newForRun = false;
         if ( network == null ) {
           network = new Network( bssid, ssid, 0, capabilities, strength, type );
@@ -413,7 +418,9 @@ public class WifiReceiver extends BroadcastReceiver {
           dbHelper.addObservation(network, location, newForRun);
         }
       }
-    }    
+    }   
+    
+    return network;
   }
   
   private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {

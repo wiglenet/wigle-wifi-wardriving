@@ -43,23 +43,29 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     final Network network = getItem(position);
     // info( "listing net: " + network.getBssid() );
     
-    final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );   
-    switch ( network.getCrypto() ) {
-      case Network.CRYPTO_WEP:
-        ico.setImageResource( R.drawable.wep_ico );
-        break;
-      case Network.CRYPTO_WPA:
-        ico.setImageResource( R.drawable.wpa_ico );
-        break;
-      case Network.CRYPTO_NONE:
-        ico.setImageResource( R.drawable.no_ico );
-        break;
-      default:
-        throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
-            + " in network: " + network );
+    final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );
+    if ( network.getType().equals(NetworkType.WIFI) ) {
+      switch ( network.getCrypto() ) {
+        case Network.CRYPTO_WEP:
+          ico.setImageResource( R.drawable.wep_ico );
+          break;
+        case Network.CRYPTO_WPA:
+          ico.setImageResource( R.drawable.wpa_ico );
+          break;
+        case Network.CRYPTO_NONE:
+          ico.setImageResource( R.drawable.no_ico );
+          break;
+        default:
+          throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
+              + " in network: " + network );
+      }
+    }
+    else {
+      // until we get some cdma/gsm icons
+      ico.setImageResource(0);
     }
       
-    TextView tv = (TextView) row.findViewById( R.id.ssid );              
+    TextView tv = (TextView) row.findViewById( R.id.ssid ); 
     tv.setText( network.getSsid() );
       
     tv = (TextView) row.findViewById( R.id.level_string );

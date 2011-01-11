@@ -173,7 +173,13 @@ public final class Network {
       final Integer chan = channel != null ? channel : frequency;
       final StringBuilder detailBuild = new StringBuilder( 40 );
       detailBuild.append( BAR_STRING ).append( bssid );
-      detailBuild.append( DASH_STRING ).append( chan );
+      detailBuild.append( DASH_STRING );
+      if ( NetworkType.WIFI.equals(type) ) {
+        detailBuild.append( chan );
+      }
+      else {
+        detailBuild.append( type );
+      }
       detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
       detail = detailBuild.toString();
     }

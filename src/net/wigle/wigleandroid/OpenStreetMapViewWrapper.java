@@ -60,8 +60,8 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
 	  final SharedPreferences prefs = this.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     
-    // if zoomed in past 16, give a little boost to circle size
-    float boost = 16 - this.getZoomLevel();
+    // if zoomed in past 15, give a little boost to circle size
+    float boost = getZoomLevel() - 15;
     boost *= 0.25f;
     boost += 1f;
     if ( boost < 1f ) {

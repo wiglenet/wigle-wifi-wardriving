@@ -208,10 +208,19 @@ public final class DatabaseHelper extends Thread {
       Process.setThreadPriority( DB_PRIORITY );
       
       try {
-        getNetworkWifiCountFromDB();
-        getLocationCountFromDB();
-        ListActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
-        ListActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
+        // keep checking done, these counts take a while
+        if ( ! done.get() ) {
+          getNetworkWifiCountFromDB();
+        }
+        if ( ! done.get() ) {
+          getLocationCountFromDB();
+        }
+//        if ( ! done.get() ) {        
+//          ListActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
+//        }
+//        if ( ! done.get() ) {        
+//          ListActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
+//        }
       }
       catch ( SQLiteException ex ) {
         ListActivity.error( "exception getting counts from db: " + ex, ex );

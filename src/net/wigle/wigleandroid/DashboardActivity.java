@@ -103,10 +103,17 @@ public class DashboardActivity extends Activity {
   
   private long newNetsSinceUpload() {
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final long uploaded = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
-    long newSinceUpload = ListActivity.lameStatic.dbLocs - uploaded;
-    if ( newSinceUpload < 0 ) {
-      newSinceUpload = 0;
+    final long marker = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+    final long uploaded = prefs.getLong( ListActivity.PREF_NETS_UPLOADED, 0L );
+    long newSinceUpload = 0;
+    if ( marker != 0 && uploaded == 0 ) {
+      // marker is set but no uploaded, a migration situation, so return zero      
+    }
+    else {
+      newSinceUpload = ListActivity.lameStatic.dbNets - uploaded;
+      if ( newSinceUpload < 0 ) {
+        newSinceUpload = 0;
+      }
     }
     return newSinceUpload;
   }

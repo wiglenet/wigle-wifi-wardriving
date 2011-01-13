@@ -124,6 +124,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";
     public static final String PREF_MAX_DB = "maxDbMarker";
+    public static final String PREF_NETS_UPLOADED = "netsUploaded";
     public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
     public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";

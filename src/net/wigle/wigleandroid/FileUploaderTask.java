@@ -388,6 +388,7 @@ public final class FileUploaderTask extends Thread {
         final Editor editor = prefs.edit();
         editor.putLong( ListActivity.PREF_DB_MARKER, maxId );
         editor.putLong( ListActivity.PREF_MAX_DB, maxId );
+        editor.putLong( ListActivity.PREF_NETS_UPLOADED, dbHelper.getNetworkWifiCount() );
         editor.commit();
       }
       else if ( response != null && response.indexOf("does not match login") > 0 ) {

@@ -90,7 +90,7 @@ public final class DatabaseHelper extends Thread {
   private final ArrayBlockingQueue<DBUpdate> queue = new ArrayBlockingQueue<DBUpdate>( MAX_QUEUE );
   private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<DBPending>( MAX_QUEUE ); // how to size this better?
   private final AtomicBoolean done = new AtomicBoolean(false);
-  private final AtomicLong networkWifiCount = new AtomicLong();
+  private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
   private final AtomicLong newNetworkWifiCount = new AtomicLong();
 
@@ -509,7 +509,7 @@ public final class DatabaseHelper extends Thread {
         logTime( start, "db network inserted: " + bssid + " drainSize: " + drainSize );
         
         // update the count
-        networkWifiCount.incrementAndGet();
+        networkCount.incrementAndGet();
         isNew = true;
         
         // to make sure this new network's location is written
@@ -800,16 +800,16 @@ public final class DatabaseHelper extends Thread {
   }
   
   public long getNetworkWifiCount() {
-    return networkWifiCount.get();
+    return networkCount.get();
   }
   
   private void getNetworkWifiCountFromDB() {
-    networkWifiCount.set( getNetworkCountFromDB( NetworkType.WIFI ) );
+    networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
   
-  private long getNetworkCountFromDB(NetworkType type) {
-    return getCountFromDB( NETWORK_TABLE + " WHERE type = '" + type.getCode() + "'" );
-  }
+//  private long getNetworkCountFromDB(NetworkType type) {
+//    return getCountFromDB( NETWORK_TABLE + " WHERE type = '" + type.getCode() + "'" );
+//  }
   
   public long getLocationCount() {
     return locationCount.get();

@@ -374,8 +374,10 @@ public class WifiReceiver extends BroadcastReceiver {
           final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
           final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);
           final int baseStationId = (Integer) cellLocation.getClass().getMethod("getBaseStationId").invoke(cellLocation);
-          bssid = systemId + "_" + networkId + "_" + baseStationId;
-          type = NetworkType.CDMA;
+          if ( systemId >= 0 && networkId >= 0 && baseStationId >= 0 ) { 
+            bssid = systemId + "_" + networkId + "_" + baseStationId;
+            type = NetworkType.CDMA;
+          }
         }
         catch ( Exception ex ) {
           ListActivity.error("cdma reflection exception: " + ex);
@@ -383,8 +385,10 @@ public class WifiReceiver extends BroadcastReceiver {
       }
       else if ( cellLocation instanceof GsmCellLocation ) {
         GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-        bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
-        type = NetworkType.GSM;
+        if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0 ) {
+          bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
+          type = NetworkType.GSM;
+        }
       }
       
       if ( bssid != null ) {

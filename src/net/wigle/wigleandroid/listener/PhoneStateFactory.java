@@ -8,6 +8,7 @@ public final class PhoneStateFactory {
   public static PhoneState createPhoneState() {
     try {
       Class.forName("android.telephony.SignalStrength");
+      ListActivity.info("Using PhoneState7");
       return new PhoneState7();
     } catch (Exception ex) {
       ListActivity.info("Using original PhoneState");

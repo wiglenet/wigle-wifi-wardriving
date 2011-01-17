@@ -15,7 +15,10 @@ try tabs on bottom in landscape mode
 remember zoom level on map
 
 --- done ---
-* 1.32
+* 1.32 ()
+Include cell network in stats numbers
+
+* 1.32 (01/16/2011)
 Added setting to use english or metric units
 Added "New Nets Since Upload" to Dashboard
 Improved startup time by delaying location count query
@@ -24,7 +27,7 @@ Record and upload cell tower observations
 Make sure last scan response time is set to stop wifi locked up false positives
 Downgraded osmdroid to r509 until can figure out why they load slower now
 
-* 1.30
+* 1.30 (12/21/2010)
 Fix binding of app to service, should help stay alive when in background
 Use setForeground service api, if supported, to increase service priority
 Update service's notificaton with some stats occasionally
@@ -32,14 +35,14 @@ If scanning is on, but no response from wifi manager after 90 seconds, the wifi
   in the OS is probably jammed, so restart it (with audio and toast warning)
 Added a setting to allow adjustment of wifi scan rate when still (0 mph)
 
-* 1.29
+* 1.29 (12/15/2010)
 Added a setting to allow adjustment of gps scan rate manually
 Update osmdroid
 
-* 1.28
+* 1.28 (12/05/2010)
 Fix post-upload threading issue
 
-* 1.27
+* 1.27 (12/04/2010)
 Can turn scanning on/off via menu option
 Donate data button
 Spoken times like 9:02 will be "nine oh two"
@@ -48,13 +51,13 @@ Tie location update intervals to scanning period, if over a second. Should
 More scan and speech period options
 Update osmdroid
 
-* 1.26
+* 1.26 (10/21/2010)
 Network list sorting options
 Remove a debug log message on maps
 Confirmation dialog around setting anonymous
 Fix KML export on run to only have one footer
 
-* 1.25
+* 1.25 (10/09/2010)
 Fix more orientation change issues, around dialogs
 Exit from menu on any tab
 Remove osmdroid accuracy bubble which looked like the new networks circle
@@ -62,38 +65,38 @@ Make file upload cancellable (with back button)
 Option for kml exports on settings tab
 Confirmation dialogs on upload/db/kml buttons
 
-* 1.24
+* 1.24 (10/02/2010)
 Work around insane verifier bug in old dalvik vm's, on inner class |= operator
 Show location and name of file written on upload
 
-* 1.23
+* 1.23 (10/02/2010)
 Clean up memory leaks on orientation change in our code and osmdroid
 Catch a BadTokenException when a dialog tries to show on a gone window
 Larger counts on dashboard
 Remember map zoom level on orientation change
 
-* 1.22
+* 1.22 (9/24/2010)
 Take care of another mediaplayer bug
 
-* 1.21
+* 1.21 (9/23/2010)
 Large refactor to fix bugs related to orientation change on the List activity:
   IllegalArgumentException: View not attached to window manager
   IllegalStateException: android.media.MediaPlayer.isPlaying
 Make uploads work on device with no sdcard
 Update osmdroid map library
 
-* 1.20
+* 1.20 (9/20/2010)
 Launch correct activity from service notification
 
-* 1.19
+* 1.19 (9/20/2010)
 Old activity launches new activity rather than subclass
 
-* 1.18
+* 1.18 (9/20/2010)
 Force old activity name to use the new tab activity, some devices don't seem to
   update what activity is launched when changed in the manifest. It should 
   never launch without the tabs at the top!
 
-* 1.17
+* 1.17 (9/20/2010)
 remove unneeded chunking and utf8 settings
 add maxout db marker button to settings
 fix ssid encoding short-circuit bug
@@ -105,12 +108,12 @@ scan speeds based on movement speed (different setting for above/below 5mph)
 tabbed layout
 submenu for announcement options: run, new, queue, miles, time, battery
 
-* 1.16
+* 1.16 (8/29/2010)
 fix db close stall
 write stackfile in additional catches
 allow user to toggle chunking and utf8 (for debugging)
 
-* 1.15
+* 1.15 (8/29/2010)
 more db optimization (more precompiled statements, temp_store=memory, 
   journal_mode=persist, count_changes=false, background thread priority)
 added ACCESS_COARSE_LOCATION which some devices seem to want (not just FINE)
@@ -119,7 +122,7 @@ take care of null network values on insert
 lock down db open/close issues
 show db sqlite exceptions to users in a dialog (disk full, disk i/o error, etc)
 
-* 1.14
+* 1.14 (8/24/2010)
 back button acts like home instead of killing app
 tell user turning on/off wifi
 previous run distance on dashboard
@@ -130,7 +133,7 @@ icon when network has WPS fixed
 improve db performance (transaction overhead)
 improve file upload memory usage (chunking)
 
-* 1.13
+* 1.13 (8/18/2010)
 file upload to UTF-8 encoding
 device will no longer go to sleep when on dashboard
 update osmdroid map library: 
@@ -139,13 +142,13 @@ update osmdroid map library:
   stops occasional npe
   map directional indicator
 
-* 1.12
+* 1.12 (8/16/2010)
 fix file upload error message on popup
 force update map draw when lockon is off
 keep config and centerpoint for map activity on a screen rotation
 stop scanning when trying to upload
 
-* 1.11
+* 1.11 (7/02/2010)
 map target easier to see
 change sounds from wav to ogg to avoid snap sound after playing
 seperate audio configs for new network in run vs. database
@@ -154,18 +157,18 @@ add new for run vs. db option in map
 better upload failure info in UI
 reflection ZoomButtonsController to support on android 1.5 and up in map
 
-* 1.10
+* 1.10 (6/19/2010)
 swap out LinkedBlockingQueue, which has issues on Android < 2.0
 mute sound when a phone call is active
 accuracy <= 32 meters to modify the distance
 
-* 1.9
+* 1.9 (6/11/2010)
 fix UI on G1 keyboard slide
 fix leak in storage for map drawing
 detailed errors in UI on file upload exceptions
 keep pending networks on short duration gps outtages
 
-* 1.8
+* 1.8 (6/03/2010)
 add dashboard (count of APs in a large font for checking status at a glance)
 distance traveled (on dashboard)
 better handling of db queue, can't block gui, fastmode also on producer side
@@ -176,7 +179,7 @@ show how long the scan took vs processed. allow more times for scan frequency
 fix dropdown layout issues
 set tts language, only if it's something non-english
 
-* 1.7:
+* 1.7 (5/21/2010)
 npe bugfixes
 upload code cleanup
 don't let hardware keyboard changes restart the app
@@ -185,7 +188,7 @@ better labels on settings dropdowns
 more efficient and better looking map bubbles
 add support for TTS in android 1.5 via TTS Extended if present, TTS_library_stub.jar is the supporting libs for that package
 
-* 1.6:
+* 1.6 (5/01/2010)
 bugfix on gps<->network flip flopping
 open street map integration (option for map showing track covered)
 check for null media player (to run on archos5)
@@ -193,7 +196,7 @@ check wifi results for null to prevent possible exception on shutdown
 change upload to ssl
 notification now stays around after a clear
 
-* 1.5:
+* 1.5 (4/22/2010)
 keep around a recent network-provided location for no gap if gps lost
 different sound on new network
 volume controls always change "media volume"
@@ -202,7 +205,7 @@ lock wifi radio on
 popup about turning off wifi notifications if on (no access to auto turn off)
 emulator detection
 
-* 1.4:
+* 1.4 (4/16/2010)
 hopefully fixed issue with looping gps fix/lost race condition
 db lock bug fix
 orientation change for settings screen (physical keyboard)
@@ -211,7 +214,7 @@ turn on gps setting if not on (takes to settings screen, can't do automagically)
 notification when wifi locating is off
 settings activity can orient to landscape (helpful for physical keyboard devices)
 
-* 1.3:
+* 1.3 (04/15/2010)
 Just turn on wifi if not on
 Optional audible notification when an AP is found
 Optional Text-to-speech of networks found
@@ -219,19 +222,19 @@ Optional Text-to-speech gps gain/lost announcements
 Fix fallback to context storage if SD card not available
 Fix 1.5 permission issue (WAKE_LOCK)
 
-* 1.2:
+* 1.2 (04/12/2010)
 Show device wifi on or not, allow to turn on
 Null check bugs
 Show sats all the time
 
-* 1.1:
+* 1.1 (04/10/2010)
 handle losing gps fix
 color by signal strength
 fix multiple processes from notification bug
 sort by signal strength
 crypto icons
 
-* 1.0:
+* 1.0 (03/31/2010)
 don't upload empty files
 update frequency setting
 distance check before storing

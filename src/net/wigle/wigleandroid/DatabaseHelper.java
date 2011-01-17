@@ -92,7 +92,7 @@ public final class DatabaseHelper extends Thread {
   private final AtomicBoolean done = new AtomicBoolean(false);
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
-  private final AtomicLong newNetworkWifiCount = new AtomicLong();
+  private final AtomicLong newNetworkCount = new AtomicLong();
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
@@ -210,7 +210,7 @@ public final class DatabaseHelper extends Thread {
       try {
         // keep checking done, these counts take a while
         if ( ! done.get() ) {
-          getNetworkWifiCountFromDB();
+          getNetworkCountFromDB();
         }
         if ( ! done.get() ) {
           getLocationCountFromDB();
@@ -531,8 +531,8 @@ public final class DatabaseHelper extends Thread {
       }
     }
     
-    if ( isNew && NetworkType.WIFI.equals(network.getType()) ) {
-      newNetworkWifiCount.incrementAndGet();
+    if ( isNew ) {
+      newNetworkCount.incrementAndGet();
     }
     
     final boolean fastMode = isFastMode();
@@ -795,15 +795,15 @@ public final class DatabaseHelper extends Thread {
    * get the number of networks new to the db for this run
    * @return number of new networks
    */
-  public long getNewNetworkWifiCount() {
-    return newNetworkWifiCount.get();
+  public long getNewNetworkCount() {
+    return newNetworkCount.get();
   }
   
-  public long getNetworkWifiCount() {
+  public long getNetworkCount() {
     return networkCount.get();
   }
   
-  private void getNetworkWifiCountFromDB() {
+  private void getNetworkCountFromDB() {
     networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
   

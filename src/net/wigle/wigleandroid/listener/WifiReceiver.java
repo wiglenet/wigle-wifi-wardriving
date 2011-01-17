@@ -225,7 +225,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     // check if there are more "New" nets
-    final long newNetCount = dbHelper.getNewNetworkWifiCount();
+    final long newNetCount = dbHelper.getNewNetworkCount();
     final long newNetDiff = newNetCount - prevNewNetCount;
     prevNewNetCount = newNetCount;
     
@@ -240,10 +240,13 @@ public class WifiReceiver extends BroadcastReceiver {
       }
     }
     
+    // check cell tower info
     final Network cellNetwork = recordCellInfo(location);
-    if (cellNetwork != null && showCurrent) {
-      listAdapter.add(cellNetwork);
+    if ( cellNetwork != null ) {
       resultSize++;
+      if ( showCurrent ) {
+        listAdapter.add(cellNetwork);
+      }            
     }    
     
     final int sort = prefs.getInt(ListActivity.PREF_LIST_SORT, SIGNAL_COMPARE);
@@ -267,7 +270,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     listAdapter.sort( comparator );
 
-    final long dbNets = dbHelper.getNetworkWifiCount();
+    final long dbNets = dbHelper.getNetworkCount();
     final long dbLocs = dbHelper.getLocationCount();
     
     // update stat
@@ -415,16 +418,17 @@ public class WifiReceiver extends BroadcastReceiver {
                 
         final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
         
-        network = networkCache.get( bssid );
-        boolean newForRun = false;
+        final boolean newForRun = runNetworks.add( bssid );
+        
+        network = networkCache.get( bssid );        
         if ( network == null ) {
           network = new Network( bssid, ssid, 0, capabilities, strength, type );
           networkCache.put( network.getBssid(), network );
-          newForRun = true;
         }
         else {
           network.setLevel(strength);
         }
+        
         if ( location != null ) {
           dbHelper.addObservation(network, location, newForRun);
         }

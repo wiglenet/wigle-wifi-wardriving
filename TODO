@@ -8,11 +8,14 @@ seen-networks map tile overlays
 --- user suggested ---
 click on network to connect, with warning about legality
 network list filtering options (new only)
-shut off when battery is at chosen percentage
 kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
+
+--- on deck ---
 remember zoom level on map
+shut off when battery is at chosen percentage
+some way to backup/restore db. catch i/o errors and offer to restore.
 
 --- done ---
 * 1.32 ()

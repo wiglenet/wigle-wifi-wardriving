@@ -377,7 +377,7 @@ public class WifiReceiver extends BroadcastReceiver {
           final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
           final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);
           final int baseStationId = (Integer) cellLocation.getClass().getMethod("getBaseStationId").invoke(cellLocation);
-          if ( systemId >= 0 && networkId >= 0 && baseStationId >= 0 ) { 
+          if ( systemId > 0 && networkId >= 0 && baseStationId >= 0 ) { 
             bssid = systemId + "_" + networkId + "_" + baseStationId;
             type = NetworkType.CDMA;
           }

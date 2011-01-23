@@ -16,6 +16,7 @@ try tabs on bottom in landscape mode
 remember zoom level on map
 shut off when battery is at chosen percentage
 some way to backup/restore db. catch i/o errors and offer to restore.
+link to registration page
 
 --- done ---
 * 1.32 ()

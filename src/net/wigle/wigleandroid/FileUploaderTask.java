@@ -493,6 +493,8 @@ public final class FileUploaderTask extends Thread {
       // don't stop when a goofy character is found
       encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
       final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
+      // no commas in the comma-separated file
+      numberFormat.setGroupingUsed( false );
       if ( numberFormat instanceof DecimalFormat ) {
         final DecimalFormat dc = (DecimalFormat) numberFormat;
         dc.setMaximumFractionDigits( 16 );

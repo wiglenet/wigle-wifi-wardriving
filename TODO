@@ -4,6 +4,7 @@ select a net, see observations
 lock screen on, lock UI
 show IEEE octet info
 seen-networks map tile overlays
+some way to backup/restore db. catch i/o errors and offer to restore.
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -12,10 +13,6 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
---- on deck ---
-shut off when battery is at chosen percentage
-some way to backup/restore db. catch i/o errors and offer to restore.
-
 --- done ---
 * 1.33 ()
 Include cell network in stats numbers
@@ -23,6 +20,7 @@ Cell towers on map as light blue squares
 Link to registration page
 Remember zoom level on map
 Setting for dead-wifi reset threshold
+Shut off when battery is at chosen percentage and not charging
 
 * 1.32 (01/16/2011)
 Added setting to use english or metric units

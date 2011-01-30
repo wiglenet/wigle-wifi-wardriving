@@ -31,6 +31,7 @@ import android.content.SharedPreferences.Editor;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
@@ -610,7 +611,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final long sinceLastScan = now - lastScanResponseTime;
         final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
         final long resetWifiPeriod = prefs.getLong(
-            ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD);
+            ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD );
         
         if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
           ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
@@ -636,6 +637,28 @@ public class WifiReceiver extends BroadcastReceiver {
       // reset this
       lastScanResponseTime = Long.MIN_VALUE;
     }
+    
+    // battery kill
+    if ( ! listActivity.isUploading() ) {
+      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final long batteryKill = prefs.getLong(
+          ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT);
+      
+      if ( listActivity.getBatteryLevelReceiver() != null ) {
+        final int batteryLevel = listActivity.getBatteryLevelReceiver().getBatteryLevel(); 
+        final int batteryStatus = listActivity.getBatteryLevelReceiver().getBatteryStatus();
+        ListActivity.info("batteryStatus: " + batteryStatus);
+  
+        if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill 
+            && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING) {
+          final String text = "Battery level at " + batteryLevel + " percent, shutting down Wigle Wifi";
+          Toast.makeText( listActivity, text, Toast.LENGTH_LONG ).show();
+          listActivity.speak( "low battery" );
+          listActivity.finish();
+        }
+      }
+    }
+    
     return retval;
   }
   

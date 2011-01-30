@@ -329,6 +329,12 @@ public final class SettingsActivity extends Activity {
           "1 min","2 min","5 min","10 min","15 min","30 min","Off" };
       doSpinner( R.id.speak_spinner, 
           ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
+            
+      // battery kill spinner
+      final long[] batteryPeriods = new long[]{ 1,2,3,4,5,10,15,20,0 };
+      final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %","Off" };
+      doSpinner( R.id.battery_kill_spinner, 
+          ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
       final long[] resetPeriods = new long[]{ 30000,60000,90000,120000,300000,600000,0 };

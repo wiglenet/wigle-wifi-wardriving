@@ -132,7 +132,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_FOUND_SOUND = "foundSound";
     public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
-    public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";    
+    public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
+    public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";    
     public static final String PREF_SPEECH_GPS = "speechGPS";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
@@ -161,6 +162,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final long SCAN_STILL_DEFAULT = 3000L;
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
+    public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;    
     
     static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";

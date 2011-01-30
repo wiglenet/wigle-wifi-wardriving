@@ -132,6 +132,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_FOUND_SOUND = "foundSound";
     public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
+    public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";    
     public static final String PREF_SPEECH_GPS = "speechGPS";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
@@ -141,18 +142,21 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     public static final String PREF_PREV_LAT = "prevLat";
     public static final String PREF_PREV_LON = "prevLon";
+    public static final String PREF_PREV_ZOOM = "prevZoom";
     public static final String PREF_LIST_SORT = "listSort";
     public static final String PREF_SCAN_RUNNING = "scanRunning";
     public static final String PREF_METRIC = "metric";
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
-    public static final String PREF_SPEAK_NEW = "speakNew";
+    public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
+    public static final String PREF_SPEAK_NEW_CELL = "speakNewCell";
     public static final String PREF_SPEAK_QUEUE = "speakQueue";
     public static final String PREF_SPEAK_MILES = "speakMiles";
     public static final String PREF_SPEAK_TIME = "speakTime";
     public static final String PREF_SPEAK_BATTERY = "speakBattery";
     
     public static final long DEFAULT_SPEECH_PERIOD = 60L;
+    public static final long DEFAULT_RESET_WIFI_PERIOD = 90000L;    
     public static final long LOCATION_UPDATE_INTERVAL = 1000L;
     public static final long SCAN_STILL_DEFAULT = 3000L;
     public static final long SCAN_DEFAULT = 2000L;
@@ -165,8 +169,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     /** cross-activity communication */
     public static class TrailStat {
-      public int newForRun = 0;
-      public int newForDB = 0;
+      public int newWifiForRun = 0;
+      public int newWifiForDB = 0;
+      public int newCellForRun = 0;
+      public int newCellForDB = 0;
     }
     public static class LameStatic {
       public Location location; 
@@ -174,6 +180,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
         new ConcurrentLinkedHashMap<GeoPoint,TrailStat>( 512 );
       public int runNets;
       public long newNets;
+      public long newWifi;
+      public long newCells;
       public int currNets;
       public int preQueueSize;
       public long dbNets;

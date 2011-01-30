@@ -8,7 +8,9 @@ import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,8 +95,7 @@ public final class SettingsActivity extends Activity {
                                     
                   buttonView.setChecked( true );
                   // poof
-                  buttonView.setEnabled( false );
-                  buttonView.setVisibility( View.GONE );
+                  eraseDonate();
                 }
               });
             }
@@ -138,6 +139,9 @@ public final class SettingsActivity extends Activity {
                   editor.commit();
                   
                   buttonView.setChecked( true );
+                  
+                  // might have to remove or show register link
+                  updateRegister();
                 }
               });
             }
@@ -148,16 +152,28 @@ public final class SettingsActivity extends Activity {
               
               editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
               editor.commit();
-            }
+              
+              // might have to remove or show register link
+              updateRegister();
+            }            
           }
         });
       
+      // register link
+      final TextView register = (TextView) findViewById(R.id.register);
+      register.setText(Html.fromHtml("<a href='http://wigle.net/gps/gps/main/register'>Register</a>"
+          + " at <a href='http://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
+      register.setMovementMethod(LinkMovementMethod.getInstance());
+      updateRegister();
+            
       user.setText( prefs.getString( ListActivity.PREF_USERNAME, "" ) );
       user.addTextChangedListener( new SetWatcher() {
         public void onTextChanged( final String s ) {
           // ListActivity.debug("user: " + s);
           editor.putString( ListActivity.PREF_USERNAME, s.trim() );
           editor.commit();
+          // might have to remove or show register link
+          updateRegister();
         } 
       });
       
@@ -300,7 +316,7 @@ public final class SettingsActivity extends Activity {
           }
       });
       
-      // speach spinner
+      // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
       if ( ! TTS.hasTTS() ) {
         // no text to speech :(
@@ -312,7 +328,14 @@ public final class SettingsActivity extends Activity {
       final String[] speechName = new String[]{ "10 sec","15 sec","30 sec",
           "1 min","2 min","5 min","10 min","15 min","30 min","Off" };
       doSpinner( R.id.speak_spinner, 
-          ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );            
+          ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
+      
+      // reset wifi spinner
+      final long[] resetPeriods = new long[]{ 30000,60000,90000,120000,300000,600000,0 };
+      final String[] resetName = new String[]{ "30 sec","1 min","1.5 min",
+          "2 min","5 min","10 min","Off" };
+      doSpinner( R.id.reset_wifi_spinner, 
+          ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
   }
   
   @Override
@@ -327,6 +350,22 @@ public final class SettingsActivity extends Activity {
     }
     
     super.onResume();
+  }
+  
+  private void updateRegister() {
+    final TextView register = (TextView) findViewById(R.id.register);
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
+    final boolean isAnonymous = prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false);
+    if ( "".equals(username) || isAnonymous ) {
+      register.setEnabled( true );
+      register.setVisibility( View.VISIBLE );        
+    }
+    else {
+      // poof
+      register.setEnabled( false );
+      register.setVisibility( View.GONE );
+    }    
   }
   
   private void eraseDonate() {

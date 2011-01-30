@@ -24,9 +24,15 @@ import android.util.AttributeSet;
 public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
   private final Paint crossBackPaint = new Paint();
   private final Paint crossPaint = new Paint();
+  
   private final Paint trailBackPaint = new Paint();
 	private final Paint trailPaint = new Paint();
 	private final Paint trailDBPaint = new Paint();
+	
+	private final Paint trailCellBackPaint = new Paint();
+  private final Paint trailCellPaint = new Paint();
+  private final Paint trailCellDBPaint = new Paint();
+  
   
   /**
    * XML Constructor (uses default Renderer)
@@ -44,9 +50,19 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     trailPaint.setColor( Color.argb( 128, 200, 128, 200 ) );
     trailPaint.setStyle( Style.FILL );
     
-    trailBackPaint.setColor( Color.argb( 128, 224, 224, 224 ) );
+    trailBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );
     trailBackPaint.setStyle( Style.STROKE );
     trailBackPaint.setStrokeWidth( 2f );
+    
+    trailCellDBPaint.setColor( Color.argb( 128, 64, 10, 220 ) );
+    trailCellDBPaint.setStyle( Style.FILL );
+    
+    trailCellPaint.setColor( Color.argb( 128, 128, 200, 200 ) );
+    trailCellPaint.setStyle( Style.FILL );
+    
+    trailCellBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );
+    trailCellBackPaint.setStyle( Style.STROKE );
+    trailCellBackPaint.setStrokeWidth( 2f );
   }
   
   @Override
@@ -62,15 +78,15 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     
     // if zoomed in past 15, give a little boost to circle size
     float boost = getZoomLevel() - 15;
-    boost *= 0.25f;
-    boost += 1f;
-    if ( boost < 1f ) {
-      boost = 1f;
+    boost *= 0.50f;
+    boost += 2f;
+    if ( boost < 2f ) {
+      boost = 2f;
     }
     
 	  if ( ! showNewDBOnly ) {
   	  for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-  			int nets = entry.getValue().newForRun;
+  			int nets = entry.getValue().newWifiForRun;
   			if ( nets > 0 ) {
   			  nets *= boost;
     	  	point = proj.toMapPixels( entry.getKey(), point );
@@ -79,21 +95,55 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     	}
   
     	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-        int nets = entry.getValue().newForRun;
+        int nets = entry.getValue().newWifiForRun;
         if ( nets > 0 ) {
           nets *= boost;
           point = proj.toMapPixels( entry.getKey(), point );
           c.drawCircle(point.x, point.y, nets + 1, trailPaint);
         }
     	}
+    	
+    	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+        int nets = entry.getValue().newCellForRun;        
+        if ( nets > 0 ) {
+          // ListActivity.info("new cell for run: " + nets);
+          nets *= boost * 8;
+          point = proj.toMapPixels( entry.getKey(), point );
+          int sub = nets/2 + 1;
+          int add = nets/2 + (nets % 2);
+          c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellBackPaint);
+        }
+      }
+    	
+    	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+        int nets = entry.getValue().newCellForRun;
+        if ( nets > 0 ) {
+          nets *= boost * 8;
+          point = proj.toMapPixels( entry.getKey(), point );
+          int sub = nets/2 + 1;
+          int add = nets/2 + (nets % 2);
+          c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellPaint);
+        }
+      }
 	  }
 
   	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      int nets = entry.getValue().newForDB;
+      int nets = entry.getValue().newWifiForDB;
       if ( nets > 0 ) {
         nets *= boost;
         point = proj.toMapPixels( entry.getKey(), point );
         c.drawCircle(point.x, point.y, nets + 1, trailDBPaint);
+      }
+    }
+  	
+  	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      int nets = entry.getValue().newCellForDB;
+      if ( nets > 0 ) {
+        nets *= boost * 8;
+        point = proj.toMapPixels( entry.getKey(), point );
+        int sub = nets/2 + 1;
+        int add = nets/2 + (nets % 2);
+        c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellDBPaint);
       }
     }
     

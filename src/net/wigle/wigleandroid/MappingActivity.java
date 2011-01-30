@@ -97,6 +97,7 @@ public final class MappingActivity extends Activity {
     mapControl = new OpenStreetMapViewController( mapView );
     GeoPoint centerPoint = DEFAULT_POINT;
     final Location location = ListActivity.lameStatic.location;
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     if ( oldCenter != null ) {
       centerPoint = oldCenter;
     }
@@ -108,7 +109,6 @@ public final class MappingActivity extends Activity {
     }
     else {
       // ok, try the saved prefs
-      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
       float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
       if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
@@ -118,6 +118,9 @@ public final class MappingActivity extends Activity {
     int zoom = 16;
     if ( oldZoom >= 0 ) {
       zoom = oldZoom;
+    }
+    else {
+      zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
     }
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( zoom );
@@ -191,6 +194,12 @@ public final class MappingActivity extends Activity {
   public void onDestroy() {
     ListActivity.info( "destroy mapping." );
     finishing.set( true );
+    
+    // save zoom
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final Editor edit = prefs.edit();
+    edit.putInt( ListActivity.PREF_PREV_ZOOM, mapView.getZoomLevel() );
+    edit.commit();
     
     super.onDestroy();
   }

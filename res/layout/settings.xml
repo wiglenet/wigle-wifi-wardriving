@@ -10,6 +10,13 @@
     android:layout_height="fill_parent"
     >
 
+<TextView
+	android:id="@+id/register"   
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:textSize="24sp"
+    />
+    
 <TextView  
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
@@ -175,6 +182,27 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:text="@string/speak_text"
+		android:layout_weight="2"
+		/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Spinner android:id="@+id/reset_wifi_spinner"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:drawSelectorOnTop="true"
+		android:layout_weight="1"
+		android:prompt="@string/reset_wifi_text"
+		/>
+	<TextView
+		android:id="@+id/reset_wifi_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/reset_wifi_text"
 		android:layout_weight="2"
 		/>
 </LinearLayout>

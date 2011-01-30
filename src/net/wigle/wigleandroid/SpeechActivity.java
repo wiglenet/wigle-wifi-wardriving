@@ -25,7 +25,8 @@ public class SpeechActivity extends Activity {
     
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     doButton( prefs, R.id.speech_run, ListActivity.PREF_SPEAK_RUN );
-    doButton( prefs, R.id.speech_new, ListActivity.PREF_SPEAK_NEW );
+    doButton( prefs, R.id.speech_new_wifi, ListActivity.PREF_SPEAK_NEW_WIFI );
+    doButton( prefs, R.id.speech_new_cell, ListActivity.PREF_SPEAK_NEW_CELL );
     doButton( prefs, R.id.speech_queue, ListActivity.PREF_SPEAK_QUEUE );
     doButton( prefs, R.id.speech_miles, ListActivity.PREF_SPEAK_MILES );
     doButton( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );

@@ -19,10 +19,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/speech_run" />
-<CheckBox android:id="@+id/speech_new"
+<CheckBox android:id="@+id/speech_new_wifi"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/speech_new" />
+        android:text="@string/speech_new_wifi" />
+<CheckBox android:id="@+id/speech_new_cell"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_new_cell" />
 <CheckBox android:id="@+id/speech_queue"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

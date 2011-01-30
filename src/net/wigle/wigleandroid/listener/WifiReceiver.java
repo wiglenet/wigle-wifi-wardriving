@@ -49,10 +49,12 @@ public class WifiReceiver extends BroadcastReceiver {
   private long scanRequestTime = Long.MIN_VALUE;
   private long lastScanResponseTime = Long.MIN_VALUE;
   private long lastWifiUnjamTime = Long.MIN_VALUE;
-  private int pendingCount = 0;
+  private int pendingWifiCount = 0;
+  private int pendingCellCount = 0;
   private long previousTalkTime = System.currentTimeMillis();
   private final Set<String> runNetworks = new HashSet<String>();
   private long prevNewNetCount;
+  private long prevNewCellCount;
   private long prevScanPeriod;
   
   public static final int SIGNAL_COMPARE = 10;
@@ -60,11 +62,7 @@ public class WifiReceiver extends BroadcastReceiver {
   public static final int CRYPTO_COMPARE = 12;
   public static final int FIND_TIME_COMPARE = 13;
   public static final int SSID_COMPARE = 14;
-  
-  // a minute and a half without a scan is probably bad, since max setting is a minute
-  private static final long LAST_SCAN_TIME_THRESH = 90000L;
-  private static final long WIFI_UNJAM_PERIOD = 30000L;
-  
+    
   private static final Comparator<Network> signalCompare = new Comparator<Network>() {
     public int compare( Network a, Network b ) {
       return b.getLevel() - a.getLevel();
@@ -163,7 +161,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
     boolean somethingAdded = false;
     int resultSize = 0;
-    int newForRun = 0;
+    int newWifiForRun = 0;
     // can be null on shutdown
     if ( results != null ) {
       resultSize = results.size();
@@ -179,7 +177,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         final boolean added = runNetworks.add( result.BSSID );
         if ( added ) {
-            newForRun++;
+            newWifiForRun++;
         }
         somethingAdded |= added;
         
@@ -226,8 +224,13 @@ public class WifiReceiver extends BroadcastReceiver {
 
     // check if there are more "New" nets
     final long newNetCount = dbHelper.getNewNetworkCount();
-    final long newNetDiff = newNetCount - prevNewNetCount;
-    prevNewNetCount = newNetCount;
+    final long newWifiCount = dbHelper.getNewWifiCount();
+    final long newNetDiff = newWifiCount - prevNewNetCount;
+    prevNewNetCount = newWifiCount;
+    // check for "New" cell towers
+    final long newCellCount = dbHelper.getNewCellCount();
+    final long newCellDiff = newCellCount - prevNewCellCount;
+    prevNewCellCount = newCellCount;
     
     if ( ! listActivity.isMuted() ) {
       final boolean playRun = prefs.getBoolean( ListActivity.PREF_FOUND_SOUND, true );
@@ -241,12 +244,17 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     
     // check cell tower info
+    final int preCellForRun = runNetworks.size();
+    int newCellForRun = 0;
     final Network cellNetwork = recordCellInfo(location);
     if ( cellNetwork != null ) {
       resultSize++;
       if ( showCurrent ) {
         listAdapter.add(cellNetwork);
-      }            
+      }
+      if ( runNetworks.size() > preCellForRun ) {
+        newCellForRun++;
+      }
     }    
     
     final int sort = prefs.getInt(ListActivity.PREF_LIST_SORT, SIGNAL_COMPARE);
@@ -279,15 +287,19 @@ public class WifiReceiver extends BroadcastReceiver {
     // set the statics for the map
     ListActivity.lameStatic.runNets = runNetworks.size();
     ListActivity.lameStatic.newNets = newNetCount;
+    ListActivity.lameStatic.newWifi = newWifiCount;
+    ListActivity.lameStatic.newCells = newCellCount;
     ListActivity.lameStatic.currNets = resultSize;
     ListActivity.lameStatic.preQueueSize = preQueueSize;
     ListActivity.lameStatic.dbNets = dbNets;
     ListActivity.lameStatic.dbLocs = dbLocs;
     
-    if ( newForRun > 0 ) {
+    if ( newWifiForRun > 0 || newCellForRun > 0 ) {
       if ( location == null ) {
         // save for later
-        pendingCount += newForRun;
+        pendingWifiCount += newWifiForRun;
+        pendingCellCount += newCellForRun;
+        // ListActivity.info("pendingCellCount: " + pendingCellCount);
       }
       else {
         final GeoPoint geoPoint = new GeoPoint( location );
@@ -296,16 +308,25 @@ public class WifiReceiver extends BroadcastReceiver {
           trailStat = new TrailStat();
           ListActivity.lameStatic.trail.put( geoPoint, trailStat );
         }
-        trailStat.newForRun += newForRun;
-        trailStat.newForDB += newNetDiff;
+        trailStat.newWifiForRun += newWifiForRun;
+        trailStat.newWifiForDB += newNetDiff;
+        // ListActivity.info("newCellForRun: " + newCellForRun);
+        trailStat.newCellForRun += newCellForRun;
+        trailStat.newCellForDB += newCellDiff;        
         
         // add any pendings
         // don't go crazy
-        if ( pendingCount > 25 ) {
-          pendingCount = 25;
+        if ( pendingWifiCount > 25 ) {
+          pendingWifiCount = 25;
         }
-        trailStat.newForRun += pendingCount;
-        pendingCount = 0;
+        trailStat.newWifiForRun += pendingWifiCount;
+        pendingWifiCount = 0;
+        
+        if ( pendingCellCount > 25 ) {
+          pendingCellCount = 25;
+        }
+        trailStat.newCellForRun += pendingCellCount;
+        pendingCellCount = 0;
       }
     }
     
@@ -357,7 +378,7 @@ public class WifiReceiver extends BroadcastReceiver {
     
     final long speechPeriod = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-      doAnnouncement( preQueueSize, newNetCount, now );
+      doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
     }
   }
   
@@ -451,7 +472,7 @@ public class WifiReceiver extends BroadcastReceiver {
     return retval;
   }
   
-  private void doAnnouncement( int preQueueSize, long newNetCount, long now ) {
+  private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
     final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     StringBuilder builder = new StringBuilder();
     
@@ -463,8 +484,11 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_RUN, true ) ) {
       builder.append( "run " ).append( runNetworks.size() ).append( ", " );
     }
-    if ( prefs.getBoolean( ListActivity.PREF_SPEAK_NEW, true ) ) {
-      builder.append( "new " ).append( newNetCount ).append( ", " );
+    if ( prefs.getBoolean( ListActivity.PREF_SPEAK_NEW_WIFI, true ) ) {
+      builder.append( "new wifi " ).append( newWifiCount ).append( ", " );
+    }
+    if ( prefs.getBoolean( ListActivity.PREF_SPEAK_NEW_CELL, true ) ) {
+      builder.append( "new cell " ).append( newCellCount ).append( ", " );
     }
     if ( preQueueSize > 0 && prefs.getBoolean( ListActivity.PREF_SPEAK_QUEUE, true ) ) {
       builder.append( "queue " ).append( preQueueSize ).append( ", " );
@@ -584,9 +608,13 @@ public class WifiReceiver extends BroadcastReceiver {
       }
       else {
         final long sinceLastScan = now - lastScanResponseTime;
-        if ( sinceLastScan > LAST_SCAN_TIME_THRESH ) {
+        final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+        final long resetWifiPeriod = prefs.getLong(
+            ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD);
+        
+        if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
           ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
-          if ( lastWifiUnjamTime < 0 || now - lastWifiUnjamTime > WIFI_UNJAM_PERIOD ) {
+          if ( lastWifiUnjamTime < 0 || now - lastWifiUnjamTime > resetWifiPeriod ) {
             Toast.makeText( listActivity, 
                 "Wifi appears jammed, Turning off, and then on, WiFi.", Toast.LENGTH_LONG ).show();
             wifiManager.setWifiEnabled(false);

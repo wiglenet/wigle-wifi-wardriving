@@ -16,7 +16,7 @@
 	<TextView
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
-    android:id="@+id/newnets"
+    android:id="@+id/newwifi"
     android:textSize="48sp"
     android:textColor="#AAEE50"
     />
@@ -55,6 +55,13 @@
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 
     android:id="@+id/newNetsSinceUpload"
+    android:textSize="24sp"
+    />
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/newcells"
     android:textSize="24sp"
     />
     

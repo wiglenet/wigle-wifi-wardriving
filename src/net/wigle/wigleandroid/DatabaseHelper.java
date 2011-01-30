@@ -93,6 +93,8 @@ public final class DatabaseHelper extends Thread {
   private final AtomicLong networkCount = new AtomicLong();
   private final AtomicLong locationCount = new AtomicLong();
   private final AtomicLong newNetworkCount = new AtomicLong();
+  private final AtomicLong newWifiCount = new AtomicLong();
+  private final AtomicLong newCellCount = new AtomicLong();  
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
@@ -533,6 +535,12 @@ public final class DatabaseHelper extends Thread {
     
     if ( isNew ) {
       newNetworkCount.incrementAndGet();
+      if ( NetworkType.WIFI.equals( network.getType() ) ) {
+        newWifiCount.incrementAndGet();
+      }
+      else {
+        newCellCount.incrementAndGet();
+      }
     }
     
     final boolean fastMode = isFastMode();
@@ -797,6 +805,14 @@ public final class DatabaseHelper extends Thread {
    */
   public long getNewNetworkCount() {
     return newNetworkCount.get();
+  }
+  
+  public long getNewWifiCount() {
+    return newWifiCount.get();
+  }
+  
+  public long getNewCellCount() {
+    return newCellCount.get();
   }
   
   public long getNetworkCount() {

@@ -29,6 +29,7 @@
     <string name="periodfast_text">Time between wifi scans &gt;5 mph</string>
     <string name="gps_text">Time between GPS updates</string>
     <string name="speak_text">Time between audio speech</string>
+    <string name="reset_wifi_text">Decide Wifi is Jammed</string>
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">Mute</string>
     <string name="unknown">Unknown</string>
@@ -37,7 +38,8 @@
     <string name="speech_button">Speech Configuration Screen &gt;&gt;</string>
     <string name="speech_text">Audio speech will include:</string>
     <string name="speech_run">Nets for run</string>
-    <string name="speech_new">New nets to DB</string>
+    <string name="speech_new_wifi">New wifi to DB</string>
+    <string name="speech_new_cell">New cell towers to DB</string>
     <string name="speech_queue">Queue size if &gt; 0</string>
     <string name="speech_miles">Miles in run</string>
     <string name="speech_time">Current time</string>

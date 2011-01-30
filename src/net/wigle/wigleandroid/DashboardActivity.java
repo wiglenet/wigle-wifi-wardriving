@@ -70,14 +70,17 @@ public class DashboardActivity extends Activity {
     TextView tv = (TextView) findViewById( R.id.runnets );
     tv.setText( ListActivity.lameStatic.runNets + " Run");
     
-    tv = (TextView) findViewById( R.id.newnets );
-    tv.setText( ListActivity.lameStatic.newNets + " New" );
+    tv = (TextView) findViewById( R.id.newwifi );
+    tv.setText( ListActivity.lameStatic.newWifi + " New Wifi" );
     
     tv = (TextView) findViewById( R.id.currnets );
     tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );
     
     tv = (TextView) findViewById( R.id.newNetsSinceUpload );
-    tv.setText( "New Nets Since Upload: " + newNetsSinceUpload() );        
+    tv.setText( "New Nets Since Upload: " + newNetsSinceUpload() );  
+    
+    tv = (TextView) findViewById( R.id.newcells );
+    tv.setText( "New Cells: " + ListActivity.lameStatic.newCells );    
     
     updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, "Total Distance: " );

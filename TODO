@@ -13,14 +13,16 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
 --- on deck ---
-remember zoom level on map
 shut off when battery is at chosen percentage
 some way to backup/restore db. catch i/o errors and offer to restore.
-link to registration page
 
 --- done ---
-* 1.32 ()
+* 1.33 ()
 Include cell network in stats numbers
+Cell towers on map as light blue squares
+Link to registration page
+Remember zoom level on map
+Setting for dead-wifi reset threshold
 
 * 1.32 (01/16/2011)
 Added setting to use english or metric units

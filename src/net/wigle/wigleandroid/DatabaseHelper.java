@@ -398,7 +398,7 @@ public final class DatabaseHelper extends Thread {
     // interrupt the take, if any
     this.interrupt();
     // give time for db to finish any writes
-    int countdown = 50;
+    int countdown = 30;
     while ( this.isAlive() && countdown > 0 ) {
       ListActivity.info( "db still alive. countdown: " + countdown );
       ListActivity.sleep( 100L );

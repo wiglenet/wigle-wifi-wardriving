@@ -80,7 +80,7 @@ public class DashboardActivity extends Activity {
     tv.setText( "New Nets Since Upload: " + newNetsSinceUpload() );  
     
     tv = (TextView) findViewById( R.id.newcells );
-    tv.setText( "New Cells: " + ListActivity.lameStatic.newCells );    
+    tv.setText( "New Cell Towers: " + ListActivity.lameStatic.newCells );    
     
     updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, "Run Distance: " );
     updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, "Total Distance: " );

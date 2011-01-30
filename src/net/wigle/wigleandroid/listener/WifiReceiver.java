@@ -647,7 +647,7 @@ public class WifiReceiver extends BroadcastReceiver {
       if ( listActivity.getBatteryLevelReceiver() != null ) {
         final int batteryLevel = listActivity.getBatteryLevelReceiver().getBatteryLevel(); 
         final int batteryStatus = listActivity.getBatteryLevelReceiver().getBatteryStatus();
-        ListActivity.info("batteryStatus: " + batteryStatus);
+        // ListActivity.info("batteryStatus: " + batteryStatus);
   
         if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill 
             && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING) {

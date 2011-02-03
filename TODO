@@ -3,8 +3,9 @@
 select a net, see observations
 lock screen on, lock UI
 show IEEE octet info
-seen-networks map tile overlays
 some way to backup/restore db. catch i/o errors and offer to restore.
+web replace: seen-networks map tile overlays
+web replace: leaderboard
 
 --- user suggested ---
 click on network to connect, with warning about legality

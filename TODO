@@ -6,6 +6,7 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
+figure out what's wrong with osmdroid on droid
 
 --- user suggested ---
 click on network to connect, with warning about legality

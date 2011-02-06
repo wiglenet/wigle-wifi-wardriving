@@ -383,10 +383,60 @@ public class WifiReceiver extends BroadcastReceiver {
     }
   }
   
+  /*
+  public String getNetworkTypeName() {
+    TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
+    if ( tele == null ) {
+      return null;
+    }
+    switch (tele.getNetworkType()) {
+        case TelephonyManager.NETWORK_TYPE_GPRS:
+            return "GPRS";
+        case TelephonyManager.NETWORK_TYPE_EDGE:
+            return "EDGE";
+        case TelephonyManager.NETWORK_TYPE_UMTS:
+            return "UMTS";
+        case TelephonyManager.NETWORK_TYPE_HSDPA:
+            return "HSDPA";
+        case TelephonyManager.NETWORK_TYPE_HSUPA:
+            return "HSUPA";
+        case TelephonyManager.NETWORK_TYPE_HSPA:
+            return "HSPA";
+        case TelephonyManager.NETWORK_TYPE_CDMA:
+            return "CDMA";
+        case TelephonyManager.NETWORK_TYPE_EVDO_0:
+            return "CDMA - EvDo rev. 0";
+        case TelephonyManager.NETWORK_TYPE_EVDO_A:
+            return "CDMA - EvDo rev. A";
+        case TelephonyManager.NETWORK_TYPE_1xRTT:
+            return "CDMA - 1xRTT";
+        case TelephonyManager.NETWORK_TYPE_IDEN:
+            return "IDEN";    
+        case 12:
+          return "CDMA - EvDo rev. B";    
+        default:
+            return "UNKNOWN";
+    }
+}
+*/
+  
   private Network recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
     Network network = null;
     if ( tele != null ) {
+      /*
+      List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
+      for (final NeighboringCellInfo cell : list ) {
+        ListActivity.info("neigh cell: " + cell + " class: " + cell.getClass().getCanonicalName() );
+        ListActivity.info("cid: " + cell.getCid());        
+        
+        // api level 5!!!!
+        ListActivity.info("lac: " + cell.getLac() );
+        ListActivity.info("psc: " + cell.getPsc() );
+        ListActivity.info("net type: " + cell.getNetworkType() );
+        ListActivity.info("nettypename: " + getNetworkTypeName() );
+      }
+      */
       String bssid = null;
       NetworkType type = null;
       

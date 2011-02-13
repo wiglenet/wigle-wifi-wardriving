@@ -1,7 +1,11 @@
 package net.wigle.wigleandroid;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.Context;
 import android.graphics.Color;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +27,20 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
   
   final LayoutInflater mInflater;
   
+  private final SimpleDateFormat format;
+  
   public NetworkListAdapter( Context context, int rowLayout ) {
     super( context, rowLayout );
     this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+    
+    int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
+    ListActivity.info("value: " + value);
+    if ( value == 24 ) {
+      format = new SimpleDateFormat("H:mm:ss");
+    }
+    else {
+      format = new SimpleDateFormat("h:mm:ss a");
+    }
   }
     
   @Override
@@ -65,8 +80,11 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     }
       
     TextView tv = (TextView) row.findViewById( R.id.ssid ); 
-    tv.setText( network.getSsid() );
-      
+    tv.setText( network.getSsid() + " ");
+    
+    tv = (TextView) row.findViewById( R.id.time ); 
+    tv.setText( format.format(new Date(network.getConstructionTime())));
+    
     tv = (TextView) row.findViewById( R.id.level_string );
     int level = network.getLevel();
     if ( level <= -90 ) {

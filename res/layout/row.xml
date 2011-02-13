@@ -9,16 +9,22 @@
 	<ImageView android:text="wepicon" android:id="@+id/wepicon" android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" android:paddingLeft="2px" android:paddingRight="13px"
 		/>
-	<TextView android:text="ssid" android:id="@+id/ssid" android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"/>	
+	
+	<TextView android:id="@+id/ssid" android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"/>
+	<TextView android:id="@+id/time" android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:textSize="12sp"
+    	android:textColor="#888888"
+    	android:gravity="right"/>	
 </LinearLayout>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal"
 	    android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<!-- Second row -->
-	<TextView android:text="level" android:id="@+id/level_string" android:layout_width="wrap_content" 
+	<TextView android:id="@+id/level_string" android:layout_width="wrap_content" 
 		android:layout_height="wrap_content"/>
-	<TextView android:text="detail" android:id="@+id/detail" android:layout_width="wrap_content" 
+	<TextView android:id="@+id/detail" android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" android:layout_weight="5"/>	
 </LinearLayout>
 

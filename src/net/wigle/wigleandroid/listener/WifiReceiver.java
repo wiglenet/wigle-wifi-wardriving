@@ -50,6 +50,7 @@ public class WifiReceiver extends BroadcastReceiver {
   private long scanRequestTime = Long.MIN_VALUE;
   private long lastScanResponseTime = Long.MIN_VALUE;
   private long lastWifiUnjamTime = Long.MIN_VALUE;
+  private long lastSaveLocationTime = Long.MIN_VALUE;
   private int pendingWifiCount = 0;
   private int pendingCellCount = 0;
   private long previousTalkTime = System.currentTimeMillis();
@@ -123,8 +124,9 @@ public class WifiReceiver extends BroadcastReceiver {
   
   @Override
   public void onReceive( final Context context, final Intent intent ){
-    lastScanResponseTime = System.currentTimeMillis();
-    // final long start = System.currentTimeMillis();
+    final long now = System.currentTimeMillis();
+    lastScanResponseTime = now;
+    // final long start = now;
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
     final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
     
@@ -134,7 +136,7 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( period == 0 ) {
       // treat as "continuous", so request scan in here
       doWifiScan();
-      nonstopScanRequestTime = System.currentTimeMillis();
+      nonstopScanRequestTime = now;
     }
     final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
     long setPeriod = prefPeriod;
@@ -148,6 +150,12 @@ public class WifiReceiver extends BroadcastReceiver {
       listActivity.setLocationUpdates(setPeriod, 0f);
 
       prevScanPeriod = setPeriod;
+    }
+    
+    // save the location every minute, for later runs, or viewing map during loss of location.
+    if (now - lastSaveLocationTime > 60000L) {
+      listActivity.getGPSListener().saveLocation();
+      lastSaveLocationTime = now;      
     }
     
     final boolean showCurrent = prefs.getBoolean( ListActivity.PREF_SHOW_CURRENT, true );
@@ -336,7 +344,6 @@ public class WifiReceiver extends BroadcastReceiver {
     // notify
     listAdapter.notifyDataSetChanged();
     
-    final long now = System.currentTimeMillis();
     if ( scanRequestTime <= 0 ) {
       // wasn't set, set to now
       scanRequestTime = now;

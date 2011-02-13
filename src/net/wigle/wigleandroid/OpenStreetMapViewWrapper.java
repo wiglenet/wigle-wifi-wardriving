@@ -84,27 +84,17 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
       boost = 2f;
     }
     
-	  if ( ! showNewDBOnly ) {
-  	  for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+    // backgrounds
+    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      if ( ! showNewDBOnly ) {  	  
   			int nets = entry.getValue().newWifiForRun;
   			if ( nets > 0 ) {
   			  nets *= boost;
     	  	point = proj.toMapPixels( entry.getKey(), point );
     	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
   			}
-    	}
-  
-    	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-        int nets = entry.getValue().newWifiForRun;
-        if ( nets > 0 ) {
-          nets *= boost;
-          point = proj.toMapPixels( entry.getKey(), point );
-          c.drawCircle(point.x, point.y, nets + 1, trailPaint);
-        }
-    	}
-    	
-    	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-        int nets = entry.getValue().newCellForRun;        
+  			
+  			nets = entry.getValue().newCellForRun;        
         if ( nets > 0 ) {
           // ListActivity.info("new cell for run: " + nets);
           nets *= boost * 8;
@@ -113,10 +103,20 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
           int add = nets/2 + (nets % 2);
           c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellBackPaint);
         }
-      }
+    	}
+	  }
+	  
+    // foregrounds
+    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      if ( ! showNewDBOnly ) {    	
+        int nets = entry.getValue().newWifiForRun;
+        if ( nets > 0 ) {
+          nets *= boost;
+          point = proj.toMapPixels( entry.getKey(), point );
+          c.drawCircle(point.x, point.y, nets + 1, trailPaint);
+        }
     	
-    	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-        int nets = entry.getValue().newCellForRun;
+        nets = entry.getValue().newCellForRun;
         if ( nets > 0 ) {
           nets *= boost * 8;
           point = proj.toMapPixels( entry.getKey(), point );
@@ -125,19 +125,15 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
           c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellPaint);
         }
       }
-	  }
-
-  	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      
       int nets = entry.getValue().newWifiForDB;
       if ( nets > 0 ) {
         nets *= boost;
         point = proj.toMapPixels( entry.getKey(), point );
         c.drawCircle(point.x, point.y, nets + 1, trailDBPaint);
       }
-    }
-  	
-  	for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      int nets = entry.getValue().newCellForDB;
+      
+      nets = entry.getValue().newCellForDB;
       if ( nets > 0 ) {
         nets *= boost * 8;
         point = proj.toMapPixels( entry.getKey(), point );
@@ -145,17 +141,18 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
         int add = nets/2 + (nets % 2);
         c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellDBPaint);
       }
-    }
-    
+	  }
+  	 
     // draw user crosshairs
     Location location = ListActivity.lameStatic.location;
     if ( location != null ) {
       final GeoPoint user = new GeoPoint( location );
       point = proj.toMapPixels( user, point );
-      // c.drawLine( point.x - 9, point.y - 9, point.x + 9, point.y + 9, crossBackPaint );
-      // c.drawLine( point.x - 9, point.y + 9, point.x + 9, point.y - 9, crossBackPaint );
-      c.drawLine( point.x - 9, point.y - 9, point.x + 9, point.y + 9, crossPaint );
-      c.drawLine( point.x - 9, point.y + 9, point.x + 9, point.y - 9, crossPaint );
+      final int len = 20;
+      c.drawLine( point.x - len, point.y - len, point.x + len, point.y + len, crossBackPaint );
+      c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossBackPaint );
+      c.drawLine( point.x - len, point.y - len, point.x + len, point.y + len, crossPaint );
+      c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossPaint );
     }
   }
 }

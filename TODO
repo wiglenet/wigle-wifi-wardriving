@@ -16,6 +16,11 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
 --- done ---
+* 1.34 ()
+Save location every minute so map is nearby if location was lost
+First seen time on list view
+Larger X on map
+
 * 1.33 (02/05/2011)
 Include cell network in stats numbers
 Cell towers on map as light blue squares

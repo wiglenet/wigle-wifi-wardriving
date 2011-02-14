@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,6 +62,14 @@ public final class ConcurrentLinkedHashMap<K,V> {
    */
   public Set<Map.Entry<K,V>> entrySet() {
     return map.entrySet();
+  }
+  
+  public Collection<V> values() {
+    return map.values();
+  }
+  
+  public boolean isEmpty() {
+    return map.isEmpty();
   }
   
   public int size() {

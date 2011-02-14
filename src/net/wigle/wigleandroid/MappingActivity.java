@@ -2,9 +2,12 @@ package net.wigle.wigleandroid;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.andnav.osm.util.GeoPoint;
-import org.andnav.osm.views.OpenStreetMapViewController;
-import org.andnav.osm.views.overlay.MyLocationOverlay;
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.api.IMapView;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -16,6 +19,7 @@ import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 /**
@@ -25,13 +29,13 @@ public final class MappingActivity extends Activity {
   private static class State {
     private boolean locked = true;
     private boolean firstMove = true;
-    private GeoPoint oldCenter = null;
+    private IGeoPoint oldCenter = null;
     private int oldZoom = Integer.MIN_VALUE;
   }
   private final State state = new State();
   
-  private OpenStreetMapViewController mapControl;
-  private OpenStreetMapViewWrapper mapView;
+  private IMapController mapControl;
+  private IMapView mapView;
   private Handler timer;
   private AtomicBoolean finishing;
   private Location previousLocation;
@@ -56,7 +60,7 @@ public final class MappingActivity extends Activity {
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
     
     final Object stored = getLastNonConfigurationInstance();
-    GeoPoint oldCenter = null;
+    IGeoPoint oldCenter = null;
     int oldZoom = Integer.MIN_VALUE;
     if ( stored != null && stored instanceof State ) {
       // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
@@ -81,21 +85,24 @@ public final class MappingActivity extends Activity {
     return state;
   }
   
-  private void setupMapView( final GeoPoint oldCenter, final int oldZoom ) {
+  private void setupMapView( final IGeoPoint oldCenter, final int oldZoom ) {
     // view
-    mapView = (OpenStreetMapViewWrapper) this.findViewById( R.id.mapview );
-    mapView.setBuiltInZoomControls( true );
-    mapView.setMultiTouchControls( true );
-    
-    // my location overlay
-    myLocationOverlay = new MyLocationOverlay(this.getApplicationContext(), mapView);
-    myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
-    myLocationOverlay.setDrawAccuracyEnabled( false );
-    mapView.getOverlays().add(myLocationOverlay);
+    mapView = (IMapView) this.findViewById( R.id.mapview );
+    if ( mapView instanceof MapView ) {
+      MapView osmMapView = (MapView) mapView;
+      osmMapView.setBuiltInZoomControls( true );
+      osmMapView.setMultiTouchControls( true );
+      
+      // my location overlay
+      myLocationOverlay = new MyLocationOverlay( getApplicationContext(), osmMapView );
+      myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
+      myLocationOverlay.setDrawAccuracyEnabled( false );
+      osmMapView.getOverlays().add( myLocationOverlay );
+    }
     
     // controller
-    mapControl = new OpenStreetMapViewController( mapView );
-    GeoPoint centerPoint = DEFAULT_POINT;
+    mapControl = mapView.getController();
+    IGeoPoint centerPoint = DEFAULT_POINT;
     final Location location = ListActivity.lameStatic.location;
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     if ( oldCenter != null ) {
@@ -153,7 +160,9 @@ public final class MappingActivity extends Activity {
                     || previousLocation.getLongitude() != location.getLongitude() 
                     || previousRunNets != ListActivity.lameStatic.runNets) {
                   // location or nets have changed, update the view
-                  mapView.postInvalidate();
+                  if ( mapView instanceof View ) {
+                    ((View) mapView).postInvalidate();
+                  }
                 }
                 // set if location isn't null
                 previousLocation = location;

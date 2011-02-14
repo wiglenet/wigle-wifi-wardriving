@@ -33,8 +33,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     super( context, rowLayout );
     this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
     
-    int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
-    ListActivity.info("value: " + value);
+    final int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
     if ( value == 24 ) {
       format = new SimpleDateFormat("H:mm:ss");
     }

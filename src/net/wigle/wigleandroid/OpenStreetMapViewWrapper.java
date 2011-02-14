@@ -1,12 +1,14 @@
 package net.wigle.wigleandroid;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
-import org.andnav.osm.util.GeoPoint;
-import org.andnav.osm.views.OpenStreetMapView;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,7 +23,7 @@ import android.util.AttributeSet;
 /**
  * wrap the open street map view, to allow setting overlays
  */
-public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
+public final class OpenStreetMapViewWrapper extends MapView {
   private final Paint crossBackPaint = new Paint();
   private final Paint crossPaint = new Paint();
   
@@ -41,19 +43,25 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
     super( context, attrs );
     
     crossPaint.setColor( Color.argb( 255, 0, 0, 0 ) );
+    crossPaint.setAntiAlias( true );
     crossBackPaint.setColor( Color.argb( 128, 30, 250, 30 ) );
+    crossBackPaint.setAntiAlias( true );
     crossBackPaint.setStrokeWidth( 3f );
     
     trailDBPaint.setColor( Color.argb( 128, 10, 64, 220 ) );
+    trailDBPaint.setAntiAlias( true );
     trailDBPaint.setStyle( Style.FILL );
     
     trailPaint.setColor( Color.argb( 128, 200, 128, 200 ) );
+    trailPaint.setAntiAlias( true );
     trailPaint.setStyle( Style.FILL );
     
     trailBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );
+    trailBackPaint.setAntiAlias( true );
     trailBackPaint.setStyle( Style.STROKE );
     trailBackPaint.setStrokeWidth( 2f );
     
+    // these are squares, no need to turn on anti-aliasing
     trailCellDBPaint.setColor( Color.argb( 128, 64, 10, 220 ) );
     trailCellDBPaint.setStyle( Style.FILL );
     
@@ -69,7 +77,7 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
   public void onDraw( final Canvas c ) {
     super.onDraw( c );
     
-    OpenStreetMapViewProjection proj = this.getProjection();
+    Projection proj = this.getProjection();
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
 	  Point point = null;
@@ -142,6 +150,35 @@ public final class OpenStreetMapViewWrapper extends OpenStreetMapView {
         c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellDBPaint);
       }
 	  }
+    
+    if ( getZoomLevel() >= 16 ) {
+      // draw ssid strings
+      final Collection<Network> networks = ListActivity.getNetworkCache().values();
+      if ( ! networks.isEmpty() ) {
+        final Map<GeoPoint,Integer> geoPoints = new HashMap<GeoPoint,Integer>();
+        for( Network network : ListActivity.getNetworkCache().values() ) {
+          final GeoPoint geoPoint = network.getGeoPoint();
+          if ( geoPoint != null ) {
+            point = proj.toMapPixels( geoPoint, point );
+            int y = point.y;
+            Integer nets = geoPoints.get(geoPoint);
+            if ( nets == null ) {
+              nets = 0;
+            }
+            else {
+              nets++;
+            }
+            geoPoints.put( geoPoint, nets );
+            // ListActivity.info("geopoint: " + geoPoint + " " + nets + " got: " + geoPoints.get(geoPoint));
+            // adjust so they don't overlap too bad
+            y += nets * 12;
+            c.drawText( network.getSsid(), point.x, y, crossPaint );
+          }
+        }
+        // ListActivity.info("geopoints: " + geoPoints);
+
+      }
+    }
   	 
     // draw user crosshairs
     Location location = ListActivity.lameStatic.location;

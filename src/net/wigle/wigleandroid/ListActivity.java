@@ -28,7 +28,7 @@ import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.PhoneStateFactory;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 
-import org.andnav.osm.util.GeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -194,10 +194,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final LameStatic lameStatic = new LameStatic();
     
     // cache
-    private static final ThreadLocal<CacheMap<String,Network>> networkCache = new ThreadLocal<CacheMap<String,Network>>() {
-      protected CacheMap<String,Network> initialValue() {
-          return new CacheMap<String,Network>( 16, 64 );
-      }
+    private static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
+      new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
+        protected ConcurrentLinkedHashMap<String,Network> initialValue() {
+            return new ConcurrentLinkedHashMap<String,Network>( 64 );
+        }
     };
     
     /** Called when the activity is first created. */
@@ -1190,7 +1191,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
      * get the per-thread network LRU cache
      * @return per-thread network cache
      */
-    public static CacheMap<String,Network> getNetworkCache() {
+    public static ConcurrentLinkedHashMap<String,Network> getNetworkCache() {
       return networkCache.get();
     }
     

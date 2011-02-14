@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.osmdroid.util.GeoPoint;
+
 import android.net.wifi.ScanResult;
 
 /**
@@ -19,6 +21,7 @@ public final class Network {
   private final String showCapabilities;
   private final int crypto;
   private final NetworkType type;
+  private GeoPoint geoPoint;
   
   private String detail;
   private final long constructionTime = System.currentTimeMillis();
@@ -185,6 +188,14 @@ public final class Network {
     }
     
     return detail;
+  }
+
+  public void setGeoPoint(GeoPoint geoPoint) {
+    this.geoPoint = geoPoint;
+  }
+
+  public GeoPoint getGeoPoint() {
+    return geoPoint;
   }
 
 }

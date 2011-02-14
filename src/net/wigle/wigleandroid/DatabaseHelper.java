@@ -102,8 +102,8 @@ public final class DatabaseHelper extends Thread {
   private final SharedPreferences prefs;
   
   /** used in private addObservation */
-  private final CacheMap<String,Location> previousWrittenLocationsCache = 
-    new CacheMap<String,Location>( 16, 64 );
+  private final ConcurrentLinkedHashMap<String,Location> previousWrittenLocationsCache = 
+    new ConcurrentLinkedHashMap<String,Location>( 64 );
   
   /** class for queueing updates to the database */
   final class DBUpdate {

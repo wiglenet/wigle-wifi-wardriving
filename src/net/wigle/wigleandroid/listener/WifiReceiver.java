@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import net.wigle.wigleandroid.CacheMap;
+import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.DashboardActivity;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListActivity;
@@ -21,7 +21,7 @@ import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.NetworkType;
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
-import org.andnav.osm.util.GeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -167,7 +167,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final boolean fastMode = dbHelper.isFastMode();
     final Location location = listActivity.getGPSListener().getLocation();
     
-    final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
+    final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
     boolean somethingAdded = false;
     int resultSize = 0;
     int newWifiForRun = 0;
@@ -184,6 +184,13 @@ public class WifiReceiver extends BroadcastReceiver {
           // cache hit, just set the level
           network.setLevel( result.level );
         }
+        
+        if ( location != null ) {
+          // set the geopoint for mapping
+          final GeoPoint geoPoint = new GeoPoint( location );
+          network.setGeoPoint( geoPoint );
+        }
+        
         final boolean added = runNetworks.add( result.BSSID );
         if ( added ) {
             newWifiForRun++;
@@ -303,7 +310,9 @@ public class WifiReceiver extends BroadcastReceiver {
     ListActivity.lameStatic.dbNets = dbNets;
     ListActivity.lameStatic.dbLocs = dbLocs;
     
-    if ( newWifiForRun > 0 || newCellForRun > 0 ) {
+    // do this if trail is empty, so as soon as we get first gps location it gets triggered
+    // and will show up on map
+    if ( newWifiForRun > 0 || newCellForRun > 0 || ListActivity.lameStatic.trail.isEmpty() ) {
       if ( location == null ) {
         // save for later
         pendingWifiCount += newWifiForRun;
@@ -495,7 +504,7 @@ public class WifiReceiver extends BroadcastReceiver {
           ListActivity.info( "location: " + location );
         }
                 
-        final CacheMap<String,Network> networkCache = ListActivity.getNetworkCache();
+        final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
         
         final boolean newForRun = runNetworks.add( bssid );
         

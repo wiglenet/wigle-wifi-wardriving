@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osmdroid.api.IGeoPoint;
@@ -10,8 +12,10 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -20,7 +24,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import dalvik.system.DexClassLoader;
 
 /**
  * show a map!
@@ -87,9 +93,16 @@ public final class MappingActivity extends Activity {
   
   private void setupMapView( final IGeoPoint oldCenter, final int oldZoom ) {
     // view
-    mapView = (IMapView) this.findViewById( R.id.mapview );
+    RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.map_rl );
+
+    //tryEvil();
+    
+    // possibly choose goog maps here
+    mapView = new OpenStreetMapViewWrapper( this );    
+    
     if ( mapView instanceof MapView ) {
       MapView osmMapView = (MapView) mapView;
+      rlView.addView( osmMapView );
       osmMapView.setBuiltInZoomControls( true );
       osmMapView.setMultiTouchControls( true );
       
@@ -307,6 +320,44 @@ public final class MappingActivity extends Activity {
       return true;
     }
     return super.onKeyDown(keyCode, event);
+  }
+  
+  private void tryEvil() {
+    final String apiKey = "";
+    //Object foo = new com.google.android.maps.MapView( this, apiKey );
+    try {
+      File file = new File("/sdcard/com.google.android.maps.jar");
+      ListActivity.info("file exists: " + file.exists() + " " + file.canRead());
+      //DexFile df = new DexFile(file);
+      
+      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
+          "/sdcard/", null, MappingActivity.class.getClassLoader() );
+      // this is abstract, doesn't seem like we can reflect into it, proxy only works for interfaces :(
+//      Class<?> mapActivityClass = cl.loadClass("com.google.android.maps.MapActivity");
+      
+      Class<?> mapActivityClass = cl.loadClass("EvilMap");
+      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
+      Object mapActivity = constructor.newInstance( this );
+      
+//      final InvocationHandler handler = new InvocationHandler() {
+//        public Object invoke( Object object, Method method, Object[] args ) {
+//          ListActivity.info("invoke: " + method.getName() );
+//          return null;
+//        }
+//      };
+//      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(), 
+//                                         new Class[]{ mapActivityClass }, handler );
+      
+      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
+      constructor = foo.getConstructor(Context.class, String.class);
+      Object googMap = constructor.newInstance( mapActivity, apiKey );
+      ListActivity.info("googMap: " + googMap);
+
+    }
+    catch ( Exception ex)  {
+      ListActivity.error("ex: " + ex, ex);
+    }
+        
   }
   
 }

@@ -35,13 +35,23 @@ public final class OpenStreetMapViewWrapper extends MapView {
   private final Paint trailCellPaint = new Paint();
   private final Paint trailCellDBPaint = new Paint();
   
+  /**
+   * code constructor
+   */
+  public OpenStreetMapViewWrapper( final Context context ) {
+    super( context, 256 );
+    setupColors();
+  }
   
   /**
    * XML Constructor (uses default Renderer)
    */
   public OpenStreetMapViewWrapper( final Context context, final AttributeSet attrs ) {
     super( context, attrs );
-    
+    setupColors();
+  }
+  
+  private void setupColors() {    
     crossPaint.setColor( Color.argb( 255, 0, 0, 0 ) );
     crossPaint.setAntiAlias( true );
     crossBackPaint.setColor( Color.argb( 128, 30, 250, 30 ) );

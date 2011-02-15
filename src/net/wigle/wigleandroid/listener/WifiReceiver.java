@@ -185,17 +185,17 @@ public class WifiReceiver extends BroadcastReceiver {
           network.setLevel( result.level );
         }
         
-        if ( location != null ) {
-          // set the geopoint for mapping
-          final GeoPoint geoPoint = new GeoPoint( location );
-          network.setGeoPoint( geoPoint );
-        }
-        
         final boolean added = runNetworks.add( result.BSSID );
         if ( added ) {
             newWifiForRun++;
         }
         somethingAdded |= added;
+        
+        if ( location != null && (added || network.getGeoPoint() == null) ) {
+          // set the geopoint for mapping
+          final GeoPoint geoPoint = new GeoPoint( location );
+          network.setGeoPoint( geoPoint );
+        }                
         
         // if we're showing current, or this was just added, put on the list
         if ( showCurrent || added ) {
@@ -399,7 +399,6 @@ public class WifiReceiver extends BroadcastReceiver {
     }
   }
   
-  /*
   public String getNetworkTypeName() {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
     if ( tele == null ) {
@@ -411,30 +410,29 @@ public class WifiReceiver extends BroadcastReceiver {
         case TelephonyManager.NETWORK_TYPE_EDGE:
             return "EDGE";
         case TelephonyManager.NETWORK_TYPE_UMTS:
-            return "UMTS";
-        case TelephonyManager.NETWORK_TYPE_HSDPA:
-            return "HSDPA";
-        case TelephonyManager.NETWORK_TYPE_HSUPA:
-            return "HSUPA";
-        case TelephonyManager.NETWORK_TYPE_HSPA:
-            return "HSPA";
-        case TelephonyManager.NETWORK_TYPE_CDMA:
+            return "UMTS";        
+        case 4:
             return "CDMA";
-        case TelephonyManager.NETWORK_TYPE_EVDO_0:
+        case 5:
             return "CDMA - EvDo rev. 0";
-        case TelephonyManager.NETWORK_TYPE_EVDO_A:
+        case 6:
             return "CDMA - EvDo rev. A";
-        case TelephonyManager.NETWORK_TYPE_1xRTT:
+        case 7:
             return "CDMA - 1xRTT";
-        case TelephonyManager.NETWORK_TYPE_IDEN:
+        case 8:
+          return "HSDPA";
+        case 9:
+          return "HSUPA";
+        case 10:
+          return "HSPA";
+        case 11:
             return "IDEN";    
         case 12:
           return "CDMA - EvDo rev. B";    
         default:
             return "UNKNOWN";
     }
-}
-*/
+  }
   
   private Network recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
@@ -483,8 +481,9 @@ public class WifiReceiver extends BroadcastReceiver {
       }
       
       if ( bssid != null ) {
-        final String ssid = tele.getNetworkOperatorName();
-        final String capabilities = tele.getNetworkCountryIso();
+        final String ssid = tele.getNetworkOperatorName();        
+        final String networkType = getNetworkTypeName();
+        final String capabilities = networkType + " " + tele.getNetworkCountryIso();
         
         int strength = 0;
         PhoneState phoneState = listActivity.getPhoneState();
@@ -500,7 +499,8 @@ public class WifiReceiver extends BroadcastReceiver {
           ListActivity.info( "bssid: " + bssid );        
           ListActivity.info( "strength: " + strength );
           ListActivity.info( "ssid: " + ssid ); 
-          ListActivity.info( "capabilities: " + capabilities );           
+          ListActivity.info( "capabilities: " + capabilities ); 
+          ListActivity.info( "networkType: " + networkType ); 
           ListActivity.info( "location: " + location );
         }
                 
@@ -516,6 +516,12 @@ public class WifiReceiver extends BroadcastReceiver {
         else {
           network.setLevel(strength);
         }
+        
+        if ( location != null && (newForRun || network.getGeoPoint() == null) ) {
+          // set the geopoint for mapping
+          final GeoPoint geoPoint = new GeoPoint( location );
+          network.setGeoPoint( geoPoint );
+        }  
         
         if ( location != null ) {
           dbHelper.addObservation(network, location, newForRun);

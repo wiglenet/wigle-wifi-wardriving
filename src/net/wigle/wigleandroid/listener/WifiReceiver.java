@@ -483,7 +483,7 @@ public class WifiReceiver extends BroadcastReceiver {
       if ( bssid != null ) {
         final String ssid = tele.getNetworkOperatorName();        
         final String networkType = getNetworkTypeName();
-        final String capabilities = networkType + " " + tele.getNetworkCountryIso();
+        final String capabilities = networkType + ", " + tele.getNetworkCountryIso();
         
         int strength = 0;
         PhoneState phoneState = listActivity.getPhoneState();

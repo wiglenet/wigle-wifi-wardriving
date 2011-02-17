@@ -197,7 +197,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
       new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
         protected ConcurrentLinkedHashMap<String,Network> initialValue() {
-            return new ConcurrentLinkedHashMap<String,Network>( 64 );
+            return new ConcurrentLinkedHashMap<String,Network>( 128 );
         }
     };
     

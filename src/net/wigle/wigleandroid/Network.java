@@ -102,7 +102,16 @@ public final class Network {
     this.type = type;
     this.channel = freqToChan.get( frequency );
     
-    if ( this.capabilities.length() > 16 ) {
+    if ( ! NetworkType.WIFI.equals( type ) ) {
+      int comma = this.capabilities.lastIndexOf(",");
+      if ( comma > 0 ) {    
+        this.showCapabilities = this.capabilities.substring(0, comma);
+      }
+      else {
+        this.showCapabilities = this.capabilities;
+      }
+    }
+    else if ( this.capabilities.length() > 16 ) {
       this.showCapabilities = this.capabilities.replaceAll("(\\[\\w+)\\-.*?\\]", "$1]");
     }
     else {
@@ -183,6 +192,7 @@ public final class Network {
       else {
         detailBuild.append( type );
       }
+
       detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
       detail = detailBuild.toString();
     }

@@ -54,7 +54,8 @@ public final class MappingActivity extends Activity {
   private static final int MENU_ZOOM_OUT = 14;
   private static final int MENU_TOGGLE_LOCK = 15;
   private static final int MENU_TOGGLE_NEWDB = 16;
-  
+  private static final int MENU_LABEL = 17;
+    
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
@@ -253,12 +254,12 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
       item.setIcon( android.R.drawable.ic_menu_revert );
       
-      item = menu.add(0, MENU_EXIT, 0, "Exit");
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-      
       String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
       item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
       item.setIcon( android.R.drawable.ic_menu_mapmode );
+      
+      item = menu.add(0, MENU_EXIT, 0, "Exit");
+      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
       
       final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
@@ -266,6 +267,8 @@ public final class MappingActivity extends Activity {
       item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
       item.setIcon( android.R.drawable.ic_menu_edit );
       
+      item = menu.add(0, MENU_LABEL, 0, "Toggle Labels");
+      item.setIcon( android.R.drawable.ic_dialog_info );
       
       return true;
   }
@@ -307,6 +310,13 @@ public final class MappingActivity extends Activity {
           String name = showNewDBOnly ? "Show Run&New" : "Show New Only";
           item.setTitle( name );
           return true;
+        }
+        case MENU_LABEL: {
+          final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+          final boolean showLabel = ! prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
+          Editor edit = prefs.edit();
+          edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
+          edit.commit();
         }
       }
       return false;

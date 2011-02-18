@@ -78,6 +78,15 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
+        <activity android:name=".NetworkActivity"
+                  android:label="@string/network_activity_name"
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
 
     <service android:name=".WigleService" android:enabled="true"
       android:icon="@drawable/wiglewifi"/>

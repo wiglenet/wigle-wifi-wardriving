@@ -147,6 +147,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_LIST_SORT = "listSort";
     public static final String PREF_SCAN_RUNNING = "scanRunning";
     public static final String PREF_METRIC = "metric";
+    public static final String PREF_MAP_LABEL = "mapLabel";
+    
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
@@ -155,6 +157,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_SPEAK_MILES = "speakMiles";
     public static final String PREF_SPEAK_TIME = "speakTime";
     public static final String PREF_SPEAK_BATTERY = "speakBattery";
+    
+    public static final String NETWORK_EXTRA_BSSID = "extraBssid";
     
     public static final long DEFAULT_SPEECH_PERIOD = 60L;
     public static final long DEFAULT_RESET_WIFI_PERIOD = 90000L;    
@@ -710,6 +714,14 @@ public final class ListActivity extends Activity implements FileUploaderListener
                
       final ListView listView = (ListView) findViewById( R.id.ListView01 );
       listView.setAdapter( listAdapter ); 
+      listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
+          final Network network = (Network) parent.getItemAtPosition( position );
+          final Intent intent = new Intent( ListActivity.this, NetworkActivity.class );
+          intent.putExtra( NETWORK_EXTRA_BSSID, network.getBssid() );
+          ListActivity.this.startActivity( intent );
+        }
+      });
     }
     
     private void setupWifi() {

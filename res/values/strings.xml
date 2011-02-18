@@ -7,6 +7,7 @@
     <string name="dashboard_app_name">WiGLE WiFi - Dashboard</string>
     <string name="error_report_name">WiGLE WiFi - Most Recent Error Report</string>
     <string name="speech_name">WiGLE WiFi - Speech Settings</string>
+    <string name="network_activity_name">Wigle WiFi - Network</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>

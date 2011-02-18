@@ -93,6 +93,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
 	  Point point = null;
 	  final SharedPreferences prefs = this.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );    
     
     // if zoomed in past 15, give a little boost to circle size
     float boost = getZoomLevel() - 15;
@@ -161,28 +162,70 @@ public final class OpenStreetMapViewWrapper extends MapView {
       }
 	  }
     
-    if ( getZoomLevel() >= 16 ) {
+    if ( getZoomLevel() >= 16 && showLabel ) {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) {
-        final Map<GeoPoint,Integer> geoPoints = new HashMap<GeoPoint,Integer>();
+        final Map<GeoPoint,LabelChoice> geoPoints = new HashMap<GeoPoint,LabelChoice>();
+        int prevX = Integer.MIN_VALUE;
+        int prevY = Integer.MIN_VALUE;      
+        LabelChoice prevChoice = new LabelChoice();
+        
         for( Network network : ListActivity.getNetworkCache().values() ) {
           final GeoPoint geoPoint = network.getGeoPoint();
           if ( geoPoint != null ) {
-            point = proj.toMapPixels( geoPoint, point );
-            int y = point.y;
-            Integer nets = geoPoints.get(geoPoint);
-            if ( nets == null ) {
-              nets = 0;
+            final GeoPoint geoCopy = new GeoPoint( geoPoint );
+            // round off a bit
+            final int shiftBits = 6;
+            geoCopy.setLatitudeE6( geoCopy.getLatitudeE6() >> shiftBits << shiftBits );
+            geoCopy.setLongitudeE6( geoCopy.getLongitudeE6() >> shiftBits << shiftBits );
+            geoCopy.setAltitude(0);
+            // ListActivity.info( "geoPoint: " + geoPoint + " geoCopy: " + geoCopy );
+            LabelChoice choice = geoPoints.get( geoCopy );
+            if ( choice == null ) {
+              choice = new LabelChoice();
             }
             else {
-              nets++;
+              choice.nets++;
             }
-            geoPoints.put( geoPoint, nets );
-            // ListActivity.info("geopoint: " + geoPoint + " " + nets + " got: " + geoPoints.get(geoPoint));
+            geoPoints.put( geoCopy, choice );
+            
+            // use real geopoint
+            point = proj.toMapPixels( geoCopy, point );
+            int x = point.x;
+            int y = point.y;                        
+            
+            if ( choice.nets == 0 ) {
+              // new box, see if we need to adjust
+              if ( prevX != Integer.MIN_VALUE ) {
+                int diffX = x - prevX;
+                int diffY = y - prevY;
+                if ( Math.abs(diffX) > Math.abs(diffY) ) {
+                  // moving horizontally, alternate vertical                  
+                  choice.verticalDirection = prevChoice.verticalDirection * -1;    
+                  choice.verticalOffset = prevChoice.verticalOffset == 0 ? -12 : 0;
+                  // unset other
+                  choice.horizontalOffset = 0;
+                }
+                else {
+                  // moving vertically, alternate horizontal
+                  choice.horizontalOffset = prevChoice.horizontalOffset == 0 ? -80 : 0;
+                  // unset other
+                  choice.verticalDirection = -1;
+                  choice.verticalOffset = 0;
+                }
+              }
+              prevX = x;
+              prevY = y;
+              prevChoice = choice;
+            }
+            
             // adjust so they don't overlap too bad
-            y += nets * 12;
-            c.drawText( network.getSsid(), point.x, y, crossPaint );
+            y += choice.nets * 12 * choice.verticalDirection + choice.verticalOffset;
+            x += choice.horizontalOffset;
+            
+            // ListActivity.info("x: " + x + " y: " + y + " point: " + point);
+            c.drawText( network.getSsid(), x, y, crossPaint );            
           }
         }
         // ListActivity.info("geopoints: " + geoPoints);
@@ -201,5 +244,12 @@ public final class OpenStreetMapViewWrapper extends MapView {
       c.drawLine( point.x - len, point.y - len, point.x + len, point.y + len, crossPaint );
       c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossPaint );
     }
+  }
+  
+  private static class LabelChoice {
+    int verticalDirection = 1;
+    int verticalOffset = 0;
+    int horizontalOffset = 0;
+    int nets = 0;
   }
 }

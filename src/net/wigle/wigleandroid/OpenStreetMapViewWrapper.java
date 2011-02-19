@@ -16,6 +16,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.location.Location;
 import android.util.AttributeSet;
@@ -35,8 +36,16 @@ public final class OpenStreetMapViewWrapper extends MapView {
   private final Paint trailCellPaint = new Paint();
   private final Paint trailCellDBPaint = new Paint();
   
+  private final Paint ssidPaintLeft = new Paint();
+  private final Paint ssidPaintRight = new Paint();
+  
+  private final Paint netTextBack = new Paint();
+  private final Paint netText = new Paint();
+  
   private final ConcurrentLinkedHashMap<GeoPoint,Boolean> labelChoice = 
     new ConcurrentLinkedHashMap<GeoPoint,Boolean>(128);
+  
+  private Network singleNetwork = null;
   
   /**
    * code constructor
@@ -52,6 +61,10 @@ public final class OpenStreetMapViewWrapper extends MapView {
   public OpenStreetMapViewWrapper( final Context context, final AttributeSet attrs ) {
     super( context, attrs );
     setupColors();
+  }
+  
+  public void setSingleNetwork( final Network singleNetwork ) {
+    this.singleNetwork = singleNetwork;
   }
   
   private void setupColors() {    
@@ -84,13 +97,53 @@ public final class OpenStreetMapViewWrapper extends MapView {
     trailCellBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );
     trailCellBackPaint.setStyle( Style.STROKE );
     trailCellBackPaint.setStrokeWidth( 2f );
+    
+    ssidPaintLeft.setColor( Color.argb( 255, 0, 0, 0 ) );
+    ssidPaintLeft.setAntiAlias( true );
+    ssidPaintLeft.setTextAlign( Align.LEFT );
+    
+    ssidPaintRight.setColor( Color.argb( 255, 0, 0, 0 ) );
+    ssidPaintRight.setAntiAlias( true );
+    ssidPaintRight.setTextAlign( Align.RIGHT );
+    
+    netTextBack.setColor( Color.argb( 255, 250, 250, 250 ) );
+    netTextBack.setStyle( Style.STROKE );
+    netTextBack.setTextSize(20f);
+    netTextBack.setAntiAlias( true );
+    netTextBack.setStrokeWidth( 4f );
+    
+    netText.setColor( Color.argb( 255, 0, 0, 0 ) );
+    netText.setStyle( Style.STROKE );
+    netText.setTextSize(20f);
+    netText.setAntiAlias( true );
   }
   
   @Override
   public void onDraw( final Canvas c ) {
     super.onDraw( c );
-        
-    Projection proj = this.getProjection();
+    
+    if ( singleNetwork != null ) {
+      drawNetwork( c, singleNetwork );
+    }
+    else {
+      drawTrail( c );
+    }
+  }
+  
+  private void drawNetwork( final Canvas c, final Network network ) {
+    final Projection proj = this.getProjection();
+    final GeoPoint geoPoint = network.getGeoPoint();
+    
+    Point point = proj.toMapPixels( geoPoint, null );
+    c.drawCircle(point.x, point.y, 16, trailBackPaint);
+    c.drawCircle(point.x, point.y, 16, trailPaint);
+    
+    c.drawText( network.getSsid(), point.x, point.y, netTextBack );                
+    c.drawText( network.getSsid(), point.x, point.y, netText );            
+  }
+   
+  private void drawTrail( final Canvas c ) {
+    final Projection proj = this.getProjection();
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
 	  Point point = null;
@@ -197,24 +250,25 @@ public final class OpenStreetMapViewWrapper extends MapView {
             int x = point.x;
             int y = point.y; 
             
-            int horizontalOffset = 0;
-            int verticalDirection = 1;
-            int verticalOffset = 0;
-            
+            Boolean choice = labelChoice.get( geoCopy ); 
             if ( nets == 0 ) {
-              // new box for this frame, see if we need to adjust
-              Boolean choice = labelChoice.get( geoCopy );     
+              // new box for this frame, see if we need to adjust                  
               if ( choice == null ) {
                 choice = !prevChoice;
                 labelChoice.put( geoCopy, choice );
               }              
-              
-              if ( choice ) {
-                  horizontalOffset = -80;
-                  verticalDirection = -1;    
-                  verticalOffset = -12;                  
-              }
               prevChoice = choice;
+            }
+            
+            int horizontalOffset = 4;
+            int verticalDirection = 1;
+            int verticalOffset = 0;
+            Paint paint = ssidPaintLeft;
+            if ( choice ) {
+              horizontalOffset = -4;
+              verticalDirection = -1;    
+              verticalOffset = -12;
+              paint = ssidPaintRight;
             }
             
             // adjust so they don't overlap too bad
@@ -222,7 +276,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
             x += horizontalOffset;
             
             // ListActivity.info("x: " + x + " y: " + y + " point: " + point);
-            c.drawText( network.getSsid(), x, y, crossPaint );            
+            c.drawText( network.getSsid(), x, y, paint );            
           }
         }
       }

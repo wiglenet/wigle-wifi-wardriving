@@ -93,7 +93,7 @@ public final class MappingActivity extends Activity {
   
   private void setupMapView( final IGeoPoint oldCenter, final int oldZoom ) {
     // view
-    RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.map_rl );
+    final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.map_rl );
 
     //tryEvil();
     

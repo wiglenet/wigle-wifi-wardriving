@@ -58,25 +58,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     // info( "listing net: " + network.getBssid() );
     
     final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );
-    if ( network.getType().equals(NetworkType.WIFI) ) {
-      switch ( network.getCrypto() ) {
-        case Network.CRYPTO_WEP:
-          ico.setImageResource( R.drawable.wep_ico );
-          break;
-        case Network.CRYPTO_WPA:
-          ico.setImageResource( R.drawable.wpa_ico );
-          break;
-        case Network.CRYPTO_NONE:
-          ico.setImageResource( R.drawable.no_ico );
-          break;
-        default:
-          throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
-              + " in network: " + network );
-      }
-    }
-    else {
-      ico.setImageResource( R.drawable.tower_ico );
-    }
+    ico.setImageResource(getImage(network));
       
     TextView tv = (TextView) row.findViewById( R.id.ssid ); 
     tv.setText( network.getSsid() + " ");
@@ -109,6 +91,31 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );
 
     return row;
+  }
+  
+  public static int getImage( final Network network ) {
+    int resource = 0;
+    if ( network.getType().equals(NetworkType.WIFI) ) {
+      switch ( network.getCrypto() ) {
+        case Network.CRYPTO_WEP:
+          resource = R.drawable.wep_ico;
+          break;
+        case Network.CRYPTO_WPA:
+          resource = R.drawable.wpa_ico;
+          break;
+        case Network.CRYPTO_NONE:
+          resource = R.drawable.no_ico;
+          break;
+        default:
+          throw new IllegalArgumentException( "unhanded crypto: " + network.getCrypto() 
+              + " in network: " + network );
+      }
+    }
+    else {
+      resource = R.drawable.tower_ico;
+    }
+    
+    return resource;
   }
 
 }

@@ -222,7 +222,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) { 
-        Boolean prevChoice = new Boolean(false);
+        Boolean prevChoice = new Boolean(true);
         Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
         
         for( Network network : ListActivity.getNetworkCache().values() ) {
@@ -230,7 +230,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
           if ( geoPoint != null ) {
             final GeoPoint geoCopy = new GeoPoint( geoPoint );
             // round off a bit
-            final int shiftBits = 7;
+            final int shiftBits = 6;
             geoCopy.setLatitudeE6( geoCopy.getLatitudeE6() >> shiftBits << shiftBits );
             geoCopy.setLongitudeE6( geoCopy.getLongitudeE6() >> shiftBits << shiftBits );
             geoCopy.setAltitude(0);

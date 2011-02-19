@@ -6,13 +6,21 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
     
-	<TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/ssid"
-    android:textSize="24sp"
-    android:textColor="#AAEE50"
-    />
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="wrap_content">
+	    
+	    <ImageView android:text="wepicon" android:id="@+id/wepicon" android:layout_width="wrap_content" 
+			android:layout_height="wrap_content" android:paddingTop="2px" 
+			android:paddingLeft="2px" android:paddingRight="13px"/>
+		
+		<TextView
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:id="@+id/ssid"
+	    android:textSize="24sp"
+	    android:textColor="#AAEE50"
+	    />
+	</LinearLayout>
     
     <TextView
     android:layout_width="fill_parent" 
@@ -21,6 +29,24 @@
     android:textSize="24sp"
     android:textColor="#AAAA00"
     />
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/connect_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/connect_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/connect_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/connect_text"
+		android:layout_weight="5"
+		/>
+	</LinearLayout>
     
     <LinearLayout
 	android:id="@+id/horizontalLine"

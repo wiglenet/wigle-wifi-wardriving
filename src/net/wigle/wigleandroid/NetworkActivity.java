@@ -1,15 +1,24 @@
 package net.wigle.wigleandroid;
 
+import net.wigle.wigleandroid.MainActivity.Doer;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +46,9 @@ public class NetworkActivity extends Activity {
     if ( network != null ) {
       tv = (TextView) findViewById( R.id.ssid );
       tv.setText( network.getSsid() );
+      
+      final ImageView ico = (ImageView) findViewById( R.id.wepicon );
+      ico.setImageResource( NetworkListAdapter.getImage( network ) );
     
       GeoPoint point = network.getGeoPoint();
       // ListActivity.info("point: " + point );
@@ -61,7 +73,45 @@ public class NetworkActivity extends Activity {
         mapControl.setZoom( 16 );
         mapControl.setCenter( point );
       }
+      
+      setupButton( network );
     }
+  }
+  
+  private void setupButton( final Network network ) {
+    final Button connectButton = (Button) findViewById( R.id.connect_button );
+    connectButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {    
+        MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?", new Doer() {
+          @Override
+          public void execute() {          
+            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            final String ssid = "\"" + network.getSsid() + "\"";            
+            int netId = -2;
+            
+            for ( final WifiConfiguration config : wifiManager.getConfiguredNetworks() ) {
+              ListActivity.info( "bssid: " + config.BSSID + " ssid: " + config.SSID + " status: " + config.status
+                  + " id: " + config.networkId );
+              if ( ssid.equals( config.SSID ) ) {
+                netId = config.networkId;
+                break;
+              }
+            }
+            
+            if ( netId < 0 ) {
+              final WifiConfiguration newConfig = new WifiConfiguration();     
+              newConfig.SSID = ssid;
+              netId = wifiManager.addNetwork( newConfig );
+            }
+            
+            if ( netId >= 0 ) {
+              final boolean disableOthers = true;
+              wifiManager.enableNetwork(netId, disableOthers);
+            }
+          }
+        } );
+      }
+    });
   }
   
   /* Creates the menu items */

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Starting</string>
-    <string name="app_name">WiGLE WiFi</string>
-    <string name="settings_app_name">WiGLE WiFi - Settings</string>
-    <string name="mapping_app_name">WiGLE WiFi - Open Street Map</string>
-    <string name="dashboard_app_name">WiGLE WiFi - Dashboard</string>
-    <string name="error_report_name">WiGLE WiFi - Most Recent Error Report</string>
-    <string name="speech_name">WiGLE WiFi - Speech Settings</string>
-    <string name="network_activity_name">Wigle WiFi - Network</string>
+    <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="settings_app_name">WiGLE Wifi - Settings</string>
+    <string name="mapping_app_name">WiGLE Wifi - Open Street Map</string>
+    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
+    <string name="error_report_name">Wifi Wifi - Most Recent Error Report</string>
+    <string name="speech_name">WiGLE Wifi - Speech Settings</string>
+    <string name="network_activity_name">Wigle Wifi - Network</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>
@@ -21,6 +21,8 @@
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="maxout_maxid_button">Maxout DB marker</string>
     <string name="maxout_maxid_text">Set marker to:</string>
+    <string name="connect_button">Connect</string>
+    <string name="connect_text">with permission of network operator</string>
     <string name="kml_run_export_button">KML Export Run</string>
     <string name="kml_run_export_text">Export current run</string>
     <string name="kml_export_button">KML Export DB</string>

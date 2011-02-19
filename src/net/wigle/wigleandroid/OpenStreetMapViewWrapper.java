@@ -35,6 +35,9 @@ public final class OpenStreetMapViewWrapper extends MapView {
   private final Paint trailCellPaint = new Paint();
   private final Paint trailCellDBPaint = new Paint();
   
+  private final ConcurrentLinkedHashMap<GeoPoint,Boolean> labelChoice = 
+    new ConcurrentLinkedHashMap<GeoPoint,Boolean>(128);
+  
   /**
    * code constructor
    */
@@ -86,7 +89,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
   @Override
   public void onDraw( final Canvas c ) {
     super.onDraw( c );
-    
+        
     Projection proj = this.getProjection();
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
@@ -165,71 +168,63 @@ public final class OpenStreetMapViewWrapper extends MapView {
     if ( getZoomLevel() >= 16 && showLabel ) {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
-      if ( ! networks.isEmpty() ) {
-        final Map<GeoPoint,LabelChoice> geoPoints = new HashMap<GeoPoint,LabelChoice>();
-        int prevX = Integer.MIN_VALUE;
-        int prevY = Integer.MIN_VALUE;      
-        LabelChoice prevChoice = new LabelChoice();
+      if ( ! networks.isEmpty() ) { 
+        Boolean prevChoice = new Boolean(false);
+        Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
         
         for( Network network : ListActivity.getNetworkCache().values() ) {
           final GeoPoint geoPoint = network.getGeoPoint();
           if ( geoPoint != null ) {
             final GeoPoint geoCopy = new GeoPoint( geoPoint );
             // round off a bit
-            final int shiftBits = 6;
+            final int shiftBits = 7;
             geoCopy.setLatitudeE6( geoCopy.getLatitudeE6() >> shiftBits << shiftBits );
             geoCopy.setLongitudeE6( geoCopy.getLongitudeE6() >> shiftBits << shiftBits );
             geoCopy.setAltitude(0);
             // ListActivity.info( "geoPoint: " + geoPoint + " geoCopy: " + geoCopy );
-            LabelChoice choice = geoPoints.get( geoCopy );
-            if ( choice == null ) {
-              choice = new LabelChoice();
+            
+            Integer nets = netsMap.get( geoCopy );
+            if ( nets == null ) {
+              nets = 0;
             }
             else {
-              choice.nets++;
-            }
-            geoPoints.put( geoCopy, choice );
+              nets++;              
+            } 
+            netsMap.put( geoCopy, nets );
             
-            // use real geopoint
+            // use geoCopy
             point = proj.toMapPixels( geoCopy, point );
             int x = point.x;
-            int y = point.y;                        
+            int y = point.y; 
             
-            if ( choice.nets == 0 ) {
-              // new box, see if we need to adjust
-              if ( prevX != Integer.MIN_VALUE ) {
-                int diffX = x - prevX;
-                int diffY = y - prevY;
-                if ( Math.abs(diffX) > Math.abs(diffY) ) {
-                  // moving horizontally, alternate vertical                  
-                  choice.verticalDirection = prevChoice.verticalDirection * -1;    
-                  choice.verticalOffset = prevChoice.verticalOffset == 0 ? -12 : 0;
-                  // unset other
-                  choice.horizontalOffset = 0;
-                }
-                else {
-                  // moving vertically, alternate horizontal
-                  choice.horizontalOffset = prevChoice.horizontalOffset == 0 ? -80 : 0;
-                  // unset other
-                  choice.verticalDirection = -1;
-                  choice.verticalOffset = 0;
-                }
+            int horizontalOffset = 0;
+            int verticalDirection = 1;
+            int verticalOffset = 0;
+            
+            if ( nets == 0 ) {
+              // new box for this frame, see if we need to adjust
+              Boolean choice = labelChoice.get( geoCopy );     
+              if ( choice == null ) {
+                choice = !prevChoice;
+                labelChoice.put( geoCopy, choice );
+              }              
+              
+              if ( choice ) {
+                  horizontalOffset = -80;
+                  verticalDirection = -1;    
+                  verticalOffset = -12;                  
               }
-              prevX = x;
-              prevY = y;
               prevChoice = choice;
             }
             
             // adjust so they don't overlap too bad
-            y += choice.nets * 12 * choice.verticalDirection + choice.verticalOffset;
-            x += choice.horizontalOffset;
+            y += nets * 12 * verticalDirection + verticalOffset;
+            x += horizontalOffset;
             
             // ListActivity.info("x: " + x + " y: " + y + " point: " + point);
             c.drawText( network.getSsid(), x, y, crossPaint );            
           }
         }
-        // ListActivity.info("geopoints: " + geoPoints);
-
       }
     }
   	 
@@ -246,10 +241,4 @@ public final class OpenStreetMapViewWrapper extends MapView {
     }
   }
   
-  private static class LabelChoice {
-    int verticalDirection = 1;
-    int verticalOffset = 0;
-    int horizontalOffset = 0;
-    int nets = 0;
-  }
 }

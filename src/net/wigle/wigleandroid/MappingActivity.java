@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;

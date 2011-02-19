@@ -153,15 +153,24 @@ final class HttpFileUploader {
       }
     
       FileChannel fc = fileInputStream.getChannel();
-      long byteswritten = fc.transferTo( 0, Integer.MAX_VALUE, wbc ); // transfer it all. the integer cap is reasonable.
-      ListActivity.info( "transferred " + byteswritten + " of " + filesize );
-      percentDone = ((int)byteswritten * 100) / (int)filesize;
+      long byteswritten = 0;
+      final int chunk = 16 * 1024;
+      while ( byteswritten < filesize ) {
+        final long bytes = fc.transferTo( byteswritten, chunk, wbc );
+        if ( bytes <= 0 ) {
+          ListActivity.info( "giving up transfering file. bytes: " + bytes );
+          break;
+        }
+        byteswritten += bytes;
+              
+        ListActivity.info( "transferred " + byteswritten + " of " + filesize );
+        percentDone = ((int)byteswritten * 100) / (int)filesize;
 
-      // only send it the once... if we want to to send updates out to the ui:
-      // hook on a wrapper to the writeable byte channel, which of course would bugger the transfer() native call
-      if ( handler != null ) {
-        handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+        if ( handler != null ) {
+          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+        }
       }
+      ListActivity.info( "done. transferred " + byteswritten + " of " + filesize );
 
       // send multipart form data necesssary after file data...
       header.setLength( 0 ); // clear()

@@ -355,12 +355,19 @@ public final class FileUploaderTask extends Thread {
 
       long filesize = file != null ? file.length() : 0L;
       if ( filesize <= 0 ) {
+        // find out how big the gzip'd file became
+        final FileInputStream fin = context.openFileInput(filename);
+        filesize = fin.available();
+        fin.close();
+        // ListActivity.info("filesize: " + filesize);
+      }
+      if ( filesize <= 0 ) {
         filesize = countStats.byteCount; // as an upper bound
       }
 
       // send file
       final FileInputStream fis = hasSD ? new FileInputStream( file ) 
-        : context.openFileInput( filename );
+        : context.openFileInput( filename ); 
       final Map<String,String> params = new HashMap<String,String>();
       
       params.put("observer", username);

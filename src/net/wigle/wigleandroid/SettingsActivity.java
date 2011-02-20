@@ -38,7 +38,7 @@ public final class SettingsActivity extends Activity {
   private static final int MENU_ERROR_REPORT = 13;
   
   /** convenience, just get the darn new string */
-  private static abstract class SetWatcher implements TextWatcher {
+  public static abstract class SetWatcher implements TextWatcher {
     public void afterTextChanged( final Editable s ) {}
     public void beforeTextChanged( final CharSequence s, final int start, final int count, final int after ) {}
     public void onTextChanged( final CharSequence s, final int start, final int before, final int count ) {

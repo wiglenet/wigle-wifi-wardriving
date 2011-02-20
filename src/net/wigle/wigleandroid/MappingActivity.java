@@ -12,6 +12,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -23,6 +24,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import dalvik.system.DexClassLoader;
@@ -54,6 +57,9 @@ public final class MappingActivity extends Activity {
   private static final int MENU_TOGGLE_LOCK = 15;
   private static final int MENU_TOGGLE_NEWDB = 16;
   private static final int MENU_LABEL = 17;
+  private static final int MENU_FILTER = 18;
+  
+  private static final int SSID_FILTER = 102;
     
   /** Called when the activity is first created. */
   @Override
@@ -247,29 +253,35 @@ public final class MappingActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
-      item.setIcon( android.R.drawable.ic_menu_add );
-      
-      item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
-      item.setIcon( android.R.drawable.ic_menu_revert );
-      
-      String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
-      item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
-      item.setIcon( android.R.drawable.ic_menu_mapmode );
-      
-      item = menu.add(0, MENU_EXIT, 0, "Exit");
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-      
-      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
-      String nameDB = showNewDBOnly ? "Show Run&New" : "Show New Only";
-      item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
-      item.setIcon( android.R.drawable.ic_menu_edit );
-      
-      item = menu.add(0, MENU_LABEL, 0, "Toggle Labels");
-      item.setIcon( android.R.drawable.ic_dialog_info );
-      
-      return true;
+    MenuItem item = null;
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+    
+    String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
+    item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
+    item.setIcon( android.R.drawable.ic_menu_mapmode );
+        
+    String nameDB = showNewDBOnly ? "Show Run&New" : "Show New Only";
+    item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
+    item.setIcon( android.R.drawable.ic_menu_edit );
+    
+    item = menu.add(0, MENU_LABEL, 0, "Toggle Labels");
+    item.setIcon( android.R.drawable.ic_dialog_info );
+    
+    item = menu.add(0, MENU_EXIT, 0, "Exit");
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );    
+    
+    item = menu.add(0, MENU_FILTER, 0, "SSID Filter");
+    item.setIcon( android.R.drawable.ic_menu_search );
+    
+    item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
+    item.setIcon( android.R.drawable.ic_menu_add );
+    
+    item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
+    item.setIcon( android.R.drawable.ic_menu_revert );
+    
+    
+    return true;
   }
 
   /* Handles item selections */
@@ -317,9 +329,14 @@ public final class MappingActivity extends Activity {
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
           edit.commit();
         }
+        case MENU_FILTER: {
+          showDialog( SSID_FILTER );
+        }
       }
       return false;
   }
+  
+  
   
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -329,6 +346,51 @@ public final class MappingActivity extends Activity {
       return true;
     }
     return super.onKeyDown(keyCode, event);
+  }
+  
+  @Override
+  public Dialog onCreateDialog( int which ) {
+    switch ( which ) {
+      case SSID_FILTER:
+        final Dialog dialog = new Dialog( this );
+
+        dialog.setContentView( R.layout.filterdialog );
+        dialog.setTitle( "SSID Filter" );
+        
+        
+        Button ok = (Button) dialog.findViewById( R.id.ok_button );
+        ok.setOnClickListener( new OnClickListener() {
+            public void onClick( final View buttonView ) {  
+              try {
+                final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+                final Editor editor = prefs.edit();
+                dialog.dismiss();
+              }
+              catch ( Exception ex ) {
+                // guess it wasn't there anyways
+                ListActivity.info( "exception dismissing filter dialog: " + ex );
+              }
+            }
+          } );
+        
+        Button cancel = (Button) dialog.findViewById( R.id.cancel_button );
+        cancel.setOnClickListener( new OnClickListener() {
+            public void onClick( final View buttonView ) {  
+              try {
+                dialog.dismiss();
+              }
+              catch ( Exception ex ) {
+                // guess it wasn't there anyways
+                ListActivity.info( "exception dismissing filter dialog: " + ex );
+              }
+            }
+          } );
+        
+        return dialog;
+      default:
+        ListActivity.error( "unhandled dialog: " + which );
+    }
+    return null;
   }
   
   private void tryEvil() {

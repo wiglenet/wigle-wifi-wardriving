@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="10dp"
+              android:minWidth="280dip"                            
+              >
+	<TextView android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="Show SSID's Matching (regex):" />
+              
+    <EditText
+        android:id="@+id/edit_regex"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textFilter" />
+    
+	<CheckBox android:id="@+id/showpass"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show what doesn't match above" /> 
+        
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content">	
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content">	
+	    	
+	    	<CheckBox android:id="@+id/showopen"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Show Open"/> 
+	        
+	    	<CheckBox android:id="@+id/enabled"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Filter Enabled" /> 
+	           
+     	</LinearLayout>
+     
+     	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content">	   	    		    	
+	    	
+	    	<CheckBox android:id="@+id/showwep"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Show WEP" />	  
+	        	        
+	    	<CheckBox android:id="@+id/showwpa"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Show WPA" />      
+	    </LinearLayout>    
+    </LinearLayout>
+	
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              >		  
+	<Button android:id="@+id/ok_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/cryptodialog_button"
+              android:layout_weight="1"
+              /> 
+    <Button android:id="@+id/cancel_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/cryptocanceldialog_button"
+              android:layout_weight="1"
+              />       
+    </LinearLayout>            
+</LinearLayout>

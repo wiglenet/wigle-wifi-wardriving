@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/layout_root"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:padding="10dp"
+              android:minWidth="280dip"              
+              >
+              
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              >
+		<TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Security  "
+              />
+    	<TextView android:id="@+id/security"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textStyle="bold"              
+              />
+    </LinearLayout>
+    
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              >
+		<TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Signal strength  "
+              />
+    	<TextView android:id="@+id/signal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textStyle="bold"              
+              />
+    </LinearLayout>
+              
+    <TextView android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Password"
+              />
+    
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword" />
+              
+    <CheckBox android:id="@+id/showpass"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show password." /> 
+	
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              >		  
+	<Button android:id="@+id/ok_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/cryptodialog_button"
+              android:layout_weight="1"
+              android:enabled="false"
+              /> 
+    <Button android:id="@+id/cancel_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/cryptocanceldialog_button"
+              android:layout_weight="1"
+              />       
+    </LinearLayout>     
+</LinearLayout>

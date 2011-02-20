@@ -29,17 +29,22 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
   
   private final SimpleDateFormat format;
   
-  public NetworkListAdapter( Context context, int rowLayout ) {
+  public NetworkListAdapter( final Context context, final int rowLayout ) {
     super( context, rowLayout );
     this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-    
+    format = getConstructionTimeFormater( context );    
+  }
+  
+  public static SimpleDateFormat getConstructionTimeFormater( final Context context ) {
     final int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
+    SimpleDateFormat format = null;
     if ( value == 24 ) {
       format = new SimpleDateFormat("H:mm:ss");
     }
     else {
       format = new SimpleDateFormat("h:mm:ss a");
     }
+    return format;
   }
     
   @Override
@@ -64,25 +69,11 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     tv.setText( network.getSsid() + " ");
     
     tv = (TextView) row.findViewById( R.id.time ); 
-    tv.setText( format.format(new Date(network.getConstructionTime())));
+    tv.setText( getConstructionTime( format, network ) );
     
     tv = (TextView) row.findViewById( R.id.level_string );
-    int level = network.getLevel();
-    if ( level <= -90 ) {
-      tv.setTextColor( COLOR_5 );
-    }
-    else if ( level <= -80 ) {
-      tv.setTextColor( COLOR_4 );
-    }
-    else if ( level <= -70 ) {
-      tv.setTextColor( COLOR_3 );
-    }
-    else if ( level <= -60 ) {
-      tv.setTextColor( COLOR_2 );
-    }
-    else {
-      tv.setTextColor( COLOR_1 );
-    }
+    final int level = network.getLevel();
+    tv.setTextColor( getSignalColor( level ) );
     tv.setText( Integer.toString( level ) );
     
     tv = (TextView) row.findViewById( R.id.detail );
@@ -91,6 +82,28 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );
 
     return row;
+  }
+  
+  public static String getConstructionTime( final SimpleDateFormat format, final Network network ) {
+    return format.format( new Date( network.getConstructionTime() ) );
+  }
+  
+  public static int getSignalColor( final int level ) {
+    int color = COLOR_1;
+    if ( level <= -90 ) {
+      color = COLOR_5;
+    }
+    else if ( level <= -80 ) {
+      color = COLOR_4;
+    }
+    else if ( level <= -70 ) {
+      color = COLOR_3;
+    }
+    else if ( level <= -60 ) {
+      color = COLOR_2;
+    }
+    
+    return color;
   }
   
   public static int getImage( final Network network ) {

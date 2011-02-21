@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IMapView;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import android.app.Activity;
@@ -95,8 +95,7 @@ public class NetworkActivity extends Activity {
   }
     
   private void setupMap( final Network network ) {
-    GeoPoint point = network.getGeoPoint();
-    // ListActivity.info("point: " + point );
+    final IGeoPoint point = MappingActivity.getCenter( this, network.getGeoPoint(), null );
     if ( point != null ) {
       // view
       final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.netmap_rl );
@@ -144,8 +143,21 @@ public class NetworkActivity extends Activity {
     int netId = -2;
     
     for ( final WifiConfiguration config : wifiManager.getConfiguredNetworks() ) {
-      ListActivity.info( "bssid: " + config.BSSID + " ssid: " + config.SSID + " status: " + config.status
-          + " id: " + config.networkId );
+      ListActivity.info( "bssid: " + config.BSSID 
+          + " ssid: " + config.SSID 
+          + " status: " + config.status
+          + " id: " + config.networkId
+          + " preSharedKey: " + config.preSharedKey
+          + " priority: " + config.priority
+          + " wepTxKeyIndex: " + config.wepTxKeyIndex
+          + " allowedAuthAlgorithms: " + config.allowedAuthAlgorithms
+          + " allowedGroupCiphers: " + config.allowedGroupCiphers
+          + " allowedKeyManagement: " + config.allowedKeyManagement
+          + " allowedPairwiseCiphers: " + config.allowedPairwiseCiphers
+          + " allowedProtocols: " + config.allowedProtocols
+          + " hiddenSSID: " + config.hiddenSSID
+          + " wepKeys: " + config.wepKeys
+          );
       if ( quotedSsid.equals( config.SSID ) ) {
         netId = config.networkId;
         break;
@@ -165,22 +177,28 @@ public class NetworkActivity extends Activity {
   }
   
   private void connectToNetwork( final String password ) {
-    final int preExistingNetId = getExistingSsid(network.getSsid());    
-    final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+    final int preExistingNetId = getExistingSsid( network.getSsid() );    
+    final WifiManager wifiManager = (WifiManager) getSystemService( Context.WIFI_SERVICE );
     int netId = -2;
     if ( preExistingNetId < 0 ) {
       final WifiConfiguration newConfig = new WifiConfiguration();     
       newConfig.SSID = "\"" + network.getSsid() + "\"";
+      newConfig.hiddenSSID = false;
       if ( password != null ) {
-        newConfig.wepKeys = new String[]{ "\"" + password + "\"" };
-        newConfig.preSharedKey = "\"" + password + "\"";
+        if ( Network.CRYPTO_WEP == network.getCrypto() ) {
+          newConfig.wepKeys = new String[]{ "\"" + password + "\"" };
+        }
+        else {
+          newConfig.preSharedKey = "\"" + password + "\"";
+        }
       }
-      netId = wifiManager.addNetwork( newConfig );
+      
+      netId = wifiManager.addNetwork( newConfig );      
     }
     
     if ( netId >= 0 ) {
       final boolean disableOthers = true;
-      wifiManager.enableNetwork(netId, disableOthers);
+      wifiManager.enableNetwork(netId, disableOthers);      
     }
   }
   

@@ -136,12 +136,14 @@ public final class OpenStreetMapViewWrapper extends MapView {
     final Projection proj = this.getProjection();
     final GeoPoint geoPoint = network.getGeoPoint();
     
-    Point point = proj.toMapPixels( geoPoint, null );
-    c.drawCircle(point.x, point.y, 16, trailBackPaint);
-    c.drawCircle(point.x, point.y, 16, trailPaint);
-    
-    c.drawText( network.getSsid(), point.x, point.y, netTextBack );                
-    c.drawText( network.getSsid(), point.x, point.y, netText );            
+    if ( geoPoint != null ) {
+      Point point = proj.toMapPixels( geoPoint, null );
+      c.drawCircle(point.x, point.y, 16, trailBackPaint);
+      c.drawCircle(point.x, point.y, 16, trailPaint);
+      
+      c.drawText( network.getSsid(), point.x, point.y, netTextBack );                
+      c.drawText( network.getSsid(), point.x, point.y, netText );
+    }
   }
    
   private void drawTrail( final Canvas c ) {

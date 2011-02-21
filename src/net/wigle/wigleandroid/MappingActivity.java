@@ -123,11 +123,30 @@ public final class MappingActivity extends Activity {
     
     // controller
     mapControl = mapView.getController();
+    final IGeoPoint centerPoint = getCenter( this, oldCenter, previousLocation );
+    int zoom = 16;
+    if ( oldZoom >= 0 ) {
+      zoom = oldZoom;
+    }
+    else {
+      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
+    }
+    mapControl.setCenter( centerPoint );
+    mapControl.setZoom( zoom );
+    mapControl.setCenter( centerPoint );
+    
+    ListActivity.info("done setupMapView");
+  }
+  
+  public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
+      final Location previousLocation ) {
+    
     IGeoPoint centerPoint = DEFAULT_POINT;
     final Location location = ListActivity.lameStatic.location;
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    if ( oldCenter != null ) {
-      centerPoint = oldCenter;
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    if ( priorityCenter != null ) {
+      centerPoint = priorityCenter;
     }
     else if ( location != null ) {
       centerPoint = new GeoPoint( location );
@@ -141,20 +160,10 @@ public final class MappingActivity extends Activity {
       float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
       if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
         centerPoint = new GeoPoint( lat, lon );
-      }
+      }    
     }
-    int zoom = 16;
-    if ( oldZoom >= 0 ) {
-      zoom = oldZoom;
-    }
-    else {
-      zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
-    }
-    mapControl.setCenter( centerPoint );
-    mapControl.setZoom( zoom );
-    mapControl.setCenter( centerPoint );
     
-    ListActivity.info("done setupMapView");
+    return centerPoint;
   }
   
   private void setupTimer() {

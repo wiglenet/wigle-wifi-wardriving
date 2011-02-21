@@ -26,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import dalvik.system.DexClassLoader;
@@ -357,13 +359,37 @@ public final class MappingActivity extends Activity {
         dialog.setContentView( R.layout.filterdialog );
         dialog.setTitle( "SSID Filter" );
         
+        ListActivity.info("make new dialog");
+        final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+        final EditText regex = (EditText) dialog.findViewById( R.id.edit_regex );
+        regex.setText( prefs.getString( ListActivity.PREF_MAPF_REGEX, "") );
+        
+        final CheckBox invert = MainActivity.prefSetCheckBox( this, dialog, R.id.showinvert, 
+            ListActivity.PREF_MAPF_INVERT, false );
+        final CheckBox open = MainActivity.prefSetCheckBox( this, dialog, R.id.showopen, 
+            ListActivity.PREF_MAPF_OPEN, true );
+        final CheckBox wep = MainActivity.prefSetCheckBox( this, dialog, R.id.showwep, 
+            ListActivity.PREF_MAPF_WEP, true );
+        final CheckBox wpa = MainActivity.prefSetCheckBox( this, dialog, R.id.showwpa, 
+            ListActivity.PREF_MAPF_WPA, true );
+        final CheckBox cell = MainActivity.prefSetCheckBox( this, dialog, R.id.showcell, 
+            ListActivity.PREF_MAPF_CELL, true );
+        final CheckBox enabled = MainActivity.prefSetCheckBox( this, dialog, R.id.enabled, 
+            ListActivity.PREF_MAPF_ENABLED, true );
         
         Button ok = (Button) dialog.findViewById( R.id.ok_button );
         ok.setOnClickListener( new OnClickListener() {
             public void onClick( final View buttonView ) {  
-              try {
-                final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+              try {                
                 final Editor editor = prefs.edit();
+                editor.putString( ListActivity.PREF_MAPF_REGEX, regex.getText().toString() );
+                editor.putBoolean( ListActivity.PREF_MAPF_INVERT, invert.isChecked() );
+                editor.putBoolean( ListActivity.PREF_MAPF_OPEN, open.isChecked() );
+                editor.putBoolean( ListActivity.PREF_MAPF_WEP, wep.isChecked() );
+                editor.putBoolean( ListActivity.PREF_MAPF_WPA, wpa.isChecked() );
+                editor.putBoolean( ListActivity.PREF_MAPF_CELL, cell.isChecked() );
+                editor.putBoolean( ListActivity.PREF_MAPF_ENABLED, enabled.isChecked() );
+                editor.commit();
                 dialog.dismiss();
               }
               catch ( Exception ex ) {
@@ -377,6 +403,20 @@ public final class MappingActivity extends Activity {
         cancel.setOnClickListener( new OnClickListener() {
             public void onClick( final View buttonView ) {  
               try {
+                regex.setText( prefs.getString( ListActivity.PREF_MAPF_REGEX, "") );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.showinvert, 
+                    ListActivity.PREF_MAPF_INVERT, false );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.showopen, 
+                    ListActivity.PREF_MAPF_OPEN, true );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.showwep, 
+                    ListActivity.PREF_MAPF_WEP, true );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.showwpa, 
+                    ListActivity.PREF_MAPF_WPA, true );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.showcell, 
+                    ListActivity.PREF_MAPF_CELL, true );
+                MainActivity.prefSetCheckBox( MappingActivity.this, dialog, R.id.enabled, 
+                    ListActivity.PREF_MAPF_ENABLED, true );
+                
                 dialog.dismiss();
               }
               catch ( Exception ex ) {

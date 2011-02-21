@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
@@ -225,7 +227,20 @@ public final class OpenStreetMapViewWrapper extends MapView {
         Boolean prevChoice = new Boolean(true);
         Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
         
+        final boolean filter = prefs.getBoolean( ListActivity.PREF_MAPF_ENABLED, true );
+        final String regex = prefs.getString( ListActivity.PREF_MAPF_REGEX, "" );
+        Matcher matcher = null;
+        if ( filter && ! "".equals(regex) ) {
+          Pattern pattern = Pattern.compile( regex, Pattern.CASE_INSENSITIVE );
+          matcher = pattern.matcher( "" );
+        }
+        
         for( Network network : ListActivity.getNetworkCache().values() ) {
+          
+          if ( filter && ! isOk( matcher, prefs, network ) ) {
+            continue;
+          }
+          
           final GeoPoint geoPoint = network.getGeoPoint();
           if ( geoPoint != null ) {
             final GeoPoint geoCopy = new GeoPoint( geoPoint );
@@ -293,6 +308,51 @@ public final class OpenStreetMapViewWrapper extends MapView {
       c.drawLine( point.x - len, point.y - len, point.x + len, point.y + len, crossPaint );
       c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossPaint );
     }
+  }
+  
+  private boolean isOk( final Matcher matcher, final SharedPreferences prefs, final Network network ) {
+    boolean retval = true;
+    
+    if ( matcher != null ) {
+      matcher.reset(network.getSsid());
+      final boolean invert = prefs.getBoolean( ListActivity.PREF_MAPF_INVERT, false );
+      final boolean matches = matcher.find();
+      if ( ! matches && ! invert) {
+        return false;
+      }
+      else if ( matches && invert ) {
+        return false;
+      }
+    }
+    
+    if ( NetworkType.WIFI.equals( network.getType() ) ) {
+      switch ( network.getCrypto() ) {
+        case Network.CRYPTO_NONE:
+          if ( ! prefs.getBoolean( ListActivity.PREF_MAPF_OPEN, true ) ) {
+            return false;
+          }
+          break;
+        case Network.CRYPTO_WEP:
+          if ( ! prefs.getBoolean( ListActivity.PREF_MAPF_WEP, true ) ) {
+            return false;
+          }
+          break;
+        case Network.CRYPTO_WPA:
+          if ( ! prefs.getBoolean( ListActivity.PREF_MAPF_WPA, true ) ) {
+            return false;
+          }
+          break;
+        default: 
+          ListActivity.error( "unhandled crypto: " + network );
+      }
+    }
+    else {
+      if ( ! prefs.getBoolean( ListActivity.PREF_MAPF_CELL, true ) ) {
+        return false;
+      }
+    }
+
+    return retval;
   }
   
 }

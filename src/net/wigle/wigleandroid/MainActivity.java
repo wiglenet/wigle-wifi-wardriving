@@ -2,14 +2,21 @@ package net.wigle.wigleandroid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TabHost;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public final class MainActivity extends TabActivity {
   static final String TAB_LIST = "list";
@@ -114,6 +121,36 @@ public final class MainActivity extends TabActivity {
     catch ( WindowManager.BadTokenException ex ) {
       ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
     }
+  }
+  
+  public static CheckBox prefSetCheckBox( final Context context, final Dialog dialog, final int id, 
+      final String pref, final boolean def ) {
+    
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final CheckBox checkbox = (CheckBox) dialog.findViewById( id );
+    checkbox.setChecked( prefs.getBoolean( pref, def ) );
+    return checkbox;
+  }
+  
+  public static CheckBox prefSetCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
+    final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final CheckBox checkbox = (CheckBox) activity.findViewById( id );
+    checkbox.setChecked( prefs.getBoolean( pref, def ) );
+    return checkbox;
+  }
+  
+  public static CheckBox prefBackedCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
+    final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final Editor editor = prefs.edit();
+    final CheckBox checkbox = prefSetCheckBox( activity, id, pref, def );
+    checkbox.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+      public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
+            editor.putBoolean( pref, isChecked );
+            editor.commit();
+        }
+    });
+    
+    return checkbox;
   }
   
   static MainActivity getMainActivity( Activity activity ) {

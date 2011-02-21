@@ -186,24 +186,6 @@ public final class SettingsActivity extends Activity {
         } 
       });
       
-      final CheckBox showCurrent = (CheckBox) findViewById(R.id.edit_showcurrent);
-      showCurrent.setChecked( prefs.getBoolean( ListActivity.PREF_SHOW_CURRENT, true ) );
-      showCurrent.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
-              editor.putBoolean( ListActivity.PREF_SHOW_CURRENT, isChecked );
-              editor.commit();
-          }
-      });
-      
-      final CheckBox useMetric = (CheckBox) findViewById(R.id.use_metric);
-      useMetric.setChecked( prefs.getBoolean( ListActivity.PREF_METRIC, false ) );
-      useMetric.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
-              editor.putBoolean( ListActivity.PREF_METRIC, isChecked );
-              editor.commit();
-          }
-      });
-      
       final Button button = (Button) findViewById( R.id.speech_button );
       button.setOnClickListener( new OnClickListener() {
           public void onClick( final View view ) {
@@ -289,32 +271,11 @@ public final class SettingsActivity extends Activity {
       doScanSpinner( R.id.gps_spinner, 
           ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, "Tie to Wifi Scan Period" );
       
-      final CheckBox foundSound = (CheckBox) findViewById(R.id.found_sound);
-      foundSound.setChecked( prefs.getBoolean( ListActivity.PREF_FOUND_SOUND, true) );
-      foundSound.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
-              editor.putBoolean( ListActivity.PREF_FOUND_SOUND, isChecked );
-              editor.commit();
-          }
-      });
-      
-      final CheckBox foundNewSound = (CheckBox) findViewById(R.id.found_new_sound);
-      foundNewSound.setChecked( prefs.getBoolean( ListActivity.PREF_FOUND_NEW_SOUND, true) );
-      foundNewSound.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {             
-              editor.putBoolean( ListActivity.PREF_FOUND_NEW_SOUND, isChecked );
-              editor.commit();
-          }
-      });
-      
-      final CheckBox speechGPS = (CheckBox) findViewById(R.id.speech_gps);
-      speechGPS.setChecked( prefs.getBoolean( ListActivity.PREF_SPEECH_GPS, true) );
-      speechGPS.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked) {             
-              editor.putBoolean( ListActivity.PREF_SPEECH_GPS, isChecked );
-              editor.commit();
-          }
-      });
+      MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListActivity.PREF_SHOW_CURRENT, true);
+      MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListActivity.PREF_METRIC, false);
+      MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListActivity.PREF_FOUND_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListActivity.PREF_FOUND_NEW_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListActivity.PREF_SPEECH_GPS, true);
       
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );

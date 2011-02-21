@@ -17,10 +17,10 @@
         android:layout_height="wrap_content"
         android:inputType="textFilter" />
     
-	<CheckBox android:id="@+id/showpass"
+	<CheckBox android:id="@+id/showinvert"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Show what doesn't match above" /> 
+        android:text="Show what doesn't match above regular expression" /> 
         
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
@@ -36,10 +36,10 @@
 	        android:layout_height="wrap_content"
 	        android:text="Show Open"/> 
 	        
-	    	<CheckBox android:id="@+id/enabled"
+	    	<CheckBox android:id="@+id/showcell"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Filter Enabled" /> 
+	        android:text="Show Cell" /> 
 	           
      	</LinearLayout>
      
@@ -59,6 +59,11 @@
 	        android:text="Show WPA" />      
 	    </LinearLayout>    
     </LinearLayout>
+    
+    <CheckBox android:id="@+id/enabled"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="Filter Enabled" /> 
 	
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"

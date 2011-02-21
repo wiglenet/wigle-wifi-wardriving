@@ -8,6 +8,7 @@ web replace: seen-networks map tile overlays
 web replace: leaderboard
 past observations on NetworkActivity
 goog maps hax
+alt and +/-: convert to feet when not using metric
 
 --- user suggested ---
 click on network to connect, with warning about legality

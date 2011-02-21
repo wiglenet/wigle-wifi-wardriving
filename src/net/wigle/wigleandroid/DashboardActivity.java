@@ -125,12 +125,13 @@ public class DashboardActivity extends Activity {
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     float dist = prefs.getFloat( pref, 0f );
-    final String distString = metersToString( numberFormat, this, dist );
+    final String distString = metersToString( numberFormat, this, dist, false );
     final TextView tv = (TextView) findViewById( id );
     tv.setText( title + distString );    
   }
   
-  public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters ) {
+  public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
+      final boolean useShort ) {
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
     
@@ -140,14 +141,14 @@ public class DashboardActivity extends Activity {
         retval = numberFormat.format( meters / 1000f ) + " km";
       }
       else {
-        retval = numberFormat.format( meters / 1609.344f ) + " miles";
+        retval = numberFormat.format( meters / 1609.344f ) + (useShort ? " mi" : " miles");
       }
     }
     else if ( metric ){
-      retval = numberFormat.format( meters ) + " meters";
+      retval = numberFormat.format( meters ) + (useShort ? " m" : " meters");
     }
     else {
-      retval = numberFormat.format( meters * 3.2808399f  ) + " feet";
+      retval = numberFormat.format( meters * 3.2808399f  ) + (useShort ? " ft" : " feet");
     }
     return retval;
   }

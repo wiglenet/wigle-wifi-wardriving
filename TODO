@@ -6,9 +6,9 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
-past observations on NetworkActivity
+
 goog maps hax
-alt and +/-: convert to feet when not using metric
+past observations on NetworkActivity
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -27,6 +27,7 @@ First-seen time on list view
 Cell tower technology on list view (HSPDA, etc)
 Larger X on map
 Back on latest osmdroid (map) revision, they fixed startup time issue
+alt and +/-: convert to feet when not using metric
 
 * 1.33 (02/05/2011)
 Include cell network in stats numbers

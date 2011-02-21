@@ -87,6 +87,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       private WifiLock wifiLock;
       private GPSListener gpsListener;
       private WifiReceiver wifiReceiver;
+      private NumberFormat numberFormat0;
       private NumberFormat numberFormat1;
       private NumberFormat numberFormat8;
       private TTS tts;
@@ -276,6 +277,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
 
         info( "id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT );
         info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + DEBUG );
+        
+        if ( state.numberFormat0 == null ) {
+          state.numberFormat0 = NumberFormat.getNumberInstance( Locale.US );
+          if ( state.numberFormat0 instanceof DecimalFormat ) {
+            ((DecimalFormat) state.numberFormat0).setMaximumFractionDigits( 0 );
+          }
+        }
         
         if ( state.numberFormat1 == null ) {
           state.numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
@@ -906,11 +914,20 @@ public final class ListActivity extends Activity implements FileUploaderListener
       tv = (TextView) this.findViewById( R.id.LocationTextView03 );
       tv.setText( "Speed: " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
       
-      tv = (TextView) this.findViewById( R.id.LocationTextView04 );
-      tv.setText( location == null ? "" : ("+/- " + state.numberFormat1.format( location.getAccuracy() ) + "m") );
-      
-      tv = (TextView) this.findViewById( R.id.LocationTextView05 );
-      tv.setText( location == null ? "" : ("Alt: " + state.numberFormat1.format( location.getAltitude() ) + "m") );
+      TextView tv4 = (TextView) this.findViewById( R.id.LocationTextView04 );
+      TextView tv5 = (TextView) this.findViewById( R.id.LocationTextView05 );
+      if ( location == null ) {
+        tv4.setText( "" );
+        tv5.setText( "" );
+      }
+      else {
+        String distString = DashboardActivity.metersToString( 
+            state.numberFormat0, this, location.getAccuracy(), true );
+        tv4.setText( "+/- " + distString );
+        distString = DashboardActivity.metersToString( 
+            state.numberFormat0, this, (float) location.getAltitude(), true );
+        tv5.setText( "Alt: " + distString );
+      }
     }
     
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,

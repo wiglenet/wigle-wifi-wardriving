@@ -13,9 +13,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,10 +37,15 @@ public class NetworkActivity extends Activity {
   private static final int MENU_EXIT = 11;
   private static final int CRYPTO_DIALOG = 101;
   
+  private static final int MSG_OBS_UPDATE = 1;
+  private static final int MSG_OBS_DONE = 2;
+  
   private Network network;
   private IMapController mapControl;
   private IMapView mapView;
   private SimpleDateFormat format;
+  private int observations = 0;
+  private ConcurrentLinkedHashMap<LatLon, Integer> obsMap = new ConcurrentLinkedHashMap<LatLon, Integer>( 512 );
 
   /** Called when the activity is first created. */
   @Override
@@ -56,6 +64,10 @@ public class NetworkActivity extends Activity {
     tv.setText( bssid );
     
     if ( network != null ) {
+      // kick off the query
+      setupQuery();      
+      
+      // do gui work
       tv = (TextView) findViewById( R.id.ssid );
       tv.setText( network.getSsid() );
       
@@ -93,6 +105,41 @@ public class NetworkActivity extends Activity {
       setupButton( network );
     }
   }
+  
+  private void setupQuery() {
+    // what runs on the gui thread
+    final Handler handler = new Handler() {
+      @Override
+      public void handleMessage( final Message msg ) {        
+        final TextView tv = (TextView) findViewById( R.id.na_observe );
+        if ( msg.what == MSG_OBS_UPDATE ) {
+          tv.setText( Integer.toString( observations ) + "...");
+        }
+        else if ( msg.what == MSG_OBS_DONE ) {
+          tv.setText( Integer.toString( observations ) );
+        }
+      }
+    };
+    
+    final String sql = "SELECT level,lat,lon FROM " 
+      + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "'";
+    
+    final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+      public void handleRow( final Cursor cursor ) {
+        observations++;
+        obsMap.put( new LatLon( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
+        if ( ( observations % 10 ) == 0 ) {
+          // change things on the gui thread
+          handler.sendEmptyMessage( MSG_OBS_UPDATE );
+        }
+      }
+      
+      public void complete() {
+        handler.sendEmptyMessage( MSG_OBS_DONE );
+      }
+    });
+    ListActivity.lameStatic.dbHelper.addToQueue( request );
+  }
     
   private void setupMap( final Network network ) {
     final IGeoPoint point = MappingActivity.getCenter( this, network.getGeoPoint(), null );
@@ -103,6 +150,7 @@ public class NetworkActivity extends Activity {
       // possibly choose goog maps here
       OpenStreetMapViewWrapper osmvw = new OpenStreetMapViewWrapper( this );  
       osmvw.setSingleNetwork( network );
+      osmvw.setObsMap( obsMap );
       mapView = osmvw;
       
       if ( mapView instanceof MapView ) {

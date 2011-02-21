@@ -25,6 +25,12 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
   private static final int COLOR_4 = Color.rgb(180,  60, 40);
   private static final int COLOR_5 = Color.rgb(180,  45, 70);
   
+  private static final int COLOR_1A = Color.argb(128,  70, 170,  0);
+  private static final int COLOR_2A = Color.argb(128, 170, 170,  0);
+  private static final int COLOR_3A = Color.argb(128, 170,  95, 30);
+  private static final int COLOR_4A = Color.argb(128, 180,  60, 40);
+  private static final int COLOR_5A = Color.argb(128, 180,  45, 70);
+  
   final LayoutInflater mInflater;
   
   private final SimpleDateFormat format;
@@ -89,18 +95,22 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
   }
   
   public static int getSignalColor( final int level ) {
-    int color = COLOR_1;
+    return getSignalColor( level, false );
+  }
+  
+  public static int getSignalColor( final int level, final boolean alpha ) {
+    int color = alpha ? COLOR_1A : COLOR_1;
     if ( level <= -90 ) {
-      color = COLOR_5;
+      color = alpha ? COLOR_5A : COLOR_5;
     }
     else if ( level <= -80 ) {
-      color = COLOR_4;
+      color = alpha ? COLOR_4A : COLOR_4;
     }
     else if ( level <= -70 ) {
-      color = COLOR_3;
+      color = alpha ? COLOR_3A : COLOR_3;
     }
     else if ( level <= -60 ) {
-      color = COLOR_2;
+      color = alpha ? COLOR_2A : COLOR_2;
     }
     
     return color;

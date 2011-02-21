@@ -8,7 +8,6 @@ web replace: seen-networks map tile overlays
 web replace: leaderboard
 
 goog maps hax
-past observations on NetworkActivity
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -22,6 +21,7 @@ try tabs on bottom in landscape mode
 Show ssid on map when zoomed in
 Filters for map ssid's
 Click on network in list to bring up info, map, and connect button
+Past observations show on NetworkActivity map
 Save location every minute so map is nearby if location was lost
 First-seen time on list view
 Cell tower technology on list view (HSPDA, etc)

@@ -48,6 +48,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
     new ConcurrentLinkedHashMap<GeoPoint,Boolean>(128);
   
   private Network singleNetwork = null;
+  private ConcurrentLinkedHashMap<LatLon, Integer> obsMap;
   
   /**
    * code constructor
@@ -67,6 +68,10 @@ public final class OpenStreetMapViewWrapper extends MapView {
   
   public void setSingleNetwork( final Network singleNetwork ) {
     this.singleNetwork = singleNetwork;
+  }
+  
+  public void setObsMap( final ConcurrentLinkedHashMap<LatLon, Integer> obsMap ) {
+    this.obsMap = obsMap;
   }
   
   private void setupColors() {    
@@ -134,8 +139,25 @@ public final class OpenStreetMapViewWrapper extends MapView {
   
   private void drawNetwork( final Canvas c, final Network network ) {
     final Projection proj = this.getProjection();
-    final GeoPoint geoPoint = network.getGeoPoint();
+        
+    if ( obsMap != null ) {
+      final GeoPoint obsPoint = new GeoPoint(0,0);
+      Point point = new Point();
+      Paint paint = new Paint();
+      paint.setColor( Color.argb( 255, 0, 0, 0 ) );
+      
+      for ( Map.Entry<LatLon, Integer> obs : obsMap.entrySet() ) {
+        final LatLon latLon = obs.getKey();
+        final int level = obs.getValue();
+        obsPoint.setLatitudeE6( (int) (latLon.getLat() * 1E6) );
+        obsPoint.setLongitudeE6( (int) (latLon.getLon() * 1E6) );
+        point = proj.toMapPixels( obsPoint, point );
+        paint.setColor( NetworkListAdapter.getSignalColor( level, true ) );
+        c.drawCircle( point.x, point.y, 4, paint );
+      }
+    }
     
+    final GeoPoint geoPoint = network.getGeoPoint();    
     if ( geoPoint != null ) {
       Point point = proj.toMapPixels( geoPoint, null );
       c.drawCircle(point.x, point.y, 16, trailBackPaint);

@@ -54,7 +54,7 @@ public final class DatabaseHelper extends Thread {
   private SQLiteStatement insertLocation;
   private SQLiteStatement updateNetwork;
   
-  private static final String NETWORK_TABLE = "network";
+  public static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
     "create table " + NETWORK_TABLE + " ( "
     + "bssid text primary key not null,"
@@ -67,7 +67,7 @@ public final class DatabaseHelper extends Thread {
     + "type text not null default '" + NetworkType.WIFI.getCode() + "'"
     + ")";
   
-  private static final String LOCATION_TABLE = "location";
+  public static final String LOCATION_TABLE = "location";
   private static final String LOCATION_CREATE =
     "create table " + LOCATION_TABLE + " ( "
     + "_id integer primary key autoincrement,"
@@ -95,6 +95,7 @@ public final class DatabaseHelper extends Thread {
   private final AtomicLong newNetworkCount = new AtomicLong();
   private final AtomicLong newWifiCount = new AtomicLong();
   private final AtomicLong newCellCount = new AtomicLong();  
+  private final QueryThread queryThread;
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
@@ -140,8 +141,20 @@ public final class DatabaseHelper extends Thread {
     this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     setName("db-worker");
     this.deathHandler = new DeathHandler( context ); 
+
+    queryThread = new QueryThread( this );
+    queryThread.start();
   }
-    
+  
+  public SQLiteDatabase getDB() {
+    checkDB();
+    return db;
+  }
+  
+  public void addToQueue( QueryThread.Request request ) {
+    queryThread.addToQueue( request );
+  }
+  
   private class DeathHandler extends Handler {    
     private Context context;
     public DeathHandler( Context context ) {

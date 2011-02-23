@@ -103,7 +103,7 @@ public final class MappingActivity extends Activity {
     // view
     final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.map_rl );
 
-    //tryEvil();
+    // tryEvil();
     
     // possibly choose goog maps here
     mapView = new OpenStreetMapViewWrapper( this );    
@@ -339,9 +339,11 @@ public final class MappingActivity extends Activity {
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
           edit.commit();
+          return true;
         }
         case MENU_FILTER: {
           showDialog( SSID_FILTER );
+          return true;
         }
       }
       return false;

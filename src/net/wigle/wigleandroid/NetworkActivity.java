@@ -136,6 +136,8 @@ public class NetworkActivity extends Activity {
       
       public void complete() {
         handler.sendEmptyMessage( MSG_OBS_DONE );
+        // force a redraw
+        ((View) mapView).postInvalidate();
       }
     });
     ListActivity.lameStatic.dbHelper.addToQueue( request );

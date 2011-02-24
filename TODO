@@ -16,6 +16,9 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
 --- done ---
+* 1.35 (02/24/2011)
+Fix race condition on NetworkActivity
+
 * 1.34 (02/24/2011)
 Show ssid on map when zoomed in
 Filters for map ssid's

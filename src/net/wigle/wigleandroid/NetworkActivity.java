@@ -64,9 +64,6 @@ public class NetworkActivity extends Activity {
     tv.setText( bssid );
     
     if ( network != null ) {
-      // kick off the query
-      setupQuery();      
-      
       // do gui work
       tv = (TextView) findViewById( R.id.ssid );
       tv.setText( network.getSsid() );
@@ -102,6 +99,8 @@ public class NetworkActivity extends Activity {
       tv.setText( network.getCapabilities().replace("][", "]\n[") );
       
       setupMap( network );
+      // kick off the query now that we have our map
+      setupQuery();      
       setupButton( network );
     }
   }

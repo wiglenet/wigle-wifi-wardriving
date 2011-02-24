@@ -6,8 +6,7 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
-
-goog maps hax
+goog maps somehow
 
 --- user suggested ---
 click on network to connect, with warning about legality
@@ -17,7 +16,7 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
 --- done ---
-* 1.34 ()
+* 1.34 (02/24/2011)
 Show ssid on map when zoomed in
 Filters for map ssid's
 Click on network in list to bring up info, map, and connect button

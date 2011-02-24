@@ -152,8 +152,10 @@ public class WifiReceiver extends BroadcastReceiver {
       prevScanPeriod = setPeriod;
     }
     
+    final Location location = listActivity.getGPSListener().getLocation();
+    
     // save the location every minute, for later runs, or viewing map during loss of location.
-    if (now - lastSaveLocationTime > 60000L) {
+    if (now - lastSaveLocationTime > 60000L && location != null) {
       listActivity.getGPSListener().saveLocation();
       lastSaveLocationTime = now;      
     }
@@ -165,8 +167,6 @@ public class WifiReceiver extends BroadcastReceiver {
     
     final int preQueueSize = dbHelper.getQueueSize();
     final boolean fastMode = dbHelper.isFastMode();
-    final Location location = listActivity.getGPSListener().getLocation();
-    
     final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
     boolean somethingAdded = false;
     int resultSize = 0;

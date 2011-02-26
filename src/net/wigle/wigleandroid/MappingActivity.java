@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osmdroid.api.IGeoPoint;
@@ -445,7 +446,7 @@ public final class MappingActivity extends Activity {
   }
   
   private void tryEvil() {
-    final String apiKey = "";
+    final String apiKey = "hiuhhkjhkjhkjh";
     //Object foo = new com.google.android.maps.MapView( this, apiKey );
     try {
       File file = new File("/sdcard/com.google.android.maps.jar");
@@ -460,6 +461,9 @@ public final class MappingActivity extends Activity {
       Class<?> mapActivityClass = cl.loadClass("EvilMap");
       Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
       Object mapActivity = constructor.newInstance( this );
+      ListActivity.info("mapActivity: " + mapActivity.getClass().getName());
+      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
+      create.invoke(mapActivity, new Bundle());
       
 //      final InvocationHandler handler = new InvocationHandler() {
 //        public Object invoke( Object object, Method method, Object[] args ) {

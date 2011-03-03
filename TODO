@@ -17,7 +17,8 @@ try tabs on bottom in landscape mode
 
 --- done ---
 * 1.36 ()
-OpenStreetMap update (osmdroid r820), plus fix for illegal location provider
+Fix NullPointerException in OpenStreetMapViewWrapper
+OpenStreetMap update (osmdroid r851), with fix for illegal location provider
 
 * 1.35 (02/24/2011)
 Fix race condition on NetworkActivity

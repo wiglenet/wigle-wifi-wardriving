@@ -299,6 +299,11 @@ public final class OpenStreetMapViewWrapper extends MapView {
               prevChoice = choice;
             }
             
+            // some race causes nets to be not zero sometimes
+            if ( choice == null ) {
+              choice = !prevChoice;
+            }
+            
             int horizontalOffset = 4;
             int verticalDirection = 1;
             int verticalOffset = 0;

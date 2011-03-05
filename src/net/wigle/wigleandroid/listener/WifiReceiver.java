@@ -454,7 +454,14 @@ public class WifiReceiver extends BroadcastReceiver {
       String bssid = null;
       NetworkType type = null;
       
-      CellLocation cellLocation = tele.getCellLocation();
+      CellLocation cellLocation = null;
+      try { 
+        cellLocation = tele.getCellLocation();
+      }
+      catch ( NullPointerException ex ) {
+        // bug in Archos7 can NPE there, just ignore
+      }
+      
       if ( cellLocation == null ) {
         // ignore
       }

@@ -22,6 +22,7 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.location.Location;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 
 /**
  * wrap the open street map view, to allow setting overlays
@@ -55,7 +56,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
    */
   public OpenStreetMapViewWrapper( final Context context ) {
     super( context, 256 );
-    setupColors();
+    setup();
   }
   
   /**
@@ -63,7 +64,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
    */
   public OpenStreetMapViewWrapper( final Context context, final AttributeSet attrs ) {
     super( context, attrs );
-    setupColors();
+    setup();
   }
   
   public void setSingleNetwork( final Network singleNetwork ) {
@@ -74,7 +75,11 @@ public final class OpenStreetMapViewWrapper extends MapView {
     this.obsMap = obsMap;
   }
   
-  private void setupColors() {    
+  private void setup() {    
+    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+    setLayoutParams(params);
+    
     crossPaint.setColor( Color.argb( 255, 0, 0, 0 ) );
     crossPaint.setAntiAlias( true );
     crossBackPaint.setColor( Color.argb( 128, 30, 250, 30 ) );

@@ -11,6 +11,8 @@ import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.MapView.Projection;
+import org.osmdroid.views.overlay.Overlay;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,13 +23,11 @@ import android.graphics.Point;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.location.Location;
-import android.util.AttributeSet;
-import android.view.ViewGroup;
 
 /**
  * wrap the open street map view, to allow setting overlays
  */
-public final class OpenStreetMapViewWrapper extends MapView {
+public final class OpenStreetMapViewWrapper extends Overlay {
   private final Paint crossBackPaint = new Paint();
   private final Paint crossPaint = new Paint();
   
@@ -55,15 +55,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
    * code constructor
    */
   public OpenStreetMapViewWrapper( final Context context ) {
-    super( context, 256 );
-    setup();
-  }
-  
-  /**
-   * XML Constructor (uses default Renderer)
-   */
-  public OpenStreetMapViewWrapper( final Context context, final AttributeSet attrs ) {
-    super( context, attrs );
+    super( context );
     setup();
   }
   
@@ -76,10 +68,6 @@ public final class OpenStreetMapViewWrapper extends MapView {
   }
   
   private void setup() {    
-    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-    setLayoutParams(params);
-    
     crossPaint.setColor( Color.argb( 255, 0, 0, 0 ) );
     crossPaint.setAntiAlias( true );
     crossBackPaint.setColor( Color.argb( 128, 30, 250, 30 ) );
@@ -131,19 +119,23 @@ public final class OpenStreetMapViewWrapper extends MapView {
   }
   
   @Override
-  public void onDraw( final Canvas c ) {
-    super.onDraw( c );
+  public void draw( final Canvas c, final MapView osmv, final boolean shadow ) {
+    if ( shadow ) {
+      return;
+    }
+    
+    ListActivity.info("ondraw");
     
     if ( singleNetwork != null ) {
-      drawNetwork( c, singleNetwork );
+      drawNetwork( c, osmv, singleNetwork );
     }
     else {
-      drawTrail( c );
+      drawTrail( c, osmv );
     }
   }
   
-  private void drawNetwork( final Canvas c, final Network network ) {
-    final Projection proj = this.getProjection();
+  private void drawNetwork( final Canvas c, final MapView osmv, final Network network ) {
+    final Projection proj = osmv.getProjection();
         
     if ( obsMap != null ) {
       final GeoPoint obsPoint = new GeoPoint(0,0);
@@ -173,17 +165,17 @@ public final class OpenStreetMapViewWrapper extends MapView {
     }
   }
    
-  private void drawTrail( final Canvas c ) {
-    final Projection proj = this.getProjection();
+  private void drawTrail( final Canvas c, final MapView osmv ) {
+    final Projection proj = osmv.getProjection();
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  // point to recycle
 	  Point point = null;
-	  final SharedPreferences prefs = this.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+	  final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );    
     
     // if zoomed in past 15, give a little boost to circle size
-    float boost = getZoomLevel() - 15;
+    float boost = osmv.getZoomLevel() - 15;
     boost *= 0.50f;
     boost += 2f;
     if ( boost < 2f ) {
@@ -249,7 +241,7 @@ public final class OpenStreetMapViewWrapper extends MapView {
       }
 	  }
     
-    if ( getZoomLevel() >= 16 && showLabel ) {
+    if ( osmv.getZoomLevel() >= 16 && showLabel ) {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) { 

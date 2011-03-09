@@ -25,7 +25,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -107,10 +109,16 @@ public final class MappingActivity extends Activity {
     // tryEvil();
     
     // possibly choose goog maps here
-    mapView = new OpenStreetMapViewWrapper( this );    
+    mapView = new MapView( this, 256 );   
+    
+    if ( mapView instanceof View ) {
+      ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+      ((View) mapView).setLayoutParams(params);
+    }
     
     if ( mapView instanceof MapView ) {
-      MapView osmMapView = (MapView) mapView;
+      final MapView osmMapView = (MapView) mapView;
       rlView.addView( osmMapView );
       osmMapView.setBuiltInZoomControls( true );
       osmMapView.setMultiTouchControls( true );
@@ -120,6 +128,9 @@ public final class MappingActivity extends Activity {
       myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
       myLocationOverlay.setDrawAccuracyEnabled( false );
       osmMapView.getOverlays().add( myLocationOverlay );
+      
+      final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( this );
+      osmMapView.getOverlays().add( overlay );
     }
     
     // controller

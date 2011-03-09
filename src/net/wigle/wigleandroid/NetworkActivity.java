@@ -23,7 +23,9 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -151,16 +153,24 @@ public class NetworkActivity extends Activity {
       final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.netmap_rl );
       
       // possibly choose goog maps here
-      OpenStreetMapViewWrapper osmvw = new OpenStreetMapViewWrapper( this );  
-      osmvw.setSingleNetwork( network );
-      osmvw.setObsMap( obsMap );
-      mapView = osmvw;
+      mapView = new MapView( this, 256 );     
+      
+      if ( mapView instanceof View ) {
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+          LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+        ((View) mapView).setLayoutParams(params);
+      }
       
       if ( mapView instanceof MapView ) {
-        MapView osmMapView = (MapView) mapView;
+        final MapView osmMapView = (MapView) mapView;
         rlView.addView( osmMapView );
         osmMapView.setBuiltInZoomControls( true );
         osmMapView.setMultiTouchControls( true );
+        
+        final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( this );
+        overlay.setSingleNetwork( network );
+        overlay.setObsMap( obsMap );
+        osmMapView.getOverlays().add( overlay );
       }
       mapControl = mapView.getController();
       

@@ -18,9 +18,10 @@ speak new ssid's
 
 --- done ---
 * 1.36 ()
+Moving map drawing to be an overlay
 Fix NullPointerException in OpenStreetMapViewWrapper
 Fix NullPointerException in Archos7's getCellLocation
-OpenStreetMap update (osmdroid r862), with fix for illegal location provider
+OpenStreetMap update (osmdroid r865), with fix for illegal location provider
 
 * 1.35 (02/24/2011)
 Fix race condition on NetworkActivity

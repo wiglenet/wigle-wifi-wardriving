@@ -385,8 +385,15 @@ public final class DatabaseHelper extends Thread {
     ListActivity.info( "database version: " + db.getVersion() );
     if ( db.getVersion() == 0 ) {
       ListActivity.info("upgrading db from 0 to 1");
-      db.execSQL( "ALTER TABLE network ADD COLUMN type text not null default '" + NetworkType.WIFI.getCode() + "'" );
-      db.setVersion(1);
+      try {
+        db.execSQL( "ALTER TABLE network ADD COLUMN type text not null default '" + NetworkType.WIFI.getCode() + "'" );
+        db.setVersion(1);
+      }
+      catch ( SQLiteException ex ) {
+        if ( "duplicate column name".equals( ex.toString() ) ) {
+          db.setVersion(1);
+        }
+      }
     }
     
     // drop index, was never publically released

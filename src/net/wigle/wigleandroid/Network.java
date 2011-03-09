@@ -103,9 +103,9 @@ public final class Network {
     this.channel = freqToChan.get( frequency );
     
     if ( ! NetworkType.WIFI.equals( type ) ) {
-      int comma = this.capabilities.lastIndexOf(",");
-      if ( comma > 0 ) {    
-        this.showCapabilities = this.capabilities.substring(0, comma);
+      int semicolon = this.capabilities.lastIndexOf(";");
+      if ( semicolon > 0 ) {    
+        this.showCapabilities = this.capabilities.substring(0, semicolon);
       }
       else {
         this.showCapabilities = this.capabilities;

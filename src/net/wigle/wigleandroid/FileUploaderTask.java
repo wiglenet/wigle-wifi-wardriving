@@ -477,7 +477,7 @@ public final class FileUploaderTask extends Thread {
     final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
     
     // name, version, header
-    final String header = "WigleWifi-1.3"
+    final String header = "WigleWifi-1.4"
         + ",appRelease=" + pi.versionName
         + ",model=" + android.os.Build.MODEL
         + ",release=" + android.os.Build.VERSION.RELEASE

@@ -342,9 +342,9 @@ public final class SettingsActivity extends Activity {
   }
   
   private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
-    final long[] periods = new long[]{ 0,50,250,500,1000,1500,2000,3000,4000,5000,10000,30000,60000 };
-    final String[] periodName = new String[]{ zeroName,"50ms","250ms","500 ms","1 sec","1.5 sec","2 sec","3 sec","4 sec","5 sec",
-        "10 sec","30 sec","1 min" };
+    final long[] periods = new long[]{ 0,50,250,500,750,1000,1500,2000,3000,4000,5000,10000,30000,60000 };
+    final String[] periodName = new String[]{ zeroName,"50ms","250ms","500 ms","750 ms","1 sec","1.5 sec","2 sec",
+        "3 sec","4 sec","5 sec","10 sec","30 sec","1 min" };
     doSpinner(id, pref, spinDefault, periods, periodName);
   }
   

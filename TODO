@@ -22,6 +22,7 @@ Moving map drawing to be an overlay
 Fix NullPointerException in OpenStreetMapViewWrapper
 Fix NullPointerException in Archos7's getCellLocation
 OpenStreetMap update (osmdroid r865), with fix for illegal location provider
+Fix CSV extra column issue
 
 * 1.35 (02/24/2011)
 Fix race condition on NetworkActivity

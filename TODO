@@ -17,6 +17,9 @@ try tabs on bottom in landscape mode
 speak new ssid's
 
 --- done ---
+* 1.37 ()
+Catch regex pattern exception
+
 * 1.36 (3/11/2011)
 Moving map drawing to be an overlay
 Fix NullPointerException in OpenStreetMapViewWrapper

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
@@ -252,8 +253,13 @@ public final class OpenStreetMapViewWrapper extends Overlay {
         final String regex = prefs.getString( ListActivity.PREF_MAPF_REGEX, "" );
         Matcher matcher = null;
         if ( filter && ! "".equals(regex) ) {
+          try {
           Pattern pattern = Pattern.compile( regex, Pattern.CASE_INSENSITIVE );
           matcher = pattern.matcher( "" );
+          }
+          catch ( PatternSyntaxException ex ) {
+            ListActivity.error("regex pattern exception: " + ex);
+          }
         }
         
         for( Network network : ListActivity.getNetworkCache().values() ) {

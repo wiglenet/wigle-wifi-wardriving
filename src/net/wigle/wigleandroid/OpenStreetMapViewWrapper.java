@@ -42,9 +42,14 @@ public final class OpenStreetMapViewWrapper extends Overlay {
   
   private final Paint ssidPaintLeft = new Paint();
   private final Paint ssidPaintRight = new Paint();
+  private final Paint ssidPaintLeftBack = new Paint();
+  private final Paint ssidPaintRightBack = new Paint(); 
   
   private final Paint netTextBack = new Paint();
   private final Paint netText = new Paint();
+  
+  private final Paint netCountBack = new Paint();
+  private final Paint netCount = new Paint();  
   
   private final ConcurrentLinkedHashMap<GeoPoint,Boolean> labelChoice = 
     new ConcurrentLinkedHashMap<GeoPoint,Boolean>(128);
@@ -107,6 +112,18 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     ssidPaintRight.setAntiAlias( true );
     ssidPaintRight.setTextAlign( Align.RIGHT );
     
+    ssidPaintLeftBack.setColor( Color.argb( 255, 240, 230, 230 ) );
+    ssidPaintLeftBack.setStyle( Style.STROKE );
+    ssidPaintLeftBack.setStrokeWidth( 3f );
+    ssidPaintLeftBack.setAntiAlias( true );
+    ssidPaintLeftBack.setTextAlign( Align.LEFT );
+    
+    ssidPaintRightBack.setColor( Color.argb( 255, 240, 230, 230 ) );
+    ssidPaintRightBack.setStyle( Style.STROKE );
+    ssidPaintRightBack.setStrokeWidth( 3f );
+    ssidPaintRightBack.setAntiAlias( true );
+    ssidPaintRightBack.setTextAlign( Align.RIGHT );    
+    
     netTextBack.setColor( Color.argb( 255, 250, 250, 250 ) );
     netTextBack.setStyle( Style.STROKE );
     netTextBack.setTextSize(20f);
@@ -117,6 +134,19 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     netText.setStyle( Style.STROKE );
     netText.setTextSize(20f);
     netText.setAntiAlias( true );
+    
+    netCountBack.setColor( Color.argb( 255, 250, 250, 250 ) );
+    netCountBack.setStyle( Style.STROKE );
+    netCountBack.setTextSize(20f);
+    netCountBack.setAntiAlias( true );
+    netCountBack.setStrokeWidth( 4f );
+    netCountBack.setTextAlign( Align.CENTER );    
+    
+    netCount.setColor( Color.argb( 255, 0, 0, 0 ) );
+    netCount.setStyle( Style.STROKE );
+    netCount.setTextSize(20f);
+    netCount.setAntiAlias( true );
+    netCount.setTextAlign( Align.CENTER );    
   }
   
   @Override
@@ -182,63 +212,62 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     if ( boost < 2f ) {
       boost = 2f;
     }
+    int wifiSize = (int) (7 * boost) + 1;
+    int cellSize = (int) (6 * boost) + 1;
+    if ( osmv.getZoomLevel() < 15 ) {
+      wifiSize /= 2;
+      cellSize /= 2;
+    }
     
     // backgrounds
     for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      if ( ! showNewDBOnly ) {  	  
-  			int nets = entry.getValue().newWifiForRun;
-  			if ( nets > 0 ) {
-  			  nets *= boost;
-    	  	point = proj.toMapPixels( entry.getKey(), point );
-    	  	c.drawCircle(point.x, point.y, nets + 1, trailBackPaint);
-  			}
-  			
-  			nets = entry.getValue().newCellForRun;        
-        if ( nets > 0 ) {
-          // ListActivity.info("new cell for run: " + nets);
-          nets *= boost * 8;
+      final TrailStat value = entry.getValue();
+      boolean projected = false;
+      
+      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
+        point = proj.toMapPixels( entry.getKey(), point );
+        projected = true;
+  	  	c.drawCircle(point.x, point.y, wifiSize, trailBackPaint);
+			}
+			    
+      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
+        if ( ! projected ) {
           point = proj.toMapPixels( entry.getKey(), point );
-          int sub = nets/2 + 1;
-          int add = nets/2 + (nets % 2);
-          c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellBackPaint);
         }
-    	}
+        c.drawRect(point.x - cellSize, point.y - cellSize, point.x + cellSize, point.y + cellSize, trailCellBackPaint);
+      }
 	  }
 	  
     // foregrounds
     for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      if ( ! showNewDBOnly ) {    	
-        int nets = entry.getValue().newWifiForRun;
-        if ( nets > 0 ) {
-          nets *= boost;
-          point = proj.toMapPixels( entry.getKey(), point );
-          c.drawCircle(point.x, point.y, nets + 1, trailPaint);
-        }
-    	
-        nets = entry.getValue().newCellForRun;
-        if ( nets > 0 ) {
-          nets *= boost * 8;
-          point = proj.toMapPixels( entry.getKey(), point );
-          int sub = nets/2 + 1;
-          int add = nets/2 + (nets % 2);
-          c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellPaint);
-        }
-      }
-      
-      int nets = entry.getValue().newWifiForDB;
-      if ( nets > 0 ) {
-        nets *= boost;
+      final TrailStat value = entry.getValue();
+      boolean projected = false;
+
+      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
         point = proj.toMapPixels( entry.getKey(), point );
-        c.drawCircle(point.x, point.y, nets + 1, trailDBPaint);
+        projected = true;
+        final Paint paint = value.newWifiForDB > 0 ? trailDBPaint : trailPaint;
+        c.drawCircle(point.x, point.y, wifiSize, paint);
       }
-      
-      nets = entry.getValue().newCellForDB;
-      if ( nets > 0 ) {
-        nets *= boost * 8;
-        point = proj.toMapPixels( entry.getKey(), point );
-        int sub = nets/2 + 1;
-        int add = nets/2 + (nets % 2);
-        c.drawRect(point.x - sub, point.y - sub, point.x + add, point.y + add, trailCellDBPaint);
+  	
+      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
+        if ( ! projected ) {
+          point = proj.toMapPixels( entry.getKey(), point );
+        }
+        final Paint paint = value.newCellForDB > 0 ? trailCellDBPaint : trailCellPaint;
+        c.drawRect(point.x - cellSize, point.y - cellSize, point.x + cellSize, point.y + cellSize, paint);
+      }
+       
+      if ( osmv.getZoomLevel() >= 15 ) {
+        int nets = value.newWifiForDB + value.newCellForDB;
+        if ( ! showNewDBOnly ) {
+          nets = value.newWifiForRun + value.newCellForRun;
+        }
+        if ( nets > 1 ) {
+          final String netString = Integer.toString( nets );
+          c.drawText( netString, point.x, point.y + 7, netCountBack );                
+          c.drawText( netString, point.x, point.y + 7, netCount );
+        }
       }
 	  }
     
@@ -307,15 +336,17 @@ public final class OpenStreetMapViewWrapper extends Overlay {
               choice = !prevChoice;
             }
             
-            int horizontalOffset = 4;
+            int horizontalOffset = 20 + (int) (boost * 2);
             int verticalDirection = 1;
             int verticalOffset = 0;
             Paint paint = ssidPaintLeft;
+            Paint paintBack = ssidPaintLeftBack;
             if ( choice ) {
-              horizontalOffset = -4;
+              horizontalOffset *= -1;
               verticalDirection = -1;    
               verticalOffset = -12;
               paint = ssidPaintRight;
+              paintBack = ssidPaintRightBack;
             }
             
             // adjust so they don't overlap too bad
@@ -323,6 +354,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
             x += horizontalOffset;
             
             // ListActivity.info("x: " + x + " y: " + y + " point: " + point);
+            c.drawText( network.getSsid(), x, y, paintBack );     
             c.drawText( network.getSsid(), x, y, paint );            
           }
         }

@@ -18,6 +18,8 @@ speak new ssid's
 
 --- done ---
 * 1.37 ()
+Add borders to ssid's on map
+Use numbers on map for wifi count, instead of circle-size
 Catch regex pattern exception
 
 * 1.36 (3/11/2011)

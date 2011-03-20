@@ -137,14 +137,14 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     
     netCountBack.setColor( Color.argb( 255, 250, 250, 250 ) );
     netCountBack.setStyle( Style.STROKE );
-    netCountBack.setTextSize(20f);
+    netCountBack.setTextSize(16f);
     netCountBack.setAntiAlias( true );
-    netCountBack.setStrokeWidth( 4f );
+    netCountBack.setStrokeWidth( 3f );
     netCountBack.setTextAlign( Align.CENTER );    
     
     netCount.setColor( Color.argb( 255, 0, 0, 0 ) );
     netCount.setStyle( Style.STROKE );
-    netCount.setTextSize(20f);
+    netCount.setTextSize(16f);
     netCount.setAntiAlias( true );
     netCount.setTextAlign( Align.CENTER );    
   }
@@ -212,8 +212,8 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     if ( boost < 2f ) {
       boost = 2f;
     }
-    int wifiSize = (int) (7 * boost) + 1;
-    int cellSize = (int) (6 * boost) + 1;
+    int wifiSize = (int) (5 * boost) + 1;
+    int cellSize = (int) (4 * boost) + 1;
     if ( osmv.getZoomLevel() < 15 ) {
       wifiSize /= 2;
       cellSize /= 2;

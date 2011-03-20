@@ -580,8 +580,9 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
       String time = timeFormat.format( new Date() );
-      time = time.replace(" 00", " oh clock");
-      time = time.replace(" 0", " oh ");
+      // time is hard to say.
+      time = time.replace(" 00", " owe clock");
+      time = time.replace(" 0", " owe ");
       builder.append( time ).append( ", " );
     }
     final int batteryLevel = listActivity.getBatteryLevelReceiver().getBatteryLevel();

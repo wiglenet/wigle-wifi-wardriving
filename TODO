@@ -1,6 +1,5 @@
 --- todo ---
 "upload every n" setting
-select a net, see observations
 lock screen on, lock UI
 show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
@@ -9,11 +8,11 @@ web replace: leaderboard
 goog maps somehow
 
 --- user suggested ---
-click on network to connect, with warning about legality
-network list filtering options (new only)
 kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
+
+network list filtering options (new only), use map ssid filter dialog
 speak new ssid's
 
 --- done ---

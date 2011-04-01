@@ -14,7 +14,7 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
 --- done ---
-* 1.37 ()
+* 1.37 (4/01/2011)
 Add borders to ssid's on map
 Use numbers on map for wifi count, instead of circle-size
 Catch regex pattern exception

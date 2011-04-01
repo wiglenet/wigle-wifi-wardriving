@@ -24,18 +24,23 @@ public class SpeechActivity extends Activity {
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
     
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    doButton( prefs, R.id.speech_run, ListActivity.PREF_SPEAK_RUN );
-    doButton( prefs, R.id.speech_new_wifi, ListActivity.PREF_SPEAK_NEW_WIFI );
-    doButton( prefs, R.id.speech_new_cell, ListActivity.PREF_SPEAK_NEW_CELL );
-    doButton( prefs, R.id.speech_queue, ListActivity.PREF_SPEAK_QUEUE );
-    doButton( prefs, R.id.speech_miles, ListActivity.PREF_SPEAK_MILES );
-    doButton( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
-    doButton( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
+    doCheckbox( prefs, R.id.speech_run, ListActivity.PREF_SPEAK_RUN );
+    doCheckbox( prefs, R.id.speech_new_wifi, ListActivity.PREF_SPEAK_NEW_WIFI );
+    doCheckbox( prefs, R.id.speech_new_cell, ListActivity.PREF_SPEAK_NEW_CELL );
+    doCheckbox( prefs, R.id.speech_queue, ListActivity.PREF_SPEAK_QUEUE );
+    doCheckbox( prefs, R.id.speech_miles, ListActivity.PREF_SPEAK_MILES );
+    doCheckbox( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
+    doCheckbox( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
+    doCheckbox( prefs, R.id.speech_ssid, ListActivity.PREF_SPEAK_SSID, false );
   }
   
-  private void doButton( final SharedPreferences prefs, final int id, final String pref ) {
+  private void doCheckbox( final SharedPreferences prefs, final int id, final String pref ) {
+    doCheckbox( prefs, id, pref, true );
+  }
+  
+  private void doCheckbox( final SharedPreferences prefs, final int id, final String pref, final boolean defaultVal ) {
     final CheckBox box = (CheckBox) findViewById( id );
-    box.setChecked( prefs.getBoolean( pref, true) );
+    box.setChecked( prefs.getBoolean( pref, defaultVal ) );
     box.setOnCheckedChangeListener( new OnCheckedChangeListener() {
       public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
         final Editor editor = prefs.edit();

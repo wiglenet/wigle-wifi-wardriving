@@ -109,7 +109,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final int MENU_MAP = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
+    private static final int MENU_FILTER = 15;
+    
     private static final int SORT_DIALOG = 100;
+    private static final int SSID_FILTER = 102;
     
     public static final String ENCODING = "ISO-8859-1";
     public static final float MIN_DISTANCE_ACCURACY = 32f;
@@ -158,6 +161,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_SPEAK_MILES = "speakMiles";
     public static final String PREF_SPEAK_TIME = "speakTime";
     public static final String PREF_SPEAK_BATTERY = "speakBattery";
+    public static final String PREF_SPEAK_SSID = "speakSsid";
     
     // map ssid filter
     public static final String PREF_MAPF_REGEX = "mapfRegex";
@@ -167,6 +171,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_MAPF_WPA = "mapfWpa";
     public static final String PREF_MAPF_CELL = "mapfCell";    
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
+    public static final String FILTER_PREF_PREFIX = "LA";
     
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
     
@@ -556,15 +561,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
       MenuItem item = menu.add(0, MENU_SORT, 0, "Sort Options");
       item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
       
+      final String scan = isScanning() ? "Off" : "On";
+      item = menu.add(0, MENU_SCAN, 0, "Scan " + scan);
+      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
+      
       item = menu.add(0, MENU_MAP, 0, "Map");
       item.setIcon( android.R.drawable.ic_menu_mapmode );
       
       item = menu.add(0, MENU_EXIT, 0, "Exit");
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+      
+      item = menu.add(0, MENU_FILTER, 0, "SSID Label Filter");
+      item.setIcon( android.R.drawable.ic_menu_search );
         
-      final String scan = isScanning() ? "Off" : "On";
-      item = menu.add(0, MENU_SCAN, 0, "Scan " + scan);
-      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
       
       item = menu.add(0, MENU_SETTINGS, 0, "Settings");
       item.setIcon( android.R.drawable.ic_menu_preferences );
@@ -606,7 +615,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
             // call over to finish
             finish();
             return true;
-        }
+          case MENU_FILTER:
+            showDialog( SSID_FILTER );
+            return true;          
+        }        
         return false;
     }
     
@@ -635,6 +647,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     @Override
     public Dialog onCreateDialog( int which ) {
       switch ( which ) {
+        case SSID_FILTER:
+          return MappingActivity.createSsidFilterDialog(this, FILTER_PREF_PREFIX);
         case SORT_DIALOG:
           final Dialog dialog = new Dialog( this );
   

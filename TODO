@@ -6,21 +6,20 @@ some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
 goog maps somehow
+shutdown after an hour with no location
 
 --- user suggested ---
 kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 
-shutdown after an hour with no location
-network list filtering options (new only), use map ssid filter dialog
-speak new ssid's
-
 --- done ---
 * 1.37 ()
 Add borders to ssid's on map
 Use numbers on map for wifi count, instead of circle-size
 Catch regex pattern exception
+Option to speak newly seen ssid's
+Network list filtering options
 
 * 1.36 (3/11/2011)
 Moving map drawing to be an overlay

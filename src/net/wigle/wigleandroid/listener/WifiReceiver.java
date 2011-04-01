@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.DashboardActivity;
@@ -19,6 +20,7 @@ import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.NetworkType;
+import net.wigle.wigleandroid.OpenStreetMapViewWrapper;
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.osmdroid.util.GeoPoint;
@@ -171,6 +173,15 @@ public class WifiReceiver extends BroadcastReceiver {
     boolean somethingAdded = false;
     int resultSize = 0;
     int newWifiForRun = 0;
+    
+    StringBuilder ssidSpeakBuilder = null;
+    final boolean ssidSpeak = prefs.getBoolean( ListActivity.PREF_SPEAK_SSID, false );
+    if ( ssidSpeak ) {
+      ssidSpeakBuilder = new StringBuilder();
+    }    
+    
+    final Matcher ssidMatcher = OpenStreetMapViewWrapper.getFilterMatcher( prefs, ListActivity.FILTER_PREF_PREFIX );
+    
     // can be null on shutdown
     if ( results != null ) {
       resultSize = results.size();
@@ -188,6 +199,9 @@ public class WifiReceiver extends BroadcastReceiver {
         final boolean added = runNetworks.add( result.BSSID );
         if ( added ) {
             newWifiForRun++;
+            if ( ssidSpeak ) {
+              ssidSpeakBuilder.append( network.getSsid() ).append( ", " );
+            }
         }
         somethingAdded |= added;
         
@@ -199,7 +213,9 @@ public class WifiReceiver extends BroadcastReceiver {
         
         // if we're showing current, or this was just added, put on the list
         if ( showCurrent || added ) {
-          listAdapter.add( network );
+          if ( OpenStreetMapViewWrapper.isOk( ssidMatcher, prefs, ListActivity.FILTER_PREF_PREFIX, network ) ) {
+            listAdapter.add( network );
+          }
           // load test
           // for ( int i = 0; i< 10; i++) {
           //  listAdapter.add( network );
@@ -265,7 +281,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final Network cellNetwork = recordCellInfo(location);
     if ( cellNetwork != null ) {
       resultSize++;
-      if ( showCurrent ) {
+      if ( showCurrent && OpenStreetMapViewWrapper.isOk( ssidMatcher, prefs, ListActivity.FILTER_PREF_PREFIX, cellNetwork ) ) {
         listAdapter.add(cellNetwork);
       }
       if ( runNetworks.size() > preCellForRun ) {
@@ -391,6 +407,11 @@ public class WifiReceiver extends BroadcastReceiver {
       
       // set for next time
       prevGpsLocation = location;
+    }
+    
+    if ( somethingAdded && ssidSpeak ) {
+      ListActivity.info( "speak: " + ssidSpeakBuilder.toString() );
+      listActivity.speak( ssidSpeakBuilder.toString() );
     }
     
     final long speechPeriod = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );

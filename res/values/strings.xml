@@ -50,4 +50,5 @@
     <string name="speech_miles">Miles in run</string>
     <string name="speech_time">Current time</string>
     <string name="speech_battery">Battery level percentage</string>
+    <string name="speech_ssid">New Network SSID\'s</string>
 </resources>

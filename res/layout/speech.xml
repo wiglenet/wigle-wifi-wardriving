@@ -43,6 +43,16 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/speech_battery" />
+<LinearLayout
+	android:id="@+id/horizontalLine"
+	android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#A07070"
+	/>         
+<CheckBox android:id="@+id/speech_ssid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_ssid" />
 
 </LinearLayout>
 </ScrollView>

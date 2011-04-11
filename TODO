@@ -13,6 +13,8 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 query local db
+try to not re-speak recent ssid's
+mute speech immediately (if possible)
 
 --- done ---
 * 1.37 (4/01/2011)

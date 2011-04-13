@@ -6,7 +6,6 @@ some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
 goog maps somehow
-shutdown after an hour with no location
 
 --- user suggested ---
 kismet drone support
@@ -15,6 +14,9 @@ try tabs on bottom in landscape mode
 query local db
 try to not re-speak recent ssid's
 mute speech immediately (if possible)
+
+low-refresh after a half-hour with no location
+checkbox to show password
 
 --- done ---
 * 1.37 (4/01/2011)

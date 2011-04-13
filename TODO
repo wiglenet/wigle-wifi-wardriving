@@ -16,9 +16,11 @@ try to not re-speak recent ssid's
 mute speech immediately (if possible)
 
 low-refresh after a half-hour with no location
-checkbox to show password
 
 --- done ---
+* 1.38 ()
+Checkbox to show password
+
 * 1.37 (4/01/2011)
 Add borders to ssid's on map
 Use numbers on map for wifi count, instead of circle-size

@@ -38,6 +38,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
+        
+<CheckBox android:id="@+id/showpassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Show Password" />
 
 <CheckBox android:id="@+id/be_anonymous"
         android:layout_width="fill_parent"

@@ -9,8 +9,11 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.text.method.SingleLineTransformationMethod;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -175,6 +178,18 @@ public final class SettingsActivity extends Activity {
           // might have to remove or show register link
           updateRegister();
         } 
+      });
+      
+      final CheckBox showPassword = (CheckBox) findViewById(R.id.showpassword);
+      showPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) { 
+          if ( isChecked ) {
+            pass.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+          }
+          else {
+            pass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+          }
+        }
       });
       
       pass.setText( prefs.getString( ListActivity.PREF_PASSWORD, "" ) );

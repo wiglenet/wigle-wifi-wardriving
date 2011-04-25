@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
@@ -54,9 +55,23 @@ final class HttpFileUploader {
     try{
       connectURL = new URL( urlString );
     }
-    catch( Exception ex ){
+    catch( Exception ex ) {
       ListActivity.error( "MALFORMATED URL: " + ex, ex );
+      return null;
     }
+
+    // test if we should be doing our own ssl
+    boolean self_serving = true;
+    try {
+        URLConnection testcon = connectURL.openConnection();
+        // we should probably time-bound this test-connection?
+        testcon.connect();
+        self_serving = false;
+        // consider a pref to skip this? or just phase out after migration?
+    } catch (IOException ex) {
+        // we're specificly interested in javax.net.ssl.SSLException
+    }
+
     
     final String lineEnd = "\r\n";
     final String twoHyphens = "--";
@@ -83,7 +98,7 @@ final class HttpFileUploader {
       // Don't use a cached copy.
       conn.setUseCaches(false);
       conn.setInstanceFollowRedirects( false );
-      if ( conn instanceof javax.net.ssl.HttpsURLConnection ) {
+      if ( ( conn instanceof javax.net.ssl.HttpsURLConnection ) && self_serving ) {
           final SSLConfigurator con = SSLConfigurator.getInstance( res );
           con.configure( (javax.net.ssl.HttpsURLConnection) conn );
           ListActivity.info("using ssl! conn: " + conn);

@@ -5,7 +5,8 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
-goog maps somehow
+low-refresh after a half-hour with no location
+username not found notice
 
 --- user suggested ---
 kismet drone support
@@ -15,11 +16,9 @@ query local db
 try to not re-speak recent ssid's
 mute speech immediately (if possible)
 
-low-refresh after a half-hour with no location
-username not found notice
-
 --- done ---
-* 1.38 ()
+* 1.38 (5/05/2011)
+Update for upcoming wigle.net ssl change
 Checkbox to show password
 
 * 1.37 (4/01/2011)

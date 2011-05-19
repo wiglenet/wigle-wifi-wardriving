@@ -15,6 +15,7 @@ try tabs on bottom in landscape mode
 query local db
 try to not re-speak recent ssid's
 mute speech immediately (if possible)
+timeout before self-kill on low battery
 
 --- done ---
 * 1.38 (5/05/2011)

@@ -5,7 +5,7 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
-low-refresh after a half-hour with no location
+low-refresh after a half-hour with no location, or pry instant refire when loc changes
 username not found notice
 
 --- user suggested ---

@@ -16,6 +16,9 @@ query local db
 try to not re-speak recent ssid's
 mute speech immediately (if possible)
 timeout before self-kill on low battery
+configurable sounds for new nets
+would be fine to add first run wizard to make easier setup wiglewifi (set&forget) dont forget to add skip button for l33t haxxors
+say how many new aps wiglewifi found from last "audio speech". integrate aps from 0 to t_audiospeech then say it :)
 
 --- done ---
 * 1.38 (5/05/2011)

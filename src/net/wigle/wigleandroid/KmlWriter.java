@@ -22,7 +22,6 @@ public class KmlWriter extends Thread {
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   private static final int WRITING_DONE = 10;
   
-  private final Context applicationContext;
   private final DatabaseHelper dbHelper;
   private final Set<String> networks;
   private final Handler handler;
@@ -39,7 +38,6 @@ public class KmlWriter extends Thread {
       throw new IllegalArgumentException( "dbHelper is null" );
     }
     
-    this.applicationContext = context.getApplicationContext();
     this.dbHelper = dbHelper;
     // make a safe local copy
     this.networks = (networks == null) ? null : new HashSet<String>( networks );
@@ -202,15 +200,10 @@ public class KmlWriter extends Thread {
       Process.setThreadPriority( UPLOAD_PRIORITY );
       
       Bundle bundle = new Bundle();
-      writeKml( bundle );
+      writeKml( bundle );      
     }
-    catch ( final Throwable throwable ) {
-      ListActivity.writeError( Thread.currentThread(), throwable, applicationContext );
-      throw new RuntimeException( "KmlWriter throwable: " + throwable, throwable );
-    }
-    finally {
-      // tell the listener
-//      listener.uploadComplete();
-    }
+    catch ( final Exception ex ) {
+      dbHelper.deathDialog("Writing Kml", ex);
+    }    
   }
 }

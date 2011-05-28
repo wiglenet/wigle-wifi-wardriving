@@ -27,6 +27,7 @@ public class GPSListener implements Listener, LocationListener {
   private Long lastLocationTime = 0L;
   private Long lastNetworkLocationTime = 0L;
   private Long satCountLowTime = 0L;
+  private float previousSpeed = 0f;
   
   public GPSListener( ListActivity listActivity ) {
     this.listActivity = listActivity;
@@ -128,6 +129,19 @@ public class GPSListener implements Listener, LocationListener {
     
     // for maps. so lame!
     ListActivity.lameStatic.location = location;
+    if ( location != null ) {
+      final float currentSpeed = location.getSpeed();
+      if ( (previousSpeed == 0f && currentSpeed > 0f)
+          || (previousSpeed < 5f && currentSpeed >= 5f)) {
+        // moving faster now than before, schedule a scan because the timing config pry changed
+        ListActivity.info("Going faster, scheduling scan");
+        listActivity.scheduleScan();
+      }
+      previousSpeed = currentSpeed;
+    }
+    else {
+      previousSpeed = 0f;
+    }
     
     if ( wasProviderChange ) {
       ListActivity.info( "wasProviderChange: satCount: " + satCount 
@@ -148,6 +162,10 @@ public class GPSListener implements Listener, LocationListener {
           : "Now have location from " + location.getProvider() + ".";
         listActivity.speak( speakAnnounce );
       }
+      
+      // get the ball rolling
+      ListActivity.info("Location provider change, scheduling scan");
+      listActivity.scheduleScan();
     }
     
     // update the UI

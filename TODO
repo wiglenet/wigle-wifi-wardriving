@@ -5,7 +5,6 @@ show IEEE octet info
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard
-low-refresh after a half-hour with no location, or pry instant refire when loc changes
 username not found notice
 
 --- user suggested ---
@@ -24,6 +23,7 @@ integrate aps from 0 to t_audiospeech then say it
 Interrupt speech on mute or phone call
 Do not re-speak recent ssid's
 30 second timeout from startup before self-kill on low battery
+Proactively update scan rate on location speed or provider change
 OpenStreetMap update (osmdroid r936)
 Database and I/O exceptions now displayed in a user-readable way
 Catch "canonical path" exception thrown by certain devices

@@ -832,8 +832,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
       state.uploading.set( false );
       info( "uploading complete" );
       // start a scan to get the ball rolling again if this is non-stop mode
-      state.wifiReceiver.scheduleScan();
+      scheduleScan();
       state.fileUploaderTask = null;
+    }
+    
+    public void scheduleScan() {
+      state.wifiReceiver.scheduleScan();
     }
     
     public void speak( final String string ) {

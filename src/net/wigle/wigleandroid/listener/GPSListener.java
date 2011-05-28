@@ -129,13 +129,15 @@ public class GPSListener implements Listener, LocationListener {
     
     // for maps. so lame!
     ListActivity.lameStatic.location = location;
+    boolean scanScheduled = false;
     if ( location != null ) {
-      final float currentSpeed = location.getSpeed();
-      if ( (previousSpeed == 0f && currentSpeed > 0f)
+       final float currentSpeed = location.getSpeed();
+       if ( (previousSpeed == 0f && currentSpeed > 0f)
           || (previousSpeed < 5f && currentSpeed >= 5f)) {
         // moving faster now than before, schedule a scan because the timing config pry changed
         ListActivity.info("Going faster, scheduling scan");
         listActivity.scheduleScan();
+        scanScheduled = true;
       }
       previousSpeed = currentSpeed;
     }
@@ -163,9 +165,11 @@ public class GPSListener implements Listener, LocationListener {
         listActivity.speak( speakAnnounce );
       }
       
-      // get the ball rolling
-      ListActivity.info("Location provider change, scheduling scan");
-      listActivity.scheduleScan();
+      if ( ! scanScheduled ) {
+        // get the ball rolling
+        ListActivity.info("Location provider change, scheduling scan");
+        listActivity.scheduleScan();
+      }
     }
     
     // update the UI

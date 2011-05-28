@@ -1,8 +1,5 @@
 package net.wigle.wigleandroid;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.osmdroid.api.IGeoPoint;
@@ -33,7 +30,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import dalvik.system.DexClassLoader;
 
 /**
  * show a map!
@@ -460,45 +456,45 @@ public final class MappingActivity extends Activity {
     return dialog;
   }
   
-  private void tryEvil() {
-    final String apiKey = "hiuhhkjhkjhkjh";
-    //Object foo = new com.google.android.maps.MapView( this, apiKey );
-    try {
-      File file = new File("/sdcard/com.google.android.maps.jar");
-      ListActivity.info("file exists: " + file.exists() + " " + file.canRead());
-      //DexFile df = new DexFile(file);
-      
-      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
-          "/sdcard/", null, MappingActivity.class.getClassLoader() );
-      // this is abstract, doesn't seem like we can reflect into it, proxy only works for interfaces :(
-//      Class<?> mapActivityClass = cl.loadClass("com.google.android.maps.MapActivity");
-      
-      Class<?> mapActivityClass = cl.loadClass("EvilMap");
-      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
-      Object mapActivity = constructor.newInstance( this );
-      ListActivity.info("mapActivity: " + mapActivity.getClass().getName());
-      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
-      create.invoke(mapActivity, new Bundle());
-      
-//      final InvocationHandler handler = new InvocationHandler() {
-//        public Object invoke( Object object, Method method, Object[] args ) {
-//          ListActivity.info("invoke: " + method.getName() );
-//          return null;
-//        }
-//      };
-//      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(), 
-//                                         new Class[]{ mapActivityClass }, handler );
-      
-      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
-      constructor = foo.getConstructor(Context.class, String.class);
-      Object googMap = constructor.newInstance( mapActivity, apiKey );
-      ListActivity.info("googMap: " + googMap);
-
-    }
-    catch ( Exception ex)  {
-      ListActivity.error("ex: " + ex, ex);
-    }
-        
-  }
+//  private void tryEvil() {
+//    final String apiKey = "hiuhhkjhkjhkjh";
+//    //Object foo = new com.google.android.maps.MapView( this, apiKey );
+//    try {
+//      File file = new File("/sdcard/com.google.android.maps.jar");
+//      ListActivity.info("file exists: " + file.exists() + " " + file.canRead());
+//      //DexFile df = new DexFile(file);
+//      
+//      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
+//          "/sdcard/", null, MappingActivity.class.getClassLoader() );
+//      // this is abstract, doesn't seem like we can reflect into it, proxy only works for interfaces :(
+////      Class<?> mapActivityClass = cl.loadClass("com.google.android.maps.MapActivity");
+//      
+//      Class<?> mapActivityClass = cl.loadClass("EvilMap");
+//      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
+//      Object mapActivity = constructor.newInstance( this );
+//      ListActivity.info("mapActivity: " + mapActivity.getClass().getName());
+//      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
+//      create.invoke(mapActivity, new Bundle());
+//      
+////      final InvocationHandler handler = new InvocationHandler() {
+////        public Object invoke( Object object, Method method, Object[] args ) {
+////          ListActivity.info("invoke: " + method.getName() );
+////          return null;
+////        }
+////      };
+////      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(), 
+////                                         new Class[]{ mapActivityClass }, handler );
+//      
+//      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
+//      constructor = foo.getConstructor(Context.class, String.class);
+//      Object googMap = constructor.newInstance( mapActivity, apiKey );
+//      ListActivity.info("googMap: " + googMap);
+//
+//    }
+//    catch ( Exception ex)  {
+//      ListActivity.error("ex: " + ex, ex);
+//    }
+//        
+//  }
   
 }

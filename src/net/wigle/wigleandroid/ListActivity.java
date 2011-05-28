@@ -844,6 +844,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
+    public void interruptSpeak() {
+      if ( state.tts != null ) {
+        state.tts.stop();
+      }
+    }
+    
     private void setupLocation() {
       // set on UI if we already have one
       setLocationUI();
@@ -1057,6 +1063,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
           
           if ( muted ) {
             mute.setText("Play");
+            interruptSpeak();
           }
           else {
             mute.setText("Mute");
@@ -1111,7 +1118,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         String openString = name;
         final boolean hasSD = hasSD();
         if ( hasSD ) {
-            final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
+            final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
             final File path = new File( filepath );
             path.mkdirs();
             openString = filepath + name;
@@ -1121,7 +1128,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
         // see if it exists already
         if ( ! f.exists() ) { 
-            info("causing "+f.getCanonicalPath()+" to be made");
+            info( "causing " + MainActivity.safeFilePath( f ) + " to be made" );
             // make it happen:
             f.createNewFile();
             
@@ -1252,11 +1259,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
         final String error = "Thread: " + thread + " throwable: " + throwable;
         error( error, throwable );
         if ( hasSD() ) {
-          File file = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
+          File file = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
           file.mkdirs();
-          file = new File(Environment.getExternalStorageDirectory().getCanonicalPath() 
+          file = new File(MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) 
               + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt" );
-          error( "Writing stackfile to: " + file.getCanonicalPath() + "/" + file.getName() );
+          error( "Writing stackfile to: " + MainActivity.safeFilePath( file ) + "/" + file.getName() );
           if ( ! file.exists() ) {
             file.createNewFile();
           }
@@ -1308,14 +1315,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     public static boolean hasSD() {
-      File sdCard = null;
-      try {
-        sdCard = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/" );
-      }
-      catch ( final IOException ex ) {
-        // ohwell
-        ListActivity.info( "no sd card apparently: " + ex, ex );
-      }
+      File sdCard = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/" );
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }        
 }

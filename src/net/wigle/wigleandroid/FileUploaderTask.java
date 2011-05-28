@@ -324,7 +324,7 @@ public final class FileUploaderTask extends Thread {
       File file = null;
       bundle.putString( FILENAME, filename );
       if ( hasSD ) {
-        final String filepath = Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/";
+        final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
         final File path = new File( filepath );
         path.mkdirs();
         openString = filepath + filename;

@@ -46,6 +46,7 @@ public class WifiReceiver extends BroadcastReceiver {
   private NetworkListAdapter listAdapter;
   private SimpleDateFormat timeFormat;
   private NumberFormat numberFormat1;
+  private SsidSpeaker ssidSpeaker;
   
   private Handler wifiTimer;
   private Location prevGpsLocation;
@@ -103,6 +104,7 @@ public class WifiReceiver extends BroadcastReceiver {
     this.dbHelper = dbHelper;
     this.listAdapter = listAdapter;
     ListActivity.lameStatic.runNetworks = runNetworks;
+    ssidSpeaker = new SsidSpeaker( listActivity );
     
     // formats for speech
     timeFormat = new SimpleDateFormat( "h mm aa" );
@@ -114,6 +116,7 @@ public class WifiReceiver extends BroadcastReceiver {
   
   public void setListActivity( final ListActivity listActivity ) {
     this.listActivity = listActivity;
+    this.ssidSpeaker.setListActivity( listActivity );
   }
   
   public void setListAdapter( final NetworkListAdapter listAdapter ) {
@@ -174,12 +177,8 @@ public class WifiReceiver extends BroadcastReceiver {
     int resultSize = 0;
     int newWifiForRun = 0;
     
-    StringBuilder ssidSpeakBuilder = null;
-    final boolean ssidSpeak = prefs.getBoolean( ListActivity.PREF_SPEAK_SSID, false );
-    if ( ssidSpeak ) {
-      ssidSpeakBuilder = new StringBuilder();
-    }    
-    
+    final boolean ssidSpeak = prefs.getBoolean( ListActivity.PREF_SPEAK_SSID, false )
+      && ! listActivity.isMuted();
     final Matcher ssidMatcher = OpenStreetMapViewWrapper.getFilterMatcher( prefs, ListActivity.FILTER_PREF_PREFIX );
     
     // can be null on shutdown
@@ -200,7 +199,7 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( added ) {
             newWifiForRun++;
             if ( ssidSpeak ) {
-              ssidSpeakBuilder.append( network.getSsid() ).append( ", " );
+              ssidSpeaker.add( network.getSsid() );
             }
         }
         somethingAdded |= added;
@@ -274,6 +273,11 @@ public class WifiReceiver extends BroadcastReceiver {
         listActivity.playRunNetSound();
       }
     }
+    
+    if ( listActivity.getPhoneState().isPhoneActive() ) {
+      // a phone call is active, make sure we aren't speaking anything      
+      listActivity.interruptSpeak();
+    }    
     
     // check cell tower info
     final int preCellForRun = runNetworks.size();
@@ -410,8 +414,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     
     if ( somethingAdded && ssidSpeak ) {
-      ListActivity.info( "speak: " + ssidSpeakBuilder.toString() );
-      listActivity.speak( ssidSpeakBuilder.toString() );
+      ssidSpeaker.speak();
     }
     
     final long speechPeriod = prefs.getLong( ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD );

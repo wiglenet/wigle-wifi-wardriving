@@ -13,14 +13,21 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 query local db
-try to not re-speak recent ssid's
-mute speech immediately (if possible)
+speak similar AP's with count, trying to condense somehow
 timeout before self-kill on low battery
 configurable sounds for new nets
-would be fine to add first run wizard to make easier setup wiglewifi (set&forget) dont forget to add skip button for l33t haxxors
-say how many new aps wiglewifi found from last "audio speech". integrate aps from 0 to t_audiospeech then say it :)
+would be fine to add first run wizard to make easier setup wiglewifi
+say how many new aps wiglewifi found from last "audio speech". 
+integrate aps from 0 to t_audiospeech then say it
 
 --- done ---
+* 1.39 (5/??/2011)
+Interrupt speech on mute or phone call
+Do not re-speak recent ssid's
+OpenStreetMap update (osmdroid r936)
+Catch "canonical path" exception thrown by certain devices
+Catch NullPointer exception thrown by certain devices
+
 * 1.38 (5/05/2011)
 Update for upcoming wigle.net ssl change
 Checkbox to show password

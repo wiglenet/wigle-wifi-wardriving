@@ -49,7 +49,7 @@ public class ErrorReportActivity extends Activity {
   private String getLatestStack() {
     StringBuilder builder = new StringBuilder( "No Error Report found" );
     try {
-      File fileDir = new File( Environment.getExternalStorageDirectory().getCanonicalPath() + "/wiglewifi/" );
+      File fileDir = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
       if ( ! fileDir.canRead() || ! fileDir.isDirectory() ) {
         ListActivity.error( "file is not readable or not a directory. fileDir: " + fileDir );
       }
@@ -69,7 +69,7 @@ public class ErrorReportActivity extends Activity {
           }
           ListActivity.info( "latest filename: " + latestFilename );
           
-          String filePath = fileDir.getCanonicalPath() + "/" + latestFilename;
+          String filePath = MainActivity.safeFilePath( fileDir ) + "/" + latestFilename;
           BufferedReader reader = new BufferedReader( new FileReader( filePath ) );
           String line = reader.readLine();
           builder.setLength( 0 );

@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -159,6 +161,22 @@ public final class MainActivity extends TabActivity {
       return (MainActivity) parent;
     }
     return null;
+  }
+  
+  /** safely get the canonical path, as this call throws exceptions on some devices */
+  public static String safeFilePath( final File file ) {
+    String retval = null;
+    try {
+      retval = file.getCanonicalPath();
+    }
+    catch ( Exception ex ) {
+      // ignore
+    }
+    
+    if ( retval == null ) {
+      retval = file.getAbsolutePath();
+    }
+    return retval;
   }
   
   /**

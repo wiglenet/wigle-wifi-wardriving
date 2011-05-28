@@ -51,6 +51,7 @@ public final class TTS {
   private static int QUEUE_FLUSH;
   private static int QUEUE_ADD;
   private static Method speak;
+  private static Method stop;
   private static Method shutdown;
   private static Method setlanguage;
   private static Method getlanguage;
@@ -91,13 +92,15 @@ public final class TTS {
       
         if ( useEyesFree ) {
           speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, String[].class );
-          shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
+          stop = SPEECH_CLASS.getMethod( "stop", new Class[]{} );
+          shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );          
           QUEUE_ADD = 1;
           setlanguage = SPEECH_CLASS.getMethod( "setLanguage", String.class ); 
         } else {
           QUEUE_FLUSH = SPEECH_CLASS.getDeclaredField("QUEUE_FLUSH").getInt(null);
           QUEUE_ADD = SPEECH_CLASS.getDeclaredField("QUEUE_ADD").getInt(null);
           speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, HashMap.class );
+          stop = SPEECH_CLASS.getMethod( "stop", new Class[]{} );
           shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
           setlanguage = SPEECH_CLASS.getMethod( "setLanguage", Locale.class ); 
           getlanguage = SPEECH_CLASS.getMethod( "getLanguage", new Class[]{} ); 
@@ -210,9 +213,22 @@ public final class TTS {
     }
   }
   
+  public void stop() {
+    try {
+      // ListActivity.info( "tts: stop" );
+      stop.invoke( speech, (Object[])null );
+    }
+    catch ( final IllegalAccessException ex ) {
+      ListActivity.error( "illegal: " + ex, ex );
+    }
+    catch ( final InvocationTargetException ex ) {
+      ListActivity.error( "invocation: " + ex, ex );
+    }
+  }
+  
   public void shutdown() {
     try {
-      // ListActivity.info("saying: " + string );
+      // ListActivity.info( "tts: shutdown" );
       shutdown.invoke( speech, (Object[])null );
     }
     catch ( final IllegalAccessException ex ) {

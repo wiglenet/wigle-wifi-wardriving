@@ -14,7 +14,6 @@ some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 query local db
 speak similar AP's with count, trying to condense somehow
-timeout before self-kill on low battery
 configurable sounds for new nets
 would be fine to add first run wizard to make easier setup wiglewifi
 say how many new aps wiglewifi found from last "audio speech". 
@@ -24,7 +23,9 @@ integrate aps from 0 to t_audiospeech then say it
 * 1.39 (5/??/2011)
 Interrupt speech on mute or phone call
 Do not re-speak recent ssid's
+30 second timeout from startup before self-kill on low battery
 OpenStreetMap update (osmdroid r936)
+Database and I/O exceptions now displayed in a user-readable way
 Catch "canonical path" exception thrown by certain devices
 Catch NullPointer exception thrown by certain devices
 

@@ -56,6 +56,7 @@ public class WifiReceiver extends BroadcastReceiver {
   private long lastSaveLocationTime = Long.MIN_VALUE;
   private int pendingWifiCount = 0;
   private int pendingCellCount = 0;
+  private final long constructionTime = System.currentTimeMillis();
   private long previousTalkTime = System.currentTimeMillis();
   private final Set<String> runNetworks = new HashSet<String>();
   private long prevNewNetCount;
@@ -753,8 +754,10 @@ public class WifiReceiver extends BroadcastReceiver {
         final int batteryStatus = listActivity.getBatteryLevelReceiver().getBatteryStatus();
         // ListActivity.info("batteryStatus: " + batteryStatus);
   
+        // give some time since starting up to change this configuration
         if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill 
-            && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING) {
+            && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
+            && (System.currentTimeMillis() - constructionTime) > 30000L) {
           final String text = "Battery level at " + batteryLevel + " percent, shutting down Wigle Wifi";
           Toast.makeText( listActivity, text, Toast.LENGTH_LONG ).show();
           listActivity.speak( "low battery" );

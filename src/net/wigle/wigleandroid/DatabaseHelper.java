@@ -15,9 +15,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -30,7 +29,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.view.WindowManager;
 
 /**
  * our database helper, makes a great data meal.
@@ -140,13 +138,13 @@ public final class DatabaseHelper extends Thread {
     this.context = context.getApplicationContext();
     this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     setName("db-worker");
-    this.deathHandler = new DeathHandler( context ); 
+    this.deathHandler = new DeathHandler(); 
 
     queryThread = new QueryThread( this );
     queryThread.start();
   }
   
-  public SQLiteDatabase getDB() {
+  public SQLiteDatabase getDB() throws DBException {
     checkDB();
     return db;
   }
@@ -156,61 +154,35 @@ public final class DatabaseHelper extends Thread {
   }
   
   private class DeathHandler extends Handler {    
-    private Context context;
-    public DeathHandler( Context context ) {
-      this.context = context;
-    }
+    private boolean fired = false;
     
-    public void setContext( Context context ) {
-      this.context = context;
+    public DeathHandler() {
     }
     
     @Override
     public void handleMessage( final Message msg ) {
-      final AlertDialog.Builder builder = new AlertDialog.Builder( context );
-      builder.setCancelable( false );
-      builder.setTitle( "Fatal DB Problem" );
-      Bundle bundle = msg.peekData();
-      Exception ex = null;
+      if ( fired ) {
+        return;
+      }
+      fired = true;
+      
+      final Bundle bundle = msg.peekData();
+      String error = "unknown";
       if ( bundle == null ) {
-        builder.setMessage( "Nothing in bundle" );
+        ListActivity.error("no bundle in msg: " + msg);
       }
       else {
-        String error = bundle.getString( ERROR );
-        builder.setMessage( "Error: " + error );
-        ex = (Exception) bundle.getSerializable( EXCEPTION );
+        error = bundle.getString( ERROR );
       }
-      final Exception finalEx = ex;
-      final AlertDialog ad = builder.create();
-      ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {
-        public void onClick( final DialogInterface dialog, final int which ) {
-          try {
-            dialog.dismiss();
-          }
-          catch ( Exception ex ) {
-            // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing alert dialog: " + ex );
-          }
-          if ( finalEx != null ) {
-            throw new RuntimeException( "rethrowing db exception: " + finalEx, finalEx );
-          }
-          return;
-        } }); 
-      
-      try {
-        ad.show();
-      }
-      catch ( WindowManager.BadTokenException windowEx ) {
-        ListActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
-      }
+
+      final MainActivity mainActivity = MainActivity.getMainActivity();
+      final Intent errorReportIntent = new Intent( mainActivity, ErrorReportActivity.class );
+      errorReportIntent.putExtra( ListActivity.ERROR_REPORT_DIALOG, error );
+      mainActivity.startActivity( errorReportIntent );
     }
   }
   
-  public void setContext( Context context ) {
-    deathHandler.setContext( context );
-  }
-
-	public int getQueueSize() {
+  public int getQueueSize() {
 		return queue.size();
 	}
   
@@ -237,14 +209,14 @@ public final class DatabaseHelper extends Thread {
 //          ListActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
 //        }
       }
-      catch ( SQLiteException ex ) {
-        ListActivity.error( "exception getting counts from db: " + ex, ex );
-        deathDialog( "counts db: " + ex, ex );
+      catch ( DBException ex ) {
+        deathDialog( "getting counts from DB", ex );
       }
       
       final List<DBUpdate> drain = new ArrayList<DBUpdate>();
       while ( ! done.get() ) {
         try {
+          checkDB();
           drain.clear();
           drain.add( queue.take() );
           final long startTime = System.currentTimeMillis();
@@ -276,12 +248,21 @@ public final class DatabaseHelper extends Thread {
           ListActivity.info("db queue take interrupted");
         }
         catch ( SQLiteException ex ) {
-          ListActivity.error( "exception in db run loop: " + ex, ex );
-          deathDialog( "runloop db: " + ex, ex );
+          deathDialog( "DB run loop", ex );
+          ListActivity.sleep(100L);
+        }
+        catch ( DBException ex ) {
+          deathDialog( "DB run loop", ex );
+          ListActivity.sleep(100L);
         }
         finally {
           if ( db != null && db.inTransaction() ) {
-            db.endTransaction();
+            try {
+              db.endTransaction();
+            }
+            catch ( SQLiteException ex ) {
+              ListActivity.error( "exception in db.endTransaction: " + ex, ex );
+            }
           }
         }
       }
@@ -292,10 +273,13 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  private void deathDialog( String message, Exception ex ) {
+  public void deathDialog( String message, Exception ex ) {
     // send message to the handler that will get this dialog on the activity thread
+    ListActivity.error( "db exception. " + message + ": " + ex, ex );
+    ListActivity.writeError(Thread.currentThread(), ex, context);
     final Bundle bundle = new Bundle();
-    bundle.putString( ERROR, message );
+    final String dialogMessage = MainActivity.getBaseErrorMessage( ex, true );
+    bundle.putString( ERROR, dialogMessage );
     bundle.putSerializable( EXCEPTION, ex );
     final Message msg = new Message();
     msg.setData(bundle);
@@ -303,6 +287,8 @@ public final class DatabaseHelper extends Thread {
   }
   
   private void open() {
+    // if(true) throw new SQLiteException("meat puppets");
+    
     String dbFilename = DATABASE_NAME;
     final boolean hasSD = ListActivity.hasSD();
     if ( hasSD ) {
@@ -427,7 +413,7 @@ public final class DatabaseHelper extends Thread {
     }
     
     countdown = 50;
-    while ( db.isOpen() && countdown > 0 ) {
+    while ( db != null && db.isOpen() && countdown > 0 ) {
       try {
         synchronized ( this ) {
           if ( insertNetwork != null ) {
@@ -451,10 +437,15 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
-  public synchronized void checkDB() {
+  public synchronized void checkDB() throws DBException {
     if ( db == null || ! db.isOpen() ) {
       ListActivity.info( "re-opening db in checkDB" );
-      open();
+      try {
+        open();
+      }
+      catch ( SQLiteException ex ) {
+        throw new DBException("checkDB", ex);
+      }
     }
   }
   
@@ -488,7 +479,7 @@ public final class DatabaseHelper extends Thread {
     return added;
   }
   
-  private void addObservation( final DBUpdate update, final int drainSize ) {
+  private void addObservation( final DBUpdate update, final int drainSize ) throws DBException {
     checkDB();
     final Network network = update.network;
     final Location location = update.location;
@@ -839,7 +830,7 @@ public final class DatabaseHelper extends Thread {
     return networkCount.get();
   }
   
-  private void getNetworkCountFromDB() {
+  private void getNetworkCountFromDB() throws DBException {
     networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
   
@@ -851,7 +842,7 @@ public final class DatabaseHelper extends Thread {
     return locationCount.get();
   }
   
-  private void getLocationCountFromDB() {
+  private void getLocationCountFromDB() throws DBException {
     final long count = getCountFromDB( LOCATION_TABLE );
     locationCount.set( count );
     setupMaxidDebug( count );
@@ -874,7 +865,7 @@ public final class DatabaseHelper extends Thread {
     edit.commit();
   }
   
-  private long getCountFromDB( final String table ) {
+  private long getCountFromDB( final String table ) throws DBException {
     checkDB();
     final Cursor cursor = db.rawQuery( "select count(*) FROM " + table, null );
     cursor.moveToFirst();
@@ -887,39 +878,44 @@ public final class DatabaseHelper extends Thread {
     // check cache
     Network retval = ListActivity.getNetworkCache().get( bssid );
     if ( retval == null ) {
-      checkDB();
-      final String[] args = new String[]{ bssid };
-      final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type FROM " + NETWORK_TABLE 
-          + " WHERE bssid = ?", args);
-      if ( cursor.getCount() > 0 ) {
-        cursor.moveToFirst();
-        final String ssid = cursor.getString(0);
-        final int frequency = cursor.getInt(1);
-        final String capabilities = cursor.getString(2);
-        final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
-        retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
-        ListActivity.getNetworkCache().put( bssid, retval );
+      try {
+        checkDB();
+        final String[] args = new String[]{ bssid };
+        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type FROM " + NETWORK_TABLE 
+            + " WHERE bssid = ?", args);
+        if ( cursor.getCount() > 0 ) {
+          cursor.moveToFirst();
+          final String ssid = cursor.getString(0);
+          final int frequency = cursor.getInt(1);
+          final String capabilities = cursor.getString(2);
+          final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
+          retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
+          ListActivity.getNetworkCache().put( bssid, retval );
+        }
+        cursor.close();
       }
-      cursor.close();
+      catch (DBException ex ) {
+        deathDialog( "getNetwork", ex );
+      }
     }
     return retval;
   }
   
-  public Cursor locationIterator( final long fromId ) {
+  public Cursor locationIterator( final long fromId ) throws DBException {
     checkDB();
     ListActivity.info( "locationIterator fromId: " + fromId );
     final String[] args = new String[]{ Long.toString( fromId ) };
     return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
   }
   
-  public Cursor networkIterator() {
+  public Cursor networkIterator() throws DBException {
     checkDB();
     ListActivity.info( "networkIterator" );
     final String[] args = new String[]{};
     return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
   }
   
-  public Cursor getSingleNetwork( final String bssid ) {
+  public Cursor getSingleNetwork( final String bssid ) throws DBException {
     checkDB();
     final String[] args = new String[]{bssid};
     return db.rawQuery( 

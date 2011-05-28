@@ -6,11 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 /**
@@ -43,6 +47,58 @@ public class ErrorReportActivity extends Activity {
       fromFailure = true;
       // setup email sending
       setupEmail( stack );
+    }
+    
+    final String dialogMessage = intent.getStringExtra(ListActivity.ERROR_REPORT_DIALOG );
+    if ( dialogMessage != null ) {
+      fromFailure = true;
+      shutdownRestOfApp();
+      
+      final Handler handler = new Handler();
+      final Runnable dialogTask = new Runnable() {
+        public void run() {              
+          final AlertDialog.Builder builder = new AlertDialog.Builder( ErrorReportActivity.this );
+          builder.setCancelable( false );
+          builder.setTitle( "Fatal DB Problem" );
+          builder.setMessage( "*** ERROR *** \n" + dialogMessage + "\n\n(Can view again with 'Error Report' on Settings menu)" );                      
+
+          final AlertDialog ad = builder.create();
+          ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {
+            public void onClick( final DialogInterface dialog, final int which ) {
+              try {
+                dialog.dismiss();
+              }
+              catch ( Exception ex ) {
+                // guess it wasn't there anyways
+                ListActivity.info( "exception dismissing alert dialog: " + ex );
+              }
+            } }); 
+          
+          try {
+            ad.show();
+          }
+          catch ( WindowManager.BadTokenException windowEx ) {
+            ListActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
+          }
+        }
+      };
+    
+      handler.removeCallbacks( dialogTask );
+      handler.postDelayed( dialogTask, 100 );
+    }
+  }
+  
+  private void shutdownRestOfApp() {
+    ListActivity.info( "ErrorReportActivity: shutting down app" );
+    // shut down anything we can get a handle to
+    final MainActivity mainActivity = MainActivity.getMainActivity();
+    mainActivity.finishListActivity();
+    mainActivity.finish();                  
+    if ( NetworkActivity.networkActivity != null ) {
+      NetworkActivity.networkActivity.finish();
+    }
+    if ( SpeechActivity.speechActivity != null ) {
+      SpeechActivity.speechActivity.finish();
     }
   }
   

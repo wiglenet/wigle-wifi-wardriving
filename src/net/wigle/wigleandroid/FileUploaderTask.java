@@ -443,7 +443,7 @@ public final class FileUploaderTask extends Thread {
   }
   
   private long writeFile( final OutputStream fos, final Bundle bundle, final CountStats countStats ) 
-      throws IOException, NameNotFoundException, InterruptedException {
+      throws IOException, NameNotFoundException, InterruptedException, DBException {
     
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );

@@ -14,11 +14,15 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 public class SpeechActivity extends Activity {
   private static final int MENU_RETURN = 12;
   
+  // used for shutting extraneous activities down on an error
+  public static SpeechActivity speechActivity;
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState) {
     super.onCreate( savedInstanceState );
     setContentView( R.layout.speech );
+    speechActivity = this;
     
     // force media volume controls
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
@@ -32,6 +36,11 @@ public class SpeechActivity extends Activity {
     doCheckbox( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
     doCheckbox( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
     doCheckbox( prefs, R.id.speech_ssid, ListActivity.PREF_SPEAK_SSID, false );
+  }
+  
+  public void onDestroy() {    
+    speechActivity = null;
+    super.onDestroy();
   }
   
   private void doCheckbox( final SharedPreferences prefs, final int id, final String pref ) {

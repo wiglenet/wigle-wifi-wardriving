@@ -26,11 +26,14 @@ public final class MainActivity extends TabActivity {
   static final String TAB_DASH = "dash";
   static final String TAB_SETTINGS = "setings";
   
+  private static MainActivity mainActivity;
   private ListActivity listActivity;
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    
+    mainActivity = this;
 
     TabHost tabHost = getTabHost();  // The activity TabHost
     TabHost.TabSpec spec;  // Reusable TabSpec for each tab
@@ -66,6 +69,11 @@ public final class MainActivity extends TabActivity {
     }
 
     tabHost.setCurrentTabByTag( TAB_LIST );
+  }
+  
+  // be careful with this
+  public static MainActivity getMainActivity() {
+    return mainActivity;
   }
   
   /**
@@ -195,7 +203,7 @@ public final class MainActivity extends TabActivity {
     }
   }
   
-  private void finishListActivity() {
+  public void finishListActivity() {
     if ( listActivity != null ) {
       listActivity.finish();
     }
@@ -243,4 +251,17 @@ public final class MainActivity extends TabActivity {
     super.finish();
   }
   
+  public static Throwable getBaseThrowable(final Throwable throwable) {
+    Throwable retval = throwable;
+    while ( retval.getCause() != null ) {
+      retval = retval.getCause();
+    }
+    return retval;
+  }
+  
+  public static String getBaseErrorMessage(Throwable throwable, final boolean withNewLine) {
+    throwable = MainActivity.getBaseThrowable( throwable );
+    final String newline = withNewLine ? "\n" : " ";
+    return throwable.getClass().getSimpleName() + ":" + newline + throwable.getMessage();
+  }
 }

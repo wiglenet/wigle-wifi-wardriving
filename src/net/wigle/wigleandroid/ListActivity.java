@@ -118,6 +118,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final float MIN_DISTANCE_ACCURACY = 32f;
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
+    static final String ERROR_REPORT_DIALOG = "doDialog";
     
     // preferences
     public static final String SHARED_PREFS = "WiglePrefs";
@@ -254,7 +255,6 @@ public final class ListActivity extends Activity implements FileUploaderListener
           // tell those that need it that we have a new context
           state.gpsListener.setListActivity( this );
           state.wifiReceiver.setListActivity( this );
-          state.dbHelper.setContext( this );
           if ( state.fileUploaderTask != null ) {
             state.fileUploaderTask.setContext( this );
           }
@@ -731,12 +731,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       // could be set by nonconfig retain
       if ( state.dbHelper == null ) {
         state.dbHelper = new DatabaseHelper( this.getApplicationContext() );
-        state.dbHelper.checkDB();
+        //state.dbHelper.checkDB();
         state.dbHelper.start();
         lameStatic.dbHelper = state.dbHelper;
-      }
-      
-      state.dbHelper.checkDB();
+      }      
     }
     
     private void setupList() {
@@ -1270,12 +1268,14 @@ public final class ListActivity extends Activity implements FileUploaderListener
           final FileOutputStream fos = new FileOutputStream( file );
           
           try {
+            final String baseErrorMessage = MainActivity.getBaseErrorMessage( throwable, false );
             StringBuilder builder = new StringBuilder( "WigleWifi error log - " );
             SimpleDateFormat format = new SimpleDateFormat();
             builder.append( format.format( new Date() ) ).append( "\n" );
             final PackageManager pm = context.getPackageManager();
             final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             builder.append( "versionName: " ).append( pi.versionName ).append( "\n" );
+            builder.append( "baseError: " ).append( baseErrorMessage ).append( "\n\n" );
             builder.append( "packageName: " ).append( pi.packageName ).append( "\n" );
             builder.append( "MODEL: " ).append( android.os.Build.MODEL ).append( "\n" );
             builder.append( "RELEASE: " ).append( android.os.Build.VERSION.RELEASE ).append( "\n" );
@@ -1303,7 +1303,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
             error( "error getting data for error: " + er, er );
           }
           
-          fos.write( error.getBytes( ENCODING ) );
+          fos.write( (error + "\n\n").getBytes( ENCODING ) );
           throwable.printStackTrace( new PrintStream( fos ) );
           fos.close();
         }

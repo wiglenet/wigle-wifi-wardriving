@@ -48,12 +48,16 @@ public class NetworkActivity extends Activity {
   private SimpleDateFormat format;
   private int observations = 0;
   private ConcurrentLinkedHashMap<LatLon, Integer> obsMap = new ConcurrentLinkedHashMap<LatLon, Integer>( 512 );
+  
+  // used for shutting extraneous activities down on an error
+  public static NetworkActivity networkActivity;
 
   /** Called when the activity is first created. */
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.network);
+    networkActivity = this;
     
     final Intent intent = getIntent();
     final String bssid = intent.getStringExtra( ListActivity.NETWORK_EXTRA_BSSID );
@@ -105,6 +109,11 @@ public class NetworkActivity extends Activity {
       setupQuery();      
       setupButton( network );
     }
+  }
+  
+  public void onDestroy() {    
+    networkActivity = null;
+    super.onDestroy();
   }
   
   private void setupQuery() {

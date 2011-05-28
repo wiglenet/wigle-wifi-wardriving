@@ -102,6 +102,9 @@ public class KmlWriter extends Thread {
             cursor = null;
           }
         }
+      }    
+      catch ( DBException ex ) {
+        dbHelper.deathDialog("Writing Kml", ex);
       }
       finally {
         if ( cursor != null ) {

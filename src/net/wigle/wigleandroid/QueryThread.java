@@ -54,6 +54,7 @@ public class QueryThread extends Thread {
     while ( ! done.get() ) {
       try {
         final Request request = queue.take();
+        // if(true) throw new DBException("meh", new SQLiteException("meat puppets"));
         if ( request != null ) {
           final SQLiteDatabase db = dbHelper.getDB();
           if ( db != null ) {
@@ -69,6 +70,10 @@ public class QueryThread extends Thread {
       catch ( InterruptedException ex ) {
         ListActivity.info( getName() + " interrupted" );
       }
+      catch ( DBException ex ) {
+        dbHelper.deathDialog("query thread", ex);        
+      }
     }
   }
+  
 }

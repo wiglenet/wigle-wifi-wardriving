@@ -19,7 +19,7 @@ say how many new aps wiglewifi found from last "audio speech".
 summarize AP's since last audio speech
 
 --- done ---
-* 1.39 (5/??/2011)
+* 1.39 (5/28/2011)
 Interrupt speech on mute or phone call
 Do not re-speak recent ssid's
 30 second timeout from startup before self-kill on low battery

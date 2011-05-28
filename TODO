@@ -14,9 +14,9 @@ try tabs on bottom in landscape mode
 query local db
 speak similar AP's with count, trying to condense somehow
 configurable sounds for new nets
-would be fine to add first run wizard to make easier setup wiglewifi
+first run wizard to make easier setup wiglewifi
 say how many new aps wiglewifi found from last "audio speech". 
-integrate aps from 0 to t_audiospeech then say it
+summarize AP's since last audio speech
 
 --- done ---
 * 1.39 (5/??/2011)

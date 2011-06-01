@@ -1,7 +1,7 @@
 --- todo ---
 "upload every n" setting
 lock screen on, lock UI
-show IEEE octet info
+show IEEE octet info (manufacturer stats/speech)
 some way to backup/restore db. catch i/o errors and offer to restore.
 web replace: seen-networks map tile overlays
 web replace: leaderboard

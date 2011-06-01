@@ -12,7 +12,7 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 query local db
-speak similar AP's with count, trying to condense somehow
+speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
 say how many new aps wiglewifi found from last "audio speech". 

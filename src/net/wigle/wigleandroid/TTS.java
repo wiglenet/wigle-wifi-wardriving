@@ -199,10 +199,12 @@ public final class TTS {
   public void speak( final String string ) {
     try {
       // ListActivity.info("saying: " + string );
-      if ( useEyesFree ) {
-        speak.invoke( speech, string, QUEUE_ADD, params );
-      } else {
-        speak.invoke( speech, string, QUEUE_ADD, (HashMap<String,String>) null );
+      if ( speech != null ) {
+        if ( useEyesFree ) {
+          speak.invoke( speech, string, QUEUE_ADD, params );
+        } else {
+          speak.invoke( speech, string, QUEUE_ADD, (HashMap<String,String>) null );
+        }
       }
     }
     catch ( final IllegalAccessException ex ) {
@@ -211,12 +213,17 @@ public final class TTS {
     catch ( final InvocationTargetException ex ) {
       ListActivity.error( "invocation: " + ex, ex );
     }
+    catch ( final NullPointerException ex ) {
+      ListActivity.error( "npe: " + ex, ex );
+    }
   }
   
   public void stop() {
     try {
       // ListActivity.info( "tts: stop" );
-      stop.invoke( speech, (Object[])null );
+      if ( speech != null ) {
+        stop.invoke( speech, (Object[])null );
+      }
     }
     catch ( final IllegalAccessException ex ) {
       ListActivity.error( "illegal: " + ex, ex );
@@ -229,7 +236,9 @@ public final class TTS {
   public void shutdown() {
     try {
       // ListActivity.info( "tts: shutdown" );
-      shutdown.invoke( speech, (Object[])null );
+      if ( speech != null ) {
+        shutdown.invoke( speech, (Object[])null );
+      }
     }
     catch ( final IllegalAccessException ex ) {
       ListActivity.error( "illegal: " + ex, ex );

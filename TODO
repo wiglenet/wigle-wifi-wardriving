@@ -18,11 +18,13 @@ first run wizard to make easier setup wiglewifi
 say how many new aps wiglewifi found from last "audio speech". 
 summarize AP's since last audio speech
 scanning off indicators
+screenlock on map tab
 
 --- done ---
 * 1.40 (6/??/2011)
 Different colors for wep/wap/none icons
 Catch NullPointerException in certain native TTS
+Retry transactions for finicky devices
 
 * 1.39 (5/28/2011)
 Interrupt speech on mute or phone call

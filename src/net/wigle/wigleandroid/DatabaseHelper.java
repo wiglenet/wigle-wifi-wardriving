@@ -43,6 +43,7 @@ public final class DatabaseHelper extends Thread {
   private static final String DATABASE_NAME = "wiglewifi.sqlite";
   private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
   private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
+  private static final Object TRANS_LOCK = new Object();
   
   private static final long QUEUE_CULL_TIMEOUT = 10000L;
   private long prevQueueCullTime = 0L;
@@ -137,7 +138,7 @@ public final class DatabaseHelper extends Thread {
   public DatabaseHelper( final Context context ) {    
     this.context = context.getApplicationContext();
     this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    setName("db-worker");
+    setName("dbworker-" + getName());
     this.deathHandler = new DeathHandler(); 
 
     queryThread = new QueryThread( this );
@@ -218,28 +219,48 @@ public final class DatabaseHelper extends Thread {
         try {
           checkDB();
           drain.clear();
-          drain.add( queue.take() );
+          DBUpdate firstUpdate = queue.take();
           final long startTime = System.currentTimeMillis();
           
-          // do a transaction for everything
-          db.beginTransaction();
-          addObservation( drain.get( 0 ), 1 );
           // give other thread some time
           Thread.yield();
+          
           // now that we've taken care of the one, see if there's more we can do in this transaction
           if ( MAX_DRAIN > 1 ) {
             // try to drain some more
             queue.drainTo( drain, MAX_DRAIN - 1 );
           }
           final int drainSize = drain.size();
-          for ( int i = 1; i < drainSize; i++ ) {
-            addObservation( drain.get( i ), drainSize );
+          
+          int countdown = 10;
+          while (countdown > 0) {
+            // doubt this will help the exclusive lock problems, but trying anyway
+            synchronized(TRANS_LOCK) {
+              try {
+                // do a transaction for everything
+                db.beginTransaction();
+                addObservation( firstUpdate, drainSize + 1 );                                                
+                for ( int i = 1; i < drainSize; i++ ) {
+                  addObservation( drain.get( i ), drainSize + 1 );
+                }
+                db.setTransactionSuccessful();
+                db.endTransaction();
+                countdown = 0;
+              }
+              catch ( SQLiteException ex ) {
+                ListActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
+                countdown--;
+                if ( countdown <= 0 ) {
+                  // give up
+                  throw ex;
+                }
+                ListActivity.sleep(100L);                
+              }
+            }
           }
-          db.setTransactionSuccessful();
-          db.endTransaction();
           
           final long delay = System.currentTimeMillis() - startTime;
-          if ( delay > 100L || ListActivity.DEBUG ) {
+          if ( delay > 1000L || ListActivity.DEBUG ) {
             ListActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
           }
         }
@@ -271,6 +292,8 @@ public final class DatabaseHelper extends Thread {
       ListActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
+    
+    ListActivity.info("db worker thread shutting down");
   }
   
   public void deathDialog( String message, Exception ex ) {

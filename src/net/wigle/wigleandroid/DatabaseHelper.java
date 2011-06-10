@@ -219,7 +219,7 @@ public final class DatabaseHelper extends Thread {
         try {
           checkDB();
           drain.clear();
-          DBUpdate firstUpdate = queue.take();
+          drain.add( queue.take() );
           final long startTime = System.currentTimeMillis();
           
           // give other thread some time
@@ -239,9 +239,8 @@ public final class DatabaseHelper extends Thread {
               try {
                 // do a transaction for everything
                 db.beginTransaction();
-                addObservation( firstUpdate, drainSize + 1 );                                                
-                for ( int i = 1; i < drainSize; i++ ) {
-                  addObservation( drain.get( i ), drainSize + 1 );
+                for ( int i = 0; i < drainSize; i++ ) {
+                  addObservation( drain.get( i ), drainSize );
                 }
                 db.setTransactionSuccessful();
                 db.endTransaction();

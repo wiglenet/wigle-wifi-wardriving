@@ -25,6 +25,7 @@ Different colors for wep/wap/none icons
 Scanning turned off indicators on Dashboard and Service
 Catch NullPointerException in certain native TTS
 Retry transactions for finicky devices
+Osmdroid r940
 
 * 1.39 (5/28/2011)
 Interrupt speech on mute or phone call

@@ -377,7 +377,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     public boolean isScanning() {
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      return isScanning(this);
+    }
+    
+    public static boolean isScanning(final Context context) {
+      final SharedPreferences prefs = context.getSharedPreferences( SHARED_PREFS, 0 );
       return prefs.getBoolean( PREF_SCAN_RUNNING, true );
     }
     

@@ -71,7 +71,8 @@ public class DashboardActivity extends Activity {
     tv.setText( ListActivity.lameStatic.runNets + " Run");
     
     tv = (TextView) findViewById( R.id.newwifi );
-    tv.setText( ListActivity.lameStatic.newWifi + " New Wifi" );
+    final String scanning = ListActivity.isScanning(this) ? "" : "(Scanning Turned Off)\n"; 
+    tv.setText( scanning + ListActivity.lameStatic.newWifi + " New Wifi" );
     
     tv = (TextView) findViewById( R.id.currnets );
     tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );

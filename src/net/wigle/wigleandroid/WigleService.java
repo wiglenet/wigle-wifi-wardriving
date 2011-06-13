@@ -151,6 +151,9 @@ public final class WigleService extends Service {
         text = "Run: " + ListActivity.lameStatic.runNets
           + "  New: " + ListActivity.lameStatic.newNets + "  DB: " + dbNets;
       }      
+      if (! ListActivity.isScanning(context)) {
+        text = "(Scanning Turned Off) " + text;
+      }
       notification.setLatestEventInfo( context, title, text, contentIntent );
       
       startForegroundCompat( NOTIFICATION_ID, notification );

@@ -15,14 +15,14 @@ query local db
 speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
-say how many new aps wiglewifi found from last "audio speech". 
 summarize AP's since last audio speech
-scanning off indicators
 screenlock on map tab
+stats on what is in the local db
 
 --- done ---
-* 1.40 (6/??/2011)
+* 1.40 (6/13/2011)
 Different colors for wep/wap/none icons
+Scanning turned off indicators on Dashboard and Service
 Catch NullPointerException in certain native TTS
 Retry transactions for finicky devices
 

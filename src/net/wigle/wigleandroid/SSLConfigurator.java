@@ -3,7 +3,7 @@
 
 // $Id$
 /* 
- * Copyright (c) 2003-2010, Hugh Kennedy
+ * Copyright (c) 2003-2011, Hugh Kennedy
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without 
@@ -71,6 +71,9 @@ public final class SSLConfigurator {
   /** factory instance */
   private static SSLConfigurator config = null;
 
+  /** fallback factory instance */
+  private static SSLConfigurator fallback_config = null;
+
   /** our self-signed client socket factory */
   private SSLSocketFactory ssf = null;
 
@@ -78,8 +81,8 @@ public final class SSLConfigurator {
   private HostnameVerifier hv = null; 
 
   /** default constructor sets up an SSLConfigurator */
-  SSLConfigurator( Resources res ) {
-     setupSSL( res );
+  SSLConfigurator( Resources res, boolean fallback ) {
+    setupSSL( res, fallback );
   }
 
   /**
@@ -89,11 +92,24 @@ public final class SSLConfigurator {
   public static SSLConfigurator getInstance( final Resources res ) {
      synchronized ( lock ) {
        if ( null == config ) {
-          config = new SSLConfigurator( res );
+         config = new SSLConfigurator( res, false );
        }
        
        return config;
      }
+  }
+
+  public static SSLConfigurator getInstance( final Resources res, boolean fallback ) {
+    if ( fallback ) {
+      synchronized ( lock ) {
+        if ( null == fallback_config ) {
+          fallback_config = new SSLConfigurator( res, true );
+        }
+        return fallback_config;
+      }
+    } else {
+      return getInstance( res );
+    }
   }
 
   /**
@@ -112,13 +128,13 @@ public final class SSLConfigurator {
    * do the dirty work.
    * @parma res the android Resources to load the cert via.
    */
-  private boolean setupSSL( final Resources res ) {
+  private boolean setupSSL( final Resources res, boolean fallback ) {
     ListActivity.info( "setupSSL" );
     boolean result = false;
     try {
 
       // GET CERT GOO FROM R.raw
-      final InputStream certstream = res.openRawResource( R.raw.ssl );
+      final InputStream certstream = res.openRawResource( fallback ? R.raw.fssl : R.raw.ssl );
       
       final CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
 

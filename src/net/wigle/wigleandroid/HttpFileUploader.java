@@ -62,6 +62,7 @@ final class HttpFileUploader {
 
     // test if we should be doing our own ssl
     boolean self_serving = true;
+    boolean fallback=true;
     try {
         URLConnection testcon = connectURL.openConnection();
         // we should probably time-bound this test-connection?
@@ -70,6 +71,18 @@ final class HttpFileUploader {
         // consider a pref to skip this? or just phase out after migration?
     } catch (IOException ex) {
         // we're specificly interested in javax.net.ssl.SSLException
+    }
+    if ( self_serving ) {
+        try {
+            URLConnection testcon = connectURL.openConnection();
+            if ( testcon instanceof javax.net.ssl.HttpsURLConnection ) {
+                SSLConfigurator con = SSLConfigurator.getInstance( res );
+                con.configure( (javax.net.ssl.HttpsURLConnection) testcon );
+                testcon.connect();
+                fallback = false;
+            }
+        } catch (IOException ex) {
+        }
     }
 
     
@@ -99,7 +112,7 @@ final class HttpFileUploader {
       conn.setUseCaches(false);
       conn.setInstanceFollowRedirects( false );
       if ( ( conn instanceof javax.net.ssl.HttpsURLConnection ) && self_serving ) {
-          final SSLConfigurator con = SSLConfigurator.getInstance( res );
+          final SSLConfigurator con = SSLConfigurator.getInstance( res, fallback );
           con.configure( (javax.net.ssl.HttpsURLConnection) conn );
           ListActivity.info("using ssl! conn: " + conn);
       }

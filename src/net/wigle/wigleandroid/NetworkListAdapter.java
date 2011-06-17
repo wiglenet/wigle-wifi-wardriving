@@ -65,7 +65,15 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
       row = convertView;
     }
 
-    final Network network = getItem(position);
+    Network network = null;
+    try {
+      network = getItem(position);
+    }
+    catch ( final IndexOutOfBoundsException ex ) {
+      // yes, this happened to someone
+      ListActivity.info("index out of bounds: " + position + " ex: " + ex);
+      return row;
+    }
     // info( "listing net: " + network.getBssid() );
     
     final ImageView ico = (ImageView) row.findViewById( R.id.wepicon );

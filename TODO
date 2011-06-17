@@ -22,6 +22,7 @@ stats on what is in the local db
 --- done ---
 * 1.41 (6/16/2011)
 Include ssl cert chain for certain devices that don't have it
+Fix IndexOutOfBoundsException that happened on one device
 
 * 1.40 (6/13/2011)
 Different colors for wep/wap/none icons

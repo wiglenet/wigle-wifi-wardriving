@@ -129,7 +129,7 @@ public final class SSLConfigurator {
    * @parma res the android Resources to load the cert via.
    */
   private boolean setupSSL( final Resources res, boolean fallback ) {
-    ListActivity.info( "setupSSL" );
+    ListActivity.info( "setupSSL. fallback: " + fallback );
     boolean result = false;
     try {
 
@@ -139,10 +139,22 @@ public final class SSLConfigurator {
       final CertificateFactory cf = CertificateFactory.getInstance( "X.509" );
 
       final java.security.cert.Certificate cert = cf.generateCertificate( certstream );
-
+      
       final KeyStore ks = KeyStore.getInstance( KeyStore.getDefaultType() );
-      ks.load( null, null );
+      ks.load( null, null );      
       ks.setCertificateEntry( "wigle.net", cert );
+      
+      if ( ! fallback ) {
+        // stuff all these certs in the store somewhere, it seems to figure it out
+        final InputStream chainstream = res.openRawResource( R.raw.sfbundle );
+        int count = 0;
+        for ( final java.security.cert.Certificate chainCert : cf.generateCertificates(chainstream) ) {
+          final String alias = "alias" + count;
+          ks.setCertificateEntry(alias, chainCert);
+          ListActivity.info("adding cert alias: " + alias);
+          count++;
+        }
+      }      
      
       final TrustManagerFactory tmf = TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() );
       tmf.init( ks );

@@ -64,6 +64,7 @@ final class HttpFileUploader {
     boolean self_serving = true;
     boolean fallback=true;
     try {
+        ListActivity.info("testcon1");
         URLConnection testcon = connectURL.openConnection();
         // we should probably time-bound this test-connection?
         testcon.connect();
@@ -72,8 +73,10 @@ final class HttpFileUploader {
     } catch (IOException ex) {
         // we're specificly interested in javax.net.ssl.SSLException
     }
+
     if ( self_serving ) {
         try {
+            ListActivity.info("testcon2");
             URLConnection testcon = connectURL.openConnection();
             if ( testcon instanceof javax.net.ssl.HttpsURLConnection ) {
                 SSLConfigurator con = SSLConfigurator.getInstance( res );
@@ -82,9 +85,10 @@ final class HttpFileUploader {
                 fallback = false;
             }
         } catch (IOException ex) {
+          // ListActivity.info("testcon ex: " + ex, ex);
         }
     }
-
+    ListActivity.info("end testcons");
     
     final String lineEnd = "\r\n";
     final String twoHyphens = "--";
@@ -95,7 +99,7 @@ final class HttpFileUploader {
     try {
       //------------------ CLIENT REQUEST
     
-      ListActivity.info("Creating url connection");
+      ListActivity.info("Creating url connection. self_serving: " + self_serving + " fallback: " + fallback);
       
       // Open a HTTP connection to the URL
       CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();

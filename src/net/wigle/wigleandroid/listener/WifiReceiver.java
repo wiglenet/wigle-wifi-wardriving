@@ -52,8 +52,9 @@ public class WifiReceiver extends BroadcastReceiver {
   private Location prevGpsLocation;
   private long scanRequestTime = Long.MIN_VALUE;
   private long lastScanResponseTime = Long.MIN_VALUE;
-  private long lastWifiUnjamTime = Long.MIN_VALUE;
-  private long lastSaveLocationTime = Long.MIN_VALUE;
+  private long lastWifiUnjamTime = 0;
+  private long lastSaveLocationTime = 0;
+  private long lastHaveLocationTime = 0;
   private int pendingWifiCount = 0;
   private int pendingCellCount = 0;
   private final long constructionTime = System.currentTimeMillis();
@@ -144,12 +145,8 @@ public class WifiReceiver extends BroadcastReceiver {
       doWifiScan();
       nonstopScanRequestTime = now;
     }
-    final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
-    long setPeriod = prefPeriod;
-    if (setPeriod == 0 ){
-      setPeriod = Math.max(period, ListActivity.LOCATION_UPDATE_INTERVAL); 
-    }
     
+    final long setPeriod = listActivity.getLocationSetPeriod();    
     if ( setPeriod != prevScanPeriod && listActivity.isScanning() ) {
       // update our location scanning speed
       ListActivity.info("setting location updates to: " + setPeriod);
@@ -158,12 +155,28 @@ public class WifiReceiver extends BroadcastReceiver {
       prevScanPeriod = setPeriod;
     }
     
+    // have the gps listener to a self-check, in case it isn't getting updates anymore
+    listActivity.getGPSListener().checkLocationOK();
+    
     final Location location = listActivity.getGPSListener().getLocation();
     
-    // save the location every minute, for later runs, or viewing map during loss of location.
-    if (now - lastSaveLocationTime > 60000L && location != null) {
+    // save the location every minute, for later runs, or viewing map during loss of location.    
+    if (now - lastSaveLocationTime > 60000L && location != null) {    
       listActivity.getGPSListener().saveLocation();
-      lastSaveLocationTime = now;      
+      lastSaveLocationTime = now;
+    }
+    
+    if (location != null) {
+      lastHaveLocationTime = now;
+    }
+    // ListActivity.info("now minus haveloctime: " + (now-lastHaveLocationTime) 
+    //    + " lastHaveLocationTime: " + lastHaveLocationTime);
+    if (now - lastHaveLocationTime > 30000L) {
+      // no location in a while, make sure we're subscribed to updates
+      ListActivity.info("no location for a while, setting location update period: " + setPeriod);
+      listActivity.setLocationUpdates(setPeriod, 0f);
+      // don't do this until another period has passed
+      lastHaveLocationTime = now;
     }
     
     final boolean showCurrent = prefs.getBoolean( ListActivity.PREF_SHOW_CURRENT, true );
@@ -720,7 +733,7 @@ public class WifiReceiver extends BroadcastReceiver {
         
         if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
           ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
-          if ( lastWifiUnjamTime < 0 || now - lastWifiUnjamTime > resetWifiPeriod ) {
+          if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
             Toast.makeText( listActivity, 
                 "Wifi appears jammed, Turning off, and then on, WiFi.", Toast.LENGTH_LONG ).show();
             wifiManager.setWifiEnabled(false);

@@ -40,7 +40,8 @@
     <string name="sort_text">Sort Options</string>
     <string name="listdialog_button">OK</string>    
     <string name="cryptodialog_button">OK</string>
-    <string name="cryptocanceldialog_button">Cancel</string>        
+    <string name="cryptocanceldialog_button">Cancel</string>  
+    <string name="circle_size_map">Map Circles Sized by Qty</string>      
     <string name="speech_button">Speech Configuration Screen &gt;&gt;</string>
     <string name="speech_text">Audio speech will include:</string>
     <string name="speech_run">Nets for run</string>

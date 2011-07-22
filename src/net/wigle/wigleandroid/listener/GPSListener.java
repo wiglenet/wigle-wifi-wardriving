@@ -39,8 +39,11 @@ public class GPSListener implements Listener, LocationListener {
   
   public void onGpsStatusChanged( final int event ) {
     if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
-      // ListActivity.info("GPS STOPPED");
+      ListActivity.info("GPS STOPPED");    
+      // gps has stopped, see if we should ask for updates again
+      listActivity.setLocationUpdates();
     }
+    // ListActivity.info("GPS event: " + event);
     updateLocationData( (Location) null );
   } 
   
@@ -51,12 +54,19 @@ public class GPSListener implements Listener, LocationListener {
   }
   
   public void onLocationChanged( final Location newLocation ) {
+    // ListActivity.info("GPS onLocationChanged: " + newLocation);
     updateLocationData( newLocation );
   }
   
-  public void onProviderDisabled( final String provider ) {}
-  public void onProviderEnabled( final String provider ) {}
-  public void onStatusChanged( final String provider, final int status, final Bundle extras ) {}
+  public void onProviderDisabled( final String provider ) {
+    ListActivity.info("provider disabled: " + provider);
+  }
+  public void onProviderEnabled( final String provider ) {
+    ListActivity.info("provider enabled: " + provider);
+  }
+  public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
+    ListActivity.info("provider status changed: " + provider + " status: " + status);
+  }
 
   /** newLocation can be null */
   private void updateLocationData( final Location newLocation ) {
@@ -107,6 +117,8 @@ public class GPSListener implements Listener, LocationListener {
         ListActivity.info( "nulling location: " + location );
         location = null;
         wasProviderChange = true;
+        // make sure we're registered for updates
+        listActivity.setLocationUpdates();
       }
     }
     else if ( newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
@@ -145,6 +157,8 @@ public class GPSListener implements Listener, LocationListener {
       previousSpeed = 0f;
     }
     
+    // ListActivity.info("sat count: " + satCount);
+    
     if ( wasProviderChange ) {
       ListActivity.info( "wasProviderChange: satCount: " + satCount 
         + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
@@ -176,6 +190,13 @@ public class GPSListener implements Listener, LocationListener {
     listActivity.setLocationUI();
   }
   
+  public void checkLocationOK() {
+    if ( ! locationOK( location, getSatCount() ) ) {
+      // do a self-check
+      updateLocationData(null);
+    }
+  }
+  
   private boolean locationOK( final Location location, final int satCount ) {
     boolean retval = false;
     final long now = System.currentTimeMillis();
@@ -184,7 +205,7 @@ public class GPSListener implements Listener, LocationListener {
       // bad!
     }
     else if ( GPS_PROVIDER.equals( location.getProvider() ) ) {
-      if ( satCount < 3 ) {
+      if ( satCount > 0 && satCount < 3 ) {
         if ( satCountLowTime == null ) {
           satCountLowTime = now;
         }
@@ -195,14 +216,26 @@ public class GPSListener implements Listener, LocationListener {
       }
       boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > GPS_TIMEOUT;
       gpsLost |= now - lastLocationTime > GPS_TIMEOUT;
+      gpsLost |= horribleGps(location);
       retval = ! gpsLost;
     }
     else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
       boolean gpsLost = now - lastNetworkLocationTime > NET_LOC_TIMEOUT;
+      gpsLost |= horribleGps(location);      
       retval = ! gpsLost;
     }
     
     return retval;
+  }
+  
+  private boolean horribleGps(final Location location) {
+    // try to protect against some horrible gps's out there
+    boolean horrible = false;
+    // check if accuracy is under 10 miles
+    horrible |= location.hasAccuracy() && location.getAccuracy() > 16000;
+    horrible |= location.getLatitude() < -90 || location.getLatitude() > 90;
+    horrible |= location.getLongitude() < -180 || location.getLongitude() > 180;
+    return horrible;
   }
   
   public int getSatCount() {

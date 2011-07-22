@@ -12,14 +12,20 @@ kismet drone support
 some response/info/stat about uploaded files
 try tabs on bottom in landscape mode
 query local db
-speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
+speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 summarize AP's since last audio speech
 screenlock on map tab
 stats on what is in the local db
 
 --- done ---
+* 1.42 (7/??/2011)
+Recover from states where the OS shuts off the gps out from under us
+Allow mock locations, which should allow bluetooth gps to work
+Setting to allow map circles to be sized by quantity (previous style)
+OpenStreetMap update (osmdroid r967)
+
 * 1.41 (6/16/2011)
 Include ssl cert chain for certain devices that don't have it
 Fix IndexOutOfBoundsException that happened on one device

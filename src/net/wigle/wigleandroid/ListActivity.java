@@ -153,6 +153,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_SCAN_RUNNING = "scanRunning";
     public static final String PREF_METRIC = "metric";
     public static final String PREF_MAP_LABEL = "mapLabel";
+    public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
@@ -885,6 +886,21 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
+    public long getLocationSetPeriod() {
+      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
+      long setPeriod = prefPeriod;
+      if (setPeriod == 0 ){
+        setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), ListActivity.LOCATION_UPDATE_INTERVAL); 
+      }
+      return setPeriod;
+    }
+    
+    public void setLocationUpdates() {
+      final long setPeriod = getLocationSetPeriod();    
+      setLocationUpdates(setPeriod, 0f);
+    }    
+    
     /**
      * resets the gps listener to the requested update time and distance.
      * an updateIntervalMillis of <= 0 will not register for updates. 
@@ -892,14 +908,16 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
       final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
       
-      if ( state.gpsListener == null ) {
-        state.gpsListener = new GPSListener( this );
-        locationManager.addGpsStatusListener( state.gpsListener );
+      if ( state.gpsListener != null ) {
+        // remove any old requests
+        locationManager.removeUpdates( state.gpsListener );
+        locationManager.removeGpsStatusListener( state.gpsListener );
       }
-
-      // remove any old requests
-      locationManager.removeUpdates( state.gpsListener );
       
+      // create a new listener to try and get around the gps stopping bug
+      state.gpsListener = new GPSListener( this );
+      locationManager.addGpsStatusListener( state.gpsListener );      
+
       final List<String> providers = locationManager.getAllProviders();
       for ( String provider : providers ) {
         info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );

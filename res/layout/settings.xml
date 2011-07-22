@@ -85,6 +85,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/use_metric" />
+        
+<CheckBox android:id="@+id/circle_size_map"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/circle_size_map" />
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"

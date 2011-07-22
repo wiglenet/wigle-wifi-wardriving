@@ -290,6 +290,7 @@ public final class SettingsActivity extends Activity {
       MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListActivity.PREF_FOUND_SOUND, true);
       MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListActivity.PREF_FOUND_NEW_SOUND, true);
       MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListActivity.PREF_SPEECH_GPS, true);
+      MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListActivity.PREF_CIRCLE_SIZE_MAP, false);
       
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );

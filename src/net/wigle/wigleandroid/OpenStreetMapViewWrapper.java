@@ -40,6 +40,14 @@ public final class OpenStreetMapViewWrapper extends Overlay {
   private final Paint trailCellPaint = new Paint();
   private final Paint trailCellDBPaint = new Paint();
   
+  private Paint trailBackSizePaint;
+  private Paint trailSizePaint;
+  private Paint trailDBSizePaint;
+  
+  private Paint trailCellBackSizePaint;
+  private Paint trailCellSizePaint;
+  private Paint trailCellDBSizePaint;
+  
   private final Paint ssidPaintLeft = new Paint();
   private final Paint ssidPaintRight = new Paint();
   private final Paint ssidPaintLeftBack = new Paint();
@@ -107,6 +115,26 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     trailCellBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );
     trailCellBackPaint.setStyle( Style.FILL );
     trailCellBackPaint.setStrokeWidth( 3f );
+        
+    trailBackSizePaint = new Paint(trailBackPaint);
+    trailBackSizePaint.setStyle( Style.STROKE );
+    trailBackSizePaint.setStrokeWidth( 2f );
+    trailSizePaint = new Paint(trailPaint);
+    trailSizePaint.setColor( Color.argb( 128, 200, 128, 200 ) );
+    trailSizePaint.setStyle( Style.FILL );
+    trailDBSizePaint = new Paint(trailDBPaint);
+    trailDBSizePaint.setColor( Color.argb( 128, 10, 64, 220 ) );
+    trailDBSizePaint.setStyle( Style.FILL );
+    
+    trailCellBackSizePaint = new Paint(trailCellBackPaint);
+    trailCellBackSizePaint.setStyle( Style.STROKE );
+    trailCellBackSizePaint.setStrokeWidth( 2f );    
+    trailCellSizePaint = new Paint(trailCellPaint);
+    trailCellSizePaint.setColor( Color.argb( 128, 128, 200, 200 ) );
+    trailCellSizePaint.setStyle( Style.FILL );
+    trailCellDBSizePaint = new Paint(trailCellDBPaint);
+    trailCellDBSizePaint.setColor( Color.argb( 128, 64, 10, 220 ) );
+    trailCellDBSizePaint.setStyle( Style.FILL );
     
     ssidPaintLeft.setColor( Color.argb( 255, 0, 0, 0 ) );
     ssidPaintLeft.setAntiAlias( true );
@@ -150,7 +178,9 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     netCount.setStyle( Style.STROKE );
     netCount.setTextSize(16f);
     netCount.setAntiAlias( true );
-    netCount.setTextAlign( Align.CENTER );    
+    netCount.setTextAlign( Align.CENTER );   
+    
+    
   }
   
   @Override
@@ -198,80 +228,28 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     }
   }
    
-  private void drawTrail( final Canvas c, final MapView osmv ) {
-    final Projection proj = osmv.getProjection();
+  private void drawTrail( final Canvas c, final MapView osmv ) {    
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
-	  // point to recycle
-	  Point point = null;
-	  final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
-    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );    
-    
-    // if zoomed in past 15, give a little boost to circle size
+	  
+	  // if zoomed in past 15, give a little boost to circle size
     float boost = osmv.getZoomLevel() - 15;
     boost *= 0.50f;
     boost += 2f;
     if ( boost < 2f ) {
       boost = 2f;
     }
-    int wifiSize = (int) (5 * boost) + 1;
-    int cellSize = (int) (4 * boost) + 1;
-    if ( osmv.getZoomLevel() < 15 ) {
-      wifiSize /= 2;
-      cellSize /= 2;
-    }
-    
-    // backgrounds
-    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      final TrailStat value = entry.getValue();
-      boolean projected = false;
-      
-      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
-        point = proj.toMapPixels( entry.getKey(), point );
-        projected = true;
-  	  	c.drawCircle(point.x, point.y, wifiSize, trailBackPaint);
-			}
-			    
-      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
-        if ( ! projected ) {
-          point = proj.toMapPixels( entry.getKey(), point );
-        }
-        c.drawRect(point.x - cellSize, point.y - cellSize, point.x + cellSize, point.y + cellSize, trailCellBackPaint);
-      }
-	  }
-	  
-    // foregrounds
-    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
-      final TrailStat value = entry.getValue();
-      boolean projected = false;
+        
+    renderCircleNumbers( c, osmv, entrySet, boost );        
+    renderSsidStrings( c, osmv, boost );
+  }
+  
+  private void renderSsidStrings( final Canvas c, final MapView osmv, final float boost ) {
+    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
+    final Projection proj = osmv.getProjection();
 
-      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
-        point = proj.toMapPixels( entry.getKey(), point );
-        projected = true;
-        final Paint paint = value.newWifiForDB > 0 ? trailDBPaint : trailPaint;
-        c.drawCircle(point.x, point.y, wifiSize, paint);
-      }
-  	
-      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
-        if ( ! projected ) {
-          point = proj.toMapPixels( entry.getKey(), point );
-        }
-        final Paint paint = value.newCellForDB > 0 ? trailCellDBPaint : trailCellPaint;
-        c.drawRect(point.x - cellSize, point.y - cellSize, point.x + cellSize, point.y + cellSize, paint);
-      }
-       
-      if ( osmv.getZoomLevel() >= 15 ) {
-        int nets = value.newWifiForDB + value.newCellForDB;
-        if ( ! showNewDBOnly ) {
-          nets = value.newWifiForRun + value.newCellForRun;
-        }
-        if ( nets > 1 ) {
-          final String netString = Integer.toString( nets );
-          c.drawText( netString, point.x, point.y + 7, netCountBack );                
-          c.drawText( netString, point.x, point.y + 7, netCount );
-        }
-      }
-	  }
+    // point to recycle
+    Point point = null;
     
     if ( osmv.getZoomLevel() >= 16 && showLabel ) {
       // draw ssid strings
@@ -363,6 +341,103 @@ public final class OpenStreetMapViewWrapper extends Overlay {
       c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossBackPaint );
       c.drawLine( point.x - len, point.y - len, point.x + len, point.y + len, crossPaint );
       c.drawLine( point.x - len, point.y + len, point.x + len, point.y - len, crossPaint );
+    }
+  }
+  
+  private void renderCircleNumbers( final Canvas c, final MapView osmv, 
+      final Set<Map.Entry<GeoPoint,TrailStat>> entrySet, float boost) {
+    
+    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+    final boolean circleSizeMap = prefs.getBoolean(ListActivity.PREF_CIRCLE_SIZE_MAP, false);
+    final Projection proj = osmv.getProjection();
+        
+    float wifiSize = (5 * boost) + 1;
+    float cellSize = (4 * boost) + 1;
+    if ( osmv.getZoomLevel() < 15 ) {
+      wifiSize /= 2;
+      cellSize /= 2;
+    }
+    
+    if ( circleSizeMap && osmv.getZoomLevel() < 15 ) {
+      boost /= 2;
+    }
+    
+    // point to recycle
+    Point point = null;
+    
+    // backgrounds
+    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      final TrailStat value = entry.getValue();
+      boolean projected = false;
+      
+      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
+        point = proj.toMapPixels( entry.getKey(), point );
+        projected = true;
+        float size = wifiSize;
+        Paint paint = trailBackPaint;
+        if ( circleSizeMap) {
+          size = (Math.max(value.newWifiForDB, value.newWifiForRun) * boost) + 1;
+          paint = trailBackSizePaint;
+        }        
+        c.drawCircle(point.x, point.y, size, paint);
+      }
+          
+      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
+        if ( ! projected ) {
+          point = proj.toMapPixels( entry.getKey(), point );
+        }
+        float size = cellSize;
+        Paint paint = trailCellBackPaint;
+        if ( circleSizeMap ) {
+          size = (Math.max(value.newCellForDB, value.newCellForRun) * boost) + 1;
+          paint = trailCellBackSizePaint;
+        }
+        c.drawRect(point.x - size, point.y - size, point.x + size, point.y + size, paint);
+      }
+    }
+    
+    // foregrounds
+    for ( Map.Entry<GeoPoint,TrailStat> entry : entrySet ) {
+      final TrailStat value = entry.getValue();
+      boolean projected = false;
+
+      if ( (value.newWifiForRun > 0 && ! showNewDBOnly) || value.newWifiForDB > 0 ) {
+        point = proj.toMapPixels( entry.getKey(), point );
+        projected = true;
+        float size = wifiSize;
+        Paint paint = value.newWifiForDB > 0 ? trailDBPaint : trailPaint;
+        if ( circleSizeMap ) {
+          size = (Math.max(value.newWifiForDB, value.newWifiForRun) * boost) + 1;
+          paint = value.newWifiForDB > 0 ? trailDBSizePaint : trailSizePaint;
+        }
+        c.drawCircle(point.x, point.y, size, paint);
+      }
+    
+      if ( (value.newCellForRun > 0 && ! showNewDBOnly) || value.newCellForDB > 0 ) {
+        if ( ! projected ) {
+          point = proj.toMapPixels( entry.getKey(), point );
+        }
+        float size = cellSize;
+        Paint paint = value.newCellForDB > 0 ? trailCellDBPaint : trailCellPaint;
+        if ( circleSizeMap ) {
+          size = (Math.max(value.newCellForDB, value.newCellForRun) * boost) + 1;
+          paint = value.newCellForDB > 0 ? trailCellDBSizePaint : trailCellSizePaint;
+        }
+        c.drawRect(point.x - size, point.y - size, point.x + size, point.y + size, paint);
+      }
+       
+      if ( osmv.getZoomLevel() >= 15 && ! circleSizeMap ) {
+        int nets = value.newWifiForDB + value.newCellForDB;
+        if ( ! showNewDBOnly ) {
+          nets = value.newWifiForRun + value.newCellForRun;
+        }
+        if ( nets > 1 ) {
+          final String netString = Integer.toString( nets );
+          c.drawText( netString, point.x, point.y + 7, netCountBack );                
+          c.drawText( netString, point.x, point.y + 7, netCount );
+        }
+      }
     }
   }
   

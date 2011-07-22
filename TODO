@@ -23,6 +23,7 @@ stats on what is in the local db
 * 1.42 (7/??/2011)
 Recover from states where the OS shuts off the gps out from under us
 Allow mock locations, which should allow bluetooth gps to work
+Better filtering of horribly inaccurate gps fixes
 Setting to allow map circles to be sized by quantity (previous style)
 OpenStreetMap update (osmdroid r967)
 

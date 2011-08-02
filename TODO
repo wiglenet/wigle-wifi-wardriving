@@ -18,6 +18,7 @@ speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 summarize AP's since last audio speech
 screenlock on map tab
 stats on what is in the local db
+pull out rest of strings to resource file for easier localization
 
 --- done ---
 * 1.42 (7/22/2011)

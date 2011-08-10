@@ -9,16 +9,17 @@ username not found notice
 
 --- user suggested ---
 kismet drone support
-some response/info/stat about uploaded files
+some response/info/stat about uploaded files (user stats?)
 try tabs on bottom in landscape mode
-query local db
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
 speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 summarize AP's since last audio speech
 screenlock on map tab
+query local db
 stats on what is in the local db
 pull out rest of strings to resource file for easier localization
+"only new" on map work with labels too
 
 --- done ---
 * 1.42 (7/22/2011)

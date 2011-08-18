@@ -22,6 +22,9 @@ pull out rest of strings to resource file for easier localization
 "only new" on map work with labels too
 
 --- done ---
+* 1.43 ()
+More choices for deciding wifi-frozen setting
+
 * 1.42 (7/22/2011)
 Recover from states where the OS shuts off the gps out from under us
 Allow mock locations, which should allow bluetooth gps to work

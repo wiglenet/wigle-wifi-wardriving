@@ -313,8 +313,8 @@ public final class SettingsActivity extends Activity {
           ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
-      final long[] resetPeriods = new long[]{ 30000,60000,90000,120000,300000,600000,0 };
-      final String[] resetName = new String[]{ "30 sec","1 min","1.5 min",
+      final long[] resetPeriods = new long[]{ 15000,30000,60000,90000,120000,300000,600000,0 };
+      final String[] resetName = new String[]{ "15 sec", "30 sec","1 min","1.5 min",
           "2 min","5 min","10 min","Off" };
       doSpinner( R.id.reset_wifi_spinner, 
           ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      

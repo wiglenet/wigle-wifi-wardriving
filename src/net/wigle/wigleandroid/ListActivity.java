@@ -872,7 +872,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
         // gps exists, but isn't on
         Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
         final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
-        startActivity(myIntent);
+        try {
+          startActivity(myIntent);
+        }
+        catch (Exception ex) {
+          error("exception trying to start location activity: " + ex, ex);
+        }
       }
       // emulator crashes if you ask this
       if ( ! state.inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) && state.gpsListener == null ) {

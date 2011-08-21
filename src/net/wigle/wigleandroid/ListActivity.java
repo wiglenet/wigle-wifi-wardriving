@@ -937,45 +937,51 @@ public final class ListActivity extends Activity implements FileUploaderListener
         return;
       }
       
-      TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
-      tv.setText( "Sats: " + state.gpsListener.getSatCount() );
-      
-      final Location location = state.gpsListener.getLocation();
-      
-      tv = (TextView) this.findViewById( R.id.LocationTextView01 );
-      String latText = "";
-      if ( location == null ) {
-        if ( isScanning() ) {
-          latText = "  (Waiting for GPS sync..)";
+      try {       
+        TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
+        tv.setText( "Sats: " + state.gpsListener.getSatCount() );
+        
+        final Location location = state.gpsListener.getLocation();
+        
+        tv = (TextView) this.findViewById( R.id.LocationTextView01 );
+        String latText = "";
+        if ( location == null ) {
+          if ( isScanning() ) {
+            latText = "  (Waiting for GPS sync..)";
+          }
+          else {
+            latText = "  (Scanning Turned Off)";
+          }
         }
         else {
-          latText = "  (Scanning Turned Off)";
+          latText = state.numberFormat8.format( location.getLatitude() );
+        }
+        tv.setText( "Lat: " + latText );
+        
+        tv = (TextView) this.findViewById( R.id.LocationTextView02 );
+        tv.setText( "Lon: " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
+        
+        tv = (TextView) this.findViewById( R.id.LocationTextView03 );
+        tv.setText( "Speed: " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
+        
+        TextView tv4 = (TextView) this.findViewById( R.id.LocationTextView04 );
+        TextView tv5 = (TextView) this.findViewById( R.id.LocationTextView05 );
+        if ( location == null ) {
+          tv4.setText( "" );
+          tv5.setText( "" );
+        }
+        else {
+          String distString = DashboardActivity.metersToString( 
+              state.numberFormat0, this, location.getAccuracy(), true );
+          tv4.setText( "+/- " + distString );
+          distString = DashboardActivity.metersToString( 
+              state.numberFormat0, this, (float) location.getAltitude(), true );
+          tv5.setText( "Alt: " + distString );
         }
       }
-      else {
-        latText = state.numberFormat8.format( location.getLatitude() );
-      }
-      tv.setText( "Lat: " + latText );
-      
-      tv = (TextView) this.findViewById( R.id.LocationTextView02 );
-      tv.setText( "Lon: " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
-      
-      tv = (TextView) this.findViewById( R.id.LocationTextView03 );
-      tv.setText( "Speed: " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
-      
-      TextView tv4 = (TextView) this.findViewById( R.id.LocationTextView04 );
-      TextView tv5 = (TextView) this.findViewById( R.id.LocationTextView05 );
-      if ( location == null ) {
-        tv4.setText( "" );
-        tv5.setText( "" );
-      }
-      else {
-        String distString = DashboardActivity.metersToString( 
-            state.numberFormat0, this, location.getAccuracy(), true );
-        tv4.setText( "+/- " + distString );
-        distString = DashboardActivity.metersToString( 
-            state.numberFormat0, this, (float) location.getAltitude(), true );
-        tv5.setText( "Alt: " + distString );
+      catch ( IncompatibleClassChangeError ex ) {
+        // yeah, saw this in the wild, who knows.
+        error( "wierd ex: " + ex, ex);
       }
     }
     

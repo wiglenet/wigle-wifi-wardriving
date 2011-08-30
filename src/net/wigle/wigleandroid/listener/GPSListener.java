@@ -40,8 +40,9 @@ public class GPSListener implements Listener, LocationListener {
   public void onGpsStatusChanged( final int event ) {
     if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
       ListActivity.info("GPS STOPPED");    
-      // gps has stopped, see if we should ask for updates again
-      listActivity.setLocationUpdates();
+      // this event lies, on one device it gets called when the
+      // network provider is disabled :(  so we do nothing...
+      // listActivity.setLocationUpdates();
     }
     // ListActivity.info("GPS event: " + event);
     updateLocationData( (Location) null );

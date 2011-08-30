@@ -26,6 +26,7 @@ pull out rest of strings to resource file for easier localization
 --- done ---
 * 1.43 ()
 More choices for deciding wifi-frozen setting
+Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 
 * 1.42 (7/22/2011)
 Recover from states where the OS shuts off the gps out from under us

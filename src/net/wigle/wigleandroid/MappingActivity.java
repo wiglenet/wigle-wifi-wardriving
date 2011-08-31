@@ -51,6 +51,7 @@ public final class MappingActivity extends Activity {
   private int previousRunNets;
   private MyLocationOverlay myLocationOverlay = null;
   
+  private static final int DEFAULT_ZOOM = 17;
   private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_EXIT = 12;
   private static final int MENU_ZOOM_IN = 13;
@@ -132,19 +133,19 @@ public final class MappingActivity extends Activity {
     // controller
     mapControl = mapView.getController();
     final IGeoPoint centerPoint = getCenter( this, oldCenter, previousLocation );
-    int zoom = 16;
+    int zoom = DEFAULT_ZOOM;
     if ( oldZoom >= 0 ) {
       zoom = oldZoom;
     }
     else {
       final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
-    }
+    }    
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( zoom );
     mapControl.setCenter( centerPoint );
     
-    ListActivity.info("done setupMapView");
+    ListActivity.info("done setupMapView. zoom: " + zoom);
   }
   
   public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
@@ -275,6 +276,7 @@ public final class MappingActivity extends Activity {
     MenuItem item = null;
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
     
     String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
     item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
@@ -284,7 +286,8 @@ public final class MappingActivity extends Activity {
     item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
     item.setIcon( android.R.drawable.ic_menu_edit );
     
-    item = menu.add(0, MENU_LABEL, 0, "Toggle Labels");
+    String nameLabel = showLabel ? "Labels Off" : "Labels On";
+    item = menu.add(0, MENU_LABEL, 0, nameLabel);
     item.setIcon( android.R.drawable.ic_dialog_info );
     
     item = menu.add(0, MENU_EXIT, 0, "Exit");
@@ -347,6 +350,9 @@ public final class MappingActivity extends Activity {
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
           edit.commit();
+          
+          String name = showLabel ? "Labels Off" : "Labels On";
+          item.setTitle( name );
           return true;
         }
         case MENU_FILTER: {

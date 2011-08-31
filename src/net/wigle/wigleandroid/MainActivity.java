@@ -56,7 +56,7 @@ public final class MainActivity extends TabActivity {
     tabHost.addTab(spec);
     
     intent = new Intent().setClass(this, DataActivity.class);
-    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator("Database")
+    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator("Data")
                   .setContent(intent);
     tabHost.addTab(spec);
     

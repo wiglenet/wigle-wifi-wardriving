@@ -251,7 +251,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     // point to recycle
     Point point = null;
     
-    if ( osmv.getZoomLevel() >= 16 && showLabel ) {
+    if ( osmv.getZoomLevel() >= 14 && showLabel ) {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) { 

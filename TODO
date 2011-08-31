@@ -25,6 +25,7 @@ pull out rest of strings to resource file for easier localization
 
 --- done ---
 * 1.43 ()
+New Database tab, for querying and exporting
 More choices for deciding wifi-frozen setting
 Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 

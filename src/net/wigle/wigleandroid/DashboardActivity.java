@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.media.AudioManager;
@@ -23,7 +24,7 @@ public class DashboardActivity extends Activity {
   private NumberFormat numberFormat;
   
   private static final int MENU_EXIT = 11;
-  private static final int MENU_LIST = 12;
+  private static final int MENU_SETTINGS = 12;
   
   /** Called when the activity is first created. */
   @Override
@@ -176,8 +177,8 @@ public class DashboardActivity extends Activity {
     MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
     item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
         
-    item = menu.add(0, MENU_LIST, 0, "List");
-    item.setIcon( android.R.drawable.ic_menu_sort_by_size  );
+    item = menu.add(0, MENU_SETTINGS, 0, "Settings");
+    item.setIcon( android.R.drawable.ic_menu_preferences );
     
     return true;
   }
@@ -190,9 +191,10 @@ public class DashboardActivity extends Activity {
           MainActivity.finishListActivity( this );
           finish();
           return true;
-        case MENU_LIST:
-          MainActivity.switchTab( this, MainActivity.TAB_LIST );
-          return true;
+        case MENU_SETTINGS:
+          final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+          startActivity( settingsIntent );
+          break;
       }
       return false;
   }

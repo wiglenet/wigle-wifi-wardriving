@@ -8,6 +8,7 @@
     <string name="error_report_name">Wifi Wifi - Most Recent Error Report</string>
     <string name="speech_name">WiGLE Wifi - Speech Settings</string>
     <string name="network_activity_name">Wigle Wifi - Network</string>
+    <string name="data_activity_name">Wigle Wifi - Database</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>
@@ -24,9 +25,9 @@
     <string name="connect_button">Connect</string>
     <string name="connect_text">with permission of network operator</string>
     <string name="kml_run_export_button">KML Export Run</string>
-    <string name="kml_run_export_text">Export current run</string>
+    <string name="kml_run_export_text">Export current run to file</string>
     <string name="kml_export_button">KML Export DB</string>
-    <string name="kml_export_text">Export entire DB</string>
+    <string name="kml_export_text">Export entire DB to file</string>
     <string name="periodstill_text">Time between wifi scans 0 mph</string>    
     <string name="period_text">Time between wifi scans &lt;5 mph</string>
     <string name="periodfast_text">Time between wifi scans &gt;5 mph</string>

@@ -24,7 +24,7 @@ public final class MainActivity extends TabActivity {
   static final String TAB_LIST = "list";
   static final String TAB_MAP = "map";
   static final String TAB_DASH = "dash";
-  static final String TAB_SETTINGS = "setings";
+  static final String TAB_DATA = "data";
   
   private static MainActivity mainActivity;
   private ListActivity listActivity;
@@ -55,8 +55,8 @@ public final class MainActivity extends TabActivity {
                   .setContent(intent);
     tabHost.addTab(spec);
     
-    intent = new Intent().setClass(this, SettingsActivity.class);
-    spec = tabHost.newTabSpec( TAB_SETTINGS ).setIndicator("Settings")
+    intent = new Intent().setClass(this, DataActivity.class);
+    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator("Database")
                   .setContent(intent);
     tabHost.addTab(spec);
     

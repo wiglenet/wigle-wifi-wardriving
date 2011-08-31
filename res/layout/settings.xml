@@ -248,55 +248,7 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	/> 
-	
-<TextView android:text="KML Export:"
-	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content"
-	/>
-	
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<Button android:id="@+id/kml_run_export_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/kml_run_export_button" android:layout_weight="0"/>
-	<TextView
-		android:id="@+id/kml_run_export_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/kml_run_export_text"
-		android:layout_weight="5"
-		/>
-</LinearLayout>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<Button android:id="@+id/kml_export_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/kml_export_button" android:layout_weight="0"/>
-	<TextView
-		android:id="@+id/kml_export_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
-		android:text="@string/kml_export_text"
-		android:layout_weight="5"
-		/>
-</LinearLayout>
-
-<LinearLayout
-	android:id="@+id/horizontalLine3"
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#A07070"
-	/> 
-	
+		
 <TextView android:text="DB Marker (where uploads start from):"
 	android:layout_width="fill_parent" 
 	android:layout_height="wrap_content"

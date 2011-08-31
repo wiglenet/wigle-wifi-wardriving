@@ -13,30 +13,28 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 /**
  * configure settings
  */
 public final class SettingsActivity extends Activity {
   
-  private static final int MENU_EXIT = 11;
-  private static final int MENU_LIST = 12;
+  private static final int MENU_RETURN = 12;
   private static final int MENU_ERROR_REPORT = 13;
   
   /** convenience, just get the darn new string */
@@ -207,36 +205,7 @@ public final class SettingsActivity extends Activity {
             SettingsActivity.this.startActivity( errorReportIntent );
           }
         });
-      
-      final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
-      kmlRunExportButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
-          MainActivity.createConfirmation( SettingsActivity.this, "Export run to KML?", new Doer() {
-            @Override
-            public void execute() {
-              // actually need this Activity context, for dialogs
-              KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper, 
-                  ListActivity.lameStatic.runNetworks );
-              kmlWriter.start();
-            }
-          } );
-        }
-      });
-      
-      final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
-      kmlExportButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
-          MainActivity.createConfirmation( SettingsActivity.this, "Export DB to KML?", new Doer() {
-            @Override
-            public void execute() {
-              // actually need this Activity context, for dialogs
-              KmlWriter kmlWriter = new KmlWriter( SettingsActivity.this, ListActivity.lameStatic.dbHelper );
-              kmlWriter.start();
-            }
-          } );
-        }
-      });
-      
+            
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
       tv.setText( "Highest uploaded id: " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );
@@ -394,16 +363,13 @@ public final class SettingsActivity extends Activity {
       }
       public void onNothingSelected( final AdapterView<?> arg0 ) {}
       });
-  }
+  }    
   
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add( 0, MENU_EXIT, 0, "Exit" );
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-        
-      item = menu.add( 0, MENU_LIST, 0, "List" );
-      item.setIcon( android.R.drawable.ic_menu_sort_by_size );
+      MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
+      item.setIcon( android.R.drawable.ic_media_previous );
       
       item = menu.add( 0, MENU_ERROR_REPORT, 0, "Error Report" );
       item.setIcon( android.R.drawable.ic_menu_report_image );
@@ -415,12 +381,8 @@ public final class SettingsActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
-        case MENU_EXIT:
-          MainActivity.finishListActivity( this );
+        case MENU_RETURN:
           finish();
-          return true;
-        case MENU_LIST:
-          MainActivity.switchTab( this, MainActivity.TAB_LIST );
           return true;
         case MENU_ERROR_REPORT:
           final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
@@ -428,16 +390,6 @@ public final class SettingsActivity extends Activity {
           break;
       }
       return false;
-  }
-  
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_BACK) {
-      ListActivity.info( "onKeyDown: not quitting app on back" );
-      MainActivity.switchTab( this, MainActivity.TAB_LIST );
-      return true;
-    }
-    return super.onKeyDown(keyCode, event);
-  }
+  }    
   
 }

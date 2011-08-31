@@ -592,8 +592,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
         switch ( item.getItemId() ) {
           case MENU_SETTINGS: {
             info("start settings activity");
-            MainActivity.switchTab( this, MainActivity.TAB_SETTINGS );
-            return true;
+            final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+            startActivity( settingsIntent );
+            break;
           }
           case MENU_MAP: {
             info("start map activity");

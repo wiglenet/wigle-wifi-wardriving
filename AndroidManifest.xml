@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.wigle.wigleandroid"
-      android:versionCode="42"
-      android:versionName="1.42"
+      android:versionCode="43"
+      android:versionName="1.43"
       android:installLocation="auto">
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name" android:debuggable="false">
     	<activity android:name=".MainActivity" android:label="@string/app_name"
@@ -80,6 +80,15 @@
         </activity>
         <activity android:name=".NetworkActivity"
                   android:label="@string/network_activity_name"
+                  android:launchMode="singleTask"
+                  android:configChanges="keyboard|keyboardHidden|orientation" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".DataActivity"
+                  android:label="@string/data_activity_name"
                   android:launchMode="singleTask"
                   android:configChanges="keyboard|keyboardHidden|orientation" >
             <intent-filter>

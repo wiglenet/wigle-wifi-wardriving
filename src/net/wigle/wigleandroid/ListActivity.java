@@ -580,8 +580,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       item = menu.add(0, MENU_FILTER, 0, "SSID Label Filter");
       item.setIcon( android.R.drawable.ic_menu_search );
-        
-      
+              
       item = menu.add(0, MENU_SETTINGS, 0, "Settings");
       item.setIcon( android.R.drawable.ic_menu_preferences );
         

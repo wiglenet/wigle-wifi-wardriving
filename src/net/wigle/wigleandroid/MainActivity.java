@@ -29,6 +29,7 @@ public final class MainActivity extends TabActivity {
   
   private static MainActivity mainActivity;
   private ListActivity listActivity;
+  private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
   
   public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +38,9 @@ public final class MainActivity extends TabActivity {
     
     PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
     wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+    if ( wakeLock.isHeld() ) {
+      wakeLock.release();
+    }
     
     mainActivity = this;
 
@@ -105,12 +109,13 @@ public final class MainActivity extends TabActivity {
     final Activity parent = activity.getParent();
     if ( parent != null && parent instanceof MainActivity ) {
       MainActivity main = (MainActivity) parent;
-      return main.wakeLock.isHeld();
+      return main.screenLocked;
     }
     return false;
   }
   
   private void setLockScreen( boolean lockScreen ) {
+    this.screenLocked = lockScreen;
     if ( lockScreen ) {
       if ( ! wakeLock.isHeld() ) {
         ListActivity.info("acquire wake lock");
@@ -276,7 +281,7 @@ public final class MainActivity extends TabActivity {
     super.onResume();
     
     // deal with wake lock
-    if ( ! wakeLock.isHeld() ) {
+    if ( ! wakeLock.isHeld() && screenLocked ) {
       ListActivity.info("acquire wake lock");
       wakeLock.acquire();
     }

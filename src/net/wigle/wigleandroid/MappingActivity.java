@@ -278,28 +278,28 @@ public final class MappingActivity extends Activity {
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
     
-    String name = state.locked ? "Turn Off Lockon" : "Turn On Lockon";
+    String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
     item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
     item.setIcon( android.R.drawable.ic_menu_mapmode );
         
-    String nameDB = showNewDBOnly ? "Show Run&New" : "Show New Only";
+    String nameDB = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
     item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
     item.setIcon( android.R.drawable.ic_menu_edit );
     
-    String nameLabel = showLabel ? "Labels Off" : "Labels On";
+    String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
     item = menu.add(0, MENU_LABEL, 0, nameLabel);
     item.setIcon( android.R.drawable.ic_dialog_info );
     
-    item = menu.add(0, MENU_EXIT, 0, "Exit");
+    item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
     item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );    
     
-    item = menu.add(0, MENU_FILTER, 0, "SSID Label Filter");
+    item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
     item.setIcon( android.R.drawable.ic_menu_search );
     
-    item = menu.add(0, MENU_ZOOM_IN, 0, "Zoom in");
+    item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
     item.setIcon( android.R.drawable.ic_menu_add );
     
-    item = menu.add(0, MENU_ZOOM_OUT, 0, "Zoom out");
+    item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
     item.setIcon( android.R.drawable.ic_menu_revert );
     
     
@@ -329,7 +329,7 @@ public final class MappingActivity extends Activity {
         }
         case MENU_TOGGLE_LOCK: {
           state.locked = ! state.locked;
-          String name = state.locked ? "Turn Off Lock-on" : "Turn On Lock-on";
+          String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
           item.setTitle( name );
           return true;
         }
@@ -340,7 +340,7 @@ public final class MappingActivity extends Activity {
           edit.putBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
           edit.commit();
           
-          String name = showNewDBOnly ? "Show Run&New" : "Show New Only";
+          String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
           item.setTitle( name );
           return true;
         }
@@ -351,7 +351,7 @@ public final class MappingActivity extends Activity {
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
           edit.commit();
           
-          String name = showLabel ? "Labels Off" : "Labels On";
+          String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
           item.setTitle( name );
           return true;
         }

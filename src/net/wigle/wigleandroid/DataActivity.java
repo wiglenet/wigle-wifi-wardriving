@@ -169,13 +169,13 @@ public final class DataActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add( 0, MENU_EXIT, 0, "Exit" );
+      MenuItem item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
               
-      item = menu.add( 0, MENU_ERROR_REPORT, 0, "Error Report" );
+      item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
       item.setIcon( android.R.drawable.ic_menu_report_image );
       
-      item = menu.add( 0, MENU_SETTINGS, 0, "Settings" );
+      item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
       item.setIcon( android.R.drawable.ic_menu_preferences );      
       
       return true;

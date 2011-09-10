@@ -349,7 +349,7 @@ public class NetworkActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_EXIT, 0, "Return");
+      MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_menu_revert );
       return true;
   }

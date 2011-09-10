@@ -378,10 +378,10 @@ public final class SettingsActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_RETURN, 0, "Return");
+      MenuItem item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_media_previous );
       
-      item = menu.add( 0, MENU_ERROR_REPORT, 0, "Error Report" );
+      item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
       item.setIcon( android.R.drawable.ic_menu_report_image );
       
       return true;

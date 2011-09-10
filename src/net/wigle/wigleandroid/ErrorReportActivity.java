@@ -158,15 +158,15 @@ public class ErrorReportActivity extends Activity {
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
     if ( fromFailure ) {
-      MenuItem item = menu.add(0, MENU_EXIT, 0, "Exit");
+      MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
     }
     else {
-      MenuItem item = menu.add(0, MENU_EXIT, 0, "Return");
+      MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_media_previous );
     }
     
-    MenuItem item = menu.add(0, MENU_EMAIL, 0, "Email Report");
+    MenuItem item = menu.add(0, MENU_EMAIL, 0, getString(R.string.menu_error_report));
     item.setIcon( android.R.drawable.ic_menu_send );
     
     return true;

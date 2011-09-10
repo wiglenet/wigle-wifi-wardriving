@@ -564,24 +564,25 @@ public final class ListActivity extends Activity implements FileUploaderListener
     /* Creates the menu items */
     @Override
     public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_SORT, 0, "Sort Options");
+      MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
       item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
       
-      final String scan = isScanning() ? "Off" : "On";
-      item = menu.add(0, MENU_SCAN, 0, "Scan " + scan);
+      final String scan = isScanning() ? getString(R.string.off) : getString(R.string.on);
+      item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
       item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
       
-      final String wake = MainActivity.isScreenLocked( this ) ? "Let Screen Sleep" : "Keep Screen On";
+      final String wake = MainActivity.isScreenLocked( this ) ? 
+          getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
       item = menu.add(0, MENU_WAKELOCK, 0, wake);
       item.setIcon( android.R.drawable.ic_menu_gallery );
       
-      item = menu.add(0, MENU_EXIT, 0, "Exit");
+      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
       
-      item = menu.add(0, MENU_FILTER, 0, "SSID Label Filter");
+      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
       item.setIcon( android.R.drawable.ic_menu_search );
               
-      item = menu.add(0, MENU_SETTINGS, 0, "Settings");
+      item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
       item.setIcon( android.R.drawable.ic_menu_preferences );
         
       return true;
@@ -600,7 +601,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
           case MENU_WAKELOCK: {
             boolean screenLocked = ! MainActivity.isScreenLocked( this );
             MainActivity.setLockScreen( this, screenLocked );
-            final String wake = screenLocked ? "Let Screen Sleep" : "Keep Screen On";
+            final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
             item.setTitle( wake );
             return true;
           }
@@ -614,7 +615,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
             final Editor edit = this.getSharedPreferences( SHARED_PREFS, 0 ).edit();
             edit.putBoolean(PREF_SCAN_RUNNING, scanning);
             edit.commit();
-            String name = scanning ? "Scan Off" : "Scan On";
+            String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
             item.setTitle( name );
             item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
             handleScanChange();

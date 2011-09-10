@@ -17,7 +17,6 @@ configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
 speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 summarize AP's since last audio speech
-screenlock on map tab
 query local db
 stats on what is in the local db
 pull out rest of strings to resource file for easier localization
@@ -28,6 +27,7 @@ pull out rest of strings to resource file for easier localization
 New Database tab, for querying and exporting
 More choices for deciding wifi-frozen setting
 Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
+List tab "Keep Screen On" menu option, will keep the screen from sleeping while WigleWifi is running
 
 * 1.42 (7/22/2011)
 Recover from states where the OS shuts off the gps out from under us

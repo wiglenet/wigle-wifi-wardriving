@@ -50,7 +50,7 @@
     <string name="cryptodialog_button"> OK </string>
     <string name="cryptocanceldialog_button"> Annulla </string>
     <string name="circle_size_map"> Circoli Mappa Sized da Qtà </string>
-    <string name="speech_button"> schermo Discorso Configurazione>> </string>
+    <string name="speech_button"> schermo Discorso Configurazione&gt;&gt; </string>
     <string name="speech_text"> discorso audio includono: </string>
     <string name="speech_run"> Reti per eseguire </string>
     <string name="speech_new_wifi"> New wifi a DB </string>
@@ -147,7 +147,7 @@
     <string name="found_time"> ricerca Ora </string>
     <string name="signal"> Signal </string>
     <string name="ssid"> SSID </string>
-    <string name="best_results"> Per ottenere risultati ottimali, unset "notifica di rete" in "Wireless e reti" -> "Impostazioni Wi-Fi" </string>
+    <string name="best_results"> Per ottenere risultati ottimali, unset "notifica di rete" in "Wireless e reti" -&gt; "Impostazioni Wi-Fi" </string>
     <string name="turn_on_wifi"> Accensione WiFi </string>
     <string name="no_gps_device"> Nessun dispositivo GPS rilevato </string>
     <string name="turn_on_gps"> Si prega di accendere il GPS </string>

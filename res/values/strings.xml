@@ -147,7 +147,7 @@
     <string name="found_time">Found Time</string>
     <string name="signal">Signal</string>
     <string name="ssid">SSID</string>
-    <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"->"Wi-Fi settings"</string>
+    <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"-&gt;"Wi-Fi settings"</string>
     <string name="turn_on_wifi">Turning on WiFi</string>
     <string name="no_gps_device">No GPS detected in device!</string>
     <string name="turn_on_gps">Please turn on GPS</string>

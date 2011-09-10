@@ -50,7 +50,7 @@
     <string name="cryptodialog_button"> Aceptar </string>
     <string name="cryptocanceldialog_button"> Cancelar </string>
     <string name="circle_size_map"> Círculos Mapa de tamaño por Cantidad </string>
-    <string name="speech_button"> habla pantalla de configuración>> </string>
+    <string name="speech_button"> habla pantalla de configuración&gt;&gt; </string>
     <string name="speech_text"> discurso Audio serán los siguientes: </string>
     <string name="speech_run"> Nets para ejecutar </string>
     <string name="speech_new_wifi"> Nueva wifi a DB </string>
@@ -147,7 +147,7 @@
     <string name="found_time"> encontrados Hora </string>
     <string name="signal"> señal </string>
     <string name="ssid"> SSID </string>
-    <string name="best_results"> Para mejores resultados, sin establecer "Notificación de red" en "Conexiones inalámbricas y redes" -> "configuración Wi-Fi" </string>
+    <string name="best_results"> Para mejores resultados, sin establecer "Notificación de red" en "Conexiones inalámbricas y redes" -&gt; "configuración Wi-Fi" </string>
     <string name="turn_on_wifi"> Encendido WiFi </string>
     <string name="no_gps_device"> No detectado en el dispositivo GPS </string>
     <string name="turn_on_gps"> Por favor, a su vez en el GPS </string>

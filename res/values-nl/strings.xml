@@ -50,7 +50,7 @@
     <string name="cryptodialog_button"> OK </string>
     <string name="cryptocanceldialog_button"> Annuleren </string>
     <string name="circle_size_map"> Kaart Circles Sized door Aantal </string>
-    <string name="speech_button"> Spraak Configuratie Scherm>> </string>
+    <string name="speech_button"> Spraak Configuratie Scherm&gt;&gt; </string>
     <string name="speech_text"> Audio speech onder meer: </string>
     <string name="speech_run"> Netten voor run </string>
     <string name="speech_new_wifi"> Nieuwe wifi aan DB </string>

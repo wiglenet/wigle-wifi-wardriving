@@ -21,6 +21,7 @@ import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.NetworkType;
 import net.wigle.wigleandroid.OpenStreetMapViewWrapper;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ListActivity.TrailStat;
 
 import org.osmdroid.util.GeoPoint;
@@ -391,7 +392,9 @@ public class WifiReceiver extends BroadcastReceiver {
       // wasn't set, set to now
       scanRequestTime = now;
     }
-    final String status = resultSize + " scanned in " + (now - scanRequestTime) + "ms. DB Queue: " + preQueueSize;
+    final String status = resultSize + " " + listActivity.getString(R.string.scanned_in) + " " 
+        + (now - scanRequestTime) + listActivity.getString(R.string.ms_short) + ". " 
+        + listActivity.getString(R.string.dash_db_queue) + " " + preQueueSize;
     listActivity.setStatusUI( status );
     // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
     scanRequestTime = nonstopScanRequestTime;
@@ -733,7 +736,7 @@ public class WifiReceiver extends BroadcastReceiver {
           ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
           if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
             Toast.makeText( listActivity, 
-                "Wifi appears jammed, Turning off, and then on, WiFi.", Toast.LENGTH_LONG ).show();
+                listActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
             wifiManager.setWifiEnabled(false);
             wifiManager.setWifiEnabled(true);    
             lastWifiUnjamTime = now;
@@ -769,7 +772,8 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill 
             && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
             && (System.currentTimeMillis() - constructionTime) > 30000L) {
-          final String text = "Battery level at " + batteryLevel + " percent, shutting down Wigle Wifi";
+          final String text = listActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
+              + listActivity.getString(R.string.battery_postfix);
           Toast.makeText( listActivity, text, Toast.LENGTH_LONG ).show();
           listActivity.speak( "low battery" );
           listActivity.finish();

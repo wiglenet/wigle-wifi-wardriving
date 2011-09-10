@@ -331,11 +331,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     public void setNetCountUI() {
       TextView tv = (TextView) findViewById( R.id.stats_run );
-      tv.setText( "Run: " + state.wifiReceiver.getRunNetworkCount() );
+      tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
       tv = (TextView) findViewById( R.id.stats_new );
-      tv.setText( "New: " + state.dbHelper.getNewNetworkCount() );
+      tv.setText( getString(R.string.new_word) + ": " + state.dbHelper.getNewNetworkCount() );
       tv = (TextView) findViewById( R.id.stats_dbnets );
-      tv.setText( "DB: " + state.dbHelper.getNetworkCount() );
+      tv.setText( getString(R.string.db) + ": " + state.dbHelper.getNetworkCount() );
     }
     
     public void setStatusUI( String status ) {
@@ -524,7 +524,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       // don't call on emulator, it crashes it
       if ( wifiWasOff && ! state.inEmulator ) {
         // tell user, cuz this takes a little while
-        Toast.makeText( this, "Turning WiFi back off", Toast.LENGTH_SHORT ).show();
+        Toast.makeText( this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT ).show();
         
         // well turn it of now that we're done
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -662,10 +662,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
           final Dialog dialog = new Dialog( this );
   
           dialog.setContentView( R.layout.listdialog );
-          dialog.setTitle( "Sort Options" );
+          dialog.setTitle( getString(R.string.sort_title) );
   
           TextView text = (TextView) dialog.findViewById( R.id.text );
-          text.setText( "Sort List By:" );
+          text.setText( getString(R.string.sort_spin_label) );
           
           final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
           final Editor editor = prefs.edit();
@@ -675,7 +675,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
               this, android.R.layout.simple_spinner_item);
           final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
               WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
-          final String[] listSortName = new String[]{ "Channel","Crypto","Found Time","Signal","SSID" };
+          final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+              getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
           int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
           int periodIndex = 0;
           for ( int i = 0; i < listSorts.length; i++ ) {
@@ -767,8 +768,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final String notifOn = Settings.Secure.getString(getContentResolver(), 
           Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
       if ( notifOn != null && "1".equals( notifOn ) && state.wifiReceiver == null ) {
-        Toast.makeText( this, "For best results, unset \"Network notification\" in"
-            + " \"Wireless & networks\"->\"Wi-Fi settings\"", 
+        Toast.makeText( this, getString(R.string.best_results), 
             Toast.LENGTH_LONG ).show();
       }
     
@@ -780,7 +780,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       boolean turnedWifiOn = false;
       if ( ! wifiManager.isWifiEnabled() ) {
         // tell user, cuz this takes a little while
-        Toast.makeText( this, "Turning on WiFi", Toast.LENGTH_LONG ).show();
+        Toast.makeText( this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG ).show();
         
         // save so we can turn it back off when we exit  
         edit.putBoolean( PREF_WIFI_WAS_OFF, true );
@@ -870,11 +870,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
       // check if there is a gps
       final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
       if ( locProvider == null ) {
-        Toast.makeText( this, "No GPS detected in device!", Toast.LENGTH_LONG ).show();
+        Toast.makeText( this, getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
       }
       else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
         // gps exists, but isn't on
-        Toast.makeText( this, "Please turn on GPS", Toast.LENGTH_SHORT ).show();
+        Toast.makeText( this, getString(R.string.turn_on_gps), Toast.LENGTH_SHORT ).show();
         final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
         try {
           startActivity(myIntent);
@@ -943,7 +943,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       try {       
         TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
-        tv.setText( "Sats: " + state.gpsListener.getSatCount() );
+        tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
         
         final Location location = state.gpsListener.getLocation();
         
@@ -951,22 +951,22 @@ public final class ListActivity extends Activity implements FileUploaderListener
         String latText = "";
         if ( location == null ) {
           if ( isScanning() ) {
-            latText = "  (Waiting for GPS sync..)";
+            latText = getString(R.string.list_waiting_gps);
           }
           else {
-            latText = "  (Scanning Turned Off)";
+            latText = getString(R.string.list_scanning_off);
           }
         }
         else {
           latText = state.numberFormat8.format( location.getLatitude() );
         }
-        tv.setText( "Lat: " + latText );
+        tv.setText( getString(R.string.list_short_lat) + " " + latText );
         
         tv = (TextView) this.findViewById( R.id.LocationTextView02 );
-        tv.setText( "Lon: " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
+        tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
         
         tv = (TextView) this.findViewById( R.id.LocationTextView03 );
-        tv.setText( "Speed: " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
+        tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
         
         TextView tv4 = (TextView) this.findViewById( R.id.LocationTextView04 );
         TextView tv5 = (TextView) this.findViewById( R.id.LocationTextView05 );
@@ -980,7 +980,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
           tv4.setText( "+/- " + distString );
           distString = DashboardActivity.metersToString( 
               state.numberFormat0, this, (float) location.getAltitude(), true );
-          tv5.setText( "Alt: " + distString );
+          tv5.setText( getString(R.string.list_short_alt) + " " + distString );
         }
       }
       catch ( IncompatibleClassChangeError ex ) {
@@ -997,10 +997,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       String retval = null;
       if ( metric ) {
-        retval = numberFormat.format( metersPerSecond * 3.6 ) + " kmph";
+        retval = numberFormat.format( metersPerSecond * 3.6 ) + " " + context.getString(R.string.kmph);
       }
       else {
-        retval = numberFormat.format( metersPerSecond * 2.23693629f ) + " mph";
+        retval = numberFormat.format( metersPerSecond * 2.23693629f ) + " " + context.getString(R.string.mph);
       }
       return retval;
     }
@@ -1009,7 +1009,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() { 
           public void onClick( final View view ) {
-            MainActivity.createConfirmation( ListActivity.this, "Upload File?", new Doer() {
+            MainActivity.createConfirmation( ListActivity.this, getString(R.string.list_upload), new Doer() {
               @Override
               public void execute() {                
                 state.uploading.set( true );
@@ -1090,7 +1090,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);
       if ( muted ) {
-        mute.setText("Play");
+        mute.setText(getString(R.string.mute));
       }
       mute.setOnClickListener(new OnClickListener(){
         public void onClick( final View buttonView ) {
@@ -1101,11 +1101,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
           editor.commit();
           
           if ( muted ) {
-            mute.setText("Play");
+            mute.setText(getString(R.string.play));
             interruptSpeak();
           }
           else {
-            mute.setText("Mute");
+            mute.setText(getString(R.string.mute));
           }
         }
       });

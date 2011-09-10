@@ -93,7 +93,7 @@ public class NetworkActivity extends Activity {
       
       tv = (TextView) findViewById( R.id.na_chan ); 
       if ( ! NetworkType.WIFI.equals(network.getType()) ) {
-        tv.setText( "N/A" );
+        tv.setText( getString(R.string.na) );
       }
       else {
         Integer chan = network.getChannel();

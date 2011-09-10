@@ -3,15 +3,16 @@ package net.wigle.wigleandroid.listener;
 import static android.location.LocationManager.GPS_PROVIDER;
 import static android.location.LocationManager.NETWORK_PROVIDER;
 import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
+import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.GpsStatus.Listener;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -168,8 +169,8 @@ public class GPSListener implements Listener, LocationListener {
         + (locOK ? " locProvider: " + location.getProvider() : "") 
         + " newLocation: " + newLocation );
 
-      final String announce = location == null ? "Lost Location" 
-          : "Now have location from \"" + location.getProvider() + "\"";
+      final String announce = location == null ? listActivity.getString(R.string.lost_location) 
+          : listActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
       Toast.makeText( listActivity, announce, Toast.LENGTH_SHORT ).show();
       final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean speechGPS = prefs.getBoolean( ListActivity.PREF_SPEECH_GPS, true );

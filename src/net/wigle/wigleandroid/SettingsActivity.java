@@ -331,11 +331,13 @@ public final class SettingsActivity extends Activity {
   }
   
   private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
+    final String ms = " " + getString(R.string.ms_short);
     final String sec = " " + getString(R.string.sec);
     final String min = " " + getString(R.string.min);
     
     final long[] periods = new long[]{ 0,50,250,500,750,1000,1500,2000,3000,4000,5000,10000,30000,60000 };
-    final String[] periodName = new String[]{ zeroName,"50 ms","250 ms","500 ms","750 ms","1" + sec,"1.5" + sec,"2" + sec,
+    final String[] periodName = new String[]{ zeroName,"50" + ms,"250" + ms,"500" + ms,"750" + ms,
+        "1" + sec,"1.5" + sec,"2" + sec,
         "3" + sec,"4" + sec,"5" + sec,"10" + sec,"30" + sec,"1" + min };
     doSpinner(id, pref, spinDefault, periods, periodName);
   }

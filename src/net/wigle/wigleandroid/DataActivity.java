@@ -72,18 +72,18 @@ public final class DataActivity extends Activity {
           try {
             switch( id ) {
               case R.id.query_address:
-                field = "Address";
+                field = getString(R.string.address);
                 Geocoder gc = new Geocoder(DataActivity.this);
                 List<Address> addresses = gc.getFromLocationName(text, 1);
                 if ( addresses.size() < 1 ) {
-                  fail = "No geocoded address found";
+                  fail = getString(R.string.no_address_found);
                   break;
                 }
                 queryArgs.setAddress(addresses.get(0));
                 okValue = true;
                 break;
               case R.id.query_ssid:
-                field = "SSID";
+                field = getString(R.string.ssid);
                 queryArgs.setSSID(text);
                 okValue = true;
                 break;
@@ -92,7 +92,7 @@ public final class DataActivity extends Activity {
             }
           }
           catch( Exception ex ) {
-            fail = "Problem with field '" + field + "': " + ex.getMessage();
+            fail = getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage();
             break;
           }          
         }

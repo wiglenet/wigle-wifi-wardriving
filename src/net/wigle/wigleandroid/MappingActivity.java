@@ -210,11 +210,11 @@ public final class MappingActivity extends Activity {
               previousRunNets = ListActivity.lameStatic.runNets;
               
               TextView tv = (TextView) findViewById( R.id.stats_run );
-              tv.setText( "Run: " + ListActivity.lameStatic.runNets );
+              tv.setText( getString(R.string.run) + ": " + ListActivity.lameStatic.runNets );
               tv = (TextView) findViewById( R.id.stats_new );
-              tv.setText( "New: " + ListActivity.lameStatic.newNets );
+              tv.setText( getString(R.string.new_word) + ": " + ListActivity.lameStatic.newNets );
               tv = (TextView) findViewById( R.id.stats_dbnets );
-              tv.setText( "DB: " + ListActivity.lameStatic.dbNets );
+              tv.setText( getString(R.string.db) + ": " + ListActivity.lameStatic.dbNets );
               
               final long period = 1000L;
               // info("wifitimer: " + period );

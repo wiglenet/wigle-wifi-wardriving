@@ -69,7 +69,7 @@ public class DashboardActivity extends Activity {
   
   private void updateUI() {
     TextView tv = (TextView) findViewById( R.id.runnets );
-    tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.dash_run));
+    tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.run));
     
     tv = (TextView) findViewById( R.id.newwifi );
     final String scanning = ListActivity.isScanning(this) ? "" : getString(R.string.dash_scan_off) + "\n"; 

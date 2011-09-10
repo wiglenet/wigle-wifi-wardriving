@@ -42,7 +42,7 @@
 <CheckBox android:id="@+id/showpassword"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Show Password" />
+        android:text="@string/setting_show_password" />
 
 <CheckBox android:id="@+id/be_anonymous"
         android:layout_width="fill_parent"
@@ -249,7 +249,7 @@
 	android:background="#A07070"
 	/> 
 		
-<TextView android:text="DB Marker (where uploads start from):"
+<TextView android:text="@string/setting_db_marker"
 	android:layout_width="fill_parent" 
 	android:layout_height="wrap_content"
 	/>

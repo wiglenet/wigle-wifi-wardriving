@@ -50,19 +50,19 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView01"
-		android:text="Lat:   (Waiting for GPS sync..)"
+		android:text="@string/list_waiting_gps"
 		/>
 		<TextView  
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView02"
-		android:text="Lon: "
+		android:text="@string/list_short_lon"
 		/>
 		<TextView  
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:id="@+id/LocationTextView03"
-		android:text="Sats: "
+		android:text="@string/list_short_sats"
 		/>
 	</LinearLayout>
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -96,7 +96,7 @@
     android:layout_width="wrap_content" 
     android:layout_height="wrap_content" 
     android:id="@+id/status"
-    android:text="(status)"
+    android:text="@string/list_status_default"
     android:layout_weight="0"
     />
 <TextView

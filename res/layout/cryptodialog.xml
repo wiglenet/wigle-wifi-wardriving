@@ -15,7 +15,7 @@
               >
 		<TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="Security  "
+              android:text="@string/crypto_security"
               />
     	<TextView android:id="@+id/security"
               android:layout_width="fill_parent"
@@ -31,7 +31,7 @@
               >
 		<TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="Signal strength  "
+              android:text="@string/crypto_strength"
               />
     	<TextView android:id="@+id/signal"
               android:layout_width="fill_parent"
@@ -42,7 +42,7 @@
               
     <TextView android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="Password"
+              android:text="@string/crypto_password"
               />
     
     <EditText
@@ -54,7 +54,7 @@
     <CheckBox android:id="@+id/showpass"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Show password." /> 
+        android:text="@string/crypto_show_password" /> 
 	
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"

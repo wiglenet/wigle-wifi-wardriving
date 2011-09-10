@@ -64,5 +64,29 @@
     <string name="search_button">Run Query</string>
     <string name="reset_button">Reset Fields</string> 
     <string name="list_query_clear">Clear Query Arguments</string> 
-    
+    <string name="crypto_security">Security  </string>
+    <string name="crypto_strength">Signal strength  </string>
+    <string name="crypto_password">Password</string>
+    <string name="crypto_show_password">Show password.</string>     
+    <string name="filter_show_ssid">Show SSID\'s Matching (regex):</string>
+    <string name="filter_not_regex">Show what doesn\'t match above regular expression</string>
+    <string name="filter_show_open">Show Open</string>
+    <string name="filter_show_cell">Show Cell</string>
+    <string name="filter_show_wep">Show WEP</string>
+    <string name="filter_show_wpa">Show WPA</string>
+    <string name="filter_enabled">Filter Enabled</string>
+    <string name="list_waiting_gps">Lat:   (Waiting for GPS sync..)</string>
+    <string name="list_short_lat">Lat: </string>
+    <string name="list_short_lon">Lon: </string>
+    <string name="list_short_sats">Sats: </string>
+    <string name="list_status_default">(status)</string>
+    <string name="network_signal">Signal: </string>
+    <string name="network_type">  Type:</string>
+    <string name="network_firstseen">  First Seen:</string>
+    <string name="network_capa">Capabilities: </string>
+    <string name="network_channel">Channel: </string>
+    <string name="network_observations">  Observations: </string>
+    <string name="network_querying">(querying...)</string>
+    <string name="setting_show_password">Show Password</string>
+    <string name="setting_db_marker">DB Marker (where uploads start from):</string>    
 </resources>

@@ -9,7 +9,7 @@
               >
 	<TextView android:layout_width="fill_parent"
               android:layout_height="wrap_content"
-              android:text="Show SSID's Matching (regex):" />
+              android:text="@string/filter_show_ssid" />
               
     <EditText
         android:id="@+id/edit_regex"
@@ -20,7 +20,7 @@
 	<CheckBox android:id="@+id/showinvert"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Show what doesn't match above regular expression" /> 
+        android:text="@string/filter_not_regex" /> 
         
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
@@ -34,12 +34,12 @@
 	    	<CheckBox android:id="@+id/showopen"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Show Open"/> 
+	        android:text="@string/filter_show_open"/> 
 	        
 	    	<CheckBox android:id="@+id/showcell"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Show Cell" /> 
+	        android:text="@string/filter_show_cell" /> 
 	           
      	</LinearLayout>
      
@@ -51,19 +51,19 @@
 	    	<CheckBox android:id="@+id/showwep"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Show WEP" />	  
+	        android:text="@string/filter_show_wep" />	  
 	        	        
 	    	<CheckBox android:id="@+id/showwpa"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Show WPA" />      
+	        android:text="@string/filter_show_wpa" />      
 	    </LinearLayout>    
     </LinearLayout>
     
     <CheckBox android:id="@+id/enabled"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="Filter Enabled" /> 
+	        android:text="@string/filter_enabled" /> 
 	
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"

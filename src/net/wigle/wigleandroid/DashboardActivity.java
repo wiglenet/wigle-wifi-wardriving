@@ -69,41 +69,41 @@ public class DashboardActivity extends Activity {
   
   private void updateUI() {
     TextView tv = (TextView) findViewById( R.id.runnets );
-    tv.setText( ListActivity.lameStatic.runNets + " Run");
+    tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.dash_run));
     
     tv = (TextView) findViewById( R.id.newwifi );
-    final String scanning = ListActivity.isScanning(this) ? "" : "(Scanning Turned Off)\n"; 
-    tv.setText( scanning + ListActivity.lameStatic.newWifi + " New Wifi" );
+    final String scanning = ListActivity.isScanning(this) ? "" : getString(R.string.dash_scan_off) + "\n"; 
+    tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
     
     tv = (TextView) findViewById( R.id.currnets );
-    tv.setText( "Visible Nets: " + ListActivity.lameStatic.currNets );
+    tv.setText( getString(R.string.dash_vis_nets) + " " + ListActivity.lameStatic.currNets );
     
     tv = (TextView) findViewById( R.id.newNetsSinceUpload );
-    tv.setText( "New Nets Since Upload: " + newNetsSinceUpload() );  
+    tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );  
     
     tv = (TextView) findViewById( R.id.newcells );
-    tv.setText( "New Cell Towers: " + ListActivity.lameStatic.newCells );    
+    tv.setText( getString(R.string.dash_new_cells) + " " + ListActivity.lameStatic.newCells );    
     
-    updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, "Run Distance: " );
-    updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, "Total Distance: " );
-    updateDist( R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, "Previous Run: " );
+    updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+    updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
+    updateDist( R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
     
     tv = (TextView) findViewById( R.id.queuesize );
-    tv.setText( "DB Queue: " + ListActivity.lameStatic.preQueueSize );
+    tv.setText( getString(R.string.dash_db_queue) + " " + ListActivity.lameStatic.preQueueSize );
     
     tv = (TextView) findViewById( R.id.dbNets );
-    tv.setText( "DB Nets: " + ListActivity.lameStatic.dbNets );
+    tv.setText( getString(R.string.dash_db_nets) + " " + ListActivity.lameStatic.dbNets );
     
     tv = (TextView) findViewById( R.id.dbLocs );
-    tv.setText( "DB Locations: " + ListActivity.lameStatic.dbLocs );
+    tv.setText( getString(R.string.dash_db_locs) + " " + ListActivity.lameStatic.dbLocs );
         
     tv = (TextView) findViewById( R.id.gpsstatus );
     Location location = ListActivity.lameStatic.location;
-    String gpsStatus = "No Location!";
+    String gpsStatus = getString(R.string.dash_no_loc);
     if ( location != null ) {
       gpsStatus = location.getProvider();
     }
-    tv.setText( "Loc: " + gpsStatus );
+    tv.setText( getString(R.string.dash_short_loc) + " " + gpsStatus );
   }
   
   private long newNetsSinceUpload() {
@@ -129,7 +129,7 @@ public class DashboardActivity extends Activity {
     float dist = prefs.getFloat( pref, 0f );
     final String distString = metersToString( numberFormat, this, dist, false );
     final TextView tv = (TextView) findViewById( id );
-    tv.setText( title + distString );    
+    tv.setText( title + " " + distString );    
   }
   
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
@@ -140,17 +140,20 @@ public class DashboardActivity extends Activity {
     String retval = null;
     if ( meters > 1000f ) {
       if ( metric ) {
-        retval = numberFormat.format( meters / 1000f ) + " km";
+        retval = numberFormat.format( meters / 1000f ) + " " + context.getString(R.string.km_short);
       }
       else {
-        retval = numberFormat.format( meters / 1609.344f ) + (useShort ? " mi" : " miles");
+        retval = numberFormat.format( meters / 1609.344f ) + " " + 
+            (useShort ? context.getString(R.string.mi_short) : context.getString(R.string.miles));
       }
     }
     else if ( metric ){
-      retval = numberFormat.format( meters ) + (useShort ? " m" : " meters");
+      retval = numberFormat.format( meters ) + " " + 
+          (useShort ? context.getString(R.string.m_short) : context.getString(R.string.meters));
     }
     else {
-      retval = numberFormat.format( meters * 3.2808399f  ) + (useShort ? " ft" : " feet");
+      retval = numberFormat.format( meters * 3.2808399f  ) + " " + 
+          (useShort ? context.getString(R.string.ft_short) : context.getString(R.string.feet));
     }
     return retval;
   }

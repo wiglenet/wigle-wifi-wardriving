@@ -50,22 +50,22 @@ public final class MainActivity extends TabActivity {
 
     // Create an Intent to launch an Activity for the tab (to be reused)
     intent = new Intent().setClass(this, ListActivity.class);
-    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator("List")
+    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator(getString(R.string.tab_list))
                   .setContent(intent);
     tabHost.addTab(spec);
     
     intent = new Intent().setClass(this, MappingActivity.class);
-    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator("Map")
+    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator(getString(R.string.tab_map))
                   .setContent(intent);
     tabHost.addTab(spec);
 
     intent = new Intent().setClass(this, DashboardActivity.class);
-    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator("Dashboard")
+    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator(getString(R.string.tab_dash))
                   .setContent(intent);
     tabHost.addTab(spec);
     
     intent = new Intent().setClass(this, DataActivity.class);
-    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator("Data")
+    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator(getString(R.string.tab_data))
                   .setContent(intent);
     tabHost.addTab(spec);
     
@@ -139,7 +139,7 @@ public final class MainActivity extends TabActivity {
     builder.setMessage( message );
     AlertDialog ad = builder.create();
     // ok
-    ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+    ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
       public void onClick( final DialogInterface dialog, final int which ) {
         try {
           dialog.dismiss();
@@ -153,7 +153,7 @@ public final class MainActivity extends TabActivity {
       } }); 
     
     // cancel
-    ad.setButton( DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+    ad.setButton( DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
       public void onClick( final DialogInterface dialog, final int which ) {
         try {
           dialog.dismiss();

@@ -208,17 +208,17 @@ public final class SettingsActivity extends Activity {
             
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-      tv.setText( "Highest uploaded id: " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );
+      tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );
       
       final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
       resetMaxidButton.setOnClickListener( new OnClickListener() {
         public void onClick( final View buttonView ) {    
-          MainActivity.createConfirmation( SettingsActivity.this, "Zero out DB marker?", new Doer() {
+          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), new Doer() {
             @Override
             public void execute() {          
               editor.putLong( ListActivity.PREF_DB_MARKER, 0L );
               editor.commit();
-              tv.setText( "Max upload id: 0" );
+              tv.setText( getString(R.string.setting_max_id) + " 0" );
             }
           } );
         }
@@ -227,18 +227,18 @@ public final class SettingsActivity extends Activity {
       // db marker maxout button and text
       final TextView maxtv = (TextView) findViewById( R.id.maxout_maxid_text );
       final long maxDB = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
-      maxtv.setText( "Max id at startup: " + maxDB );
+      maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
       
       final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
       maxoutMaxidButton.setOnClickListener( new OnClickListener() {
         public void onClick( final View buttonView ) { 
-          MainActivity.createConfirmation( SettingsActivity.this, "Max out DB marker?", new Doer() {
+          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), new Doer() {
             @Override
             public void execute() {
               editor.putLong( ListActivity.PREF_DB_MARKER, maxDB );
               editor.commit();
               // set the text on the other button
-              tv.setText( "Max upload id: " + maxDB );
+              tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
             } 
           } );
         }
@@ -246,13 +246,13 @@ public final class SettingsActivity extends Activity {
       
       // period spinners
       doScanSpinner( R.id.periodstill_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_STILL_DEFAULT, "Nonstop" );
+          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.period_spinner, 
-          ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, "Nonstop" );
+          ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.periodfast_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_FAST_DEFAULT, "Nonstop" );
+          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.gps_spinner, 
-          ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, "Tie to Wifi Scan Period" );
+          ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
       
       MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListActivity.PREF_SHOW_CURRENT, true);
       MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListActivity.PREF_METRIC, false);
@@ -267,24 +267,29 @@ public final class SettingsActivity extends Activity {
         // no text to speech :(
         spinner.setEnabled( false );
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
-        speakText.setText("No Text-to-Speech engine");
+        speakText.setText(getString(R.string.no_tts));
       }
+      
+      final String off = getString(R.string.off);
+      final String sec = " " + getString(R.string.sec);
+      final String min = " " + getString(R.string.min);
+      
       final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,900,1800,0 };
-      final String[] speechName = new String[]{ "10 sec","15 sec","30 sec",
-          "1 min","2 min","5 min","10 min","15 min","30 min","Off" };
+      final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
+          "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
       doSpinner( R.id.speak_spinner, 
           ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
             
       // battery kill spinner
       final long[] batteryPeriods = new long[]{ 1,2,3,4,5,10,15,20,0 };
-      final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %","Off" };
+      final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
       doSpinner( R.id.battery_kill_spinner, 
           ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
       final long[] resetPeriods = new long[]{ 15000,30000,60000,90000,120000,300000,600000,0 };
-      final String[] resetName = new String[]{ "15 sec", "30 sec","1 min","1.5 min",
-          "2 min","5 min","10 min","Off" };
+      final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
+          "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner, 
           ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
   }
@@ -326,9 +331,12 @@ public final class SettingsActivity extends Activity {
   }
   
   private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
+    final String sec = " " + getString(R.string.sec);
+    final String min = " " + getString(R.string.min);
+    
     final long[] periods = new long[]{ 0,50,250,500,750,1000,1500,2000,3000,4000,5000,10000,30000,60000 };
-    final String[] periodName = new String[]{ zeroName,"50ms","250ms","500 ms","750 ms","1 sec","1.5 sec","2 sec",
-        "3 sec","4 sec","5 sec","10 sec","30 sec","1 min" };
+    final String[] periodName = new String[]{ zeroName,"50 ms","250 ms","500 ms","750 ms","1" + sec,"1.5" + sec,"2" + sec,
+        "3" + sec,"4" + sec,"5" + sec,"10" + sec,"30" + sec,"1" + min };
     doSpinner(id, pref, spinDefault, periods, periodName);
   }
   

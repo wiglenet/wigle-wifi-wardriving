@@ -9,6 +9,77 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+    
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/query_address"
+    />
+<EditText
+        android:id="@+id/query_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text" />
+        
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/query_ssid"
+    />
+<EditText
+        android:id="@+id/query_ssid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text" 
+        android:maxLength="4"/>
+        
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:paddingTop="6dip">
+  
+<Button android:id="@+id/search_button"
+	android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:text="@string/search_button" 
+	android:layout_weight="1"
+	/>
+	
+<Button android:id="@+id/reset_button"
+	android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+	android:text="@string/reset_button"
+	android:layout_weight="1" 
+	/>
+</LinearLayout>
+
+<LinearLayout
+	android:id="@+id/horizontalLine"
+	android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#A07070"
+	android:layout_marginBottom="4dip"
+	/> 
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/csv_run_export_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/csv_run_export_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/csv_run_export_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/csv_run_export_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
 	
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
@@ -42,6 +113,50 @@
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 
 		android:text="@string/kml_export_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
+<LinearLayout
+	android:id="@+id/horizontalLine"
+	android:layout_width="fill_parent"
+	android:layout_height="2dip"
+	android:background="#A07070"
+	android:layout_marginBottom="4dip"
+	/> 
+	
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/backup_db_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/backup_db_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/backup_db_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/backup_db_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+	<Button android:id="@+id/import_observed_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/import_observed_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/import_observed_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/import_observed_text"
 		android:layout_weight="5"
 		/>
 </LinearLayout>

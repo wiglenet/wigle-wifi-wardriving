@@ -13,8 +13,8 @@ import java.util.Locale;
 
 import android.content.Context;
 
-@SuppressWarnings("unchecked")
-public final class TTS {
+@SuppressWarnings("rawtypes")
+public final class TTS {  
   private static Class SPEECH_CLASS;
   private static Class LISTENER_CLASS;
 

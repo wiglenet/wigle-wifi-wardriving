@@ -12,13 +12,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.TabHost;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TabHost;
 
 public final class MainActivity extends TabActivity {
   static final String TAB_LIST = "list";
@@ -28,10 +29,14 @@ public final class MainActivity extends TabActivity {
   
   private static MainActivity mainActivity;
   private ListActivity listActivity;
+  private PowerManager.WakeLock wakeLock;
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
+    
+    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
     
     mainActivity = this;
 
@@ -85,6 +90,36 @@ public final class MainActivity extends TabActivity {
     final Activity parent = activity.getParent();
     if ( parent != null && parent instanceof TabActivity ) {
       ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
+    }
+  }
+  
+  static void setLockScreen( Activity activity, boolean lockScreen ) {
+    final Activity parent = activity.getParent();
+    if ( parent != null && parent instanceof MainActivity ) {
+      MainActivity main = (MainActivity) parent;
+      main.setLockScreen( lockScreen );
+    }
+  }
+  
+  static boolean isScreenLocked( Activity activity ) {
+    final Activity parent = activity.getParent();
+    if ( parent != null && parent instanceof MainActivity ) {
+      MainActivity main = (MainActivity) parent;
+      return main.wakeLock.isHeld();
+    }
+    return false;
+  }
+  
+  private void setLockScreen( boolean lockScreen ) {
+    if ( lockScreen ) {
+      if ( ! wakeLock.isHeld() ) {
+        ListActivity.info("acquire wake lock");
+        wakeLock.acquire();
+      }
+    }
+    else if ( wakeLock.isHeld() ) {
+      ListActivity.info("release wake lock");
+      wakeLock.release();
     }
   }
   
@@ -203,6 +238,14 @@ public final class MainActivity extends TabActivity {
     }
   }
   
+  public static ListActivity getListActivity( final Activity activity ) {
+    MainActivity main = getMainActivity( activity );
+    if ( main != null ) {
+      return main.listActivity;
+    }
+    return null;
+  }
+  
   public void finishListActivity() {
     if ( listActivity != null ) {
       listActivity.finish();
@@ -219,12 +262,24 @@ public final class MainActivity extends TabActivity {
   public void onPause() {
     ListActivity.info( "MAIN: pause." );
     super.onPause();
+    
+    // deal with wake lock
+    if ( wakeLock.isHeld() ) {
+      ListActivity.info("release wake lock");
+      wakeLock.release();
+    }
   }
   
   @Override
   public void onResume() {
     ListActivity.info( "MAIN: resume." );
     super.onResume();
+    
+    // deal with wake lock
+    if ( ! wakeLock.isHeld() ) {
+      ListActivity.info("acquire wake lock");
+      wakeLock.acquire();
+    }
   }
   
   @Override

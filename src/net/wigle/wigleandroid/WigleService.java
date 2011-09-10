@@ -19,10 +19,10 @@ public final class WigleService extends Service {
   private AtomicBoolean done = new AtomicBoolean( false );
   
   // copied from javadoc
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static final Class[] mStartForegroundSignature = new Class[] {
     int.class, Notification.class};
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   private static final Class[] mStopForegroundSignature = new Class[] {
     boolean.class};
 

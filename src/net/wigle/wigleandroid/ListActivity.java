@@ -106,7 +106,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
-    private static final int MENU_MAP = 12;
+    private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
     private static final int MENU_FILTER = 15;
@@ -211,6 +211,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       public long dbLocs;
       public DatabaseHelper dbHelper;
       public Set<String> runNetworks;
+      public QueryArgs queryArgs;
     }
     public static final LameStatic lameStatic = new LameStatic();
     
@@ -570,8 +571,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
       item = menu.add(0, MENU_SCAN, 0, "Scan " + scan);
       item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
       
-      item = menu.add(0, MENU_MAP, 0, "Map");
-      item.setIcon( android.R.drawable.ic_menu_mapmode );
+      final String wake = MainActivity.isScreenLocked( this ) ? "Let Screen Sleep" : "Keep Screen On";
+      item = menu.add(0, MENU_WAKELOCK, 0, wake);
+      item.setIcon( android.R.drawable.ic_menu_gallery );
       
       item = menu.add(0, MENU_EXIT, 0, "Exit");
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
@@ -596,9 +598,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
             startActivity( settingsIntent );
             break;
           }
-          case MENU_MAP: {
-            info("start map activity");
-            MainActivity.switchTab( this, MainActivity.TAB_MAP );
+          case MENU_WAKELOCK: {
+            boolean screenLocked = ! MainActivity.isScreenLocked( this );
+            MainActivity.setLockScreen( this, screenLocked );
+            final String wake = screenLocked ? "Let Screen Sleep" : "Keep Screen On";
+            item.setTitle( wake );
             return true;
           }
           case MENU_SORT: {
@@ -1004,7 +1008,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     private void setupUploadButton() {
       final Button button = (Button) findViewById( R.id.upload_button );
-      button.setOnClickListener( new OnClickListener() {
+      button.setOnClickListener( new OnClickListener() { 
           public void onClick( final View view ) {
             MainActivity.createConfirmation( ListActivity.this, "Upload File?", new Doer() {
               @Override

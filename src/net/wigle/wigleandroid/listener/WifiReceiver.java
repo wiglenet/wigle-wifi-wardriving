@@ -540,14 +540,12 @@ public class WifiReceiver extends BroadcastReceiver {
           strength = gsmRssiMagicDecoderRing( strength );
         }
         
-        if ( false ) {
-          ListActivity.info( "bssid: " + bssid );        
-          ListActivity.info( "strength: " + strength );
-          ListActivity.info( "ssid: " + ssid ); 
-          ListActivity.info( "capabilities: " + capabilities ); 
-          ListActivity.info( "networkType: " + networkType ); 
-          ListActivity.info( "location: " + location );
-        }
+//          ListActivity.info( "bssid: " + bssid );        
+//          ListActivity.info( "strength: " + strength );
+//          ListActivity.info( "ssid: " + ssid ); 
+//          ListActivity.info( "capabilities: " + capabilities ); 
+//          ListActivity.info( "networkType: " + networkType ); 
+//          ListActivity.info( "location: " + location );
                 
         final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
         

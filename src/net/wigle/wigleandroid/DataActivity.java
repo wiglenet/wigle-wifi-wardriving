@@ -1,8 +1,12 @@
 package net.wigle.wigleandroid;
 
+import java.util.List;
+
 import net.wigle.wigleandroid.MainActivity.Doer;
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -11,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * configure settings
@@ -30,40 +36,129 @@ public final class DataActivity extends Activity {
       // force media volume controls
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
 
-      // get prefs
-//      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-//      final Editor editor = prefs.edit();      
+//      try {
+//        Geocoder gc = new Geocoder(this);
+//        List<Address> addresses = gc.getFromLocationName("Chicago, IL", 1);
+//        ListActivity.info("addresses: " + addresses.size() + " addresses: " + addresses);
+//      }
+//      catch ( IOException ex ) {
+//        ListActivity.error( "ex: " + ex, ex);
+//      }
       
-      final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
-      kmlRunExportButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
-          MainActivity.createConfirmation( DataActivity.this, "Export run to KML file?", new Doer() {
-            @Override
-            public void execute() {
-              // actually need this Activity context, for dialogs
-              KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper, 
-                  ListActivity.lameStatic.runNetworks );
-              kmlWriter.start();
-            }
-          } );
-        }
-      });
-      
-      final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
-      kmlExportButton.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
-          MainActivity.createConfirmation( DataActivity.this, "Export DB to KML file?", new Doer() {
-            @Override
-            public void execute() {
-              // actually need this Activity context, for dialogs
-              KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper );
-              kmlWriter.start();
-            }
-          } );
-        }
-      });
-      
+      setupQueryButtons();
+      setupKmlButtons();
   }  
+  
+  private void setupQueryButtons() {
+    Button button = (Button) findViewById( R.id.search_button );
+    button.setOnClickListener(new OnClickListener() {
+      public void onClick( final View view ) {
+        final QueryArgs queryArgs = new QueryArgs();
+        String fail = null;
+        String field = null;
+        boolean okValue = false;
+        
+        for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid } ) {
+          if ( fail != null ) {
+            break;
+          }
+          
+          final EditText editText = (EditText) findViewById( id );
+          final String text = editText.getText().toString().trim();
+          if ( "".equals(text) ) {
+            continue;
+          }
+          
+          try {
+            switch( id ) {
+              case R.id.query_address:
+                field = "Address";
+                Geocoder gc = new Geocoder(DataActivity.this);
+                List<Address> addresses = gc.getFromLocationName(text, 1);
+                if ( addresses.size() < 1 ) {
+                  fail = "No geocoded address found";
+                  break;
+                }
+                queryArgs.setAddress(addresses.get(0));
+                okValue = true;
+                break;
+              case R.id.query_ssid:
+                field = "SSID";
+                queryArgs.setSSID(text);
+                okValue = true;
+                break;
+              default:
+                ListActivity.error("setupButtons: bad id: " + id);
+            }
+          }
+          catch( Exception ex ) {
+            fail = "Problem with field '" + field + "': " + ex.getMessage();
+            break;
+          }          
+        }
+        
+        if ( fail == null && ! okValue ) {
+          fail = "No query fields specified";
+        }
+        
+        if ( fail != null ) {
+          // toast!
+          Toast.makeText( DataActivity.this, fail, Toast.LENGTH_SHORT ).show();
+        }
+        else {
+          ListActivity.lameStatic.queryArgs = queryArgs;
+          // mark dirty
+          final ListActivity listActivity = MainActivity.getListActivity(DataActivity.this);
+          if ( listActivity != null ) {
+            //listActivity.markDirty();
+          }
+          MainActivity.switchTab( DataActivity.this, MainActivity.TAB_LIST );
+        }
+      }
+    });
+    
+    button = (Button) findViewById( R.id.reset_button );
+    button.setOnClickListener(new OnClickListener() {
+      public void onClick( final View view ) {
+        for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid } ) {        
+          final EditText editText = (EditText) findViewById( id );
+          editText.setText("");
+        }
+      }
+    });
+
+  }
+  
+  private void setupKmlButtons() {
+    final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
+    kmlRunExportButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, "Export run to KML file?", new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper, 
+                ListActivity.lameStatic.runNetworks );
+            kmlWriter.start();
+          }
+        } );
+      }
+    });
+    
+    final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
+    kmlExportButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, "Export DB to KML file?", new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper );
+            kmlWriter.start();
+          }
+        } );
+      }
+    });    
+  }
   
   @Override
   public void onResume() {

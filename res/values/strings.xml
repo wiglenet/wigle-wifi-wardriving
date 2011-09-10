@@ -24,10 +24,16 @@
     <string name="maxout_maxid_text">Set marker to:</string>
     <string name="connect_button">Connect</string>
     <string name="connect_text">with permission of network operator</string>
+    <string name="csv_run_export_button">CSV Export Run</string>
+    <string name="csv_run_export_text">Export current run to CSV file</string>    
     <string name="kml_run_export_button">KML Export Run</string>
-    <string name="kml_run_export_text">Export current run to file</string>
+    <string name="kml_run_export_text">Export current run to KML file</string>
     <string name="kml_export_button">KML Export DB</string>
-    <string name="kml_export_text">Export entire DB to file</string>
+    <string name="kml_export_text">Export entire DB to KML file</string>
+    <string name="backup_db_button">Backup Database</string>
+    <string name="backup_db_text">Make a database backup</string>
+    <string name="import_observed_button">Import Observed</string>
+    <string name="import_observed_text">Import my observed networks from WiGLE</string>    
     <string name="periodstill_text">Time between wifi scans 0 mph</string>    
     <string name="period_text">Time between wifi scans &lt;5 mph</string>
     <string name="periodfast_text">Time between wifi scans &gt;5 mph</string>
@@ -53,4 +59,10 @@
     <string name="speech_time">Current time</string>
     <string name="speech_battery">Battery level percentage</string>
     <string name="speech_ssid">New Network SSID\'s</string>
+    <string name="query_address">Address (ex: Chicago, IL):</string>
+    <string name="query_ssid">SSID (ex: Linksys):</string>    
+    <string name="search_button">Run Query</string>
+    <string name="reset_button">Reset Fields</string> 
+    <string name="list_query_clear">Clear Query Arguments</string> 
+    
 </resources>

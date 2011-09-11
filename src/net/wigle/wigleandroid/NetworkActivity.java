@@ -98,11 +98,11 @@ public class NetworkActivity extends Activity {
       else {
         Integer chan = network.getChannel();
         chan = chan != null ? chan : network.getFrequency();
-        tv.setText( Integer.toString(chan) );
+        tv.setText( " " + Integer.toString(chan) + " " );
       }
       
       tv = (TextView) findViewById( R.id.na_cap ); 
-      tv.setText( network.getCapabilities().replace("][", "]\n[") );
+      tv.setText( " " + network.getCapabilities().replace("][", "]\n[") );
       
       setupMap( network );
       // kick off the query now that we have our map
@@ -123,10 +123,10 @@ public class NetworkActivity extends Activity {
       public void handleMessage( final Message msg ) {        
         final TextView tv = (TextView) findViewById( R.id.na_observe );
         if ( msg.what == MSG_OBS_UPDATE ) {
-          tv.setText( Integer.toString( observations ) + "...");
+          tv.setText( " " + Integer.toString( observations ) + "...");
         }
         else if ( msg.what == MSG_OBS_DONE ) {
-          tv.setText( Integer.toString( observations ) );
+          tv.setText( " " + Integer.toString( observations ) );
         }
       }
     };

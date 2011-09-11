@@ -28,6 +28,7 @@ New Database tab, for querying and exporting
 More choices for deciding wifi-frozen setting
 Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 List tab "Keep Screen On" menu option, will keep the screen from sleeping while WigleWifi is running
+Pulled out all strings to resource file, for internationalization
 
 * 1.42 (7/22/2011)
 Recover from states where the OS shuts off the gps out from under us

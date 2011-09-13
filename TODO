@@ -30,6 +30,8 @@ Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 List tab "Keep Screen On" menu option, will keep the screen from sleeping while WigleWifi is running
 Pulled out all strings for internationalization
 Added mechanical translation for: Dutch, German, Spanish, French, Italian, Polish, Russian, Swedish
+Export CSV button, to get a CSV without uploading
+Export KML operations now have progress dialogs boxes
 
 * 1.42 (7/22/2011)
 Recover from states where the OS shuts off the gps out from under us

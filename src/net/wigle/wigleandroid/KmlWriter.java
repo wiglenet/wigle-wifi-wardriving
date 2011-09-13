@@ -9,22 +9,31 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.wigle.wigleandroid.FileUploaderTask.Status;
+import net.wigle.wigleandroid.FileUploaderTask.UploaderHandler;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Process;
 
-public class KmlWriter extends Thread {
+public class KmlWriter extends Thread implements AlertSettable {
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
-  private static final int WRITING_DONE = 10;
   
   private final DatabaseHelper dbHelper;
   private final Set<String> networks;
   private final Handler handler;
+  private ProgressDialog pd;
+  private final AtomicBoolean interrupt = new AtomicBoolean( false );
+  private final Object lock = new Object();
+  private final Context context;
   
   public KmlWriter( final Context context, final DatabaseHelper dbHelper ) {
     this( context, dbHelper, (Set<String>) null );
@@ -38,24 +47,29 @@ public class KmlWriter extends Thread {
       throw new IllegalArgumentException( "dbHelper is null" );
     }
     
+    this.context = context;
     this.dbHelper = dbHelper;
     // make a safe local copy
     this.networks = (networks == null) ? null : new HashSet<String>( networks );
     
-    this.handler = new Handler() {
-      @Override
-      public void handleMessage( final Message msg ) {
-        if ( msg.what == WRITING_DONE ) {
-          FileUploaderTask.buildAlertDialog( context, msg, FileUploaderTask.Status.WRITE_SUCCESS );        }
-        }
-    };
-
+    createProgressDialog( context );
+    
+    this.handler = new UploaderHandler(context, lock, pd, this);
   }
   
-  private boolean writeKml( Bundle bundle ) throws FileNotFoundException, IOException {
+  public void setAlertDialog(final AlertDialog alertDialog) {
+    // nothing for now
+    // this.alertDialog = alertDialog;
+  }
+  
+  public void clearProgressDialog() {
+    pd = null;
+  }  
+  
+  private void writeKml( Bundle bundle ) throws FileNotFoundException, IOException {
     final boolean hasSD = ListActivity.hasSD();
     if ( ! hasSD ) {
-      return false;
+      return;
     }
     final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
     final File path = new File( filepath );
@@ -80,29 +94,37 @@ public class KmlWriter extends Thread {
         + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href></Icon></IconStyle></Style>"
         + "<Folder><name>Wifi Networks</name>\n" );
     
-    boolean retval = false;
-    
     // body
     Cursor cursor = null;
+    Status status = null;
     if ( true ) {
       try {
         if ( this.networks == null ) {
           cursor = dbHelper.networkIterator();    
-          retval = writeKmlFromCursor( fos, cursor, dateFormat );
+          writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle );
         }
         else {
+          int count = 0;
           for ( String network : networks ) {
             // ListActivity.info( "network: " + network );
             cursor = dbHelper.getSingleNetwork( network ); 
-            // avoiding |= operator cuz of old validator wierdness
-            retval = writeKmlFromCursor( fos, cursor, dateFormat ) || retval;
+            writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
             cursor.close();
             cursor = null;
+            count++;
           }
         }
+        status = Status.WRITE_SUCCESS;
       }    
       catch ( DBException ex ) {
         dbHelper.deathDialog("Writing Kml", ex);
+      }
+      catch ( final Exception ex ) {
+        ex.printStackTrace();
+        ListActivity.error( "ex problem: " + ex, ex );
+        ListActivity.writeError( this, ex, context );
+        status = Status.EXCEPTION;
+        bundle.putString( FileUploaderTask.ERROR, "ex problem: " + ex );
       }
       finally {
         if ( cursor != null ) {
@@ -120,19 +142,20 @@ public class KmlWriter extends Thread {
     ListActivity.info( "done with kml export" );
     
     // tell gui
-    Message message = new Message();
-    message.what = WRITING_DONE;
-    message.setData( bundle );
-    handler.sendMessage( message );
-    
-    return retval;
+    FileUploaderTask.sendBundledMessage( handler, status.ordinal(), bundle );
   }
   
-  private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat ) 
-      throws IOException {
+  private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat,
+      long startCount, long totalCount, final Bundle bundle ) throws IOException, InterruptedException {
+    
     int lineCount = 0;
-    final int total = cursor.getCount();
+    int lastSentPercent = -1;
+
     for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
+      if ( interrupt.get() ) {
+        throw new InterruptedException( "we were interrupted" );
+      }
+      
       // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon
       final String bssid = cursor.getString(0);
       final String ssid = cursor.getString(1);
@@ -167,11 +190,19 @@ public class KmlWriter extends Thread {
 
       lineCount++;
       if ( (lineCount % 1000) == 0 ) {
-        ListActivity.info("lineCount: " + lineCount + " of " + total );
+        ListActivity.info("lineCount: " + lineCount + " of " + totalCount );
       }
-      // if ( lineCount > 10000) {
-      //  break;
-      // }
+      
+      // update UI
+      if ( totalCount == 0 ) {
+        totalCount = 1;
+      }
+      final int percentDone = (int)(((lineCount + startCount) * 100) / totalCount);
+      // only send up to 100 times
+      if ( percentDone > lastSentPercent ) {
+        FileUploaderTask.sendBundledMessage( handler, FileUploaderTask.WRITING_PERCENT_START + percentDone, bundle );
+        lastSentPercent = percentDone;
+      }
     }
     
     return true;
@@ -205,5 +236,16 @@ public class KmlWriter extends Thread {
     catch ( final Exception ex ) {
       dbHelper.deathDialog("Writing Kml", ex);
     }    
+  }
+  
+  private void createProgressDialog(final Context context) {
+    // make an interruptable progress dialog
+    pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, true,
+      new OnCancelListener(){ 
+        @Override
+        public void onCancel( DialogInterface di ) {
+          interrupt.set(true);
+        }
+      });
   }
 }

@@ -29,8 +29,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -43,7 +43,7 @@ import android.os.Message;
 import android.os.Process;
 import android.view.WindowManager;
 
-public final class FileUploaderTask extends Thread {
+public final class FileUploaderTask extends Thread implements AlertSettable {
   private Context context;
   private final Handler handler;
   private final DatabaseHelper dbHelper;
@@ -52,8 +52,9 @@ public final class FileUploaderTask extends Thread {
   private AlertDialog ad;
   private final Object lock = new Object();
   private final AtomicBoolean interrupt = new AtomicBoolean( false );
+  private final boolean justWriteFile;
   
-  static final int WRITING_PERCENT_START = 10000;
+  public static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
   public static final String ERROR = "error";
@@ -93,7 +94,9 @@ public final class FileUploaderTask extends Thread {
     int lineCount;
   }
   
-  public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener ) {
+  public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
+      final boolean justWriteFile ) {
+    
     if ( context == null ) {
       throw new IllegalArgumentException( "context is null" );
     }
@@ -107,56 +110,81 @@ public final class FileUploaderTask extends Thread {
     this.context = context;
     this.dbHelper = dbHelper;
     this.listener = listener;
+    this.justWriteFile = justWriteFile;
     
     // set with activity context, sets up the progress dialog
     createProgressDialog();
     
-    this.handler = new Handler() {
-      private String msg_text = "";
+    this.handler = new UploaderHandler(context, lock, pd, this);
+  }
+  
+  public void setAlertDialog(final AlertDialog ad) {
+    this.ad = ad;
+  }
+    
+  public static class UploaderHandler extends Handler {
+    private final Context context;
+    private final Object lock;
+    private final ProgressDialog pd;
+    private final AlertSettable alertSettable;
+    
+    private String msg_text = "";
+    
+    public UploaderHandler(final Context context, final Object lock, final ProgressDialog pd,
+        final AlertSettable alertSettable) {
       
-      @Override
-      public void handleMessage( final Message msg ) {
-        synchronized ( lock ) {
-          if ( msg.what >= WRITING_PERCENT_START ) {
-            final int percent = msg.what - WRITING_PERCENT_START;
-            pd.setMessage( msg_text + percent + "%" );
-            pd.setProgress( percent * 100 );
-            return;
-          }
-          
-          final Status status = Status.values()[ msg.what ];
-          if ( Status.UPLOADING.equals( status ) ) {
-            //          pd.setMessage( status.getMessage() );
-            msg_text = status.getMessage();
-            pd.setProgress(0);
-            return;
-          }
-          if ( Status.WRITING.equals( status ) ) {
-            msg_text = status.getMessage();
-            pd.setProgress(0);
-            return;
-          }
-          // make sure we didn't progress dialog this somewhere
-          if ( pd != null && pd.isShowing() ) {
-            try {
-              pd.dismiss();
-              pd = null;
-            }
-            catch ( Exception ex ) {
-              // guess it wasn't there anyways
-              ListActivity.info( "exception dismissing dialog: " + ex );
-            }
-          }
-          // Activity context
-          ad = buildAlertDialog( context, msg, status );
+      this.context = context;
+      this.lock = lock;
+      this.pd = pd;
+      this.alertSettable = alertSettable;          
+    }
+    
+    @Override
+    public void handleMessage( final Message msg ) {
+      synchronized ( lock ) {
+        if ( msg.what >= WRITING_PERCENT_START ) {
+          final int percent = msg.what - WRITING_PERCENT_START;
+          pd.setMessage( msg_text + percent + "%" );
+          pd.setProgress( percent * 100 );
+          return;
         }
+        
+        final Status status = Status.values()[ msg.what ];
+        if ( Status.UPLOADING.equals( status ) ) {
+          //          pd.setMessage( status.getMessage() );
+          msg_text = status.getMessage();
+          pd.setProgress(0);
+          return;
+        }
+        if ( Status.WRITING.equals( status ) ) {
+          msg_text = status.getMessage();
+          pd.setProgress(0);
+          return;
+        }
+        // make sure we didn't progress dialog this somewhere
+        if ( pd != null && pd.isShowing() ) {
+          try {
+            pd.dismiss();
+            alertSettable.clearProgressDialog();
+          }
+          catch ( Exception ex ) {
+            // guess it wasn't there anyways
+            ListActivity.info( "exception dismissing dialog: " + ex );
+          }
+        }
+        // Activity context
+        alertSettable.setAlertDialog( buildAlertDialog( context, msg, status ) );
       }
-     };
+    }
+  }  
+  
+  public void clearProgressDialog() {
+    pd = null;
   }
   
   private void createProgressDialog() {
     // make an interruptable progress dialog
-    this.pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, true,
+    pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, true,
       new OnCancelListener(){ 
         @Override
         public void onCancel( DialogInterface di ) {
@@ -254,7 +282,12 @@ public final class FileUploaderTask extends Thread {
       ListActivity.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
       Process.setThreadPriority( UPLOAD_PRIORITY );
       
-      doRun();
+      if ( justWriteFile ) {
+        justWriteFile();
+      }
+      else {
+        doRun();
+      }
     }
     catch ( final InterruptedException ex ) {
       ListActivity.info( "file upload interrupted" );
@@ -299,7 +332,7 @@ public final class FileUploaderTask extends Thread {
     sendBundledMessage( handler, status.ordinal(), bundle );
   }
   
-  private static void sendBundledMessage( Handler handler, int what, Bundle bundle ) {
+  public static void sendBundledMessage( Handler handler, int what, Bundle bundle ) {
     final Message msg = new Message();
     msg.what = what;
     msg.setData(bundle);
@@ -311,35 +344,45 @@ public final class FileUploaderTask extends Thread {
     interrupt.set( true );
   }
   
-  private Status doUpload( final String username, final String password, final Bundle bundle ) throws InterruptedException {    
-    
+  public static OutputStream getOutputStream(final Context context, final Bundle bundle, final Object[] fileFilename)
+      throws IOException {
     final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
     
+    String openString = filename;
+    final boolean hasSD = ListActivity.hasSD();
+    File file = null;
+    bundle.putString( FILENAME, filename );
+    if ( hasSD ) {
+      final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
+      final File path = new File( filepath );
+      path.mkdirs();
+      openString = filepath + filename;
+      file = new File( openString );
+      if ( ! file.exists() && hasSD ) {
+        file.createNewFile();
+      }
+      bundle.putString( FILEPATH, filepath );
+      bundle.putString( FILENAME, filename );
+    }
+    
+    final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
+      : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
+
+    final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
+    fileFilename[0] = file;
+    fileFilename[1] = filename;
+    return fos;
+  }
+  
+  private Status doUpload( final String username, final String password, final Bundle bundle ) throws InterruptedException {    
     Status status = Status.UNKNOWN;
     
     try {
-      String openString = filename;
-      final boolean hasSD = ListActivity.hasSD();
-      File file = null;
-      bundle.putString( FILENAME, filename );
-      if ( hasSD ) {
-        final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
-        final File path = new File( filepath );
-        path.mkdirs();
-        openString = filepath + filename;
-        file = new File( openString );
-        if ( ! file.exists() && hasSD ) {
-          file.createNewFile();
-        }
-        bundle.putString( FILEPATH, filepath );
-        bundle.putString( FILENAME, filename );
-      }
-      
-      final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
-        : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
-
-      final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
+      final Object[] fileFilename = new Object[2];
+      final OutputStream fos = getOutputStream( context, bundle, fileFilename );
+      final File file = (File) fileFilename[0];
+      final String filename = (String) fileFilename[1];
 
       // write file
       CountStats countStats = new CountStats();
@@ -366,6 +409,7 @@ public final class FileUploaderTask extends Thread {
       }
 
       // send file
+      final boolean hasSD = ListActivity.hasSD();
       final FileInputStream fis = hasSD ? new FileInputStream( file ) 
         : context.openFileInput( filename ); 
       final Map<String,String> params = new HashMap<String,String>();
@@ -439,6 +483,44 @@ public final class FileUploaderTask extends Thread {
       bundle.putString( ERROR, "ex problem: " + ex );
     }
     
+    return status;
+  }
+  
+  public Status justWriteFile() {
+    Status status = null;
+    final CountStats countStats = new CountStats();
+    final Bundle bundle = new Bundle();
+    
+    try {
+      OutputStream fos = null;
+      try {
+        fos = getOutputStream( context, bundle, new Object[2] );
+        writeFile( fos, bundle, countStats );
+        // show on the UI
+        status = Status.WRITE_SUCCESS;
+        sendBundledMessage( handler, status.ordinal(), bundle );
+      }
+      finally {
+        if ( fos != null ) {
+          fos.close();
+        }
+      }
+    }
+    catch ( IOException ex ) {
+      ex.printStackTrace();
+      ListActivity.error( "io problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
+      status = Status.EXCEPTION;
+      bundle.putString( ERROR, "io problem: " + ex );
+    }
+    catch ( final Exception ex ) {
+      ex.printStackTrace();
+      ListActivity.error( "ex problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
+      status = Status.EXCEPTION;
+      bundle.putString( ERROR, "ex problem: " + ex );
+    }
+        
     return status;
   }
   

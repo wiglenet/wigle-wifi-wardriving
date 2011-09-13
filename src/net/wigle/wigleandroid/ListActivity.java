@@ -1254,7 +1254,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private void uploadFile( final DatabaseHelper dbHelper ){
       info( "upload file" );
       // actually need this Activity context, for dialogs
-      state.fileUploaderTask = new FileUploaderTask( this, dbHelper, this );
+      state.fileUploaderTask = new FileUploaderTask( this, dbHelper, this, false );
       state.fileUploaderTask.start();
     }
     

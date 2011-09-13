@@ -21,7 +21,7 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataActivity extends Activity {
+public final class DataActivity extends Activity implements FileUploaderListener {
   
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
@@ -37,6 +37,7 @@ public final class DataActivity extends Activity {
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
       
       setupQueryButtons();
+      setupCsvButton();
       setupKmlButtons();
   }  
   
@@ -118,6 +119,32 @@ public final class DataActivity extends Activity {
       }
     });
 
+  }
+  
+  /**
+   * FileUploaderListener interface
+   */
+  public void uploadComplete() {
+    // nothing
+  }
+  
+  private void setupCsvButton() {
+    // actually need this Activity context, for dialogs
+    
+    final Button csvRunExportButton = (Button) findViewById( R.id.csv_run_export_button );
+    csvRunExportButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, "Export run to CSV file?", new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
+                ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+            fileUploaderTask.start();
+          }
+        } );
+      }
+    });
   }
   
   private void setupKmlButtons() {

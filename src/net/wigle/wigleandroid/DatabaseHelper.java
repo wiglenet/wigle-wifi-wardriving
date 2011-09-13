@@ -6,6 +6,11 @@ package net.wigle.wigleandroid;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import net.wigle.wigleandroid.DataActivity.BackupTask;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -944,4 +950,35 @@ public final class DatabaseHelper extends Thread {
         "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", args );
   }
   
+
+  public Pair<Boolean,String> copyDatabase(final BackupTask task) {
+    final String dbFilename = DATABASE_PATH + DATABASE_NAME;
+    final String outputFilename = DATABASE_PATH + "backup-" + System.currentTimeMillis() + ".sqlite";
+    File file = new File(dbFilename);
+    File outputFile = new File(outputFilename);
+    Pair<Boolean,String> result = null;
+    try {
+      InputStream input = new FileInputStream(file);
+      OutputStream output = new FileOutputStream(outputFile);
+      byte[] buffer = new byte[1024];
+      int bytesRead = 0;
+      final long total = file.length();
+      long read = 0;
+      while( (bytesRead = input.read(buffer)) > 0){
+          output.write(buffer, 0, bytesRead);
+          read += bytesRead;
+          int percent = (int)( (read*100)/total );
+          // ListActivity.info("percent: " + percent + " read: " + read + " total: " + total );
+          task.progress( percent );
+      }
+      output.close();
+      input.close();
+      result = new Pair<Boolean,String>(Boolean.TRUE, outputFilename);
+    }
+    catch ( IOException ex ) {
+      result = new Pair<Boolean,String>(Boolean.FALSE, "ERROR: " + ex);
+    }
+
+    return result;
+  }
 }

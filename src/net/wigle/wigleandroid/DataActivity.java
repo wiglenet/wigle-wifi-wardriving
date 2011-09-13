@@ -4,10 +4,13 @@ import java.util.List;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -135,7 +139,8 @@ public final class DataActivity extends Activity implements FileUploaderListener
     final Button csvRunExportButton = (Button) findViewById( R.id.csv_run_export_button );
     csvRunExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, "Export run to CSV file?", new Doer() {
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_export_csv), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
@@ -152,7 +157,8 @@ public final class DataActivity extends Activity implements FileUploaderListener
     final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
     kmlRunExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, "Export run to KML file?", new Doer() {
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_export_kml_run), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
@@ -167,7 +173,8 @@ public final class DataActivity extends Activity implements FileUploaderListener
     final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
     kmlExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, "Export DB to KML file?", new Doer() {
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_export_kml_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
@@ -181,18 +188,82 @@ public final class DataActivity extends Activity implements FileUploaderListener
   
   private void setupBackupDbButton() {
     final Button kmlExportButton = (Button) findViewById( R.id.backup_db_button );
+    if ( ! ListActivity.hasSD() ) {
+      kmlExportButton.setEnabled(false);
+    }
+    
     kmlExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, "Backup DB to differnt file?", new Doer() {
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_backup_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper );
-            kmlWriter.start();
+            BackupTask task = new BackupTask(DataActivity.this, MainActivity.getListActivity(DataActivity.this));
+            task.execute();
           }
         } );
       }
     });  
+  }
+  
+  /**
+   * way to background load the data and show progress on the gui thread
+   */
+  public static class BackupTask extends AsyncTask<Object, Integer, Integer> {
+    private final Activity activity;
+    private final ListActivity listActivity;
+    private Pair<Boolean,String> dbResult;
+    
+    public BackupTask ( final Activity activity, final ListActivity listActivity ) {
+      this.activity = activity;
+      this.listActivity = listActivity;
+      listActivity.setUploading();
+    }
+    
+    @Override
+    protected Integer doInBackground( Object... obj ) {
+      dbResult = ListActivity.lameStatic.dbHelper.copyDatabase(this);
+      // dbResult = new Pair<Boolean,String>(Boolean.TRUE, "meh");
+      return 0;
+    }
+    
+    @Override
+    protected void onProgressUpdate( Integer... progress ) {      
+      final TextView tv = (TextView) activity.findViewById( R.id.backup_db_text );
+      tv.setText( activity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
+    }
+    
+    @Override
+    protected void onPostExecute( Integer result ) {       
+      listActivity.uploadComplete();
+      
+      final TextView tv = (TextView) activity.findViewById( R.id.backup_db_text );
+      tv.setText( activity.getString(R.string.backup_db_text) );
+      
+      final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+      builder.setCancelable( true );
+      builder.setTitle( activity.getString( dbResult.getFirst() ? R.string.status_success : R.string.status_fail ));
+      builder.setMessage( dbResult.getSecond() );
+      final AlertDialog ad = builder.create();
+      // ok
+      ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
+        public void onClick( final DialogInterface dialog, final int which ) {
+          try {
+            dialog.dismiss();
+          }
+          catch ( Exception ex ) {
+            // guess it wasn't there anyways
+            ListActivity.info( "exception dismissing alert dialog: " + ex );
+          }
+          return;
+        } }); 
+      ad.show();
+    }
+    
+    public void progress( int progress ) {
+      publishProgress(progress);
+    }        
   }
   
   @Override

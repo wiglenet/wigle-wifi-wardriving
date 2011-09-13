@@ -835,6 +835,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
+    public void setUploading() {
+      state.uploading.set( true );
+    }
+    
     /**
      * FileUploaderListener interface
      */
@@ -1013,7 +1017,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
             MainActivity.createConfirmation( ListActivity.this, getString(R.string.list_upload), new Doer() {
               @Override
               public void execute() {                
-                state.uploading.set( true );
+                setUploading();
                 uploadFile( state.dbHelper );
               }
             } );
@@ -1359,5 +1363,5 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static boolean hasSD() {
       File sdCard = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/" );
       return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
-    }        
+    }            
 }

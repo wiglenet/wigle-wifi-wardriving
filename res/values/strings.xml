@@ -200,5 +200,9 @@
     <string name="status_uploading">Uploading File</string>
     <string name="status_writing">Writing File</string>
     <string name="status_nothing">Doing Nothing</string>
-    <string name="status_empty">File would be empty</string>             
+    <string name="status_empty">File would be empty</string>   
+    <string name="data_export_csv">Export run to CSV file?</string>
+    <string name="data_export_kml_run">Export run to KML file?</string>
+    <string name="data_export_kml_db">Export DB to KML file?</string>
+    <string name="data_backup_db">Backup DB to different file?</string>          
 </resources>

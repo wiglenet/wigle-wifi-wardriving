@@ -596,37 +596,38 @@ public class WifiReceiver extends BroadcastReceiver {
     StringBuilder builder = new StringBuilder();
     
     if ( listActivity.getGPSListener().getLocation() == null ) {
-      builder.append( "no gps fix, " );
+      builder.append( listActivity.getString(R.string.tts_no_gps_fix) + ", " );
     }
     
     // run, new, queue, miles, time, battery
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_RUN, true ) ) {
-      builder.append( "run " ).append( runNetworks.size() ).append( ", " );
+      builder.append( listActivity.getString(R.string.run) + " " ).append( runNetworks.size() ).append( ", " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_NEW_WIFI, true ) ) {
-      builder.append( "new wifi " ).append( newWifiCount ).append( ", " );
+      builder.append( listActivity.getString(R.string.tts_new_wifi) + " " ).append( newWifiCount ).append( ", " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_NEW_CELL, true ) ) {
-      builder.append( "new cell " ).append( newCellCount ).append( ", " );
+      builder.append( listActivity.getString(R.string.tts_new_cell) + " " ).append( newCellCount ).append( ", " );
     }
     if ( preQueueSize > 0 && prefs.getBoolean( ListActivity.PREF_SPEAK_QUEUE, true ) ) {
-      builder.append( "queue " ).append( preQueueSize ).append( ", " );
+      builder.append( listActivity.getString(R.string.tts_queue) + " " ).append( preQueueSize ).append( ", " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_MILES, true ) ) {
       final float dist = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
       final String distString = DashboardActivity.metersToString( numberFormat1, listActivity, dist, false );
-      builder.append( "from " ).append( distString );
+      builder.append( listActivity.getString(R.string.tts_from) + " " ).append( distString );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
       String time = timeFormat.format( new Date() );
       // time is hard to say.
-      time = time.replace(" 00", " owe clock");
-      time = time.replace(" 0", " owe ");
+      time = time.replace(" 00", " " + listActivity.getString(R.string.tts_o_clock));
+      time = time.replace(" 0", " " + listActivity.getString(R.string.tts_o) +  " ");
       builder.append( time ).append( ", " );
     }
     final int batteryLevel = listActivity.getBatteryLevelReceiver().getBatteryLevel();
     if ( batteryLevel >= 0 && prefs.getBoolean( ListActivity.PREF_SPEAK_BATTERY, true ) ) {
-      builder.append( "battery " ).append( batteryLevel ).append( " percent, " );
+      builder.append( listActivity.getString(R.string.tts_battery) + " " ).append( batteryLevel )
+        .append( " " + listActivity.getString(R.string.tts_percent) + ", " );
     }
     
     ListActivity.info( "speak: " + builder.toString() );

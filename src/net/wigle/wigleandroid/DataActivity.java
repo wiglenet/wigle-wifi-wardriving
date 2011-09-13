@@ -35,15 +35,6 @@ public final class DataActivity extends Activity {
       
       // force media volume controls
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
-
-//      try {
-//        Geocoder gc = new Geocoder(this);
-//        List<Address> addresses = gc.getFromLocationName("Chicago, IL", 1);
-//        ListActivity.info("addresses: " + addresses.size() + " addresses: " + addresses);
-//      }
-//      catch ( IOException ex ) {
-//        ListActivity.error( "ex: " + ex, ex);
-//      }
       
       setupQueryButtons();
       setupKmlButtons();

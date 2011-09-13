@@ -240,7 +240,8 @@ public class KmlWriter extends Thread implements AlertSettable {
   
   private void createProgressDialog(final Context context) {
     // make an interruptable progress dialog
-    pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, true,
+    pd = ProgressDialog.show( context, context.getString(Status.WRITING.getTitle()), 
+        context.getString(Status.WRITING.getMessage()), true, true,
       new OnCancelListener(){ 
         @Override
         public void onCancel( DialogInterface di ) {

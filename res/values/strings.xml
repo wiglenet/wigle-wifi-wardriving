@@ -185,5 +185,20 @@
     <string name="tts_o_clock">owe clock</string>
     <string name="tts_o">owe</string>
     <string name="tts_battery">battery</string>
-    <string name="tts_percent">percent</string>     
+    <string name="tts_percent">percent</string>  
+    <string name="status_unknown">Unknown</string>   
+    <string name="status_unknown_error">Unknown error</string>   
+    <string name="status_fail">Fail</string>
+    <string name="status_success">Success</string>
+    <string name="status_working">Working...</string>
+    <string name="status_upload_success">Upload Successful</string>
+    <string name="status_write_success">Write Successful</string>
+    <string name="status_no_user">Username not set</string>
+    <string name="status_no_pass">Password not set and username not \'anonymous\'</string>
+    <string name="status_exception">Exception</string>
+    <string name="status_login_fail">Login failed, check password?</string>
+    <string name="status_uploading">Uploading File</string>
+    <string name="status_writing">Writing File</string>
+    <string name="status_nothing">Doing Nothing</string>
+    <string name="status_empty">File would be empty</string>             
 </resources>

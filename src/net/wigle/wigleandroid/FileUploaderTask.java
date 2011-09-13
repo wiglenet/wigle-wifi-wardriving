@@ -63,28 +63,28 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
   private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   
   public static enum Status {
-    UNKNOWN("Unknown", "Unknown error"),
-    FAIL( "Fail", "Fail" ),
-    SUCCESS( "Success", "Upload Successful"),
-    WRITE_SUCCESS( "Success", "Write Successful"),
-    BAD_USERNAME("Fail", "Username not set"),
-    BAD_PASSWORD("Fail", "Password not set and username not 'anonymous'"),
-    EXCEPTION("Fail", "Exception"),
-    BAD_LOGIN("Fail", "Login failed, check password?"),
-    UPLOADING("Working...", "Uploading File "),
-    WRITING("Working...", "Writing File "),
-    EMPTY_FILE("Doing Nothing", "File would be empty");
+    UNKNOWN( R.string.status_unknown, R.string.status_unknown_error ),
+    FAIL( R.string.status_fail, R.string.status_fail ),
+    SUCCESS( R.string.status_success, R.string.status_upload_success ),
+    WRITE_SUCCESS( R.string.status_success, R.string.status_write_success ),
+    BAD_USERNAME( R.string.status_fail, R.string.status_no_user ),
+    BAD_PASSWORD( R.string.status_fail, R.string.status_no_pass ),
+    EXCEPTION( R.string.status_fail, R.string.status_exception ),
+    BAD_LOGIN( R.string.status_fail, R.string.status_login_fail ),
+    UPLOADING( R.string.status_working, R.string.status_uploading ),
+    WRITING( R.string.status_working, R.string.status_writing ),
+    EMPTY_FILE( R.string.status_nothing, R.string.status_empty );  
     
-    private final String title;
-    private final String message;
-    private Status( final String title, final String message ) {
+    private final int title;
+    private final int message;
+    private Status( final int title, final int message ) {
       this.title = title;
       this.message = message;
     }
-    public String getTitle() {
+    public int getTitle() {
       return title;
     }
-    public String getMessage() {
+    public int getMessage() {
       return message;
     }
   }
@@ -152,12 +152,12 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
         final Status status = Status.values()[ msg.what ];
         if ( Status.UPLOADING.equals( status ) ) {
           //          pd.setMessage( status.getMessage() );
-          msg_text = status.getMessage();
+          msg_text = context.getString( status.getMessage() );
           pd.setProgress(0);
           return;
         }
         if ( Status.WRITING.equals( status ) ) {
-          msg_text = status.getMessage();
+          msg_text = context.getString( status.getMessage() );
           pd.setProgress(0);
           return;
         }
@@ -184,7 +184,8 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
   
   private void createProgressDialog() {
     // make an interruptable progress dialog
-    pd = ProgressDialog.show( context, Status.WRITING.getTitle(), Status.WRITING.getMessage(), true, true,
+    pd = ProgressDialog.show( context, context.getString(Status.WRITING.getTitle()), 
+        context.getString(Status.WRITING.getMessage()), true, true,
       new OnCancelListener(){ 
         @Override
         public void onCancel( DialogInterface di ) {
@@ -218,12 +219,12 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     }
     
     if ( bundle == null ) {
-      builder.setMessage( status.getMessage() + filename );
+      builder.setMessage( context.getString( status.getMessage() ) + filename );
     }
     else {
       String error = bundle.getString( ERROR );
       error = error == null ? "" : " Error: " + error;
-      builder.setMessage( status.getMessage() + error + filename );
+      builder.setMessage( context.getString( status.getMessage() ) + error + filename );
     }
     AlertDialog ad = builder.create();
     ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {

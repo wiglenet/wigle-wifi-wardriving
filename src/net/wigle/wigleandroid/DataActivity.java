@@ -39,6 +39,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
       setupQueryButtons();
       setupCsvButton();
       setupKmlButtons();
+      setupBackupDbButton();
   }  
   
   private void setupQueryButtons() {
@@ -176,6 +177,22 @@ public final class DataActivity extends Activity implements FileUploaderListener
         } );
       }
     });    
+  }
+  
+  private void setupBackupDbButton() {
+    final Button kmlExportButton = (Button) findViewById( R.id.backup_db_button );
+    kmlExportButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, "Backup DB to differnt file?", new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper );
+            kmlWriter.start();
+          }
+        } );
+      }
+    });  
   }
   
   @Override

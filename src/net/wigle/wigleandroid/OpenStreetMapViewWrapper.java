@@ -189,22 +189,27 @@ public final class OpenStreetMapViewWrapper extends Overlay {
       return;
     }
     
+    boolean drawTrail = true;
     if ( singleNetwork != null ) {
       drawNetwork( c, osmv, singleNetwork );
+      drawTrail = false;
     }
-    else {
+    if (obsMap != null) {
+      drawObsMap( c, osmv );
+      drawTrail = false;
+    }
+    if ( drawTrail ) {
       drawTrail( c, osmv );
     }
   }
   
-  private void drawNetwork( final Canvas c, final MapView osmv, final Network network ) {
-    final Projection proj = osmv.getProjection();
-        
+  private void drawObsMap( final Canvas c, final MapView osmv ) {
     if ( obsMap != null ) {
       final GeoPoint obsPoint = new GeoPoint(0,0);
       Point point = new Point();
       Paint paint = new Paint();
       paint.setColor( Color.argb( 255, 0, 0, 0 ) );
+      final Projection proj = osmv.getProjection();
       
       for ( Map.Entry<LatLon, Integer> obs : obsMap.entrySet() ) {
         final LatLon latLon = obs.getKey();
@@ -214,11 +219,18 @@ public final class OpenStreetMapViewWrapper extends Overlay {
         point = proj.toMapPixels( obsPoint, point );
         paint.setColor( NetworkListAdapter.getSignalColor( level, true ) );
         c.drawCircle( point.x, point.y, 4, paint );
+        if ( singleNetwork == null ) {
+          // not a single network, highlight this better
+          c.drawCircle( point.x, point.y, 5, trailPaint );
+        }
       }
     }
-    
+  }
+  
+  private void drawNetwork( final Canvas c, final MapView osmv, final Network network ) {
     final GeoPoint geoPoint = network.getGeoPoint();    
     if ( geoPoint != null ) {
+      final Projection proj = osmv.getProjection();
       Point point = proj.toMapPixels( geoPoint, null );
       c.drawCircle(point.x, point.y, 16, trailBackPaint);
       c.drawCircle(point.x, point.y, 16, trailPaint);

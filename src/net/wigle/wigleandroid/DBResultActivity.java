@@ -32,6 +32,7 @@ public class DBResultActivity extends Activity {
   private NetworkListAdapter listAdapter;
   private IMapView mapView;
   private List<Network> resultList = new ArrayList<Network>();
+  private ConcurrentLinkedHashMap<LatLon, Integer> obsMap = new ConcurrentLinkedHashMap<LatLon, Integer>();
   
   @Override
   public void onCreate( final Bundle savedInstanceState) {
@@ -71,7 +72,8 @@ public class DBResultActivity extends Activity {
   private void setupMap( final IGeoPoint center ) {
     mapView = new MapView( this, 256 );
     final OpenStreetMapViewWrapper overlay = NetworkActivity.setupMap( this, center, mapView, R.id.db_map_rl );
-    if ( overlay != null ) {            
+    if ( overlay != null ) {        
+      overlay.setObsMap( obsMap );
     }
   }
   
@@ -105,17 +107,21 @@ public class DBResultActivity extends Activity {
     
     String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
     final String ssid = queryArgs.getSSID();    
+    boolean limit = false;
     if ( ssid != null && ! "".equals(ssid) ) {
       sql += " AND ssid like '" + ssid + "'";
+      limit = true;
     }
     if ( address != null ) {
-      final double diff = 0.5d;
+      final double diff = 0.1d;
       final double lat = address.getLatitude();
       final double lon = address.getLongitude();
       sql += " AND lastlat > '" + (lat - diff) + "' AND lastlat < '" + (lat + diff) + "'";
       sql += " AND lastlon > '" + (lon - diff) + "' AND lastlon < '" + (lon + diff) + "'";
     }
-    sql += " LIMIT " + LIMIT;
+    if ( limit ) {
+      sql += " LIMIT " + LIMIT;
+    }
     
     final TreeMap<Float,String> top = new TreeMap<Float,String>();
     final float[] results = new float[1];
@@ -149,9 +155,12 @@ public class DBResultActivity extends Activity {
       }
       
       public void complete() {        
-        for ( String bssid : top.values() ) {          
-          Network network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
-          resultList.add( network );            
+        for ( final String bssid : top.values() ) {          
+          final Network network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
+          resultList.add( network );
+          final IGeoPoint point = network.getGeoPoint();
+          final LatLon key = new LatLon(point.getLatitudeE6() / 1e6f, point.getLongitudeE6() / 1e6f);
+          obsMap.put(key, 0);
         }
         
         handler.sendEmptyMessage( MSG_OBS_DONE );

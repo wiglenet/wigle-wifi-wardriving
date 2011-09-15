@@ -30,8 +30,7 @@
         android:id="@+id/query_ssid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" 
-        android:maxLength="4"/>
+        android:inputType="text"/>
         
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"

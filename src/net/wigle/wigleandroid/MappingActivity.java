@@ -52,7 +52,7 @@ public final class MappingActivity extends Activity {
   private MyLocationOverlay myLocationOverlay = null;
   
   private static final int DEFAULT_ZOOM = 17;
-  private static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
+  public static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_EXIT = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;

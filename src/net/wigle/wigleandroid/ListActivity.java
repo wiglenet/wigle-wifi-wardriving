@@ -750,16 +750,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
     
     private void setupList() {
       // not set by nonconfig retain
-      listAdapter = new NetworkListAdapter( this.getApplicationContext(), R.layout.row );
-               
-      final ListView listView = (ListView) findViewById( R.id.ListView01 );
+      listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
+      setupListAdapter( this, listAdapter, R.id.ListView01 );
+    }
+     
+    public static void setupListAdapter( final Activity activity, final NetworkListAdapter listAdapter, final int id) {
+      final ListView listView = (ListView) activity.findViewById( id );
       listView.setAdapter( listAdapter ); 
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
         public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
           final Network network = (Network) parent.getItemAtPosition( position );
-          final Intent intent = new Intent( ListActivity.this, NetworkActivity.class );
+          final Intent intent = new Intent( activity, NetworkActivity.class );
           intent.putExtra( NETWORK_EXTRA_BSSID, network.getBssid() );
-          ListActivity.this.startActivity( intent );
+          activity.startActivity( intent );
         }
       });
     }

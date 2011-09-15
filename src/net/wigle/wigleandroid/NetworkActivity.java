@@ -23,17 +23,17 @@ import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 
 public class NetworkActivity extends Activity {
   private static final int MENU_EXIT = 11;
@@ -43,7 +43,6 @@ public class NetworkActivity extends Activity {
   private static final int MSG_OBS_DONE = 2;
   
   private Network network;
-  private IMapController mapControl;
   private IMapView mapView;
   private SimpleDateFormat format;
   private int observations = 0;
@@ -157,12 +156,21 @@ public class NetworkActivity extends Activity {
     
   private void setupMap( final Network network ) {
     final IGeoPoint point = MappingActivity.getCenter( this, network.getGeoPoint(), null );
-    if ( point != null ) {
+    mapView = new MapView( this, 256 );
+    final OpenStreetMapViewWrapper overlay = setupMap( this, point, mapView, R.id.netmap_rl );
+    if ( overlay != null ) {
+      overlay.setSingleNetwork( network );
+      overlay.setObsMap( obsMap );      
+    }
+  }
+  
+  public static OpenStreetMapViewWrapper setupMap( final Activity activity, final IGeoPoint center, 
+      final IMapView mapView, final int id ) {
+    
+    OpenStreetMapViewWrapper overlay = null;
+    if ( center != null ) {
       // view
-      final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.netmap_rl );
-      
-      // possibly choose goog maps here
-      mapView = new MapView( this, 256 );     
+      final RelativeLayout rlView = (RelativeLayout) activity.findViewById( id );
       
       if ( mapView instanceof View ) {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
@@ -176,17 +184,17 @@ public class NetworkActivity extends Activity {
         osmMapView.setBuiltInZoomControls( true );
         osmMapView.setMultiTouchControls( true );
         
-        final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( this );
-        overlay.setSingleNetwork( network );
-        overlay.setObsMap( obsMap );
+        overlay = new OpenStreetMapViewWrapper( activity );
         osmMapView.getOverlays().add( overlay );
       }
-      mapControl = mapView.getController();
       
-      mapControl.setCenter( point );
+      final IMapController mapControl = mapView.getController();
+      mapControl.setCenter( center );
       mapControl.setZoom( 16 );
-      mapControl.setCenter( point );
+      mapControl.setCenter( center );
     }
+    
+    return overlay;
   }
   
   private void setupButton( final Network network ) {

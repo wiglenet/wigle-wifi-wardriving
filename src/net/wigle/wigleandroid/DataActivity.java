@@ -104,12 +104,9 @@ public final class DataActivity extends Activity implements FileUploaderListener
         }
         else {
           ListActivity.lameStatic.queryArgs = queryArgs;
-          // mark dirty
-          final ListActivity listActivity = MainActivity.getListActivity(DataActivity.this);
-          if ( listActivity != null ) {
-            //listActivity.markDirty();
-          }
-          MainActivity.switchTab( DataActivity.this, MainActivity.TAB_LIST );
+          // start db result activity
+          final Intent settingsIntent = new Intent( DataActivity.this, DBResultActivity.class );
+          startActivity( settingsIntent );
         }
       }
     });

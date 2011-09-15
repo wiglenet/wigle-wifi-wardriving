@@ -19,4 +19,8 @@ public class QueryArgs {
   public void setSSID(String ssid) {
     this.ssid = ssid;
   }
+  
+  public String toString() {
+    return "QueryArgs: address: " + address + ", ssid: " + ssid; 
+  }
 }

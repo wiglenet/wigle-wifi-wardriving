@@ -9,6 +9,7 @@
     <string name="speech_name">WiGLE Wifi - Speech Settings</string>
     <string name="network_activity_name">Wigle Wifi - Network</string>
     <string name="data_activity_name">Wigle Wifi - Database</string>
+    <string name="dbresult_activity_name">Wigle Wifi - Search Result</string>  
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>
@@ -204,5 +205,5 @@
     <string name="data_export_csv">Export run to CSV file?</string>
     <string name="data_export_kml_run">Export run to KML file?</string>
     <string name="data_export_kml_db">Export DB to KML file?</string>
-    <string name="data_backup_db">Backup DB to different file?</string>          
+    <string name="data_backup_db">Backup DB to different file?</string>                  
 </resources>

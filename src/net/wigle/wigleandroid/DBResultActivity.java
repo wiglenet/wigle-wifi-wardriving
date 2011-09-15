@@ -106,7 +106,7 @@ public class DBResultActivity extends Activity {
     String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
     final String ssid = queryArgs.getSSID();    
     if ( ssid != null && ! "".equals(ssid) ) {
-      sql += " AND ssid = '" + ssid + "'";
+      sql += " AND ssid like '" + ssid + "'";
     }
     if ( address != null ) {
       final double diff = 0.5d;

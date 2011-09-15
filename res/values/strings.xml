@@ -62,7 +62,7 @@
     <string name="speech_battery">Battery level percentage</string>
     <string name="speech_ssid">New Network SSID\'s</string>
     <string name="query_address">Address (ex: Chicago, IL):</string>
-    <string name="query_ssid">SSID (ex: Linksys):</string>    
+    <string name="query_ssid">SSID (ex: Linksys, SQL wildcards: %,_):</string>    
     <string name="search_button">Run Query</string>
     <string name="reset_button">Reset Fields</string> 
     <string name="list_query_clear">Clear Query Arguments</string> 

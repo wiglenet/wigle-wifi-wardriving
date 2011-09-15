@@ -760,6 +760,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
         public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
           final Network network = (Network) parent.getItemAtPosition( position );
+          ListActivity.getNetworkCache().put( network.getBssid(), network );
           final Intent intent = new Intent( activity, NetworkActivity.class );
           intent.putExtra( NETWORK_EXTRA_BSSID, network.getBssid() );
           activity.startActivity( intent );

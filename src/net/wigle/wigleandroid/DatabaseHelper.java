@@ -21,6 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.wigle.wigleandroid.DataActivity.BackupTask;
+
+import org.osmdroid.util.GeoPoint;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -909,15 +912,19 @@ public final class DatabaseHelper extends Thread {
       try {
         checkDB();
         final String[] args = new String[]{ bssid };
-        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type FROM " + NETWORK_TABLE 
+        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon FROM " + NETWORK_TABLE 
             + " WHERE bssid = ?", args);
         if ( cursor.getCount() > 0 ) {
           cursor.moveToFirst();
           final String ssid = cursor.getString(0);
           final int frequency = cursor.getInt(1);
           final String capabilities = cursor.getString(2);
+          final float lastlat = cursor.getFloat(4);
+          final float lastlon = cursor.getFloat(5);
+          
           final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
           retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
+          retval.setGeoPoint( new GeoPoint(lastlat, lastlon) );
           ListActivity.getNetworkCache().put( bssid, retval );
         }
         cursor.close();

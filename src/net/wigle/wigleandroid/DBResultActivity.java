@@ -76,6 +76,8 @@ public class DBResultActivity extends Activity {
   }
   
   private void setupQuery( final QueryArgs queryArgs ) {
+    final Address address = queryArgs.getAddress();
+    
     // what runs on the gui thread
     final Handler handler = new Handler() {
       @Override
@@ -85,8 +87,16 @@ public class DBResultActivity extends Activity {
           tv.setText( getString(R.string.status_success)  );
           
           listAdapter.clear();
+          boolean first = true;
           for ( final Network network : resultList ) {
             listAdapter.add( network );
+            if ( address == null && first ) {
+              final IGeoPoint center = MappingActivity.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
+              ListActivity.info( "set center: " + center + " network: " + network.getSsid()
+                  + " point: " + network.getGeoPoint());
+              mapView.getController().setCenter( center );
+              first = false;
+            }
           }
           resultList.clear();
         }
@@ -94,8 +104,7 @@ public class DBResultActivity extends Activity {
     };
     
     String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
-    final String ssid = queryArgs.getSSID();
-    final Address address = queryArgs.getAddress();
+    final String ssid = queryArgs.getSSID();    
     if ( ssid != null && ! "".equals(ssid) ) {
       sql += " AND ssid = '" + ssid + "'";
     }
@@ -139,16 +148,10 @@ public class DBResultActivity extends Activity {
         }
       }
       
-      public void complete() {
-        boolean first = false;
+      public void complete() {        
         for ( String bssid : top.values() ) {          
           Network network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
-          resultList.add( network );
-          if ( address == null && first ) {
-            final IGeoPoint center = MappingActivity.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
-            mapView.getController().setCenter( center );
-            first = false;
-          }
+          resultList.add( network );            
         }
         
         handler.sendEmptyMessage( MSG_OBS_DONE );

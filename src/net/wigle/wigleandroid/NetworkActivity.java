@@ -68,7 +68,10 @@ public class NetworkActivity extends Activity {
     TextView tv = (TextView) findViewById( R.id.bssid );
     tv.setText( bssid );
     
-    if ( network != null ) {
+    if ( network == null ) {
+      ListActivity.info( "no network found in cache for bssid: " + bssid );
+    }
+    else {
       // do gui work
       tv = (TextView) findViewById( R.id.ssid );
       tv.setText( network.getSsid() );

@@ -200,7 +200,7 @@
     <string name="status_login_fail"> Anmeldung fehlgeschlagen, überprüfen Sie vergessen? </string>
     <string name="status_uploading"> Upload File </string>
     <string name="status_writing"> Schreiben der Datei </string>
-    <string name="status_nothing"> Doing Nothing </string>
+    <string name="status_nothing"> nichts zu tun</string>
     <string name="status_empty"> Datei wäre leer </string> werden
     <string name="data_export_csv"> Export ausführen, um CSV-Datei? </string>
     <string name="data_export_kml_run"> Export ausführen, um KML-Datei? </string>

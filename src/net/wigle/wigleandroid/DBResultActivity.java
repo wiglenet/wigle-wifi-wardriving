@@ -26,7 +26,7 @@ import android.widget.TextView;
 public class DBResultActivity extends Activity {
   private static final int MENU_RETURN = 12;
   private static final int MENU_SETTINGS = 13;
-  private static final int MSG_OBS_DONE = 2;  
+  private static final int MSG_QUERY_DONE = 2; 
   private static final int LIMIT = 50;
   
   private NetworkListAdapter listAdapter;
@@ -78,14 +78,16 @@ public class DBResultActivity extends Activity {
   }
   
   private void setupQuery( final QueryArgs queryArgs ) {
-    final Address address = queryArgs.getAddress();
+    final Address address = queryArgs.getAddress();    
     
     // what runs on the gui thread
     final Handler handler = new Handler() {
       @Override
-      public void handleMessage( final Message msg ) {        
-        if ( msg.what == MSG_OBS_DONE ) {
-          final TextView tv = (TextView) findViewById( R.id.dbstatus );          
+      public void handleMessage( final Message msg ) {
+        final TextView tv = (TextView) findViewById( R.id.dbstatus );
+        
+        if ( msg.what == MSG_QUERY_DONE ) {
+                    
           tv.setText( getString(R.string.status_success)  );
           
           listAdapter.clear();
@@ -124,8 +126,8 @@ public class DBResultActivity extends Activity {
     }
     
     final TreeMap<Float,String> top = new TreeMap<Float,String>();
-    final float[] results = new float[1];
-    final int[] count = new int[1];
+    final float[] results = new float[1];    
+    final long[] count = new long[1];
     
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       public void handleRow( final Cursor cursor ) {
@@ -163,7 +165,7 @@ public class DBResultActivity extends Activity {
           obsMap.put(key, 0);
         }
         
-        handler.sendEmptyMessage( MSG_OBS_DONE );
+        handler.sendEmptyMessage( MSG_QUERY_DONE );
         if ( mapView != null ) {
           // force a redraw
           ((View) mapView).postInvalidate();

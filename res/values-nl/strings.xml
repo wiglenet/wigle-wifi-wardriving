@@ -201,7 +201,7 @@
     <string name="status_uploading"> Uploaden Bestand </string>
     <string name="status_writing"> schrijven Bestand </string>
     <string name="status_nothing"> Doing Nothing </string>
-    <string name="status_empty"> File zou leeg </string> worden
+    <string name="status_empty"> File zou leeg worden</string> 
     <string name="data_export_csv"> Export ren naar CSV-bestand? </string>
     <string name="data_export_kml_run"> Export ren naar KML-bestand? </string>
     <string name="data_export_kml_db"> Export DB om KML-bestand? </string>

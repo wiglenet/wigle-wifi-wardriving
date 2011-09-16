@@ -195,7 +195,7 @@
     <string name="status_upload_success"> carga correcta </string>
     <string name="status_write_success"> Escribir éxito </string>
     <string name="status_no_user"> Nombre de usuario no establecida </string>
-    <string name="status_no_pass"> Contraseña no se establece y nombre de usuario no \ 'anonymous \ "</string>
+    <string name="status_no_pass"> Contraseña no se establece y nombre de usuario no \'anonymous\'</string>
     <string name="status_exception"> excepción </string>
     <string name="status_login_fail"> Error de acceso, comprobación de la contraseña? </string>
     <string name="status_uploading"> Cargando archivo </string>

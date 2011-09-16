@@ -202,8 +202,8 @@
     <string name="status_writing"> Fichier écriture </string>
     <string name="status_nothing"> ne rien faire</string>
     <string name="status_empty"> Fichier serait vide </string>
-    <string name="data_export_csv"> courir à l'exportation de fichier CSV? </string>
-    <string name="data_export_kml_run"> courir à l'exportation de fichiers KML? </string>
+    <string name="data_export_csv"> courir à l\'exportation de fichier CSV? </string>
+    <string name="data_export_kml_run"> courir à l\'exportation de fichiers KML? </string>
     <string name="data_export_kml_db"> Exporter DB fichier KML? </string>
     <string name="data_backup_db"> DB sauvegarde au fichier? </string>
 </resources>

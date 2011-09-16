@@ -19,13 +19,13 @@ stats on what is in the local db
 "only new" on map work with labels too
 
 --- done ---
-* 1.43 ()
+* 1.43 (9/16/2011)
 New Database tab, for querying, exporting and DB backup
 More choices for deciding wifi-frozen setting
 Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 List tab "Keep Screen On" menu option, will keep the screen from sleeping while WigleWifi is running
 Pulled out all strings for internationalization
-Added mechanical translation for: Dutch, German, Spanish, French, Italian, Polish, Russian, Swedish
+Added mechanical translations for: Dutch, German, Spanish, French, Italian, Polish, Russian, Swedish
 Query local DB by ssid or location
 Export CSV button, to get a CSV without uploading
 Export KML operations now have progress dialogs boxes

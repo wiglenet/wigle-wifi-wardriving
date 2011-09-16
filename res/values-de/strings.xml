@@ -194,14 +194,14 @@
     <string name="status_working"> Working ...</string>
     <string name="status_upload_success"> Upload erfolgreich </string>
     <string name="status_write_success"> Schreiben erfolgreich </string>
-    <string name="status_no_user"> Benutzername nicht </string> set
+    <string name="status_no_user"> Benutzername nicht set </string>
     <string name="status_no_pass"> Passwort nicht gesetzt und Benutzername nicht \'anonymous\' </string>
     <string name="status_exception"> Exception </string>
     <string name="status_login_fail"> Anmeldung fehlgeschlagen, überprüfen Sie vergessen? </string>
     <string name="status_uploading"> Upload File </string>
     <string name="status_writing"> Schreiben der Datei </string>
     <string name="status_nothing"> nichts zu tun</string>
-    <string name="status_empty"> Datei wäre leer </string> werden
+    <string name="status_empty"> Datei wäre leer werden</string> 
     <string name="data_export_csv"> Export ausführen, um CSV-Datei? </string>
     <string name="data_export_kml_run"> Export ausführen, um KML-Datei? </string>
     <string name="data_export_kml_db"> Export DB zu KML-Datei? </string>

@@ -20,7 +20,7 @@ stats on what is in the local db
 
 --- done ---
 * 1.43 (9/16/2011)
-New Database tab, for querying, exporting and DB backup
+New Data tab, for querying, exporting and DB backup
 More choices for deciding wifi-frozen setting
 Don't reinitilize location listeners on GPS_STOPPED event, it sometimes lies
 List tab "Keep Screen On" menu option, will keep the screen from sleeping while WigleWifi is running

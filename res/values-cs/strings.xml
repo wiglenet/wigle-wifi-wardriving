@@ -65,7 +65,7 @@
     <string name="query_ssid">SSID (např: Linksys) (SQL divoké karty: %,_):</string>    
     <string name="search_button">Dotaz na místní DB</string>
     <string name="reset_button">Vymazat pole</string> 
-//    <string name="list_query_clear">Clear Query Arguments</string> 
+    <string name="list_query_clear">Clear Query Arguments</string> 
     <string name="crypto_security">Zabezpečení  </string>
     <string name="crypto_strength">Síla signálu  </string>
     <string name="crypto_password">Heslo</string>

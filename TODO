@@ -18,7 +18,12 @@ summarize AP's since last audio speech
 stats on what is in the local db
 "only new" on map work with labels too
 
+Allow choosing of language for the app (not just using the Android settings)
+
 --- done ---
+* 1.44 ()
+Adding Czech
+
 * 1.43 (9/16/2011)
 New Data tab, for querying, exporting and DB backup
 More choices for deciding wifi-frozen setting

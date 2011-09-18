@@ -206,4 +206,6 @@
     <string name="data_export_kml_run">Exportovat sken do KML souboru?</string>
     <string name="data_export_kml_db">Exportovat DB do KML souboru?</string>
     <string name="data_backup_db">Zálohovat DB do jiného souboru ?</string>                  
+    <string name="language_text"> Vybraný jazyk </string>
+    <string name="auto"> Automatické </string>
 </resources>

@@ -206,4 +206,6 @@
     <string name="data_export_kml_run"> Export ren naar KML-bestand? </string>
     <string name="data_export_kml_db"> Export DB om KML-bestand? </string>
     <string name="data_backup_db"> Backup DB naar ander bestand? </string>
+    <string name="language_text"> Gekozen taal </string>
+    <string name="auto"> Automatisch </string>
 </resources>

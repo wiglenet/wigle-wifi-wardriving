@@ -206,4 +206,6 @@
     <string name="data_export_kml_run"> Exportera runda till KML-fil? </string>
     <string name="data_export_kml_db"> Exportera DB till KML-fil? </string>
     <string name="data_backup_db"> Säkerhetskopiera DB till en annan fil? </string>
+    <string name="language_text"> Valt språk </string>
+    <string name="auto"> Automatisk </string>
 </resources>

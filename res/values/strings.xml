@@ -205,5 +205,17 @@
     <string name="data_export_csv">Export run to CSV file?</string>
     <string name="data_export_kml_run">Export run to KML file?</string>
     <string name="data_export_kml_db">Export DB to KML file?</string>
-    <string name="data_backup_db">Backup DB to different file?</string>                  
+    <string name="data_backup_db">Backup DB to different file?</string>
+    <string name="language_en">English (en)</string>
+    <string name="language_cs">čeština (cs) </string>     
+    <string name="language_de">Deutsch (de)</string>
+    <string name="language_es">español (es)</string>
+    <string name="language_fr">français (fr)</string>
+    <string name="language_it">italiano (it)</string>
+    <string name="language_nl">Nederlands (nl)</string>
+    <string name="language_pl">polski (pl)</string>
+    <string name="language_ru">русский (ru)</string>
+    <string name="language_sv">svenska (sv)</string>     
+    <string name="language_text">Selected language</string>
+    <string name="auto">Automatic</string>                  
 </resources>

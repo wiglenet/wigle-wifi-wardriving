@@ -37,6 +37,8 @@ public class DBResultActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
     super.onCreate( savedInstanceState );
+    // set language
+    MainActivity.setLocale( this );
     setContentView( R.layout.dbresult );
       
     // force media volume controls

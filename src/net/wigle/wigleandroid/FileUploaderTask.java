@@ -144,7 +144,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       synchronized ( lock ) {
         if ( msg.what >= WRITING_PERCENT_START ) {
           final int percent = msg.what - WRITING_PERCENT_START;
-          pd.setMessage( msg_text + percent + "%" );
+          pd.setMessage( msg_text + " " + percent + "%" );
           pd.setProgress( percent * 100 );
           return;
         }

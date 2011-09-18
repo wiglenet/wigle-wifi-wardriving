@@ -30,6 +30,8 @@ public class DashboardActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
+    // set language
+    MainActivity.setLocale( this );
     setContentView( R.layout.dash );
     
     // media volume

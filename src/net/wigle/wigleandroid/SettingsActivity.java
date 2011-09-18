@@ -51,6 +51,8 @@ public final class SettingsActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
       super.onCreate( savedInstanceState );
+      // set language
+      MainActivity.setLocale( this );
       setContentView( R.layout.settings );
       
       // force media volume controls
@@ -269,25 +271,33 @@ public final class SettingsActivity extends Activity {
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText(getString(R.string.no_tts));
       }
+
+      final String[] languages = new String[]{ "", "en", "cs", "de", "es", "fr", "it", "nl", "pl", "ru", "sv" };
+      final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en), 
+          getString(R.string.language_cs), getString(R.string.language_de), getString(R.string.language_es), 
+          getString(R.string.language_fr), getString(R.string.language_it), getString(R.string.language_nl), 
+          getString(R.string.language_pl), getString(R.string.language_ru), getString(R.string.language_sv),
+          };
+      doSpinner( R.id.language_spinner, ListActivity.PREF_LANGUAGE, "", languages, languageName );   
       
       final String off = getString(R.string.off);
       final String sec = " " + getString(R.string.sec);
-      final String min = " " + getString(R.string.min);
+      final String min = " " + getString(R.string.min);            
       
-      final long[] speechPeriods = new long[]{ 10,15,30,60,120,300,600,900,1800,0 };
+      final Long[] speechPeriods = new Long[]{ 10L,15L,30L,60L,120L,300L,600L,900L,1800L,0L };
       final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
           "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
       doSpinner( R.id.speak_spinner, 
           ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
             
       // battery kill spinner
-      final long[] batteryPeriods = new long[]{ 1,2,3,4,5,10,15,20,0 };
+      final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
       final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
       doSpinner( R.id.battery_kill_spinner, 
           ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
-      final long[] resetPeriods = new long[]{ 15000,30000,60000,90000,120000,300000,600000,0 };
+      final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
       final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
           "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner, 
@@ -335,15 +345,15 @@ public final class SettingsActivity extends Activity {
     final String sec = " " + getString(R.string.sec);
     final String min = " " + getString(R.string.min);
     
-    final long[] periods = new long[]{ 0,50,250,500,750,1000,1500,2000,3000,4000,5000,10000,30000,60000 };
+    final Long[] periods = new Long[]{ 0L,50L,250L,500L,750L,1000L,1500L,2000L,3000L,4000L,5000L,10000L,30000L,60000L };
     final String[] periodName = new String[]{ zeroName,"50" + ms,"250" + ms,"500" + ms,"750" + ms,
         "1" + sec,"1.5" + sec,"2" + sec,
         "3" + sec,"4" + sec,"5" + sec,"10" + sec,"30" + sec,"1" + min };
     doSpinner(id, pref, spinDefault, periods, periodName);
   }
   
-  private void doSpinner( final int id, final String pref, final long spinDefault, 
-      final long[] periods, final String[] periodName ) {
+  private <V> void doSpinner( final int id, final String pref, final V spinDefault, 
+      final V[] periods, final String[] periodName ) {
     
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
@@ -352,11 +362,21 @@ public final class SettingsActivity extends Activity {
     ArrayAdapter<String> adapter = new ArrayAdapter<String>(
         this, android.R.layout.simple_spinner_item);
     
-    long period = prefs.getLong( pref, spinDefault );
+    Object period = null;
+    if ( periods instanceof Long[] ) {
+      period = prefs.getLong( pref, (Long) spinDefault );
+    }
+    else if ( periods instanceof String[] ) {
+      period = prefs.getString( pref, (String) spinDefault );
+    }
+    else {
+      ListActivity.error("unhandled object type array: " + periods + " class: " + periods.getClass());
+    }
+    
     int periodIndex = 0;
     for ( int i = 0; i < periods.length; i++ ) {
       adapter.add( periodName[i] );
-      if ( period == periods[i] ) {
+      if ( period.equals(periods[i]) ) {
         periodIndex = i;
       }
     }
@@ -366,10 +386,23 @@ public final class SettingsActivity extends Activity {
     spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
       public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
         // set pref
-        final long period = periods[position];
+        final V period = periods[position];
         ListActivity.info( pref + " setting scan period: " + period );
-        editor.putLong( pref, period );
+        if ( period instanceof Long ) {
+          editor.putLong( pref, (Long) period );
+        }
+        else if ( period instanceof String ) {
+          editor.putString( pref, (String) period );
+        }
+        else {
+          ListActivity.error("unhandled object type: " + period + " class: " + period.getClass());
+        }
         editor.commit();
+        
+        if ( period instanceof String ) {          
+          MainActivity.setLocale( SettingsActivity.this );       
+        }
+
       }
       public void onNothingSelected( final AdapterView<?> arg0 ) {}
       });

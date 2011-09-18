@@ -55,6 +55,8 @@ public class NetworkActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    // set language
+    MainActivity.setLocale( this );
     setContentView(R.layout.network);
     networkActivity = this;
     

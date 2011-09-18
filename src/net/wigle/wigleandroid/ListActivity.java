@@ -137,6 +137,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_FOUND_SOUND = "foundSound";
     public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
+    public static final String PREF_LANGUAGE = "speechLanguage";
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";    
     public static final String PREF_SPEECH_GPS = "speechGPS";
@@ -227,6 +228,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        // set language
+        MainActivity.setLocale( this );
         setContentView( R.layout.list );
         
         if ( DEBUG ) {
@@ -724,9 +727,10 @@ public final class ListActivity extends Activity implements FileUploaderListener
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
+      info( "LIST: on config change" );
+      MainActivity.setLocale( this, newConfig);
       super.onConfigurationChanged( newConfig );
-      setContentView( R.layout.list );
-      info( "on config change" );
+      setContentView( R.layout.list );      
       
       // have to redo linkages/listeners
       setupUploadButton();

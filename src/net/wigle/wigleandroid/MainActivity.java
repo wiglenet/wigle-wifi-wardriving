@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.io.File;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.View;
@@ -34,6 +36,8 @@ public final class MainActivity extends TabActivity {
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    // set language
+    setLocale( this );  
     setContentView(R.layout.main);
     
     PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -43,7 +47,7 @@ public final class MainActivity extends TabActivity {
     }
     
     mainActivity = this;
-
+    
     TabHost tabHost = getTabHost();  // The activity TabHost
     TabHost.TabSpec spec;  // Reusable TabSpec for each tab
     Intent intent;  // Reusable Intent for each tab
@@ -288,6 +292,13 @@ public final class MainActivity extends TabActivity {
   }
   
   @Override
+  public void onConfigurationChanged( final Configuration newConfig ) {
+    ListActivity.info( "MAIN: config changed" );
+    setLocale( this, newConfig );
+    super.onConfigurationChanged( newConfig );        
+  }
+  
+  @Override
   public void onStart() {
     ListActivity.info( "MAIN: start." );
     super.onStart();
@@ -323,5 +334,26 @@ public final class MainActivity extends TabActivity {
     throwable = MainActivity.getBaseThrowable( throwable );
     final String newline = withNewLine ? "\n" : " ";
     return throwable.getClass().getSimpleName() + ":" + newline + throwable.getMessage();
+  }
+  
+  public static void setLocale( final Activity activity ) {
+    final Context context = activity.getBaseContext();
+    final Configuration config = context.getResources().getConfiguration();
+    setLocale( activity, config );
+  }
+  
+  public static void setLocale( final Activity activity, final Configuration config ) {
+    final Context context = activity.getBaseContext();
+    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final String lang = prefs.getString( ListActivity.PREF_LANGUAGE, "" );
+    final String current = config.locale.getLanguage();
+    ListActivity.info("current lang: " + current + " new lang: " + lang);
+    if (! "".equals(lang) && ! current.equals(lang)) {
+      final Locale locale = new Locale(lang);
+      Locale.setDefault(locale);
+      config.locale = locale;
+      ListActivity.info("setting locale: " + locale);
+      context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+    }      
   }
 }

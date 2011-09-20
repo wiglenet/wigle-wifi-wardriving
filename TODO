@@ -19,6 +19,9 @@ stats on what is in the local db
 "only new" on map work with labels too
 
 --- done ---
+* 1.45 ()
+Updated German translation (thanks 'doommaster'!)
+
 * 1.44 (9/19/2011)
 Allow choosing of language for the app (overriding the Android device's settings)
 Adding Czech translation (thanks 'gpsfreemap'!)

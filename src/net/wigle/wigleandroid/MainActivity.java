@@ -348,7 +348,7 @@ public final class MainActivity extends TabActivity {
     final String lang = prefs.getString( ListActivity.PREF_LANGUAGE, "" );
     final String current = config.locale.getLanguage();
     ListActivity.info("current lang: " + current + " new lang: " + lang);
-    if (! "".equals(lang) && ! current.equals(lang)) {
+    if (! "".equals(lang) && ! current.equals(lang) && lang != null) {
       final Locale locale = new Locale(lang);
       Locale.setDefault(locale);
       config.locale = locale;

@@ -216,6 +216,6 @@
     <string name="language_pl">polski (pl)</string>
     <string name="language_ru">русский (ru)</string>
     <string name="language_sv">svenska (sv)</string>     
-    <string name="language_text">Selected language</string>
+    <string name="language_text">Selected language (requires restart)</string>
     <string name="auto">Automatic</string>                  
 </resources>

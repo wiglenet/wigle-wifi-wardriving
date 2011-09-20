@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.Editable;
@@ -400,7 +402,7 @@ public final class SettingsActivity extends Activity {
         editor.commit();
         
         if ( period instanceof String ) {          
-          MainActivity.setLocale( SettingsActivity.this );       
+          MainActivity.setLocale( SettingsActivity.this );           
         }
 
       }

@@ -62,7 +62,6 @@
     <string name="speech_battery"> Batterijniveau percentage </string>
     <string name="speech_ssid"> Nieuw Netwerk SSID\'s </string>
     <string name="query_address"> Adres (vb: Amsterdam, NL): </string>
-    <string name="dbresult_activity_name"> Wigle Wifi - Zoekresultaten </string>
     <string name="query_ssid"> SSID (vb: Linksys) (SQL toevoegingen: %,_): </string>
     <string name="search_button"> Query lokaal uitvoeren </string>
     <string name="reset_button"> Leegmaken </string>
@@ -208,16 +207,5 @@
     <string name="data_export_kml_db"> Export DB naar KML-bestand? </string>
     <string name="data_backup_db"> Backup DB naar bestand? </string>
     <string name="language_text"> Gekozen taal (opnieuw opstarten noodzakelijk)</string>
-	<string name="language_en">English (en)</string>
-    <string name="language_cs">čeština (cs) </string>     
-    <string name="language_de">Deutsch (de)</string>
-    <string name="language_es">español (es)</string>
-    <string name="language_fr">français (fr)</string>
-    <string name="language_it">italiano (it)</string>
-    <string name="language_nl">Nederlands (nl)</string>
-    <string name="language_pl">polski (pl)</string>
-    <string name="language_ru">русский (ru)</string>
-    <string name="language_sv">svenska (sv)</string>     
-    <string name="language_text">Selected language (requires restart)</string>
-    <string name="auto"> Automatisch </string>
+	<string name="auto"> Automatisch </string>
 </resources>

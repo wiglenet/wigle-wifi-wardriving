@@ -1,211 +1,656 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="stats"> Начиная </string>
-    <string name="app_name"> Уигл Wi-Fi беспроводных сетей </string>
-    <string name="settings_app_name"> Уигл Wi-Fi - Настройки </string>
-    <string name="mapping_app_name"> Уигл Wi-Fi - Open Street Map </string>
-    <string name="dashboard_app_name"> Уигл Wi-Fi - Панель инструментов </string>
-    <string name="error_report_name"> Wi-Fi Wi-Fi - Новые об ошибке </string>
-    <string name="speech_name"> Уигл Wi-Fi - Настройки речи </string>
-    <string name="network_activity_name"> Уигл Wi-Fi - сети </string>
-    <string name="data_activity_name"> Уигл Wi-Fi - База данных </string>
-    <string name="upload_button"> Загрузить на \ nWiGLE.net </string>
-    <string name="username"> Уигл Имя пользователя </string>
-    <string name="password"> Уигл пароль </string>
-    <string name="show_current"> Показать существующих сетей только </string>
-    <string name="use_metric"> Использование метрических единицах </string>
-    <string name="be_anonymous"> Загрузить анонимно </string>
-    <string name="donate"> Пожертвовать данные: Разрешить коммерческое использование </string>
-    <string name="found_sound"> Воспроизведение звука, когда сеть находится в запустить </string>
-    <string name="found_new_sound"> Воспроизведение звука при новой сети в БД </string>
-    <string name="reset_maxid_button"> Нулевой DB маркер </string>
-    <string name="reset_maxid_text"> Последние загрузки маркером: </string>
-    <string name="maxout_maxid_button"> Maxout DB маркер </string>
-    <string name="maxout_maxid_text"> Установить маркер: </string>
-    <string name="connect_button"> Connect </string>
-    <string name="connect_text"> с разрешения оператора сети </string>
-    <string name="csv_run_export_button"> CSV Экспорт запуска </string>
-    <string name="csv_run_export_text"> Экспорт текущего запуска в CSV-файл </string>
-    <string name="kml_run_export_button"> KML Экспорт запуска </string>
-    <string name="kml_run_export_text"> Экспортировать текущую бежать к KML файл </string>
-    <string name="kml_export_button"> KML Экспорт БД </string>
-    <string name="kml_export_text"> экспорт всей БД в KML файл </string>
-    <string name="backup_db_button"> резервную копию базы данных </string>
-    <string name="backup_db_text"> Сделайте резервную копию базы данных </string>
-    <string name="import_observed_button"> Импорт Наблюдаемые </string>
-    <string name="import_observed_text"> Импорт мой наблюдается сетей от Уигл </string>
-    <string name="periodstill_text"> Время между WiFi сканирует 0 миль / ч </string>
-    <string name="period_text"> Время между WiFi сканирует &lt;5 миль / ч </string>
-    <string name="periodfast_text"> Время между WiFi сканирует &gt;5 миль / ч </string>
-    <string name="gps_text"> Время между обновлениями GPS </string>
-    <string name="speak_text"> Время между аудио речи </string>
-    <string name="battery_kill_text"> Выйти на этот уровень батареи </string>
-    <string name="reset_wifi_text"> Решите Wifi застряла </string>
-    <string name="speech_gps"> объявляют об изменениях GPS статус </string>
-    <string name="mute"> Mute </string>
-    <string name="play"> Play </string>
-    <string name="unknown"> неизвестно </string>
-    <string name="sort_text"> параметры Сортировать </string>
-    <string name="listdialog_button"> ОК </string>
-    <string name="cryptodialog_button"> ОК </string>
-    <string name="cryptocanceldialog_button"> Отмена </string>
-    <string name="circle_size_map"> Карта Круги Sized по Кол </string>
-    <string name="speech_button"> Речь Экран настройки>> </string>
-    <string name="speech_text"> Аудио речь будет включать в себя: </string>
-    <string name="speech_run"> сетей для бега </string>
-    <string name="speech_new_wifi"> Новый WiFi к БД </string>
-    <string name="speech_new_cell"> Новые вышек сотовой связи к БД </string>
-    <string name="speech_queue"> очереди размера, если> 0 </string>
-    <string name="speech_miles"> миль в беге </string>
-    <string name="speech_time"> Текущее время </string>
-    <string name="speech_battery"> уровень заряда аккумулятора процент </string>
-    <string name="speech_ssid"> новой сети SSID\'ы </string>
-    <string name="query_address"> адрес (например: Чикаго, Иллинойс): </string>
-    <string name="dbresult_activity_name"> Wigle Wi-Fi - Результаты поиска </string>
-    <string name="query_ssid"> SSID (например: Linksys) (SQL символы: %,_): </string>
-    <string name="search_button"> запросов локальной БД</string>
-    <string name="reset_button"> Поля Сбросить </string>
-    <string name="list_query_clear"> четких аргументов Query </string>
-    <string name="crypto_security"> безопасности </string>
-    <string name="crypto_strength"> Мощность сигнала </string>
-    <string name="crypto_password"> пароль </string>
-    <string name="crypto_show_password"> Показать пароль. </string>
-    <string name="filter_show_ssid"> Показать SSID\'ов соответствия (регулярное выражение): </string>
-    <string name="filter_not_regex"> Показать что Безразлично\'т матча выше регулярное выражение </string>
-    <string name="filter_show_open"> Показать Открыть </string>
-    <string name="filter_show_cell"> Показать сотовый </string>
-    <string name="filter_show_wep"> Показать WEP </string>
-    <string name="filter_show_wpa"> Показать WPA </string>
-    <string name="filter_enabled"> включен фильтр </string>
-    <string name="list_waiting_gps"> (Ожидание GPS строка синхронизации ..)</string>
-    <string name="list_scanning_off"> (сканирования выключена) </string>
-    <string name="list_short_lat"> Lat: </string>
-    <string name="list_short_lon"> Lon: </string>
-    <string name="list_short_sats"> Сац: </string>
-    <string name="list_short_alt"> Alt: </string>
-    <string name="list_status_default"> (статус) </string>
-    <string name="list_speed"> Скорость: </string>
-    <string name="list_upload"> Загрузить файл </string>
-    <string name="network_signal"> сигнал: </string>
-    <string name="network_type"> Тип: </string>
-    <string name="network_firstseen"> Впервые замечен: </string>
-    <string name="network_capa">Возможности : </string>
-    <string name="network_channel"> канала: </string>
-    <string name="network_observations">Наблюдения : </string>
-    <string name="network_querying"> (querying. ..)</string>
-    <string name="setting_show_password"> Показать пароль </string>
-    <string name="setting_db_marker"> DB Маркер (там, где начинаются от добавления): </string>
-    <string name="setting_high_up"> Высокая загружены №: </string>
-    <string name="setting_zero_out"> обнулить маркер DB? </string>
-    <string name="setting_max_id"> Макс загрузить ID: </string>
-    <string name="setting_max_start"> Макс ID при запуске: </string>
-    <string name="setting_max_out"> Макс из БД маркер? </string>
-    <string name="setting_tie_wifi"> Tie к Wi-fi Scan Период </string>
-    <string name="no_tts"> нет текста в речь двигателя </string>
-    <string name="sec"> сек </string>
-    <string name="min"> мин </string>
-    <string name="off"> Off </string>
-    <string name="on"> На </string>
-    <string name="nonstop"> Nonstop </string>
-    <string name="tab_list"> List </string>
-    <string name="tab_map"> Карта </string>
-    <string name="tab_dash"> панели инструментов </string>
-    <string name="tab_data"> Данные </string>
-    <string name="ok"> ОК </string>
-    <string name="cancel"> Отмена </string>
-    <string name="dash_scan_off"> (сканирования выключена) </string>
-    <string name="dash_new_wifi"> Новый Wi-Fi </string>
-    <string name="dash_vis_nets"> Видимый сетей: </string>
-    <string name="dash_new_upload"> Сети Нью С Добавлено: </string>
-    <string name="dash_new_cells"> новые башни Cell: </string>
-    <string name="dash_dist_run"> Беговая дистанция: </string>
-    <string name="dash_dist_total"> Всего Dist. </string>
-    <string name="dash_dist_prev"> предыдущего запуска: </string>
-    <string name="dash_db_queue"> DB Очередь: </string>
-    <string name="dash_db_nets"> DB сетей: </string>
-    <string name="dash_db_locs"> DB Место проживания: </string>
-    <string name="dash_no_loc"> нет Откуда </string>
-    <string name="dash_short_loc"> Loc: </string>
-    <string name="km_short"> км </string>
-    <string name="mi_short"> ми </string>
-    <string name="miles"> миль </string>
-    <string name="m_short"> т </string>
-    <string name="meters"> метров </string>
-    <string name="ft_short"> футов </string>
-    <string name="feet"> ноги </string>
-    <string name="kmph"> км в час </string>
-    <string name="mph"> миль / ч </string>
-    <string name="ms_short"> мс </string>
-    <string name="na"> N/A </string>
-    <string name="run"> запуска </string>
-    <string name="new_word"> New </string>
-    <string name="db"> DB </string>
-    <string name="scanned_in"> сканируется в </string>
-    <string name="sort_title"> параметры Сортировать </string>
-    <string name="sort_spin_label"> Сортировать список по: </string>
-    <string name="channel"> канала </string>
-    <string name="crypto"> Crypto </string>
-    <string name="found_time"> нашел время </string>
-    <string name="signal"> сигнала </string>
-    <string name="ssid"> SSID </string>
-    <string name="best_results"> Для достижения наилучших результатов отключено "Уведомление о сети" в "Wireless и сетями" -> "Настройки Wi-Fi" </string>
-    <string name="turn_on_wifi"> Включение Wi-Fi </string>
-    <string name="no_gps_device"> Нет GPS обнаружен в устройстве! </string>
-    <string name="turn_on_gps"> Пожалуйста, включите GPS </string>
-    <string name="address"> Адрес </string>
-    <string name="no_address_found"> Нет геокодированных адрес найдено </string>
-    <string name="problem_with_field"> Проблема с полем </string>
-    <string name="turning_wifi_off"> Включение WiFi отступить </string>
-    <string name="lost_location"> Забыли Расположение </string>
-    <string name="have_location"> Теперь есть место от </string>
-    <string name="wifi_jammed"> WiFi появляется застряла, выключив, а затем, WiFi. </string>
-    <string name="battery_at"> Уровень заряда батареи в </string>
-    <string name="battery_postfix"> процентов, закрытие Уигл Wi-Fi </string>
-    <string name="scan"> сканирования </string>
-    <string name="menu_exit"> Выход </string>
-    <string name="menu_settings"> Настройки </string>
-    <string name="menu_error_report"> об ошибке </string>
-    <string name="menu_return"> Возвращение </string>
-    <string name="menu_sort"> параметры Сортировать </string>
-    <string name="menu_ssid_filter"> Этикетка SSID фильтр </string>
-    <string name="menu_screen_sleep"> Давайте экрана сна </string>
-    <string name="menu_screen_wake"> Держите экран </string>
-    <string name="menu_labels_off"> Этикетки Off </string>
-    <string name="menu_labels_on"> этикетки на </string>
-    <string name="menu_zoom_in"> Увеличить </string>
-    <string name="menu_zoom_out"> Zoom Out </string>
-    <string name="menu_turn_off_lockon"> Выключить Lockon </string>
-    <string name="menu_turn_on_lockon"> Включение Lockon </string>
-    <string name="menu_show_old"> Показать Выполнить &amp; New </string>
-    <string name="menu_show_new"> Показать новые Только </string>
-    <string name="tts_no_gps_fix"> не исправить GPS </string>
-    <string name="tts_new_wifi"> Новый Wi-Fi </string>
-    <string name="tts_new_cell"> Новая ячейка </string>
-    <string name="tts_queue"> Queue </string>
-    <string name="tts_from"> от </string>
-    <string name="tts_o_clock"> обязаны часы </string>
-    <string name="tts_o"> обязаны </string>
-    <string name="tts_battery"> батареи </string>
-    <string name="tts_percent"> процентов </string>
-    <string name="status_unknown"> неизвестно </string>
-    <string name="status_unknown_error"> Неизвестная ошибка </string>
-    <string name="status_fail"> Ошибка </string>
-    <string name="status_success"> успеха </string>
-    <string name="status_working"> Рабочие ...</string>
-    <string name="status_upload_success"> Загрузить Успешное </string>
-    <string name="status_write_success"> Написать Успешный </string>
-    <string name="status_no_user"> Имя пользователя не установлен </string>
-    <string name="status_no_pass"> Пароль не установил и имя пользователя, а не \'анонимные\'</string>
-    <string name="status_exception"> Exception </string>
-    <string name="status_login_fail"> Войти не удалось, проверьте пароль? </string>
-    <string name="status_uploading"> Загрузка файлов </string>
-    <string name="status_writing"> Запись файлов </string>
-    <string name="status_nothing"> ничего не делать </string>
-    <string name="status_empty"> файла будет пустым </string>
-    <string name="data_export_csv"> Экспорт запустить в файл CSV </string>
-    <string name="data_export_kml_run"> Экспорт запустить в файл KML? </string>
-    <string name="data_export_kml_db"> Экспорт БД в файл KML? </string>
-    <string name="data_backup_db"> Резервное копирование БД на другой файл? </string>
-    <string name="language_text"> Выбранный язык (требуется перезапуск)</string>
-    <string name="auto"> Автоматическая </string>
+  <string name="stats">
+    Отправной
+  </string>
+  <string name="app_name">
+    WiGLE Wi-Fi беспроводных сетей
+  </string>
+  <string name="settings_app_name">
+    WiGLE Wi-Fi - Настройки
+  </string>
+  <string name="mapping_app_name">
+    WiGLE Wi-Fi - Open Street Карта
+  </string>
+  <string name="dashboard_app_name">
+    WiGLE Wi-Fi - Dashboard
+  </string>
+  <string name="error_report_name">
+    Wi-Fi Wi-Fi - Новые ошибке
+  </string>
+  <string name="speech_name">
+    WiGLE Wi-Fi - Выступление Настройки
+  </string>
+  <string name="network_activity_name">
+    Wigle Wi-Fi - сети
+  </string>
+  <string name="data_activity_name">
+    Wigle Wi-Fi - База данных
+  </string>
+  <string name="dbresult_activity_name">
+    Wigle Wi-Fi - Результаты поиска
+  </string>
+  <string name="upload_button">
+    Загрузить на \n WiGLE.net
+  </string>
+  <string name="username">
+    WiGLE Имя пользователя
+  </string>
+  <string name="password">
+    WiGLE Пароль
+  </string>
+  <string name="show_current">
+    Показать текущие сети только
+  </string>
+  <string name="use_metric">
+    Использование метрических единицах
+  </string>
+  <string name="be_anonymous">
+    Загрузить анонимно
+  </string>
+  <string name="donate">
+    Пожертвовать данные: Разрешить коммерческое использование
+  </string>
+  <string name="found_sound">
+    Воспроизведение звука, когда сети найден в беге
+  </string>
+  <string name="found_new_sound">
+    Воспроизведение звука при новой сети в БД
+  </string>
+  <string name="reset_maxid_button">
+    Нулевой DB маркера
+  </string>
+  <string name="reset_maxid_text">
+    Последние загрузки маркера:
+  </string>
+  <string name="maxout_maxid_button">
+    Maxout DB маркера
+  </string>
+  <string name="maxout_maxid_text">
+    Установите маркер:
+  </string>
+  <string name="connect_button">
+    Соединяться
+  </string>
+  <string name="connect_text">
+    с разрешения оператора сети
+  </string>
+  <string name="csv_run_export_button">
+    CSV Экспорт Run
+  </string>
+  <string name="csv_run_export_text">
+    Экспорт текущего запуска в файл CSV
+  </string>
+  <string name="kml_run_export_button">
+    KML Экспорт Run
+  </string>
+  <string name="kml_run_export_text">
+    Экспорт текущего запуска в файл KML
+  </string>
+  <string name="kml_export_button">
+    KML Экспорт БД
+  </string>
+  <string name="kml_export_text">
+    Экспорт всей БД в файл KML
+  </string>
+  <string name="backup_db_button">
+    Резервное копирование баз данных
+  </string>
+  <string name="backup_db_text">
+    Сделайте резервную копию базы данных
+  </string>
+  <string name="import_observed_button">
+    Импорт Наблюдаемые
+  </string>
+  <string name="import_observed_text">
+    Импорт мой наблюдается сетей от WiGLE
+  </string>
+  <string name="periodstill_text">
+    Время между WiFi сканирует 0 миль / ч
+  </string>
+  <string name="period_text">
+    Время между WiFi сканирует &lt;5 миль / ч
+  </string>
+  <string name="periodfast_text">
+    Время между WiFi сканирует&gt; 5 миль / ч
+  </string>
+  <string name="gps_text">
+    Время между обновлениями GPS
+  </string>
+  <string name="speak_text">
+    Время между аудио речи
+  </string>
+  <string name="battery_kill_text">
+    Выйти на этот уровень батареи
+  </string>
+  <string name="reset_wifi_text">
+    Решите Wifi застряла
+  </string>
+  <string name="speech_gps">
+    Анонс изменений GPS статус
+  </string>
+  <string name="mute">
+    Немой
+  </string>
+  <string name="play">
+    Играть
+  </string>
+  <string name="unknown">
+    Неизвестный
+  </string>
+  <string name="sort_text">
+    Параметры сортировки
+  </string>
+  <string name="listdialog_button">
+    ОК
+  </string>
+  <string name="cryptodialog_button">
+    ОК
+  </string>
+  <string name="cryptocanceldialog_button">
+    Отменить
+  </string>
+  <string name="circle_size_map">
+    Карта Круги Sized по Кол
+  </string>
+  <string name="speech_button">
+    Экран Речь Конфигурация&gt;&gt;
+  </string>
+  <string name="speech_text">
+    Аудио речь будет включать в себя:
+  </string>
+  <string name="speech_run">
+    Сетки для запуска
+  </string>
+  <string name="speech_new_wifi">
+    Новый Wi-Fi к БД
+  </string>
+  <string name="speech_new_cell">
+    Новые вышек сотовой к БД
+  </string>
+  <string name="speech_queue">
+    Очередь длинее, если&gt; 0
+  </string>
+  <string name="speech_miles">
+    Майлз в беге
+  </string>
+  <string name="speech_time">
+    Текущее время
+  </string>
+  <string name="speech_battery">
+    Аккумулятор процентный уровень
+  </string>
+  <string name="speech_ssid">
+    Новые сети SSID\'s
+  </string>
+  <string name="query_address">
+    Адрес (например: Чикаго, Иллинойс):
+  </string>
+  <string name="query_ssid">
+    SSID (например: Linksys) (SQL символы: %,_):
+  </string>
+  <string name="search_button">
+    Запросов локальной БД
+  </string>
+  <string name="reset_button">
+    Сброс поля
+  </string>
+  <string name="list_query_clear">
+    Очистить Аргументы запросов
+  </string>
+  <string name="crypto_security">
+    Безопасность
+  </string>
+  <string name="crypto_strength">
+    Мощность сигнала
+  </string>
+  <string name="crypto_password">
+    Пароль
+  </string>
+  <string name="crypto_show_password">
+    Показать пароль.
+  </string>
+  <string name="filter_show_ssid">
+    Показать SSID\'s соответствия (регулярное выражение):
+  </string>
+  <string name="filter_not_regex">
+    Показать, что Безразлично не соответствуют выше регулярного выражения
+  </string>
+  <string name="filter_show_open">
+    Показать Открытое
+  </string>
+  <string name="filter_show_cell">
+    Показать сотовый
+  </string>
+  <string name="filter_show_wep">
+    Показать WEP
+  </string>
+  <string name="filter_show_wpa">
+    Показать WPA
+  </string>
+  <string name="filter_enabled">
+    Включен фильтр
+  </string>
+  <string name="list_waiting_gps">
+    (Ожидание GPS синхронизации ..)
+  </string>
+  <string name="list_scanning_off">
+    (Сканирования выключена)
+  </string>
+  <string name="list_short_lat">
+    Lat:
+  </string>
+  <string name="list_short_lon">
+    Lon:
+  </string>
+  <string name="list_short_sats">
+    Сац:
+  </string>
+  <string name="list_short_alt">
+    Alt:
+  </string>
+  <string name="list_status_default">
+    (Статус)
+  </string>
+  <string name="list_speed">
+    Скорость:
+  </string>
+  <string name="list_upload">
+    Загрузить файл?
+  </string>
+  <string name="network_signal">
+    Сигнал:
+  </string>
+  <string name="network_type">
+    Тип:
+  </string>
+  <string name="network_firstseen">
+    Впервые в списке:
+  </string>
+  <string name="network_capa">
+    Возможности:
+  </string>
+  <string name="network_channel">
+    Канал:
+  </string>
+  <string name="network_observations">
+    Наблюдения:
+  </string>
+  <string name="network_querying">
+    (Querying. ..)
+  </string>
+  <string name="setting_show_password">
+    Показать пароль
+  </string>
+  <string name="setting_db_marker">
+    DB Маркер (там, где начинаются от добавления):
+  </string>
+  <string name="setting_high_up">
+    Высокая загружены №:
+  </string>
+  <string name="setting_zero_out">
+    Нулевой из БД маркер?
+  </string>
+  <string name="setting_max_id">
+    Макс загрузить №:
+  </string>
+  <string name="setting_max_start">
+    Макс ID при запуске:
+  </string>
+  <string name="setting_max_out">
+    Макс из маркера DB?
+  </string>
+  <string name="setting_tie_wifi">
+    Привяжите к Wi-fi Период сканирования
+  </string>
+  <string name="no_tts">
+    Нет текста в речь
+  </string>
+  <string name="sec">
+    сек
+  </string>
+  <string name="min">
+    мин
+  </string>
+  <string name="off">
+    От
+  </string>
+  <string name="on">
+    На
+  </string>
+  <string name="nonstop">
+    Без перерыва
+  </string>
+  <string name="tab_list">
+    Список
+  </string>
+  <string name="tab_map">
+    Карта
+  </string>
+  <string name="tab_dash">
+    Приборная панель
+  </string>
+  <string name="tab_data">
+    Данные
+  </string>
+  <string name="ok">
+    ОК
+  </string>
+  <string name="cancel">
+    Отменить
+  </string>
+  <string name="dash_scan_off">
+    (Сканирования выключена)
+  </string>
+  <string name="dash_new_wifi">
+    Новый Wi-Fi
+  </string>
+  <string name="dash_vis_nets">
+    Видимый сетей:
+  </string>
+  <string name="dash_new_upload">
+    Сети Нью С Загрузить:
+  </string>
+  <string name="dash_new_cells">
+    Новые башни Cell:
+  </string>
+  <string name="dash_dist_run">
+    Беговая дистанция:
+  </string>
+  <string name="dash_dist_total">
+    Всего Dist.:
+  </string>
+  <string name="dash_dist_prev">
+    Предыдущая Run:
+  </string>
+  <string name="dash_db_queue">
+    DB Очередь:
+  </string>
+  <string name="dash_db_nets">
+    DB сетей:
+  </string>
+  <string name="dash_db_locs">
+    DB Место проживания:
+  </string>
+  <string name="dash_no_loc">
+    Нет Откуда!
+  </string>
+  <string name="dash_short_loc">
+    Loc:
+  </string>
+  <string name="km_short">
+    км
+  </string>
+  <string name="mi_short">
+    ми
+  </string>
+  <string name="miles">
+    мили
+  </string>
+  <string name="m_short">
+    метр
+  </string>
+  <string name="meters">
+    метров
+  </string>
+  <string name="ft_short">
+    фут
+  </string>
+  <string name="feet">
+    ноги
+  </string>
+  <string name="kmph">
+    км в час
+  </string>
+  <string name="mph">
+    миль / ч
+  </string>
+  <string name="ms_short">
+    мс
+  </string>
+  <string name="na">
+    N / A
+  </string>
+  <string name="run">
+    Работать
+  </string>
+  <string name="new_word">
+    Новый
+  </string>
+  <string name="db">
+    DB
+  </string>
+  <string name="scanned_in">
+    сканируется в
+  </string>
+  <string name="sort_title">
+    Параметры сортировки
+  </string>
+  <string name="sort_spin_label">
+    Сортировать список по:
+  </string>
+  <string name="channel">
+    Канал
+  </string>
+  <string name="crypto">
+    Крипто-
+  </string>
+  <string name="found_time">
+    Найдено время
+  </string>
+  <string name="signal">
+    Сигнал
+  </string>
+  <string name="ssid">
+    SSID
+  </string>
+  <string name="best_results">
+    Для достижения наилучших результатов отключено &quot;Уведомление о сети&quot; в &quot;Wireless и сетями&quot; -&gt; &quot;Настройки Wi-Fi&quot;
+  </string>
+  <string name="turn_on_wifi">
+    Включение Wi-Fi
+  </string>
+  <string name="no_gps_device">
+    Нет GPS обнаружен в устройстве!
+  </string>
+  <string name="turn_on_gps">
+    Пожалуйста, включите GPS
+  </string>
+  <string name="address">
+    Адрес
+  </string>
+  <string name="no_address_found">
+    Нет геокодированных адрес найден
+  </string>
+  <string name="problem_with_field">
+    Проблема с полем
+  </string>
+  <string name="turning_wifi_off">
+    Включение WiFi отступить
+  </string>
+  <string name="lost_location">
+    Забыли Место
+  </string>
+  <string name="have_location">
+    Сейчас есть места, с
+  </string>
+  <string name="wifi_jammed">
+    Wi-Fi появится застряла, выключив, а затем, WiFi.
+  </string>
+  <string name="battery_at">
+    Уровень заряда батареи в
+  </string>
+  <string name="battery_postfix">
+    процентов, закрытие Wigle Wi-Fi
+  </string>
+  <string name="scan">
+    Сканирование
+  </string>
+  <string name="menu_exit">
+    Выход
+  </string>
+  <string name="menu_settings">
+    Настройки
+  </string>
+  <string name="menu_error_report">
+    Сообщение об ошибках
+  </string>
+  <string name="menu_return">
+    Возвращение
+  </string>
+  <string name="menu_sort">
+    Параметры сортировки
+  </string>
+  <string name="menu_ssid_filter">
+    SSID фильтра этикетки
+  </string>
+  <string name="menu_screen_sleep">
+    Давайте экрана сна
+  </string>
+  <string name="menu_screen_wake">
+    Держите экран
+  </string>
+  <string name="menu_labels_off">
+    Этикетки Off
+  </string>
+  <string name="menu_labels_on">
+    Этикетки на
+  </string>
+  <string name="menu_zoom_in">
+    Увеличить
+  </string>
+  <string name="menu_zoom_out">
+    Уменьшить
+  </string>
+  <string name="menu_turn_off_lockon">
+    Выключить Lockon
+  </string>
+  <string name="menu_turn_on_lockon">
+    Включение Lockon
+  </string>
+  <string name="menu_show_old">
+    Показать Run &amp; Новый
+  </string>
+  <string name="menu_show_new">
+    Показать только новые
+  </string>
+  <string name="tts_no_gps_fix">
+    не исправить GPS
+  </string>
+  <string name="tts_new_wifi">
+    Новый Wi-Fi
+  </string>
+  <string name="tts_new_cell">
+    Новая ячейка
+  </string>
+  <string name="tts_queue">
+    Очередь
+  </string>
+  <string name="tts_from">
+    от
+  </string>
+  <string name="tts_o_clock">
+    обязаны часы
+  </string>
+  <string name="tts_o">
+    задолжать
+  </string>
+  <string name="tts_battery">
+    батарея
+  </string>
+  <string name="tts_percent">
+    процент
+  </string>
+  <string name="status_unknown">
+    Неизвестный
+  </string>
+  <string name="status_unknown_error">
+    Неизвестная ошибка
+  </string>
+  <string name="status_fail">
+    Неудача
+  </string>
+  <string name="status_success">
+    Успех
+  </string>
+  <string name="status_working">
+    Рабочие ...
+  </string>
+  <string name="status_upload_success">
+    Загрузить Успешная
+  </string>
+  <string name="status_write_success">
+    Написать Успешный
+  </string>
+  <string name="status_no_user">
+    Имя пользователя не установлен
+  </string>
+  <string name="status_no_pass">
+    Пароль не установлен и имя пользователя, а не \ &quot;анонимные \ &#39;
+  </string>
+  <string name="status_exception">
+    Исключение
+  </string>
+  <string name="status_login_fail">
+    Войти не удалось, проверьте пароль?
+  </string>
+  <string name="status_uploading">
+    Загрузка файлов
+  </string>
+  <string name="status_writing">
+    Запись файла
+  </string>
+  <string name="status_nothing">
+    Ничего не делать
+  </string>
+  <string name="status_empty">
+    Файл будет пустым
+  </string>
+  <string name="data_export_csv">
+    Экспорт запустить в файл CSV?
+  </string>
+  <string name="data_export_kml_run">
+    Экспорт запустить в файл KML?
+  </string>
+  <string name="data_export_kml_db">
+    Экспорт БД в файл KML?
+  </string>
+  <string name="data_backup_db">
+    Резервное копирование БД на другой файл?
+  </string>
+  <string name="language_en">
+    Английский (англ.)
+  </string>
+  <string name="language_cs">
+    čeština (CS)
+  </string>
+  <string name="language_de">
+    Deutsch (DE)
+  </string>
+  <string name="language_es">
+    español (адреса)
+  </string>
+  <string name="language_fr">
+    Французский (FR)
+  </string>
+  <string name="language_it">
+    Вы здесь: Главная (она)
+  </string>
+  <string name="language_nl">
+    Nederlands (NL)
+  </string>
+  <string name="language_pl">
+    Польский (PL)
+  </string>
+  <string name="language_ru">
+    русский (RU)
+  </string>
+  <string name="language_sv">
+    Svenska (SV)
+  </string>
+  <string name="language_text">
+    Выбранный язык (требуется перезапуск)
+  </string>
+  <string name="auto">
+    Автоматический
+  </string>
 </resources>

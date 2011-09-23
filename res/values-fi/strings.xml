@@ -1,240 +1,240 @@
 <resources>
   <string name="stats">
-    A partir
+    Alkaen
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE Wifi Wardriving
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    WiGLE Wifi - Asetukset
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE Wifi - Open Street Map
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE Wifi - Dashboard
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    Wifi Wifi - Viimeisin virheraportti
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE Wifi - Puhe-asetukset
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle Wifi - Network
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle Wifi - tietokanta
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle Wifi - Hakutulokset
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    Upload \n WiGLE.net
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE Käyttäjätunnus
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE Salasana
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    Näytä Nykyiset verkot vain
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    Käytä metrisiä mittoja
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    Lähetä anonyymisti
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    Lahjoita tiedot: Salli kaupallinen käyttö
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    Soita ääni verkko löytyy run
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    Soita ääni uuden verkon DB
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    Zero DB merkki
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    Uusin ladata merkki:
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout DB merkki
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    Set-merkki:
   </string>
   <string name="connect_button">
-    Conectar
+    Liitä
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    luvalla operaattorilta
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSV Export Run
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    Vie nykyinen juosta CSV-tiedostoon
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML Export Run
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    Vie nykyinen juosta KML tiedosto
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML Export DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    Vie koko DB KML tiedosto
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    Backup tietokannan
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    Tee tietokannasta varmuuskopio
   </string>
   <string name="import_observed_button">
-    Importación observados
+    Tuo Havaittu
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    Tuo minun havaittu verkkoja WiGLE
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    Aika wifi skannaa 0 mph
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    Aika wifi skannaa &lt;5 mph
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    Aika wifi skannaa&gt; 5 mph
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    Aika välillä GPS päivitykset
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    Aika välillä audio puheen
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    Poistu tällä Akun
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    Päätä Wifi on juuttunut
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    Ilmoita GPS tila muuttuu
   </string>
   <string name="mute">
-    Mudo
+    Mykkä
   </string>
   <string name="play">
-    Juego
+    Pelaa
   </string>
   <string name="unknown">
-    Desconocido
+    Tuntematon
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    Lajittele Options
   </string>
   <string name="listdialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    Peruuta
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    Kartta Circles kokoluokituksen Määrä
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    Puhe mukautusikkuna&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    Audio puhe kuuluu:
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    Verkot run
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    Uusi wifi DB
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    Uusi solu tornit DB
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    Jonon koko, jos&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    Miles KÄY
   </string>
   <string name="speech_time">
-    La hora actual
+    Nykyinen aika
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    Akun taso prosentteina
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    New Network SSID\'s
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    Osoite (ex: Chicago, IL):
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID (ex: Linksys) (SQL yleismerkkejä: %,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    Query Paikallinen DB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    Nollaa kentät
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    Tyhjennä Query argumentit
   </string>
   <string name="crypto_security">
-    Seguridad
+    Turvallisuus
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    Signaalin voimakkuus
   </string>
   <string name="crypto_password">
-    Contraseña
+    Salasana
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    Näytä salasana.
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    Näytä SSID\'s Matching (regex):
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    Näytä mitä ei ottelun yllä säännöllistä lauseketta
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    Näytä Avaa
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    Show Cell
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    Näytä WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    Näytä WPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    Suodattimen käyttöön
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    (Odotetaan GPS Sync ..)
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    (Skannaus sammutettu)
   </string>
   <string name="list_short_lat">
     Lat:
@@ -243,160 +243,160 @@
     Lon:
   </string>
   <string name="list_short_sats">
-    SAT:
+    SATS:
   </string>
   <string name="list_short_alt">
     Alt:
   </string>
   <string name="list_status_default">
-    (Estado)
+    (Status)
   </string>
   <string name="list_speed">
-    Velocidad:
+    Nopeus:
   </string>
   <string name="list_upload">
-    Subir archivos?
+    Lataa tiedosto?
   </string>
   <string name="network_signal">
-    De la señal:
+    Signal:
   </string>
   <string name="network_type">
-    Tipo:
+    Tyyppi:
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    Ensihavainnon:
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    Ominaisuudet:
   </string>
   <string name="network_channel">
-    Canal:
+    Kanava:
   </string>
   <string name="network_observations">
-    Observaciones:
+    Havainnot:
   </string>
   <string name="network_querying">
     (Querying. ..)
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    Näytä salasana
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DB Marker (jossa kuvat alkavat):
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    Korkein ladataan id:
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    Zero ulos DB merkki?
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    Max upload id:
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    Max id käynnistettäessä:
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    Max ulos DB merkki?
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    Tie WiFi Scan Period
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    Ei Teksti puheeksi-moottori
   </string>
   <string name="sec">
-    segundo
+    SEK
   </string>
   <string name="min">
     min
   </string>
   <string name="off">
-    De
+    Pois
   </string>
   <string name="on">
-    En
+    Päällä
   </string>
   <string name="nonstop">
-    Sin parar
+    Tauotta
   </string>
   <string name="tab_list">
     Lista
   </string>
   <string name="tab_map">
-    Mapa
+    Kartta
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    Kojelauta
   </string>
   <string name="tab_data">
-    Datos
+    Tiedot
   </string>
   <string name="ok">
-    Aceptar
+    OK
   </string>
   <string name="cancel">
-    Cancelar
+    Peruuta
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    (Skannaus sammutettu)
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    Uusi Wifi
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    Näkyvä Nets:
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    Uusi Nets Koska Tallennettu:
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    Uusi Cell Towers:
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    Run Matka:
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    Yhteensä Dist.:
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    Edellinen Run:
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DB jonoon:
   </string>
   <string name="dash_db_nets">
     DB Nets:
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DB Toimipaikat:
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    Ei Location!
   </string>
   <string name="dash_short_loc">
     Loc:
   </string>
   <string name="km_short">
-    kilometros
+    km
   </string>
   <string name="mi_short">
     mi
   </string>
   <string name="miles">
-    millas
+    kilometriä
   </string>
   <string name="m_short">
     m
   </string>
   <string name="meters">
-    metros
+    metriä
   </string>
   <string name="ft_short">
     ft
   </string>
   <string name="feet">
-    pies
+    jalat
   </string>
   <string name="kmph">
     kmph
@@ -411,217 +411,217 @@
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    Suorita
   </string>
   <string name="new_word">
-    Nuevo
+    Uusi
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    skannataan
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    Lajittele Options
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    Lajittele lista:
   </string>
   <string name="channel">
-    Canal
+    Kanava
   </string>
   <string name="crypto">
     Crypto
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    Löytyi aika
   </string>
   <string name="signal">
-    Señal
+    Signaali
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    Parhaan tuloksen unset &quot;Network ilmoitus&quot; in &quot;Langattomat ja verkot&quot; -&gt; &quot;Wi-Fi-asetukset&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    Käynnistäminen WiFi
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    Ei GPS havaittu laite!
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    Ota päälle GPS
   </string>
   <string name="address">
-    Dirección
+    Osoite
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    Ei maakooditettu osoite löytyy
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    Ongelma kenttä
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    Turning WiFi perääntymään
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    Kadonnut Paikkakunta
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    Nyt on sijainti
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    WiFi näyttää juuttuneen, sammuttamalla, ja sitten, WiFi.
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    Akun taso
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    prosenttia, sammuttaa Wigle Wifi
   </string>
   <string name="scan">
-    Escanear
+    Skannata
   </string>
   <string name="menu_exit">
-    Salida
+    Poistuminen
   </string>
   <string name="menu_settings">
-    Configuración
+    Asetukset
   </string>
   <string name="menu_error_report">
-    Informar de error
+    Virheraportti
   </string>
   <string name="menu_return">
-    Volver
+    Palata
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    Lajittele Options
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSID Label Filter
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    Let Screen Sleep
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    Pidä Screen
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    Labels Off
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    Tarroja
   </string>
   <string name="menu_zoom_in">
     Zoom In
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    Loitonna
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    Sammuta Lockon
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    Ota käyttöön Lockon
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    Näytä Run &amp; New
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    Näytä New vain
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    GPS-paikannus ei
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    Uusi wifi
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    Uusi solu
   </string>
   <string name="tts_queue">
-    Cola
+    Jono
   </string>
   <string name="tts_from">
-    de
+    alkaen
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    velkaa kello
   </string>
   <string name="tts_o">
-    deber
+    velkaa
   </string>
   <string name="tts_battery">
-    batería
+    akku
   </string>
   <string name="tts_percent">
-    por ciento
+    prosenttia
   </string>
   <string name="status_unknown">
-    Desconocido
+    Tuntematon
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    Tuntematon virhe
   </string>
   <string name="status_fail">
-    Fallar
+    Epäonnistua
   </string>
   <string name="status_success">
-    Éxito
+    Menestys
   </string>
   <string name="status_working">
-    De trabajo ...
+    Työskentely ...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    Lataus onnistui
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    Kirjoita Onnistunut
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    Käyttäjätunnus ei asetettu
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    Salasanaa ei ole asetettu ja käyttäjätunnuksella ei \ &quot;nimettömän \&quot;
   </string>
   <string name="status_exception">
-    Excepción
+    Poikkeus
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    Kirjautuminen epäonnistui, tarkista salasana?
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    Ladataan tiedostoa
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    Kirjoitettaessa tiedostoa
   </string>
   <string name="status_nothing">
-    No hacer nada
+    Tekemättä mitään
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    Tiedosto olisi tyhjä
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    Vie juoksemaan CSV-tiedoston?
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    Vie juoksemaan KML-tiedoston?
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    Vie DB KML-tiedoston?
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    Backup DB eri tiedostoon?
   </string>
   <string name="language_en">
-    Inglés (en)
+    Englanti (en)
   </string>
   <string name="language_cs">
-    čeština (cs)
+    Čeština (CS)
   </string>
   <string name="language_de">
     Deutsch (de)
@@ -633,7 +633,7 @@
     français (fr)
   </string>
   <string name="language_it">
-    Italiano (it)
+    italiano (it)
   </string>
   <string name="language_nl">
     Nederlands (nl)
@@ -645,12 +645,12 @@
     русский (ru)
   </string>
   <string name="language_sv">
-    svenska (sv)
+    Svenska (sv)
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    Valittu kieli (vaatii uudelleenkäynnistyksen)
   </string>
   <string name="auto">
-    Automático
+    Automaattinen
   </string>
 </resources>

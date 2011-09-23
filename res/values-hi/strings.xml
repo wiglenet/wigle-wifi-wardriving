@@ -1,656 +1,656 @@
 <resources>
   <string name="stats">
-    A partir
+    शुरू
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE Wifi Wardriving
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    WiGLE Wifi - सेटिंग्स
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE Wifi - ओपन स्ट्रीट मानचित्र
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE Wifi - डैशबोर्ड
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    वाईफ़ाई वाईफ़ाई सबसे हाल ही में त्रुटि की रिपोर्ट -
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE Wifi - भाषण सेटिंग्स
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle वाईफ़ाई - नेटवर्क
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle Wifi - धन्यवाद
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle Wifi खोज परिणाम -
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    WiGLE.net \n अपलोड करें
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE प्रयोक्तानाम
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE पासवर्ड
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    दिखाएँ मौजूदा नेटवर्क केवल
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    मीट्रिक इकाइयों का प्रयोग करें
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    गुमनाम रूप से अपलोड
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    दान डेटा: वाणिज्यिक उपयोग की अनुमति दें
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    चलायें ध्वनि जब नेटवर्क चलाने में पाया
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    ध्वनि चलायें जब DB में नए नेटवर्क
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    शून्य DB मार्कर
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    Latest अपलोड मार्कर:
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout DB मार्कर
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    मार्कर सेट:
   </string>
   <string name="connect_button">
-    Conectar
+    कनेक्ट
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    नेटवर्क ऑपरेटर की अनुमति के साथ
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    सीएसवी निर्यात भागो
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    CSV फ़ाइल के लिए वर्तमान रन निर्यात
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML निर्यात भागो
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    KML फ़ाइल के लिए वर्तमान रन निर्यात
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML निर्यात DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    KML फ़ाइल को पूरे DB निर्यात
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    बैकअप धन्यवाद
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    एक डेटाबेस बैकअप बनाओ
   </string>
   <string name="import_observed_button">
-    Importación observados
+    आयात मनाया
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    WiGLE से मेरी मनाया नेटवर्क आयात
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    वाईफ़ाई के बीच समय 0 मील प्रति स्कैन
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    वाईफ़ाई स्कैन के बीच समय &lt;5 मील प्रति घंटा
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    वाईफ़ाई स्कैन के बीच समय&gt; 5 मील प्रति घंटा
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    जीपीएस अद्यतन के बीच समय
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    ऑडियो भाषण के बीच में समय
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    इस बैटरी स्तर पर बाहर निकलें
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    तय Wifi जाम
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    जीपीएस स्थिति परिवर्तन की घोषणा
   </string>
   <string name="mute">
-    Mudo
+    मूक
   </string>
   <string name="play">
-    Juego
+    खेल
   </string>
   <string name="unknown">
-    Desconocido
+    अज्ञात
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    सॉर्ट विकल्प
   </string>
   <string name="listdialog_button">
-    Aceptar
+    ठीक है
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    ठीक है
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    रद्द करें
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    नक्शा मात्रा द्वारा आकार सर्किलों
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    भाषण विन्यास स्क्रीन&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    ऑडियो भाषण शामिल होंगे:
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    चलाने के लिए जाल
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    नई DB के लिए वाईफ़ाई
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    DB के लिए नई सेल टावरों
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    कतार आकार अगर&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    समय में मील
   </string>
   <string name="speech_time">
-    La hora actual
+    वर्तमान समय
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    बैटरी स्तर प्रतिशत
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    नई नेटवर्क SSID\'s
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    पता (पूर्व: शिकागो, आईएल):
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID (पूर्व: Linksys) (एसक्यूएल वाइल्डकार्ड: %,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    क्वेरी स्थानीय DB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    रीसेट फील्ड्स
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    साफ़ प्रश्न तर्क
   </string>
   <string name="crypto_security">
-    Seguridad
+    सुरक्षा
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    संकेत संख्या
   </string>
   <string name="crypto_password">
-    Contraseña
+    पासवर्ड
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    पासवर्ड दिखाएँ.
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    दिखाएँ SSID\'s मिलान (regex):
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    दिखाएँ नहीं होता क्या नियमित अभिव्यक्ति से ऊपर मैच
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    खोलें दिखाएँ
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    सेल दिखाएँ
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    दिखाएँ WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    दिखाएँ डबल्यु पी ए
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    फ़िल्टर सक्रिय
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    (जीपीएस सिंक के लिए प्रतीक्षा कर रहा है ..)
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    (स्कैनिंग बंद कर दिया)
   </string>
   <string name="list_short_lat">
-    Lat:
+    अक्षां:
   </string>
   <string name="list_short_lon">
-    Lon:
+    लंदन:
   </string>
   <string name="list_short_sats">
-    SAT:
+    SATs:
   </string>
   <string name="list_short_alt">
-    Alt:
+    ऑल्ट:
   </string>
   <string name="list_status_default">
-    (Estado)
+    (स्थिति)
   </string>
   <string name="list_speed">
-    Velocidad:
+    स्पीड:
   </string>
   <string name="list_upload">
-    Subir archivos?
+    फ़ाइल अपलोड करें?
   </string>
   <string name="network_signal">
-    De la señal:
+    सिग्नल:
   </string>
   <string name="network_type">
-    Tipo:
+    प्रकार:
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    पहले देखा है:
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    क्षमताओं:
   </string>
   <string name="network_channel">
-    Canal:
+    चैनल:
   </string>
   <string name="network_observations">
-    Observaciones:
+    टिप्पणियों:
   </string>
   <string name="network_querying">
     (Querying. ..)
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    पासवर्ड दिखाएँ
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    डीबी मार्कर (अपलोड जहां से शुरू):
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    उच्चतम अपलोड आईडी:
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    DB मार्कर बाहर शून्य?
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    अधिकतम अपलोड आईडी:
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    स्टार्टअप पर अधिकतम आईडी:
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    डीबी मार्कर बाहर अधिकतम?
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    Wifi स्कैन अवधि के लिए टाई
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    कोई इंजन पाठ - भाषण
   </string>
   <string name="sec">
-    segundo
+    सेकंड
   </string>
   <string name="min">
-    min
+    मिनट
   </string>
   <string name="off">
-    De
+    बंद
   </string>
   <string name="on">
-    En
+    पर
   </string>
   <string name="nonstop">
-    Sin parar
+    निरंतर
   </string>
   <string name="tab_list">
-    Lista
+    सूची
   </string>
   <string name="tab_map">
-    Mapa
+    नक्शा
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    डैशबोर्ड
   </string>
   <string name="tab_data">
-    Datos
+    डेटा
   </string>
   <string name="ok">
-    Aceptar
+    ठीक है
   </string>
   <string name="cancel">
-    Cancelar
+    रद्द करें
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    (स्कैनिंग बंद कर दिया)
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    नई Wifi
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    दर्शनीय जाल:
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    अपलोड के बाद से नई जाल:
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    नई सेल टावर्स:
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    दूरी भागो:
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    जिला कुल.
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    पिछला चलाएँ:
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    डीबी कतार:
   </string>
   <string name="dash_db_nets">
-    DB Nets:
+    डीबी जाल
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    डीबी स्थान:
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    नहीं स्थान!
   </string>
   <string name="dash_short_loc">
-    Loc:
+    नियंत्रण रेखा:
   </string>
   <string name="km_short">
-    kilometros
+    मी
   </string>
   <string name="mi_short">
-    mi
+    मील
   </string>
   <string name="miles">
-    millas
+    मील
   </string>
   <string name="m_short">
-    m
+    मीटर
   </string>
   <string name="meters">
-    metros
+    मीटर
   </string>
   <string name="ft_short">
-    ft
+    फुट
   </string>
   <string name="feet">
-    pies
+    पैर
   </string>
   <string name="kmph">
-    kmph
+    किमी प्रति घंटे
   </string>
   <string name="mph">
-    mph
+    मील प्रति घंटा
   </string>
   <string name="ms_short">
-    ms
+    एमएस
   </string>
   <string name="na">
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    चलाना
   </string>
   <string name="new_word">
-    Nuevo
+    नया
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    में स्कैन
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    सॉर्ट विकल्प
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    Sort By सूची:
   </string>
   <string name="channel">
-    Canal
+    चैनल
   </string>
   <string name="crypto">
-    Crypto
+    क्रिप्टोप्लग
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    मिला समय
   </string>
   <string name="signal">
-    Señal
+    संकेत
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    सर्वोत्तम परिणामों के लिए, &quot;unset वायरलेस और नेटवर्क&quot; में &quot;नेटवर्क अधिसूचना&quot; -&gt; &quot;WI-Fi सेटिंग्स&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    वाईफ़ाई पर बदल
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    No जीपीएस डिवाइस में पाया!
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    जीपीएस पर बारी
   </string>
   <string name="address">
-    Dirección
+    पता
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    नहीं भूकूटित पाया पता
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    क्षेत्र के साथ समस्या
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    वाईफ़ाई वापस बंद
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    खोया स्थान
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    अब से स्थान है
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    वाईफ़ाई जाम दिखाई देता है, बंद, और वाईफाई, पर तब.
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    बैटरी स्तर पर
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    प्रतिशत नीचे Wigle Wifi बंद
   </string>
   <string name="scan">
-    Escanear
+    स्कैन
   </string>
   <string name="menu_exit">
-    Salida
+    निकास
   </string>
   <string name="menu_settings">
-    Configuración
+    सेटिंग्स
   </string>
   <string name="menu_error_report">
-    Informar de error
+    त्रुटि रिपोर्ट
   </string>
   <string name="menu_return">
-    Volver
+    वापसी
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    सॉर्ट विकल्प
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSID लेबल फ़िल्टर
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    चलो स्क्रीन नींद
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    पर स्क्रीन रखें
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    के बाहर लेबल
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    में लेबल
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    ज़ूमइन
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    ज़ूमआउट
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    ऑफ Lockon मुड़ें
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    Lockon में मुड़ें
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    भागो और नई दिखाएँ
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    दिखाएँ नई केवल
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    कोई जीपीएस तय
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    नई वाईफ़ाई
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    नई सेल
   </string>
   <string name="tts_queue">
-    Cola
+    पंक्ति
   </string>
   <string name="tts_from">
-    de
+    से
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    घड़ी कर्ज़दार
   </string>
   <string name="tts_o">
-    deber
+    कर्ज़दार
   </string>
   <string name="tts_battery">
-    batería
+    बैटरी
   </string>
   <string name="tts_percent">
-    por ciento
+    प्रतिशत
   </string>
   <string name="status_unknown">
-    Desconocido
+    अज्ञात
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    अज्ञात त्रुटि
   </string>
   <string name="status_fail">
-    Fallar
+    असफल
   </string>
   <string name="status_success">
-    Éxito
+    सफलता
   </string>
   <string name="status_working">
-    De trabajo ...
+    कार्य ...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    सफल अपलोड
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    सफल लिखें
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    सेट नहीं उपयोगकर्ता नाम
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    पासवर्ड सेट उपयोगकर्ता नाम \'अनाम\' नहीं \ और नहीं
   </string>
   <string name="status_exception">
-    Excepción
+    अपवाद
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    लॉगिन विफल, पासवर्ड की जाँच करें?
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    अपलोड फ़ाइल
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    फ़ाइल लेखन
   </string>
   <string name="status_nothing">
-    No hacer nada
+    कुछ नहीं कर रही
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    फ़ाइल खाली हो जाएगा
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    CSV फ़ाइल को चलाने के लिए निर्यात?
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    KML फ़ाइल को चलाने के लिए निर्यात?
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    KML फ़ाइल DB निर्यात?
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    अलग फाइल करने के लिए DB बैकअप है?
   </string>
   <string name="language_en">
-    Inglés (en)
+    अंग्रेजी (एन)
   </string>
   <string name="language_cs">
-    čeština (cs)
+    Čeština (सीएस)
   </string>
   <string name="language_de">
-    Deutsch (de)
+    Deutsch (डे)
   </string>
   <string name="language_es">
-    español (es)
+    español (तों)
   </string>
   <string name="language_fr">
     français (fr)
   </string>
   <string name="language_it">
-    Italiano (it)
+    Italiano (यह)
   </string>
   <string name="language_nl">
     Nederlands (nl)
   </string>
   <string name="language_pl">
-    polski (pl)
+    Polski (pl)
   </string>
   <string name="language_ru">
-    русский (ru)
+    русский (आरयू)
   </string>
   <string name="language_sv">
     svenska (sv)
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    चयनित भाषा (की आवश्यकता है को पुनरारंभ करें)
   </string>
   <string name="auto">
-    Automático
+    स्वचालित
   </string>
 </resources>

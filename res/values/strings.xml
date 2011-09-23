@@ -216,6 +216,15 @@
     <string name="language_pl">polski (pl)</string>
     <string name="language_ru">русский (ru)</string>
     <string name="language_sv">svenska (sv)</string>     
+    <string name="language_pt">português (pt)</string>     
+    <string name="language_da">dansk (da)</string>     
+    <string name="language_ja">日本語 (ja)</string>     
+    <string name="language_fi">suomi (fi)</string>     
+    <string name="language_hi">हिन्दी (hi)</string>     
+    <string name="language_ko">한국어 (ko)</string>     
+    <string name="language_no">norsk (no)</string>     
+    <string name="language_iw">עברית (iw)</string>     
+    <string name="language_zh">中文（繁體）(zh)</string>     
     <string name="language_text">Selected language (requires restart)</string>
     <string name="auto">Automatic</string>                  
 </resources>

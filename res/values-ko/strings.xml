@@ -1,402 +1,402 @@
 <resources>
   <string name="stats">
-    A partir
+    시작
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE 와이파이 Wardriving
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    WiGLE 와이파이 - 설정
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE 와이파이 - 영업 거리지도
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE 와이파이 - 대시보드
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    와이파이 와이파이 - 대부분의 최근 오류 보고서
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE 와이파이 - 음성 설정
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle 와이파이 - 네트워크
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle 와이파이 - 데이터베이스
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle 와이파이 - 검색 결과
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    WiGLE.net \n 업로드
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE 사용자 이름
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE 비밀 번호
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    현재 네트워크를 표시 전용
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    측정 단위를 사용
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    익명 업로드
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    기부 데이터 상업적인 사용을 허용
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    네트워크에서 실행 발견했을 때 소리 재생
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    사운드를 재생할 때 DB에 새로운 네트워크
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    제로 DB 마커
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    최근 업로드 마커 :
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout DB 마커
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    에 마커를 설정합니다 :
   </string>
   <string name="connect_button">
-    Conectar
+    연결
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    네트워크 운영자의 승인
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSV 내보내기 실행
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    CSV 파일에 현재 실행 내보내기
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML 내보내기 실행
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    KML 파일을 현재 실행 내보내기
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML 수출 DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    KML 파일에 전체 DB를 내보내기
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    백업 데이터베이스
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    데이터베이스 백업 만들기
   </string>
   <string name="import_observed_button">
-    Importación observados
+    가져오기 관찰된
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    WiGLE에서 내 관찰 네트워크를 가져오기
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    무선랜 사이의 시간 0mph을 스캔
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    WiFi를 스캔 사이의 시간 &lt;5mph
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    WiFi를 스캔 사이의 시간&gt; 5mph
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    GPS 업데이트 사이의 시간
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    오디오 음성 사이의 시간
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    이 배터리 수준에서 출구
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    와이파이가 열려요 결정
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    GPS 상태 변경을 발표
   </string>
   <string name="mute">
-    Mudo
+    음소거
   </string>
   <string name="play">
-    Juego
+    놀이
   </string>
   <string name="unknown">
-    Desconocido
+    알 수없는
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    정렬 옵션
   </string>
   <string name="listdialog_button">
-    Aceptar
+    확인
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    확인
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    취소
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    수량으로 크기 맵 동아리
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    음성 구성 화면&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    오디오 연설은 포함됩니다 :
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    실행을위한 그물
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    DB에 새로운 와이파이
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    DB에 새로운 셀 타워
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    대기열 크기가있다면&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    실행 마일
   </string>
   <string name="speech_time">
-    La hora actual
+    현재 시간
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    배터리 수준 비율
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    새로운 네트워크 SSID\'s 의
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    주소 (예 : 시카고, IL) :
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID (예 : 링크시스) (SQL 와일드 카드 : %,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    검색어 로컬 DB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    재설정 필드
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    삭제 쿼리 인수
   </string>
   <string name="crypto_security">
-    Seguridad
+    보안
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    신호 강도
   </string>
   <string name="crypto_password">
-    Contraseña
+    암호
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    비밀 번호를 표시합니다.
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    보기 SSID\'s 의 매칭 (정규식) :
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    표시 어떤 어쩌려 구 는 정규 표현식과 일치하는 위
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    오픈보기
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    셀 표시
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    보기 WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    보기 WPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    필터 사용
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    (GPS 동기화 대기 ...)
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    (검색이 꺼져)
   </string>
   <string name="list_short_lat">
-    Lat:
+    위도 :
   </string>
   <string name="list_short_lon">
-    Lon:
+    경도 :
   </string>
   <string name="list_short_sats">
-    SAT:
+    수능 점수 :
   </string>
   <string name="list_short_alt">
-    Alt:
+    ALT :
   </string>
   <string name="list_status_default">
-    (Estado)
+    (상태)
   </string>
   <string name="list_speed">
-    Velocidad:
+    속도 :
   </string>
   <string name="list_upload">
-    Subir archivos?
+    파일 업로드?
   </string>
   <string name="network_signal">
-    De la señal:
+    신호 :
   </string>
   <string name="network_type">
-    Tipo:
+    유형 :
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    먼저 보면 :
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    기능 :
   </string>
   <string name="network_channel">
-    Canal:
+    채널 :
   </string>
   <string name="network_observations">
-    Observaciones:
+    관찰 :
   </string>
   <string name="network_querying">
-    (Querying. ..)
+    (querying. ...)
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    비밀 번호를 표시
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DB 마커 (여기서 업로드부터 시작) :
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    최고 업로드 ID :
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    DB 마커 아웃 제로?
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    최대 업로드 ID :
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    시작시 최대 ID :
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    DB 마커 아웃 맥스?
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    와이파이 스캔 기간에 타이
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    아무 텍스트 음성 변환 엔진 없습니다
   </string>
   <string name="sec">
-    segundo
+    초
   </string>
   <string name="min">
-    min
+    분
   </string>
   <string name="off">
-    De
+    끄기
   </string>
   <string name="on">
-    En
+    에
   </string>
   <string name="nonstop">
-    Sin parar
+    논스톱
   </string>
   <string name="tab_list">
-    Lista
+    목록
   </string>
   <string name="tab_map">
-    Mapa
+    지도
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    계기판
   </string>
   <string name="tab_data">
-    Datos
+    데이터
   </string>
   <string name="ok">
-    Aceptar
+    확인
   </string>
   <string name="cancel">
-    Cancelar
+    취소
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    (검색이 꺼져)
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    새로운 와이파이
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    표시 네츠 :
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    업로드 이후 새로운 네츠 :
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    새로운 셀 타워 :
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    거리를 실행합니다 :
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    Dist 총. :
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    이전이 실행 :
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DB 대기열 :
   </string>
   <string name="dash_db_nets">
-    DB Nets:
+    DB 네츠 :
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DB 위치 :
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    없음 위치!
   </string>
   <string name="dash_short_loc">
-    Loc:
+    LOC :
   </string>
   <string name="km_short">
-    kilometros
+    km
   </string>
   <string name="mi_short">
-    mi
+    미
   </string>
   <string name="miles">
-    millas
+    마일
   </string>
   <string name="m_short">
     m
   </string>
   <string name="meters">
-    metros
+    m
   </string>
   <string name="ft_short">
-    ft
+    피트
   </string>
   <string name="feet">
-    pies
+    피트
   </string>
   <string name="kmph">
     kmph
@@ -405,252 +405,252 @@
     mph
   </string>
   <string name="ms_short">
-    ms
+    MS
   </string>
   <string name="na">
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    실행
   </string>
   <string name="new_word">
-    Nuevo
+    새로운
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    에서 스캔
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    정렬 옵션
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    정렬 목록 :
   </string>
   <string name="channel">
-    Canal
+    채널
   </string>
   <string name="crypto">
-    Crypto
+    암호화
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    발견 시간
   </string>
   <string name="signal">
-    Señal
+    신호
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    최상의 결과를 들어, &quot;무선 및 네트워크&quot;의 해제 &quot;네트워크 알​​림&quot;-&gt; &quot;와이파이 설정&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    무선랜 켜기
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    아무 GPS 장치에 감지되지!
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    GPS를 켜주십시오
   </string>
   <string name="address">
-    Dirección
+    주소
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    찾지 코드 화됨 주소 없음
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    필드 문제
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    와이파이를 다시 해제
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    분실 장소
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    지금부터 위치를
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    와이파이는 와이파이에 다음 해제하고, 고장이 나타납니다.
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    에서 배터리 수준
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    퍼센트 Wigle 와이파이를 종료
   </string>
   <string name="scan">
-    Escanear
+    스캔
   </string>
   <string name="menu_exit">
-    Salida
+    출구
   </string>
   <string name="menu_settings">
-    Configuración
+    설정
   </string>
   <string name="menu_error_report">
-    Informar de error
+    오류 신고
   </string>
   <string name="menu_return">
-    Volver
+    반환
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    정렬 옵션
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSID 레이블 필터
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    화면 자게
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    화면 계속
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    오프 라벨
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    레이블
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    확대
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    축소
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    Lockon 끄기
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    Lockon 켭니다
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    실행 및 새보기
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    표시 새 전용
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    더 GPS 수정 없음
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    새로운 와이파이
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    새 휴대폰
   </string>
   <string name="tts_queue">
-    Cola
+    대기열
   </string>
   <string name="tts_from">
-    de
+    부터
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    시계 신세
   </string>
   <string name="tts_o">
-    deber
+    신세
   </string>
   <string name="tts_battery">
-    batería
+    배터리
   </string>
   <string name="tts_percent">
-    por ciento
+    퍼센트
   </string>
   <string name="status_unknown">
-    Desconocido
+    알 수없는
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    알 수없는 오류
   </string>
   <string name="status_fail">
-    Fallar
+    실패
   </string>
   <string name="status_success">
-    Éxito
+    성공
   </string>
   <string name="status_working">
-    De trabajo ...
+    작업 ...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    성공을 업로드
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    성공 쓰기
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    사용자 이름 설정하지
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    비밀 번호 설정되지 및 사용자 이름없는 \'익명\'
   </string>
   <string name="status_exception">
-    Excepción
+    예외
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    로그인 실패 비밀 번호를 확인?
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    업로드 파일
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    파일 쓰기
   </string>
   <string name="status_nothing">
-    No hacer nada
+    아무것도하지
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    파일은 비어 될
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    CSV 파일을 실행 수출?
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    KML 파일을 실행 수출?
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    KML 파일을 DB를 내보내기?
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    다른 파일에 대한 DB를 백업?
   </string>
   <string name="language_en">
-    Inglés (en)
+    영어 (en)
   </string>
   <string name="language_cs">
-    čeština (cs)
+    čeština (CS)
   </string>
   <string name="language_de">
-    Deutsch (de)
+    Deutsch (DE)
   </string>
   <string name="language_es">
-    español (es)
+    español (ES)
   </string>
   <string name="language_fr">
-    français (fr)
+    프랑스어 (FR)
   </string>
   <string name="language_it">
-    Italiano (it)
+    이탈리아어 (IT)
   </string>
   <string name="language_nl">
-    Nederlands (nl)
+    Nederlands (NL)
   </string>
   <string name="language_pl">
-    polski (pl)
+    폴란드 (PL)
   </string>
   <string name="language_ru">
-    русский (ru)
+    русский (RU)
   </string>
   <string name="language_sv">
-    svenska (sv)
+    svenska (SV)
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    선택된 언어 (다시 시작해야 함)
   </string>
   <string name="auto">
-    Automático
+    자동
   </string>
 </resources>

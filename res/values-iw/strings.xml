@@ -1,408 +1,408 @@
 <resources>
   <string name="stats">
-    A partir
+    החל
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE Wifi Wardriving
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    WiGLE Wifi - הגדרות
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE Wifi - רחוב פתח מפה
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE Wifi - Dashboard
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    Wifi Wifi - דוח שגיאות אחרונות
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE Wifi - הגדרות דיבור
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle Wifi - רשת
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle Wifi - Database
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle Wifi - תוצאות חיפוש
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    טען WiGLE.net
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE שם משתמש
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE סיסמה
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    הצג רשתות הנוכחי בלבד
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    השתמש ביחידות מטריות
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    טען בעילום שם
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    תרום נתונים: אפשר שימוש מסחרי
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    השמע צליל כאשר הרשת נמצא בטווח
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    השמע צליל כאשר הרשת החדשה DB
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    אפס DB סמן
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    אחרון להעלות את הסמן:
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout DB סמן
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    הגדר סמן ל:
   </string>
   <string name="connect_button">
-    Conectar
+    לחבר
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    עם אישור של מפעיל הרשת
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSV יצוא הפעלה
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    ייצוא לרוץ הנוכחית קובץ CSV
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML ייצוא הפעלה
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    ייצוא לרוץ הנוכחי לקובץ KML
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML ייצוא DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    ייצוא DB כולו לקובץ KML
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    גיבוי מסד נתונים
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    בצע גיבוי מסד הנתונים
   </string>
   <string name="import_observed_button">
-    Importación observados
+    ייבוא ​​נצפה
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    ייבוא ​​רשתות נצפתה שלי WiGLE
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    זמן בין סריקות wifi 0 קמ&quot;ש
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    זמן בין סריקות wifi &lt;5 קמ&quot;ש
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    זמן בין סריקות wifi&gt; 5 קמ&quot;ש
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    הזמן בין עדכוני ה-GPS
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    זמן בין דיבור אודיו
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    יציאה ברמה זו סוללה
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    החלט Wifi נתקע
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    הכרז על מצב השינויים GPS
   </string>
   <string name="mute">
-    Mudo
+    להשתיק
   </string>
   <string name="play">
-    Juego
+    משחק
   </string>
   <string name="unknown">
-    Desconocido
+    לא ידוע
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    אפשרויות מיון
   </string>
   <string name="listdialog_button">
-    Aceptar
+    בסדר
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    בסדר
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    לבטל
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    מפת עיגולים בגודל של כמות
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    תצורת דיבור מסך&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    נאום אודיו יכלול:
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    הנטס לריצת
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    חדש wifi ל DB
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    תא מגדלים חדשים DB
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    תור גודל אם&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    מיילס בטווח
   </string>
   <string name="speech_time">
-    La hora actual
+    זמן נוכחי
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    רמת סוללה אחוז
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    חדש ברשת SSID\'s
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    כתובת (לשעבר: שיקגו, אילינוי):
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID (לשעבר: Linksys) (SQL בתווים כלליים: %,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    DB מקומי Query
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    איפוס שדות
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    שאילתה טיעונים נקה
   </string>
   <string name="crypto_security">
-    Seguridad
+    בטחון
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    עוצמת האות
   </string>
   <string name="crypto_password">
-    Contraseña
+    סיסמה
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    הצג סיסמה.
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    הצג SSID\'s התאמה (RegEx):
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    הצג מה לא מסוגל להתאים מעל ביטוי רגיל
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    הצג פתיחת
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    הצג Cell
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    הצג ב-WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    הצג ב-WPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    סנן מאופשר
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    (מחכים GPS סנכרון ..)
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    (סריקה מבוטלת)
   </string>
   <string name="list_short_lat">
-    Lat:
+    קווי רוחב:
   </string>
   <string name="list_short_lon">
-    Lon:
+    לון:
   </string>
   <string name="list_short_sats">
-    SAT:
+    פסיכומטרי:
   </string>
   <string name="list_short_alt">
     Alt:
   </string>
   <string name="list_status_default">
-    (Estado)
+    (מעמד)
   </string>
   <string name="list_speed">
-    Velocidad:
+    מהירות:
   </string>
   <string name="list_upload">
-    Subir archivos?
+    העלאת קובץ?
   </string>
   <string name="network_signal">
-    De la señal:
+    אותות:
   </string>
   <string name="network_type">
-    Tipo:
+    סוג:
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    במבט ראשון:
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    יכולות:
   </string>
   <string name="network_channel">
-    Canal:
+    ערוץ:
   </string>
   <string name="network_observations">
-    Observaciones:
+    תוכן:
   </string>
   <string name="network_querying">
     (Querying. ..)
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    הצג סיסמה
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DB מרקר (שם שנוספו להתחיל):
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    Id נטען גבוהה ביותר:
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    אפס את סמן DB?
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    מקס להעלות id:
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    מקס id בעת האתחול:
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    מקס החוצה סמן DB?
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    עניבה כדי תקופת סריקה Wifi
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    אין מנוע טקסט לדיבור
   </string>
   <string name="sec">
-    segundo
+    שניות
   </string>
   <string name="min">
-    min
+    דקות
   </string>
   <string name="off">
-    De
+    כבוי
   </string>
   <string name="on">
-    En
+    על
   </string>
   <string name="nonstop">
-    Sin parar
+    ללא הפסק
   </string>
   <string name="tab_list">
-    Lista
+    רשימה
   </string>
   <string name="tab_map">
-    Mapa
+    מפה
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    לוח מחוונים
   </string>
   <string name="tab_data">
-    Datos
+    נתונים
   </string>
   <string name="ok">
-    Aceptar
+    בסדר
   </string>
   <string name="cancel">
-    Cancelar
+    לבטל
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    (סריקה מבוטלת)
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    חדש Wifi
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    Visible נטס:
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    הנטס בניו מאז טען:
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    תא מגדלי חדש:
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    הפעל מרחק:
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    סך Dist.:
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    הקודם הפעלה:
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DB תור:
   </string>
   <string name="dash_db_nets">
-    DB Nets:
+    DB נטס:
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DB מיקומים:
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    לא מיקום!
   </string>
   <string name="dash_short_loc">
-    Loc:
+    לוק:
   </string>
   <string name="km_short">
-    kilometros
+    ק&quot;מ
   </string>
   <string name="mi_short">
-    mi
+    מי
   </string>
   <string name="miles">
-    millas
+    מייל
   </string>
   <string name="m_short">
-    m
+    מ
   </string>
   <string name="meters">
-    metros
+    מטר
   </string>
   <string name="ft_short">
-    ft
+    רגל
   </string>
   <string name="feet">
-    pies
+    מטר
   </string>
   <string name="kmph">
     kmph
   </string>
   <string name="mph">
-    mph
+    קמ&quot;ש
   </string>
   <string name="ms_short">
     ms
@@ -411,246 +411,246 @@
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    לרוץ
   </string>
   <string name="new_word">
-    Nuevo
+    חדש
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    סריקת
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    אפשרויות מיון
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    סייג לפי:
   </string>
   <string name="channel">
-    Canal
+    ערוץ
   </string>
   <string name="crypto">
     Crypto
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    מצא זמן
   </string>
   <string name="signal">
-    Señal
+    אות
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    לקבלת התוצאות הטובות ביותר, unset &quot;דיווח רשת&quot; ב &quot;&amp; Wireless רשתות&quot; -&gt; &quot;Wi-Fi הגדרות&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    הפעלת WiFi
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    GPS לא זוהה במכשיר!
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    נא להפעיל את ה-GPS
   </string>
   <string name="address">
-    Dirección
+    כתובת
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    לא מצאו כתובת geocoded
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    בעיה עם שדה
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    מפנה את הגב WiFi
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    אבודים מיקום
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    כעת יש מיקום מ
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    WiFi נראה תקוע, כיבוי ולאחר מכן, WiFi.
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    רמת סוללה ב
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    אחוזים, כיבוי Wigle Wifi
   </string>
   <string name="scan">
-    Escanear
+    לסרוק
   </string>
   <string name="menu_exit">
-    Salida
+    יציאה
   </string>
   <string name="menu_settings">
-    Configuración
+    הגדרות
   </string>
   <string name="menu_error_report">
-    Informar de error
+    דווח על שגיאה
   </string>
   <string name="menu_return">
-    Volver
+    לחזור
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    אפשרויות מיון
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    לייבל SSID סינון
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    תנו לישון מסך
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    שמור על המסך
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    תוויות כבוי
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    התוויות על
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    להתמקד
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    זום אאוט
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    כיבוי Lockon
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    הפעל Lockon
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    הצג הפעלה וניו
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    הצג חדשים בלבד
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    אין לתקן gps
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    חדש wifi
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    חדש התא
   </string>
   <string name="tts_queue">
-    Cola
+    תור
   </string>
   <string name="tts_from">
-    de
+    מן
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    חייבים שעון
   </string>
   <string name="tts_o">
-    deber
+    חייבים
   </string>
   <string name="tts_battery">
-    batería
+    סוללה
   </string>
   <string name="tts_percent">
-    por ciento
+    אחוז
   </string>
   <string name="status_unknown">
-    Desconocido
+    לא ידוע
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    שגיאה לא ידועה
   </string>
   <string name="status_fail">
-    Fallar
+    Fail
   </string>
   <string name="status_success">
-    Éxito
+    הצלחה
   </string>
   <string name="status_working">
-    De trabajo ...
+    עובד ...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    העלאה מוצלחת
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    כתוב מוצלחת
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    שם משתמש לא מוגדר
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    סיסמה לא להגדיר את שם המשתמש לא \ &quot;אנונימי \ &#39;
   </string>
   <string name="status_exception">
-    Excepción
+    יוצא מן הכלל
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    הכניסה נכשלה, בדוק את הסיסמה?
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    העלאת קבצים
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    כתיבת קובץ
   </string>
   <string name="status_nothing">
-    No hacer nada
+    עושה שום דבר
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    הקובץ יהיה ריק
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    ייצוא לרוץ קובץ CSV?
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    ייצוא לרוץ קובץ KML?
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    ייצוא DB לקובץ KML?
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    גיבוי DB לקובץ אחר?
   </string>
   <string name="language_en">
-    Inglés (en)
+    אנגלית (en)
   </string>
   <string name="language_cs">
     čeština (cs)
   </string>
   <string name="language_de">
-    Deutsch (de)
+    דויטש (דה)
   </string>
   <string name="language_es">
-    español (es)
+    ספרדית (ES)
   </string>
   <string name="language_fr">
     français (fr)
   </string>
   <string name="language_it">
-    Italiano (it)
+    italiano (IT)
   </string>
   <string name="language_nl">
     Nederlands (nl)
   </string>
   <string name="language_pl">
-    polski (pl)
+    פולנית (pl)
   </string>
   <string name="language_ru">
     русский (ru)
   </string>
   <string name="language_sv">
-    svenska (sv)
+    Svenska (ד&quot;ה)
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    השפה שנבחרה (דורש איתחול)
   </string>
   <string name="auto">
-    Automático
+    אוטומטי
   </string>
 </resources>

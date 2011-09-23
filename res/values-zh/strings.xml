@@ -1,656 +1,656 @@
 <resources>
   <string name="stats">
-    A partir
+    開始
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE無線駕駛攻擊
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    無線網絡 - 設置 WiGLE
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE無線 - 開街地圖
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE無線 - 儀表盤
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    WIFI無線 - 最近的錯誤報告
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE無線網絡 - 語音設置
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle無線網絡 - 網絡
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle無線 - 數據庫
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle無線上網 - 搜索結果
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    上傳到\nWiGLE.net
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE名
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE密碼
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    僅顯示當前的網絡
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    使用公制單位
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    上傳匿名
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    捐贈數據：允許商業用途
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    播放聲音，當網絡在運行中發現
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    在DB的新的網絡時播放聲音
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    零DB的標記
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    最新上傳的標記：
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout數據庫標記
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    設置標記：
   </string>
   <string name="connect_button">
-    Conectar
+    連接
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    與網絡運營商的許可
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSV導出運行
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    當前運行導出到CSV文件
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML的出口運行
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    當前運行導出為 KML文件
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML的出口DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    KML文件導出整個數據庫
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    備份數據庫
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    使數據庫備份
   </string>
   <string name="import_observed_button">
-    Importación observados
+    導入觀察
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    從 WiGLE我觀察到的網絡導入
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    時間之間的無線掃描 0英里
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    WIFI掃描之間的時間 &lt;5英里
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    WIFI掃描之間的時間&gt; 5英里
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    GPS的更新之間的時間
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    時間之間的音頻講話
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    在這種電池電量退出
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    決定無線上網被卡住
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    宣布GPS狀態的變化
   </string>
   <string name="mute">
-    Mudo
+    啞
   </string>
   <string name="play">
-    Juego
+    播放
   </string>
   <string name="unknown">
-    Desconocido
+    未知
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    排序選項
   </string>
   <string name="listdialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    取消
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    地圖界大小由數量
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    語音配置屏幕&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    音頻講話將包括：
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    網運行
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    新的WiFi到DB
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    新的發射塔到DB
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    隊列的大小，如果&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    英里在運行
   </string>
   <string name="speech_time">
-    La hora actual
+    當前時間
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    電池電量百分比
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    新網絡的SSID \“
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    （例如：芝加哥，IL）地址：
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID（例如：Linksys的）（SQL通配符：%,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    查詢的本地DB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    重置字段
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    清除查詢參數
   </string>
   <string name="crypto_security">
-    Seguridad
+    安全
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    信號強度
   </string>
   <string name="crypto_password">
-    Contraseña
+    密碼
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    顯示密碼。
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    顯示的SSID \“匹配（正則表達式）：
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    顯示哪些沒有按\&#39;匹配上述正則表達式
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    顯示打開
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    顯示細胞
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    顯示的WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    顯示的WPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    篩選器已啟用
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    （等待GPS同步）..
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    （掃描轉身的）
   </string>
   <string name="list_short_lat">
-    Lat:
+    緯度：
   </string>
   <string name="list_short_lon">
-    Lon:
+    經度：
   </string>
   <string name="list_short_sats">
-    SAT:
+    SATS：
   </string>
   <string name="list_short_alt">
-    Alt:
+    Alt鍵：
   </string>
   <string name="list_status_default">
-    (Estado)
+    （地位）
   </string>
   <string name="list_speed">
-    Velocidad:
+    速度：
   </string>
   <string name="list_upload">
-    Subir archivos?
+    上傳文件？
   </string>
   <string name="network_signal">
-    De la señal:
+    信號：
   </string>
   <string name="network_type">
-    Tipo:
+    類型：
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    最早上市：
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    功能：
   </string>
   <string name="network_channel">
-    Canal:
+    頻道：
   </string>
   <string name="network_observations">
-    Observaciones:
+    觀察：
   </string>
   <string name="network_querying">
-    (Querying. ..)
+    （querying. ...）
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    顯示密碼
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DB標記（上傳從）：
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    最高上傳 ID：
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    零出DB的標誌嗎？
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    最大上傳 ID：
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    在啟動時的最大ID：
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    最大輸出 DB的標誌呢？
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    領帶 WIFI掃描時間
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    沒有文字語音轉換引擎
   </string>
   <string name="sec">
-    segundo
+    秒
   </string>
   <string name="min">
-    min
+    分
   </string>
   <string name="off">
-    De
+    關
   </string>
   <string name="on">
-    En
+    在
   </string>
   <string name="nonstop">
-    Sin parar
+    馬不停蹄
   </string>
   <string name="tab_list">
-    Lista
+    名單
   </string>
   <string name="tab_map">
-    Mapa
+    地圖
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    儀表盤
   </string>
   <string name="tab_data">
-    Datos
+    數據
   </string>
   <string name="ok">
-    Aceptar
+    OK
   </string>
   <string name="cancel">
-    Cancelar
+    取消
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    （掃描轉身的）
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    新的WiFi
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    可見籃網：
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    由於上傳新籃網：
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    新的發射塔：
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    運行距離：
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    共有區。
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    以前的運行：
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DB的隊列：
   </string>
   <string name="dash_db_nets">
-    DB Nets:
+    DB的籃網：
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DB的位置：
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    沒有位置！
   </string>
   <string name="dash_short_loc">
-    Loc:
+    LOC：
   </string>
   <string name="km_short">
-    kilometros
+    公里
   </string>
   <string name="mi_short">
-    mi
+    MI
   </string>
   <string name="miles">
-    millas
+    英里
   </string>
   <string name="m_short">
-    m
+    米
   </string>
   <string name="meters">
-    metros
+    米
   </string>
   <string name="ft_short">
-    ft
+    英尺
   </string>
   <string name="feet">
-    pies
+    腳
   </string>
   <string name="kmph">
     kmph
   </string>
   <string name="mph">
-    mph
+    英里
   </string>
   <string name="ms_short">
-    ms
+    MS
   </string>
   <string name="na">
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    運行
   </string>
   <string name="new_word">
-    Nuevo
+    新
   </string>
   <string name="db">
-    DB
+    數據庫
   </string>
   <string name="scanned_in">
-    escaneados en
+    掃描
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    排序選項
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    排序列表：
   </string>
   <string name="channel">
-    Canal
+    頻道
   </string>
   <string name="crypto">
-    Crypto
+    加密
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    成立時間
   </string>
   <string name="signal">
-    Señal
+    信號
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    為了達到最佳效果，未設置“網絡通知”中的“無線和網絡” - &gt;“Wi - Fi設置”
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    打開在WiFi
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    無 GPS檢測設備！
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    請關閉在GPS上
   </string>
   <string name="address">
-    Dirección
+    地址
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    沒有地理編碼的地址找到。
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    問題與現場
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    關閉 WIFI回
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    失落的位置
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    現在位置從
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    WIFI出現卡紙，關閉，然後，WIFI。
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    電池水平
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    ％，關停 Wigle無線上網
   </string>
   <string name="scan">
-    Escanear
+    掃描
   </string>
   <string name="menu_exit">
-    Salida
+    退出
   </string>
   <string name="menu_settings">
-    Configuración
+    設置
   </string>
   <string name="menu_error_report">
-    Informar de error
+    錯誤報告
   </string>
   <string name="menu_return">
-    Volver
+    返回
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    排序選項
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSID標籤過濾
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    讓屏幕休眠
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    保持屏幕開
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    關閉標籤
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    在標籤上
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    放大
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    縮小
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    關 Lockon
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    打開在Lockon
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    顯示運行及新
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    只顯示新
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    沒有 GPS定位
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    新的WiFi
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    新的細胞
   </string>
   <string name="tts_queue">
-    Cola
+    隊列中
   </string>
   <string name="tts_from">
-    de
+    從
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    欠時鐘
   </string>
   <string name="tts_o">
-    deber
+    欠
   </string>
   <string name="tts_battery">
-    batería
+    電池
   </string>
   <string name="tts_percent">
-    por ciento
+    ％
   </string>
   <string name="status_unknown">
-    Desconocido
+    未知
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    未知的錯誤
   </string>
   <string name="status_fail">
-    Fallar
+    故障
   </string>
   <string name="status_success">
-    Éxito
+    成功
   </string>
   <string name="status_working">
-    De trabajo ...
+    工作...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    上傳成功
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    寫成功
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    用戶名不設定
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    沒有設置密碼和用戶名\&#39;匿名\“
   </string>
   <string name="status_exception">
-    Excepción
+    異常
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    登錄失敗，請檢查密碼？
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    上傳文件
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    寫入文件
   </string>
   <string name="status_nothing">
-    No hacer nada
+    無為
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    文件將空
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    進出口運行到CSV文件？
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    進出口運行 KML文件？
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    數據庫導出為 KML文件？
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    數據庫備份到不同的文件？
   </string>
   <string name="language_en">
-    Inglés (en)
+    英語（en）
   </string>
   <string name="language_cs">
-    čeština (cs)
+    čeština（CS）
   </string>
   <string name="language_de">
-    Deutsch (de)
+    德語（DE）
   </string>
   <string name="language_es">
-    español (es)
+    西班牙語（ES）
   </string>
   <string name="language_fr">
-    français (fr)
+    法語（FR）
   </string>
   <string name="language_it">
-    Italiano (it)
+    意大利語（IT）
   </string>
   <string name="language_nl">
-    Nederlands (nl)
+    荷蘭（NL）
   </string>
   <string name="language_pl">
-    polski (pl)
+    波蘭語（PL）
   </string>
   <string name="language_ru">
-    русский (ru)
+    русский（茹）
   </string>
   <string name="language_sv">
-    svenska (sv)
+    瑞典語（SV）
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    選擇的語言（需要重新啟動）
   </string>
   <string name="auto">
-    Automático
+    自動
   </string>
 </resources>

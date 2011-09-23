@@ -1,240 +1,240 @@
 <resources>
   <string name="stats">
-    A partir
+    Starte
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    WiGLE Wifi Wardriving
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    WiGLE Wifi - Innstillinger
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    WiGLE Wifi - Open Street Map
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    WiGLE Wifi - Dashboard
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    Wifi Wifi - Nyeste feilrapport
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    WiGLE Wifi - Tale Innstillinger
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    Wigle Wifi - Nettverk
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    Wigle Wifi - Database
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    Wigle Wifi - Søkeresultat
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    Last opp til \n WiGLE.net
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    WiGLE Brukernavn
   </string>
   <string name="password">
-    Wigle Contraseña
+    WiGLE Passord
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    Vis nåværende nettverk
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    Bruk metriske enheter
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    Last opp anonymt
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    Donere data: Tillat kommersiell bruk
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    Spill av lyd når nettverk funnet i løp
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    Spill av lyd når nye nettverk i DB
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    Zero DB markør
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    Siste opplasting markør:
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    Maxout DB markør
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    Sett markør til:
   </string>
   <string name="connect_button">
-    Conectar
+    Koble
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    med tillatelse fra nettoperatøren
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSV Eksport Run
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    Eksporter nåværende kjøre til CSV fil
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KML Export Run
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    Eksporter nåværende kjøre til KML-fil
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KML Export DB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    Eksporter hele DB til KML-fil
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    Backup Database
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    Lag en database backup
   </string>
   <string name="import_observed_button">
-    Importación observados
+    Import Observert
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    Import min observerte nettverk fra WiGLE
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    Tid mellom wifi skanner 0 km / h
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    Tid mellom wifi skanner &lt;5 mph
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    Tid mellom wifi skanner&gt; 5 km / h
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    Tid mellom GPS oppdateringer
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    Tid mellom lyd tale
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    Exit på dette Batterinivå
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    Bestem Wifi sitter fast
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    Kunngjøre GPS endres
   </string>
   <string name="mute">
-    Mudo
+    Mute
   </string>
   <string name="play">
-    Juego
+    Spill
   </string>
   <string name="unknown">
-    Desconocido
+    Ukjent
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    Sorter Alternativer
   </string>
   <string name="listdialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    OK
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    Avbryt
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    Kart Circles Sized av ant
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    Tale Configuration Screen&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    Audio tale vil omfatte:
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    Nets for kjøre
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    Nye wifi til DB
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    Nye celle tårnene til DB
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    Kø størrelse hvis&gt; 0
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    Miles i løp
   </string>
   <string name="speech_time">
-    La hora actual
+    Gjeldende tid
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    Batterinivå prosent
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    Nytt nettverk SSID\'s
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    Adresse (ex: Chicago, IL):
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID (ex: Linksys) (SQL jokertegn: %,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    Query Lokal DB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    Reset Fields
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    Clear Query Argumenter
   </string>
   <string name="crypto_security">
-    Seguridad
+    Sikkerhet
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    Signalstyrke
   </string>
   <string name="crypto_password">
-    Contraseña
+    Passord
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    Vis passord.
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    Vis SSID\'s Matching (regex):
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    Vis hva ikke matche over regulært uttrykk
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    Vis Åpne
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    Vis Cell
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    Vis WEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    Vis WPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    Filter Enabled
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    (Venter på GPS sync ..)
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    (Scanning slått av)
   </string>
   <string name="list_short_lat">
     Lat:
@@ -243,160 +243,160 @@
     Lon:
   </string>
   <string name="list_short_sats">
-    SAT:
+    SATS:
   </string>
   <string name="list_short_alt">
     Alt:
   </string>
   <string name="list_status_default">
-    (Estado)
+    (Status)
   </string>
   <string name="list_speed">
-    Velocidad:
+    Speed:
   </string>
   <string name="list_upload">
-    Subir archivos?
+    Last opp fil?
   </string>
   <string name="network_signal">
-    De la señal:
+    Signal:
   </string>
   <string name="network_type">
-    Tipo:
+    Type:
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    Først sett:
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    Capabilities:
   </string>
   <string name="network_channel">
-    Canal:
+    Channel:
   </string>
   <string name="network_observations">
-    Observaciones:
+    Observasjoner:
   </string>
   <string name="network_querying">
     (Querying. ..)
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    Vis passord
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DB Marker (hvor opplastninger start fra):
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    Høyeste lastet id:
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    Zero ut DB markør?
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    Max opplasting id:
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    Max id ved oppstart:
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    Max out DB markør?
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    Tie til Wifi Scan Periode
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    Nei Tekst-til-tale-motor
   </string>
   <string name="sec">
-    segundo
+    sek
   </string>
   <string name="min">
     min
   </string>
   <string name="off">
-    De
+    Av
   </string>
   <string name="on">
-    En
+    På
   </string>
   <string name="nonstop">
-    Sin parar
+    Nonstop
   </string>
   <string name="tab_list">
-    Lista
+    List
   </string>
   <string name="tab_map">
-    Mapa
+    Kart
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    Dashbord
   </string>
   <string name="tab_data">
-    Datos
+    Data
   </string>
   <string name="ok">
-    Aceptar
+    OK
   </string>
   <string name="cancel">
-    Cancelar
+    Avbryt
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    (Scanning slått av)
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    Nye Wifi
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    Synlig Nets:
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    Nye Nets Siden Upload:
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    Nye Cell Towers:
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    Run Avstand:
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    Total Dist.
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    Forrige Run:
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DB Kø:
   </string>
   <string name="dash_db_nets">
     DB Nets:
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DB Locations:
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    No Sted!
   </string>
   <string name="dash_short_loc">
     Loc:
   </string>
   <string name="km_short">
-    kilometros
+    km
   </string>
   <string name="mi_short">
     mi
   </string>
   <string name="miles">
-    millas
+    miles
   </string>
   <string name="m_short">
     m
   </string>
   <string name="meters">
-    metros
+    meter
   </string>
   <string name="ft_short">
     ft
   </string>
   <string name="feet">
-    pies
+    føtter
   </string>
   <string name="kmph">
     kmph
@@ -411,214 +411,214 @@
     N / A
   </string>
   <string name="run">
-    Ejecutar
+    Run
   </string>
   <string name="new_word">
-    Nuevo
+    Nytt
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    skannes i
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    Sorter Alternativer
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    Sorter listen etter:
   </string>
   <string name="channel">
-    Canal
+    Channel
   </string>
   <string name="crypto">
     Crypto
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    Fant Tid
   </string>
   <string name="signal">
-    Señal
+    Signal
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    For best resultat, unset &quot;Network melding&quot; i &quot;Trådløst nettverk&quot; -&gt; &quot;Wi-Fi-innstillinger&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    Slå på WiFi
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    Ingen GPS oppdaget i enheten!
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    Vennligst slå på GPS
   </string>
   <string name="address">
-    Dirección
+    Adresse
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    Ingen geokodet adresse funnet
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    Problem med felt
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    Slå WiFi back off
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    Mistet Sted
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    Nå har stedet fra
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    WiFi vises fast, slå av, og så videre, WiFi.
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    Battery nivå
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    prosent, nedleggelse Wigle Wifi
   </string>
   <string name="scan">
-    Escanear
+    Scan
   </string>
   <string name="menu_exit">
-    Salida
+    Utgang
   </string>
   <string name="menu_settings">
-    Configuración
+    Innstillinger
   </string>
   <string name="menu_error_report">
-    Informar de error
+    Feilrapport
   </string>
   <string name="menu_return">
-    Volver
+    Return
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    Sorter Alternativer
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSID Etikett Filter
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    La Screen Sleep
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    Hold skjermen på
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    Etiketter Off
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    Etiketter på
   </string>
   <string name="menu_zoom_in">
     Zoom In
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    Zoom ut
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    Turn Off Lockon
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    Turn On Lockon
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    Vis Run &amp; New
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    Vis nye Only
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    Ingen GPS fix
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    Nye wifi
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    Ny celle
   </string>
   <string name="tts_queue">
-    Cola
+    Kø
   </string>
   <string name="tts_from">
-    de
+    fra
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    skylder klokke
   </string>
   <string name="tts_o">
-    deber
+    skylder
   </string>
   <string name="tts_battery">
-    batería
+    batteri
   </string>
   <string name="tts_percent">
-    por ciento
+    prosent
   </string>
   <string name="status_unknown">
-    Desconocido
+    Ukjent
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    Ukjent feil
   </string>
   <string name="status_fail">
-    Fallar
+    Fail
   </string>
   <string name="status_success">
-    Éxito
+    Suksess
   </string>
   <string name="status_working">
-    De trabajo ...
+    Arbeide ...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    Last opp Vellykket
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    Skriv Vellykket
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    Brukernavn ikke satt
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    Passord ikke satt og brukernavn ikke \'anonymous\'
   </string>
   <string name="status_exception">
-    Excepción
+    Unntak
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    Pålogging mislyktes, sjekk passord?
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    Opplasting av fil
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    Skrive File
   </string>
   <string name="status_nothing">
-    No hacer nada
+    Doing Nothing
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    File ville være tom
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    Eksporter kjøre til CSV fil?
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    Eksporter kjøre til KML-fil?
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    Eksporter DB til KML-fil?
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    Backup DB til forskjellige fil?
   </string>
   <string name="language_en">
-    Inglés (en)
+    Engelsk (en)
   </string>
   <string name="language_cs">
     čeština (cs)
@@ -633,13 +633,13 @@
     français (fr)
   </string>
   <string name="language_it">
-    Italiano (it)
+    Italiano (den)
   </string>
   <string name="language_nl">
     Nederlands (nl)
   </string>
   <string name="language_pl">
-    polski (pl)
+    Polski (pl)
   </string>
   <string name="language_ru">
     русский (ru)
@@ -648,9 +648,9 @@
     svenska (sv)
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    Valgte språk (krever omstart)
   </string>
   <string name="auto">
-    Automático
+    Automatisk
   </string>
 </resources>

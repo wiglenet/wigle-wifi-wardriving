@@ -1,656 +1,656 @@
 <resources>
   <string name="stats">
-    A partir
+    起動
   </string>
   <string name="app_name">
-    Wigle Wifi wardriving
+    ワイグルWifiのウォードライビング
   </string>
   <string name="settings_app_name">
-    Wigle Wifi - Configuración
+    ワイグル無線LAN - 設定
   </string>
   <string name="mapping_app_name">
-    Wigle Wifi - Abrir Mapa de calles
+    ワイグル無線LAN - オープンストリートマップ
   </string>
   <string name="dashboard_app_name">
-    Wigle Wifi - Dashboard
+    ワイグル無線LAN - ダッシュボード
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Informe de error de más reciente
+    Wifiの無線LAN - 直近のエラーレポート
   </string>
   <string name="speech_name">
-    Wigle Wifi - Configuración del habla
+    ワイグル無線LAN - 音声の設定
   </string>
   <string name="network_activity_name">
-    Wigle Wifi - Red
+    ワイグル無線LAN - ネットワーク
   </string>
   <string name="data_activity_name">
-    Wigle Wifi - Base de datos
+    ワイグル無線LAN - データベース
   </string>
   <string name="dbresult_activity_name">
-    Wigle Wifi - Resultado de la búsqueda
+    ワイグル無線LAN - 検索結果
   </string>
   <string name="upload_button">
-    Subir a \n WiGLE.net
+    WiGLE.net \n にアップロード
   </string>
   <string name="username">
-    Wigle Nombre de usuario
+    ワイグルユーザー名
   </string>
   <string name="password">
-    Wigle Contraseña
+    ワイグルパスワード
   </string>
   <string name="show_current">
-    Mostrar sólo las redes actuales
+    現在のネットワークのみを表示する
   </string>
   <string name="use_metric">
-    Utilizar unidades métricas
+    メートル単位を使用してください
   </string>
   <string name="be_anonymous">
-    Sube de forma anónima
+    匿名でアップロードする
   </string>
   <string name="donate">
-    Donar los datos: Se permite el uso comercial
+    データを寄付：商用利用を許可する
   </string>
   <string name="found_sound">
-    Reproducir un sonido cuando la red se encuentran en ejecución
+    ネットワークが実行で検出されたときに音を再生する
   </string>
   <string name="found_new_sound">
-    Reproducir un sonido cuando la nueva red de DB
+    サウンドを再生するときに、DBの新しいネットワーク
   </string>
   <string name="reset_maxid_button">
-    Cero DB marcador
+    ゼロDBのマーカー
   </string>
   <string name="reset_maxid_text">
-    Última subida marcador:
+    最新アップロードマーカー：
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcador
+    MAXOUT DBマーカー
   </string>
   <string name="maxout_maxid_text">
-    Establecer marcador a:
+    にマーカーを設定します。
   </string>
   <string name="connect_button">
-    Conectar
+    接続
   </string>
   <string name="connect_text">
-    con el permiso de operador de red
+    ネットワークオペレータの許可を得て
   </string>
   <string name="csv_run_export_button">
-    CSV Exportación de ejecución
+    CSVエクスポートの実行
   </string>
   <string name="csv_run_export_text">
-    Exportación de ejecución actual en un archivo CSV
+    CSVファイルへの現在の実行をエクスポートする
   </string>
   <string name="kml_run_export_button">
-    KML de exportación de ejecución
+    KMLエクスポートファイル名を指定して実行
   </string>
   <string name="kml_run_export_text">
-    Exportación de ejecución actual en un archivo KML
+    KMLファイルへの現在の実行をエクスポートする
   </string>
   <string name="kml_export_button">
-    KML Exportación DB
+    KMLエクスポートDB
   </string>
   <string name="kml_export_text">
-    Exportación DB entera archivo KML
+    KMLファイルへの全体のDBをエクスポートする
   </string>
   <string name="backup_db_button">
-    Base de datos de copia de seguridad
+    データベースのバックアップ
   </string>
   <string name="backup_db_text">
-    Haga una copia de seguridad de base de datos
+    データベースのバックアップを作成
   </string>
   <string name="import_observed_button">
-    Importación observados
+    観測されたインポート
   </string>
   <string name="import_observed_text">
-    Importar mis redes observado desde Wigle
+    ワイグルから私の観測ネットワークをインポート
   </string>
   <string name="periodstill_text">
-    Tiempo entre las exploraciones wifi 0 mph
+    無線LANとの間の時間は、0 mphにスキャンし
   </string>
   <string name="period_text">
-    Tiempo entre las exploraciones wifi &lt;5 mph
+    無線LANのスキャンの間隔&lt;毎時5マイル
   </string>
   <string name="periodfast_text">
-    Tiempo entre las exploraciones wifi&gt; 5 mph
+    無線LANのスキャンの間隔&gt;毎時5マイル
   </string>
   <string name="gps_text">
-    Tiempo entre las actualizaciones del GPS
+    GPSの更新間隔
   </string>
   <string name="speak_text">
-    Tiempo entre la grabación de audio
+    オーディオスピーチの間に時間
   </string>
   <string name="battery_kill_text">
-    Tome la salida de este nivel de la batería
+    このバッテリーレベルで終了します
   </string>
   <string name="reset_wifi_text">
-    Decidir Wifi está atascado
+    無線LANが詰まっているかを決定
   </string>
   <string name="speech_gps">
-    Anuncian cambios de estado de GPS
+    GPSのステータスの変更を発表
   </string>
   <string name="mute">
-    Mudo
+    ミュート
   </string>
   <string name="play">
-    Juego
+    再生
   </string>
   <string name="unknown">
-    Desconocido
+    未知
   </string>
   <string name="sort_text">
-    Opciones de ordenación
+    ソートオプション
   </string>
   <string name="listdialog_button">
-    Aceptar
+    [OK]
   </string>
   <string name="cryptodialog_button">
-    Aceptar
+    [OK]
   </string>
   <string name="cryptocanceldialog_button">
-    Cancelar
+    キャンセル
   </string>
   <string name="circle_size_map">
-    Mapa del tamaño de los círculos Cantidad
+    数量によってサイズのマップサークル
   </string>
   <string name="speech_button">
-    Habla de la pantalla de configuración&gt;&gt;
+    音声設定画面&gt;&gt;
   </string>
   <string name="speech_text">
-    Grabación de audio se incluyen:
+    オーディオ音声が含まれます：
   </string>
   <string name="speech_run">
-    Redes para ejecutar
+    実行のためのネット
   </string>
   <string name="speech_new_wifi">
-    Nueva wifi a DB
+    DBへの新しい無線LAN
   </string>
   <string name="speech_new_cell">
-    Nuevas torres celulares para DB
+    DBへの新しい携帯電話のアンテナ塔
   </string>
   <string name="speech_queue">
-    Tamaño de la cola, si&gt; 0
+    &gt; 0ならば、キューのサイズ
   </string>
   <string name="speech_miles">
-    Miles de ejecutar
+    ランのマイル
   </string>
   <string name="speech_time">
-    La hora actual
+    現在の時間
   </string>
   <string name="speech_battery">
-    Porcentaje de nivel de batería
+    バッテリーレベルの割合
   </string>
   <string name="speech_ssid">
-    Nueva red SSID\'s
+    新しいネットワークSSID \&#39;sの
   </string>
   <string name="query_address">
-    Dirección (por ejemplo: Chicago, IL):
+    アドレス（例：シカゴ、イリノイ州）：
   </string>
   <string name="query_ssid">
-    SSID (por ejemplo: Linksys) (comodines SQL: %,_):
+    SSID（例：Linksysの）（SQLワイルドカード：%,_):
   </string>
   <string name="search_button">
-    DB Local consulta
+    クエリのローカルDB
   </string>
   <string name="reset_button">
-    Campos Restablecer
+    フィールドをリセットする
   </string>
   <string name="list_query_clear">
-    Argumentos claros de consulta
+    明確なクエリー引数
   </string>
   <string name="crypto_security">
-    Seguridad
+    セキュリティ
   </string>
   <string name="crypto_strength">
-    Intensidad de la señal
+    信号強度
   </string>
   <string name="crypto_password">
-    Contraseña
+    パスワード
   </string>
   <string name="crypto_show_password">
-    Mostrar contraseña.
+    パスワードを表示します。
   </string>
   <string name="filter_show_ssid">
-    Mostrar SSID\'s de Contrapartida (regex):
+    ショーSSID \&#39;sのマッチング（正規表現）：
   </string>
   <string name="filter_not_regex">
-    Mostrar lo que no encuentro por encima de expresión regular
+    表示どのようなdoesnの\&#39;tは正規表現の上に一致
   </string>
   <string name="filter_show_open">
-    Mostrar Abrir
+    オープン表示
   </string>
   <string name="filter_show_cell">
-    Mostrar celular
+    セルを表示する
   </string>
   <string name="filter_show_wep">
-    Mostrar WEP
+    ショーWEP
   </string>
   <string name="filter_show_wpa">
-    Mostrar WPA
+    ショーWPA
   </string>
   <string name="filter_enabled">
-    Filtro Activado
+    フィルタが有効
   </string>
   <string name="list_waiting_gps">
-    (A la espera de sincronización GPS ..)
+    （GPS同期を待って..）
   </string>
   <string name="list_scanning_off">
-    (Scanning apagado)
+    （スキャンはオフになって）
   </string>
   <string name="list_short_lat">
-    Lat:
+    緯度：
   </string>
   <string name="list_short_lon">
-    Lon:
+    LON：
   </string>
   <string name="list_short_sats">
-    SAT:
+    サッツ：
   </string>
   <string name="list_short_alt">
-    Alt:
+    Altキー：
   </string>
   <string name="list_status_default">
-    (Estado)
+    （ステータス）
   </string>
   <string name="list_speed">
-    Velocidad:
+    速度：
   </string>
   <string name="list_upload">
-    Subir archivos?
+    ファイルをアップロード？
   </string>
   <string name="network_signal">
-    De la señal:
+    信号：
   </string>
   <string name="network_type">
-    Tipo:
+    種類：
   </string>
   <string name="network_firstseen">
-    Visto por primera vez:
+    最初に見た：
   </string>
   <string name="network_capa">
-    Las capacidades de:
+    機能：
   </string>
   <string name="network_channel">
-    Canal:
+    チャンネル：
   </string>
   <string name="network_observations">
-    Observaciones:
+    観測：
   </string>
   <string name="network_querying">
-    (Querying. ..)
+    （querying. ..）
   </string>
   <string name="setting_show_password">
-    Mostrar Contraseña
+    パスワードを表示する
   </string>
   <string name="setting_db_marker">
-    DB marcador (en archivos de inicio):
+    DBマーカー（ここで、アップロードから開始）：
   </string>
   <string name="setting_high_up">
-    Identificación del más alto de publicación:
+    最高アップロードID：
   </string>
   <string name="setting_zero_out">
-    Marcador de cero DB?
+    DBのマーカーをゼロ？
   </string>
   <string name="setting_max_id">
-    Max subir id:
+    最大アップロードID：
   </string>
   <string name="setting_max_start">
-    Max Identificación en el arranque:
+    起動時の最大ID：
   </string>
   <string name="setting_max_out">
-    Max marcador a base de datos?
+    DBのマーカーのうち最大？
   </string>
   <string name="setting_tie_wifi">
-    Vínculo con Wifi período de exploración
+    Wifiのスキャン周期に接続します
   </string>
   <string name="no_tts">
-    Ningún motor de Text-to-Speech
+    いいえText - To - Speechエンジンなし
   </string>
   <string name="sec">
-    segundo
+    秒
   </string>
   <string name="min">
-    min
+    分
   </string>
   <string name="off">
-    De
+    オフ
   </string>
   <string name="on">
-    En
+    の
   </string>
   <string name="nonstop">
-    Sin parar
+    ノンストップ
   </string>
   <string name="tab_list">
-    Lista
+    一覧
   </string>
   <string name="tab_map">
-    Mapa
+    地図
   </string>
   <string name="tab_dash">
-    Tablero de instrumentos
+    ダッシュボード
   </string>
   <string name="tab_data">
-    Datos
+    データ
   </string>
   <string name="ok">
-    Aceptar
+    [OK]
   </string>
   <string name="cancel">
-    Cancelar
+    キャンセル
   </string>
   <string name="dash_scan_off">
-    (Scanning apagado)
+    （スキャンはオフになって）
   </string>
   <string name="dash_new_wifi">
-    Nueva Wifi
+    新しい無線LAN
   </string>
   <string name="dash_vis_nets">
-    Redes visibles:
+    目に見えるネット：
   </string>
   <string name="dash_new_upload">
-    Nets de Nueva Desde Subir:
+    アップロード以降に新しいネッツ。
   </string>
   <string name="dash_new_cells">
-    Torres nuevo celular:
+    新しい携帯電話のアンテナ塔：
   </string>
   <string name="dash_dist_run">
-    La distancia recorrida:
+    距離を実行します。
   </string>
   <string name="dash_dist_total">
-    Dist. total.:
+    ディストリ合計。：
   </string>
   <string name="dash_dist_prev">
-    Anterior Run:
+    前回の実行：
   </string>
   <string name="dash_db_queue">
-    DB de cola:
+    DBキュー：
   </string>
   <string name="dash_db_nets">
-    DB Nets:
+    DBネット：
   </string>
   <string name="dash_db_locs">
-    DB ubicaciones:
+    DBの場所：
   </string>
   <string name="dash_no_loc">
-    No hay Lugar!
+    場所がない！
   </string>
   <string name="dash_short_loc">
-    Loc:
+    のLoc：
   </string>
   <string name="km_short">
-    kilometros
+    キロ
   </string>
   <string name="mi_short">
-    mi
+    マイル
   </string>
   <string name="miles">
-    millas
+    マイル
   </string>
   <string name="m_short">
-    m
+    メートル
   </string>
   <string name="meters">
-    metros
+    メートル
   </string>
   <string name="ft_short">
-    ft
+    フィート
   </string>
   <string name="feet">
-    pies
+    足
   </string>
   <string name="kmph">
-    kmph
+    時速
   </string>
   <string name="mph">
-    mph
+    時速
   </string>
   <string name="ms_short">
-    ms
+    ミリ秒
   </string>
   <string name="na">
-    N / A
+    N /
   </string>
   <string name="run">
-    Ejecutar
+    実行して
   </string>
   <string name="new_word">
-    Nuevo
+    新
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    escaneados en
+    でスキャン
   </string>
   <string name="sort_title">
-    Opciones de ordenación
+    ソートオプション
   </string>
   <string name="sort_spin_label">
-    Lista Ordenar por:
+    [並べ替えのリスト：
   </string>
   <string name="channel">
-    Canal
+    チャンネル
   </string>
   <string name="crypto">
-    Crypto
+    暗号化
   </string>
   <string name="found_time">
-    Tiempo encontrado
+    が見つかりました時刻
   </string>
   <string name="signal">
-    Señal
+    シグナル
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    Para mejores resultados, sin establecer &quot;Notificación de red&quot; en &quot;Conexiones inalámbricas y redes&quot; -&gt; &quot;configuración Wi-Fi&quot;
+    最良の結果を得るためには、&quot;ワイヤレス＆ネットワーク&quot;で設定されていない&quot;ネットワークの通知&quot; - &gt;&quot;Wi - Fi設定&quot;
   </string>
   <string name="turn_on_wifi">
-    Encendido de WiFi
+    無線LANをオンにする
   </string>
   <string name="no_gps_device">
-    No GPS detectado en el dispositivo!
+    いいえのGPSデバイスで検出されない！
   </string>
   <string name="turn_on_gps">
-    Por favor, a su vez en el GPS
+    GPSをオンにしてください
   </string>
   <string name="address">
-    Dirección
+    住所
   </string>
   <string name="no_address_found">
-    No hay dirección geocodificada encontrado
+    見つかりませんでしたジオコードされた住所なし
   </string>
   <string name="problem_with_field">
-    Problema con el campo
+    フィールドに問題がある
   </string>
   <string name="turning_wifi_off">
-    Volviendo WiFi apagado
+    無線LANのバックをオフにする
   </string>
   <string name="lost_location">
-    Ubicación perdido
+    失われた場所
   </string>
   <string name="have_location">
-    Ahora tiene lugar a partir de
+    今から場所を持っている
   </string>
   <string name="wifi_jammed">
-    WiFi parece atascado, apagar, y luego, WiFi.
+    WiFiは、WiFiのをOFF→ON、と、詰まりが表示されます。
   </string>
   <string name="battery_at">
-    Nivel de la batería en
+    でバッテリーレベル
   </string>
   <string name="battery_postfix">
-    por ciento, cerrando Wigle Wifi
+    パーセント、ワイグル無線LANをシャットダウンする
   </string>
   <string name="scan">
-    Escanear
+    スキャン
   </string>
   <string name="menu_exit">
-    Salida
+    出口
   </string>
   <string name="menu_settings">
-    Configuración
+    設定
   </string>
   <string name="menu_error_report">
-    Informar de error
+    エラーレポート
   </string>
   <string name="menu_return">
-    Volver
+    戻る
   </string>
   <string name="menu_sort">
-    Opciones de ordenación
+    ソートオプション
   </string>
   <string name="menu_ssid_filter">
-    Filtro de etiquetas SSID
+    SSIDラベルフィルタ
   </string>
   <string name="menu_screen_sleep">
-    Dejar que el sueño de la pantalla
+    画面のスリープをしましょう
   </string>
   <string name="menu_screen_wake">
-    Tenga en pantalla
+    画面をキープオン
   </string>
   <string name="menu_labels_off">
-    Etiquetas Off
+    オフラベル
   </string>
   <string name="menu_labels_on">
-    En las etiquetas
+    上のラベル
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    ズームイン
   </string>
   <string name="menu_zoom_out">
-    Alejar
+    ズームアウトする
   </string>
   <string name="menu_turn_off_lockon">
-    Apagar Lockon
+    ロックオンをオフにする
   </string>
   <string name="menu_turn_on_lockon">
-    Activar Lockon
+    ロックオンをオンにする
   </string>
   <string name="menu_show_old">
-    Mostrar Ejecutar y Nueva
+    ラン＆ニューを表示する
   </string>
   <string name="menu_show_new">
-    Nuevo espectáculo Sólo
+    新規のみ表示
   </string>
   <string name="tts_no_gps_fix">
-    sin GPS
+    はGPSの修正なし
   </string>
   <string name="tts_new_wifi">
-    Nueva wifi
+    新しい無線LAN
   </string>
   <string name="tts_new_cell">
-    Nueva célula
+    新しい細胞
   </string>
   <string name="tts_queue">
-    Cola
+    キュー
   </string>
   <string name="tts_from">
-    de
+    からの
   </string>
   <string name="tts_o_clock">
-    debe reloj
+    時計を借りている
   </string>
   <string name="tts_o">
-    deber
+    負っている
   </string>
   <string name="tts_battery">
-    batería
+    バッテリ
   </string>
   <string name="tts_percent">
-    por ciento
+    ％に
   </string>
   <string name="status_unknown">
-    Desconocido
+    未知
   </string>
   <string name="status_unknown_error">
-    Error desconocido
+    不明なエラー
   </string>
   <string name="status_fail">
-    Fallar
+    失敗
   </string>
   <string name="status_success">
-    Éxito
+    成功
   </string>
   <string name="status_working">
-    De trabajo ...
+    処理中...
   </string>
   <string name="status_upload_success">
-    Subir éxito
+    成功したアップロード
   </string>
   <string name="status_write_success">
-    Escribir con éxito
+    正常に書き込み
   </string>
   <string name="status_no_user">
-    Nombre de usuario no se establece
+    ユーザ名が設定されていません
   </string>
   <string name="status_no_pass">
-    Contraseña y nombre de usuario no se establece, no \'anonymous\'
+    パスワード設定しないとユーザー名ではない\&#39;匿名\&#39;
   </string>
   <string name="status_exception">
-    Excepción
+    例外
   </string>
   <string name="status_login_fail">
-    Error de acceso, comprobación de la contraseña?
+    ログインが失敗した、パスワードを確認してください？
   </string>
   <string name="status_uploading">
-    La subida de archivos
+    アップロードファイル
   </string>
   <string name="status_writing">
-    Escritura de archivos
+    ファイルの書き込み
   </string>
   <string name="status_nothing">
-    No hacer nada
+    何もしない
   </string>
   <string name="status_empty">
-    Archivo se vacía
+    ファイルが空になる
   </string>
   <string name="data_export_csv">
-    Exportación de ejecución a un archivo CSV?
+    CSVファイルへの実行をエクスポートする？
   </string>
   <string name="data_export_kml_run">
-    Exportación de ejecución al archivo KML?
+    KMLファイルへの実行をエクスポートする？
   </string>
   <string name="data_export_kml_db">
-    DB exportación a archivo KML?
+    KMLファイルへのDBをエクスポートする？
   </string>
   <string name="data_backup_db">
-    Copia de seguridad de base de datos de archivo diferente?
+    別のファイルにDBをバックアップ？
   </string>
   <string name="language_en">
-    Inglés (en)
+    英語（en）
   </string>
   <string name="language_cs">
-    čeština (cs)
+    印Čeština（CS）
   </string>
   <string name="language_de">
-    Deutsch (de)
+    ドイツ（DE）
   </string>
   <string name="language_es">
-    español (es)
+    印Español（ES）
   </string>
   <string name="language_fr">
-    français (fr)
+    バーゲン（FR）
   </string>
   <string name="language_it">
-    Italiano (it)
+    イタリア語（それ）
   </string>
   <string name="language_nl">
-    Nederlands (nl)
+    Nederlands（NL）
   </string>
   <string name="language_pl">
-    polski (pl)
+    印Polski（PL）
   </string>
   <string name="language_ru">
-    русский (ru)
+    русский（RU）
   </string>
   <string name="language_sv">
-    svenska (sv)
+    ソフトウェアアップデートを（SV）
   </string>
   <string name="language_text">
-    Idioma seleccionado (requiere reinicio)
+    選択した言語（再起動が必要）
   </string>
   <string name="auto">
-    Automático
+    自動
   </string>
 </resources>

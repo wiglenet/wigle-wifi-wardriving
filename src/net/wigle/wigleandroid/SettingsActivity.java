@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.util.Arrays;
+
 import net.wigle.wigleandroid.MainActivity.Doer;
 import android.app.Activity;
 import android.content.Intent;
@@ -271,12 +273,18 @@ public final class SettingsActivity extends Activity {
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText(getString(R.string.no_tts));
       }
+      
+      
 
-      final String[] languages = new String[]{ "", "en", "cs", "de", "es", "fr", "it", "nl", "pl", "ru", "sv" };
+      final String[] languages = new String[]{ "", "en", "cs", "da", "de", "es", "fi", 
+          "fr", "hi", "it", "iw", "ja", "ko", "nl", "no", "pl", "pt", "ru", "sv", "zh" };
       final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en), 
-          getString(R.string.language_cs), getString(R.string.language_de), getString(R.string.language_es), 
-          getString(R.string.language_fr), getString(R.string.language_it), getString(R.string.language_nl), 
-          getString(R.string.language_pl), getString(R.string.language_ru), getString(R.string.language_sv),
+          getString(R.string.language_cs), getString(R.string.language_da), getString(R.string.language_de), 
+          getString(R.string.language_es), getString(R.string.language_fi), getString(R.string.language_fr), 
+          getString(R.string.language_hi), getString(R.string.language_it), getString(R.string.language_iw), 
+          getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl), 
+          getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt), 
+          getString(R.string.language_ru), getString(R.string.language_sv), getString(R.string.language_zh),
           };
       doSpinner( R.id.language_spinner, ListActivity.PREF_LANGUAGE, "", languages, languageName );   
       
@@ -354,6 +362,11 @@ public final class SettingsActivity extends Activity {
   
   private <V> void doSpinner( final int id, final String pref, final V spinDefault, 
       final V[] periods, final String[] periodName ) {
+    
+    if ( periods.length != periodName.length ) {
+      throw new IllegalArgumentException("lengths don't match, periods: " + Arrays.toString(periods)
+          + " periodName: " + Arrays.toString(periodName));
+    }
     
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();

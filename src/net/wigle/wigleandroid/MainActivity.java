@@ -28,6 +28,7 @@ public final class MainActivity extends TabActivity {
   static final String TAB_MAP = "map";
   static final String TAB_DASH = "dash";
   static final String TAB_DATA = "data";
+  static final Locale ORIG_LOCALE = Locale.getDefault();
   
   private static MainActivity mainActivity;
   private ListActivity listActivity;
@@ -348,12 +349,19 @@ public final class MainActivity extends TabActivity {
     final String lang = prefs.getString( ListActivity.PREF_LANGUAGE, "" );
     final String current = config.locale.getLanguage();
     ListActivity.info("current lang: " + current + " new lang: " + lang);
+    Locale newLocale = null;
     if (! "".equals(lang) && ! current.equals(lang) && lang != null) {
-      final Locale locale = new Locale(lang);
-      Locale.setDefault(locale);
-      config.locale = locale;
-      ListActivity.info("setting locale: " + locale);
+      newLocale = new Locale(lang);
+    }
+    else if ("".equals(lang) && ! current.equals(ORIG_LOCALE) && ORIG_LOCALE != null) {
+      newLocale = ORIG_LOCALE;
+    }
+    
+    if ( newLocale != null ) {
+      Locale.setDefault(newLocale);
+      config.locale = newLocale;
+      ListActivity.info("setting locale: " + newLocale);
       context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
-    }      
+    }          
   }
 }

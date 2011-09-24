@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -156,6 +157,7 @@ public final class MappingActivity extends Activity {
     IGeoPoint centerPoint = DEFAULT_POINT;
     final Location location = ListActivity.lameStatic.location;
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    
     if ( priorityCenter != null ) {
       centerPoint = priorityCenter;
     }
@@ -166,11 +168,22 @@ public final class MappingActivity extends Activity {
       centerPoint = new GeoPoint( previousLocation );
     }
     else {
-      // ok, try the saved prefs
-      float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
-      float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
-      if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
-        centerPoint = new GeoPoint( lat, lon );
+      final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+      final Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+      final Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+      if ( gpsLocation != null ) {
+        centerPoint = new GeoPoint( gpsLocation );
+      }
+      else if ( networkLocation != null ) {
+        centerPoint = new GeoPoint( networkLocation );
+      }
+      else {      
+        // ok, try the saved prefs
+        float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
+        float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
+        if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
+          centerPoint = new GeoPoint( lat, lon );
+        }
       }    
     }
     

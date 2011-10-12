@@ -41,7 +41,7 @@
     <string name="gps_text">Čas obnovení GPS souřadnic</string>
     <string name="speak_text">Časové rozmezí hlasového výstupu</string>
     <string name="battery_kill_text">Skončit když baterie je na</string>
-    <string name="reset_wifi_text">Rozhodnout zda je WiFi zarušená</string>        
+    <string name="reset_wifi_text">Rozhodnout zda je WiFi zaseklá</string>        
     <string name="speech_gps">Oznamovat změny GPS</string>
     <string name="mute">Ztišit</string>
     <string name="play">Přehrávat</string>
@@ -60,7 +60,7 @@
     <string name="speech_miles">Počet ujetých mil</string>
     <string name="speech_time">Aktuální čas</string>
     <string name="speech_battery">)Úroveň nabití baterie</string>
-    <string name="speech_ssid">Nová sít:\'s</string>
+    <string name="speech_ssid">Nových sítí</string>
     <string name="query_address">Adresa (např: Chicago, IL):</string>
     <string name="query_ssid">SSID (např: Linksys) (SQL divoké karty: %,_):</string>    
     <string name="search_button">Dotaz na místní DB</string>
@@ -158,7 +158,7 @@
     <string name="turning_wifi_off">Vypínám WiFi zpět</string>
     <string name="lost_location">Pozice ztracena</string>
     <string name="have_location">Nyní mám pozici z</string>
-    <string name="wifi_jammed">WiFi se zdá zarušena, vypínám a zapínám WiFi</string>
+    <string name="wifi_jammed">WiFi je zaseknutá, vypínám a zapínám WiFi</string>
     <string name="battery_at">)Úroveň baterie na</string>
     <string name="battery_postfix">procent, vypínám Wigle Wifi</string>
     <string name="scan">Sken</string>
@@ -198,7 +198,7 @@
     <string name="status_no_pass">Nevyplněné heslo a uživatel není \'anonymous\'</string>
     <string name="status_exception">Vyjímka</string>
     <string name="status_login_fail">Přihlášení selhalo, zkontrolujte heslo?</string>
-    <string name="status_uploading">Nahráávm soubor</string>
+    <string name="status_uploading">Nahrávám soubor</string>
     <string name="status_writing">Zapisuji soubor</string>
     <string name="status_nothing">Dělám prd</string>
     <string name="status_empty">Soubor by měl být prázdný</string>   

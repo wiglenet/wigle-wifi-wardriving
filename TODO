@@ -22,6 +22,7 @@ allow turning off network locations in-app (stop osm for any locating)
 download observed networks to phone's db
 notice on database problems that it's likely the device/sd card failing
 search by bssid
+export all to csv
 
 --- done ---
 * 1.46 ()

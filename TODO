@@ -23,6 +23,7 @@ download observed networks to phone's db
 notice on database problems that it's likely the device/sd card failing
 search by bssid
 export all to csv
+error on lastlocation
 
 --- done ---
 * 1.46 ()

@@ -54,7 +54,7 @@
     <string name="speech_text"> Ansagetexte: </string>
     <string name="speech_run"> Netze seit Start </string>
     <string name="speech_new_wifi"> Neue WLANs in DB </string>
-    <string name="speech_new_cell"> Neue Mobilfunkzellen in DB </string>
+    <string name="speech_new_cell"> Neue Mobil in DB </string>
     <string name="speech_queue"> Queuelänge, wenn &gt; 0 </string>
     <string name="speech_miles"> Strecke seit Start </string>
     <string name="speech_time"> Aktuelle Uhrzeit </string>
@@ -117,7 +117,7 @@
     <string name="dash_new_wifi"> Neue WLANs </string>
     <string name="dash_vis_nets"> WLANs in Reichweite: </string>
     <string name="dash_new_upload"> Neue Wlans seit Upload: </string>
-    <string name="dash_new_cells"> Neue Mobilfunkzellen: </string>
+    <string name="dash_new_cells"> Neue Mobil: </string>
     <string name="dash_dist_run"> Strecke seit Start: </string>
     <string name="dash_dist_total"> Gesamtstrecke:. </string>
     <string name="dash_dist_prev"> Vorheriger Lauf: </string>

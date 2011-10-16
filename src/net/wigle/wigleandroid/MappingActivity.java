@@ -168,9 +168,9 @@ public final class MappingActivity extends Activity {
       centerPoint = new GeoPoint( previousLocation );
     }
     else {
-      final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-      final Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-      final Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+      final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
+      final Location networkLocation = safelyGetLast(context, LocationManager.NETWORK_PROVIDER);
+      
       if ( gpsLocation != null ) {
         centerPoint = new GeoPoint( gpsLocation );
       }
@@ -188,6 +188,18 @@ public final class MappingActivity extends Activity {
     }
     
     return centerPoint;
+  }
+  
+  private static Location safelyGetLast( final Context context, final String provider ) {
+    Location retval = null;
+    try {
+      final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+      retval = locationManager.getLastKnownLocation( provider );
+    }
+    catch ( IllegalArgumentException ex ) {
+      ListActivity.info("exception getting last known location: " + ex);
+    }
+    return retval;
   }
   
   private void setupTimer() {

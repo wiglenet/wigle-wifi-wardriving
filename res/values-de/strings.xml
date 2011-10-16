@@ -73,7 +73,7 @@
     <string name="filter_show_ssid"> passende SSIDs anzeigen (reguläre Ausdrücke): </string>
     <string name="filter_not_regex"> Zeigen, was nicht über reguläre Ausdrücke zutrifft </string>
     <string name="filter_show_open"> Offen anzeigen </string>
-    <string name="filter_show_cell"> Mobilfunkzellen anzeigen </string>
+    <string name="filter_show_cell"> Mobil anzeigen </string>
     <string name="filter_show_wep"> WEP anzeigen </string>
     <string name="filter_show_wpa"> WPA anzeigen </string>
     <string name="filter_enabled"> Filter aktiviert </string>

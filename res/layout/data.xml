@@ -32,6 +32,17 @@
         android:layout_height="wrap_content"
         android:inputType="text"/>
         
+<TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/query_bssid"
+    />
+<EditText
+        android:id="@+id/query_bssid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"/>
+        
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="horizontal"

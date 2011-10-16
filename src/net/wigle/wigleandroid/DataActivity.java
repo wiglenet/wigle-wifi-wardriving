@@ -57,7 +57,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
         String field = null;
         boolean okValue = false;
         
-        for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid } ) {
+        for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid, R.id.query_bssid } ) {
           if ( fail != null ) {
             break;
           }
@@ -84,6 +84,11 @@ public final class DataActivity extends Activity implements FileUploaderListener
               case R.id.query_ssid:
                 field = getString(R.string.ssid);
                 queryArgs.setSSID(text);
+                okValue = true;
+                break;
+              case R.id.query_bssid:
+                field = getString(R.string.bssid);
+                queryArgs.setBSSID(text);
                 okValue = true;
                 break;
               default:

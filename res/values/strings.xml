@@ -62,7 +62,8 @@
     <string name="speech_battery">Battery level percentage</string>
     <string name="speech_ssid">New Network SSID\'s</string>
     <string name="query_address">Address (ex: Chicago, IL):</string>
-    <string name="query_ssid">SSID (ex: Linksys) (SQL wildcards: %,_):</string>    
+    <string name="query_ssid">SSID (ex: Linksys) (SQL wildcards: %,_):</string>
+    <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>    
     <string name="search_button">Query Local DB</string>
     <string name="reset_button">Reset Fields</string> 
     <string name="list_query_clear">Clear Query Arguments</string> 
@@ -148,6 +149,7 @@
     <string name="found_time">Found Time</string>
     <string name="signal">Signal</string>
     <string name="ssid">SSID</string>
+    <string name="bssid">BSSID</string>
     <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"-&gt;"Wi-Fi settings"</string>
     <string name="turn_on_wifi">Turning on WiFi</string>
     <string name="no_gps_device">No GPS detected in device!</string>

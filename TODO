@@ -21,15 +21,15 @@ stats on what is in the local db
 allow turning off network locations in-app (stop osm for any locating)
 download observed networks to phone's db
 notice on database problems that it's likely the device/sd card failing
-search by bssid
 export all to csv
-error on lastlocation
 
 --- done ---
 * 1.46 ()
+Query by BSSID
 Updated German translation (thanks 'moeter'!)
 Updated Russian translation (thanks Alexander!)
 Updated Czech translation
+Fix error getting lastlocation on some devices
 
 * 1.45 (9/23/2011)
 Added: Danish, Finnish, Hebrew, Hindi, Japanese, Korean, Norwegian, Portuguese, Chinese

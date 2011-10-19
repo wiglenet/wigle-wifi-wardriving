@@ -155,6 +155,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_METRIC = "metric";
     public static final String PREF_MAP_LABEL = "mapLabel";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
+    public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";    
     
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
@@ -940,11 +941,19 @@ public final class ListActivity extends Activity implements FileUploaderListener
       state.gpsListener = new GPSListener( this );
       state.gpsListener.setMapListener(MappingActivity.STATIC_LOCATION_LISTENER);
       locationManager.addGpsStatusListener( state.gpsListener );      
+      
+      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final boolean useNetworkLoc = prefs.getBoolean(ListActivity.PREF_USE_NETWORK_LOC, false);
 
       final List<String> providers = locationManager.getAllProviders();
       for ( String provider : providers ) {
         info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );
+        if ( ! useNetworkLoc && LocationManager.NETWORK_PROVIDER.equals(provider)) {
+          // skip!          
+          continue;
+        }
         if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
+          info("using provider: " + provider);
           locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
         }
       }

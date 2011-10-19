@@ -18,7 +18,6 @@ summarize AP's since last audio speech
 stats on what is in the local db
 "only new" on map work with labels too
 
-allow turning off network locations in-app 
 download observed networks to phone's db
 
 --- done ---
@@ -30,6 +29,7 @@ Updated Czech translation
 Fix error getting lastlocation on some devices
 Export whole DB to CSV button
 Have OSM use main GPS listener, rather than its own
+Setting to not use network locations in-app (now the default)
 
 * 1.45 (9/23/2011)
 Added: Danish, Finnish, Hebrew, Hindi, Japanese, Korean, Norwegian, Portuguese, Chinese

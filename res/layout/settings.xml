@@ -90,6 +90,11 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/circle_size_map" />
+        
+<CheckBox android:id="@+id/use_network_location"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_network_location" />
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"

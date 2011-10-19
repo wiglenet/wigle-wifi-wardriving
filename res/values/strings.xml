@@ -234,5 +234,6 @@
     <string name="auto">Automatic</string>   
     <string name="fatal_title">Fatal DB Problem</string>
     <string name="fatal_pre_message">Usually caused by device or SD card problems!\n\n*** ERROR: *** \n</string>
-    <string name="fatal_post_message">\n\n(Can view again with "Error Report" on Settings menu)</string>                  
+    <string name="fatal_post_message">\n\n(Can view again with "Error Report" on Settings menu)</string>        
+    <string name="use_network_location">Use Network Location Provider</string>          
 </resources>

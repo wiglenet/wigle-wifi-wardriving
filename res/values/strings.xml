@@ -231,5 +231,8 @@
     <string name="language_iw">עברית (iw)</string>     
     <string name="language_zh">中文（繁體）(zh)</string>     
     <string name="language_text">Selected language (requires restart)</string>
-    <string name="auto">Automatic</string>                  
+    <string name="auto">Automatic</string>   
+    <string name="fatal_title">Fatal DB Problem</string>
+    <string name="fatal_pre_message">Usually caused by device or SD card problems!\n\n*** ERROR: *** \n</string>
+    <string name="fatal_post_message">\n\n(Can view again with "Error Report" on Settings menu)</string>                  
 </resources>

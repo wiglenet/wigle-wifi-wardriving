@@ -276,6 +276,10 @@ public final class DatabaseHelper extends Thread {
           // no worries
           ListActivity.info("db queue take interrupted");
         }
+        catch ( IllegalStateException ex ) {
+          deathDialog( "DB run loop", ex );
+          ListActivity.sleep(100L);
+        }
         catch ( SQLiteException ex ) {
           deathDialog( "DB run loop", ex );
           ListActivity.sleep(100L);
@@ -285,11 +289,11 @@ public final class DatabaseHelper extends Thread {
           ListActivity.sleep(100L);
         }
         finally {
-          if ( db != null && db.inTransaction() ) {
+          if ( db != null && db.isOpen() && db.inTransaction() ) {
             try {
               db.endTransaction();
             }
-            catch ( SQLiteException ex ) {
+            catch ( Exception ex ) {
               ListActivity.error( "exception in db.endTransaction: " + ex, ex );
             }
           }

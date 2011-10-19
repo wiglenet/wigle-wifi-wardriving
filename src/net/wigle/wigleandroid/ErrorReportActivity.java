@@ -61,8 +61,9 @@ public class ErrorReportActivity extends Activity {
         public void run() {              
           final AlertDialog.Builder builder = new AlertDialog.Builder( ErrorReportActivity.this );
           builder.setCancelable( false );
-          builder.setTitle( "Fatal DB Problem" );
-          builder.setMessage( "*** ERROR *** \n" + dialogMessage + "\n\n(Can view again with 'Error Report' on Settings menu)" );                      
+          builder.setTitle( getString(R.string.fatal_title) );
+          builder.setMessage( getString(R.string.fatal_pre_message) + dialogMessage 
+              + getString(R.string.fatal_post_message) );                      
 
           final AlertDialog ad = builder.create();
           ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {

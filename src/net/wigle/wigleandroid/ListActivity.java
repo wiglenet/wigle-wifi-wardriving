@@ -938,6 +938,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       // create a new listener to try and get around the gps stopping bug
       state.gpsListener = new GPSListener( this );
+      state.gpsListener.setMapListener(MappingActivity.STATIC_LOCATION_LISTENER);
       locationManager.addGpsStatusListener( state.gpsListener );      
 
       final List<String> providers = locationManager.getAllProviders();

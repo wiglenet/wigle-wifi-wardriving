@@ -29,15 +29,21 @@ public class GPSListener implements Listener, LocationListener {
   private Long lastNetworkLocationTime = 0L;
   private Long satCountLowTime = 0L;
   private float previousSpeed = 0f;
+  private LocationListener mapLocationListener;
   
   public GPSListener( ListActivity listActivity ) {
     this.listActivity = listActivity;
+  }
+  
+  public void setMapListener( LocationListener mapLocationListener ) {
+    this.mapLocationListener = mapLocationListener;
   }
   
   public void setListActivity( ListActivity listActivity ) {
     this.listActivity = listActivity;
   }
   
+  @Override
   public void onGpsStatusChanged( final int event ) {
     if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
       ListActivity.info("GPS STOPPED");    
@@ -55,19 +61,41 @@ public class GPSListener implements Listener, LocationListener {
     location = null;
   }
   
+  @Override
   public void onLocationChanged( final Location newLocation ) {
     // ListActivity.info("GPS onLocationChanged: " + newLocation);
     updateLocationData( newLocation );
+        
+    if ( mapLocationListener != null ) {
+      mapLocationListener.onLocationChanged( newLocation );
+    }
   }
   
+  @Override
   public void onProviderDisabled( final String provider ) {
     ListActivity.info("provider disabled: " + provider);
+        
+    if ( mapLocationListener != null ) {
+      mapLocationListener.onProviderDisabled( provider );
+    }
   }
+  
+  @Override
   public void onProviderEnabled( final String provider ) {
     ListActivity.info("provider enabled: " + provider);
+        
+    if ( mapLocationListener != null ) {
+      mapLocationListener.onProviderEnabled( provider );
+    }
   }
+  
+  @Override
   public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
     ListActivity.info("provider status changed: " + provider + " status: " + status);
+        
+    if ( mapLocationListener != null ) {
+      mapLocationListener.onStatusChanged( provider, status, extras );
+    }
   }
 
   /** newLocation can be null */

@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.osmdroid.LocationListenerProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IMapView;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -23,8 +25,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -51,6 +53,8 @@ public final class MappingActivity extends Activity {
   private Location previousLocation;
   private int previousRunNets;
   private MyLocationOverlay myLocationOverlay = null;
+  
+  public static LocationListener STATIC_LOCATION_LISTENER = null;
   
   private static final int DEFAULT_ZOOM = 17;
   public static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
@@ -282,8 +286,8 @@ public final class MappingActivity extends Activity {
   @Override
   public void onPause() {
     ListActivity.info( "pause mapping." );
-    myLocationOverlay.disableMyLocation();
     myLocationOverlay.disableCompass();
+    disableLocation();
     
     super.onPause();
   }
@@ -292,9 +296,31 @@ public final class MappingActivity extends Activity {
   public void onResume() {
     ListActivity.info( "resume mapping." );
     myLocationOverlay.enableCompass();    
-    myLocationOverlay.enableMyLocation();
+    enableLocation();
     
     super.onResume();
+  }
+  
+  private void disableLocation() {
+    myLocationOverlay.mLocationListener = null;
+
+    // Update the screen to see changes take effect
+    if ( mapView instanceof View ) {
+      ((View) mapView).postInvalidate();
+    }
+  }
+  
+  private void enableLocation() {
+    try {
+      // force it to think it's own location listening is on
+      myLocationOverlay.mLocationListener = new LocationListenerProxy(null);
+      STATIC_LOCATION_LISTENER = myLocationOverlay;
+      MainActivity.getListActivity(this).getGPSListener().setMapListener(myLocationOverlay);
+      myLocationOverlay.enableMyLocation();
+    }
+    catch (Exception ex) {
+      ListActivity.error("Could not enableLocation for maps: " + ex, ex);
+    }
   }
   
   /* Creates the menu items */

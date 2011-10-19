@@ -114,6 +114,24 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
+	<Button android:id="@+id/csv_export_button" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/csv_export_button" android:layout_weight="0"/>
+	<TextView
+		android:id="@+id/csv_export_text"  
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:text="@string/csv_export_text"
+		android:layout_weight="5"
+		/>
+</LinearLayout>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
 	<Button android:id="@+id/kml_export_button" 
 		android:layout_width="wrap_content" 
 		android:layout_height="wrap_content" 

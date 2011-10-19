@@ -53,6 +53,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
   private final Object lock = new Object();
   private final AtomicBoolean interrupt = new AtomicBoolean( false );
   private final boolean justWriteFile;
+  private boolean writeWholeDb;
   
   public static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
@@ -120,6 +121,10 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
   
   public void setAlertDialog(final AlertDialog ad) {
     this.ad = ad;
+  }
+  
+  public void setWriteWholeDb() {
+    this.writeWholeDb = true;
   }
     
   public static class UploaderHandler extends Handler {
@@ -530,6 +535,9 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+    if ( writeWholeDb ) {
+      maxId = 0;
+    }
     final Cursor cursor = dbHelper.locationIterator( maxId );
     
     try {

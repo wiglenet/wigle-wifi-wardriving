@@ -43,7 +43,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
       
       setupQueryButtons();
-      setupCsvButton();
+      setupCsvButtons();
       setupKmlButtons();
       setupBackupDbButton();
   }  
@@ -137,7 +137,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
     // nothing
   }
   
-  private void setupCsvButton() {
+  private void setupCsvButtons() {
     // actually need this Activity context, for dialogs
     
     final Button csvRunExportButton = (Button) findViewById( R.id.csv_run_export_button );
@@ -150,6 +150,23 @@ public final class DataActivity extends Activity implements FileUploaderListener
             // actually need this Activity context, for dialogs
             FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
                 ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+            fileUploaderTask.start();
+          }
+        } );
+      }
+    });
+    
+    final Button csvExportButton = (Button) findViewById( R.id.csv_export_button );
+    csvExportButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_export_csv_db), new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
+                ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+            fileUploaderTask.setWriteWholeDb();
             fileUploaderTask.start();
           }
         } );

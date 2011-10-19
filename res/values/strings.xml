@@ -26,7 +26,9 @@
     <string name="connect_button">Connect</string>
     <string name="connect_text">with permission of network operator</string>
     <string name="csv_run_export_button">CSV Export Run</string>
-    <string name="csv_run_export_text">Export current run to CSV file</string>    
+    <string name="csv_run_export_text">Export current run to CSV file</string>
+    <string name="csv_export_button">CSV Export DB</string>
+    <string name="csv_export_text">Export entire DB to CSV file</string>           
     <string name="kml_run_export_button">KML Export Run</string>
     <string name="kml_run_export_text">Export current run to KML file</string>
     <string name="kml_export_button">KML Export DB</string>
@@ -205,6 +207,7 @@
     <string name="status_nothing">Doing Nothing</string>
     <string name="status_empty">File would be empty</string>   
     <string name="data_export_csv">Export run to CSV file?</string>
+    <string name="data_export_csv_db">Export DB to CSV file?</string>
     <string name="data_export_kml_run">Export run to KML file?</string>
     <string name="data_export_kml_db">Export DB to KML file?</string>
     <string name="data_backup_db">Backup DB to different file?</string>

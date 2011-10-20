@@ -19,6 +19,9 @@ stats on what is in the local db
 "only new" on map work with labels too
 
 download observed networks to phone's db
+BUG: mute button comes up on mute when it's not
+BUG: org.osmdroid.tileprovider.modules.MapTileFileArchiveProvider cannot be cast
+to org.osmdroid.tileprovider.modules.MapTileModuleProviderBase
 
 --- done ---
 * 1.46 ()

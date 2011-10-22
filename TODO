@@ -22,6 +22,7 @@ download observed networks to phone's db
 BUG: mute button comes up on mute when it's not
 BUG: org.osmdroid.tileprovider.modules.MapTileFileArchiveProvider cannot be cast
 to org.osmdroid.tileprovider.modules.MapTileModuleProviderBase
+don't make a wifi scan request if one is in-flight (and recent)
 
 --- done ---
 * 1.46 ()

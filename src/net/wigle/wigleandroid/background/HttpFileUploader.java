@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +19,8 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Map;
 
+import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.SSLConfigurator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -37,7 +39,8 @@ final class HttpFileUploader {
   private HttpFileUploader(){
   }
   
-  public static HttpURLConnection connect(final String urlString, final Resources res) throws IOException {
+  public static HttpURLConnection connect(final String urlString, final Resources res,
+      final boolean setBoundary) throws IOException {
     URL connectURL = null;
     try{
       connectURL = new URL( urlString );
@@ -58,7 +61,7 @@ final class HttpFileUploader {
         self_serving = false;
         // consider a pref to skip this? or just phase out after migration?
     } catch (IOException ex) {
-        // we're specificly interested in javax.net.ssl.SSLException
+        // we're specifically interested in javax.net.ssl.SSLException
     }
 
     if ( self_serving ) {
@@ -98,7 +101,9 @@ final class HttpFileUploader {
     // Use a post method.
     conn.setRequestMethod("POST");
     conn.setRequestProperty("Connection", "Keep-Alive");
-    conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+    if ( setBoundary ) {
+      conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+    }
     
     // chunk large stuff
     conn.setChunkedStreamingMode( 32*1024 );
@@ -132,33 +137,30 @@ final class HttpFileUploader {
      
     String retval = null;
     HttpURLConnection conn = null;
-    CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
-    CharBuffer cbuff = CharBuffer.allocate( 1024 );
-    ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
-
+    
     try {
-      conn = connect(urlString, res);    
+      final boolean setBoundary = true;
+      conn = connect( urlString, res, setBoundary );    
       OutputStream connOutputStream = conn.getOutputStream();
-      if ( true ) {
-        // reflect out the chunking info
-        for ( Method meth : connOutputStream.getClass().getMethods() ) {
-          // ListActivity.info("meth: " + meth.getName() );
-          try {
-            if ( "isCached".equals(meth.getName()) || "isChunked".equals(meth.getName())) {
-              Boolean val = (Boolean) meth.invoke( connOutputStream, (Object[]) null );
-              ListActivity.info( meth.getName() + " " + val );
-            }
-            else if ( "size".equals( meth.getName())) {
-              Integer val = (Integer) meth.invoke( connOutputStream, (Object[]) null );
-              ListActivity.info( meth.getName() + " " + val );
-            }
+
+      // reflect out the chunking info
+      for ( Method meth : connOutputStream.getClass().getMethods() ) {
+        // ListActivity.info("meth: " + meth.getName() );
+        try {
+          if ( "isCached".equals(meth.getName()) || "isChunked".equals(meth.getName())) {
+            Boolean val = (Boolean) meth.invoke( connOutputStream, (Object[]) null );
+            ListActivity.info( meth.getName() + " " + val );
           }
-          catch ( Exception ex ) {
-            // this block is just for logging, so don't splode if it has a problem
-            ListActivity.error("ex: " + ex, ex );
+          else if ( "size".equals( meth.getName())) {
+            Integer val = (Integer) meth.invoke( connOutputStream, (Object[]) null );
+            ListActivity.info( meth.getName() + " " + val );
           }
         }
-      }
+        catch ( Exception ex ) {
+          // this block is just for logging, so don't splode if it has a problem
+          ListActivity.error("ex: " + ex, ex );
+        }
+      }      
       
       WritableByteChannel wbc = Channels.newChannel( connOutputStream );
       
@@ -178,12 +180,15 @@ final class HttpFileUploader {
       header.append( LINE_END );
 
       ListActivity.info( "About to write headers, length: " + header.length() );
+      CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
+      CharBuffer cbuff = CharBuffer.allocate( 1024 );
+      ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
       ListActivity.info( "Headers are written, length: " + header.length() );
       int percentDone = ( (int)header.length() * 100) / (int)filesize;
       if ( handler != null ) {
-          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentDone );
       }
     
       FileChannel fc = fileInputStream.getChannel();
@@ -201,7 +206,7 @@ final class HttpFileUploader {
         percentDone = ((int)byteswritten * 100) / (int)filesize;
 
         if ( handler != null ) {
-          handler.sendEmptyMessage( FileUploaderTask.WRITING_PERCENT_START + percentDone );
+          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentDone );
         }
       }
       ListActivity.info( "done. transferred " + byteswritten + " of " + filesize );

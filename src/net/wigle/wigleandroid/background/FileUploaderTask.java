@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,14 +22,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPOutputStream;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import net.wigle.wigleandroid.DBException;
+import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.Network;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
@@ -38,57 +38,14 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Process;
-import android.view.WindowManager;
 
-public final class FileUploaderTask extends Thread implements AlertSettable {
-  private Context context;
-  private final Handler handler;
-  private final DatabaseHelper dbHelper;
-  private ProgressDialog pd;
+public final class FileUploaderTask extends AbstractBackgroundTask {
   private final FileUploaderListener listener;
-  private AlertDialog ad;
-  private final Object lock = new Object();
-  private final AtomicBoolean interrupt = new AtomicBoolean( false );
   private final boolean justWriteFile;
   private boolean writeWholeDb;
   
-  public static final int WRITING_PERCENT_START = 10000;
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
-  public static final String ERROR = "error";
-  public static final String FILENAME = "filename";
-  public static final String FILEPATH = "filepath";
-  private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
-  
-  public static enum Status {
-    UNKNOWN( R.string.status_unknown, R.string.status_unknown_error ),
-    FAIL( R.string.status_fail, R.string.status_fail ),
-    SUCCESS( R.string.status_success, R.string.status_upload_success ),
-    WRITE_SUCCESS( R.string.status_success, R.string.status_write_success ),
-    BAD_USERNAME( R.string.status_fail, R.string.status_no_user ),
-    BAD_PASSWORD( R.string.status_fail, R.string.status_no_pass ),
-    EXCEPTION( R.string.status_fail, R.string.status_exception ),
-    BAD_LOGIN( R.string.status_fail, R.string.status_login_fail ),
-    UPLOADING( R.string.status_working, R.string.status_uploading ),
-    WRITING( R.string.status_working, R.string.status_writing ),
-    EMPTY_FILE( R.string.status_nothing, R.string.status_empty );  
-    
-    private final int title;
-    private final int message;
-    private Status( final int title, final int message ) {
-      this.title = title;
-      this.message = message;
-    }
-    public int getTitle() {
-      return title;
-    }
-    public int getMessage() {
-      return message;
-    }
-  }
   
   private static class CountStats {
     int byteCount;
@@ -98,196 +55,21 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
   public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
       final boolean justWriteFile ) {
     
-    if ( context == null ) {
-      throw new IllegalArgumentException( "context is null" );
-    }
-    if ( dbHelper == null ) {
-      throw new IllegalArgumentException( "dbHelper is null" );
-    }
+    super( context, dbHelper, "HttpUL" );
     if ( listener == null ) {
       throw new IllegalArgumentException( "listener is null" );
     }
     
-    this.context = context;
-    this.dbHelper = dbHelper;
     this.listener = listener;
     this.justWriteFile = justWriteFile;
-    
-    // set with activity context, sets up the progress dialog
-    createProgressDialog();
-    
-    this.handler = new UploaderHandler(context, lock, pd, this);
-  }
-  
-  public void setAlertDialog(final AlertDialog ad) {
-    this.ad = ad;
   }
   
   public void setWriteWholeDb() {
     this.writeWholeDb = true;
   }
-    
-  public static class UploaderHandler extends Handler {
-    private final Context context;
-    private final Object lock;
-    private final ProgressDialog pd;
-    private final AlertSettable alertSettable;
-    
-    private String msg_text = "";
-    
-    public UploaderHandler(final Context context, final Object lock, final ProgressDialog pd,
-        final AlertSettable alertSettable) {
-      
-      this.context = context;
-      this.lock = lock;
-      this.pd = pd;
-      this.alertSettable = alertSettable;          
-    }
-    
-    @Override
-    public void handleMessage( final Message msg ) {
-      synchronized ( lock ) {
-        if ( msg.what >= WRITING_PERCENT_START ) {
-          final int percent = msg.what - WRITING_PERCENT_START;
-          pd.setMessage( msg_text + " " + percent + "%" );
-          pd.setProgress( percent * 100 );
-          return;
-        }
-        
-        final Status status = Status.values()[ msg.what ];
-        if ( Status.UPLOADING.equals( status ) ) {
-          //          pd.setMessage( status.getMessage() );
-          msg_text = context.getString( status.getMessage() );
-          pd.setProgress(0);
-          return;
-        }
-        if ( Status.WRITING.equals( status ) ) {
-          msg_text = context.getString( status.getMessage() );
-          pd.setProgress(0);
-          return;
-        }
-        // make sure we didn't progress dialog this somewhere
-        if ( pd != null && pd.isShowing() ) {
-          try {
-            pd.dismiss();
-            alertSettable.clearProgressDialog();
-          }
-          catch ( Exception ex ) {
-            // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing dialog: " + ex );
-          }
-        }
-        // Activity context
-        alertSettable.setAlertDialog( buildAlertDialog( context, msg, status ) );
-      }
-    }
-  }  
   
-  public void clearProgressDialog() {
-    pd = null;
-  }
-  
-  private void createProgressDialog() {
-    // make an interruptable progress dialog
-    pd = ProgressDialog.show( context, context.getString(Status.WRITING.getTitle()), 
-        context.getString(Status.WRITING.getMessage()), true, true,
-      new OnCancelListener(){ 
-        @Override
-        public void onCancel( DialogInterface di ) {
-          interrupt.set(true);
-        }
-      });
-  }
-  
-  public static AlertDialog buildAlertDialog( final Context context, final Message msg, final Status status ) {
-    final AlertDialog.Builder builder = new AlertDialog.Builder( context );
-    builder.setCancelable( false );
-    builder.setTitle( status.getTitle() );
-    Bundle bundle = msg.peekData();
-    String filename = "";
-    if ( bundle != null ) {
-      String filepath = bundle.getString( FILEPATH );
-      filepath = filepath == null ? "" : filepath + "\n";
-      filename = bundle.getString( FILENAME );
-      if ( filename != null ) {
-        // just don't show the gz
-        int index = filename.indexOf( ".gz" );
-        if ( index > 0 ) {
-          filename = filename.substring( 0, index );
-        }
-        index = filename.indexOf( ".kml" );
-        if ( index > 0 ) {
-          filename = filename.substring( 0, index );
-        }
-      }
-      filename = "\n\nFile location:\n" + filepath + filename;
-    }
-    
-    if ( bundle == null ) {
-      builder.setMessage( context.getString( status.getMessage() ) + filename );
-    }
-    else {
-      String error = bundle.getString( ERROR );
-      error = error == null ? "" : " Error: " + error;
-      builder.setMessage( context.getString( status.getMessage() ) + error + filename );
-    }
-    AlertDialog ad = builder.create();
-    ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-      public void onClick( final DialogInterface dialog, final int which ) {
-        try {
-          dialog.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing alert dialog: " + ex );
-        }
-        return;
-      } }); 
-    try {
-      ad.show();
-    }
-    catch ( WindowManager.BadTokenException ex ) {
-      ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
-    }
-    
-    return ad;
-  }
-  
-  public  void setContext( final Context context ) {
-    synchronized ( lock ) {
-      this.context = context;
-      
-      if ( pd != null && pd.isShowing() ) {
-        try {
-          pd.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing progress dialog: " + ex );
-        }
-        createProgressDialog();
-      }
-      
-      if ( ad != null && ad.isShowing() ) {
-        try {
-          ad.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing alert dialog: " + ex );
-        }
-      }
-    }
-  }
-  
-  public void run() {
-    // set thread name
-    setName( "FileUploaderTask-" + getName() );
-    
-    try {
-      ListActivity.info( "setting file upload thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
-      Process.setThreadPriority( UPLOAD_PRIORITY );
-      
+  public void subRun() {
+    try {      
       if ( justWriteFile ) {
         justWriteFile();
       }
@@ -335,19 +117,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     }
 
     // tell the gui thread
-    sendBundledMessage( handler, status.ordinal(), bundle );
-  }
-  
-  public static void sendBundledMessage( Handler handler, int what, Bundle bundle ) {
-    final Message msg = new Message();
-    msg.what = what;
-    msg.setData(bundle);
-    handler.sendMessage(msg);
-  }
-  
-  /** interrupt this upload */
-  public void setInterrupted() {
-    interrupt.set( true );
+    sendBundledMessage( status.ordinal(), bundle );
   }
   
   public static OutputStream getOutputStream(final Context context, final Bundle bundle, final Object[] fileFilename)
@@ -358,7 +128,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     String openString = filename;
     final boolean hasSD = ListActivity.hasSD();
     File file = null;
-    bundle.putString( FILENAME, filename );
+    bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     if ( hasSD ) {
       final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
       final File path = new File( filepath );
@@ -368,8 +138,8 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       if ( ! file.exists() && hasSD ) {
         file.createNewFile();
       }
-      bundle.putString( FILEPATH, filepath );
-      bundle.putString( FILENAME, filename );
+      bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
+      bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     }
     
     final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
@@ -400,7 +170,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       }
       
       // show on the UI
-      sendBundledMessage( handler, Status.UPLOADING.ordinal(), bundle );
+      sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
 
       long filesize = file != null ? file.length() : 0L;
       if ( filesize <= 0 ) {
@@ -428,7 +198,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       }
       final String response = HttpFileUploader.upload( 
         ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
-        params, context.getResources(), handler, filesize, context );
+        params, context.getResources(), getHandler(), filesize, context );
       
       if ( ! prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
         if ( response != null && response.indexOf("donate=Y") > 0 ) {
@@ -460,7 +230,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
           error = "response: " + response;
         }
         ListActivity.error( error );
-        bundle.putString( ERROR, error );
+        bundle.putString( BackgroundGuiHandler.ERROR, error );
         status = Status.FAIL;
       }
     } 
@@ -472,21 +242,21 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       ListActivity.error( "file problem: " + ex, ex );
       ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "file problem: " + ex );
+      bundle.putString( BackgroundGuiHandler.ERROR, "file problem: " + ex );
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
       ListActivity.error( "io problem: " + ex, ex );
       ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "io problem: " + ex );
+      bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       ListActivity.error( "ex problem: " + ex, ex );
       ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "ex problem: " + ex );
+      bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
     
     return status;
@@ -504,7 +274,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
         writeFile( fos, bundle, countStats );
         // show on the UI
         status = Status.WRITE_SUCCESS;
-        sendBundledMessage( handler, status.ordinal(), bundle );
+        sendBundledMessage( status.ordinal(), bundle );
       }
       finally {
         if ( fos != null ) {
@@ -512,19 +282,22 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
         }
       }
     }
+    catch ( InterruptedException ex ) {
+      ListActivity.info("justWriteFile interrupted: " + ex);
+    }
     catch ( IOException ex ) {
       ex.printStackTrace();
       ListActivity.error( "io problem: " + ex, ex );
       ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "io problem: " + ex );
+      bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       ListActivity.error( "ex problem: " + ex, ex );
       ListActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
-      bundle.putString( ERROR, "ex problem: " + ex );
+      bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
         
     return status;
@@ -562,7 +335,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     long fileWriteMillis = 0;
     long netMillis = 0;
     
-    sendBundledMessage( handler, Status.WRITING.ordinal(), bundle );
+    sendBundledMessage( Status.WRITING.ordinal(), bundle );
     
     final PackageManager pm = context.getPackageManager();
     final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
@@ -584,7 +357,6 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
     countStats.byteCount = header.length();
 
     if ( total > 0 ) {
-      int lastSentPercent = 0;
       CharBuffer charBuffer = CharBuffer.allocate( 256 );
       ByteBuffer byteBuffer = ByteBuffer.allocate( 256 ); // this ensures hasArray() is true
       final CharsetEncoder encoder = Charset.forName( ListActivity.ENCODING ).newEncoder();
@@ -602,7 +374,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
       final Date date = new Date();
       // loop!
       for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-        if ( interrupt.get() ) {
+        if ( wasInterrupted() ) {
           throw new InterruptedException( "we were interrupted" );
         }
         // _id,bssid,level,lat,lon,time
@@ -701,11 +473,7 @@ public final class FileUploaderTask extends Thread implements AlertSettable {
 
         // update UI
         final int percentDone = (countStats.lineCount * 100) / total;
-        // only send up to 100 times
-        if ( percentDone > lastSentPercent ) {
-          sendBundledMessage( handler, WRITING_PERCENT_START + percentDone, bundle );
-          lastSentPercent = percentDone;
-        }
+        sendPercent( percentDone, bundle );        
       }
     }
     

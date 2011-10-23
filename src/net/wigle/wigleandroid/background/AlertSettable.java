@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 import android.app.AlertDialog;
 

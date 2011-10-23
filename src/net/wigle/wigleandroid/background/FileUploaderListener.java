@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 public interface FileUploaderListener {
   public void uploadComplete();

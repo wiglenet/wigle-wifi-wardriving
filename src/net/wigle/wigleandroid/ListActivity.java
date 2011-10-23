@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
+import net.wigle.wigleandroid.background.FileUploaderListener;
+import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
@@ -67,13 +69,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemSelectedListener;
 
 public final class ListActivity extends Activity implements FileUploaderListener {
     // *** state that is retained ***
@@ -187,7 +189,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;    
     
-    static final String ANONYMOUS = "anonymous";
+    public static final String ANONYMOUS = "anonymous";
     private static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     static final boolean DEBUG = false;

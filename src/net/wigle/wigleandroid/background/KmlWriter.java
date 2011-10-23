@@ -1,7 +1,6 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -9,64 +8,33 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.wigle.wigleandroid.FileUploaderTask.Status;
-import net.wigle.wigleandroid.FileUploaderTask.UploaderHandler;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import net.wigle.wigleandroid.DBException;
+import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Process;
 
-public class KmlWriter extends Thread implements AlertSettable {
-  private static final int UPLOAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
-  
-  private final DatabaseHelper dbHelper;
+public class KmlWriter extends AbstractBackgroundTask {
   private final Set<String> networks;
-  private final Handler handler;
-  private ProgressDialog pd;
-  private final AtomicBoolean interrupt = new AtomicBoolean( false );
-  private final Object lock = new Object();
-  private final Context context;
   
   public KmlWriter( final Context context, final DatabaseHelper dbHelper ) {
     this( context, dbHelper, (Set<String>) null );
   }
   
   public KmlWriter( final Context context, final DatabaseHelper dbHelper, final Set<String> networks ) {
-    if ( context == null ) {
-      throw new IllegalArgumentException( "context is null" );
-    }
-    if ( dbHelper == null ) {
-      throw new IllegalArgumentException( "dbHelper is null" );
-    }
+    super(context, dbHelper, "KmlWriter");
     
-    this.context = context;
-    this.dbHelper = dbHelper;
     // make a safe local copy
-    this.networks = (networks == null) ? null : new HashSet<String>( networks );
-    
-    createProgressDialog( context );
-    
-    this.handler = new UploaderHandler(context, lock, pd, this);
+    this.networks = (networks == null) ? null : new HashSet<String>( networks );        
   }
   
-  public void setAlertDialog(final AlertDialog alertDialog) {
-    // nothing for now
-    // this.alertDialog = alertDialog;
-  }
-  
-  public void clearProgressDialog() {
-    pd = null;
-  }  
-  
-  private void writeKml( Bundle bundle ) throws FileNotFoundException, IOException {
+  @Override
+  protected void subRun() throws IOException {
+    final Bundle bundle = new Bundle();
     final boolean hasSD = ListActivity.hasSD();
     if ( ! hasSD ) {
       return;
@@ -115,16 +83,20 @@ public class KmlWriter extends Thread implements AlertSettable {
           }
         }
         status = Status.WRITE_SUCCESS;
-      }    
+      }
+      catch ( final InterruptedException ex ) {
+        ListActivity.info("Writing Kml Interrupted: " + ex);
+      }      
       catch ( DBException ex ) {
         dbHelper.deathDialog("Writing Kml", ex);
+        status = Status.EXCEPTION;
       }
       catch ( final Exception ex ) {
         ex.printStackTrace();
         ListActivity.error( "ex problem: " + ex, ex );
         ListActivity.writeError( this, ex, context );
         status = Status.EXCEPTION;
-        bundle.putString( FileUploaderTask.ERROR, "ex problem: " + ex );
+        bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
       }
       finally {
         if ( cursor != null ) {
@@ -137,22 +109,24 @@ public class KmlWriter extends Thread implements AlertSettable {
     
     fos.close();    
     
-    bundle.putString( FileUploaderTask.FILEPATH, filepath );
-    bundle.putString( FileUploaderTask.FILENAME, filename );
+    bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
+    bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     ListActivity.info( "done with kml export" );
     
-    // tell gui
-    FileUploaderTask.sendBundledMessage( handler, status.ordinal(), bundle );
+    // status is null on interrupted
+    if ( status != null ) {
+      // tell gui
+      sendBundledMessage( status.ordinal(), bundle );
+    }
   }
   
   private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat,
       long startCount, long totalCount, final Bundle bundle ) throws IOException, InterruptedException {
     
     int lineCount = 0;
-    int lastSentPercent = -1;
 
     for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-      if ( interrupt.get() ) {
+      if ( wasInterrupted() ) {
         throw new InterruptedException( "we were interrupted" );
       }
       
@@ -198,11 +172,7 @@ public class KmlWriter extends Thread implements AlertSettable {
         totalCount = 1;
       }
       final int percentDone = (int)(((lineCount + startCount) * 100) / totalCount);
-      // only send up to 100 times
-      if ( percentDone > lastSentPercent ) {
-        FileUploaderTask.sendBundledMessage( handler, FileUploaderTask.WRITING_PERCENT_START + percentDone, bundle );
-        lastSentPercent = percentDone;
-      }
+      sendPercent( percentDone, bundle );      
     }
     
     return true;
@@ -221,32 +191,5 @@ public class KmlWriter extends Thread implements AlertSettable {
       }
     }
   }
-  
-  public void run() {
-    // set thread name
-    setName( "KmlWriter-" + getName() );
-    
-    try {
-      ListActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + UPLOAD_PRIORITY );
-      Process.setThreadPriority( UPLOAD_PRIORITY );
       
-      Bundle bundle = new Bundle();
-      writeKml( bundle );      
-    }
-    catch ( final Exception ex ) {
-      dbHelper.deathDialog("Writing Kml", ex);
-    }    
-  }
-  
-  private void createProgressDialog(final Context context) {
-    // make an interruptable progress dialog
-    pd = ProgressDialog.show( context, context.getString(Status.WRITING.getTitle()), 
-        context.getString(Status.WRITING.getMessage()), true, true,
-      new OnCancelListener(){ 
-        @Override
-        public void onCancel( DialogInterface di ) {
-          interrupt.set(true);
-        }
-      });
-  }
 }

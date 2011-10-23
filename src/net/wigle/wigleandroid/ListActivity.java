@@ -1112,9 +1112,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Button mute = (Button) this.findViewById(R.id.mute);
       final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);
-      if ( muted ) {
-        mute.setText(getString(R.string.mute));
-      }
+      mute.setText(getString(muted ? R.string.play : R.string.mute));
+      
       mute.setOnClickListener(new OnClickListener(){
         public void onClick( final View buttonView ) {
           boolean muted = prefs.getBoolean(PREF_MUTED, false);

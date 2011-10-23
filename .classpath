@@ -6,5 +6,5 @@
 	<classpathentry kind="lib" path="libs/slf4j-android-1.5.8.jar"/>
 	<classpathentry kind="lib" path="libs/TTS_library_stub.jar"/>
 	<classpathentry kind="lib" path="libs/osmdroid-android.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

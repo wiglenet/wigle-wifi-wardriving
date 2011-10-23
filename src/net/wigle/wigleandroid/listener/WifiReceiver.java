@@ -64,6 +64,7 @@ public class WifiReceiver extends BroadcastReceiver {
   private long prevNewNetCount;
   private long prevNewCellCount;
   private long prevScanPeriod;
+  private boolean scanInFlight = false;
   
   public static final int SIGNAL_COMPARE = 10;
   public static final int CHANNEL_COMPARE = 11;
@@ -131,7 +132,8 @@ public class WifiReceiver extends BroadcastReceiver {
   }
   
   @Override
-  public void onReceive( final Context context, final Intent intent ){
+  public void onReceive( final Context context, final Intent intent ) {
+    scanInFlight = false;
     final long now = System.currentTimeMillis();
     lastScanResponseTime = now;
     // final long start = now;
@@ -714,14 +716,21 @@ public class WifiReceiver extends BroadcastReceiver {
   private boolean doWifiScan() {
     // ListActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
-    boolean retval = false;
+    boolean success = false;
+    
     if ( listActivity.isUploading() ) {
       ListActivity.info( "uploading, not scanning for now" );
       // reset this
       lastScanResponseTime = Long.MIN_VALUE;
     }
-    else if (listActivity.isScanning()){
-      retval = wifiManager.startScan();
+    else if (listActivity.isScanning()) {
+      if ( ! scanInFlight ) {
+        success = wifiManager.startScan();
+        if ( success ) {
+          scanInFlight = true;
+        }      
+      }      
+            
       final long now = System.currentTimeMillis();
       if ( lastScanResponseTime < 0 ) {
         // use now, since we made a request
@@ -738,6 +747,7 @@ public class WifiReceiver extends BroadcastReceiver {
           if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
             Toast.makeText( listActivity, 
                 listActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
+            scanInFlight = false;
             wifiManager.setWifiEnabled(false);
             wifiManager.setWifiEnabled(true);    
             lastWifiUnjamTime = now;
@@ -782,8 +792,7 @@ public class WifiReceiver extends BroadcastReceiver {
       }
     }
     
-    return retval;
-  }
-  
+    return success;
+  }  
   
 }

@@ -19,9 +19,6 @@ stats on what is in the local db
 "only new" on map work with labels too
 
 download observed networks to phone's db
-BUG: org.osmdroid.tileprovider.modules.MapTileFileArchiveProvider cannot be cast
-to org.osmdroid.tileprovider.modules.MapTileModuleProviderBase
-don't make a wifi scan request if one is in-flight (and recent)
 
 --- done ---
 * 1.46 ()
@@ -33,7 +30,8 @@ Fix error getting lastlocation on some devices
 Export whole DB to CSV button
 Have OSM use main GPS listener, rather than its own
 Setting to not use network locations in-app (now the default)
-fix bug: mute button comes up on mute when it's not
+Fix mute button comes up unmuted when it shouldn't
+Don't make a wifi scan request if one is in-flight (and recent)
 
 * 1.45 (9/23/2011)
 Added: Danish, Finnish, Hebrew, Hindi, Japanese, Korean, Norwegian, Portuguese, Chinese

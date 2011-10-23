@@ -5,6 +5,7 @@ import java.util.List;
 import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -49,6 +50,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
       setupCsvButtons();
       setupKmlButtons();
       setupBackupDbButton();
+      setupImportObservedButton();
   }  
   
   private void setupQueryButtons() {
@@ -225,6 +227,24 @@ public final class DataActivity extends Activity implements FileUploaderListener
             // actually need this Activity context, for dialogs
             BackupTask task = new BackupTask(DataActivity.this, MainActivity.getListActivity(DataActivity.this));
             task.execute();
+          }
+        } );
+      }
+    });  
+  }
+  
+  private void setupImportObservedButton() {
+    final Button importObservedButton = (Button) findViewById( R.id.import_observed_button );
+    
+    importObservedButton.setOnClickListener( new OnClickListener() {
+      public void onClick( final View buttonView ) {  
+        MainActivity.createConfirmation( DataActivity.this, 
+            DataActivity.this.getString(R.string.data_import_observed), new Doer() {
+          @Override
+          public void execute() {
+            // actually need this Activity context, for dialogs
+            HttpDownloader task = new HttpDownloader(DataActivity.this, ListActivity.lameStatic.dbHelper);
+            task.start();
           }
         } );
       }

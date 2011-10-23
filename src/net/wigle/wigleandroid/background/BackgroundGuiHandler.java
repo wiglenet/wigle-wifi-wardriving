@@ -91,7 +91,12 @@ public class BackgroundGuiHandler extends Handler {
           filename = filename.substring( 0, index );
         }
       }
-      filename = "\n\nFile location:\n" + filepath + filename;
+      if ( filename == null ) {
+        filename = "";
+      }
+      else {
+        filename = "\n\nFile location:\n" + filepath + filename;
+      }
     }
     
     if ( bundle == null ) {

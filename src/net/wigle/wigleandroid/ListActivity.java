@@ -105,6 +105,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     private String previousStatus;
     
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
+    public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;

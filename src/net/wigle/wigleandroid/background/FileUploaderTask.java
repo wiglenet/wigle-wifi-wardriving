@@ -91,28 +91,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   }
   
   private void doRun() throws InterruptedException {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
-    Status status = Status.UNKNOWN;
+    final String username = getUsername();
+    final String password = getPassword();
+    Status status = validateUserPass( username, password );
     final Bundle bundle = new Bundle();
-    
-    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
-      username = ListActivity.ANONYMOUS;
-      password = "";
-    }
-        
-    if ( "".equals( username ) ) {
-      // TODO: error
-      ListActivity.error( "username not defined" );
-      status = Status.BAD_USERNAME;
-    }
-    else if ( "".equals( password ) && ! ListActivity.ANONYMOUS.equals( username.toLowerCase() ) ) {
-      // TODO: error
-      ListActivity.error( "password not defined and username isn't 'anonymous'" );
-      status = Status.BAD_PASSWORD;
-    }
-    else {
+    if ( status == null ) {
       status = doUpload( username, password, bundle );
     }
 
@@ -151,7 +134,9 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     return fos;
   }
   
-  private Status doUpload( final String username, final String password, final Bundle bundle ) throws InterruptedException {    
+  private Status doUpload( final String username, final String password, final Bundle bundle ) 
+      throws InterruptedException {    
+    
     Status status = Status.UNKNOWN;
     
     try {

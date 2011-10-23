@@ -104,6 +104,9 @@ final class HttpFileUploader {
     if ( setBoundary ) {
       conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
     }
+    else {
+      conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+    }
     
     // chunk large stuff
     conn.setChunkedStreamingMode( 32*1024 );

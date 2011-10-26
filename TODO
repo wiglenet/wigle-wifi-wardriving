@@ -17,6 +17,7 @@ speak similar AP's with count, trying to condense somehow, start with s/\d+$//
 summarize AP's since last audio speech
 stats on what is in the local db
 "only new" on map work with labels too
+workaround the clearing of wifi list on screen rotate somehow
 
 download observed networks to phone's db
 

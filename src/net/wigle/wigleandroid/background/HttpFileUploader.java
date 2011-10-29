@@ -129,6 +129,8 @@ final class HttpFileUploader {
     conn.setChunkedStreamingMode( 32*1024 );
     // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
     conn.setRequestProperty("Transfer-Encoding", "chunked");
+    // 8 hours
+    conn.setReadTimeout(8*60*60*1000);
     
     // connect
     ListActivity.info( "about to connect" );

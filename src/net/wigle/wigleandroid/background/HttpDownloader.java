@@ -25,22 +25,34 @@ public class HttpDownloader extends AbstractBackgroundTask {
   }
   
   protected void subRun() throws IOException, InterruptedException {
+    Status status = null;
+    final Bundle bundle = new Bundle();
     try {
       final String username = getUsername();
       final String password = getPassword();
-      Status status = validateUserPass( username, password );
-      final Bundle bundle = new Bundle();
+      status = validateUserPass( username, password );      
       if ( status == null ) {
         status = doDownload( username, password, bundle );
       }
       
-      // tell the gui thread
-      sendBundledMessage( status.ordinal(), bundle );
+    }
+    catch ( final InterruptedException ex ) {
+      ListActivity.info("Writing Kml Interrupted: " + ex);
+    }      
+    catch ( final Exception ex ) {
+      ex.printStackTrace();
+      ListActivity.error( "ex problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context );
+      status = Status.EXCEPTION;
+      bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
     finally {
       // tell the listener
       listener.transferComplete();
     }
+
+    // tell the gui thread
+    sendBundledMessage( status.ordinal(), bundle );
   }
    
   private Status doDownload( final String username, final String password, final Bundle bundle ) 

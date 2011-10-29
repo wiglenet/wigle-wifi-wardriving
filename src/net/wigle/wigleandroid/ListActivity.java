@@ -523,7 +523,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
       
       // release the lock before turning wifi off
       if ( state.wifiLock != null && state.wifiLock.isHeld() ) {
-        state.wifiLock.release();
+        try {
+          state.wifiLock.release();
+        }
+        catch ( SecurityException ex ) {
+          error( "exception releasing wifi lock: " + ex, ex );
+        }
       }
       
       final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );

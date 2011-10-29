@@ -653,4 +653,22 @@
   <string name="auto">
     Automatisk
   </string>
+  <string name="fatal_title">
+    Fatal DB Problem
+  </string>
+  <string name="fatal_db_warn">
+    Vanligvis forårsaket av enheten eller SD-kort problemer!
+  </string>
+  <string name="fatal_pre_message">
+    ERROR
+  </string>
+  <string name="fatal_post_message">
+    (Kan vise igjen med "Error Report" på Innstillinger-menyen)
+  </string>
+  <string name="use_network_location">
+    Bruk Nettverksplassering Provider
+  </string>
+  <string name="data_import_observed">
+    Import min observerte wifi fra WiGLE i lokal database?
+  </string>    
 </resources>

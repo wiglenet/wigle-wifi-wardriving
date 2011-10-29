@@ -208,4 +208,22 @@
     <string name="data_backup_db"> Backup DB naar bestand? </string>
     <string name="language_text"> Gekozen taal (opnieuw opstarten noodzakelijk)</string>
 	<string name="auto"> Automatisch </string>
+	<string name="fatal_title">
+	  Fatal DB Probleem
+	</string>
+	<string name="fatal_db_warn">
+	  Meestal veroorzaakt door het apparaat of SD-kaart problemen!
+	</string>
+	<string name="fatal_pre_message">
+	  FOUT
+	</string>
+	<string name="fatal_post_message">
+	  (Kan opnieuw te bekijken met "Error Report" op Settings menu)
+	</string>
+	<string name="use_network_location">
+	  Gebruik Netwerklocatie Provider
+	</string>
+	<string name="data_import_observed">
+	  Importeer ik mijn wifi waargenomen van Wigle in de lokale database?
+	</string>
 </resources>

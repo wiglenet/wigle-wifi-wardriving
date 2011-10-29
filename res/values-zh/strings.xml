@@ -653,4 +653,22 @@
   <string name="auto">
     自動
   </string>
+  <string name="fatal_title">
+  致命的DB問題
+  </string>
+  <string name="fatal_db_warn">
+  通常造成設備或SD卡的問題！
+  </string>
+  <string name="fatal_pre_message">
+  錯誤
+  </string>
+  <string name="fatal_post_message">
+  （可以查看設置菜單上的“錯誤報告”再次）
+  </string>
+  <string name="use_network_location">
+  使用網絡位置提供
+  </string>
+  <string name="data_import_observed">
+  導入本地數據庫我從 WiGLE觀察 WIFI？
+  </string>
 </resources>

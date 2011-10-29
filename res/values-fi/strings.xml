@@ -653,4 +653,10 @@
   <string name="auto">
     Automaattinen
   </string>
+  <string name="fatal_title"> Fatal DB ongelma </string>
+  <string name="fatal_db_warn"> yleensä aiheuttanut tai SD-kortti ongelmia! </string>
+  <string name="fatal_pre_message"> VIRHE </string>
+  <string name="fatal_post_message"> (oikeus tarkastella uudelleen "Virhe raportti" Settings menu) </string>
+  <string name="use_network_location"> Käytä Network Location Provider </string>
+  <string name="data_import_observed"> Tuo minun havaittu WiFi-WiGLE paikalliseen tietokantaan? </string>
 </resources>

@@ -680,4 +680,22 @@
   <string name="auto">
     Автоматический
   </string>
+  <string name="fatal_title">
+    Фатальная ошибка DB
+  </string>
+  <string name="fatal_db_warn">
+    Обычно вызвано устройства или проблемы SD карту!
+  </string>
+  <string name="fatal_pre_message">
+    ОШИБКА
+  </string>
+  <string name="fatal_post_message">
+    (Может просматривать снова с "ошибке" в меню Настройки)
+  </string>
+  <string name="use_network_location">
+    Использование поставщика сетевого расположения
+  </string>
+  <string name="data_import_observed">
+    Импорт мой наблюдается WiFi от WiGLE в локальные базы данных?
+  </string>
 </resources>

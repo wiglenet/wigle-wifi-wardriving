@@ -653,4 +653,10 @@
   <string name="auto">
     Automático
   </string>
+  <string name="fatal_title">problema DB Fatal </string>
+  <string name="fatal_db_warn"> lo general causados ​​por problemas del dispositivo o la tarjeta SD! </string>
+  <string name="fatal_pre_message"> ERROR </string>
+  <string name="fatal_post_message"> (se puede ver de nuevo con "Notificar un error" en el menú de configuración) </string>
+  <string name="use_network_location"> uso Red de Proveedores Localización </string>
+  <string name="data_import_observed"> importar mis observado wifi de Wigle en la base de datos local? </string>      
 </resources>

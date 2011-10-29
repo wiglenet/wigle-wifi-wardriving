@@ -653,4 +653,22 @@
   <string name="auto">
     Automatico
   </string>
+  <string name="fatal_title">
+    DB Problema fatale
+  </string>
+  <string name="fatal_db_warn">
+    Di solito causata da problemi di periferica o scheda SD!
+  </string>
+  <string name="fatal_pre_message">
+    ERRORE
+  </string>
+  <string name="fatal_post_message">
+    (Può visualizzare di nuovo con "segnalazione errori" nel menu Impostazioni)
+  </string>
+  <string name="use_network_location">
+    Usa Località provider di rete
+  </string>
+  <string name="data_import_observed">
+    Importare la mia wifi osservato da WiGLE nel database locale?
+  </string>
 </resources>

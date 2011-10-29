@@ -208,4 +208,10 @@
     <string name="data_backup_db"> Säkerhetskopiera DB till en annan fil? </string>
     <string name="language_text"> Valt språk (kräver omstart) </string>
     <string name="auto"> Automatisk </string>
+    <string name="fatal_title"> Fatal DB Problem </string>
+	<string name="fatal_db_warn"> Orsakas oftast av enhet eller SD problem med kort! </string>
+	<string name="fatal_pre_message"> FEL </string>
+	<string name="fatal_post_message"> (Kan visa igen med "Fel Rapport" på menyn Inställningar) </string>
+	<string name="use_network_location"> Använd Provider Nätverksplats </string>
+	<string name="data_import_observed"> Importera mina observerade wifi från WiGLE i lokala databas? </string>
 </resources>

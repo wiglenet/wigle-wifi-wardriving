@@ -653,4 +653,22 @@
   <string name="auto">
     自動
   </string>
+  <string name="fatal_title">
+  致命的なDBの問題
+  </string>
+  <string name="fatal_db_warn">
+  通常、デバイスまたはSDカードの問題が原因！
+  </string>
+  <string name="fatal_pre_message">
+  ERROR
+  </string>
+  <string name="fatal_post_message">
+  （[設定]メニューの"エラー報告"を再び表示することができます）
+  </string>
+  <string name="use_network_location">
+  ネットワークロケーションプロバイダを使用して、
+  </string>
+  <string name="data_import_observed">
+  ローカルデータベースにワイグルから私の観測された無線LANをインポート？
+  </string>    
 </resources>

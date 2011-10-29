@@ -653,4 +653,22 @@
   <string name="auto">
     אוטומטי
   </string>
+  <string name="fatal_title">
+    DB בעיה חמורה
+  </string>
+  <string name="fatal_db_warn">
+  בדרך כלל נגרמת על ידי המכשיר או בעיות כרטיס SD!
+  </string>
+  <string name="fatal_pre_message">
+  ERROR
+  </string>
+  <string name="fatal_post_message">
+  (ניתן לצפות שוב עם "דוח שגיאות" בתפריט הגדרות)
+  </string>
+  <string name="use_network_location">
+  השתמש מיקום ספק רשת
+  </string>
+  <string name="data_import_observed">
+  ייבוא ​​wifi נצפתה שלי WiGLE לתוך מסד נתונים מקומי?
+  </string>
 </resources>

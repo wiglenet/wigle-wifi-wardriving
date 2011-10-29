@@ -653,4 +653,22 @@
   <string name="auto">
     स्वचालित
   </string>
+  <string name="fatal_title">
+    घातक DB समस्या
+  </string>
+  <string name="fatal_db_warn">
+    आमतौर पर डिवाइस या एसडी कार्ड समस्याओं की वजह से!
+  </string>
+  <string name="fatal_pre_message">
+    त्रुटि
+  </string>
+  <string name="fatal_post_message">
+    (सेटिंग्स मेनू पर "त्रुटि रिपोर्ट" के साथ फिर से देख सकते हैं)
+  </string>
+  <string name="use_network_location">
+    नेटवर्क स्थान प्रदाता का उपयोग करें
+  </string>
+  <string name="data_import_observed">
+    स्थानीय डेटाबेस में मेरे WiGLE से मनाया वाईफ़ाई आयात?
+  </string>
 </resources>

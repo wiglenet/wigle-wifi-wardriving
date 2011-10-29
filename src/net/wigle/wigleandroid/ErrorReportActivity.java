@@ -66,8 +66,8 @@ public class ErrorReportActivity extends Activity {
           if ( dialogMessage.contains("SQL") ) {
             fatalDbWarn = getString(R.string.fatal_db_warn);
           }
-          builder.setMessage( fatalDbWarn + getString(R.string.fatal_pre_message) + dialogMessage 
-              + getString(R.string.fatal_post_message) );                      
+          builder.setMessage( fatalDbWarn + "\n\n*** " + getString(R.string.fatal_pre_message) + ": ***\n" + dialogMessage 
+              + "\n\n" + getString(R.string.fatal_post_message) );                      
 
           final AlertDialog ad = builder.create();
           ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK, Shutdown", new DialogInterface.OnClickListener() {

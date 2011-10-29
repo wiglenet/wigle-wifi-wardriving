@@ -208,4 +208,10 @@
     <string name="data_backup_db">Zálohovat DB do jiného souboru ?</string>                  
     <string name="language_text"> Vybraný jazyk (vyžaduje restart)</string>
     <string name="auto"> Automatické </string>
+    <string name="fatal_title"> Fatální problém DB </string>
+    <string name="fatal_db_warn"> obvykle způsobeny zařízení nebo SD karta problémy </string>
+    <string name="fatal_pre_message"> Chyba </string>
+    <string name="fatal_post_message"> (lze zobrazit znovu s "Error Report" v menu Settings) </string>
+    <string name="use_network_location"> Použijte umístění v síti poskytovatele </string>
+    <string name="data_import_observed"> importovat pozorovat wifi z WiGLE do lokální databáze? </string>        
 </resources>

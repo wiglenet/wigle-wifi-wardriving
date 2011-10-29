@@ -653,4 +653,22 @@
   <string name="auto">
     자동
   </string>
+  <string name="fatal_title">
+  치명적인 DB의 문제
+  </string>
+  <string name="fatal_db_warn">
+  보통 장치 또는 SD 카드 문제로 인해!
+  </string>
+  <string name="fatal_pre_message">
+  오류
+  </string>
+  <string name="fatal_post_message">
+  (설정 메뉴에서 "오류보고"로 다시보실 수 있습니다)
+  </string>
+  <string name="use_network_location">
+  네트워크 위치 공급자를 사용
+  </string>
+  <string name="data_import_observed">
+  로컬 데이터베이스로 WiGLE에서 내 관찰 WiFi를 가져오기?
+  </string>
 </resources>

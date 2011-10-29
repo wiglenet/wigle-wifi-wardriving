@@ -617,8 +617,12 @@ public final class DatabaseHelper extends Thread {
       // do lots of inserts when debug is on
       isNew = true;
     }
+    
+    final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
+        && location.getAltitude() == 0 && location.getAccuracy() == 0
+        && update.level == 0;
 
-    if ( isNew || bigChange || (! fastMode && changeWorthy ) ) {
+    if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
       // ListActivity.info("inserting loc: " + network.getSsid() );
       insertLocation.bindString( 1, bssid );
       insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...

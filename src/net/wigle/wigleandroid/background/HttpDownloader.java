@@ -84,6 +84,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
         }
         else {
           totalCount = Integer.parseInt(line.substring(COUNT_TAG.length()));
+          ListActivity.info("observed totalCount: " + totalCount);
         }
       }
       if ( line.length() != 12 || line.startsWith( "<" ) ) {

@@ -86,7 +86,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     }
     finally {
       // tell the listener
-      listener.uploadComplete();
+      listener.transferComplete();
     }
   }
   

@@ -83,7 +83,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
       private DatabaseHelper dbHelper;
       private ServiceConnection serviceConnection;
       private AtomicBoolean finishing;
-      private AtomicBoolean uploading;
+      private AtomicBoolean transferring;
       private MediaPlayer soundPop;
       private MediaPlayer soundNewPop;
       private WifiLock wifiLock;
@@ -271,7 +271,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         else {
           state = new State();
           state.finishing = new AtomicBoolean( false );
-          state.uploading = new AtomicBoolean( false );
+          state.transferring = new AtomicBoolean( false );
           
           // new run, reset
           final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
@@ -381,8 +381,8 @@ public final class ListActivity extends Activity implements FileUploaderListener
       return state.finishing.get();
     }
     
-    public boolean isUploading() {
-      return state.uploading.get();
+    public boolean isTransferring() {
+      return state.transferring.get();
     }
     
     public boolean isScanning() {
@@ -847,16 +847,16 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
-    public void setUploading() {
-      state.uploading.set( true );
+    public void setTransferring() {
+      state.transferring.set( true );
     }
     
     /**
      * FileUploaderListener interface
      */
-    public void uploadComplete() {
-      state.uploading.set( false );
-      info( "uploading complete" );
+    public void transferComplete() {
+      state.transferring.set( false );
+      info( "transfer complete" );
       // start a scan to get the ball rolling again if this is non-stop mode
       scheduleScan();
       state.fileUploaderTask = null;
@@ -1038,7 +1038,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
             MainActivity.createConfirmation( ListActivity.this, getString(R.string.list_upload), new Doer() {
               @Override
               public void execute() {                
-                setUploading();
+                setTransferring();
                 uploadFile( state.dbHelper );
               }
             } );

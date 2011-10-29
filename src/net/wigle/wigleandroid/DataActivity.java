@@ -138,7 +138,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
   /**
    * FileUploaderListener interface
    */
-  public void uploadComplete() {
+  public void transferComplete() {
     // nothing
   }
   
@@ -242,8 +242,19 @@ public final class DataActivity extends Activity implements FileUploaderListener
             DataActivity.this.getString(R.string.data_import_observed), new Doer() {
           @Override
           public void execute() {
+            final ListActivity listActivity = MainActivity.getListActivity(DataActivity.this);
+            if ( listActivity != null ) {
+              listActivity.setTransferring();
+            }
             // actually need this Activity context, for dialogs
-            HttpDownloader task = new HttpDownloader(DataActivity.this, ListActivity.lameStatic.dbHelper);
+            HttpDownloader task = new HttpDownloader(DataActivity.this, ListActivity.lameStatic.dbHelper,
+                new FileUploaderListener() {
+              public void transferComplete() {
+                if ( listActivity != null ) {
+                  listActivity.transferComplete();
+                }
+              }
+            });
             task.start();
           }
         } );
@@ -262,7 +273,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
     public BackupTask ( final Activity activity, final ListActivity listActivity ) {
       this.activity = activity;
       this.listActivity = listActivity;
-      listActivity.setUploading();
+      listActivity.setTransferring();
     }
     
     @Override
@@ -280,7 +291,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
     
     @Override
     protected void onPostExecute( Integer result ) {       
-      listActivity.uploadComplete();
+      listActivity.transferComplete();
       
       final TextView tv = (TextView) activity.findViewById( R.id.backup_db_text );
       tv.setText( activity.getString(R.string.backup_db_text) );

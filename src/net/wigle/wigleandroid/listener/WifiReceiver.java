@@ -718,8 +718,8 @@ public class WifiReceiver extends BroadcastReceiver {
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
     boolean success = false;
     
-    if ( listActivity.isUploading() ) {
-      ListActivity.info( "uploading, not scanning for now" );
+    if ( listActivity.isTransferring() ) {
+      ListActivity.info( "transferring, not scanning for now" );
       // reset this
       lastScanResponseTime = Long.MIN_VALUE;
     }
@@ -769,7 +769,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     
     // battery kill
-    if ( ! listActivity.isUploading() ) {
+    if ( ! listActivity.isTransferring() ) {
       final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final long batteryKill = prefs.getLong(
           ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT);

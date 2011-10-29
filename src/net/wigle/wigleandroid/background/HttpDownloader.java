@@ -12,22 +12,32 @@ import android.content.Context;
 import android.os.Bundle;
 
 public class HttpDownloader extends AbstractBackgroundTask {
+  private final FileUploaderListener listener;
   
-  public HttpDownloader( final Context context, final DatabaseHelper dbHelper ) {
+  public HttpDownloader( final Context context, final DatabaseHelper dbHelper, 
+      final FileUploaderListener listener ) {
+    
     super(context, dbHelper, "HttpDL");
+    this.listener = listener;
   }
   
   protected void subRun() throws IOException, InterruptedException {
-    final String username = getUsername();
-    final String password = getPassword();
-    Status status = validateUserPass( username, password );
-    final Bundle bundle = new Bundle();
-    if ( status == null ) {
-      status = doDownload( username, password, bundle );
+    try {
+      final String username = getUsername();
+      final String password = getPassword();
+      Status status = validateUserPass( username, password );
+      final Bundle bundle = new Bundle();
+      if ( status == null ) {
+        status = doDownload( username, password, bundle );
+      }
+      
+      // tell the gui thread
+      sendBundledMessage( status.ordinal(), bundle );
     }
-    
-    // tell the gui thread
-    sendBundledMessage( status.ordinal(), bundle );
+    finally {
+      // tell the listener
+      listener.transferComplete();
+    }
   }
    
   private Status doDownload( final String username, final String password, final Bundle bundle ) 
@@ -79,7 +89,6 @@ public class HttpDownloader extends AbstractBackgroundTask {
       
       ListActivity.info("line: " + line);
       
-//      todo: turn off stumbling while we insert
 //      todo: insert line into db
       
       lineCount++;

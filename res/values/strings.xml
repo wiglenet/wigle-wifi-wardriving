@@ -233,7 +233,8 @@
     <string name="language_text">Selected language (requires restart)</string>
     <string name="auto">Automatic</string>   
     <string name="fatal_title">Fatal DB Problem</string>
-    <string name="fatal_pre_message">Usually caused by device or SD card problems!\n\n*** ERROR: *** \n</string>
+    <string name="fatal_db_warn">Usually caused by device or SD card problems!</string>
+    <string name="fatal_pre_message">\n\n*** ERROR: *** \n</string>
     <string name="fatal_post_message">\n\n(Can view again with "Error Report" on Settings menu)</string>        
     <string name="use_network_location">Use Network Location Provider</string>   
     <string name="data_import_observed">Import my observed wifi from WiGLE into local database?</string>       

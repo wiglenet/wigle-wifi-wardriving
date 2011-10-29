@@ -62,7 +62,11 @@ public class ErrorReportActivity extends Activity {
           final AlertDialog.Builder builder = new AlertDialog.Builder( ErrorReportActivity.this );
           builder.setCancelable( false );
           builder.setTitle( getString(R.string.fatal_title) );
-          builder.setMessage( getString(R.string.fatal_pre_message) + dialogMessage 
+          String fatalDbWarn = "";
+          if ( dialogMessage.contains("SQL") ) {
+            fatalDbWarn = getString(R.string.fatal_db_warn);
+          }
+          builder.setMessage( fatalDbWarn + getString(R.string.fatal_pre_message) + dialogMessage 
               + getString(R.string.fatal_post_message) );                      
 
           final AlertDialog ad = builder.create();

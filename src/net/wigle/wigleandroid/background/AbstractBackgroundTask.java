@@ -72,8 +72,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     }    
   }
   
-  protected final void sendPercent(final int percentDone, final Bundle bundle) {
-    // only send up to 100 times
+  protected final void sendPercentTimesTen(final int percentDone, final Bundle bundle) {
+    // only send up to 1000 times
     if ( percentDone > lastSentPercent ) {
       sendBundledMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentDone, bundle );
       lastSentPercent = percentDone;

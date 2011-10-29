@@ -484,11 +484,22 @@ public final class DatabaseHelper extends Thread {
     }
   }
   
+  public void blockingAddObservation( final Network network, final Location location, final boolean newForRun )
+      throws InterruptedException {
+    
+    final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun );
+    queue.put(update);    
+  }
+  
   public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
     return addObservation( network, network.getLevel(), location, newForRun );
   }
-  private boolean addObservation( final Network network, final int level, final Location location, final boolean newForRun ) {
+  
+  private boolean addObservation( final Network network, final int level, final Location location, 
+      final boolean newForRun ) {
+    
     final DBUpdate update = new DBUpdate( network, level, location, newForRun );
+    
     // data is lost if queue is full!
     boolean added = queue.offer( update );
     if ( ! added ) {

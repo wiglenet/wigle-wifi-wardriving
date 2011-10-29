@@ -457,8 +457,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         countStats.byteCount += end;
 
         // update UI
-        final int percentDone = (countStats.lineCount * 100) / total;
-        sendPercent( percentDone, bundle );        
+        final int percentDone = (countStats.lineCount * 1000) / total;
+        sendPercentTimesTen( percentDone, bundle );        
       }
     }
     

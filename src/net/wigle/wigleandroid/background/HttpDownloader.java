@@ -8,7 +8,10 @@ import java.net.URLEncoder;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.Network;
+import net.wigle.wigleandroid.NetworkType;
 import android.content.Context;
+import android.location.Location;
 import android.os.Bundle;
 
 public class HttpDownloader extends AbstractBackgroundTask {
@@ -87,9 +90,27 @@ public class HttpDownloader extends AbstractBackgroundTask {
         continue;
       }
       
-      ListActivity.info("line: " + line);
+      // re-colon
+      StringBuilder builder = new StringBuilder(15);
+      for ( int i = 0; i < 12; i++ ) {
+        builder.append(line.charAt(i));
+        if ( i < 11 && (i%2) == 1 ) {
+          builder.append(":");
+        }
+      }
       
-//      todo: insert line into db
+      final String bssid = builder.toString();
+      // ListActivity.info("line: " + line + " bssid: " + bssid);
+      
+      // do the insert      
+      final String ssid = "";
+      final int frequency = 0;
+      final String capabilities = "";
+      final int level = 0;
+      final Network network = new Network(bssid, ssid, frequency, capabilities, level, NetworkType.WIFI);
+      final Location location = new Location("wigle");
+      final boolean newForRun = true;
+      dbHelper.blockingAddObservation( network, location, newForRun );
       
       lineCount++;
       if ( (lineCount % 1000) == 0 ) {
@@ -100,8 +121,8 @@ public class HttpDownloader extends AbstractBackgroundTask {
       if ( totalCount == 0 ) {
         totalCount = 1;
       }
-      final int percentDone = (int)((lineCount * 100) / totalCount);
-      sendPercent( percentDone, bundle );      
+      final int percentDone = (int)((lineCount * 1000) / totalCount);
+      sendPercentTimesTen( percentDone, bundle );      
     }        
   }
   

@@ -206,9 +206,9 @@ final class HttpFileUploader {
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
       ListActivity.info( "Headers are written, length: " + header.length() );
-      int percentDone = ( (int)header.length() * 100) / (int)filesize;
+      int percentTimesTenDone = ( (int)header.length() * 1000) / (int)filesize;
       if ( handler != null ) {
-          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentDone );
+          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
       }
     
       FileChannel fc = fileInputStream.getChannel();
@@ -223,10 +223,10 @@ final class HttpFileUploader {
         byteswritten += bytes;
               
         ListActivity.info( "transferred " + byteswritten + " of " + filesize );
-        percentDone = ((int)byteswritten * 100) / (int)filesize;
+        percentTimesTenDone = ((int)byteswritten * 1000) / (int)filesize;
 
         if ( handler != null ) {
-          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentDone );
+          handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
         }
       }
       ListActivity.info( "done. transferred " + byteswritten + " of " + filesize );

@@ -1,10 +1,10 @@
 --- todo ---
 "upload every n" setting
-show IEEE octet info (manufacturer stats/speech)
 web replace: seen-networks map tile overlays
 web replace: leaderboard
 username not found notice
 stop counting on startup
+show IEEE octet info (manufacturer stats/speech)
 show countdown while trying to close database
 
 --- user suggested ---
@@ -19,11 +19,10 @@ stats on what is in the local db
 "only new" on map work with labels too
 workaround the clearing of wifi list on screen rotate somehow
 
-download observed networks to phone's db
-
 --- done ---
 * 1.46 ()
 Query by BSSID
+Download previously observed networks to phone's db (Data->Import Observed)
 Updated German translation (thanks 'moeter'!)
 Updated Russian translation (thanks Alexander!)
 Updated Czech translation
@@ -33,6 +32,7 @@ Have OSM use main GPS listener, rather than its own
 Setting to not use network locations in-app (now the default)
 Fix mute button comes up unmuted when it shouldn't
 Don't make a wifi scan request if one is in-flight (and recent)
+More precision on progress percentages
 
 * 1.45 (9/23/2011)
 Added: Danish, Finnish, Hebrew, Hindi, Japanese, Korean, Norwegian, Portuguese, Chinese

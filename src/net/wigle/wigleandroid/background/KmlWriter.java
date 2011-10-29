@@ -171,8 +171,8 @@ public class KmlWriter extends AbstractBackgroundTask {
       if ( totalCount == 0 ) {
         totalCount = 1;
       }
-      final int percentDone = (int)(((lineCount + startCount) * 100) / totalCount);
-      sendPercent( percentDone, bundle );      
+      final int percentDone = (int)(((lineCount + startCount) * 1000) / totalCount);
+      sendPercentTimesTen( percentDone, bundle );      
     }
     
     return true;

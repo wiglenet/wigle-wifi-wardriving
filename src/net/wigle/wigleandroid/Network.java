@@ -94,7 +94,7 @@ public final class Network {
   public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
       final int level, final NetworkType type ) {
     
-    this.bssid = ( bssid == null ) ? "" : bssid;
+    this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase();
     this.ssid = ( ssid == null ) ? "" : ssid;
     this.frequency = frequency;
     this.capabilities = ( capabilities == null ) ? "" : capabilities;

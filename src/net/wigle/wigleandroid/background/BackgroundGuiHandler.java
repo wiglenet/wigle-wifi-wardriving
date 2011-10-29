@@ -11,7 +11,7 @@ import android.os.Message;
 import android.view.WindowManager;
 
 public class BackgroundGuiHandler extends Handler {
-  public static final int WRITING_PERCENT_START = 10000;
+  public static final int WRITING_PERCENT_START = 100000;
   public static final String ERROR = "error";
   public static final String FILENAME = "filename";
   public static final String FILEPATH = "filepath";
@@ -36,9 +36,10 @@ public class BackgroundGuiHandler extends Handler {
   public void handleMessage( final Message msg ) {
     synchronized ( lock ) {
       if ( msg.what >= WRITING_PERCENT_START ) {
-        final int percent = msg.what - WRITING_PERCENT_START;
-        pd.setMessage( msg_text + " " + percent + "%" );
-        pd.setProgress( percent * 100 );
+        final int percentTimesTen = msg.what - WRITING_PERCENT_START;
+        pd.setMessage( msg_text + " " + (percentTimesTen/10f) + "%" );
+        // "The progress range is 0..10000."
+        pd.setProgress( percentTimesTen * 10 );
         return;
       }
       

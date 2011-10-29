@@ -18,6 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.SSLConfigurator;
@@ -83,6 +84,20 @@ final class HttpFileUploader {
     HttpURLConnection conn = null;
     ListActivity.info("Creating url connection. self_serving: " + self_serving + " fallback: " + fallback);
     
+    String javaVersion = "unknown";                                                  
+    try {                                                                            
+        javaVersion =  System.getProperty("java.vendor") + " " +                     
+        System.getProperty("java.version") + ", jvm: " +                             
+        System.getProperty("java.vm.vendor") + " " +                                 
+        System.getProperty("java.vm.name") + " " +                                   
+        System.getProperty("java.vm.version") + " on " +                             
+        System.getProperty("os.name") + " " +                                        
+        System.getProperty("os.version") +                                           
+        " [" + System.getProperty("os.arch") + "]";                                  
+    } catch (Exception e) { }                                                        
+                                                                                     
+    final String userAgent = "WigleWifi ("+javaVersion+")";                    
+    
     // Open a HTTP connection to the URL    
     conn = (HttpURLConnection) connectURL.openConnection();    
     // Allow Inputs
@@ -106,7 +121,9 @@ final class HttpFileUploader {
     }
     else {
       conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-    }
+    }    
+    conn.setRequestProperty( "Accept-Encoding", "gzip" );
+    conn.setRequestProperty( "User-Agent", userAgent );
     
     // chunk large stuff
     conn.setChunkedStreamingMode( 32*1024 );
@@ -230,7 +247,7 @@ final class HttpFileUploader {
       ListActivity.info( "connection response code: " + responseCode );
 
       // read the response
-      final InputStream is = conn.getInputStream();
+      final InputStream is = getInputStream( conn );
       int ch;
       final StringBuilder b = new StringBuilder();
       final byte[] buffer = new byte[1024];
@@ -259,6 +276,20 @@ final class HttpFileUploader {
     }
     
     return retval;
+  }
+  
+  /**
+   * get the InputStream, gunzip'ing if needed
+   */
+  public static InputStream getInputStream( HttpURLConnection conn ) throws IOException {
+    InputStream input = conn.getInputStream();
+
+    String encode = conn.getContentEncoding();
+    ListActivity.info( "Encoding: " + encode );
+    if ( "gzip".equalsIgnoreCase( encode ) ) {
+      input = new GZIPInputStream( input );  
+    }
+    return input;
   }
 
   /**

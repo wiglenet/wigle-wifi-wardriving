@@ -46,7 +46,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
     printout.close();
     
     // get response data
-    DataInputStream input = new DataInputStream ( conn.getInputStream() );
+    DataInputStream input = new DataInputStream ( HttpFileUploader.getInputStream( conn ) );
     insertObserved( input );
     return Status.WRITE_SUCCESS;
   }

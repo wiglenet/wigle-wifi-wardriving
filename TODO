@@ -20,6 +20,8 @@ stats on what is in the local db
 "only new" on map work with labels too
 workaround the clearing of wifi list on screen rotate somehow
 
+debug logging mode
+
 --- done ---
 * 1.46 (10/29/2011)
 Query by BSSID

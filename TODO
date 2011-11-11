@@ -7,6 +7,7 @@ stop counting on startup
 show IEEE octet info (manufacturer stats/speech)
 show countdown while trying to close database
 lat/lon in observed import from wigle
+debug logging mode
 
 --- user suggested ---
 kismet drone support
@@ -20,12 +21,11 @@ stats on what is in the local db
 "only new" on map work with labels too
 workaround the clearing of wifi list on screen rotate somehow
 
-debug logging mode
-
 --- done ---
 * 1.47 ()
 Handle out of bounds in BackgrounGuiHandler
 Handle NullPointerException in NetworkActivity
+Handle NullPointerException in SQLiteException
 
 * 1.46 (10/29/2011)
 Query by BSSID

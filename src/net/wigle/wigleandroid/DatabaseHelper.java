@@ -255,7 +255,7 @@ public final class DatabaseHelper extends Thread {
                 db.endTransaction();
                 countdown = 0;
               }
-              catch ( SQLiteException ex ) {
+              catch ( Exception ex ) {
                 ListActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
                 countdown--;
                 if ( countdown <= 0 ) {

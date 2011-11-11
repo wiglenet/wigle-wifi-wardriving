@@ -43,7 +43,7 @@ public class BackgroundGuiHandler extends Handler {
         return;
       }
       
-      if ( msg.what >= Status.values().length ) {
+      if ( msg.what >= Status.values().length || msg.what < 0 ) {
         ListActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
         return;
       }

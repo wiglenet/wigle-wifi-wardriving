@@ -23,6 +23,10 @@ workaround the clearing of wifi list on screen rotate somehow
 debug logging mode
 
 --- done ---
+* 1.47 ()
+Handle out of bounds in BackgrounGuiHandler
+Handle NullPointerException in NetworkActivity
+
 * 1.46 (10/29/2011)
 Query by BSSID
 Download previously observed networks to phone's db (Data->Import Observed)

@@ -209,7 +209,7 @@ final class HttpFileUploader {
 
       ListActivity.info( "Headers are written, length: " + header.length() );
       int percentTimesTenDone = ( (int)header.length() * 1000) / (int)filesize;
-      if ( handler != null ) {
+      if ( handler != null && percentTimesTenDone >= 0 ) {
           handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
       }
     
@@ -227,7 +227,7 @@ final class HttpFileUploader {
         ListActivity.info( "transferred " + byteswritten + " of " + filesize );
         percentTimesTenDone = ((int)byteswritten * 1000) / (int)filesize;
 
-        if ( handler != null ) {
+        if ( handler != null && percentTimesTenDone >= 0 ) {
           handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
         }
       }

@@ -289,6 +289,9 @@ public class NetworkActivity extends Activity {
   public Dialog onCreateDialog( int which ) {
     switch ( which ) {
       case CRYPTO_DIALOG:        
+        if ( network == null ) {
+          return null;
+        }
         final Dialog dialog = new Dialog( this );
 
         dialog.setContentView( R.layout.cryptodialog );

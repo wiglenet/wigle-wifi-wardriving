@@ -25,7 +25,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
   }
   
   protected void subRun() throws IOException, InterruptedException {
-    Status status = null;
+    Status status = Status.UNKNOWN;
     final Bundle bundle = new Bundle();
     try {
       final String username = getUsername();

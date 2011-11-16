@@ -37,7 +37,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
       
     }
     catch ( final InterruptedException ex ) {
-      ListActivity.info("Writing Kml Interrupted: " + ex);
+      ListActivity.info("Download Interrupted: " + ex);
     }      
     catch ( final Exception ex ) {
       ex.printStackTrace();

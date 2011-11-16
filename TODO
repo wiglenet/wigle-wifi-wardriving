@@ -20,6 +20,7 @@ summarize AP's since last audio speech
 stats on what is in the local db
 "only new" on map work with labels too
 workaround the clearing of wifi list on screen rotate somehow
+store system time on db records (not just gps time)
 
 --- done ---
 * 1.47 ()

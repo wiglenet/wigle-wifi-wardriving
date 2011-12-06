@@ -40,7 +40,7 @@ final class HttpFileUploader {
   private HttpFileUploader(){
   }
   
-  public static HttpURLConnection connect(final String urlString, final Resources res,
+  public static HttpURLConnection connect(String urlString, final Resources res,
       final boolean setBoundary) throws IOException {
     URL connectURL = null;
     try{
@@ -61,7 +61,23 @@ final class HttpFileUploader {
         testcon.connect();
         self_serving = false;
         // consider a pref to skip this? or just phase out after migration?
-    } catch (IOException ex) {
+    } 
+    catch (UnknownHostException ex) {
+        // dns is broke, try the last known ip
+        urlString.replace("wigle.net", "205.234.142.193");
+        connectURL = new URL( urlString );
+        try {
+            ListActivity.info("testcon1.1");
+            URLConnection testcon = connectURL.openConnection();
+            // we should probably time-bound this test-connection?
+            testcon.connect();
+            self_serving = false;
+        } 
+        catch (IOException ex) {
+            // we're specifically interested in javax.net.ssl.SSLException
+        }
+    } 
+    catch (IOException ex) {
         // we're specifically interested in javax.net.ssl.SSLException
     }
 
@@ -75,7 +91,8 @@ final class HttpFileUploader {
                 testcon.connect();
                 fallback = false;
             }
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
           // ListActivity.info("testcon ex: " + ex, ex);
         }
     }

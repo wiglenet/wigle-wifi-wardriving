@@ -661,7 +661,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
         setStatusUI( "Scanning Turned Off" );
         state.gpsListener.handleScanStop();
         if ( state.wifiLock.isHeld() ){
-          state.wifiLock.release();
+          try {
+            state.wifiLock.release();
+          }
+          catch (SecurityException ex) {
+            // a case where we have a leftover lock from another run?
+            info("exception releasing wifilock: " + ex);
+          }
         }
       }
     }

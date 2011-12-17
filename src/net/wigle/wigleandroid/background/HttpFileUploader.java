@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
@@ -73,7 +74,7 @@ final class HttpFileUploader {
             testcon.connect();
             self_serving = false;
         } 
-        catch (IOException ex) {
+        catch (IOException ioEx) {
             // we're specifically interested in javax.net.ssl.SSLException
         }
     } 

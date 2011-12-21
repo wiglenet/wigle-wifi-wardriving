@@ -25,8 +25,9 @@ store system time on db records (not just gps time)
 download of cell observed as well
 
 --- done ---
-* 1.47 ()
+* 1.47 (12/20/2011)
 Italian update (thanks Andrea!)
+Add CHANGE_NETWORK_STATE to stop some devices from complaining
 Handle out of bounds in BackgroundGuiHandler
 Handle NullPointerException in NetworkActivity
 Handle NullPointerException in SQLiteException

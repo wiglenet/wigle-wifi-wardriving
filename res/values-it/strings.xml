@@ -15,10 +15,10 @@
     WiGLE Wifi - Dashboard
   </string>
   <string name="error_report_name">
-    Wifi Wifi - Resoconto errori più recenti
+    WiGLE Wifi - Segnalazioni di errore
   </string>
   <string name="speech_name">
-    WiGLE Wifi - Impostazioni Speech
+    WiGLE Wifi - Impostazioni sintesi vocale
   </string>
   <string name="network_activity_name">
     WiGLE Wifi - Rete
@@ -27,118 +27,118 @@
     WiGLE Wifi - Database
   </string>
   <string name="dbresult_activity_name">
-    WiGLE Wifi - Risultati Ricerca
+    WiGLE Wifi - Risultati ricerca
   </string>
   <string name="upload_button">
-    Carica a \n WiGLE.net
+    Carica su\nWiGLE.net
   </string>
   <string name="username">
     Nome utente WiGLE
   </string>
   <string name="password">
-    WiGLE password
+    Password WiGLE
   </string>
   <string name="show_current">
-    Mostra le reti corrente
+    Mostra soltanto le reti correnti
   </string>
   <string name="use_metric">
     Usa unità metriche
   </string>
   <string name="be_anonymous">
-    Carica anonima
+    Carica i dati in forma anonima
   </string>
   <string name="donate">
-    Donare dati: Consente l\'uso commerciale
+    Consenti l\'uso commerciale dei dati donati a WiGLE
   </string>
   <string name="found_sound">
-    Riproduci suono quando la rete si trovano in corsa
+    Riproduci un suono quando viene trovata una rete
   </string>
   <string name="found_new_sound">
-    Riproduci suono quando nuova rete in DB
+    Riproduci un suono quando una nuova rete viene aggiunta al database
   </string>
   <string name="reset_maxid_button">
-    Zero DB marcatore
+    Azzera il segnalibro del database
   </string>
   <string name="reset_maxid_text">
-    Ultimi caricare marcatore:
+    Segnalibro dell\'ultimo caricamento:
   </string>
   <string name="maxout_maxid_button">
-    Maxout DB marcatore
+    Massimizza il segnalibro del database
   </string>
   <string name="maxout_maxid_text">
-    Imposta marcatore:
+    Imposta il segnalibro al valore:
   </string>
   <string name="connect_button">
-    Collegare
+    Connetti
   </string>
   <string name="connect_text">
-    con il permesso di operatore di rete
+    con l\'autorizzazione del proprietario della rete
   </string>
   <string name="csv_run_export_button">
-    CSV Export Run
+    Esporta CSV esecuzione
   </string>
   <string name="csv_run_export_text">
-    Esportazione eseguire corrente su file CSV
+    Esporta l\'esecuzione corrente su file CSV
   </string>
   <string name="kml_run_export_button">
-    KML Export Run
+    Esporta KML esecuzione
   </string>
   <string name="kml_run_export_text">
-    Esportazione eseguire corrente su file KML
+    Esporta l\'esecuzione corrente su file KML
   </string>
   <string name="kml_export_button">
-    KML Export DB
+    Esporta KML database
   </string>
   <string name="kml_export_text">
-    Esportazione DB intero file KML
+    Esporta tutto il database su file KML
   </string>
   <string name="backup_db_button">
     Backup database
   </string>
   <string name="backup_db_text">
-    Effettuare un backup del database
+    Effettua un backup dell\'intero database
   </string>
   <string name="import_observed_button">
-    Importa osservati
+    Importa osservate
   </string>
   <string name="import_observed_text">
-    Importare i miei reti osservato da WiGLE
+    Importa da WiGLE le mie reti osservate
   </string>
   <string name="periodstill_text">
-    Tempo tra wifi scansioni 0 mph
+    Intervallo di scansione wifi a 0 km/h
   </string>
   <string name="period_text">
-    Tempo tra le scansioni wifi &lt;5 mph
+    Intervallo di scansione wifi a &lt; 8 km/h
   </string>
   <string name="periodfast_text">
-    Tempo tra le scansioni wifi&gt; 5 mph
+    Intervallo di scansione wifi a &gt; 8 km/h
   </string>
   <string name="gps_text">
-    Tempo tra gli aggiornamenti GPS
+    Intervallo di aggiornamento GPS
   </string>
   <string name="speak_text">
-    Tempo tra discorso audio
+    Intervallo di notifica con sintesi vocale
   </string>
   <string name="battery_kill_text">
-    Uscire a questo livello della batteria
+    Uscita quando la batteria è critica
   </string>
   <string name="reset_wifi_text">
-    Decidere Wifi è inceppata
+    Rilevamento blocco sensore wifi
   </string>
   <string name="speech_gps">
-    Annunciare le modifiche dello stato GPS
+    Annunciare il cambiamento di stato GPS
   </string>
   <string name="mute">
-    Muto
+    Audio disattivato
   </string>
   <string name="play">
-    Giocare
+    Audio attivato
   </string>
   <string name="unknown">
     Sconosciuto
   </string>
   <string name="sort_text">
-    Ordina Opzioni
+    Opzioni di ordinamento
   </string>
   <string name="listdialog_button">
     OK
@@ -147,103 +147,103 @@
     OK
   </string>
   <string name="cryptocanceldialog_button">
-    Annullare
+    Annulla
   </string>
   <string name="circle_size_map">
-    Cerchi mappa Sized da Qtà
+    Dimensione dei cerchi nella mappa in base alla qualità
   </string>
   <string name="speech_button">
-    Discorso Schermata di configurazione&gt;&gt;
+    Configurazione sintesi vocale &gt;&gt;
   </string>
   <string name="speech_text">
-    Discorso audio includono:
+    La sintesi vocale include:
   </string>
   <string name="speech_run">
-    Reti per eseguire
+    Numero di reti nell\'esecuzione corrente
   </string>
   <string name="speech_new_wifi">
-    Nuovo wifi a DB
+    Nuova rete wifi nel database
   </string>
   <string name="speech_new_cell">
-    Torri nuova cella a DB
+    Nuova torre GSM nel database
   </string>
   <string name="speech_queue">
-    Coda di dimensioni, se&gt; 0
+    Dimensione della coda, se &gt; 0
   </string>
   <string name="speech_miles">
-    Miglia a correre
+    Kilometri o miglia percorse
   </string>
   <string name="speech_time">
-    Orario
+    Orario corrente
   </string>
   <string name="speech_battery">
-    Livello percentuale della batteria
+    Percentuale livello batteria
   </string>
   <string name="speech_ssid">
-    Nuova rete SSID\'s
+    SSID della nuova rete wifi
   </string>
   <string name="query_address">
-    Indirizzo (es: Chicago, IL):
+    Indirizzo (ad es. Milano):
   </string>
   <string name="query_ssid">
     SSID (es: Linksys) (caratteri jolly SQL: %,_):
   </string>
   <string name="search_button">
-    Query DB locale
+    Cerca nel DB locale
   </string>
   <string name="reset_button">
-    Campi reset
+    Pulisci i campi
   </string>
   <string name="list_query_clear">
-    Argomenti Query chiaro
+    Pulisci gli argomenti della ricerca
   </string>
   <string name="crypto_security">
-    Sicurezza
+    Cifratura
   </string>
   <string name="crypto_strength">
-    Potenza del segnale
+    Potenza segnale
   </string>
   <string name="crypto_password">
     Password
   </string>
   <string name="crypto_show_password">
-    Mostra password.
+    Mostra password
   </string>
   <string name="filter_show_ssid">
-    Mostra SSID\'s Matching (regex):
+    Mostra SSID che soddisfano l\'espressione regolare:
   </string>
   <string name="filter_not_regex">
-    Mostrare ciò che non corrispondere sopra delle espressioni regolari
+    Mostra SSID che NON soddisfano l\'espressione regolare
   </string>
   <string name="filter_show_open">
-    Mostra Aprire
+    Mostra reti aperte
   </string>
   <string name="filter_show_cell">
     Mostra cella
   </string>
   <string name="filter_show_wep">
-    Mostra WEP
+    Mostra reti WEP
   </string>
   <string name="filter_show_wpa">
-    Mostra WPA
+    Mostra reti WPA
   </string>
   <string name="filter_enabled">
-    Filtro Enabled
+    Filtro abilitato
   </string>
   <string name="list_waiting_gps">
-    (In attesa di sincronizzazione GPS ..)
+    (In attesa del segnale GPS...)
   </string>
   <string name="list_scanning_off">
-    (Scansione spento)
+    (Scansione disattivata)
   </string>
   <string name="list_short_lat">
     Lat:
   </string>
   <string name="list_short_lon">
-    Lon:
+    Long:
   </string>
   <string name="list_short_sats">
-    Sats:
+    Sat:
   </string>
   <string name="list_short_alt">
     Alt:
@@ -264,7 +264,7 @@
     Tipo:
   </string>
   <string name="network_firstseen">
-    First Click:
+    Prima osservazione:
   </string>
   <string name="network_capa">
     Funzionalità:
@@ -276,49 +276,49 @@
     Osservazioni:
   </string>
   <string name="network_querying">
-    (Querying. ..)
+    (ricerca...)
   </string>
   <string name="setting_show_password">
     Mostra password
   </string>
   <string name="setting_db_marker">
-    DB Marker (dove arrivi partire da):
+    Segnalibro del database (da cui inizia il caricamento):
   </string>
   <string name="setting_high_up">
-    Massima id caricato:
+    Più alto ID caricato:
   </string>
   <string name="setting_zero_out">
-    Azzerare marcatore DB?
+    Azzerare il segnalibro del database?
   </string>
   <string name="setting_max_id">
-    Max caricare id:
+    Massimo ID caricato:
   </string>
   <string name="setting_max_start">
-    Max id all\'avvio:
+    Massimo ID all\'avvio:
   </string>
   <string name="setting_max_out">
-    Max fuori marcatore DB?
+    Massimizzare il segnalibro del database?
   </string>
   <string name="setting_tie_wifi">
-    Legare al Periodo Wifi Scan
+    Vincola all\'intervallo di scansione wifi
   </string>
   <string name="no_tts">
-    No Text-to-Speech motore
+    Nessun motore di sintesi vocale
   </string>
   <string name="sec">
-    secondo
+    sec
   </string>
   <string name="min">
     min
   </string>
   <string name="off">
-    Via
+    off
   </string>
   <string name="on">
-    Su
+    on
   </string>
   <string name="nonstop">
-    Nonstop
+    ininterrotto
   </string>
   <string name="tab_list">
     Lista
@@ -327,55 +327,55 @@
     Mappa
   </string>
   <string name="tab_dash">
-    Cruscotto
+    Panoramica
   </string>
   <string name="tab_data">
-    Dati
+    Database
   </string>
   <string name="ok">
     OK
   </string>
   <string name="cancel">
-    Annullare
+    Annulla
   </string>
   <string name="dash_scan_off">
-    (Scansione spento)
+    (Scansione disattivata)
   </string>
   <string name="dash_new_wifi">
-    Nuovo Wifi
+    Nuove reti wifi
   </string>
   <string name="dash_vis_nets">
-    Reti visibili:
+    Reti wifi visibili:
   </string>
   <string name="dash_new_upload">
-    Reti nuovo Dal Carica:
+    Nuove reti (dall\'ultimo upload):
   </string>
   <string name="dash_new_cells">
-    Torri nuova cellula:
+    Nuove torri GSM:
   </string>
   <string name="dash_dist_run">
-    Esegui Distanza:
+    Distanza percorsa (esecuzione corrente):
   </string>
   <string name="dash_dist_total">
-    Totale Dist.:
+    Distanza percorsa (in totale):
   </string>
   <string name="dash_dist_prev">
-    Precedente Run:
+    Distanza percorsa (esecuzione precedente):
   </string>
   <string name="dash_db_queue">
-    DB Coda:
+    Database coda:
   </string>
   <string name="dash_db_nets">
-    DB Reti:
+    Database reti:
   </string>
   <string name="dash_db_locs">
-    DB Sedi:
+    Database posizioni:
   </string>
   <string name="dash_no_loc">
-    No Localizzazione!
+    Posizione non disponibile
   </string>
   <string name="dash_short_loc">
-    Loc:
+    Pos:
   </string>
   <string name="km_short">
     km
@@ -399,7 +399,7 @@
     piedi
   </string>
   <string name="kmph">
-    kmph
+    km/h
   </string>
   <string name="mph">
     mph
@@ -408,34 +408,34 @@
     ms
   </string>
   <string name="na">
-    N / A
+    n.d.
   </string>
   <string name="run">
-    Corsa
+    Viste
   </string>
   <string name="new_word">
-    Nuovo
+    Nuove
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    acquisiti in
+    esaminate in
   </string>
   <string name="sort_title">
-    Ordina Opzioni
+    Opzioni di ordinamento
   </string>
   <string name="sort_spin_label">
-    Lista Ordina per:
+    Ordina la lista in base a:
   </string>
   <string name="channel">
     Canale
   </string>
   <string name="crypto">
-    Crypto
+    Cifratura
   </string>
   <string name="found_time">
-    Tempo trovati
+    Istante di rilevamento
   </string>
   <string name="signal">
     Segnale
@@ -444,10 +444,10 @@
     SSID
   </string>
   <string name="best_results">
-    Per ottenere risultati ottimali, unset &quot;notifica di rete&quot; in &quot;Wireless e reti&quot; -&gt; &quot;Impostazioni Wi-Fi&quot;
+    Per ottenere migliori risultati, deselezionare &quot;Notifica rete&quot; in &quot;Wireless e reti&quot; -&gt; &quot;Impostazioni Wi-Fi&quot;
   </string>
   <string name="turn_on_wifi">
-    Accensione WiFi
+    Accensione del wifi in corso
   </string>
   <string name="no_gps_device">
     Nessun dispositivo GPS rilevato!
@@ -459,34 +459,34 @@
     Indirizzo
   </string>
   <string name="no_address_found">
-    Nessun indirizzo geocodificato trovato
+    L\'indirizzo non è stato trovato
   </string>
   <string name="problem_with_field">
     Problema con il campo
   </string>
   <string name="turning_wifi_off">
-    Tornando indietro WiFi spento
+    Spegnimento del wifi in corso
   </string>
   <string name="lost_location">
-    Località perso
+    Posizione persa
   </string>
   <string name="have_location">
-    Ora hanno luogo da
+    Posizione fornita da
   </string>
   <string name="wifi_jammed">
-    WiFi appare inceppata, spegnere, e poi, WiFi.
+    Il sensore wifi sembra bloccato, si prega di riavviare.
   </string>
   <string name="battery_at">
-    Il livello della batteria a
+    Livello batteria
   </string>
   <string name="battery_postfix">
-    per cento, chiudendo WiGLE Wifi
+    percento, uscita dal programma in corso.
   </string>
   <string name="scan">
     Scansione
   </string>
   <string name="menu_exit">
-    Uscita
+    Esci
   </string>
   <string name="menu_settings">
     Impostazioni
@@ -495,52 +495,52 @@
     Segnala errore
   </string>
   <string name="menu_return">
-    Ritorno
+    Indietro
   </string>
   <string name="menu_sort">
-    Ordina Opzioni
+    Opzioni di ordinamento
   </string>
   <string name="menu_ssid_filter">
-    Etichetta Filtro SSID
+    Filtraggio etichetta SSID
   </string>
   <string name="menu_screen_sleep">
-    Lasciate sonno schermo
+    Permetti allo schermo di spegnersi
   </string>
   <string name="menu_screen_wake">
-    Tenere On Screen
+    Mantieni lo schermo acceso
   </string>
   <string name="menu_labels_off">
-    Etichette Off
+    Non mostrare etichette 
   </string>
   <string name="menu_labels_on">
-    Etichette On
+    Mostra etichette
   </string>
   <string name="menu_zoom_in">
-    Zoom In
+    Aumenta ingrandimento
   </string>
   <string name="menu_zoom_out">
-    Zoom Out
+    Diminuisci ingrandimento
   </string>
   <string name="menu_turn_off_lockon">
-    Spegni Lockon
+    Non seguire la posizione correntes
   </string>
   <string name="menu_turn_on_lockon">
-    Attiva Lockon
+    Segui la posizione corrente
   </string>
   <string name="menu_show_old">
-    Mostra Run &amp; New
+    Mostra viste e nuove
   </string>
   <string name="menu_show_new">
-    Mostra Solo Nuovi
+    Mostra solo nuove
   </string>
   <string name="tts_no_gps_fix">
-    nessun fix gps
+    Nessun segnale GPS
   </string>
   <string name="tts_new_wifi">
-    Nuovo wifi
+    Nuova rete wifi
   </string>
   <string name="tts_new_cell">
-    Nuova cella
+    Nuova cella GSM
   </string>
   <string name="tts_queue">
     Coda
@@ -549,16 +549,16 @@
     da
   </string>
   <string name="tts_o_clock">
-    devono orologio
+    in punto
   </string>
   <string name="tts_o">
-    dovere
+    zero
   </string>
   <string name="tts_battery">
     batteria
   </string>
   <string name="tts_percent">
-    per cento
+    percento
   </string>
   <string name="status_unknown">
     Sconosciuto
@@ -567,55 +567,55 @@
     Errore sconosciuto
   </string>
   <string name="status_fail">
-    Fallire
+    Non riuscito
   </string>
   <string name="status_success">
-    Successo
+    Riuscito
   </string>
   <string name="status_working">
-    Di lavoro ...
+    In corso...
   </string>
   <string name="status_upload_success">
-    Carica di successo
+    Caricamento riuscito
   </string>
   <string name="status_write_success">
-    Scrivi successo
+    Salvataggio riuscito
   </string>
   <string name="status_no_user">
-    Nome utente non impostata
+    Nome utente non impostato
   </string>
   <string name="status_no_pass">
-    La password non impostata e username non \'anonymous\'
+    Password non impostata
   </string>
   <string name="status_exception">
     Eccezione
   </string>
   <string name="status_login_fail">
-    Accesso non riuscito, verificare la password?
+    Accesso non riuscito, verificare nome utente e password
   </string>
   <string name="status_uploading">
-    Caricamento di file
+    Caricamento del file
   </string>
   <string name="status_writing">
-    La scrittura di file
+    Salvataggio del file
   </string>
   <string name="status_nothing">
-    Fare Nulla
+    Nessuna azione
   </string>
   <string name="status_empty">
-    File sarebbe vuoto
+    Il file sarebbe vuoto
   </string>
   <string name="data_export_csv">
-    Eseguire l\'esportazione di file CSV?
+    Esportare l\'esecuzione corrente su file CSV?
   </string>
   <string name="data_export_kml_run">
-    Eseguire l\'esportazione di file KML?
+    Esportare l\'esecuzione corrente su file KML?
   </string>
   <string name="data_export_kml_db">
-    Esportazione DB di file KML?
+    Esportare l\'intero database su file KML?
   </string>
   <string name="data_backup_db">
-    Backup DB su file diversi?
+    Effettuare il backup in un file differente?
   </string>
   <string name="language_en">
     Inglese (en)
@@ -648,27 +648,27 @@
     svenska (sv)
   </string>
   <string name="language_text">
-    Lingua selezionata (richiede riavvio)
+    Seleziona lingua (riavvio richiesto)
   </string>
   <string name="auto">
     Automatico
   </string>
   <string name="fatal_title">
-    DB Problema fatale
+    Grave problema del database
   </string>
   <string name="fatal_db_warn">
-    Di solito causata da problemi di periferica o scheda SD!
+    Questo errore è di norma causato da problemi della periferica o della scheda SD.
   </string>
   <string name="fatal_pre_message">
     ERRORE
   </string>
   <string name="fatal_post_message">
-    (Può visualizzare di nuovo con "segnalazione errori" nel menu Impostazioni)
+    (Visualizzabile nel menu &quot;Impostazioni&quot; alla voce &quot;Segnala errore&quot;)
   </string>
   <string name="use_network_location">
-    Usa Località provider di rete
+    Utilizza la posizione fornita dalla rete GSM
   </string>
   <string name="data_import_observed">
-    Importare la mia wifi osservato da WiGLE nel database locale?
+    Importare le mie reti osservate da WiGLE nel database locale?
   </string>
 </resources>

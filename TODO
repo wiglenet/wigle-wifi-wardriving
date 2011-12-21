@@ -26,7 +26,8 @@ download of cell observed as well
 
 --- done ---
 * 1.47 ()
-Handle out of bounds in BackgrounGuiHandler
+Italian update (thanks Andrea!)
+Handle out of bounds in BackgroundGuiHandler
 Handle NullPointerException in NetworkActivity
 Handle NullPointerException in SQLiteException
 

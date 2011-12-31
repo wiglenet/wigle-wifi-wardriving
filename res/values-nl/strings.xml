@@ -5,8 +5,7 @@
 	<string name="settings_app_name">WiGLE Wifi - Instellingen</string>
 	<string name="mapping_app_name">WiGLE Wifi - Open Street Map</string>
 	<string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-	<string name="error_report_name">WiGLE Wifi - Meest recente
-Foutrapport</string>
+	<string name="error_report_name">WiGLE Wifi - Meest recente Foutrapport</string>
 	<string name="speech_name">WiGLE Wifi - Spraak Instellingen</string>
 	<string name="network_activity_name">WiGLE Wifi - Netwerk</string>
 	<string name="data_activity_name">WiGLE Wifi - Database</string>
@@ -18,33 +17,26 @@ Foutrapport</string>
 	<string name="use_metric">Gebruik metrische eenheden</string>
 	<string name="be_anonymous">Anoniem uploaden</string>
 	<string name="donate">Doneer gegevens voor commercieel gebruik</string>
-	<string name="found_sound">Geluid afspelen bij een nieuw netwerk in
-run</string>
-	<string name="found_new_sound">Geluid afspelen bij een nieuw netwerk in
-DB</string>
+	<string name="found_sound">Geluid afspelen bij een nieuw netwerk in run</string>
+	<string name="found_new_sound">Geluid afspelen bij een nieuw netwerk in DB</string>
 	<string name="reset_maxid_button">Leeg DB marker</string>
 	<string name="reset_maxid_text">Laatste uploadmarker:</string>
 	<string name="maxout_maxid_button">Maxout DB marker</string>
 	<string name="maxout_maxid_text">Stel marker in op:</string>
 	<string name="connect_button">Verbind</string>
-	<string name="connect_text">alleen als je toestemming hebt van de
-houder</string>
+	<string name="connect_text">alleen als je toestemming hebt van de houder</string>
 	<string name="csv_run_export_button">CSV export run</string>
-	<string name="csv_run_export_text">Exporteer je run naar een
-CSV-bestand</string>
+	<string name="csv_run_export_text">Exporteer je run naar een CSV-bestand</string>
 	<string name="csv_export_button">CSV exporteer DB</string>
 	<string name="csv_export_text">Exporteer hele DB naar CSV-bestand</string>
 	<string name="kml_run_export_button">KML export DB</string>
-	<string name="kml_run_export_text">Exporteer huidige run naar een
-KML-bestand</string>
+	<string name="kml_run_export_text">Exporteer huidige run naar een KML-bestand</string>
 	<string name="kml_export_button">KML exporteer DB</string>
-	<string name="kml_export_text">Exporteer de lokale Database naar een
-KML-bestand</string>
+	<string name="kml_export_text">Exporteer de lokale Database naar een KML-bestand</string>
 	<string name="backup_db_button">Back-up database</string>
 	<string name="backup_db_text">Maak een database back-up</string>
 	<string name="import_observed_button">Importeer gevonden</string>
-	<string name="import_observed_text">Importeer de gevonden netwerken van
-mijn Wigle account in de lokale database</string>
+	<string name="import_observed_text">Importeer de gevonden netwerken van mijn Wigle account in de lokale database</string>
 	<string name="periodstill_text">tijd tussen WiFi scans 0 KM/h</string>
 	<string name="period_text">tijd tussen WiFi scans &lt;8 KM/h</string>
 	<string name="periodfast_text">tijd tussen WiFi scans &gt;8 KM/h</string>
@@ -60,8 +52,7 @@ mijn Wigle account in de lokale database</string>
 	<string name="listdialog_button">Ok</string>
 	<string name="cryptodialog_button">Ok</string>
 	<string name="cryptocanceldialog_button">Annuleren</string>
-	<string name="circle_size_map">Map cirkelgrootte wordt bepaald door sterkte
-van het netwerk</string>
+	<string name="circle_size_map">Map cirkelgrootte wordt bepaald door sterkte van het netwerk</string>
 	<string name="speech_button">Spraak Configuratie Scherm&gt;&gt;</string>
 	<string name="speech_text">Audio spraak onder meer:</string>
 	<string name="speech_run">Netwerken in run</string>
@@ -73,9 +64,7 @@ van het netwerk</string>
 	<string name="speech_battery">Batterijniveau percentage</string>
 	<string name="speech_ssid">Nieuw Netwerk SSID\'s</string>
 	<string name="query_address">Adres (vb: Amsterdam, NL):</string>
-	<string name="dbresult_activity_name">WiGLE Wifi - Zoekresultaten</string>
-	<string name="query_ssid">SSID (vb: Linksys) (SQL toevoegingen:
-%,_):</string>
+	<string name="query_ssid">SSID (vb: Linksys) (SQL toevoegingen: %,_):</string>
 	<string name="search_button">Query lokaal uitvoeren</string>
 	<string name="reset_button">Leegmaken</string>
 	<string name="list_query_clear">Leeg Query toevoegingen</string>
@@ -129,8 +118,7 @@ van het netwerk</string>
 	<string name="dash_scan_off">(Scannen uit)</string>
 	<string name="dash_new_WiFi">nieuwe WiFi</string>
 	<string name="dash_vis_nets">Zichtbare netwerken:</string>
-	<string name="dash_new_upload">Nieuwe netwerken sinds laatste
-upload:</string>
+	<string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
 	<string name="dash_new_cells">Nieuwe GSM masten:</string>
 	<string name="dash_dist_run">Run afstand:</string>
 	<string name="dash_dist_total">Totale afstand:.</string>
@@ -163,8 +151,7 @@ upload:</string>
 	<string name="signal">Signaal</string>
 	<string name="ssid">SSID</string>
 	<string name="bssid">BSSID</string>
-	<string name="best_results">Voor de beste resultaten, vink "Netwerkmelding"
-in "Draadloos en netwerken" ->"WiFi-instellingen" uit</string>
+	<string name="best_results">Voor de beste resultaten, vink "Netwerkmelding" in "Draadloos en netwerken" ->"WiFi-instellingen" uit</string>
 	<string name="turn_on_WiFi">Zet WiFi aan</string>
 	<string name="no_gps_device">Geen GPS apparaat gevonden!</string>
 	<string name="turn_on_gps">Zet GPS aan</string>
@@ -174,8 +161,7 @@ in "Draadloos en netwerken" ->"WiFi-instellingen" uit</string>
 	<string name="turning_WiFi_off">WiFi weer uitzetten</string>
 	<string name="lost_location">Geen locatie meer</string>
 	<string name="have_location">Locatie gevonden</string>
-	<string name="WiFi_jammed">WiFi lijkt bezet of vastgelopen te zijn, Zet
-WiFi uit en weer aan.</string>
+	<string name="WiFi_jammed">WiFi lijkt bezet of vastgelopen te zijn, Zet WiFi uit en weer aan.</string>
 	<string name="battery_at">Als het batterijniveau</string>
 	<string name="battery_postfix">procent komt, sluit WiGLE Wifi af</string>
 	<string name="scan">Scan</string>
@@ -208,15 +194,13 @@ WiFi uit en weer aan.</string>
 	<string name="status_unknown_error">Onbekende fout</string>
 	<string name="status_fail">Mislukt</string>
 	<string name="status_success">Gelukt</string>
-	<string name="status_working">Bezig...</string>
+	<string name="status_working">Bezig&#8230;</string>
 	<string name="status_upload_success">Uploaden gelukt!</string>
 	<string name="status_write_success">Schrijven gelukt!</string>
 	<string name="status_no_user">Gebruikersnaam niet ingesteld</string>
-	<string name="status_no_pass">Wachtwoord niet ingesteld en de
-gebruikersnaam is niet \'anoniem \'</string>
+	<string name="status_no_pass">Wachtwoord niet ingesteld en de gebruikersnaam is niet \'anoniem \'</string>
 	<string name="status_exception">Uitzondering</string>
-	<string name="status_login_fail">Aanmelden mislukt, controleer de
-logingegevens in de instellingen</string>
+	<string name="status_login_fail">Aanmelden mislukt, controleer de logingegevens in de instellingen</string>
 	<string name="status_uploading">Bestand uploaden</string>
 	<string name="status_writing"> Bestand schrijven</string>
 	<string name="status_nothing">Doet niks</string>
@@ -248,13 +232,9 @@ logingegevens in de instellingen</string>
 	<string name="language_text">Selected language (requires restart)</string>
 	<string name="auto">Automatisch</string>
 	<string name="fatal_title">Fataal DB Probleem</string>
-	<string name="fatal_db_warn">Meestal veroorzaakt door het apparaat of een
-SD-kaart probleen!</string>
+	<string name="fatal_db_warn">Meestal veroorzaakt door het apparaat of een SD-kaart probleen!</string>
 	<string name="fatal_pre_message">FOUT</string>
-	<string name="fatal_post_message">(Terug te kijken in het "Foutrapport" in
-Instellingen)</string>
-	<string name="use_network_location">Gebruik netwerklocatie van
-provider</string>
-	<string name="data_import_observed">Importeer de gevonden netwerken van
-mijn Wigle account in de lokale database</string>
+	<string name="fatal_post_message">(Terug te kijken in het "Foutrapport" in Instellingen)</string>
+	<string name="use_network_location">Gebruik netwerklocatie van provider</string>
+	<string name="data_import_observed">Importeer de gevonden netwerken van mijn Wigle account in de lokale database</string>
 </resources>

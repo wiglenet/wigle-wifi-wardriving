@@ -95,7 +95,7 @@
     <string name="network_capa">Capabilities:</string>
     <string name="network_channel">Channel:</string>
     <string name="network_observations">Observations:</string>
-    <string name="network_querying">(querying...)</string>
+    <string name="network_querying">(querying&#8230;)</string>
     <string name="setting_show_password">Show Password</string>
     <string name="setting_db_marker">DB Marker (where uploads start from):</string>  
     <string name="setting_high_up">Highest uploaded id:</string>
@@ -195,7 +195,7 @@
     <string name="status_unknown_error">Unknown error</string>   
     <string name="status_fail">Fail</string>
     <string name="status_success">Success</string>
-    <string name="status_working">Working...</string>
+    <string name="status_working">Working&#8230;</string>
     <string name="status_upload_success">Upload Successful</string>
     <string name="status_write_success">Write Successful</string>
     <string name="status_no_user">Username not set</string>

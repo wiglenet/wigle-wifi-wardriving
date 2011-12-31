@@ -1115,8 +1115,13 @@ public final class ListActivity extends Activity implements FileUploaderListener
       if ( tele != null && state.phoneState == null ) {
         state.phoneState = PhoneStateFactory.createPhoneState();
         final int signal_strengths = 256;
-        tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
+        try {
+          tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
             | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH | signal_strengths );
+        }
+        catch (SecurityException ex) {
+          info("cannot get call state, will play audio over any telephone calls: " + ex);
+        }
       }
       
       setupMuteButton();

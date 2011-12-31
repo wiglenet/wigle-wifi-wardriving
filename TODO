@@ -8,6 +8,7 @@ show IEEE octet info (manufacturer stats/speech)
 show countdown while trying to close database
 lat/lon in observed import from wigle
 debug logging mode
+download of cell observed as well
 
 --- user suggested ---
 kismet drone support
@@ -21,11 +22,13 @@ stats on what is in the local db
 "only new" on map work with labels too
 workaround the clearing of wifi list on screen rotate somehow
 store system time on db records (not just gps time)
-
-download of cell observed as well
+be able to disable cell tower recording, and/or filter kml output
+output GPX (open street map)
 
 --- done ---
-* 1.48
+* 1.48 (12/31/2011)
+CSV Run Export selects from the current run of the app, rather than latest upload to WiGLE
+Catch SecurityException if can't get phone state (to not play audio during any phone calls)
 Catch UnsupportedOperationException in osmdroid's drawCompass
 update osmdroid to r1018
 

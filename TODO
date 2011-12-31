@@ -27,6 +27,7 @@ output GPX (open street map)
 
 --- done ---
 * 1.48 (12/31/2011)
+Dutch language update (thanks Roestje!)
 CSV Run Export selects from the current run of the app, rather than latest upload to WiGLE
 Catch SecurityException if can't get phone state (to not play audio during any phone calls)
 Catch UnsupportedOperationException in osmdroid's drawCompass

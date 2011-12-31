@@ -237,5 +237,7 @@
     <string name="fatal_pre_message">ERROR</string>
     <string name="fatal_post_message">(Can view again with "Error Report" on Settings menu)</string>        
     <string name="use_network_location">Use Network Location Provider</string>   
-    <string name="data_import_observed">Import my observed wifi from WiGLE into local database?</string>       
+    <string name="data_import_observed">Import my observed wifi from WiGLE into local database?</string>    
+    <string name="donate_question">Donate data to WiGLE?</string>
+    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>   
 </resources>

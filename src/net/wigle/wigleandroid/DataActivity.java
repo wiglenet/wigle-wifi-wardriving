@@ -155,6 +155,7 @@ public final class DataActivity extends Activity implements FileUploaderListener
             // actually need this Activity context, for dialogs
             FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
                 ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+            fileUploaderTask.setWriteRunOnly();
             fileUploaderTask.start();
           }
         } );

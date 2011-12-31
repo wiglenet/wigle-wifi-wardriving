@@ -89,8 +89,7 @@ public final class SettingsActivity extends Activity {
               buttonView.setChecked( false );
               // confirm
               MainActivity.createConfirmation( SettingsActivity.this, 
-                  "Donate data to WiGLE?\n\n"
-                  + "Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.", 
+                  getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain), 
                   new Doer() {
                 @Override
                 public void execute() {

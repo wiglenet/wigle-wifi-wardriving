@@ -43,6 +43,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   private final FileUploaderListener listener;
   private final boolean justWriteFile;
   private boolean writeWholeDb;
+  private boolean writeRunOnly;
   
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
@@ -66,6 +67,10 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   
   public void setWriteWholeDb() {
     this.writeWholeDb = true;
+  }
+  
+  public void setWriteRunOnly() {
+    this.writeRunOnly = true;
   }
   
   public void subRun() {
@@ -296,6 +301,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     if ( writeWholeDb ) {
       maxId = 0;
     }
+    else if ( writeRunOnly ) {
+      // max id at startup
+      maxId = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
+    }
+    ListActivity.info( "Writing file starting with observation id: " + maxId);
     final Cursor cursor = dbHelper.locationIterator( maxId );
     
     try {

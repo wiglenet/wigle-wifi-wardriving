@@ -43,7 +43,7 @@
 	<string name="gps_text">Tijd tussen GPS update</string>
 	<string name="speak_text">Tijd tussen audio speech</string>
 	<string name="battery_kill_text">Verlaat op dit Batterij niveau</string>
-	<string name="reset_WiFi_text">Beslis dat Wifi is weggedrukt</string>
+	<string name="reset_wifi_text">Beslis dat Wifi is weggedrukt</string>
 	<string name="speech_gps">Laat een GPS status verandering horen</string>
 	<string name="mute">Dempen</string>
 	<string name="play">Afspelen</string>
@@ -56,7 +56,7 @@
 	<string name="speech_button">Spraak Configuratie Scherm&gt;&gt;</string>
 	<string name="speech_text">Audio spraak onder meer:</string>
 	<string name="speech_run">Netwerken in run</string>
-	<string name="speech_new_WiFi">Nieuwe WiFinetwerken in DB</string>
+	<string name="speech_new_wifi">Nieuwe WiFinetwerken in DB</string>
 	<string name="speech_new_cell">Nieuwe celtorens in DB</string>
 	<string name="speech_queue">Wachtrij formaat als>0</string>
 	<string name="speech_miles">Mijlen in run</string>
@@ -102,7 +102,7 @@
 	<string name="setting_max_id">Max upload ID:</string>
 	<string name="setting_max_start">Max ID bij het opstarten:</string>
 	<string name="setting_max_out">Max uit DB marker?</string>
-	<string name="setting_tie_WiFi">Reset Wifi scanperiode</string>
+	<string name="setting_tie_wifi">Reset Wifi scanperiode</string>
 	<string name="no_tts">Geen Tekst-naar-spraak aanwezig</string>
 	<string name="sec">sec</string>
 	<string name="min">min</string>
@@ -116,7 +116,7 @@
 	<string name="ok">Ok</string>
 	<string name="cancel">Annuleren</string>
 	<string name="dash_scan_off">(Scannen uit)</string>
-	<string name="dash_new_WiFi">nieuwe WiFi</string>
+	<string name="dash_new_wifi">nieuwe WiFi</string>
 	<string name="dash_vis_nets">Zichtbare netwerken:</string>
 	<string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
 	<string name="dash_new_cells">Nieuwe GSM masten:</string>
@@ -151,17 +151,17 @@
 	<string name="signal">Signaal</string>
 	<string name="ssid">SSID</string>
 	<string name="bssid">BSSID</string>
-	<string name="best_results">Voor de beste resultaten, vink "Netwerkmelding" in "Draadloos en netwerken" ->"WiFi-instellingen" uit</string>
-	<string name="turn_on_WiFi">Zet WiFi aan</string>
+	<string name="best_results">Voor de beste resultaten, vink "Netwerkmelding" in "Draadloos en netwerken" -&gt;"WiFi-instellingen" uit</string>
+	<string name="turn_on_wifi">Zet WiFi aan</string>
 	<string name="no_gps_device">Geen GPS apparaat gevonden!</string>
 	<string name="turn_on_gps">Zet GPS aan</string>
 	<string name="address">Adres</string>
 	<string name="no_address_found">Geen geocode adres gevonden</string>
 	<string name="problem_with_field">Probleem met veld</string>
-	<string name="turning_WiFi_off">WiFi weer uitzetten</string>
+	<string name="turning_wifi_off">WiFi weer uitzetten</string>
 	<string name="lost_location">Geen locatie meer</string>
 	<string name="have_location">Locatie gevonden</string>
-	<string name="WiFi_jammed">WiFi lijkt bezet of vastgelopen te zijn, Zet WiFi uit en weer aan.</string>
+	<string name="wifi_jammed">WiFi lijkt bezet of vastgelopen te zijn, Zet WiFi uit en weer aan.</string>
 	<string name="battery_at">Als het batterijniveau</string>
 	<string name="battery_postfix">procent komt, sluit WiGLE Wifi af</string>
 	<string name="scan">Scan</string>
@@ -182,7 +182,7 @@
 	<string name="menu_show_old">Laat run &amp; nieuwe zien</string>
 	<string name="menu_show_new">Toon alleen nieuw</string>
 	<string name="tts_no_gps_fix">geen GPS-fix</string>
-	<string name="tts_new_WiFi">Nieuwe WiFi netwerken</string>
+	<string name="tts_new_wifi">Nieuwe WiFi netwerken</string>
 	<string name="tts_new_cell">Nieuwe GSM masten</string>
 	<string name="tts_queue">wachtrij</string>
 	<string name="tts_from">van</string>

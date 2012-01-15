@@ -26,6 +26,12 @@ be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 
 --- done ---
+* 1.49 (01/15/2012)
+Polish language update (thanks R3t!)
+Faster count of 'DB Locations' on startup
+Catch another UnsupportedOperationException in osmdroid's drawCompass
+Catch NullPointerException in osmdroid's BitmapTileSourceBase
+
 * 1.48 (12/31/2011)
 Dutch language update (thanks Roestje!)
 CSV Run Export selects from the current run of the app, rather than latest upload to WiGLE

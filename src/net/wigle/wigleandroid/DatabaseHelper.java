@@ -893,7 +893,10 @@ public final class DatabaseHelper extends Thread {
   }
   
   private void getLocationCountFromDB() throws DBException {
-    final long count = getCountFromDB( LOCATION_TABLE );
+    long start = System.currentTimeMillis();
+    final long count = getMaxIdFromDB( LOCATION_TABLE );
+    long end = System.currentTimeMillis();
+    ListActivity.info( "loc count: " + count + " in: " + (end-start) + "ms" );
     locationCount.set( count );
     setupMaxidDebug( count );
   }
@@ -918,6 +921,15 @@ public final class DatabaseHelper extends Thread {
   private long getCountFromDB( final String table ) throws DBException {
     checkDB();
     final Cursor cursor = db.rawQuery( "select count(*) FROM " + table, null );
+    cursor.moveToFirst();
+    final long count = cursor.getLong( 0 );
+    cursor.close();
+    return count;
+  }
+  
+  private long getMaxIdFromDB( final String table ) throws DBException {
+    checkDB();
+    final Cursor cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
     cursor.moveToFirst();
     final long count = cursor.getLong( 0 );
     cursor.close();

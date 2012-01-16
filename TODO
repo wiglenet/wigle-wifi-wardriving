@@ -26,8 +26,10 @@ be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 
 --- done ---
-* 1.49 (01/15/2012)
+* 1.50 (01/15/2012)
 Polish language update (thanks R3t!)
+
+* 1.49 (01/15/2012)
 Faster count of 'DB Locations' on startup
 Catch another UnsupportedOperationException in osmdroid's drawCompass
 Catch NullPointerException in osmdroid's BitmapTileSourceBase

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -152,7 +151,7 @@ final class HttpFileUploader {
     
     // connect
     ListActivity.info( "about to connect" );
-    conn.connect();
+    conn.connect();  
     ListActivity.info( "connected" );
     
     return conn;
@@ -173,14 +172,14 @@ final class HttpFileUploader {
   public static String upload( final String urlString, final String filename, final String fileParamName,
                                final FileInputStream fileInputStream, final Map<String,String> params, 
                                final Resources res, final Handler handler, final long filesize,
-                               final Context context ) {
+                               final Context context ) throws IOException {
      
     String retval = null;
     HttpURLConnection conn = null;
     
     try {
       final boolean setBoundary = true;
-      conn = connect( urlString, res, setBoundary );    
+      conn = connect( urlString, res, setBoundary);    
       OutputStream connOutputStream = conn.getOutputStream();
 
       // reflect out the chunking info
@@ -277,16 +276,6 @@ final class HttpFileUploader {
       }
       retval = b.toString();
       // ListActivity.info( "Response: " + retval );
-    }
-    catch ( final MalformedURLException ex ) {
-      ListActivity.error( "HttpFileUploader: " + ex, ex );
-      ListActivity.writeError(Thread.currentThread(), ex, context);
-      retval = ex.toString();
-    }  
-    catch ( final IOException ioe ) {
-      ListActivity.error( "HttpFileUploader: " + ioe, ioe );
-      ListActivity.writeError(Thread.currentThread(), ioe, context);
-      retval = ioe.toString();
     }
     finally {
       if ( conn != null ) {

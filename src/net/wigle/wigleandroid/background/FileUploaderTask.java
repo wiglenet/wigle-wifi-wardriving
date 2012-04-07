@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -29,6 +31,7 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
+import net.wigle.wigleandroid.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -36,6 +39,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
 
@@ -230,26 +235,60 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     catch ( final FileNotFoundException ex ) {
       ex.printStackTrace();
       ListActivity.error( "file problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "file problem: " + ex );
+    }
+    catch (ConnectException ex) {
+      ex.printStackTrace();
+      ListActivity.error( "connect problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      status = Status.EXCEPTION;
+      bundle.putString( BackgroundGuiHandler.ERROR, "connect problem: " + ex );
+      if (! hasDataConnection(context)) {
+        bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_data_conn) + ex);
+      }
+    }
+    catch (UnknownHostException ex) {
+      ex.printStackTrace();
+      ListActivity.error( "dns problem: " + ex, ex );
+      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      status = Status.EXCEPTION;
+      bundle.putString( BackgroundGuiHandler.ERROR, "dns problem: " + ex );
+      if (! hasDataConnection(context)) {
+        bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_data_conn) + ex);
+      }
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
       ListActivity.error( "io problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
       ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
     
     return status;
+  }
+  
+  public static boolean hasDataConnection(final Context context) {
+    final ConnectivityManager connMgr = 
+        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+    final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+    if (wifi.isAvailable()) {
+      return true;
+    } 
+    if (mobile.isAvailable()) {
+      return true;
+    }
+    return false;    
   }
   
   public Status justWriteFile() {

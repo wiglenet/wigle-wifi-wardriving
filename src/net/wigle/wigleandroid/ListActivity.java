@@ -1335,6 +1335,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
     }
     
     public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {
+      writeError(thread, throwable, context, null);
+    }
+    public static void writeError( final Thread thread, final Throwable throwable, final Context context, final String detail ) {
       try {
         final String error = "Thread: " + thread + " throwable: " + throwable;
         error( error, throwable );
@@ -1358,6 +1361,9 @@ public final class ListActivity extends Activity implements FileUploaderListener
             final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
             builder.append( "versionName: " ).append( pi.versionName ).append( "\n" );
             builder.append( "baseError: " ).append( baseErrorMessage ).append( "\n\n" );
+            if (detail != null) {
+              builder.append( "detail: " ).append( detail ).append( "\n" );
+            }
             builder.append( "packageName: " ).append( pi.packageName ).append( "\n" );
             builder.append( "MODEL: " ).append( android.os.Build.MODEL ).append( "\n" );
             builder.append( "RELEASE: " ).append( android.os.Build.VERSION.RELEASE ).append( "\n" );

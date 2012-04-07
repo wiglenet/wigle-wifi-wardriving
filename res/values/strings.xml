@@ -10,7 +10,7 @@
     <string name="network_activity_name">WiGLE Wifi - Network</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
     <string name="dbresult_activity_name">WiGLE Wifi - Search Result</string>  
-    <string name="upload_button">Upload to\nWiGLE.net</string>
+    <string name="upload_button">Upload! to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>
     <string name="show_current">Show current networks only</string>
@@ -198,7 +198,7 @@
     <string name="status_working">Working&#8230;</string>
     <string name="status_upload_success">Upload Successful</string>
     <string name="status_write_success">Write Successful</string>
-    <string name="status_no_user">Username not set</string>
+    <string name="status_no_user">Username not set, heading to Settings</string>
     <string name="status_no_pass">Password not set and username not \'anonymous\'</string>
     <string name="status_exception">Exception</string>
     <string name="status_login_fail">Login failed, check password?</string>
@@ -239,5 +239,6 @@
     <string name="use_network_location">Use Network Location Provider</string>   
     <string name="data_import_observed">Import my observed wifi from WiGLE into local database?</string>    
     <string name="donate_question">Donate data to WiGLE?</string>
-    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>   
+    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
+    <string name="no_data_conn">No data connection, cannot connect to internet. \nDetail: </string>   
 </resources>

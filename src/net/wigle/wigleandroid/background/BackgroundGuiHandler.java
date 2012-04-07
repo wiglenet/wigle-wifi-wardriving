@@ -1,10 +1,12 @@
 package net.wigle.wigleandroid.background;
 
 import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.SettingsActivity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -122,6 +124,18 @@ public class BackgroundGuiHandler extends Handler {
           // guess it wasn't there anyways
           ListActivity.info( "exception dismissing alert dialog: " + ex );
         }
+        
+        if (status == Status.BAD_USERNAME || status == Status.BAD_PASSWORD || status == Status.BAD_LOGIN) {
+          ListActivity.info("dialog: start settings activity");
+          try {
+            final Intent settingsIntent = new Intent( context, SettingsActivity.class );
+            context.startActivity( settingsIntent );
+          }
+          catch (Exception ex) {
+            ListActivity.info("failed to start settings activity: " + ex, ex);
+          }
+        }
+        
         return;
       } }); 
     try {

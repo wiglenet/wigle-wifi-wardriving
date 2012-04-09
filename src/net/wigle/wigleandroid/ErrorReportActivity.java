@@ -99,8 +99,10 @@ public class ErrorReportActivity extends Activity {
     ListActivity.info( "ErrorReportActivity: shutting down app" );
     // shut down anything we can get a handle to
     final MainActivity mainActivity = MainActivity.getMainActivity();
-    mainActivity.finishListActivity();
-    mainActivity.finish();                  
+    if ( mainActivity != null ) {
+      mainActivity.finishListActivity();
+      mainActivity.finish();       
+    }
     if ( NetworkActivity.networkActivity != null ) {
       NetworkActivity.networkActivity.finish();
     }

@@ -1097,18 +1097,23 @@ public final class ListActivity extends Activity implements FileUploaderListener
 
       // make volume change "media"
       this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
-      
-      if ( TTS.hasTTS() ) {
-        // don't reuse an old one, has to be on *this* context
-        if ( state.tts != null ) {
-          state.tts.shutdown();
+
+      try {
+        if ( TTS.hasTTS() ) {
+          // don't reuse an old one, has to be on *this* context
+          if ( state.tts != null ) {
+            state.tts.shutdown();
+          }
+          // this has to have the parent activity, for whatever wacky reasons
+          Activity context = this.getParent();
+          if ( context == null ) {
+            context = this;
+          }
+          state.tts = new TTS( context );        
         }
-        // this has to have the parent activity, for whatever wacky reasons
-        Activity context = this.getParent();
-        if ( context == null ) {
-          context = this;
-        }
-        state.tts = new TTS( context );        
+      }
+      catch ( Exception ex ) {
+        error( "exception setting TTS: " + ex, ex);
       }
       
       TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );

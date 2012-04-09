@@ -10,7 +10,7 @@
     <string name="network_activity_name">WiGLE Wifi - Network</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
     <string name="dbresult_activity_name">WiGLE Wifi - Search Result</string>  
-    <string name="upload_button">Upload! to\nWiGLE.net</string>
+    <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE Username</string>
     <string name="password">WiGLE Password</string>
     <string name="show_current">Show current networks only</string>

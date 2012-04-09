@@ -50,6 +50,10 @@ public class HttpDownloader extends AbstractBackgroundTask {
       // tell the listener
       listener.transferComplete();
     }
+    
+    if ( status == null ) {
+      status = Status.FAIL;
+    }
 
     // tell the gui thread
     sendBundledMessage( status.ordinal(), bundle );

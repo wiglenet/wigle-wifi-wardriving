@@ -242,7 +242,7 @@ public final class DatabaseHelper extends Thread {
           final int drainSize = drain.size();
           
           int countdown = 10;
-          while (countdown > 0) {
+          while ( countdown > 0 && ! done.get() ) {
             // doubt this will help the exclusive lock problems, but trying anyway
             synchronized(TRANS_LOCK) {
               try {
@@ -277,15 +277,21 @@ public final class DatabaseHelper extends Thread {
           ListActivity.info("db queue take interrupted");
         }
         catch ( IllegalStateException ex ) {
-          deathDialog( "DB run loop", ex );
+          if ( ! done.get() ) {
+            deathDialog( "DB run loop", ex );
+          }
           ListActivity.sleep(100L);
         }
         catch ( SQLiteException ex ) {
-          deathDialog( "DB run loop", ex );
+          if ( ! done.get() ) {
+            deathDialog( "DB run loop", ex );
+          }
           ListActivity.sleep(100L);
         }
         catch ( DBException ex ) {
-          deathDialog( "DB run loop", ex );
+          if ( ! done.get() ) {
+            deathDialog( "DB run loop", ex );
+          }
           ListActivity.sleep(100L);
         }
         finally {

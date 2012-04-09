@@ -12,6 +12,7 @@ import org.osmdroid.views.MapView;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.location.Address;
 import android.location.Location;
 import android.media.AudioManager;
@@ -114,11 +115,11 @@ public class DBResultActivity extends Activity {
     final String bssid = queryArgs.getBSSID();  
     boolean limit = false;
     if ( ssid != null && ! "".equals(ssid) ) {
-      sql += " AND ssid like '" + ssid + "'";
+      sql += " AND ssid like '" + DatabaseUtils.sqlEscapeString(ssid) + "'";
       limit = true;
     }
     if ( bssid != null && ! "".equals(bssid) ) {
-      sql += " AND bssid like '" + bssid + "'";
+      sql += " AND bssid like '" + DatabaseUtils.sqlEscapeString(bssid) + "'";
       limit = true;
     }
     if ( address != null ) {

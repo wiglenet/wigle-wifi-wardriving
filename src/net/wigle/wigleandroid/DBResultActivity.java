@@ -115,11 +115,11 @@ public class DBResultActivity extends Activity {
     final String bssid = queryArgs.getBSSID();  
     boolean limit = false;
     if ( ssid != null && ! "".equals(ssid) ) {
-      sql += " AND ssid like '" + DatabaseUtils.sqlEscapeString(ssid) + "'";
+      sql += " AND ssid like " + DatabaseUtils.sqlEscapeString(ssid);
       limit = true;
     }
     if ( bssid != null && ! "".equals(bssid) ) {
-      sql += " AND bssid like '" + DatabaseUtils.sqlEscapeString(bssid) + "'";
+      sql += " AND bssid like " + DatabaseUtils.sqlEscapeString(bssid);
       limit = true;
     }
     if ( address != null ) {

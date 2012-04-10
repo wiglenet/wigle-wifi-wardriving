@@ -26,6 +26,10 @@ be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 
 --- done ---
+* 1.52 (04/09/2012)
+Fix db searching
+Capture ClassCast exception being thrown in osmdroid
+
 * 1.51 (04/08/2012)
 Portuguese brasilian translation (thanks Marcelo!)
 Go to Settings on missing username/password

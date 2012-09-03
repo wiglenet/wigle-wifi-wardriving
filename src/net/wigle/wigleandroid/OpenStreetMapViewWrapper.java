@@ -267,7 +267,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
       // draw ssid strings
       final Collection<Network> networks = ListActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) { 
-        Boolean prevChoice = new Boolean(true);
+        Boolean prevChoice = Boolean.TRUE;
         Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
         
         final boolean filter = prefs.getBoolean( ListActivity.PREF_MAPF_ENABLED, true );

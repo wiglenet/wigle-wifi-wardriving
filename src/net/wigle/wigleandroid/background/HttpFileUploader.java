@@ -64,7 +64,7 @@ final class HttpFileUploader {
     } 
     catch (UnknownHostException ex) {
         // dns is broke, try the last known ip
-        urlString.replace("wigle.net", "205.234.142.193");
+        urlString = urlString.replace("wigle.net", "205.234.142.193");
         connectURL = new URL( urlString );
         try {
             ListActivity.info("testcon1.1");
@@ -272,7 +272,7 @@ final class HttpFileUploader {
       final byte[] buffer = new byte[1024];
       
       while( ( ch = is.read( buffer ) ) != -1 ) {
-        b.append( new String( buffer, 0, ch ) );
+          b.append( new String( buffer, 0, ch, ENCODING ) );
       }
       retval = b.toString();
       // ListActivity.info( "Response: " + retval );

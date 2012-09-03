@@ -115,7 +115,7 @@ public final class DatabaseHelper extends Thread {
     new ConcurrentLinkedHashMap<String,Location>( 64 );
   
   /** class for queueing updates to the database */
-  final class DBUpdate {
+  final static class DBUpdate {
     public final Network network;
     public final int level;
     public final Location location;
@@ -130,7 +130,7 @@ public final class DatabaseHelper extends Thread {
   }
 
   /** holder for updates which we'll attempt to interpolate based on timing */
-  final class DBPending {
+  final static class DBPending {
     public final Network network;
     public final int level;
     public final boolean newForRun;
@@ -163,7 +163,7 @@ public final class DatabaseHelper extends Thread {
     queryThread.addToQueue( request );
   }
   
-  private class DeathHandler extends Handler {    
+  private static class DeathHandler extends Handler {    
     private boolean fired = false;
     
     public DeathHandler() {

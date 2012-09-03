@@ -194,7 +194,9 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       final String response = HttpFileUploader.upload( 
         ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
         params, context.getResources(), getHandler(), filesize, context );
-      
+
+      // as upload() is currently written: response can never be null. leave checks inplace anyhow. -uhtu
+
       if ( ! prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
         if ( response != null && response.indexOf("donate=Y") > 0 ) {
           final Editor editor = prefs.edit();

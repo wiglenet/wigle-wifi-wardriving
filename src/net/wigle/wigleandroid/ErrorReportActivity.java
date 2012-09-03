@@ -2,7 +2,8 @@ package net.wigle.wigleandroid;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 
 import android.app.Activity;
@@ -135,7 +136,7 @@ public class ErrorReportActivity extends Activity {
           ListActivity.info( "latest filename: " + latestFilename );
           
           String filePath = MainActivity.safeFilePath( fileDir ) + "/" + latestFilename;
-          BufferedReader reader = new BufferedReader( new FileReader( filePath ) );
+          BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
           String line = reader.readLine();
           builder.setLength( 0 );
           while ( line != null ) {

@@ -383,7 +383,7 @@ public final class SettingsActivity extends Activity {
       period = prefs.getString( pref, (String) spinDefault );
     }
     else {
-      ListActivity.error("unhandled object type array: " + periods + " class: " + periods.getClass());
+        ListActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
     }
     
     int periodIndex = 0;

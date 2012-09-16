@@ -353,7 +353,7 @@ public final class MainActivity extends TabActivity {
     if (! "".equals(lang) && ! current.equals(lang) && lang != null) {
       newLocale = new Locale(lang);
     }
-    else if ("".equals(lang) && ! current.equals(ORIG_LOCALE) && ORIG_LOCALE != null) {
+    else if ("".equals(lang) && ORIG_LOCALE != null && ! current.equals(ORIG_LOCALE.getLanguage()) ) {
       newLocale = ORIG_LOCALE;
     }
     

@@ -250,7 +250,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         
         
-        if ( dbHelper != null ) {
+
           if ( location != null  ) {
             // if in fast mode, only add new-for-run stuff to the db queue
             if ( fastMode && ! added ) {
@@ -266,7 +266,6 @@ public class WifiReceiver extends BroadcastReceiver {
             // no location
             dbHelper.pendingObservation( network, added );
           }
-        }
       }
     }
 

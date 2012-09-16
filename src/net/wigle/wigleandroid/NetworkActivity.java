@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
 
@@ -239,7 +240,7 @@ public class NetworkActivity extends Activity {
           + " allowedPairwiseCiphers: " + config.allowedPairwiseCiphers
           + " allowedProtocols: " + config.allowedProtocols
           + " hiddenSSID: " + config.hiddenSSID
-          + " wepKeys: " + config.wepKeys
+          + " wepKeys: " + Arrays.toString( config.wepKeys )
           );
       if ( quotedSsid.equals( config.SSID ) ) {
         netId = config.networkId;

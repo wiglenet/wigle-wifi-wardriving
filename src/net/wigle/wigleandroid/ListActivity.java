@@ -526,7 +526,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
         try {
           state.wifiLock.release();
         }
-        catch ( SecurityException ex ) {
+        catch ( Exception ex ) {
           error( "exception releasing wifi lock: " + ex, ex );
         }
       }
@@ -960,15 +960,17 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final boolean useNetworkLoc = prefs.getBoolean(ListActivity.PREF_USE_NETWORK_LOC, false);
 
       final List<String> providers = locationManager.getAllProviders();
-      for ( String provider : providers ) {
-        info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );
-        if ( ! useNetworkLoc && LocationManager.NETWORK_PROVIDER.equals(provider)) {
-          // skip!          
-          continue;
-        }
-        if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
-          info("using provider: " + provider);
-          locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
+      if (providers != null) {
+        for ( String provider : providers ) {
+          info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );
+          if ( ! useNetworkLoc && LocationManager.NETWORK_PROVIDER.equals(provider)) {
+            // skip!          
+            continue;
+          }
+          if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
+            info("using provider: " + provider);
+            locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
+          }
         }
       }
     }
@@ -1046,7 +1048,11 @@ public final class ListActivity extends Activity implements FileUploaderListener
       final Button button = (Button) findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() { 
           public void onClick( final View view ) {
-            MainActivity.createConfirmation( ListActivity.this, getString(R.string.list_upload), new Doer() {
+            final MainActivity main = MainActivity.getMainActivity( ListActivity.this );
+            final SharedPreferences prefs = main.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+            final String username = prefs.getString( ListActivity.PREF_USERNAME, "anonymous" );
+            final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
+            MainActivity.createConfirmation( ListActivity.this, text, new Doer() {
               @Override
               public void execute() {                
                 setTransferring();

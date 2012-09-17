@@ -284,10 +284,10 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
     final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-    if (wifi.isAvailable()) {
+    if (wifi != null && wifi.isAvailable()) {
       return true;
     } 
-    if (mobile.isAvailable()) {
+    if (mobile != null && mobile.isAvailable()) {
       return true;
     }
     return false;    

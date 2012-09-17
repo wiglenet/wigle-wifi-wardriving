@@ -138,7 +138,13 @@ public class WifiReceiver extends BroadcastReceiver {
     lastScanResponseTime = now;
     // final long start = now;
     final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
-    final List<ScanResult> results = wifiManager.getScanResults(); // return can be null!
+    List<ScanResult> results = null;
+    try {
+      results = wifiManager.getScanResults(); // return can be null!
+    }
+    catch (NullPointerException ex) {
+      // ignore, happens on some vm's
+    }
     
     long nonstopScanRequestTime = Long.MIN_VALUE;
     final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );

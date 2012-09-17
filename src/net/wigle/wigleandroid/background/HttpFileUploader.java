@@ -34,7 +34,8 @@ final class HttpFileUploader {
   private static final String ENCODING = "UTF-8";
   public static final String LINE_END = "\r\n";
   public static final String TWO_HYPHENS = "--";
-  public static final String BOUNDARY = "*****";  
+  public static final String BOUNDARY = "*****";
+  public static final String LATEST_IP = "205.234.142.193";
   
   /** don't allow construction */
   private HttpFileUploader(){
@@ -64,7 +65,7 @@ final class HttpFileUploader {
     } 
     catch (UnknownHostException ex) {
         // dns is broke, try the last known ip
-        urlString = urlString.replace("wigle.net", "205.234.142.193");
+        urlString = urlString.replace("wigle.net", LATEST_IP);
         connectURL = new URL( urlString );
         try {
             ListActivity.info("testcon1.1");
@@ -100,6 +101,22 @@ final class HttpFileUploader {
     
     HttpURLConnection conn = null;
     ListActivity.info("Creating url connection. self_serving: " + self_serving + " fallback: " + fallback);
+
+    try {
+      conn = createConnection(connectURL, res, setBoundary, self_serving, fallback);
+    }
+    catch (UnknownHostException ex) {
+      // dns is broke, try the last known ip
+      urlString = urlString.replace("wigle.net", LATEST_IP);
+      connectURL = new URL( urlString );
+      conn = createConnection(connectURL, res, setBoundary, self_serving, fallback);
+    }
+    
+    return conn;
+  }
+  
+  private static HttpURLConnection createConnection(final URL connectURL, final Resources res,
+      final boolean setBoundary, final boolean self_serving, final boolean fallback) throws IOException {
     
     String javaVersion = "unknown";                                                  
     try {                                                                            
@@ -111,12 +128,11 @@ final class HttpFileUploader {
         System.getProperty("os.name") + " " +                                        
         System.getProperty("os.version") +                                           
         " [" + System.getProperty("os.arch") + "]";                                  
-    } catch (Exception e) { }                                                        
-                                                                                     
-    final String userAgent = "WigleWifi ("+javaVersion+")";                    
+    } catch (Exception e) { }  
+    final String userAgent = "WigleWifi ("+javaVersion+")";  
     
     // Open a HTTP connection to the URL    
-    conn = (HttpURLConnection) connectURL.openConnection();    
+    HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();    
     // Allow Inputs
     conn.setDoInput(true);
     // Allow Outputs

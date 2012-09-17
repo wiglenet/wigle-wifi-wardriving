@@ -20,9 +20,9 @@ import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.Point;
 import android.location.Location;
 
 /**

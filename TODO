@@ -11,6 +11,9 @@ debug logging mode
 download of cell observed as well
 
 --- user suggested ---
+map-page type filter on four csv/kml exports
+exit button as different color
+option to stop scanning when not plugged in
 kismet drone support
 some response/info/stat about uploaded files (user stats?)
 try tabs on bottom in landscape mode
@@ -26,6 +29,11 @@ be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 
 --- done ---
+* 1.53 (09/16/2012)
+Spanish translation update (thanks Axel!)
+Upload confirmation shows WiGLE username
+Bug fixes and code cleanup
+
 * 1.52 (04/09/2012)
 Fix db searching
 Capture ClassCast exception being thrown in osmdroid

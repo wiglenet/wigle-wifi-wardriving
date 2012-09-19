@@ -39,7 +39,7 @@
     <string name="import_observed_text">Importa as redes que já enviei ao WiGLE.</string>    
     <string name="periodstill_text">Pausa entre os scans wifi a 0 km&#47;h</string>    
     <string name="period_text">Pausa entre os scans wifi a menos de &lt;8 km&#47;h</string>
-    <string name="periodfast_text">Pausa entre os scans wifi a mais &gt;8km&#47;h</string>
+    <string name="periodfast_text">Pausa entre os scans wifi a mais &gt;8 km&#47;h</string>
     <string name="gps_text">Pausa entre as atualizações de GPS</string>
     <string name="speak_text">Pausa entre as falas de audio</string>
     <string name="battery_kill_text">Sair quando a bateria atingir</string>
@@ -127,8 +127,8 @@
     <string name="dash_db_queue">Fila do BD:</string>
     <string name="dash_db_nets">Redes no BD:</string>
     <string name="dash_db_locs">Localizações no BD:</string>
-    <string name="dash_no_loc">Sem Lozalização!</string>
-    <string name="dash_short_loc">Localização:</string>
+    <string name="dash_no_loc">Sem Localização!</string>
+    <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">milhas</string>
@@ -240,5 +240,5 @@
     <string name="data_import_observed">Importar minhas redes já enviei ao WiGLE no banco de dados local?</string>
     <string name="donate_question">Doar dados ao WiGLE?</string>
     <string name="donate_explain">Permite que o WiGLE faça uma cópia anônima dos dados em que o WiGLE é autorizado a licenciar o uso comercial para terceiros.</string>
-    <string name="no_data_conn">Sem conexão de dados, não é possível acessar a internet. \Detalhes: </string>
+    <string name="no_data_conn">Sem conexão de dados, não é possível acessar a internet. \nDetalhes: </string>
 </resources>

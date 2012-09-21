@@ -756,8 +756,9 @@ public class WifiReceiver extends BroadcastReceiver {
             wifiManager.setWifiEnabled(false);
             wifiManager.setWifiEnabled(true);    
             lastWifiUnjamTime = now;
-            listActivity.speak("Warning, latest wifi scan completed " 
+            if (speechPeriod!=0){ listActivity.speak("Warning, latest wifi scan completed " 
                 + (sinceLastScan / 1000L) + " seconds ago. Restarting wifi.");
+            }
           }
         }
       }

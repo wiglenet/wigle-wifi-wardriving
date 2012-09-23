@@ -38,6 +38,7 @@ public class SpeechActivity extends Activity {
     doCheckbox( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
     doCheckbox( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
     doCheckbox( prefs, R.id.speech_ssid, ListActivity.PREF_SPEAK_SSID, false );
+    doCheckbox( prefs, R.id.speech_wifi_restart, ListActivity.PREF_SPEAK_WIFI_RESTART );
   }
   
   public void onDestroy() {    

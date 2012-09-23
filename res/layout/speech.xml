@@ -7,7 +7,7 @@
 	android:id="@+id/linearlayout" 
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     >
 <TextView android:id="@+id/speech_text"
 	android:layout_width="fill_parent"
@@ -43,6 +43,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/speech_battery" />
+<CheckBox android:id="@+id/speech_wifi_restart"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_wifi_restart" />
 <LinearLayout
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"

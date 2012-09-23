@@ -169,6 +169,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_SPEAK_TIME = "speakTime";
     public static final String PREF_SPEAK_BATTERY = "speakBattery";
     public static final String PREF_SPEAK_SSID = "speakSsid";
+    public static final String PREF_SPEAK_WIFI_RESTART = "speakWifiRestart";    
     
     // map ssid filter
     public static final String PREF_MAPF_REGEX = "mapfRegex";

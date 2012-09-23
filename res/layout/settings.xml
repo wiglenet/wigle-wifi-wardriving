@@ -7,7 +7,7 @@
 	android:id="@+id/linearlayout" 
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     >
 
 <TextView
@@ -266,7 +266,7 @@
 
 <Button android:id="@+id/speech_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
 		android:text="@string/speech_button" android:layout_weight="0"
-		android:paddingTop="10px" android:paddingBottom="10px"/>
+		android:paddingTop="10dip" android:paddingBottom="10dip"/>
 
 <LinearLayout
 	android:id="@+id/horizontalLine2"

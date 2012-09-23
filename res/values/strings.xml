@@ -241,4 +241,7 @@
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet. \nDetail: </string>   
+    <string name="speech_wifi_restart">Wifi restarts</string>
+    <string name="wifi_restart_1">Warning, latest wifi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting wifi.</string>
 </resources>

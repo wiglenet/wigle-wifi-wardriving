@@ -182,7 +182,7 @@
     <string name="menu_turn_on_lockon">Travar o Mapa</string>
     <string name="menu_show_old">Todas Desta Sessão</string>
     <string name="menu_show_new">Apenas Redes Novas</string> 
-    <string name="tts_no_gps_fix">sem localização GPS</string>
+    <string name="tts_no_gps_fix">sem localização do GPS</string>
     <string name="tts_new_wifi">Novas Redes</string>
     <string name="tts_new_cell">Novas Torres</string>
     <string name="tts_queue">Fila</string>

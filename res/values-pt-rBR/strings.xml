@@ -11,7 +11,7 @@
     <string name="data_activity_name">WiGLE Wifi - Banco de Dados</string>
     <string name="dbresult_activity_name">WiGLE Wifi - Resultado da Busca</string>  
     <string name="upload_button">Enviar p&#47;\nWiGLE.net</string>
-    <string name="username">Username do WiGLE</string>
+    <string name="username">Usuário do WiGLE</string>
     <string name="password">Senha do WiGLE</string>
     <string name="show_current">Mostrar apenas as redes atuais</string>
     <string name="use_metric">Usar Unidades Métricas</string>
@@ -94,7 +94,7 @@
     <string name="network_firstseen">Descoberta:</string>
     <string name="network_capa">Tecnologias:</string>
     <string name="network_channel">Canal:</string>
-    <string name="network_observations">Obesvações:</string>
+    <string name="network_observations">Observações:</string>
     <string name="network_querying">(buscando&#8230;)</string>
     <string name="setting_show_password">Mostrar Senha</string>
     <string name="setting_db_marker">Marcador do BD (Da onde os envios começam):</string>  
@@ -176,19 +176,19 @@
     <string name="menu_screen_wake">Manter a Tela Ligada</string>
     <string name="menu_labels_off">Esconder Nomes</string>
     <string name="menu_labels_on">Mostrar Nomes</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom Out</string>
+    <string name="menu_zoom_in">Aumentar Zoom</string>
+    <string name="menu_zoom_out">Diminuir Zoom</string>
     <string name="menu_turn_off_lockon">Destravar o Mapa</string>
     <string name="menu_turn_on_lockon">Travar o Mapa</string>
     <string name="menu_show_old">Todas Desta Sessão</string>
     <string name="menu_show_new">Apenas Redes Novas</string> 
-    <string name="tts_no_gps_fix">sem GPS</string>
+    <string name="tts_no_gps_fix">sem localização do GPS</string>
     <string name="tts_new_wifi">Novas Redes</string>
     <string name="tts_new_cell">Novas Torres</string>
     <string name="tts_queue">Fila</string>
     <string name="tts_from">a</string>
-    <string name="tts_o_clock">owe clock</string>
-    <string name="tts_o">owe</string>
+    <string name="tts_o_clock">horas</string>
+    <string name="tts_o">horas</string>
     <string name="tts_battery">bateria</string>
     <string name="tts_percent">porcento</string>  
     <string name="status_unknown">Desconhecido</string>   
@@ -198,8 +198,8 @@
     <string name="status_working">Trabalhando&#8230;</string>
     <string name="status_upload_success">Enviado com Sucesso</string>
     <string name="status_write_success">Arquivo Salvo</string>
-    <string name="status_no_user">Username não configurado</string>
-    <string name="status_no_pass">Senha não configurada e username não é \'anônimo\'</string>
+    <string name="status_no_user">Usuário não configurado</string>
+    <string name="status_no_pass">Senha não configurada e usuário não é \'anônimo\'</string>
     <string name="status_exception">Exceção</string>
     <string name="status_login_fail">Falha no login, confira sua senha.</string>
     <string name="status_uploading">Enviando Arquivo</string>
@@ -241,4 +241,7 @@
     <string name="donate_question">Doar dados ao WiGLE?</string>
     <string name="donate_explain">Permite que o WiGLE faça uma cópia anônima dos dados em que o WiGLE é autorizado a licenciar o uso comercial para terceiros.</string>
     <string name="no_data_conn">Sem conexão de dados, não é possível acessar a internet. \nDetalhes: </string>
+    <string name="speech_wifi_restart">Reinício do Wifi</string>
+    <string name="wifi_restart_1">Aviso, o último escaneamento wifi foi a</string>
+    <string name="wifi_restart_2">segundos atrás. Reiniciando o wifi.</string>
 </resources>

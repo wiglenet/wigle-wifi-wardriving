@@ -174,8 +174,8 @@
     <string name="menu_labels_on"> Labels an </string>
     <string name="menu_zoom_in"> Einzoomen </string>
     <string name="menu_zoom_out"> Auszoomen </string>
-    <string name="menu_turn_off_lockon"> Sperre einschalten </string>
-    <string name="menu_turn_on_lockon"> Sperre ausschalten </string>
+    <string name="menu_turn_off_lockon"> Sperre ausschalten </string>
+    <string name="menu_turn_on_lockon"> Sperre einschalten </string>
     <string name="menu_show_old"> anzeigen Lauf &amp; Neu </string>
     <string name="menu_show_new"> Zeige nur Neu </string>
     <string name="tts_no_gps_fix"> kein GPS-Signal </string>

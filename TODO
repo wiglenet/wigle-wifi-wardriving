@@ -30,9 +30,10 @@ output GPX (open street map)
 limit list to one ssid, show multiple observations
 
 --- done ---
-* 1.54 (?)
+* 1.54 (02/09/2013)
 Dutch language update (thanks Roestje!)
 Wifi jamming restart speech config
+Fix german on/off labels
 
 * 1.53 (09/16/2012)
 Spanish translation update (thanks Axel!)

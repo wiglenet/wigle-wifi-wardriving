@@ -264,7 +264,7 @@
 		/>
 </LinearLayout>
 
-<Button android:id="@+id/speech_button" android:layout_width="wrap_content" 
+<Button android:id="@+id/speech_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
 		android:text="@string/speech_button" android:layout_weight="0"
 		android:paddingTop="10dip" android:paddingBottom="10dip"/>
 

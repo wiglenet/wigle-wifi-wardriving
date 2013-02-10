@@ -30,6 +30,9 @@ output GPX (open street map)
 limit list to one ssid, show multiple observations
 
 --- done ---
+* 1.55 (02/09/2013)
+Add in a layout_height attribute that some devices require.
+
 * 1.54 (02/09/2013)
 Dutch language update (thanks Roestje!)
 Wifi jamming restart speech config

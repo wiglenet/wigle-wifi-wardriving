@@ -11,6 +11,8 @@ debug logging mode
 download of cell observed as well
 
 --- user suggested ---
+option to turn off gps on/off toast
+option to configure off smaller-button hoop-jumping for devices that don't deal with it correctly
 map-page type filter on four csv/kml exports
 exit button as different color
 option to stop scanning when not plugged in

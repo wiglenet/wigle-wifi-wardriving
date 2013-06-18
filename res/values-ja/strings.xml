@@ -3,94 +3,94 @@
     起動
   </string>
   <string name="app_name">
-    ワイグルWifiのウォードライビング
+    WiGLE WiFi Wardriving
   </string>
   <string name="settings_app_name">
-    ワイグル無線LAN - 設定
+    WiGLE Wifi - 設定
   </string>
   <string name="mapping_app_name">
-    ワイグル無線LAN - オープンストリートマップ
+    WiGLE Wifi - Open Street Map
   </string>
   <string name="dashboard_app_name">
-    ワイグル無線LAN - ダッシュボード
+    WiGLE Wifi- ダッシュボード
   </string>
   <string name="error_report_name">
-    Wifiの無線LAN - 直近のエラーレポート
+    WiGLE Wifi - 直近のエラーレポート
   </string>
   <string name="speech_name">
-    ワイグル無線LAN - 音声の設定
+    WiGLE Wifi - サウンド設定
   </string>
   <string name="network_activity_name">
-    ワイグル無線LAN - ネットワーク
+    WiGLE Wifi - ネットワーク
   </string>
   <string name="data_activity_name">
-    ワイグル無線LAN - データベース
+    WiGLE Wifi - データベース
   </string>
   <string name="dbresult_activity_name">
-    ワイグル無線LAN - 検索結果
+    WiGLE Wifi - 検索結果
   </string>
   <string name="upload_button">
-    WiGLE.net \n にアップロード
+    WiGLE.net\nにアップロード
   </string>
   <string name="username">
-    ワイグルユーザー名
+    WiGLE ユーザネーム
   </string>
   <string name="password">
-    ワイグルパスワード
+    WiGLE パスワード
   </string>
   <string name="show_current">
     現在のネットワークのみを表示する
   </string>
   <string name="use_metric">
-    メートル単位を使用してください
+    メートル単位系を使用する
   </string>
   <string name="be_anonymous">
     匿名でアップロードする
   </string>
   <string name="donate">
-    データを寄付：商用利用を許可する
+    データの商用利用を許可する
   </string>
   <string name="found_sound">
-    ネットワークが実行で検出されたときに音を再生する
+    ネットワークが検出されたら音で通知する
   </string>
   <string name="found_new_sound">
-    サウンドを再生するときに、DBの新しいネットワーク
+    新しいネットワークが検出されたら音で通知する
   </string>
   <string name="reset_maxid_button">
-    ゼロDBのマーカー
+    DB Maker のリセット
   </string>
   <string name="reset_maxid_text">
-    最新アップロードマーカー：
+    Latest upload marker:
   </string>
   <string name="maxout_maxid_button">
-    MAXOUT DBマーカー
+    Maxout DB marker
   </string>
   <string name="maxout_maxid_text">
-    にマーカーを設定します。
+    Set marker to:
   </string>
   <string name="connect_button">
     接続
   </string>
   <string name="connect_text">
-    ネットワークオペレータの許可を得て
+    (このネットワーク管理者の許可を得ている場合)
   </string>
   <string name="csv_run_export_button">
-    CSVエクスポートの実行
+    RUN to CSV
   </string>
   <string name="csv_run_export_text">
-    CSVファイルへの現在の実行をエクスポートする
+    現在の走行をCSVファイルへ出力する
   </string>
   <string name="kml_run_export_button">
-    KMLエクスポートファイル名を指定して実行
+    RUN to KML
   </string>
   <string name="kml_run_export_text">
-    KMLファイルへの現在の実行をエクスポートする
+    現在の走行をKMLファイルへ出力する
   </string>
   <string name="kml_export_button">
-    KMLエクスポートDB
+    DB to KML
   </string>
   <string name="kml_export_text">
-    KMLファイルへの全体のDBをエクスポートする
+    全部の走行をKMLファイルへ出力する
   </string>
   <string name="backup_db_button">
     データベースのバックアップ
@@ -99,46 +99,46 @@
     データベースのバックアップを作成
   </string>
   <string name="import_observed_button">
-    観測されたインポート
+    WiGLE をインポート
   </string>
   <string name="import_observed_text">
-    ワイグルから私の観測ネットワークをインポート
+    自分が観測したネットワークを WiGLE からインポート
   </string>
   <string name="periodstill_text">
-    無線LANとの間の時間は、0 mphにスキャンし
+    無線LANのスキャン間隔(静止時)
   </string>
   <string name="period_text">
-    無線LANのスキャンの間隔&lt;毎時5マイル
+    無線LANのスキャン間隔&lt;8km/h
   </string>
   <string name="periodfast_text">
-    無線LANのスキャンの間隔&gt;毎時5マイル
+    無線LANのスキャン間隔&gt;8km/h
   </string>
   <string name="gps_text">
     GPSの更新間隔
   </string>
   <string name="speak_text">
-    オーディオスピーチの間に時間
+    音声通知の通知間隔
   </string>
   <string name="battery_kill_text">
-    このバッテリーレベルで終了します
+    このバッテリーレベルを下回ったら WiGLE WiFi を停止
   </string>
   <string name="reset_wifi_text">
-    無線LANが詰まっているかを決定
+    無線LANデバイス異常の監視間隔
   </string>
   <string name="speech_gps">
-    GPSのステータスの変更を発表
+    GPSの状態を音声で通知する
   </string>
   <string name="mute">
-    ミュート
+    Mute
   </string>
   <string name="play">
-    再生
+    Play
   </string>
   <string name="unknown">
-    未知
+    Unknown
   </string>
   <string name="sort_text">
-    ソートオプション
+    並べ替え
   </string>
   <string name="listdialog_button">
     [OK]
@@ -147,58 +147,58 @@
     [OK]
   </string>
   <string name="cryptocanceldialog_button">
-    キャンセル
+    Cancel
   </string>
   <string name="circle_size_map">
-    数量によってサイズのマップサークル
+    サークルの大きさを電波強度によって変える
   </string>
   <string name="speech_button">
     音声設定画面&gt;&gt;
   </string>
   <string name="speech_text">
-    オーディオ音声が含まれます：
+    音声通知するイベント:
   </string>
   <string name="speech_run">
-    実行のためのネット
+    無線LANを発見
   </string>
   <string name="speech_new_wifi">
-    DBへの新しい無線LAN
+    新しい無線LANを発見
   </string>
   <string name="speech_new_cell">
-    DBへの新しい携帯電話のアンテナ塔
+    新しい携帯電話基地局を発見
   </string>
   <string name="speech_queue">
-    &gt; 0ならば、キューのサイズ
+    DB キューの待ち
   </string>
   <string name="speech_miles">
-    ランのマイル
+    走行距離(miles)
   </string>
   <string name="speech_time">
-    現在の時間
+    時刻
   </string>
   <string name="speech_battery">
-    バッテリーレベルの割合
+    バッテリーレベル
   </string>
   <string name="speech_ssid">
-    新しいネットワークSSID \&#39;sの
+    新しい SSID
   </string>
   <string name="query_address">
-    アドレス（例：シカゴ、イリノイ州）：
+    住所(ex: Chicago, IL)
   </string>
   <string name="query_ssid">
-    SSID（例：Linksysの）（SQLワイルドカード：%,_):
+    SSID (ex: Linksys) (SQL wildcards: %,_):
   </string>
   <string name="search_button">
-    クエリのローカルDB
+    ローカルDBを調べる
   </string>
   <string name="reset_button">
-    フィールドをリセットする
+    リセット
   </string>
   <string name="list_query_clear">
-    明確なクエリー引数
+    クリア
   </string>
   <string name="crypto_security">
-    セキュリティ
+    暗号化
   </string>
   <string name="crypto_strength">
     信号強度
@@ -210,70 +210,70 @@
     パスワードを表示します。
   </string>
   <string name="filter_show_ssid">
-    ショーSSID \&#39;sのマッチング（正規表現）：
+    SSID を絞り込み (正規表現):
   </string>
   <string name="filter_not_regex">
-    表示どのようなdoesnの\&#39;tは正規表現の上に一致
+    除外(正規表現)
   </string>
   <string name="filter_show_open">
-    オープン表示
+    Open
   </string>
   <string name="filter_show_cell">
-    セルを表示する
+    Cells
   </string>
   <string name="filter_show_wep">
-    ショーWEP
+    WEP
   </string>
   <string name="filter_show_wpa">
-    ショーWPA
+    WPA
   </string>
   <string name="filter_enabled">
-    フィルタが有効
+    フィルタ有効
   </string>
   <string name="list_waiting_gps">
-    （GPS同期を待って..）
+    (GPS はまだ Fix していません)
   </string>
   <string name="list_scanning_off">
-    （スキャンはオフになって）
+    (スキャン停止中)
   </string>
   <string name="list_short_lat">
-    緯度：
+    Lat:
   </string>
   <string name="list_short_lon">
-    LON：
+    Lon:
   </string>
   <string name="list_short_sats">
-    サッツ：
+    Sats:
   </string>
   <string name="list_short_alt">
-    Altキー：
+    Alt:
   </string>
   <string name="list_status_default">
-    （ステータス）
+    (Status)
   </string>
   <string name="list_speed">
-    速度：
+    Speed:
   </string>
   <string name="list_upload">
-    ファイルをアップロード？
+    ファイルをアップロード
   </string>
   <string name="network_signal">
-    信号：
+    RSSI:
   </string>
   <string name="network_type">
-    種類：
+    Type:
   </string>
   <string name="network_firstseen">
-    最初に見た：
+    First seen:
   </string>
   <string name="network_capa">
-    機能：
+    Capabilities:
   </string>
   <string name="network_channel">
     チャンネル：
   </string>
   <string name="network_observations">
-    観測：
+    観測:
   </string>
   <string name="network_querying">
     （querying. ..）
@@ -282,28 +282,28 @@
     パスワードを表示する
   </string>
   <string name="setting_db_marker">
-    DBマーカー（ここで、アップロードから開始）：
+    DBマーカー (ここからアップロード):
   </string>
   <string name="setting_high_up">
-    最高アップロードID：
+    Highest uploaded id:
   </string>
   <string name="setting_zero_out">
-    DBのマーカーをゼロ？
+    Zero out DB marker?
   </string>
   <string name="setting_max_id">
-    最大アップロードID：
+    Max upload id:
   </string>
   <string name="setting_max_start">
-    起動時の最大ID：
+    Max id at startup:
   </string>
   <string name="setting_max_out">
-    DBのマーカーのうち最大？
+    Max out DB marker?
   </string>
   <string name="setting_tie_wifi">
     Wifiのスキャン周期に接続します
   </string>
   <string name="no_tts">
-    いいえText - To - Speechエンジンなし
+    音声読み上げを使用しない
   </string>
   <string name="sec">
     秒
@@ -312,10 +312,10 @@
     分
   </string>
   <string name="off">
-    オフ
+    off
   </string>
   <string name="on">
-    の
+    on
   </string>
   <string name="nonstop">
     ノンストップ
@@ -336,97 +336,97 @@
     [OK]
   </string>
   <string name="cancel">
-    キャンセル
+    Cancel
   </string>
   <string name="dash_scan_off">
-    （スキャンはオフになって）
+   (スキャン停止中)
   </string>
   <string name="dash_new_wifi">
-    新しい無線LAN
+    新しく発見した WiFi
   </string>
   <string name="dash_vis_nets">
-    目に見えるネット：
+    現在見えている WiFi
   </string>
   <string name="dash_new_upload">
-    アップロード以降に新しいネッツ。
+    アップロード以降に発見した WiFi
   </string>
   <string name="dash_new_cells">
-    新しい携帯電話のアンテナ塔：
+    新しく発見した基地局
   </string>
   <string name="dash_dist_run">
-    距離を実行します。
+    走行距離
   </string>
   <string name="dash_dist_total">
-    ディストリ合計。：
+    トータル走行距離
   </string>
   <string name="dash_dist_prev">
-    前回の実行：
+    前回の走行距離
   </string>
   <string name="dash_db_queue">
-    DBキュー：
+    DB queue:
   </string>
   <string name="dash_db_nets">
-    DBネット：
+    DB Net:
   </string>
   <string name="dash_db_locs">
-    DBの場所：
+    DB Locations:
   </string>
   <string name="dash_no_loc">
-    場所がない！
+    不明
   </string>
   <string name="dash_short_loc">
-    のLoc：
+    位置:
   </string>
   <string name="km_short">
-    キロ
+    km
   </string>
   <string name="mi_short">
-    マイル
+    mi
   </string>
   <string name="miles">
-    マイル
+    miles
   </string>
   <string name="m_short">
-    メートル
+    m
   </string>
   <string name="meters">
-    メートル
+    meters
   </string>
   <string name="ft_short">
-    フィート
+    ft
   </string>
   <string name="feet">
-    足
+    feet
   </string>
   <string name="kmph">
-    時速
+    km/h
   </string>
   <string name="mph">
-    時速
+    mph
   </string>
   <string name="ms_short">
-    ミリ秒
+    ms
   </string>
   <string name="na">
-    N /
+    N/A
   </string>
   <string name="run">
-    実行して
+    Run
   </string>
   <string name="new_word">
-    新
+    New
   </string>
   <string name="db">
     DB
   </string>
   <string name="scanned_in">
-    でスキャン
+    スキャン
   </string>
   <string name="sort_title">
-    ソートオプション
+    並べ替え
   </string>
   <string name="sort_spin_label">
-    [並べ替えのリスト：
+    並べ替え
   </string>
   <string name="channel">
     チャンネル
@@ -435,58 +435,58 @@
     暗号化
   </string>
   <string name="found_time">
-    が見つかりました時刻
+    見つかった時刻
   </string>
   <string name="signal">
-    シグナル
+    RSSI
   </string>
   <string name="ssid">
     SSID
   </string>
   <string name="best_results">
-    最良の結果を得るためには、&quot;ワイヤレス＆ネットワーク&quot;で設定されていない&quot;ネットワークの通知&quot; - &gt;&quot;Wi - Fi設定&quot;
+    最良の結果を得るためには &quot;無線とネットワーク&quot; - &quot;Wi-Fi&quot; - &quot;詳細設定&quot; - &quot;ネットワークの通知&quot; をオフにしてください
   </string>
   <string name="turn_on_wifi">
     無線LANをオンにする
   </string>
   <string name="no_gps_device">
-    いいえのGPSデバイスで検出されない！
+    このデバイスにはGPSがありません
   </string>
   <string name="turn_on_gps">
-    GPSをオンにしてください
+    GPSを有効にしてください
   </string>
   <string name="address">
     住所
   </string>
   <string name="no_address_found">
-    見つかりませんでしたジオコードされた住所なし
+    住所が見つかりません
   </string>
   <string name="problem_with_field">
-    フィールドに問題がある
+    フィールドに問題
   </string>
   <string name="turning_wifi_off">
-    無線LANのバックをオフにする
+    無線LANをオフ
   </string>
   <string name="lost_location">
-    失われた場所
+    位置不明
   </string>
   <string name="have_location">
-    今から場所を持っている
+    位置
   </string>
   <string name="wifi_jammed">
-    WiFiは、WiFiのをOFF→ON、と、詰まりが表示されます。
+    WiFi が停止しました。WiFi を一旦無効にしてください
   </string>
   <string name="battery_at">
-    でバッテリーレベル
+    バッテリーレベル
   </string>
   <string name="battery_postfix">
-    パーセント、ワイグル無線LANをシャットダウンする
+    WiGLE Wifiを停止する
   </string>
   <string name="scan">
     スキャン
   </string>
   <string name="menu_exit">
-    出口
+    終了
   </string>
   <string name="menu_settings">
     設定
@@ -504,10 +504,10 @@
     SSIDラベルフィルタ
   </string>
   <string name="menu_screen_sleep">
-    画面のスリープをしましょう
+    画面をスリープ
   </string>
   <string name="menu_screen_wake">
-    画面をキープオン
+    画面をスリープさせない
   </string>
   <string name="menu_labels_off">
     オフラベル
@@ -534,25 +534,25 @@
     新規のみ表示
   </string>
   <string name="tts_no_gps_fix">
-    はGPSの修正なし
+    GPS 位置不明
   </string>
   <string name="tts_new_wifi">
     新しい無線LAN
   </string>
   <string name="tts_new_cell">
-    新しい細胞
+    新しい基地局
   </string>
   <string name="tts_queue">
-    キュー
+    Queue
   </string>
   <string name="tts_from">
-    からの
+    from
   </string>
   <string name="tts_o_clock">
-    時計を借りている
+    owe clock
   </string>
   <string name="tts_o">
-    負っている
+    owe
   </string>
   <string name="tts_battery">
     バッテリ
@@ -561,92 +561,81 @@
     ％に
   </string>
   <string name="status_unknown">
-    未知
+    不明
   </string>
   <string name="status_unknown_error">
     不明なエラー
   </string>
   <string name="status_fail">
-    失敗
+    Fail
   </string>
   <string name="status_success">
-    成功
+    完了
   </string>
   <string name="status_working">
     処理中...
   </string>
   <string name="status_upload_success">
-    成功したアップロード
+    アップロード完了
   </string>
   <string name="status_write_success">
-    正常に書き込み
+    書き込み完了
   </string>
   <string name="status_no_user">
     ユーザ名が設定されていません
   </string>
   <string name="status_no_pass">
-    パスワード設定しないとユーザー名ではない\&#39;匿名\&#39;
+    ユーザ名とパスワードを設定しないと anonymous として扱います
   </string>
   <string name="status_exception">
     例外
   </string>
   <string name="status_login_fail">
-    ログインが失敗した、パスワードを確認してください？
+    ログインできません。ユーザ名とパスワードを確認してください
   </string>
   <string name="status_uploading">
-    アップロードファイル
+    アップロード中
   </string>
   <string name="status_writing">
-    ファイルの書き込み
+    ファイルに出力中
   </string>
   <string name="status_nothing">
-    何もしない
+    処理なし
   </string>
   <string name="status_empty">
-    ファイルが空になる
+    ファイルは空です
   </string>
   <string name="data_export_csv">
-    CSVファイルへの実行をエクスポートする？
+    走行をCSVファイルへ出力しますか?
   </string>
   <string name="data_export_kml_run">
-    KMLファイルへの実行をエクスポートする？
+   走行をKMLファイルへ出力しますか?
   </string>
   <string name="data_export_kml_db">
-    KMLファイルへのDBをエクスポートする？
+    全DBをKML ファイルへ出力しますか?
   </string>
   <string name="data_backup_db">
-    別のファイルにDBをバックアップ？
+    ファイルにDBをバックアップしますか?
   </string>
-  <string name="language_en">
-    英語（en）
-  </string>
-  <string name="language_cs">
-    印Čeština（CS）
-  </string>
-  <string name="language_de">
-    ドイツ（DE）
-  </string>
-  <string name="language_es">
-    印Español（ES）
-  </string>
-  <string name="language_fr">
-    バーゲン（FR）
-  </string>
-  <string name="language_it">
-    イタリア語（それ）
-  </string>
-  <string name="language_nl">
-    Nederlands（NL）
-  </string>
-  <string name="language_pl">
-    印Polski（PL）
-  </string>
-  <string name="language_ru">
-    русский（RU）
-  </string>
-  <string name="language_sv">
-    ソフトウェアアップデートを（SV）
-  </string>
+    <string name="language_en">English (en)</string>
+    <string name="language_cs">ﾄ稿ﾅ｡tina (cs) </string>
+    <string name="language_de">Deutsch (de)</string>
+    <string name="language_es">espanol (es)</string>
+    <string name="language_fr">francais (fr)</string>
+    <string name="language_it">italiano (it)</string>
+    <string name="language_nl">Nederlands (nl)</string>
+    <string name="language_pl">polski (pl)</string>
+    <string name="language_ru">русский (ru)</string>
+    <string name="language_sv">svenska (sv)</string>
+    <string name="language_pt">portugues (pt)</string>
+    <string name="language_da">dansk (da)</string>
+    <string name="language_ja">日本語 (ja)</string>
+    <string name="language_fi">suomi (fi)</string>
+    <string name="language_hi">爨ｹ爨ｿ爨ｨ爭財､ｦ爭 (hi)</string>
+    <string name="language_ko">﨑懋ｵｭ・ｴ (ko)</string>
+    <string name="language_no">norsk (no)</string>
+    <string name="language_iw">ﾗ｢ﾗ泰ｨﾗ燮ｪ (iw)</string>
+    <string name="language_zh">中文（繁體）(zh)</string>
   <string name="language_text">
     選択した言語（再起動が必要）
   </string>
@@ -654,10 +643,10 @@
     自動
   </string>
   <string name="fatal_title">
-  致命的なDBの問題
+  致命的なDBの問題が発生
   </string>
   <string name="fatal_db_warn">
-  通常、デバイスまたはSDカードの問題が原因！
+  通常、デバイスまたはSDカードの問題が原因
   </string>
   <string name="fatal_pre_message">
   ERROR
@@ -666,9 +655,9 @@
   （[設定]メニューの"エラー報告"を再び表示することができます）
   </string>
   <string name="use_network_location">
-  ネットワークロケーションプロバイダを使用して、
+  Use Network Location Provider
   </string>
   <string name="data_import_observed">
-  ローカルデータベースにワイグルから私の観測された無線LANをインポート？
+  すでに WiGLE へアップロードしたデータをローカルデータベースにインポート
   </string>    
 </resources>

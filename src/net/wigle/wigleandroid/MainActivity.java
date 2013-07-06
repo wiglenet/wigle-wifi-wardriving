@@ -15,8 +15,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -55,33 +53,29 @@ public final class MainActivity extends TabActivity {
 
     // Create an Intent to launch an Activity for the tab (to be reused)
     intent = new Intent().setClass(this, ListActivity.class);
-    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator(getString(R.string.tab_list))
+    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator(getString(R.string.tab_list),
+                   getResources().getDrawable(android.R.drawable.ic_menu_sort_by_size))
                   .setContent(intent);
     tabHost.addTab(spec);
     
     intent = new Intent().setClass(this, MappingActivity.class);
-    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator(getString(R.string.tab_map))
+    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator(getString(R.string.tab_map),
+                  getResources().getDrawable(android.R.drawable.ic_menu_mapmode))
                   .setContent(intent);
     tabHost.addTab(spec);
 
     intent = new Intent().setClass(this, DashboardActivity.class);
-    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator(getString(R.string.tab_dash))
+    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator(getString(R.string.tab_dash),
+                  getResources().getDrawable(android.R.drawable.ic_menu_view))
                   .setContent(intent);
     tabHost.addTab(spec);
     
     intent = new Intent().setClass(this, DataActivity.class);
-    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator(getString(R.string.tab_data))
+    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator(getString(R.string.tab_data),
+                  getResources().getDrawable(android.R.drawable.ic_menu_search))
                   .setContent(intent);
     tabHost.addTab(spec);
     
-    // force shrink the tabs
-    for ( int i = 0; i < tabHost.getTabWidget().getChildCount(); i++ ) {
-      View view = tabHost.getTabWidget().getChildAt( i );
-      int height = 60;
-      ViewGroup.LayoutParams param = view.getLayoutParams();
-      param.height = height;
-    }
-
     tabHost.setCurrentTabByTag( TAB_LIST );
   }
   

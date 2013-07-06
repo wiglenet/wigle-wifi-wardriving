@@ -20,6 +20,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import android.widget.TextView;
 
 public class NetworkActivity extends Activity {
   private static final int MENU_EXIT = 11;
+  private static final int MENU_COPY = 12;
   private static final int CRYPTO_DIALOG = 101;
   
   private static final int MSG_OBS_UPDATE = 1;
@@ -368,6 +370,9 @@ public class NetworkActivity extends Activity {
   public boolean onCreateOptionsMenu( final Menu menu ) {
       MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_menu_revert );
+      
+      item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
+      item.setIcon( android.R.drawable.ic_menu_save );
       return true;
   }
 
@@ -378,6 +383,13 @@ public class NetworkActivity extends Activity {
         case MENU_EXIT:
           // call over to finish
           finish();
+          return true;
+        case MENU_COPY:
+          // copy the netid
+          if (network != null) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(network.getBssid());
+          }
           return true;
       }
       return false;

@@ -111,7 +111,7 @@ public class WifiReceiver extends BroadcastReceiver {
     ssidSpeaker = new SsidSpeaker( listActivity );
     
     // formats for speech
-    timeFormat = new SimpleDateFormat( "h mm aa" );
+    timeFormat = new SimpleDateFormat( "h mm aa", Locale.US );
     numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
     if ( numberFormat1 instanceof DecimalFormat ) {
       ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
@@ -753,8 +753,13 @@ public class WifiReceiver extends BroadcastReceiver {
             Toast.makeText( listActivity, 
                 listActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
             scanInFlight = false;
-            wifiManager.setWifiEnabled(false);
-            wifiManager.setWifiEnabled(true);    
+            try {
+              wifiManager.setWifiEnabled(false);
+              wifiManager.setWifiEnabled(true);
+            }
+            catch (SecurityException ex) {
+              ListActivity.info("exception resetting wifi: " + ex, ex);
+            }
             lastWifiUnjamTime = now;
             if (prefs.getBoolean(ListActivity.PREF_SPEAK_WIFI_RESTART, true)) {
               listActivity.speak(listActivity.getString(R.string.wifi_restart_1) + " " 

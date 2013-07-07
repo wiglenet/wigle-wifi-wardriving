@@ -61,6 +61,7 @@ public final class DatabaseHelper extends Thread {
   private SQLiteStatement insertNetwork;
   private SQLiteStatement insertLocation;
   private SQLiteStatement updateNetwork;
+  private SQLiteStatement updateNetworkMetadata;
   
   public static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
@@ -72,7 +73,10 @@ public final class DatabaseHelper extends Thread {
     + "lasttime long not null,"
     + "lastlat double not null,"
     + "lastlon double not null,"
-    + "type text not null default '" + NetworkType.WIFI.getCode() + "'"
+    + "type text not null default '" + NetworkType.WIFI.getCode() + "',"
+    + "bestlevel integer not null default 0,"
+    + "bestlat double not null default 0,"
+    + "bestlon double not null default 0"
     + ")";
   
   public static final String LOCATION_TABLE = "location";
@@ -111,8 +115,15 @@ public final class DatabaseHelper extends Thread {
   private final SharedPreferences prefs;
   
   /** used in private addObservation */
-  private final ConcurrentLinkedHashMap<String,Location> previousWrittenLocationsCache = 
-    new ConcurrentLinkedHashMap<String,Location>( 64 );
+  private final ConcurrentLinkedHashMap<String,CachedLocation> previousWrittenLocationsCache = 
+    new ConcurrentLinkedHashMap<String,CachedLocation>( 64 );
+  
+  private final static class CachedLocation {
+    public Location location;
+    public int bestlevel;
+    public double bestlat;
+    public double bestlon;
+  }
   
   /** class for queueing updates to the database */
   final static class DBUpdate {
@@ -377,6 +388,10 @@ public final class DatabaseHelper extends Thread {
           // only diff to version 1 is the "type" column in network table
           db.setVersion(1);
         }
+        if ( db.getVersion() == 1 ) {
+          // only diff to version 2 is the "bestlevel", "bestlat", "bestlon" columns in network table
+          db.setVersion(2);
+        }
       }
       catch ( final SQLiteException ex ) {
         ListActivity.error( "sqlite exception: " + ex, ex );
@@ -417,8 +432,24 @@ public final class DatabaseHelper extends Thread {
         db.setVersion(1);
       }
       catch ( SQLiteException ex ) {
+        ListActivity.info("ex: " + ex, ex);
         if ( "duplicate column name".equals( ex.toString() ) ) {
           db.setVersion(1);
+        }
+      }
+    }
+    else if ( db.getVersion() == 1 ) {
+      ListActivity.info("upgrading db from 1 to 2");
+      try {
+        db.execSQL( "ALTER TABLE network ADD COLUMN bestlevel integer not null default 0" );
+        db.execSQL( "ALTER TABLE network ADD COLUMN bestlat double not null default 0");
+        db.execSQL( "ALTER TABLE network ADD COLUMN bestlon double not null default 0");
+        db.setVersion(2);
+      }
+      catch ( SQLiteException ex ) {
+        ListActivity.info("ex: " + ex, ex);
+        if ( "duplicate column name".equals( ex.toString() ) ) {
+          db.setVersion(2);
         }
       }
     }
@@ -428,13 +459,16 @@ public final class DatabaseHelper extends Thread {
     
     // compile statements
     insertNetwork = db.compileStatement( "INSERT INTO network"
-        + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type) VALUES (?,?,?,?,?,?,?,?)" );
+        + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon) VALUES (?,?,?,?,?,?,?,?,?,?,?)" );
     
     insertLocation = db.compileStatement( "INSERT INTO location"
         + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
     
     updateNetwork = db.compileStatement( "UPDATE network SET"
         + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
+    
+    updateNetworkMetadata = db.compileStatement( "UPDATE network SET"
+        + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ? WHERE bssid = ?" );
   }
   
   /**
@@ -465,6 +499,9 @@ public final class DatabaseHelper extends Thread {
           }
           if ( updateNetwork != null ) {
             updateNetwork.close();
+          }
+          if ( updateNetworkMetadata != null ) {
+            updateNetworkMetadata.close();
           }
           if ( db.isOpen() ) {
             db.close();
@@ -541,22 +578,28 @@ public final class DatabaseHelper extends Thread {
     long lasttime = 0;
     double lastlat = 0;
     double lastlon = 0;
+    int bestlevel = 0;
+    double bestlat = 0;
+    double bestlon = 0;
     boolean isNew = false;
     
     // first try cache
-    final Location prevWrittenLocation = previousWrittenLocationsCache.get( bssid );
+    final CachedLocation prevWrittenLocation = previousWrittenLocationsCache.get( bssid );
     if ( prevWrittenLocation != null ) {
       // cache hit!
-      lasttime = prevWrittenLocation.getTime();
-      lastlat = prevWrittenLocation.getLatitude();
-      lastlon = prevWrittenLocation.getLongitude();
+      lasttime = prevWrittenLocation.location.getTime();
+      lastlat = prevWrittenLocation.location.getLatitude();
+      lastlon = prevWrittenLocation.location.getLongitude();
+      bestlevel = prevWrittenLocation.bestlevel;
+      bestlat = prevWrittenLocation.bestlat;
+      bestlon = prevWrittenLocation.bestlon;
       // ListActivity.info( "db cache hit. bssid: " + network.getBssid() );
     }
     else {
       // cache miss, get the last values from the db, if any
       long start = System.currentTimeMillis();
       // SELECT: can't precompile, as it has more than 1 result value
-      final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon FROM network WHERE bssid = ?", bssidArgs );
+      final Cursor cursor = db.rawQuery("SELECT lasttime,lastlat,lastlon,bestlevel,bestlat,bestlon FROM network WHERE bssid = ?", bssidArgs );
       logTime( start, "db network queried " + bssid );
       if ( cursor.getCount() == 0 ) {
         insertNetwork.bindString( 1, bssid );
@@ -567,6 +610,9 @@ public final class DatabaseHelper extends Thread {
         insertNetwork.bindDouble( 6, location.getLatitude() );
         insertNetwork.bindDouble( 7, location.getLongitude() );
         insertNetwork.bindString( 8, network.getType().getCode() );
+        insertNetwork.bindLong( 9, network.getLevel() );
+        insertNetwork.bindDouble( 10, location.getLatitude() );
+        insertNetwork.bindDouble( 11, location.getLongitude() );
         
         start = System.currentTimeMillis();
         // INSERT
@@ -586,6 +632,9 @@ public final class DatabaseHelper extends Thread {
         lasttime = cursor.getLong(0);
         lastlat = cursor.getDouble(1);
         lastlon = cursor.getDouble(2);
+        bestlevel = cursor.getInt(3);
+        bestlat = cursor.getDouble(4);
+        bestlon = cursor.getDouble(5);
       }
       try {
         cursor.close();
@@ -617,7 +666,8 @@ public final class DatabaseHelper extends Thread {
     // ListActivity.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
     //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
-    final boolean changeWorthy = mediumChange || (now - lasttime > SMALL_LOC_DELAY && smallChange);
+    final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
+    final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange);
     
     if ( ListActivity.DEBUG ) {
       // do lots of inserts when debug is on
@@ -651,7 +701,12 @@ public final class DatabaseHelper extends Thread {
       // update the count
       locationCount.incrementAndGet();
       // update the cache
-      previousWrittenLocationsCache.put( bssid, location );
+      CachedLocation cached = new CachedLocation();
+      cached.location = location;
+      cached.bestlevel = update.level;
+      cached.bestlat = location.getLatitude();
+      cached.bestlon = location.getLongitude();
+      previousWrittenLocationsCache.put( bssid, cached );
       
       if ( ! isNew ) {
         // update the network with the lasttime,lastlat,lastlon
@@ -669,6 +724,30 @@ public final class DatabaseHelper extends Thread {
         // UPDATE
         updateNetwork.execute();
         logTime( start, "db network updated" );
+
+        
+        boolean newBest = bestlevel == 0 || update.level > bestlevel;
+        // ListActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
+        if (newBest) {
+          bestlevel = update.level;
+          bestlat = location.getLatitude();
+          bestlon = location.getLongitude();
+        }
+        
+        if (smallLocDelay || newBest) {
+          // ListActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
+          updateNetworkMetadata.bindLong( 1, bestlevel );
+          updateNetworkMetadata.bindDouble( 2, bestlat );
+          updateNetworkMetadata.bindDouble( 3, bestlon );
+          updateNetworkMetadata.bindString( 4, network.getSsid() );
+          updateNetworkMetadata.bindLong( 5, network.getFrequency() );
+          updateNetworkMetadata.bindString( 6, network.getCapabilities() );
+          updateNetworkMetadata.bindString( 7, bssid );
+          
+          start = System.currentTimeMillis();
+          updateNetworkMetadata.execute();
+          logTime( start, "db network metatdata updated" );
+        }
       }
     }
     else {

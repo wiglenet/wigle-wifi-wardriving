@@ -209,9 +209,9 @@
     <string name="language_text"> Gewählte Sprache (Neustart erforderlich) </string>
     <string name="auto"> Automatisch </string>
     <string name="fatal_title"> Fatal DB Problem </string>
-    <string name="fatal_db_warn"> Regel nach Gerät oder SD-Karte Probleme verursacht! </string>
+    <string name="fatal_db_warn"> Probleme meistens von Gerät oder SD-Karte verursacht! </string>
     <string name="fatal_pre_message"> ERROR </string>
-    <string name="fatal_post_message"> (Kann wieder sehen mit "Error Report" auf Settings-Menü) </string>
+    <string name="fatal_post_message"> (Kann mit "Error Report" im Settings-Menü erneut angesehen werden) </string>
     <string name="use_network_location"> Mit Network Location Provider </string>
-    <string name="data_import_observed"> Import meiner beobachtet wifi aus Wigle in die lokale Datenbank? </string>        
+    <string name="data_import_observed"> Import meiner beobachteten Wifi aus Wigle in die lokale Datenbank? </string>        
 </resources>

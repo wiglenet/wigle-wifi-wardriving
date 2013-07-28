@@ -504,31 +504,31 @@
     SSIDラベルフィルタ
   </string>
   <string name="menu_screen_sleep">
-    画面をスリープ
+    画面をスリープを抑止しない
   </string>
   <string name="menu_screen_wake">
-    画面をスリープさせない
+    画面のスリープを抑止
   </string>
   <string name="menu_labels_off">
-    オフラベル
+    ESSID ラベル非表示
   </string>
   <string name="menu_labels_on">
-    上のラベル
+    ESSID ラベル表示
   </string>
   <string name="menu_zoom_in">
     ズームイン
   </string>
   <string name="menu_zoom_out">
-    ズームアウトする
+    ズームアウト
   </string>
   <string name="menu_turn_off_lockon">
-    ロックオンをオフにする
+    現在地に追従する
   </string>
   <string name="menu_turn_on_lockon">
-    ロックオンをオンにする
+    現在地に追従しない
   </string>
   <string name="menu_show_old">
-    ラン＆ニューを表示する
+    軌跡を消さない
   </string>
   <string name="menu_show_new">
     新規のみ表示
@@ -618,27 +618,25 @@
     ファイルにDBをバックアップしますか?
   </string>
     <string name="language_en">English (en)</string>
-    <string name="language_cs">ﾄ稿ﾅ｡tina (cs) </string>
+    <string name="language_cs">čeština (cs) </string>
     <string name="language_de">Deutsch (de)</string>
-    <string name="language_es">espanol (es)</string>
-    <string name="language_fr">francais (fr)</string>
+    <string name="language_es">español (es)</string>
+    <string name="language_fr">français (fr)</string>
     <string name="language_it">italiano (it)</string>
     <string name="language_nl">Nederlands (nl)</string>
     <string name="language_pl">polski (pl)</string>
     <string name="language_ru">русский (ru)</string>
     <string name="language_sv">svenska (sv)</string>
-    <string name="language_pt">portugues (pt)</string>
+    <string name="language_pt">português (pt)</string>
     <string name="language_da">dansk (da)</string>
     <string name="language_ja">日本語 (ja)</string>
     <string name="language_fi">suomi (fi)</string>
-    <string name="language_hi">爨ｹ爨ｿ爨ｨ爭財､ｦ爭 (hi)</string>
-    <string name="language_ko">﨑懋ｵｭ・ｴ (ko)</string>
-    <string name="language_no">norsk (no)</string>
-    <string name="language_iw">ﾗ｢ﾗ泰ｨﾗ燮ｪ (iw)</string>
+    <string name="language_hi">हिन्दी (hi)</string>  
+    <string name="language_ko">한국어 (ko)</string>     
+    <string name="language_no">norsk (no)</string>     
+    <string name="language_iw">עברית (iw)</string>     
     <string name="language_zh">中文（繁體）(zh)</string>
-  <string name="language_text">
-    選択した言語（再起動が必要）
-  </string>
+    <string name="language_text">Selected language (requires restart)</string>
   <string name="auto">
     自動
   </string>
@@ -655,9 +653,9 @@
   （[設定]メニューの"エラー報告"を再び表示することができます）
   </string>
   <string name="use_network_location">
-  Use Network Location Provider
+  GPS 以外のネットワーク位置情報を利用する
   </string>
   <string name="data_import_observed">
   すでに WiGLE へアップロードしたデータをローカルデータベースにインポート
-  </string>    
+  </string>
 </resources>

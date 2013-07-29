@@ -363,13 +363,7 @@ public class WifiReceiver extends BroadcastReceiver {
       }
       else {
         final GeoPoint geoPoint = new GeoPoint( location );
-        TrailStat trailStat = ListActivity.lameStatic.trail.get( geoPoint );
-        if ( trailStat == null ) {
-          trailStat = new TrailStat();
-          ListActivity.lameStatic.trail.put( geoPoint, trailStat );
-        }
-        trailStat.newWifiForRun += newWifiForRun;
-        trailStat.newWifiForDB += newNetDiff;
+        final TrailStat trailStat = updateTrailStat( geoPoint, newWifiForRun, newNetDiff );
         // ListActivity.info("newCellForRun: " + newCellForRun);
         trailStat.newCellForRun += newCellForRun;
         trailStat.newCellForDB += newCellDiff;        
@@ -445,6 +439,17 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
       doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
     }
+  }
+
+  public static TrailStat updateTrailStat( final GeoPoint geoPoint, int newWifiForRun, final long newWifiForDB ) {
+    TrailStat trailStat = ListActivity.lameStatic.trail.get( geoPoint );
+    if ( trailStat == null ) {
+      trailStat = new TrailStat();
+      ListActivity.lameStatic.trail.put( geoPoint, trailStat );
+    }
+    trailStat.newWifiForRun += newWifiForRun;
+    trailStat.newWifiForDB += newWifiForDB;
+    return trailStat;
   }
   
   public String getNetworkTypeName() {

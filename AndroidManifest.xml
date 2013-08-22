@@ -11,7 +11,7 @@
    	android:largeScreens="true"
    	android:resizeable="true"
 	/>
-    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="8" />
+    <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="11" />
     
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>

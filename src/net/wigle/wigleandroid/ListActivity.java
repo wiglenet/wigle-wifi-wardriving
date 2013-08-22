@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -1367,7 +1368,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
           try {
             final String baseErrorMessage = MainActivity.getBaseErrorMessage( throwable, false );
             StringBuilder builder = new StringBuilder( "WigleWifi error log - " );
-            SimpleDateFormat format = new SimpleDateFormat();
+            final DateFormat format = SimpleDateFormat.getDateTimeInstance();
             builder.append( format.format( new Date() ) ).append( "\n" );
             final PackageManager pm = context.getPackageManager();
             final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);

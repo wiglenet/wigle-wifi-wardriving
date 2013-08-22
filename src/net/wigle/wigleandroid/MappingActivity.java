@@ -2,6 +2,8 @@ package net.wigle.wigleandroid;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.wigle.wigleandroid.listener.WifiReceiver;
+
 import org.osmdroid.LocationListenerProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -15,6 +17,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -67,7 +70,7 @@ public final class MappingActivity extends Activity {
   private static final int MENU_FILTER = 18;
   
   private static final int SSID_FILTER = 102;
-    
+  
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
@@ -94,6 +97,7 @@ public final class MappingActivity extends Activity {
     
     setupMapView( oldCenter, oldZoom );
     setupTimer();
+    setupQuery();
   }
   
   @Override
@@ -513,6 +517,43 @@ public final class MappingActivity extends Activity {
       } );
     
     return dialog;
+  }
+
+  private void setupQuery() {
+    if (ListActivity.getNetworkCache().size() > 25) {
+      // don't load, there's already networks to show
+      return;
+    }
+    
+    final String sql = "SELECT bssid FROM " 
+      + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT 200";
+    
+    final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+      public void handleRow( final Cursor cursor ) {
+        final String bssid = cursor.getString(0);
+        final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
+        
+        Network network = networkCache.get( bssid );        
+        if ( network == null ) {
+          network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
+          networkCache.put( network.getBssid(), network );      
+          ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
+        
+          final GeoPoint geoPoint = network.getGeoPoint();
+          final int newWifiForRun = 1;
+          final long newWifiForDB = 0;
+          WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);          
+        }
+      }
+      
+      public void complete() {
+        if ( mapView != null ) {
+          // force a redraw
+          ((View) mapView).postInvalidate();
+        }
+      }
+    });
+    ListActivity.lameStatic.dbHelper.addToQueue( request );
   }
   
 //  private void tryEvil() {

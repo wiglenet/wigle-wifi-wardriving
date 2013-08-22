@@ -273,8 +273,10 @@ public final class OpenStreetMapViewWrapper extends Overlay {
         final boolean filter = prefs.getBoolean( ListActivity.PREF_MAPF_ENABLED, true );
         final Matcher matcher = getFilterMatcher( prefs, "" );
         
-        for( Network network : ListActivity.getNetworkCache().values() ) {
-          
+        for( final Network network : networks ) {
+          if (network.getSsid() == null || network.getSsid() == "") {
+            continue;
+          }
           if ( filter && ! isOk( matcher, prefs, "", network ) ) {
             continue;
           }

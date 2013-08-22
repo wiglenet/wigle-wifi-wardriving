@@ -32,6 +32,15 @@ output GPX (open street map)
 limit list to one ssid, show multiple observations
 
 --- done ---
+* 1.56 (08/21/2013)
+Stop shrinking tab buttons.
+Fix Japanese translation (thanks Tinbotu!)
+Fix French translaction (thanks f4ahw!)
+Catch SecurityExceptions when trying to turn on/off wifi.
+Add bestlevel/lat/lon to database and object, use for maps.
+Load recent networks on a new map.
+Take care of other odd exceptions folks have reported.
+
 * 1.55 (02/09/2013)
 Add in a layout_height attribute that some devices require.
 

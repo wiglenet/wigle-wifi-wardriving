@@ -13,7 +13,7 @@ import java.util.Locale;
 
 import android.content.Context;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 public final class TTS {  
   private static Class SPEECH_CLASS;
   private static Class LISTENER_CLASS;
@@ -122,7 +122,7 @@ public final class TTS {
   public static boolean hasTTS() {
     return SPEECH_CLASS != null;
   }
-  
+
   public TTS( final Context context ) {
     try {
       Constructor construct;

@@ -10,6 +10,7 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IMapView;
 import org.osmdroid.views.MapView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -37,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+@SuppressWarnings("deprecation")
 public class NetworkActivity extends Activity {
   private static final int MENU_EXIT = 11;
   private static final int MENU_COPY = 12;
@@ -123,6 +125,7 @@ public class NetworkActivity extends Activity {
     super.onDestroy();
   }
   
+  @SuppressLint("HandlerLeak")
   private void setupQuery() {
     // what runs on the gui thread
     final Handler handler = new Handler() {

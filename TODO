@@ -32,6 +32,9 @@ output GPX (open street map)
 limit list to one ssid, show multiple observations
 
 --- done ---
+* 1.57 (08/22/2013)
+Target api 10 for menu button on tablets.
+
 * 1.56 (08/21/2013)
 Stop shrinking tab buttons.
 Fix Japanese translation (thanks Tinbotu!)

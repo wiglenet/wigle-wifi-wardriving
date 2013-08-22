@@ -35,7 +35,6 @@ final class HttpFileUploader {
   public static final String LINE_END = "\r\n";
   public static final String TWO_HYPHENS = "--";
   public static final String BOUNDARY = "*****";
-  public static final String LATEST_IP = "205.234.142.193";
   
   /** don't allow construction */
   private HttpFileUploader(){
@@ -64,22 +63,12 @@ final class HttpFileUploader {
         // consider a pref to skip this? or just phase out after migration?
     } 
     catch (UnknownHostException ex) {
-        // dns is broke, try the last known ip
-        urlString = urlString.replace("wigle.net", LATEST_IP);
-        connectURL = new URL( urlString );
-        try {
-            ListActivity.info("testcon1.1");
-            URLConnection testcon = connectURL.openConnection();
-            // we should probably time-bound this test-connection?
-            testcon.connect();
-            self_serving = false;
-        } 
-        catch (IOException ioEx) {
-            // we're specifically interested in javax.net.ssl.SSLException
-        }
+        // dns is broke
+        ListActivity.error("dns is broke: " + ex, ex);
     } 
     catch (IOException ex) {
         // we're specifically interested in javax.net.ssl.SSLException
+        ListActivity.error("problem uploading: " + ex, ex);
     }
 
     if ( self_serving ) {
@@ -94,25 +83,14 @@ final class HttpFileUploader {
             }
         } 
         catch (IOException ex) {
-          // ListActivity.info("testcon ex: " + ex, ex);
+            ListActivity.error("problem uploading testcon2: " + ex, ex);
         }
     }
     ListActivity.info("end testcons");
     
-    HttpURLConnection conn = null;
     ListActivity.info("Creating url connection. self_serving: " + self_serving + " fallback: " + fallback);
 
-    try {
-      conn = createConnection(connectURL, res, setBoundary, self_serving, fallback);
-    }
-    catch (UnknownHostException ex) {
-      // dns is broke, try the last known ip
-      urlString = urlString.replace("wigle.net", LATEST_IP);
-      connectURL = new URL( urlString );
-      conn = createConnection(connectURL, res, setBoundary, self_serving, fallback);
-    }
-    
-    return conn;
+    return createConnection(connectURL, res, setBoundary, self_serving, fallback);
   }
   
   private static HttpURLConnection createConnection(final URL connectURL, final Resources res,

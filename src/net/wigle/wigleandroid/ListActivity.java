@@ -543,7 +543,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
         // well turn it of now that we're done
         final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         info( "turning back off wifi" );
-        wifiManager.setWifiEnabled( false );
+        try {
+          wifiManager.setWifiEnabled( false );
+        }
+        catch ( Exception ex ) {
+          error("exception turning wifi back off: " + ex, ex);
+        }
       }
       
       TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );

@@ -393,8 +393,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     countStats.byteCount = header.length();
 
     if ( total > 0 ) {
-      CharBuffer charBuffer = CharBuffer.allocate( 256 );
-      ByteBuffer byteBuffer = ByteBuffer.allocate( 256 ); // this ensures hasArray() is true
+      CharBuffer charBuffer = CharBuffer.allocate( 1024 );
+      ByteBuffer byteBuffer = ByteBuffer.allocate( 1024 ); // this ensures hasArray() is true
       final CharsetEncoder encoder = Charset.forName( ListActivity.ENCODING ).newEncoder();
       // don't stop when a goofy character is found
       encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
@@ -486,8 +486,14 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         // do the encoding
         encoder.reset();
         encoder.encode( charBuffer, byteBuffer, true );
-        encoder.flush( byteBuffer );
-        // byteBuffer = encoder.encode( charBuffer );  (old way)
+        try {
+          encoder.flush( byteBuffer );
+        }
+        catch ( IllegalStateException ex ) {
+          ListActivity.error("exception flushing: " + ex, ex);
+          continue;
+        }
+        // byteBuffer = encoder.encode( charBuffer );  (old way)          
         
         // figure out where in the byteBuffer to stop
         final int end = byteBuffer.position();

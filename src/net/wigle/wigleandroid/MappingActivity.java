@@ -537,7 +537,7 @@ public final class MappingActivity extends Activity {
         if ( network == null ) {
           network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
           networkCache.put( network.getBssid(), network );      
-          ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
+          // ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
         
           final GeoPoint geoPoint = network.getGeoPoint();
           final int newWifiForRun = 1;

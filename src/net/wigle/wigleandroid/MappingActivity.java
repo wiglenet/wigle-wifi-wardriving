@@ -24,7 +24,6 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,9 +71,6 @@ public final class MappingActivity extends Activity {
   
   private static final int SSID_FILTER = 102;
   
-  private static final int MSG_OBS_UPDATE = 300;
-  private static final int MSG_OBS_DONE = 301;
-    
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
@@ -529,13 +525,6 @@ public final class MappingActivity extends Activity {
       return;
     }
     
-    // what runs on the gui thread
-    final Handler handler = new Handler() {
-      @Override
-      public void handleMessage( final Message msg ) {        
-      }
-    };
-    
     final String sql = "SELECT bssid FROM " 
       + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT 200";
     
@@ -547,7 +536,8 @@ public final class MappingActivity extends Activity {
         Network network = networkCache.get( bssid );        
         if ( network == null ) {
           network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
-          networkCache.put( network.getBssid(), network );        
+          networkCache.put( network.getBssid(), network );      
+          ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
         
           final GeoPoint geoPoint = network.getGeoPoint();
           final int newWifiForRun = 1;
@@ -557,7 +547,6 @@ public final class MappingActivity extends Activity {
       }
       
       public void complete() {
-        handler.sendEmptyMessage( MSG_OBS_DONE );
         if ( mapView != null ) {
           // force a redraw
           ((View) mapView).postInvalidate();

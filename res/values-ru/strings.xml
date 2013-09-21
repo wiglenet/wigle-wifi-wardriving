@@ -18,7 +18,7 @@
     Wi-Fi Wi-Fi - Новые ошибки
   </string>
   <string name="speech_name">
-    WiGLE Wi-Fi - Аудио Настройки
+    WiGLE Wi-Fi - Аудио настройки
   </string>
   <string name="network_activity_name">
     Wigle Wi-Fi - Сети
@@ -282,7 +282,7 @@
     Показывать пароль
   </string>
   <string name="setting_db_marker">
-    Настройки ID маркера в БД (там, где начинаются от добавления):
+    Настройки ID маркера в БД (там, где начинаются добавления):
   </string>
   <string name="setting_high_up">
     Текущий ID в БД:
@@ -300,7 +300,7 @@
     Максимальный ID из БД?
   </string>
   <string name="setting_tie_wifi">
-    Привяжите к Wi-fi Период сканирования
+    Привяжите к Wi-Fi период сканирования
   </string>
   <string name="no_tts">
     Нет интерпретатора текста в речь
@@ -591,7 +591,7 @@
     Исключение
   </string>
   <string name="status_login_fail">
-    Логин не удался, проверьте пароль?
+    Логин не удался, проверьте пароль.
   </string>
   <string name="status_uploading">
     Загрузка файлов
@@ -684,18 +684,18 @@
     Фатальная ошибка DB
   </string>
   <string name="fatal_db_warn">
-    Обычно вызвано устройства или проблемы SD карту!
+    Обычно вызвана устройством или проблемой с SD картой!
   </string>
   <string name="fatal_pre_message">
     ОШИБКА
   </string>
   <string name="fatal_post_message">
-    (Может просматривать снова с "ошибке" в меню Настройки)
+    (Можете просматреть её снова в "Ошибка" в меню Настройки)
   </string>
   <string name="use_network_location">
     Использование поставщика сетевого расположения
   </string>
   <string name="data_import_observed">
-    Импорт мой наблюдается WiFi от WiGLE в локальные базы данных?
+    Импорт моих наблюдений WiFi от WiGLE в локальную базу данных?
   </string>
 </resources>

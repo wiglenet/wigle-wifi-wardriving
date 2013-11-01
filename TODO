@@ -30,6 +30,7 @@ store system time on db records (not just gps time)
 be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 limit list to one ssid, show multiple observations
+scan on/off toggle added to the dashboard tab
 
 --- done ---
 * 1.58 (??/??/2013)

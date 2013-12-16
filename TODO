@@ -31,6 +31,9 @@ be able to disable cell tower recording, and/or filter kml output
 output GPX (open street map)
 limit list to one ssid, show multiple observations
 scan on/off toggle added to the dashboard tab
+wifi scanner always available in kit kat
+show manufacturer from oui
+update icon to higher-rez
 
 --- done ---
 * 1.58 (??/??/2013)

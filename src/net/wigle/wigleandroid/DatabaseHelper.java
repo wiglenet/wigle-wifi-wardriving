@@ -570,6 +570,12 @@ public final class DatabaseHelper extends Thread {
   
   private void addObservation( final DBUpdate update, final int drainSize ) throws DBException {
     checkDB();
+    if (insertNetwork == null || insertLocation == null
+        || updateNetwork == null || updateNetworkMetadata == null) {
+      
+      ListActivity.warn("A stored procedure is null, not adding observation");
+      return;
+    }
     final Network network = update.network;
     final Location location = update.location;
     final String bssid = network.getBssid();

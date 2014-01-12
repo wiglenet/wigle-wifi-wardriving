@@ -38,7 +38,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-@SuppressWarnings("deprecation")
 public class NetworkActivity extends Activity {
   private static final int MENU_EXIT = 11;
   private static final int MENU_COPY = 12;

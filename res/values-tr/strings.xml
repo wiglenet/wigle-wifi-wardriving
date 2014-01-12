@@ -27,7 +27,7 @@
     <string name="connect_text">Ağ operatörünün izniyle</string>
     <string name="csv_run_export_button">CSV dışarı aktarım</string>
     <string name="csv_run_export_text">Şu andaki aramayı CSV`ye aktar</string>
-    <string name="csv_export_button">CSV`den veritabanına aktarım/string>
+    <string name="csv_export_button">CSV`den veritabanına aktarım</string>
     <string name="csv_export_text">Tüm veritabanını CSV dosyasına aktar</string>           
     <string name="kml_run_export_button">KML dışa aktarım</string>
     <string name="kml_run_export_text">Şu andaki aramayı KML`ye aktar</string>
@@ -228,10 +228,9 @@
     <string name="language_fi">suomi (fi)</string>     
     <string name="language_hi">हिन्दी (hi)</string>     
     <string name="language_ko">한국어 (ko)</string>     
-    <string name="language_no">norsk (no)</string>     
+    <string name="language_no">Türkçe (tr)</string>     
     <string name="language_iw">עברית (iw)</string>     
-    <string name="language_zh">中文（繁體）(zh)</string>     
-     <string name="language_no">Türkçe (tr)</string>   
+    <string name="language_zh">中文（繁體）(zh)</string>
     <string name="language_text">Selected language (requires restart)</string>
     <string name="auto">Otomatik</string>   
     <string name="fatal_title">Fatal DB Problem</string>

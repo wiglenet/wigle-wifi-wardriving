@@ -209,7 +209,7 @@
 	<string name="data_export_csv">Run exporteren naar een CSV-bestand</string>
 	<string name="data_export_csv_db">Database exporteren naar een CSV-bestand</string>
 	<string name="data_export_kml_run">Run exporteren naar een KML-bestand</string>
-	<string name="data_export_kml_db">Database exporteren naar een CSV-bestand</string>
+	<string name="data_export_kml_db">Database exporteren naar een KML-bestand</string>
 	<string name="data_backup_db">Back-up van database opslaan in bestand?</string>
 	<string name="language_en">English (en)</string>
 	<string name="language_cs">čeština (cs)</string>

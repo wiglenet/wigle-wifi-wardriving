@@ -127,6 +127,14 @@ public final class MappingActivity extends Activity {
     
     if ( mapView instanceof MapView ) {
       final MapView osmMapView = (MapView) mapView;
+
+      // conditionally replace the tile source
+      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final boolean wigleTiles = prefs.getBoolean( ListActivity.PREF_USE_WIGLE_TILES, true );
+      if ( wigleTiles ) { 
+          osmMapView.setTileSource( WigleTileSource.WiGLE );
+      }
+
       rlView.addView( osmMapView );
       osmMapView.setBuiltInZoomControls( true );
       osmMapView.setMultiTouchControls( true );

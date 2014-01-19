@@ -245,4 +245,5 @@
     <string name="speech_wifi_restart">Wifi restarts</string>
     <string name="wifi_restart_1">Warning, latest wifi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting wifi.</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

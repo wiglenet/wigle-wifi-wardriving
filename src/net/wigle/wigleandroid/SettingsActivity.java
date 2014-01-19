@@ -264,7 +264,8 @@ public final class SettingsActivity extends Activity {
       MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListActivity.PREF_SPEECH_GPS, true);
       MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListActivity.PREF_CIRCLE_SIZE_MAP, false);
       MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListActivity.PREF_USE_NETWORK_LOC, false);
-      
+      MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListActivity.PREF_USE_WIGLE_TILES, true);
+
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
       if ( ! TTS.hasTTS() ) {

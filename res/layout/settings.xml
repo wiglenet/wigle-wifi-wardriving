@@ -96,6 +96,11 @@
         android:layout_height="wrap_content"
         android:text="@string/use_network_location" />
 
+<CheckBox android:id="@+id/use_wigle_tiles"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_wigle_tiles" />
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="fill_parent"

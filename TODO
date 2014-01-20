@@ -34,13 +34,14 @@ scan on/off toggle added to the dashboard tab
 sending collected data to another place in easy way (mail,ftp...)
 wifi scanner always available in kit kat
 show manufacturer from oui
-update icon to higher-rez
 
 --- done ---
-* 1.58 (??/??/2013)
+* 1.58 (01/19/2013)
+Use WiGLE's OpenStreetMap tileserver
 Added Turkish Translation, thanks ozdemircili!
 Russian language fixes, thanks developexaccount!
 Dutch language fix (thanks Roestje!)
+Update to higher-rez icon
 
 * 1.57 (08/22/2013)
 Target api 10 for menu button on tablets.

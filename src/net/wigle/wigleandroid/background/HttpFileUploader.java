@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
@@ -21,7 +19,6 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import net.wigle.wigleandroid.ListActivity;
-import net.wigle.wigleandroid.SSLConfigurator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -51,50 +48,11 @@ final class HttpFileUploader {
       return null;
     }
 
-    // test if we should be doing our own ssl
-    boolean self_serving = true;
-    boolean fallback=true;
-    try {
-        ListActivity.info("testcon1");
-        URLConnection testcon = connectURL.openConnection();
-        // we should probably time-bound this test-connection?
-        testcon.connect();
-        self_serving = false;
-        // consider a pref to skip this? or just phase out after migration?
-    } 
-    catch (UnknownHostException ex) {
-        // dns is broke
-        ListActivity.error("dns is broke: " + ex, ex);
-    } 
-    catch (IOException ex) {
-        // we're specifically interested in javax.net.ssl.SSLException
-        ListActivity.error("problem uploading: " + ex, ex);
-    }
-
-    if ( self_serving ) {
-        try {
-            ListActivity.info("testcon2");
-            URLConnection testcon = connectURL.openConnection();
-            if ( testcon instanceof javax.net.ssl.HttpsURLConnection ) {
-                SSLConfigurator con = SSLConfigurator.getInstance( res );
-                con.configure( (javax.net.ssl.HttpsURLConnection) testcon );
-                testcon.connect();
-                fallback = false;
-            }
-        } 
-        catch (IOException ex) {
-            ListActivity.error("problem uploading testcon2: " + ex, ex);
-        }
-    }
-    ListActivity.info("end testcons");
-    
-    ListActivity.info("Creating url connection. self_serving: " + self_serving + " fallback: " + fallback);
-
-    return createConnection(connectURL, res, setBoundary, self_serving, fallback);
+    return createConnection(connectURL, res, setBoundary);
   }
   
   private static HttpURLConnection createConnection(final URL connectURL, final Resources res,
-      final boolean setBoundary, final boolean self_serving, final boolean fallback) throws IOException {
+      final boolean setBoundary) throws IOException {
     
     String javaVersion = "unknown";                                                  
     try {                                                                            
@@ -118,11 +76,6 @@ final class HttpFileUploader {
     // Don't use a cached copy.
     conn.setUseCaches(false);
     conn.setInstanceFollowRedirects( false );
-    if ( ( conn instanceof javax.net.ssl.HttpsURLConnection ) && self_serving ) {
-        final SSLConfigurator con = SSLConfigurator.getInstance( res, fallback );
-        con.configure( (javax.net.ssl.HttpsURLConnection) conn );
-        ListActivity.info("using ssl! conn: " + conn);
-    }
     
     // Use a post method.
     conn.setRequestMethod("POST");

@@ -627,7 +627,7 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_MILES, true ) ) {
       final float dist = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
       final String distString = DashboardActivity.metersToString( numberFormat1, listActivity, dist, false );
-      builder.append( listActivity.getString(R.string.tts_from) + " " ).append( distString );
+      builder.append( listActivity.getString(R.string.tts_from) + " " ).append( distString ).append( ", " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
       String time = timeFormat.format( new Date() );

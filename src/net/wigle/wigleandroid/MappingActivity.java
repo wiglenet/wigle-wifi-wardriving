@@ -40,6 +40,7 @@ import android.widget.TextView;
 /**
  * show a map!
  */
+@SuppressWarnings("deprecation")
 public final class MappingActivity extends Activity {
   private static class State {
     private boolean locked = true;

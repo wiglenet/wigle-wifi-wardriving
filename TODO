@@ -12,13 +12,11 @@ download of cell observed as well
 
 --- user suggested ---
 option to turn off gps on/off toast
-option to configure off smaller-button hoop-jumping for devices that don't deal with it correctly
 map-page type filter on four csv/kml exports
 exit button as different color
 option to stop scanning when not plugged in
 kismet drone support
 some response/info/stat about uploaded files (user stats?)
-try tabs on bottom in landscape mode
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
 speak similar AP's with count, trying to condense somehow, start with s/\d+$//
@@ -33,9 +31,19 @@ limit list to one ssid, show multiple observations
 scan on/off toggle added to the dashboard tab
 sending collected data to another place in easy way (mail,ftp...)
 wifi scanner always available in kit kat
-show manufacturer from oui
+integrate the bluetooth part in
+a checkbox to have it start on bootup
+decoding base64 (assuming ssid)
+switch to satellite maps, or between Google Maps/OSMs
+see frequency the AP is operating on
+a widget
+heat mapping
+import files, instead of uploading to site and downloading to app
 
 --- done ---
+* 1.59 (?)
+Migrate to safe-draw to fix osm drawing distortions
+
 * 1.58 (01/19/2014)
 Use WiGLE's OpenStreetMap tileserver
 Added Turkish Translation, thanks ozdemircili!

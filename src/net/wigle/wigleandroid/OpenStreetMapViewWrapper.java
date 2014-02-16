@@ -13,13 +13,13 @@ import net.wigle.wigleandroid.ListActivity.TrailStat;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.MapView.Projection;
-import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.SafeDrawOverlay;
+import org.osmdroid.views.safecanvas.ISafeCanvas;
+import org.osmdroid.views.safecanvas.SafePaint;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Point;
@@ -28,36 +28,36 @@ import android.location.Location;
 /**
  * wrap the open street map view, to allow setting overlays
  */
-public final class OpenStreetMapViewWrapper extends Overlay {
-  private final Paint crossBackPaint = new Paint();
-  private final Paint crossPaint = new Paint();
+public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
+  private final SafePaint crossBackPaint = new SafePaint();
+  private final SafePaint crossPaint = new SafePaint();
   
-  private final Paint trailBackPaint = new Paint();
-	private final Paint trailPaint = new Paint();
-	private final Paint trailDBPaint = new Paint();
+  private final SafePaint trailBackPaint = new SafePaint();
+	private final SafePaint trailPaint = new SafePaint();
+	private final SafePaint trailDBPaint = new SafePaint();
 	
-	private final Paint trailCellBackPaint = new Paint();
-  private final Paint trailCellPaint = new Paint();
-  private final Paint trailCellDBPaint = new Paint();
+	private final SafePaint trailCellBackPaint = new SafePaint();
+  private final SafePaint trailCellPaint = new SafePaint();
+  private final SafePaint trailCellDBPaint = new SafePaint();
   
-  private Paint trailBackSizePaint;
-  private Paint trailSizePaint;
-  private Paint trailDBSizePaint;
+  private SafePaint trailBackSizePaint;
+  private SafePaint trailSizePaint;
+  private SafePaint trailDBSizePaint;
   
-  private Paint trailCellBackSizePaint;
-  private Paint trailCellSizePaint;
-  private Paint trailCellDBSizePaint;
+  private SafePaint trailCellBackSizePaint;
+  private SafePaint trailCellSizePaint;
+  private SafePaint trailCellDBSizePaint;
   
-  private final Paint ssidPaintLeft = new Paint();
-  private final Paint ssidPaintRight = new Paint();
-  private final Paint ssidPaintLeftBack = new Paint();
-  private final Paint ssidPaintRightBack = new Paint(); 
+  private final SafePaint ssidPaintLeft = new SafePaint();
+  private final SafePaint ssidPaintRight = new SafePaint();
+  private final SafePaint ssidPaintLeftBack = new SafePaint();
+  private final SafePaint ssidPaintRightBack = new SafePaint(); 
   
-  private final Paint netTextBack = new Paint();
-  private final Paint netText = new Paint();
+  private final SafePaint netTextBack = new SafePaint();
+  private final SafePaint netText = new SafePaint();
   
-  private final Paint netCountBack = new Paint();
-  private final Paint netCount = new Paint();  
+  private final SafePaint netCountBack = new SafePaint();
+  private final SafePaint netCount = new SafePaint();  
   
   private final ConcurrentLinkedHashMap<GeoPoint,Boolean> labelChoice = 
     new ConcurrentLinkedHashMap<GeoPoint,Boolean>(128);
@@ -116,23 +116,36 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     trailCellBackPaint.setStyle( Style.FILL );
     trailCellBackPaint.setStrokeWidth( 3f );
         
-    trailBackSizePaint = new Paint(trailBackPaint);
+    trailBackSizePaint = new SafePaint();
+    trailBackSizePaint.setColor( Color.argb( 128, 240, 240, 240 ) );
+    trailBackSizePaint.setAntiAlias( true );
     trailBackSizePaint.setStyle( Style.STROKE );
     trailBackSizePaint.setStrokeWidth( 2f );
-    trailSizePaint = new Paint(trailPaint);
+    
+    trailSizePaint = new SafePaint();
+    trailSizePaint.setAntiAlias( true );
+    trailSizePaint.setStrokeWidth( 2f );
     trailSizePaint.setColor( Color.argb( 128, 200, 128, 200 ) );
     trailSizePaint.setStyle( Style.FILL );
-    trailDBSizePaint = new Paint(trailDBPaint);
+    
+    trailDBSizePaint = new SafePaint();
+    trailDBSizePaint.setAntiAlias( true );
+    trailDBSizePaint.setStrokeWidth( 2f );    
     trailDBSizePaint.setColor( Color.argb( 128, 10, 64, 220 ) );
     trailDBSizePaint.setStyle( Style.FILL );
     
-    trailCellBackSizePaint = new Paint(trailCellBackPaint);
+    trailCellBackSizePaint = new SafePaint();
+    trailCellBackPaint.setColor( Color.argb( 128, 240, 240, 240 ) );    
     trailCellBackSizePaint.setStyle( Style.STROKE );
     trailCellBackSizePaint.setStrokeWidth( 2f );    
-    trailCellSizePaint = new Paint(trailCellPaint);
+    
+    trailCellSizePaint = new SafePaint();
+    trailCellSizePaint.setStrokeWidth( 2f );    
     trailCellSizePaint.setColor( Color.argb( 128, 128, 200, 200 ) );
     trailCellSizePaint.setStyle( Style.FILL );
-    trailCellDBSizePaint = new Paint(trailCellDBPaint);
+    
+    trailCellDBSizePaint = new SafePaint();
+    trailCellDBPaint.setStrokeWidth( 2f );    
     trailCellDBSizePaint.setColor( Color.argb( 128, 64, 10, 220 ) );
     trailCellDBSizePaint.setStyle( Style.FILL );
     
@@ -184,7 +197,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
   }
   
   @Override
-  public void draw( final Canvas c, final MapView osmv, final boolean shadow ) {
+  public void drawSafe( final ISafeCanvas c, final MapView osmv, final boolean shadow ) {
     if ( shadow ) {
       return;
     }
@@ -203,11 +216,11 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     }
   }
   
-  private void drawObsMap( final Canvas c, final MapView osmv ) {
+  private void drawObsMap( final ISafeCanvas c, final MapView osmv ) {
     if ( obsMap != null ) {
       final GeoPoint obsPoint = new GeoPoint(0,0);
       Point point = new Point();
-      Paint paint = new Paint();
+      SafePaint paint = new SafePaint();
       paint.setColor( Color.argb( 255, 0, 0, 0 ) );
       final Projection proj = osmv.getProjection();
       
@@ -227,7 +240,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     }
   }
   
-  private void drawNetwork( final Canvas c, final MapView osmv, final Network network ) {
+  private void drawNetwork( final ISafeCanvas c, final MapView osmv, final Network network ) {
     final GeoPoint geoPoint = network.getGeoPoint();    
     if ( geoPoint != null ) {
       final Projection proj = osmv.getProjection();
@@ -240,7 +253,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     }
   }
    
-  private void drawTrail( final Canvas c, final MapView osmv ) {    
+  private void drawTrail( final ISafeCanvas c, final MapView osmv ) {    
 	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
 	  
 	  // if zoomed in past 15, give a little boost to circle size
@@ -255,7 +268,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     renderSsidStrings( c, osmv, boost );
   }
   
-  private void renderSsidStrings( final Canvas c, final MapView osmv, final float boost ) {
+  private void renderSsidStrings( final ISafeCanvas c, final MapView osmv, final float boost ) {
     final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
     final Projection proj = osmv.getProjection();
@@ -323,8 +336,8 @@ public final class OpenStreetMapViewWrapper extends Overlay {
             int horizontalOffset = 20 + (int) (boost * 2);
             int verticalDirection = 1;
             int verticalOffset = 0;
-            Paint paint = ssidPaintLeft;
-            Paint paintBack = ssidPaintLeftBack;
+            SafePaint paint = ssidPaintLeft;
+            SafePaint paintBack = ssidPaintLeftBack;
             if ( choice ) {
               horizontalOffset *= -1;
               verticalDirection = -1;    
@@ -358,7 +371,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
     }
   }
   
-  private void renderCircleNumbers( final Canvas c, final MapView osmv, 
+  private void renderCircleNumbers( final ISafeCanvas c, final MapView osmv, 
       final Set<Map.Entry<GeoPoint,TrailStat>> entrySet, float boost) {
     
     final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
@@ -389,7 +402,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
         point = proj.toMapPixels( entry.getKey(), point );
         projected = true;
         float size = wifiSize;
-        Paint paint = trailBackPaint;
+        SafePaint paint = trailBackPaint;
         if ( circleSizeMap) {
           size = (Math.max(value.newWifiForDB, value.newWifiForRun) * boost) + 1;
           paint = trailBackSizePaint;
@@ -402,7 +415,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
           point = proj.toMapPixels( entry.getKey(), point );
         }
         float size = cellSize;
-        Paint paint = trailCellBackPaint;
+        SafePaint paint = trailCellBackPaint;
         if ( circleSizeMap ) {
           size = (Math.max(value.newCellForDB, value.newCellForRun) * boost) + 1;
           paint = trailCellBackSizePaint;
@@ -420,7 +433,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
         point = proj.toMapPixels( entry.getKey(), point );
         projected = true;
         float size = wifiSize;
-        Paint paint = value.newWifiForDB > 0 ? trailDBPaint : trailPaint;
+        SafePaint paint = value.newWifiForDB > 0 ? trailDBPaint : trailPaint;
         if ( circleSizeMap ) {
           size = (Math.max(value.newWifiForDB, value.newWifiForRun) * boost) + 1;
           paint = value.newWifiForDB > 0 ? trailDBSizePaint : trailSizePaint;
@@ -433,7 +446,7 @@ public final class OpenStreetMapViewWrapper extends Overlay {
           point = proj.toMapPixels( entry.getKey(), point );
         }
         float size = cellSize;
-        Paint paint = value.newCellForDB > 0 ? trailCellDBPaint : trailCellPaint;
+        SafePaint paint = value.newCellForDB > 0 ? trailCellDBPaint : trailCellPaint;
         if ( circleSizeMap ) {
           size = (Math.max(value.newCellForDB, value.newCellForRun) * boost) + 1;
           paint = value.newCellForDB > 0 ? trailCellDBSizePaint : trailCellSizePaint;

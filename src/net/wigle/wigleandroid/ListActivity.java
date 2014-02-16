@@ -160,7 +160,7 @@ public final class ListActivity extends Activity implements FileUploaderListener
     public static final String PREF_MAP_LABEL = "mapLabel";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
-    public static final String PREF_USE_WIGLE_TILES = "useWigleTileSource"; // bool
+    public static final String PREF_USE_WIGLE_TILES = "useWigleTileSource2"; // bool
     
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";

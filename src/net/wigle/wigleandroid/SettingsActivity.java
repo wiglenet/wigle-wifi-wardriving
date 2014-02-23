@@ -3,12 +3,12 @@ package net.wigle.wigleandroid;
 import java.util.Arrays;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -34,7 +34,7 @@ import android.widget.TextView;
 /**
  * configure settings
  */
-public final class SettingsActivity extends Activity {
+public final class SettingsActivity extends ActionBarActivity {
   
   private static final int MENU_RETURN = 12;
   private static final int MENU_ERROR_REPORT = 13;

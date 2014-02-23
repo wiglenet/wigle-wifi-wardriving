@@ -5,7 +5,6 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,12 +12,13 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class DashboardActivity extends Activity {
+public class DashboardActivity extends ActionBarActivity {
   private Handler timer;
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;

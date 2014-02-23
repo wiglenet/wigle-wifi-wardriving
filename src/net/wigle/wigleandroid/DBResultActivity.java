@@ -9,7 +9,6 @@ import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -19,12 +18,13 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class DBResultActivity extends Activity {
+public class DBResultActivity extends ActionBarActivity {
   private static final int MENU_RETURN = 12;
   private static final int MENU_SETTINGS = 13;
   private static final int MSG_QUERY_DONE = 2; 

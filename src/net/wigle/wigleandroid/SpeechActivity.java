@@ -1,17 +1,17 @@
 package net.wigle.wigleandroid;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class SpeechActivity extends Activity {
+public class SpeechActivity extends ActionBarActivity {
   private static final int MENU_RETURN = 12;
   
   // used for shutting extraneous activities down on an error

@@ -6,7 +6,6 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.TabActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,13 +14,14 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.support.v7.app.ActionBarActivity;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TabHost;
 
-public final class MainActivity extends TabActivity {
+public final class MainActivity extends ActionBarActivity {
   static final String TAB_LIST = "list";
   static final String TAB_MAP = "map";
   static final String TAB_DASH = "dash";
@@ -47,36 +47,36 @@ public final class MainActivity extends TabActivity {
     
     mainActivity = this;
     
-    TabHost tabHost = getTabHost();  // The activity TabHost
-    TabHost.TabSpec spec;  // Reusable TabSpec for each tab
-    Intent intent;  // Reusable Intent for each tab
-
-    // Create an Intent to launch an Activity for the tab (to be reused)
-    intent = new Intent().setClass(this, ListActivity.class);
-    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator(getString(R.string.tab_list),
-                   getResources().getDrawable(android.R.drawable.ic_menu_sort_by_size))
-                  .setContent(intent);
-    tabHost.addTab(spec);
-    
-    intent = new Intent().setClass(this, MappingActivity.class);
-    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator(getString(R.string.tab_map),
-                  getResources().getDrawable(android.R.drawable.ic_menu_mapmode))
-                  .setContent(intent);
-    tabHost.addTab(spec);
-
-    intent = new Intent().setClass(this, DashboardActivity.class);
-    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator(getString(R.string.tab_dash),
-                  getResources().getDrawable(android.R.drawable.ic_menu_view))
-                  .setContent(intent);
-    tabHost.addTab(spec);
-    
-    intent = new Intent().setClass(this, DataActivity.class);
-    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator(getString(R.string.tab_data),
-                  getResources().getDrawable(android.R.drawable.ic_menu_search))
-                  .setContent(intent);
-    tabHost.addTab(spec);
-    
-    tabHost.setCurrentTabByTag( TAB_LIST );
+//    TabHost tabHost = getTabHost();  // The activity TabHost
+//    TabHost.TabSpec spec;  // Reusable TabSpec for each tab
+//    Intent intent;  // Reusable Intent for each tab
+//
+//    // Create an Intent to launch an Activity for the tab (to be reused)
+//    intent = new Intent().setClass(this, ListActivity.class);
+//    spec = tabHost.newTabSpec( TAB_LIST ).setIndicator(getString(R.string.tab_list),
+//                   getResources().getDrawable(android.R.drawable.ic_menu_sort_by_size))
+//                  .setContent(intent);
+//    tabHost.addTab(spec);
+//    
+//    intent = new Intent().setClass(this, MappingActivity.class);
+//    spec = tabHost.newTabSpec( TAB_MAP ).setIndicator(getString(R.string.tab_map),
+//                  getResources().getDrawable(android.R.drawable.ic_menu_mapmode))
+//                  .setContent(intent);
+//    tabHost.addTab(spec);
+//
+//    intent = new Intent().setClass(this, DashboardActivity.class);
+//    spec = tabHost.newTabSpec( TAB_DASH ).setIndicator(getString(R.string.tab_dash),
+//                  getResources().getDrawable(android.R.drawable.ic_menu_view))
+//                  .setContent(intent);
+//    tabHost.addTab(spec);
+//    
+//    intent = new Intent().setClass(this, DataActivity.class);
+//    spec = tabHost.newTabSpec( TAB_DATA ).setIndicator(getString(R.string.tab_data),
+//                  getResources().getDrawable(android.R.drawable.ic_menu_search))
+//                  .setContent(intent);
+//    tabHost.addTab(spec);
+//    
+//    tabHost.setCurrentTabByTag( TAB_LIST );
   }
   
   // be careful with this
@@ -91,9 +91,9 @@ public final class MainActivity extends TabActivity {
    */
   static void switchTab( Activity activity, String tab ) {
     final Activity parent = activity.getParent();
-    if ( parent != null && parent instanceof TabActivity ) {
-      ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
-    }
+//    if ( parent != null && parent instanceof TabActivity ) {
+//      ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
+//    }
   }
   
   static void setLockScreen( Activity activity, boolean lockScreen ) {

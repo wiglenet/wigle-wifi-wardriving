@@ -24,6 +24,7 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +42,7 @@ import android.widget.TextView;
  * show a map!
  */
 @SuppressWarnings("deprecation")
-public final class MappingActivity extends Activity {
+public final class MappingActivity extends ActionBarActivity {
   private static class State {
     private boolean locked = true;
     private boolean firstMove = true;
@@ -101,15 +102,15 @@ public final class MappingActivity extends Activity {
     setupQuery();
   }
   
-  @Override
-  public Object onRetainNonConfigurationInstance() {
-    ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
-    // save the map info
-    state.oldCenter = mapView.getMapCenter();
-    state.oldZoom = mapView.getZoomLevel();
-    // return state class to copy data from
-    return state;
-  }
+//  @Override
+//  public Object onRetainNonConfigurationInstance() {
+//    ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
+//    // save the map info
+//    state.oldCenter = mapView.getMapCenter();
+//    state.oldZoom = mapView.getZoomLevel();
+//    // return state class to copy data from
+//    return state;
+//  }
   
   private void setupMapView( final IGeoPoint oldCenter, final int oldZoom ) {
     // view

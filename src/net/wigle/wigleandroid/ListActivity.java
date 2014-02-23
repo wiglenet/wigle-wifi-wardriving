@@ -61,6 +61,7 @@ import android.os.Debug;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -78,7 +79,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class ListActivity extends Activity implements FileUploaderListener {
+public final class ListActivity extends ActionBarActivity implements FileUploaderListener {
     // *** state that is retained ***
     private static class State {
       private DatabaseHelper dbHelper;
@@ -429,12 +430,12 @@ public final class ListActivity extends Activity implements FileUploaderListener
       }
     }
     
-    @Override
-    public Object onRetainNonConfigurationInstance() {
-      info( "onRetainNonConfigurationInstance" );
-      // return the whole state class to copy data from
-      return state;
-    }
+//    @Override
+//    public Object onRetainNonConfigurationInstance() {
+//      info( "onRetainNonConfigurationInstance" );
+//      // return the whole state class to copy data from
+//      return state;
+//    }
     
     @Override
     public void onPause() {

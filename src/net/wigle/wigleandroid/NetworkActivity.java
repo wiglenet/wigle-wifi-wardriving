@@ -21,6 +21,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBarActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.Menu;
@@ -38,7 +39,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class NetworkActivity extends Activity {
+public class NetworkActivity extends ActionBarActivity {
   private static final int MENU_EXIT = 11;
   private static final int MENU_COPY = 12;
   private static final int CRYPTO_DIALOG = 101;

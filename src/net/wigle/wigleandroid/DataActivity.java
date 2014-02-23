@@ -16,6 +16,7 @@ import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,7 +30,7 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataActivity extends Activity implements FileUploaderListener {
+public final class DataActivity extends ActionBarActivity implements FileUploaderListener {
   
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;

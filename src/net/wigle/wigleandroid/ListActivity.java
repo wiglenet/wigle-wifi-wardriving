@@ -3,68 +3,25 @@
 
 package net.wigle.wigleandroid;
 
-import static android.location.LocationManager.GPS_PROVIDER;
-import static android.location.LocationManager.NETWORK_PROVIDER;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.wigle.wigleandroid.MainActivity.Doer;
+import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
-import net.wigle.wigleandroid.listener.GPSListener;
-import net.wigle.wigleandroid.listener.PhoneState;
-import net.wigle.wigleandroid.listener.PhoneStateFactory;
-import net.wigle.wigleandroid.listener.WifiReceiver;
 
 import org.osmdroid.util.GeoPoint;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
-import android.os.Environment;
-import android.os.IBinder;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,38 +31,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public final class ListActivity extends Fragment implements FileUploaderListener {
-    // *** state that is retained ***
-    private static class State {
-      private DatabaseHelper dbHelper;
-      private ServiceConnection serviceConnection;
-      private AtomicBoolean finishing;
-      private AtomicBoolean transferring;
-      private MediaPlayer soundPop;
-      private MediaPlayer soundNewPop;
-      private WifiLock wifiLock;
-      private GPSListener gpsListener;
-      private WifiReceiver wifiReceiver;
-      private NumberFormat numberFormat0;
-      private NumberFormat numberFormat1;
-      private NumberFormat numberFormat8;
-      private TTS tts;
-      private boolean inEmulator;
-      private BatteryLevelReceiver batteryLevelReceiver;
-      private PhoneState phoneState;
-      private FileUploaderTask fileUploaderTask;
-    }
-    private State state;
-    // *** end of state that is retained ***
-    
     private NetworkListAdapter listAdapter;
     private String previousStatus;
     
-    public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
-    public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
-    private static final String LOG_TAG = "wigle";
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
@@ -116,11 +46,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     private static final int SORT_DIALOG = 100;
     private static final int SSID_FILTER = 102;
     
-    public static final String ENCODING = "ISO-8859-1";
     public static final float MIN_DISTANCE_ACCURACY = 32f;
-    static final String ERROR_STACK_FILENAME = "errorstack";
-    static final String ERROR_REPORT_DO_EMAIL = "doEmail";
-    static final String ERROR_REPORT_DIALOG = "doDialog";
     
     // preferences
     public static final String SHARED_PREFS = "WiglePrefs";
@@ -183,16 +109,8 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
     
-    public static final long DEFAULT_SPEECH_PERIOD = 60L;
-    public static final long DEFAULT_RESET_WIFI_PERIOD = 90000L;    
-    public static final long LOCATION_UPDATE_INTERVAL = 1000L;
-    public static final long SCAN_STILL_DEFAULT = 3000L;
-    public static final long SCAN_DEFAULT = 2000L;
-    public static final long SCAN_FAST_DEFAULT = 1000L;
-    public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;    
-    
     public static final String ANONYMOUS = "anonymous";
-    private static final String WIFI_LOCK_NAME = "wigleWifiLock";
+    public static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     static final boolean DEBUG = false;
     
@@ -222,7 +140,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public static final LameStatic lameStatic = new LameStatic();
     
     // cache
-    private static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
+    public static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
       new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
         protected ConcurrentLinkedHashMap<String,Network> initialValue() {
             return new ConcurrentLinkedHashMap<String,Network>( 128 );
@@ -231,24 +149,20 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//      final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat);
-//      final LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
       final View view = inflater.inflate(R.layout.list, container, false);
       
-      info( "setupUploadButton" );
+      MainActivity.info( "setupUploadButton" );
       setupUploadButton( view );
-      info( "setupList" );
+      MainActivity.info( "setupList" );
       setupList( view );
-      info( "setupWifi" );
-      setupWifi(); // must be after setupList for wifireceiver
-      info( "setupSound" );
-      setupSound( view );
-      info( "setNetCountUI" );
+      MainActivity.info( "setNetCountUI" );
       setNetCountUI( view );
-      info( "setStatusUI" );
+      MainActivity.info( "setStatusUI" );
       setStatusUI( view, (String) null );
-      info( "setupLocation" );
-      setupLocation( view );      
+      MainActivity.info( "setupLocation" );
+      setupLocation( view );
+      MainActivity.info( "setupMuteButton" );
+      setupMuteButton( view );
       
       return view;
     }
@@ -257,96 +171,11 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        // set language
-        MainActivity.setLocale( this.getActivity() );
-
-        if ( DEBUG ) {
-          Debug.startMethodTracing("wigle");
-        }
         
-        // set ourselves for later finishing by other activities
-        MainActivity main = MainActivity.getMainActivity( this.getActivity() );
-        if ( main != null ) {
-          main.setListActivity( this );
-        }
-        
-        // do some of our own error handling, write a file with the stack
-        final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
-        if ( ! (origHandler instanceof WigleUncaughtExceptionHandler) ) {
-          Thread.setDefaultUncaughtExceptionHandler( 
-              new WigleUncaughtExceptionHandler( this.getActivity().getApplicationContext(), origHandler ) ); 
-        }
-        
-        // test the error reporting
-        // if( true ){ throw new RuntimeException( "weee" ); }
-
-        final Object stored = this.getActivity().getLastNonConfigurationInstance();
-        if ( stored != null && stored instanceof State ) {
-          // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-          state = (State) stored;
-          
-          // tell those that need it that we have a new context
-          state.gpsListener.setListActivity( this );
-          state.wifiReceiver.setListActivity( this );
-          if ( state.fileUploaderTask != null ) {
-            state.fileUploaderTask.setContext( this.getActivity() );
-          }
-        }
-        else {
-          state = new State();
-          state.finishing = new AtomicBoolean( false );
-          state.transferring = new AtomicBoolean( false );
-          
-          // new run, reset
-          final SharedPreferences prefs = this.getActivity().getSharedPreferences( SHARED_PREFS, 0 );
-          final float prevRun = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
-          Editor edit = prefs.edit();
-          edit.putFloat( PREF_DISTANCE_RUN, 0f );
-          edit.putFloat( PREF_DISTANCE_PREV_RUN, prevRun );
-          edit.commit();
-        }
-        
-        final String id = Settings.Secure.getString( getActivity().getContentResolver(), Settings.Secure.ANDROID_ID );
-
-        // DO NOT turn these into |=, they will cause older dalvik verifiers to freak out
-        state.inEmulator = id == null;
-        state.inEmulator =  state.inEmulator || "sdk".equals( android.os.Build.PRODUCT );
-        state.inEmulator = state.inEmulator || "google_sdk".equals( android.os.Build.PRODUCT );
-
-        info( "id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT );
-        info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + DEBUG );
-        
-        if ( state.numberFormat0 == null ) {
-          state.numberFormat0 = NumberFormat.getNumberInstance( Locale.US );
-          if ( state.numberFormat0 instanceof DecimalFormat ) {
-            ((DecimalFormat) state.numberFormat0).setMaximumFractionDigits( 0 );
-          }
-        }
-        
-        if ( state.numberFormat1 == null ) {
-          state.numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
-          if ( state.numberFormat1 instanceof DecimalFormat ) {
-            ((DecimalFormat) state.numberFormat1).setMaximumFractionDigits( 1 );
-          }
-        }
-        
-        if ( state.numberFormat8 == null ) {
-          state.numberFormat8 = NumberFormat.getNumberInstance( Locale.US );
-          if ( state.numberFormat8 instanceof DecimalFormat ) {
-            ((DecimalFormat) state.numberFormat8).setMaximumFractionDigits( 8 );
-          }
-        }
-        
-        info( "setupService" );
-        setupService();
-        info( "setupDatabase" );
-        setupDatabase();
-        info( "setupBattery" );
-        setupBattery();
-        info( "setup complete" );
     }
     
     public void setNetCountUI( final View view ) {
+      MainActivity.State state = MainActivity.getState( this );
       TextView tv = (TextView) view.findViewById( R.id.stats_run );
       tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
       tv = (TextView) view.findViewById( R.id.stats_new );
@@ -367,110 +196,42 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       }
     }
     
-    public boolean inEmulator() {
-      return state.inEmulator;
-    }
-    
-    public DatabaseHelper getDBHelper() {
-      return state.dbHelper;
-    }
-    
-    public BatteryLevelReceiver getBatteryLevelReceiver() {
-      return state.batteryLevelReceiver;
-    }
-    
-    public GPSListener getGPSListener() {
-      return state.gpsListener;
-    }
-    
-    public PhoneState getPhoneState() {
-      return state.phoneState;
-    }
-    
-    public boolean isFinishing() {
-      return state.finishing.get();
-    }
-    
-    public boolean isTransferring() {
-      return state.transferring.get();
-    }
-    
-    public boolean isScanning() {
-      return isScanning(getActivity());
-    }
-    
-    public static boolean isScanning(final Context context) {
-      final SharedPreferences prefs = context.getSharedPreferences( SHARED_PREFS, 0 );
-      return prefs.getBoolean( PREF_SCAN_RUNNING, true );
-    }
-    
-    public void playNewNetSound() {
-      try {
-        if ( state.soundNewPop != null && ! state.soundNewPop.isPlaying() ) {
-          // play sound on something new
-          state.soundNewPop.start();
-        }
-        else {
-          ListActivity.info( "soundNewPop is playing or null" );
-        }
-      }
-      catch ( IllegalStateException ex ) {
-        // ohwell, likely already playing
-        info( "exception trying to play sound: " + ex );
-      }
-    }
-    
-    public void playRunNetSound() {
-      try {
-        if ( state.soundPop != null && ! state.soundPop.isPlaying() ) {
-          // play sound on something new
-          state.soundPop.start();
-        }  
-        else {
-          ListActivity.info( "soundPop is playing or null" );
-        }
-      }
-      catch ( IllegalStateException ex ) {
-        // ohwell, likely already playing
-        info( "exception trying to play sound: " + ex );
-      }
-    }
     
 //    @Override
 //    public Object onRetainNonConfigurationInstance() {
-//      info( "onRetainNonConfigurationInstance" );
+//      MainActivity.info( "onRetainNonConfigurationInstance" );
 //      // return the whole state class to copy data from
 //      return state;
 //    }
     
     @Override
     public void onPause() {
-      info( "LIST: paused. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: paused.");
       super.onPause();
     }
     
     @Override
     public void onResume() {
-      info( "LIST: resumed. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: resumed.");
       super.onResume();
     }
     
     @Override
     public void onStart() {
-      info( "LIST: start. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: start.");
       super.onStart();
     }
     
     @Override
     public void onStop() {
-      info( "LIST: stop. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: stop.");
       super.onStop();
     }
 
 //    @Override
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {
 //      if (keyCode == KeyEvent.KEYCODE_BACK) {
-//        info( "onKeyDown: treating back like home, not quitting app" );
+//        MainActivity.info( "onKeyDown: treating back like home, not quitting app" );
 //        moveTaskToBack(true);
 //        if ( getParent() != null ) {
 //          getParent().moveTaskToBack( true );
@@ -482,29 +243,29 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     
     @Override
     public void onDestroyView() {
-      info( "LIST: onDestroyView. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: onDestroyView.");
       super.onDestroyView();
     }
     
     @Override
     public void onDestroy() {
-      info( "LIST: destroy. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: destroy.");
       super.onDestroy();
     }
     
     @Override
     public void onDetach() {
-      info( "LIST: onDestroyView. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      MainActivity.info( "LIST: onDestroyView.");
       super.onDestroyView();
     }
     
 //    @Override
 //    public void finish() {
-//      info( "LIST: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
+//      MainActivity.info( "LIST: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
 //      
 //      final boolean wasFinishing = state.finishing.getAndSet( true );
 //      if ( wasFinishing ) {
-//        info( "LIST: finish called twice!" );
+//        MainActivity.info( "LIST: finish called twice!" );
 //      }
 //
 //      // save our location for later runs
@@ -523,7 +284,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //        getActivity().unregisterReceiver( state.wifiReceiver );
 //      }
 //      catch ( final IllegalArgumentException ex ) {
-//        info( "wifiReceiver not registered: " + ex );
+//        MainActivity.info( "wifiReceiver not registered: " + ex );
 //      }
 //
 //      // stop the service, so when we die it's both stopped and unbound and will die
@@ -534,7 +295,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //        getActivity().getApplicationContext().unbindService( state.serviceConnection );
 //      }
 //      catch ( final IllegalArgumentException ex ) {
-//        info( "serviceConnection not registered: " + ex, ex );
+//        MainActivity.info( "serviceConnection not registered: " + ex, ex );
 //      }    
 //      
 //      // release the lock before turning wifi off
@@ -543,7 +304,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //          state.wifiLock.release();
 //        }
 //        catch ( Exception ex ) {
-//          error( "exception releasing wifi lock: " + ex, ex );
+//          MainActivity.error( "exception releasing wifi lock: " + ex, ex );
 //        }
 //      }
 //      
@@ -556,12 +317,12 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //        
 //        // well turn it of now that we're done
 //        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        info( "turning back off wifi" );
+//        MainActivity.info( "turning back off wifi" );
 //        try {
 //          wifiManager.setWifiEnabled( false );
 //        }
 //        catch ( Exception ex ) {
-//          error("exception turning wifi back off: " + ex, ex);
+//          MainActivity.error("exception turning wifi back off: " + ex, ex);
 //        }
 //      }
 //      
@@ -624,9 +385,10 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     /* Handles item selections */
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
+      MainActivity main = MainActivity.getMainActivity(this);
         switch ( item.getItemId() ) {
           case MENU_SETTINGS: {
-            info("start settings activity");
+            MainActivity.info("start settings activity");
             final Intent settingsIntent = new Intent( this.getActivity(), SettingsActivity.class );
             startActivity( settingsIntent );
             break;
@@ -639,18 +401,18 @@ public final class ListActivity extends Fragment implements FileUploaderListener
             return true;
           }
           case MENU_SORT: {
-            info("sort dialog");
+            MainActivity.info("sort dialog");
             getActivity().showDialog( SORT_DIALOG );
             return true;
           }
           case MENU_SCAN: {
-            boolean scanning = ! isScanning();
+            boolean scanning = ! main.isScanning();
             final Editor edit = getActivity().getSharedPreferences( SHARED_PREFS, 0 ).edit();
             edit.putBoolean(PREF_SCAN_RUNNING, scanning);
             edit.commit();
             String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
             item.setTitle( name );
-            item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
+            item.setIcon( main.isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
             handleScanChange( getView() );
             return true;
           }
@@ -666,30 +428,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     }
     
     private void handleScanChange( final View view ) {
-      final boolean isScanning = isScanning();
-      info("handleScanChange: isScanning now: " + isScanning );
+      MainActivity main = MainActivity.getMainActivity(this);
+      final boolean isScanning = main.isScanning();
+      MainActivity.info("handleScanChange: isScanning now: " + isScanning );
       if ( isScanning ) {
-        // turn on location updates
-        this.setLocationUpdates(LOCATION_UPDATE_INTERVAL, 0f);
-        setStatusUI( view, "Scanning Turned On" );
-        if ( ! state.wifiLock.isHeld() ){
-          state.wifiLock.acquire();
-        }
+        setStatusUI( view, "Scanning Turned On" );        
       }
       else {
-        // turn off location updates
-        this.setLocationUpdates(0L, 0f);
-        setStatusUI( getView(), "Scanning Turned Off" );
-        state.gpsListener.handleScanStop();
-        if ( state.wifiLock.isHeld() ){
-          try {
-            state.wifiLock.release();
-          }
-          catch (SecurityException ex) {
-            // a case where we have a leftover lock from another run?
-            info("exception releasing wifilock: " + ex);
-          }
-        }
+        setStatusUI( view, "Scanning Turned Off" );
       }
     }
     
@@ -732,7 +478,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
 //              // set pref
 //              final int listSort = listSorts[position];
-//              ListActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+//              ListActivity.MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
 //              editor.putInt( PREF_LIST_SORT, listSort );
 //              editor.commit();
 //            }
@@ -747,14 +493,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //                }
 //                catch ( Exception ex ) {
 //                  // guess it wasn't there anyways
-//                  info( "exception dismissing sort dialog: " + ex );
+//                  MainActivity.info( "exception dismissing sort dialog: " + ex );
 //                }
 //              }
 //            } );
 //          
 //          return dialog;
 //        default:
-//          error( "unhandled dialog: " + which );
+//          MainActivity.error( "unhandled dialog: " + which );
 //      }
 //      return null;
 //    }
@@ -763,7 +509,9 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-      info( "LIST: on config change" );
+      State state = MainActivity.getState(this);
+      
+      MainActivity.info( "LIST: on config change" );
       MainActivity.setLocale( this.getActivity(), newConfig);
       super.onConfigurationChanged( newConfig );
       getActivity().setContentView( R.layout.list );      
@@ -778,16 +526,6 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       setStatusUI( getView(), previousStatus );
     }
     
-    private void setupDatabase() {
-      // could be set by nonconfig retain
-      if ( state.dbHelper == null ) {
-        state.dbHelper = new DatabaseHelper( getActivity().getApplicationContext() );
-        //state.dbHelper.checkDB();
-        state.dbHelper.start();
-        lameStatic.dbHelper = state.dbHelper;
-      }      
-    }
-    
     private void setupList( final View view ) {
       // not set by nonconfig retain
       listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
@@ -800,7 +538,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
         public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
           final Network network = (Network) parent.getItemAtPosition( position );
-          ListActivity.getNetworkCache().put( network.getBssid(), network );
+          MainActivity.getNetworkCache().put( network.getBssid(), network );
           final Intent intent = new Intent( activity, NetworkActivity.class );
           intent.putExtra( NETWORK_EXTRA_BSSID, network.getBssid() );
           activity.startActivity( intent );
@@ -808,195 +546,19 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       });
     }
     
-    private void setupWifi() {
-      // warn about turning off network notification
-      final String notifOn = Settings.Secure.getString(getActivity().getContentResolver(), 
-          Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
-      if ( notifOn != null && "1".equals( notifOn ) && state.wifiReceiver == null ) {
-        Toast.makeText( this.getActivity(), getString(R.string.best_results), 
-            Toast.LENGTH_LONG ).show();
-      }
-    
-      final WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
-      final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
-      final Editor edit = prefs.edit();
-      
-      // keep track of for later
-      boolean turnedWifiOn = false;
-      if ( ! wifiManager.isWifiEnabled() ) {
-        // tell user, cuz this takes a little while
-        Toast.makeText( this.getActivity(), getString(R.string.turn_on_wifi), Toast.LENGTH_LONG ).show();
-        
-        // save so we can turn it back off when we exit  
-        edit.putBoolean( PREF_WIFI_WAS_OFF, true );
-        
-        // just turn it on, but not in emulator cuz it crashes it
-        if ( ! state.inEmulator ) {
-          info( "turning on wifi");
-          wifiManager.setWifiEnabled( true );
-          info( "wifi on");
-          turnedWifiOn = true;
-        }
-      }
-      else {
-        edit.putBoolean( PREF_WIFI_WAS_OFF, false );
-      }
-      edit.commit();
-      
-      if ( state.wifiReceiver == null ) {
-        info( "new wifiReceiver");
-        // wifi scan listener
-        // this receiver is the main workhorse of the entire app
-        state.wifiReceiver = new WifiReceiver( this, state.dbHelper, listAdapter );
-        state.wifiReceiver.setupWifiTimer( turnedWifiOn );
-        
-        // register
-        info( "register BroadcastReceiver");
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
-        getActivity().registerReceiver( state.wifiReceiver, intentFilter );
-      }
-      // always set our current list adapter
-      state.wifiReceiver.setListAdapter( listAdapter );
-      
-      if ( state.wifiLock == null ) {
-        info( "lock wifi radio on");
-        // lock the radio on
-        state.wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, WIFI_LOCK_NAME );
-        state.wifiLock.acquire();
-      }
-    }
-    
-    /**
-     * Computes the battery level by registering a receiver to the intent triggered 
-     * by a battery status/level change.
-     */
-    private void setupBattery() {
-      if ( state.batteryLevelReceiver == null ) {
-        state.batteryLevelReceiver = new BatteryLevelReceiver();
-        IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        getActivity().registerReceiver(state.batteryLevelReceiver, batteryLevelFilter);
-      }
-    }
-    
-    public void setTransferring() {
-      state.transferring.set( true );
-    }
-    
-    /**
-     * FileUploaderListener interface
-     */
-    public void transferComplete() {
-      state.transferring.set( false );
-      info( "transfer complete" );
-      // start a scan to get the ball rolling again if this is non-stop mode
-      scheduleScan();
-      state.fileUploaderTask = null;
-    }
-    
-    public void scheduleScan() {
-      state.wifiReceiver.scheduleScan();
-    }
-    
-    public void speak( final String string ) {
-      if ( ! isMuted() && state.tts != null ) {
-        state.tts.speak( string );
-      }
-    }
-    
-    public void interruptSpeak() {
-      if ( state.tts != null ) {
-        state.tts.stop();
-      }
+    public NetworkListAdapter getListAdapter() {
+      return listAdapter;
     }
     
     private void setupLocation( final View view ) {
       // set on UI if we already have one
       setLocationUI( view );
-      
-      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-      
-      // check if there is a gps
-      final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
-      if ( locProvider == null ) {
-        Toast.makeText( this.getActivity(), getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
-      }
-      else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
-        // gps exists, but isn't on
-        Toast.makeText( this.getActivity(), getString(R.string.turn_on_gps), Toast.LENGTH_SHORT ).show();
-        final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
-        try {
-          startActivity(myIntent);
-        }
-        catch (Exception ex) {
-          error("exception trying to start location activity: " + ex, ex);
-        }
-      }
-      // emulator crashes if you ask this
-      if ( ! state.inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) && state.gpsListener == null ) {
-        //Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"", 
-        //    Toast.LENGTH_LONG ).show();
-      }
-
-      if ( state.gpsListener == null ) {
-        // force a listener to be created
-        handleScanChange( view );
-      }
-    }
-    
-    public long getLocationSetPeriod() {
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
-      long setPeriod = prefPeriod;
-      if (setPeriod == 0 ){
-        setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), ListActivity.LOCATION_UPDATE_INTERVAL); 
-      }
-      return setPeriod;
-    }
-    
-    public void setLocationUpdates() {
-      final long setPeriod = getLocationSetPeriod();    
-      setLocationUpdates(setPeriod, 0f);
-    }    
-    
-    /**
-     * resets the gps listener to the requested update time and distance.
-     * an updateIntervalMillis of <= 0 will not register for updates. 
-     */
-    public void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
-      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-      
-      if ( state.gpsListener != null ) {
-        // remove any old requests
-        locationManager.removeUpdates( state.gpsListener );
-        locationManager.removeGpsStatusListener( state.gpsListener );
-      }
-      
-      // create a new listener to try and get around the gps stopping bug
-      state.gpsListener = new GPSListener( this );
-      state.gpsListener.setMapListener(MappingActivity.STATIC_LOCATION_LISTENER);
-      locationManager.addGpsStatusListener( state.gpsListener );      
-      
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final boolean useNetworkLoc = prefs.getBoolean(ListActivity.PREF_USE_NETWORK_LOC, false);
-
-      final List<String> providers = locationManager.getAllProviders();
-      if (providers != null) {
-        for ( String provider : providers ) {
-          info( "available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis );
-          if ( ! useNetworkLoc && LocationManager.NETWORK_PROVIDER.equals(provider)) {
-            // skip!          
-            continue;
-          }
-          if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
-            info("using provider: " + provider);
-            locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
-          }
-        }
-      }
+      handleScanChange( view );
     }
     
     public void setLocationUI( final View view ) {
+      final MainActivity main = MainActivity.getMainActivity( this );
+      final State state = main.getState();
       if ( state.gpsListener == null ) {
         return;
       }
@@ -1010,7 +572,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         tv = (TextView) view.findViewById( R.id.LocationTextView01 );
         String latText = "";
         if ( location == null ) {
-          if ( isScanning() ) {
+          if ( main.isScanning() ) {
             latText = getString(R.string.list_waiting_gps);
           }
           else {
@@ -1045,7 +607,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       }
       catch ( IncompatibleClassChangeError ex ) {
         // yeah, saw this in the wild, who knows.
-        error( "wierd ex: " + ex, ex);
+        MainActivity.error( "wierd ex: " + ex, ex);
       }
     }
     
@@ -1065,95 +627,23 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       return retval;
     }
     
-    private void setupUploadButton( final View view ) {
+    private void setupUploadButton( final View view ) {      
       final Button button = (Button) view.findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() { 
           public void onClick( final View view ) {
-            final MainActivity main = MainActivity.getMainActivity( getActivity() );
+            final MainActivity main = MainActivity.getMainActivity( ListActivity.this );
             final SharedPreferences prefs = main.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
             final String username = prefs.getString( ListActivity.PREF_USERNAME, "anonymous" );
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
             MainActivity.createConfirmation( getActivity(), text, new Doer() {
               @Override
               public void execute() {                
-                setTransferring();
+                final State state = MainActivity.getState( ListActivity.this );     
                 uploadFile( state.dbHelper );
               }
             } );
           }
         });
-    }
-    
-    private void setupService() {
-      // could be set by nonconfig retain
-      if ( state.serviceConnection == null ) {        
-        final Intent serviceIntent = new Intent( getActivity().getApplicationContext(), WigleService.class );
-        final ComponentName compName = getActivity().startService( serviceIntent );
-        if ( compName == null ) {
-          error( "startService() failed!" );
-        }
-        else {
-          info( "service started ok: " + compName );
-        }
-        
-        state.serviceConnection = new ServiceConnection() {
-          public void onServiceConnected( final ComponentName name, final IBinder iBinder ) {
-            info( name + " service connected" ); 
-          }
-          public void onServiceDisconnected( final ComponentName name ) {
-            info( name + " service disconnected" );
-          }
-        };  
-      
-        int flags = 0;
-        // have to use the app context to bind to the service, cuz we're in tabs
-        // http://code.google.com/p/android/issues/detail?id=2483#c2
-        final boolean bound = getActivity().getApplicationContext().bindService( serviceIntent, state.serviceConnection, flags );
-        info( "service bound: " + bound );        
-      }
-    }
-    
-    private void setupSound( final View view ) {
-      // could have been retained
-      if ( state.soundPop == null ) {
-        state.soundPop = createMediaPlayer( R.raw.pop );
-      }
-      if ( state.soundNewPop == null ) {
-        state.soundNewPop = createMediaPlayer( R.raw.newpop );
-      }
-
-      // make volume change "media"
-      getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
-
-      try {
-        if ( TTS.hasTTS() ) {
-          // don't reuse an old one, has to be on *this* context
-          if ( state.tts != null ) {
-            state.tts.shutdown();
-          }
-          // this has to have the parent activity, for whatever wacky reasons
-          Activity context = getActivity();
-          state.tts = new TTS( context );        
-        }
-      }
-      catch ( Exception ex ) {
-        error( "exception setting TTS: " + ex, ex);
-      }
-      
-      TelephonyManager tele = (TelephonyManager) getActivity().getSystemService( Context.TELEPHONY_SERVICE );
-      if ( tele != null && state.phoneState == null ) {
-        state.phoneState = PhoneStateFactory.createPhoneState();
-        final int signal_strengths = 256;
-        try {
-          tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
-            | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH | signal_strengths );
-        }
-        catch (SecurityException ex) {
-          info("cannot get call state, will play audio over any telephone calls: " + ex);
-        }
-      }
-      
-      setupMuteButton( view );
     }
      
     private void setupMuteButton( final View view ) {
@@ -1161,6 +651,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);
       mute.setText(getString(muted ? R.string.play : R.string.mute));
+      final MainActivity main = MainActivity.getMainActivity();
       
       mute.setOnClickListener(new OnClickListener(){
         public void onClick( final View buttonView ) {
@@ -1172,7 +663,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           
           if ( muted ) {
             mute.setText(getString(R.string.play));
-            interruptSpeak();
+            main.interruptSpeak();
           }
           else {
             mute.setText(getString(R.string.mute));
@@ -1180,259 +671,24 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         }
       });
     }
-
-    /** 
-     * create a mediaplayer for a given raw resource id.
-     * @param soundId the R.raw. id for a given sound
-     * @return the mediaplayer for soundId or null if it could not be created.
-     */
-    private MediaPlayer createMediaPlayer( final int soundId ) {
-      final MediaPlayer sound = createMp( getActivity().getApplicationContext(), soundId );
-      if ( sound == null ) {
-        info( "sound null from media player" );
-        return null;
-      }
-      // try to figure out why sounds stops after a while
-      sound.setOnErrorListener( new OnErrorListener() {
-        public boolean onError( final MediaPlayer mp, final int what, final int extra ) {
-          String whatString = null;
-          switch ( what ) {
-            case MediaPlayer.MEDIA_ERROR_UNKNOWN:
-              whatString = "error unknown";
-              break;
-            case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-              whatString = "server died";
-              break;
-            default:
-              whatString = "not defined";
-          }
-          info( "media player error \"" + whatString + "\" what: " + what
-            + " extra: " + extra + " mp: " + mp );
-          return false;
-        }
-      } );
-
-      return sound;
-    }
-
-    /** 
-     * externalize the file from a given resource id (if it dosen't already exist), write to our dir if there is one.
-     * @param context the context to use
-     * @param resid the resource id
-     * @param name the file name to write out
-     * @return the uri of a file containing resid's resource
-     */
-    private static Uri resToFile( final Context context, final int resid, final String name ) throws IOException {
-        // throw it in our bag of fun.
-        String openString = name;
-        final boolean hasSD = hasSD();
-        if ( hasSD ) {
-            final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
-            final File path = new File( filepath );
-            path.mkdirs();
-            openString = filepath + name;
-        }
-
-        final File f = new File( openString );
-      
-        // see if it exists already
-        if ( ! f.exists() ) { 
-            info( "causing " + MainActivity.safeFilePath( f ) + " to be made" );
-            // make it happen:
-            f.createNewFile();
-            
-            InputStream is = null;
-            FileOutputStream fos = null;
-            try {
-                is = context.getResources().openRawResource( resid );
-                if ( hasSD ) {
-                    fos = new FileOutputStream( f );
-                } else { 
-                    // XXX: should this be using openString instead? baroo?
-                    fos = context.openFileOutput( name, Context.MODE_WORLD_READABLE );
-                }
-
-                final byte[] buff = new byte[ 1024 ];
-                int rv = -1;
-                while( ( rv = is.read( buff ) ) > -1 ) {
-                    fos.write( buff, 0, rv );
-                }
-            } finally {
-                if ( fos != null ) {
-                    fos.close();
-                }
-                if ( is != null ) {
-                    is.close();
-                }
-            }
-        }
-        return Uri.fromFile( f );
-    }
-
-    /** 
-     * create a media player (trying several paths if available)
-     * @param context the context to use
-     * @param resid the resource to use
-     * @return the media player for resid (or null if it wasn't creatable)
-     */
-    private static MediaPlayer createMp( final Context context, final int resid ) {
-        try {
-            MediaPlayer mp = MediaPlayer.create( context, resid );
-            // this can fail for many reasons, but android 1.6 on archos5 definitely hates creating from resource
-            if ( mp == null ) {
-                Uri sounduri;
-                // XXX: find a better way? baroo.
-                if ( resid == R.raw.pop ) {
-                    sounduri = resToFile( context, resid, "pop.wav" );
-                } else if ( resid == R.raw.newpop ) {
-                    sounduri = resToFile( context, resid, "newpop.wav" );
-                } else {
-                    info( "unknown raw sound id:"+resid );
-                    return null;
-                }
-                mp = MediaPlayer.create( context, sounduri );
-                // may still end up null
-            }
-
-            return mp;
-        } catch (IOException ex) {
-            error("ioe create failed: " + ex, ex);
-            // fall through
-        } catch (IllegalArgumentException ex) {
-            error("iae create failed: " + ex, ex);
-           // fall through
-        } catch (SecurityException ex) {
-            error("se create failed: " + ex, ex);
-            // fall through
-        } catch ( Resources.NotFoundException ex ) {
-            error("rnfe create failed("+resid+"): " + ex, ex );
-        }
-        return null;
-    }
-   
-    public boolean isMuted() {
-      if ( state.phoneState != null && state.phoneState.isPhoneActive() ) {
-        // always be quiet when the phone is active
-        return true;
-      }
-      boolean retval = getActivity().getSharedPreferences(SHARED_PREFS, 0).getBoolean(PREF_MUTED, false);
-      // info( "ismuted: " + retval );
-      return retval;
-    }
-    
-    private void uploadFile( final DatabaseHelper dbHelper ){
-      info( "upload file" );
+ 
+    public void uploadFile( final DatabaseHelper dbHelper ){
+      MainActivity.info( "upload file" );
+      final MainActivity main = MainActivity.getMainActivity( this );
+      final State state = main.getState();
+      main.setTransferring();
       // actually need this Activity context, for dialogs
       state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
       state.fileUploaderTask.start();
     }
     
-    public static void sleep( final long sleep ) {
-      try {
-        Thread.sleep( sleep );
-      }
-      catch ( final InterruptedException ex ) {
-        // no worries
-      }
-    }
-    public static void info( final String value ) {
-      Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value );
-    }
-    public static void warn( final String value ) {
-      Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value );
-    }
-    public static void error( final String value ) {
-      Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
-    }
-
-    public static void info( final String value, final Throwable t ) {
-      Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
-    }
-    public static void warn( final String value, final Throwable t ) {
-      Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
-    }
-    public static void error( final String value, final Throwable t ) {
-      Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
-    }
-
     /**
-     * get the per-thread network LRU cache
-     * @return per-thread network cache
+     * FileUploaderListener interface
      */
-    public static ConcurrentLinkedHashMap<String,Network> getNetworkCache() {
-      return networkCache.get();
+    public void transferComplete() {
+      final MainActivity main = MainActivity.getMainActivity( this );
+      main.transferComplete();
     }
     
-    public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {
-      writeError(thread, throwable, context, null);
-    }
-    public static void writeError( final Thread thread, final Throwable throwable, final Context context, final String detail ) {
-      try {
-        final String error = "Thread: " + thread + " throwable: " + throwable;
-        error( error, throwable );
-        if ( hasSD() ) {
-          File file = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
-          file.mkdirs();
-          file = new File(MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) 
-              + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt" );
-          error( "Writing stackfile to: " + MainActivity.safeFilePath( file ) + "/" + file.getName() );
-          if ( ! file.exists() ) {
-            file.createNewFile();
-          }
-          final FileOutputStream fos = new FileOutputStream( file );
-          
-          try {
-            final String baseErrorMessage = MainActivity.getBaseErrorMessage( throwable, false );
-            StringBuilder builder = new StringBuilder( "WigleWifi error log - " );
-            final DateFormat format = SimpleDateFormat.getDateTimeInstance();
-            builder.append( format.format( new Date() ) ).append( "\n" );
-            final PackageManager pm = context.getPackageManager();
-            final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-            builder.append( "versionName: " ).append( pi.versionName ).append( "\n" );
-            builder.append( "baseError: " ).append( baseErrorMessage ).append( "\n\n" );
-            if (detail != null) {
-              builder.append( "detail: " ).append( detail ).append( "\n" );
-            }
-            builder.append( "packageName: " ).append( pi.packageName ).append( "\n" );
-            builder.append( "MODEL: " ).append( android.os.Build.MODEL ).append( "\n" );
-            builder.append( "RELEASE: " ).append( android.os.Build.VERSION.RELEASE ).append( "\n" );
-          
-            builder.append( "BOARD: " ).append( android.os.Build.BOARD ).append( "\n" );
-            builder.append( "BRAND: " ).append( android.os.Build.BRAND ).append( "\n" );
-            // android 1.6 android.os.Build.CPU_ABI;
-            builder.append( "DEVICE: " ).append( android.os.Build.DEVICE ).append( "\n" );
-            builder.append( "DISPLAY: " ).append( android.os.Build.DISPLAY ).append( "\n" );
-            builder.append( "FINGERPRINT: " ).append( android.os.Build.FINGERPRINT ).append( "\n" );
-            builder.append( "HOST: " ).append( android.os.Build.HOST ).append( "\n" );
-            builder.append( "ID: " ).append( android.os.Build.ID ).append( "\n" );
-            // android 1.6: android.os.Build.MANUFACTURER;
-            builder.append( "PRODUCT: " ).append( android.os.Build.PRODUCT ).append( "\n" );
-            builder.append( "TAGS: " ).append( android.os.Build.TAGS ).append( "\n" );
-            builder.append( "TIME: " ).append( android.os.Build.TIME ).append( "\n" );
-            builder.append( "TYPE: " ).append( android.os.Build.TYPE ).append( "\n" );
-            builder.append( "USER: " ).append( android.os.Build.USER ).append( "\n" );
-            
-            // write to file
-            fos.write( builder.toString().getBytes( ENCODING ) );
-          }
-          catch ( Throwable er ) {
-            // ohwell
-            error( "error getting data for error: " + er, er );
-          }
-          
-          fos.write( (error + "\n\n").getBytes( ENCODING ) );
-          throwable.printStackTrace( new PrintStream( fos ) );
-          fos.close();
-        }
-      }
-      catch ( final Exception ex ) {
-        error( "error logging error: " + ex, ex );
-        ex.printStackTrace();
-      }
-    }
     
-    public static boolean hasSD() {
-      File sdCard = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/" );
-      return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
-    }            
 }

@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +70,7 @@ public class DashboardActivity extends Fragment {
               timer.postDelayed( this, period );
             }
             else {
-              ListActivity.info( "finishing mapping timer" );
+              MainActivity.info( "finishing mapping timer" );
             }
         }
       };
@@ -85,7 +84,7 @@ public class DashboardActivity extends Fragment {
     tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.run));
     
     tv = (TextView) view.findViewById( R.id.newwifi );
-    final String scanning = ListActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n"; 
+    final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n"; 
     tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
     
     tv = (TextView) view.findViewById( R.id.currnets );
@@ -182,7 +181,7 @@ public class DashboardActivity extends Fragment {
   
   @Override
   public void onDestroy() {
-    ListActivity.info( "destroy dash." );
+    MainActivity.info( "destroy dash." );
     finishing.set( true );
     
     super.onDestroy();
@@ -205,8 +204,8 @@ public class DashboardActivity extends Fragment {
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT:
-          MainActivity.finishListActivity( getActivity() );
-//          finish(); XXX
+          final MainActivity main = MainActivity.getMainActivity();
+          main.finish();
           return true;
         case MENU_SETTINGS:
           final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );

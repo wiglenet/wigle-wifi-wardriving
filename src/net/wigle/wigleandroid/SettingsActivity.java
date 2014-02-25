@@ -249,13 +249,13 @@ public final class SettingsActivity extends ActionBarActivity {
       
       // period spinners
       doScanSpinner( R.id.periodstill_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
+          ListActivity.PREF_SCAN_PERIOD_STILL, MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.period_spinner, 
-          ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
+          ListActivity.PREF_SCAN_PERIOD, MainActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.periodfast_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
+          ListActivity.PREF_SCAN_PERIOD_FAST, MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.gps_spinner, 
-          ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
+          ListActivity.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
       
       MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListActivity.PREF_SHOW_CURRENT, true);
       MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListActivity.PREF_METRIC, false);
@@ -297,25 +297,25 @@ public final class SettingsActivity extends ActionBarActivity {
       final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
           "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
       doSpinner( R.id.speak_spinner, 
-          ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
+          ListActivity.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
             
       // battery kill spinner
       final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
       final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
       doSpinner( R.id.battery_kill_spinner, 
-          ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
+          ListActivity.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
       final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
       final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
           "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner, 
-          ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
+          ListActivity.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
   }
   
   @Override
   public void onResume() {
-    ListActivity.info( "resume settings." );
+    MainActivity.info( "resume settings." );
     
     final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
     // donate
@@ -384,7 +384,7 @@ public final class SettingsActivity extends ActionBarActivity {
       period = prefs.getString( pref, (String) spinDefault );
     }
     else {
-        ListActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
+        MainActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
     }
     
     int periodIndex = 0;
@@ -401,7 +401,7 @@ public final class SettingsActivity extends ActionBarActivity {
       public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
         // set pref
         final V period = periods[position];
-        ListActivity.info( pref + " setting scan period: " + period );
+        MainActivity.info( pref + " setting scan period: " + period );
         if ( period instanceof Long ) {
           editor.putLong( pref, (Long) period );
         }
@@ -409,7 +409,7 @@ public final class SettingsActivity extends ActionBarActivity {
           editor.putString( pref, (String) period );
         }
         else {
-          ListActivity.error("unhandled object type: " + period + " class: " + period.getClass());
+          MainActivity.error("unhandled object type: " + period + " class: " + period.getClass());
         }
         editor.commit();
         

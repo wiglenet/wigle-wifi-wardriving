@@ -48,7 +48,7 @@ public class DBResultActivity extends ActionBarActivity {
     setupList();
     
     QueryArgs queryArgs = ListActivity.lameStatic.queryArgs;
-    ListActivity.info("queryArgs: " + queryArgs);
+    MainActivity.info("queryArgs: " + queryArgs);
     final TextView tv = (TextView) findViewById( R.id.dbstatus );    
     
     if ( queryArgs != null ) {
@@ -99,7 +99,7 @@ public class DBResultActivity extends ActionBarActivity {
             listAdapter.add( network );
             if ( address == null && first ) {
               final IGeoPoint center = MappingActivity.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
-              ListActivity.info( "set center: " + center + " network: " + network.getSsid()
+              MainActivity.info( "set center: " + center + " network: " + network.getSsid()
                   + " point: " + network.getGeoPoint());
               mapView.getController().setCenter( center );
               first = false;

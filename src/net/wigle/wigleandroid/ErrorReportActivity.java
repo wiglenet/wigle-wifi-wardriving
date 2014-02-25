@@ -45,14 +45,14 @@ public class ErrorReportActivity extends ActionBarActivity {
     tv.setText( stack );
     
     Intent intent = getIntent();
-    boolean doEmail = intent.getBooleanExtra( ListActivity.ERROR_REPORT_DO_EMAIL, false );
+    boolean doEmail = intent.getBooleanExtra( MainActivity.ERROR_REPORT_DO_EMAIL, false );
     if ( doEmail ) {
       fromFailure = true;
       // setup email sending
       setupEmail( stack );
     }
     
-    final String dialogMessage = intent.getStringExtra(ListActivity.ERROR_REPORT_DIALOG );
+    final String dialogMessage = intent.getStringExtra(MainActivity.ERROR_REPORT_DIALOG );
     if ( dialogMessage != null ) {
       fromFailure = true;
       shutdownRestOfApp();
@@ -78,7 +78,7 @@ public class ErrorReportActivity extends ActionBarActivity {
               }
               catch ( Exception ex ) {
                 // guess it wasn't there anyways
-                ListActivity.info( "exception dismissing alert dialog: " + ex );
+                MainActivity.info( "exception dismissing alert dialog: " + ex );
               }
             } }); 
           
@@ -86,7 +86,7 @@ public class ErrorReportActivity extends ActionBarActivity {
             ad.show();
           }
           catch ( WindowManager.BadTokenException windowEx ) {
-            ListActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
+            MainActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
           }
         }
       };
@@ -97,11 +97,10 @@ public class ErrorReportActivity extends ActionBarActivity {
   }
   
   private void shutdownRestOfApp() {
-    ListActivity.info( "ErrorReportActivity: shutting down app" );
+    MainActivity.info( "ErrorReportActivity: shutting down app" );
     // shut down anything we can get a handle to
     final MainActivity mainActivity = MainActivity.getMainActivity();
     if ( mainActivity != null ) {
-      mainActivity.finishListActivity();
       mainActivity.finish();       
     }
     if ( NetworkActivity.networkActivity != null ) {
@@ -117,23 +116,23 @@ public class ErrorReportActivity extends ActionBarActivity {
     try {
       File fileDir = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
       if ( ! fileDir.canRead() || ! fileDir.isDirectory() ) {
-        ListActivity.error( "file is not readable or not a directory. fileDir: " + fileDir );
+        MainActivity.error( "file is not readable or not a directory. fileDir: " + fileDir );
       }
       else {
         String[] files = fileDir.list();
         if ( files == null ) {
-          ListActivity.error( "no files in dir: " + fileDir );
+          MainActivity.error( "no files in dir: " + fileDir );
         }
         else {
           String latestFilename = null;
           for ( String filename : files ) {
-            if ( filename.startsWith( ListActivity.ERROR_STACK_FILENAME ) ) {
+            if ( filename.startsWith( MainActivity.ERROR_STACK_FILENAME ) ) {
               if ( latestFilename == null || filename.compareTo( latestFilename ) > 0 ) {
                 latestFilename = filename;
               }
             }
           }
-          ListActivity.info( "latest filename: " + latestFilename );
+          MainActivity.info( "latest filename: " + latestFilename );
           
           String filePath = MainActivity.safeFilePath( fileDir ) + "/" + latestFilename;
           BufferedReader reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
@@ -147,14 +146,14 @@ public class ErrorReportActivity extends ActionBarActivity {
       }
     }
     catch ( IOException ex ) {
-      ListActivity.error( "error reading stack file: " + ex, ex );
+      MainActivity.error( "error reading stack file: " + ex, ex );
     }
     
     return builder.toString();
   }
   
   private void setupEmail( String stack ) {
-    ListActivity.info( "ErrorReport onCreate" );
+    MainActivity.info( "ErrorReport onCreate" );
     final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
     emailIntent.setType( "plain/text" );
     emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"} );

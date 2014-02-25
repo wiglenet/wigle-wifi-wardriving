@@ -110,7 +110,7 @@ public final class MappingActivity extends Fragment {
   
 //  @Override
 //  public Object onRetainNonConfigurationInstance() {
-//    ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
+//    MainActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
 //    // save the map info
 //    state.oldCenter = mapView.getMapCenter();
 //    state.oldZoom = mapView.getZoomLevel();
@@ -149,7 +149,7 @@ public final class MappingActivity extends Fragment {
       
       // my location overlay
       myLocationOverlay = new MyLocationOverlay( getActivity().getApplicationContext(), osmMapView );
-      myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
+      myLocationOverlay.setLocationUpdateMinTime( MainActivity.LOCATION_UPDATE_INTERVAL );
       myLocationOverlay.setDrawAccuracyEnabled( false );
       osmMapView.getOverlays().add( myLocationOverlay );
       
@@ -172,7 +172,7 @@ public final class MappingActivity extends Fragment {
     mapControl.setZoom( zoom );
     mapControl.setCenter( centerPoint );
     
-    ListActivity.info("done setupMapView. zoom: " + zoom);
+    MainActivity.info("done setupMapView. zoom: " + zoom);
   }
   
   public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
@@ -221,7 +221,7 @@ public final class MappingActivity extends Fragment {
       retval = locationManager.getLastKnownLocation( provider );
     }
     catch ( IllegalArgumentException ex ) {
-      ListActivity.info("exception getting last known location: " + ex);
+      MainActivity.info("exception getting last known location: " + ex);
     }
     return retval;
   }
@@ -236,7 +236,7 @@ public final class MappingActivity extends Fragment {
               final Location location = ListActivity.lameStatic.location;
               if ( location != null ) {
                 if ( state.locked ) {
-                  // ListActivity.info( "mapping center location: " + location );
+                  // MainActivity.info( "mapping center location: " + location );
   								final GeoPoint locGeoPoint = new GeoPoint( location );
   								if ( state.firstMove ) {
   								  mapControl.setCenter( locGeoPoint );
@@ -272,7 +272,7 @@ public final class MappingActivity extends Fragment {
               timer.postDelayed( this, period );
             }
             else {
-              ListActivity.info( "finishing mapping timer" );
+              MainActivity.info( "finishing mapping timer" );
             }
         }
       };
@@ -284,7 +284,7 @@ public final class MappingActivity extends Fragment {
 // XXX   
 //  @Override
 //  public void finish() {
-//    ListActivity.info( "finish mapping." );
+//    MainActivity.info( "finish mapping." );
 //    finishing.set( true );
 //    
 //    super.finish();
@@ -292,7 +292,7 @@ public final class MappingActivity extends Fragment {
   
   @Override
   public void onDestroy() {
-    ListActivity.info( "destroy mapping." );
+    MainActivity.info( "destroy mapping." );
     finishing.set( true );
     
     // save zoom
@@ -306,7 +306,7 @@ public final class MappingActivity extends Fragment {
   
   @Override
   public void onPause() {
-    ListActivity.info( "pause mapping." );
+    MainActivity.info( "pause mapping." );
     myLocationOverlay.disableCompass();
     disableLocation();
     
@@ -315,7 +315,7 @@ public final class MappingActivity extends Fragment {
   
   @Override
   public void onResume() {
-    ListActivity.info( "resume mapping." );
+    MainActivity.info( "resume mapping." );
     myLocationOverlay.enableCompass();    
     enableLocation();
     
@@ -336,11 +336,11 @@ public final class MappingActivity extends Fragment {
       // force it to think it's own location listening is on
       myLocationOverlay.mLocationListener = new LocationListenerProxy(null);
       STATIC_LOCATION_LISTENER = myLocationOverlay;
-      MainActivity.getListActivity(getActivity()).getGPSListener().setMapListener(myLocationOverlay);
+      MainActivity.getMainActivity(this).getGPSListener().setMapListener(myLocationOverlay);
       myLocationOverlay.enableMyLocation();
     }
     catch (Exception ex) {
-      ListActivity.error("Could not enableLocation for maps: " + ex, ex);
+      MainActivity.error("Could not enableLocation for maps: " + ex, ex);
     }
   }
   
@@ -386,8 +386,8 @@ public final class MappingActivity extends Fragment {
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT: {
-          MainActivity.finishListActivity( getActivity() );
-//          finish();  XXX
+          final MainActivity main = MainActivity.getMainActivity();
+          main.finish();
           return true;
         }
         case MENU_ZOOM_IN: {
@@ -443,7 +443,7 @@ public final class MappingActivity extends Fragment {
 //  @Override
 //  public boolean onKeyDown(int keyCode, KeyEvent event) {
 //    if (keyCode == KeyEvent.KEYCODE_BACK) {
-//      ListActivity.info( "onKeyDown: not quitting app on back" );
+//      MainActivity.info( "onKeyDown: not quitting app on back" );
 //      MainActivity.switchTab( this, MainActivity.TAB_LIST );
 //      return true;
 //    }
@@ -457,7 +457,7 @@ public final class MappingActivity extends Fragment {
 //      case SSID_FILTER:
 //        return createSsidFilterDialog( this, "" );
 //      default:
-//        ListActivity.error( "unhandled dialog: " + which );
+//        MainActivity.error( "unhandled dialog: " + which );
 //    }
 //    return null;    
 //  }
@@ -468,7 +468,7 @@ public final class MappingActivity extends Fragment {
     dialog.setContentView( R.layout.filterdialog );
     dialog.setTitle( "SSID Filter" );
     
-    ListActivity.info("make new dialog");
+    MainActivity.info("make new dialog");
     final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final EditText regex = (EditText) dialog.findViewById( R.id.edit_regex );
     regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
@@ -503,7 +503,7 @@ public final class MappingActivity extends Fragment {
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing filter dialog: " + ex );
+            MainActivity.info( "exception dismissing filter dialog: " + ex );
           }
         }
       } );
@@ -530,7 +530,7 @@ public final class MappingActivity extends Fragment {
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing filter dialog: " + ex );
+            MainActivity.info( "exception dismissing filter dialog: " + ex );
           }
         }
       } );
@@ -539,7 +539,7 @@ public final class MappingActivity extends Fragment {
   }
 
   private void setupQuery() {
-    if (ListActivity.getNetworkCache().size() > 25) {
+    if (MainActivity.getNetworkCache().size() > 25) {
       // don't load, there's already networks to show
       return;
     }
@@ -550,13 +550,13 @@ public final class MappingActivity extends Fragment {
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       public void handleRow( final Cursor cursor ) {
         final String bssid = cursor.getString(0);
-        final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
+        final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
         
         Network network = networkCache.get( bssid );        
         if ( network == null ) {
           network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
           networkCache.put( network.getBssid(), network );      
-          // ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
+          // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
         
           final GeoPoint geoPoint = network.getGeoPoint();
           final int newWifiForRun = 1;
@@ -580,7 +580,7 @@ public final class MappingActivity extends Fragment {
 //    //Object foo = new com.google.android.maps.MapView( this, apiKey );
 //    try {
 //      File file = new File("/sdcard/com.google.android.maps.jar");
-//      ListActivity.info("file exists: " + file.exists() + " " + file.canRead());
+//      MainActivity.info("file exists: " + file.exists() + " " + file.canRead());
 //      //DexFile df = new DexFile(file);
 //      
 //      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
@@ -591,13 +591,13 @@ public final class MappingActivity extends Fragment {
 //      Class<?> mapActivityClass = cl.loadClass("EvilMap");
 //      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
 //      Object mapActivity = constructor.newInstance( this );
-//      ListActivity.info("mapActivity: " + mapActivity.getClass().getName());
+//      MainActivity.info("mapActivity: " + mapActivity.getClass().getName());
 //      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
 //      create.invoke(mapActivity, new Bundle());
 //      
 ////      final InvocationHandler handler = new InvocationHandler() {
 ////        public Object invoke( Object object, Method method, Object[] args ) {
-////          ListActivity.info("invoke: " + method.getName() );
+////          MainActivity.info("invoke: " + method.getName() );
 ////          return null;
 ////        }
 ////      };
@@ -607,11 +607,11 @@ public final class MappingActivity extends Fragment {
 //      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
 //      constructor = foo.getConstructor(Context.class, String.class);
 //      Object googMap = constructor.newInstance( mapActivity, apiKey );
-//      ListActivity.info("googMap: " + googMap);
+//      MainActivity.info("googMap: " + googMap);
 //
 //    }
 //    catch ( Exception ex)  {
-//      ListActivity.error("ex: " + ex, ex);
+//      MainActivity.error("ex: " + ex, ex);
 //    }
 //        
 //  }

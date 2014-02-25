@@ -7,7 +7,6 @@ import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,13 +16,11 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -106,7 +103,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
                 okValue = true;
                 break;
               default:
-                ListActivity.error("setupButtons: bad id: " + id);
+                MainActivity.error("setupButtons: bad id: " + id);
             }
           }
           catch( Exception ex ) {
@@ -224,7 +221,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
   
   private void setupBackupDbButton( final View view ) {
     final Button kmlExportButton = (Button) view.findViewById( R.id.backup_db_button );
-    if ( ! ListActivity.hasSD() ) {
+    if ( ! MainActivity.hasSD() ) {
       kmlExportButton.setEnabled(false);
     }
     
@@ -235,7 +232,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            BackupTask task = new BackupTask(getActivity(), MainActivity.getListActivity(getActivity()));
+            BackupTask task = new BackupTask(DataActivity.this, MainActivity.getMainActivity(DataActivity.this));
             task.execute();
           }
         } );
@@ -252,16 +249,16 @@ public final class DataActivity extends Fragment implements FileUploaderListener
             DataActivity.this.getString(R.string.data_import_observed), new Doer() {
           @Override
           public void execute() {
-            final ListActivity listActivity = MainActivity.getListActivity(getActivity());
-            if ( listActivity != null ) {
-              listActivity.setTransferring();
+            final MainActivity mainActivity = MainActivity.getMainActivity( DataActivity.this );
+            if ( mainActivity != null ) {
+              mainActivity.setTransferring();
             }
             // actually need this Activity context, for dialogs
             HttpDownloader task = new HttpDownloader(getActivity(), ListActivity.lameStatic.dbHelper,
                 new FileUploaderListener() {
               public void transferComplete() {
-                if ( listActivity != null ) {
-                  listActivity.transferComplete();
+                if ( mainActivity != null ) {
+                  mainActivity.transferComplete();
                 }
               }
             });
@@ -276,14 +273,14 @@ public final class DataActivity extends Fragment implements FileUploaderListener
    * way to background load the data and show progress on the gui thread
    */
   public static class BackupTask extends AsyncTask<Object, Integer, Integer> {
-    private final Activity activity;
-    private final ListActivity listActivity;
+    private final Fragment fragment;
+    private final MainActivity mainActivity;
     private Pair<Boolean,String> dbResult;
     
-    public BackupTask ( final Activity activity, final ListActivity listActivity ) {
-      this.activity = activity;
-      this.listActivity = listActivity;
-      listActivity.setTransferring();
+    public BackupTask ( final Fragment fragment, final MainActivity mainActivity ) {
+      this.fragment = fragment;
+      this.mainActivity = mainActivity;
+      mainActivity.setTransferring();
     }
     
     @Override
@@ -295,31 +292,33 @@ public final class DataActivity extends Fragment implements FileUploaderListener
     
     @Override
     protected void onProgressUpdate( Integer... progress ) {      
-      final TextView tv = (TextView) activity.findViewById( R.id.backup_db_text );
-      tv.setText( activity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
+      final View view = fragment.getView();
+      final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
+      tv.setText( mainActivity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
     }
     
     @Override
     protected void onPostExecute( Integer result ) {       
-      listActivity.transferComplete();
+      mainActivity.transferComplete();
       
-      final TextView tv = (TextView) activity.findViewById( R.id.backup_db_text );
-      tv.setText( activity.getString(R.string.backup_db_text) );
+      final View view = fragment.getView();
+      final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
+      tv.setText( mainActivity.getString(R.string.backup_db_text) );
       
-      final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+      final AlertDialog.Builder builder = new AlertDialog.Builder( mainActivity );
       builder.setCancelable( true );
-      builder.setTitle( activity.getString( dbResult.getFirst() ? R.string.status_success : R.string.status_fail ));
+      builder.setTitle( mainActivity.getString( dbResult.getFirst() ? R.string.status_success : R.string.status_fail ));
       builder.setMessage( dbResult.getSecond() );
       final AlertDialog ad = builder.create();
       // ok
-      ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
+      ad.setButton( DialogInterface.BUTTON_POSITIVE, mainActivity.getString(R.string.ok), new DialogInterface.OnClickListener() {
         public void onClick( final DialogInterface dialog, final int which ) {
           try {
             dialog.dismiss();
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing alert dialog: " + ex );
+            MainActivity.info( "exception dismissing alert dialog: " + ex );
           }
           return;
         } }); 
@@ -333,7 +332,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
   
   @Override
   public void onResume() {
-    ListActivity.info( "resume data." );    
+    MainActivity.info( "resume data." );    
     super.onResume();
   }
 //  XXX 
@@ -357,8 +356,8 @@ public final class DataActivity extends Fragment implements FileUploaderListener
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT:
-          MainActivity.finishListActivity( getActivity() );
-//          finish(); XXX
+          final MainActivity main = MainActivity.getMainActivity();
+          main.finish();
           return true;
         case MENU_SETTINGS:
           final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );
@@ -376,7 +375,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
 //  @Override
 //  public boolean onKeyDown(int keyCode, KeyEvent event) {
 //    if (keyCode == KeyEvent.KEYCODE_BACK) {
-//      ListActivity.info( "onKeyDown: not quitting app on back" );
+//      MainActivity.info( "onKeyDown: not quitting app on back" );
 //      MainActivity.switchTab( this, MainActivity.TAB_LIST );
 //      return true;
 //    }

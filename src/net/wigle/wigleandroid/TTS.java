@@ -80,7 +80,7 @@ public final class TTS {
       try {
         for ( Class clazz : SPEECH_CLASS.getClasses() ) {
           String cname =  clazz.getCanonicalName();
-          ListActivity.info("class: " +cname );
+          MainActivity.info("class: " +cname );
           if ( "android.speech.tts.TextToSpeech.OnInitListener".equals( cname )
                ||
                ( useEyesFree && "com.google.tts.TTS.InitListener".equals( cname ) ) 
@@ -107,13 +107,13 @@ public final class TTS {
         }
       }
       catch ( final NoSuchFieldException ex ) {
-        ListActivity.error( "no such field: " + ex, ex );
+        MainActivity.error( "no such field: " + ex, ex );
       }
       catch ( final IllegalAccessException ex ) {
-        ListActivity.error( "illegal in static: " + ex, ex );
+        MainActivity.error( "illegal in static: " + ex, ex );
       }
       catch ( final NoSuchMethodException ex ) {
-        ListActivity.error( "no such method: " + ex, ex );
+        MainActivity.error( "no such method: " + ex, ex );
       }
     }
     
@@ -133,7 +133,7 @@ public final class TTS {
       }
       final InvocationHandler handler = new InvocationHandler() {
         public Object invoke( Object object, Method method, Object[] args ) {
-          ListActivity.info("invoke: " + method.getName() );
+          MainActivity.info("invoke: " + method.getName() );
           // call our init to set the language to engrish.
           onInit();
           return null;
@@ -151,16 +151,16 @@ public final class TTS {
       }
     }
     catch ( final NoSuchMethodException ex ) {
-      ListActivity.error( "no such method: " + ex, ex );
+      MainActivity.error( "no such method: " + ex, ex );
     }
     catch ( final IllegalAccessException ex ) {
-      ListActivity.error( "illegal: " + ex, ex );
+      MainActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InstantiationException ex ) {
-      ListActivity.error( "instantiation: " + ex, ex );
+      MainActivity.error( "instantiation: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      ListActivity.error( "invocation: " + ex, ex );
+      MainActivity.error( "invocation: " + ex, ex );
     }
   }
 
@@ -181,24 +181,24 @@ public final class TTS {
               || "eng".equals( locale.getLanguage() )) {
             doLanguage = false;
           }
-          ListActivity.info("locale: " + locale + " doLanguage: " + doLanguage + " lang: " + locale.getLanguage() );
+          MainActivity.info("locale: " + locale + " doLanguage: " + doLanguage + " lang: " + locale.getLanguage() );
         }
         
         if ( doLanguage ) {
           setlanguage.invoke( speech, Locale.US ); // english, motherfucker. do you speak it?
         }
       }
-      //      ListActivity.info("should be talkin' english now");
+      //      MainActivity.info("should be talkin' english now");
     } catch ( final IllegalAccessException ex ) {
-      ListActivity.error( "init illegal: " + ex, ex );
+      MainActivity.error( "init illegal: " + ex, ex );
     } catch ( final InvocationTargetException ex ) {
-      ListActivity.error( "init invocation: " + ex, ex );
+      MainActivity.error( "init invocation: " + ex, ex );
     }
   }
   
   public void speak( final String string ) {
     try {
-      // ListActivity.info("saying: " + string );
+      // MainActivity.info("saying: " + string );
       if ( speech != null ) {
         if ( useEyesFree ) {
           speak.invoke( speech, string, QUEUE_ADD, params );
@@ -208,43 +208,43 @@ public final class TTS {
       }
     }
     catch ( final IllegalAccessException ex ) {
-      ListActivity.error( "illegal: " + ex, ex );
+      MainActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      ListActivity.error( "invocation: " + ex, ex );
+      MainActivity.error( "invocation: " + ex, ex );
     }
     catch ( final NullPointerException ex ) {
-      ListActivity.error( "npe: " + ex, ex );
+      MainActivity.error( "npe: " + ex, ex );
     }
   }
   
   public void stop() {
     try {
-      // ListActivity.info( "tts: stop" );
+      // MainActivity.info( "tts: stop" );
       if ( speech != null ) {
         stop.invoke( speech, (Object[])null );
       }
     }
     catch ( final IllegalAccessException ex ) {
-      ListActivity.error( "illegal: " + ex, ex );
+      MainActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      ListActivity.error( "invocation: " + ex, ex );
+      MainActivity.error( "invocation: " + ex, ex );
     }
   }
   
   public void shutdown() {
     try {
-      // ListActivity.info( "tts: shutdown" );
+      // MainActivity.info( "tts: shutdown" );
       if ( speech != null ) {
         shutdown.invoke( speech, (Object[])null );
       }
     }
     catch ( final IllegalAccessException ex ) {
-      ListActivity.error( "illegal: " + ex, ex );
+      MainActivity.error( "illegal: " + ex, ex );
     }
     catch ( final InvocationTargetException ex ) {
-      ListActivity.error( "invocation: " + ex, ex );
+      MainActivity.error( "invocation: " + ex, ex );
     }
   }
 

@@ -190,7 +190,7 @@ public final class DatabaseHelper extends Thread {
       final Bundle bundle = msg.peekData();
       String error = "unknown";
       if ( bundle == null ) {
-        ListActivity.error("no bundle in msg: " + msg);
+        MainActivity.error("no bundle in msg: " + msg);
       }
       else {
         error = bundle.getString( ERROR );
@@ -198,7 +198,7 @@ public final class DatabaseHelper extends Thread {
 
       final MainActivity mainActivity = MainActivity.getMainActivity();
       final Intent errorReportIntent = new Intent( mainActivity, ErrorReportActivity.class );
-      errorReportIntent.putExtra( ListActivity.ERROR_REPORT_DIALOG, error );
+      errorReportIntent.putExtra( MainActivity.ERROR_REPORT_DIALOG, error );
       mainActivity.startActivity( errorReportIntent );
     }
   }
@@ -210,9 +210,9 @@ public final class DatabaseHelper extends Thread {
   @Override
   public void run() {
     try {
-      ListActivity.info( "starting db thread" );
+      MainActivity.info( "starting db thread" );
       
-      ListActivity.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
+      MainActivity.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
       Process.setThreadPriority( DB_PRIORITY );
       
       try {
@@ -224,10 +224,10 @@ public final class DatabaseHelper extends Thread {
           getLocationCountFromDB();
         }
 //        if ( ! done.get() ) {        
-//          ListActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
+//          MainActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
 //        }
 //        if ( ! done.get() ) {        
-//          ListActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
+//          MainActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
 //        }
       }
       catch ( DBException ex ) {
@@ -267,43 +267,43 @@ public final class DatabaseHelper extends Thread {
                 countdown = 0;
               }
               catch ( Exception ex ) {
-                ListActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
+                MainActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
                 countdown--;
                 if ( countdown <= 0 ) {
                   // give up
                   throw ex;
                 }
-                ListActivity.sleep(100L);                
+                MainActivity.sleep(100L);                
               }
             }
           }
           
           final long delay = System.currentTimeMillis() - startTime;
           if ( delay > 1000L || ListActivity.DEBUG ) {
-            ListActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
+            MainActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
           }
         }
         catch ( final InterruptedException ex ) {
           // no worries
-          ListActivity.info("db queue take interrupted");
+          MainActivity.info("db queue take interrupted");
         }
         catch ( IllegalStateException ex ) {
           if ( ! done.get() ) {
             deathDialog( "DB run loop", ex );
           }
-          ListActivity.sleep(100L);
+          MainActivity.sleep(100L);
         }
         catch ( SQLiteException ex ) {
           if ( ! done.get() ) {
             deathDialog( "DB run loop", ex );
           }
-          ListActivity.sleep(100L);
+          MainActivity.sleep(100L);
         }
         catch ( DBException ex ) {
           if ( ! done.get() ) {
             deathDialog( "DB run loop", ex );
           }
-          ListActivity.sleep(100L);
+          MainActivity.sleep(100L);
         }
         finally {
           if ( db != null && db.isOpen() && db.inTransaction() ) {
@@ -311,24 +311,24 @@ public final class DatabaseHelper extends Thread {
               db.endTransaction();
             }
             catch ( Exception ex ) {
-              ListActivity.error( "exception in db.endTransaction: " + ex, ex );
+              MainActivity.error( "exception in db.endTransaction: " + ex, ex );
             }
           }
         }
       }
     }
     catch ( final Throwable throwable ) {
-      ListActivity.writeError( Thread.currentThread(), throwable, context );
+      MainActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
     
-    ListActivity.info("db worker thread shutting down");
+    MainActivity.info("db worker thread shutting down");
   }
   
   public void deathDialog( String message, Exception ex ) {
     // send message to the handler that will get this dialog on the activity thread
-    ListActivity.error( "db exception. " + message + ": " + ex, ex );
-    ListActivity.writeError(Thread.currentThread(), ex, context);
+    MainActivity.error( "db exception. " + message + ": " + ex, ex );
+    MainActivity.writeError(Thread.currentThread(), ex, context);
     final Bundle bundle = new Bundle();
     final String dialogMessage = MainActivity.getBaseErrorMessage( ex, true );
     bundle.putString( ERROR, dialogMessage );
@@ -342,7 +342,7 @@ public final class DatabaseHelper extends Thread {
     // if(true) throw new SQLiteException("meat puppets");
     
     String dbFilename = DATABASE_NAME;
-    final boolean hasSD = ListActivity.hasSD();
+    final boolean hasSD = MainActivity.hasSD();
     if ( hasSD ) {
       File path = new File( DATABASE_PATH );
       path.mkdirs();
@@ -355,7 +355,7 @@ public final class DatabaseHelper extends Thread {
       doCreateNetwork = true;
       doCreateLocation = true;
     }
-    ListActivity.info("opening: " + dbFilename );
+    MainActivity.info("opening: " + dbFilename );
     
     if ( hasSD ) {
       db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
@@ -368,7 +368,7 @@ public final class DatabaseHelper extends Thread {
       db.rawQuery( "SELECT count(*) FROM network", (String[]) null ).close();
     }
     catch ( final SQLiteException ex ) {
-      ListActivity.info("exception selecting from network, try to create. ex: " + ex );
+      MainActivity.info("exception selecting from network, try to create. ex: " + ex );
       doCreateNetwork = true;
     }
     
@@ -376,12 +376,12 @@ public final class DatabaseHelper extends Thread {
       db.rawQuery( "SELECT count(*) FROM location", (String[]) null ).close();
     }
     catch ( final SQLiteException ex ) {
-      ListActivity.info("exception selecting from location, try to create. ex: " + ex );
+      MainActivity.info("exception selecting from location, try to create. ex: " + ex );
       doCreateLocation = true;
     }
     
     if ( doCreateNetwork ) {
-      ListActivity.info( "creating network table" );
+      MainActivity.info( "creating network table" );
       try {
         db.execSQL(NETWORK_CREATE);
         if ( db.getVersion() == 0 ) {
@@ -394,12 +394,12 @@ public final class DatabaseHelper extends Thread {
         }
       }
       catch ( final SQLiteException ex ) {
-        ListActivity.error( "sqlite exception: " + ex, ex );
+        MainActivity.error( "sqlite exception: " + ex, ex );
       }
     }
     
     if ( doCreateLocation ) {
-      ListActivity.info( "creating location table" );
+      MainActivity.info( "creating location table" );
       try {
         db.execSQL(LOCATION_CREATE);
         // new database, reset a marker, if any
@@ -408,14 +408,14 @@ public final class DatabaseHelper extends Thread {
         edit.commit();
       }
       catch ( final SQLiteException ex ) {
-        ListActivity.error( "sqlite exception: " + ex, ex );
+        MainActivity.error( "sqlite exception: " + ex, ex );
       }
     }
     
     // VACUUM turned off, this takes a long long time (20 min), and has little effect since we're not using DELETE
-    // ListActivity.info("Vacuuming db");
+    // MainActivity.info("Vacuuming db");
     // db.execSQL( "VACUUM" );
-    // ListActivity.info("Vacuuming done");
+    // MainActivity.info("Vacuuming done");
     
     // we don't need to know how many we wrote
     db.execSQL( "PRAGMA count_changes = false" );
@@ -424,22 +424,22 @@ public final class DatabaseHelper extends Thread {
     // keep around the journal file, don't create and delete a ton of times
     db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null ).close();
     
-    ListActivity.info( "database version: " + db.getVersion() );
+    MainActivity.info( "database version: " + db.getVersion() );
     if ( db.getVersion() == 0 ) {
-      ListActivity.info("upgrading db from 0 to 1");
+      MainActivity.info("upgrading db from 0 to 1");
       try {
         db.execSQL( "ALTER TABLE network ADD COLUMN type text not null default '" + NetworkType.WIFI.getCode() + "'" );
         db.setVersion(1);
       }
       catch ( SQLiteException ex ) {
-        ListActivity.info("ex: " + ex, ex);
+        MainActivity.info("ex: " + ex, ex);
         if ( "duplicate column name".equals( ex.toString() ) ) {
           db.setVersion(1);
         }
       }
     }
     else if ( db.getVersion() == 1 ) {
-      ListActivity.info("upgrading db from 1 to 2");
+      MainActivity.info("upgrading db from 1 to 2");
       try {
         db.execSQL( "ALTER TABLE network ADD COLUMN bestlevel integer not null default 0" );
         db.execSQL( "ALTER TABLE network ADD COLUMN bestlat double not null default 0");
@@ -447,7 +447,7 @@ public final class DatabaseHelper extends Thread {
         db.setVersion(2);
       }
       catch ( SQLiteException ex ) {
-        ListActivity.info("ex: " + ex, ex);
+        MainActivity.info("ex: " + ex, ex);
         if ( "duplicate column name".equals( ex.toString() ) ) {
           db.setVersion(2);
         }
@@ -481,8 +481,8 @@ public final class DatabaseHelper extends Thread {
     // give time for db to finish any writes
     int countdown = 30;
     while ( this.isAlive() && countdown > 0 ) {
-      ListActivity.info( "db still alive. countdown: " + countdown );
-      ListActivity.sleep( 100L );
+      MainActivity.info( "db still alive. countdown: " + countdown );
+      MainActivity.sleep( 100L );
       countdown--;
       this.interrupt();
     }
@@ -509,15 +509,15 @@ public final class DatabaseHelper extends Thread {
         }
       }
       catch ( SQLiteException ex ) {
-        ListActivity.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
-        ListActivity.sleep( 100L );
+        MainActivity.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
+        MainActivity.sleep( 100L );
       }
     }
   }
   
   public synchronized void checkDB() throws DBException {
     if ( db == null || ! db.isOpen() ) {
-      ListActivity.info( "re-opening db in checkDB" );
+      MainActivity.info( "re-opening db in checkDB" );
       try {
         open();
       }
@@ -546,9 +546,9 @@ public final class DatabaseHelper extends Thread {
     // data is lost if queue is full!
     boolean added = queue.offer( update );
     if ( ! added ) {
-      ListActivity.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
+      MainActivity.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
       if ( System.currentTimeMillis() - prevQueueCullTime > QUEUE_CULL_TIMEOUT ) {
-        ListActivity.info("culling queue. size: " + queue.size() );
+        MainActivity.info("culling queue. size: " + queue.size() );
         // go thru the queue, cull out anything not newForRun
         for ( Iterator<DBUpdate> it = queue.iterator(); it.hasNext(); ) {
           final DBUpdate val = it.next();
@@ -556,10 +556,10 @@ public final class DatabaseHelper extends Thread {
             it.remove();
           }
         }
-        ListActivity.info("culled queue. size now: " + queue.size() );
+        MainActivity.info("culled queue. size now: " + queue.size() );
         added = queue.offer( update );
         if ( ! added ) {
-          ListActivity.info( "queue still full, couldn't add: " + network.getBssid() );
+          MainActivity.info( "queue still full, couldn't add: " + network.getBssid() );
         }
         prevQueueCullTime = System.currentTimeMillis();
       }
@@ -573,7 +573,7 @@ public final class DatabaseHelper extends Thread {
     if (insertNetwork == null || insertLocation == null
         || updateNetwork == null || updateNetworkMetadata == null) {
       
-      ListActivity.warn("A stored procedure is null, not adding observation");
+      MainActivity.warn("A stored procedure is null, not adding observation");
       return;
     }
     final Network network = update.network;
@@ -599,7 +599,7 @@ public final class DatabaseHelper extends Thread {
       bestlevel = prevWrittenLocation.bestlevel;
       bestlat = prevWrittenLocation.bestlat;
       bestlon = prevWrittenLocation.bestlon;
-      // ListActivity.info( "db cache hit. bssid: " + network.getBssid() );
+      // MainActivity.info( "db cache hit. bssid: " + network.getBssid() );
     }
     else {
       // cache miss, get the last values from the db, if any
@@ -633,7 +633,7 @@ public final class DatabaseHelper extends Thread {
         // don't update stack lasttime,lastlat,lastlon variables
       }
       else {
-        // ListActivity.info("db using cursor values: " + network.getBssid() );
+        // MainActivity.info("db using cursor values: " + network.getBssid() );
         cursor.moveToFirst();
         lasttime = cursor.getLong(0);
         lastlat = cursor.getDouble(1);
@@ -647,7 +647,7 @@ public final class DatabaseHelper extends Thread {
       }
       catch ( NoSuchElementException ex ) {
         // weird error cropping up
-        ListActivity.info("the weird close-cursor exception: " + ex );
+        MainActivity.info("the weird close-cursor exception: " + ex );
       }
     }
     
@@ -669,7 +669,7 @@ public final class DatabaseHelper extends Thread {
     final boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
     final boolean mediumChange = latDiff > MEDIUM_LATLON_CHANGE || lonDiff > MEDIUM_LATLON_CHANGE;
     final boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
-    // ListActivity.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
+    // MainActivity.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
     //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
     final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
@@ -685,7 +685,7 @@ public final class DatabaseHelper extends Thread {
         && update.level == 0;
 
     if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
-      // ListActivity.info("inserting loc: " + network.getSsid() );
+      // MainActivity.info("inserting loc: " + network.getSsid() );
       insertLocation.bindString( 1, bssid );
       insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...
       insertLocation.bindDouble( 3, location.getLatitude() );
@@ -695,9 +695,9 @@ public final class DatabaseHelper extends Thread {
       insertLocation.bindLong( 7, location.getTime() );
       if ( db.isDbLockedByOtherThreads() ) {
         // this is kinda lame, make this better
-        ListActivity.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid
+        MainActivity.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid
             + " drainSize: " + drainSize );
-        ListActivity.sleep(1000L);
+        MainActivity.sleep(1000L);
       }
       long start = System.currentTimeMillis();
       // INSERT
@@ -722,9 +722,9 @@ public final class DatabaseHelper extends Thread {
         updateNetwork.bindString( 4, bssid );
         if ( db.isDbLockedByOtherThreads() ) {
           // this is kinda lame, make this better
-          ListActivity.error( "db locked by another thread, waiting to net update. bssid: " + bssid
+          MainActivity.error( "db locked by another thread, waiting to net update. bssid: " + bssid
               + " drainSize: " + drainSize );
-          ListActivity.sleep(1000L);
+          MainActivity.sleep(1000L);
         }
         start = System.currentTimeMillis();
         // UPDATE
@@ -733,7 +733,7 @@ public final class DatabaseHelper extends Thread {
 
         
         boolean newBest = bestlevel == 0 || update.level > bestlevel;
-        // ListActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
+        // MainActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
         if (newBest) {
           bestlevel = update.level;
           bestlat = location.getLatitude();
@@ -741,7 +741,7 @@ public final class DatabaseHelper extends Thread {
         }
         
         if (smallLocDelay || newBest) {
-          // ListActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
+          // MainActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
           updateNetworkMetadata.bindLong( 1, bestlevel );
           updateNetworkMetadata.bindDouble( 2, bestlat );
           updateNetworkMetadata.bindDouble( 3, bestlon );
@@ -757,7 +757,7 @@ public final class DatabaseHelper extends Thread {
       }
     }
     else {
-      // ListActivity.info( "db network not changeworthy: " + bssid );
+      // MainActivity.info( "db network not changeworthy: " + bssid );
     }
   }
 
@@ -836,7 +836,7 @@ public final class DatabaseHelper extends Thread {
       boolean added = pending.offer( update );
       if ( ! added ) {
         if ( System.currentTimeMillis() - prevPendingQueueCullTime > QUEUE_CULL_TIMEOUT ) {
-          ListActivity.info("culling pending queue. size: " + pending.size() );
+          MainActivity.info("culling pending queue. size: " + pending.size() );
           // go thru the queue, cull out anything not newForRun
           for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
             final DBPending val = it.next();
@@ -844,10 +844,10 @@ public final class DatabaseHelper extends Thread {
               it.remove();
             }
           }
-          ListActivity.info("culled pending queue. size now: " + pending.size() );
+          MainActivity.info("culled pending queue. size now: " + pending.size() );
           added = pending.offer( update );
           if ( ! added ) {
-            ListActivity.info( "pending queue still full, couldn't add: " + network.getBssid() );
+            MainActivity.info( "pending queue still full, couldn't add: " + network.getBssid() );
             // go thru the queue, squash dups.
             HashSet<String> bssids = new HashSet<String>();
             for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
@@ -860,7 +860,7 @@ public final class DatabaseHelper extends Thread {
             
             added = pending.offer( update );
             if ( ! added ) {
-              ListActivity.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
+              MainActivity.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
             }
           }
           prevPendingQueueCullTime = System.currentTimeMillis();
@@ -890,7 +890,7 @@ public final class DatabaseHelper extends Thread {
       }
 
       final long d_time = MILLISECONDS.toSeconds( locWhen - lastLocWhen );
-      ListActivity.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
+      MainActivity.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
       // walk the locations and 
       // lerp! y = y0 + (t - t0)((y1-y0)/(t1-t0))
       // y = y0 + (t - lastLocWhen)((y1-y0)/d_time);
@@ -917,18 +917,18 @@ public final class DatabaseHelper extends Thread {
         lerpLoc.setAccuracy( accuracy );
 
         // pull this once we're happy.
-        //        ListActivity.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
+        //        MainActivity.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
 
         // throw it on the queue!
         if ( addObservation( pend.network, pend.level, lerpLoc, pend.newForRun ) ) {
           count++;
         } else {
-          ListActivity.info( "failed to add "+pend );
+          MainActivity.info( "failed to add "+pend );
         }
         // XXX: altitude? worth it?
       }
       // return
-      ListActivity.info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
+      MainActivity.info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
     }
 
     lastLoc = null;
@@ -938,7 +938,7 @@ public final class DatabaseHelper extends Thread {
   private void logTime( final long start, final String string ) {
     long diff = System.currentTimeMillis() - start;
     if ( diff > 150L ) {
-      ListActivity.info( string + " in " + diff + " ms" );
+      MainActivity.info( string + " in " + diff + " ms" );
     }
   }
   
@@ -987,7 +987,7 @@ public final class DatabaseHelper extends Thread {
     long start = System.currentTimeMillis();
     final long count = getMaxIdFromDB( LOCATION_TABLE );
     long end = System.currentTimeMillis();
-    ListActivity.info( "loc count: " + count + " in: " + (end-start) + "ms" );
+    MainActivity.info( "loc count: " + count + " in: " + (end-start) + "ms" );
     locationCount.set( count );
     setupMaxidDebug( count );
   }
@@ -1002,7 +1002,7 @@ public final class DatabaseHelper extends Thread {
       if ( locCount > 0 ) {
         // there is no preference set, yet there are locations, this is likely
         // a developer testing a new install on an old db, so set the pref.
-        ListActivity.info( "setting db marker to: " + locCount );
+        MainActivity.info( "setting db marker to: " + locCount );
         edit.putLong( ListActivity.PREF_DB_MARKER, locCount );
       }
     }
@@ -1029,7 +1029,7 @@ public final class DatabaseHelper extends Thread {
   
   public Network getNetwork( final String bssid ) {
     // check cache
-    Network retval = ListActivity.getNetworkCache().get( bssid );
+    Network retval = MainActivity.getNetworkCache().get( bssid );
     if ( retval == null ) {
       try {
         checkDB();
@@ -1047,7 +1047,7 @@ public final class DatabaseHelper extends Thread {
           final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
           retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
           retval.setGeoPoint( new GeoPoint(lastlat, lastlon) );
-          ListActivity.getNetworkCache().put( bssid, retval );
+          MainActivity.getNetworkCache().put( bssid, retval );
         }
         cursor.close();
       }
@@ -1060,14 +1060,14 @@ public final class DatabaseHelper extends Thread {
   
   public Cursor locationIterator( final long fromId ) throws DBException {
     checkDB();
-    ListActivity.info( "locationIterator fromId: " + fromId );
+    MainActivity.info( "locationIterator fromId: " + fromId );
     final String[] args = new String[]{ Long.toString( fromId ) };
     return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
   }
   
   public Cursor networkIterator() throws DBException {
     checkDB();
-    ListActivity.info( "networkIterator" );
+    MainActivity.info( "networkIterator" );
     final String[] args = new String[]{};
     return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
   }
@@ -1097,7 +1097,7 @@ public final class DatabaseHelper extends Thread {
           output.write(buffer, 0, bytesRead);
           read += bytesRead;
           int percent = (int)( (read*100)/total );
-          // ListActivity.info("percent: " + percent + " read: " + read + " total: " + total );
+          // MainActivity.info("percent: " + percent + " read: " + read + " total: " + total );
           task.progress( percent );
       }
       output.close();

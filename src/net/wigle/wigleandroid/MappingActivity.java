@@ -26,6 +26,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -76,6 +78,7 @@ public final class MappingActivity extends Fragment {
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
+    setHasOptionsMenu(true);
     // set language
     MainActivity.setLocale( getActivity() );
     finishing = new AtomicBoolean( false );
@@ -344,42 +347,40 @@ public final class MappingActivity extends Fragment {
     }
   }
   
-//  XXX
-//  /* Creates the menu items */
-//  @Override
-//  public boolean onCreateOptionsMenu( final Menu menu ) {
-//    MenuItem item = null;
-//    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-//    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
-//    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
-//    
-//    String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-//    item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
-//    item.setIcon( android.R.drawable.ic_menu_mapmode );
-//        
-//    String nameDB = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
-//    item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
-//    item.setIcon( android.R.drawable.ic_menu_edit );
-//    
-//    String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
-//    item = menu.add(0, MENU_LABEL, 0, nameLabel);
-//    item.setIcon( android.R.drawable.ic_dialog_info );
-//    
-//    item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-//    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );    
-//    
-//    item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-//    item.setIcon( android.R.drawable.ic_menu_search );
-//    
-//    item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
-//    item.setIcon( android.R.drawable.ic_menu_add );
-//    
-//    item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
-//    item.setIcon( android.R.drawable.ic_menu_revert );
-//    
-//    
-//    return true;
-//  }
+  /* Creates the menu items */
+  @Override
+  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) { 
+    MenuItem item = null;
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
+    
+    String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+    item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
+    item.setIcon( android.R.drawable.ic_menu_mapmode );
+        
+    String nameDB = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
+    item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
+    item.setIcon( android.R.drawable.ic_menu_edit );
+    
+    String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
+    item = menu.add(0, MENU_LABEL, 0, nameLabel);
+    item.setIcon( android.R.drawable.ic_dialog_info );
+    
+    item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );    
+    
+    item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+    item.setIcon( android.R.drawable.ic_menu_search );
+    
+    item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
+    item.setIcon( android.R.drawable.ic_menu_add );
+    
+    item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
+    item.setIcon( android.R.drawable.ic_menu_revert );
+        
+    super.onCreateOptionsMenu(menu, inflater);  
+  }
 
   /* Handles item selections */
   @Override

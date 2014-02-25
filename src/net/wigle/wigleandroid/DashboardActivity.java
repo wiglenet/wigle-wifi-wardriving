@@ -14,6 +14,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +33,7 @@ public class DashboardActivity extends Fragment {
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
+    setHasOptionsMenu(true);
     // set language
     MainActivity.setLocale( getActivity() );
     
@@ -186,18 +189,18 @@ public class DashboardActivity extends Fragment {
     
     super.onDestroy();
   }
-//  XXX
-//  /* Creates the menu items */
-//  @Override
-//  public boolean onCreateOptionsMenu( final Menu menu ) {
-//    MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-//    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-//        
-//    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-//    item.setIcon( android.R.drawable.ic_menu_preferences );
-//    
-//    return true;
-//  }
+
+  /* Creates the menu items */
+  @Override
+  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        
+    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+    item.setIcon( android.R.drawable.ic_menu_preferences );
+    
+    super.onCreateOptionsMenu(menu, inflater);  
+  }
 
   /* Handles item selections */
   @Override

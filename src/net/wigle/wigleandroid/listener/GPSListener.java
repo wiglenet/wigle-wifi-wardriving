@@ -101,7 +101,6 @@ public class GPSListener implements Listener, LocationListener {
 
   /** newLocation can be null */
   private void updateLocationData( final Location newLocation ) {
-    MainActivity.info("mainActivity: " + mainActivity);
     final LocationManager locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
     // see if we have new data
     gpsStatus = locationManager.getGpsStatus( gpsStatus );

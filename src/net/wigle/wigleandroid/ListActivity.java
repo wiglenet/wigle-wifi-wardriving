@@ -13,7 +13,6 @@ import net.wigle.wigleandroid.background.FileUploaderTask;
 
 import org.osmdroid.util.GeoPoint;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +22,8 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -171,7 +172,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
-        
+        setHasOptionsMenu(true);
     }
     
     public void setNetCountUI( final View view ) {
@@ -259,128 +260,33 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       super.onDestroyView();
     }
     
-//    @Override
-//    public void finish() {
-//      MainActivity.info( "LIST: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
-//      
-//      final boolean wasFinishing = state.finishing.getAndSet( true );
-//      if ( wasFinishing ) {
-//        MainActivity.info( "LIST: finish called twice!" );
-//      }
-//
-//      // save our location for later runs
-//      state.gpsListener.saveLocation();
-//      
-//      // close the db. not in destroy, because it'll still write after that.
-//      state.dbHelper.close();
-//      
-//      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-//      if ( state.gpsListener != null ) {
-//        locationManager.removeGpsStatusListener( state.gpsListener );
-//        locationManager.removeUpdates( state.gpsListener );
-//      }
-//      
-//      try {
-//        getActivity().unregisterReceiver( state.wifiReceiver );
-//      }
-//      catch ( final IllegalArgumentException ex ) {
-//        MainActivity.info( "wifiReceiver not registered: " + ex );
-//      }
-//
-//      // stop the service, so when we die it's both stopped and unbound and will die
-//      final Intent serviceIntent = new Intent( this.getActivity(), WigleService.class );
-//      this.getActivity().stopService( serviceIntent );
-//      try {
-//        // have to use the app context to bind to the service, cuz we're in tabs
-//        getActivity().getApplicationContext().unbindService( state.serviceConnection );
-//      }
-//      catch ( final IllegalArgumentException ex ) {
-//        MainActivity.info( "serviceConnection not registered: " + ex, ex );
-//      }    
-//      
-//      // release the lock before turning wifi off
-//      if ( state.wifiLock != null && state.wifiLock.isHeld() ) {
-//        try {
-//          state.wifiLock.release();
-//        }
-//        catch ( Exception ex ) {
-//          MainActivity.error( "exception releasing wifi lock: " + ex, ex );
-//        }
-//      }
-//      
-//      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-//      final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
-//      // don't call on emulator, it crashes it
-//      if ( wifiWasOff && ! state.inEmulator ) {
-//        // tell user, cuz this takes a little while
-//        Toast.makeText( this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT ).show();
-//        
-//        // well turn it of now that we're done
-//        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-//        MainActivity.info( "turning back off wifi" );
-//        try {
-//          wifiManager.setWifiEnabled( false );
-//        }
-//        catch ( Exception ex ) {
-//          MainActivity.error("exception turning wifi back off: " + ex, ex);
-//        }
-//      }
-//      
-//      TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
-//      if ( tele != null && state.phoneState != null ) {
-//        tele.listen( state.phoneState, PhoneStateListener.LISTEN_NONE );
-//      }
-//      
-//      if ( state.tts != null ) {
-//        if ( ! isMuted() ) {
-//          // give time for the above "done" to be said
-//          sleep( 250 );
-//        }
-//        state.tts.shutdown();
-//      }
-//      
-//      
-//      if ( DEBUG ) {
-//        Debug.stopMethodTracing();
-//      }
-//
-//      // clean up.
-//      if ( state.soundPop != null ) {
-//        state.soundPop.release();
-//      }
-//      if ( state.soundNewPop != null ) {
-//        state.soundNewPop.release();
-//      }
-//      
-//      super.finish();
-//    }
-    
     /* Creates the menu items */
-//    @Override
-//    public boolean onCreateOptionsMenu( final Menu menu ) {
-//      MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
-//      item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
-//      
-//      final String scan = isScanning() ? getString(R.string.off) : getString(R.string.on);
-//      item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
-//      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
-//      
-//      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ? 
-//          getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-//      item = menu.add(0, MENU_WAKELOCK, 0, wake);
-//      item.setIcon( android.R.drawable.ic_menu_gallery );
-//      
-//      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-//      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-//      
-//      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-//      item.setIcon( android.R.drawable.ic_menu_search );
-//              
-//      item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-//      item.setIcon( android.R.drawable.ic_menu_preferences );
-//        
-//      return true;
-//    }
+    @Override
+    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {    
+      MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
+      item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+      
+      MainActivity main = MainActivity.getMainActivity(this);
+      final String scan = main.isScanning() ? getString(R.string.off) : getString(R.string.on);
+      item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
+      item.setIcon( main.isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
+      
+      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ? 
+          getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
+      item = menu.add(0, MENU_WAKELOCK, 0, wake);
+      item.setIcon( android.R.drawable.ic_menu_gallery );
+      
+      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+      
+      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+      item.setIcon( android.R.drawable.ic_menu_search );
+              
+      item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+      item.setIcon( android.R.drawable.ic_menu_preferences );
+      
+      super.onCreateOptionsMenu(menu, inflater);           
+    }
 
     /* Handles item selections */
     @Override
@@ -529,10 +435,13 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     private void setupList( final View view ) {
       // not set by nonconfig retain
       listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
-      setupListAdapter( view, this.getActivity(), listAdapter, R.id.ListView01 );
+      setupListAdapter( view, MainActivity.getMainActivity(this), listAdapter, R.id.ListView01 );
     }
      
-    public static void setupListAdapter( final View view, final Activity activity, final NetworkListAdapter listAdapter, final int id) {
+    public static void setupListAdapter( final View view, final MainActivity activity, final NetworkListAdapter listAdapter, final int id) {
+      // always set our current list adapter
+      activity.getState().wifiReceiver.setListAdapter( listAdapter );    
+      
       final ListView listView = (ListView) view.findViewById( id );
       listView.setAdapter( listAdapter ); 
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {

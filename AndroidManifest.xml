@@ -62,7 +62,13 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+		        <meta-data
+		            android:name="android.support.PARENT_ACTIVITY"
+		            android:value=".MainActivity" />
+            
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -84,7 +90,13 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".SettingsActivity" >
+            
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SettingsActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -95,7 +107,12 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -106,7 +123,12 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />

@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,10 @@ public class SpeechActivity extends ActionBarActivity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
     super.onCreate( savedInstanceState );
+    
+    final ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
     // set language
     MainActivity.setLocale( this );      
     setContentView( R.layout.speech );

@@ -65,6 +65,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -256,11 +258,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       tab.setText(labels[i]);
       tab.setTabListener(this);
       bar.addTab(tab);
-    }
-    
-    // always set our current list adapter
-    state.wifiReceiver.setListAdapter( list.getListAdapter() );    
-    
+    }    
   }
   
   // be careful with this
@@ -483,12 +481,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   public void onRestart() {
     MainActivity.info( "MAIN: restart." );
     super.onRestart();
-  }
-  
-  @Override
-  public void finish() {
-    MainActivity.info( "MAIN: finish." );
-    super.finish();
   }
   
   public static Throwable getBaseThrowable(final Throwable throwable) {
@@ -1164,5 +1156,116 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     // XXX: tell list
   }
   
+  @Override
+  public boolean onCreateOptionsMenu( final Menu menu ) {
+    info("MAIN: onCreateOptionsMenu.");
+    return true;
+  }
   
+  @Override
+  public boolean onOptionsItemSelected( final MenuItem item ) {
+    return false;
+  }
+  
+  //@Override
+  public void finish() {
+    info( "MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
+    
+    final boolean wasFinishing = state.finishing.getAndSet( true );
+    if ( wasFinishing ) {
+      info( "MAIN: finish called twice!" );
+    }
+  
+    // save our location for later runs
+    state.gpsListener.saveLocation();
+    
+    // close the db. not in destroy, because it'll still write after that.
+    state.dbHelper.close();
+    
+    final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    if ( state.gpsListener != null ) {
+      locationManager.removeGpsStatusListener( state.gpsListener );
+      locationManager.removeUpdates( state.gpsListener );
+    }
+    
+    try {
+      unregisterReceiver( state.wifiReceiver );
+    }
+    catch ( final IllegalArgumentException ex ) {
+      info( "wifiReceiver not registered: " + ex );
+    }
+  
+    // stop the service, so when we die it's both stopped and unbound and will die
+    final Intent serviceIntent = new Intent( this, WigleService.class );
+    stopService( serviceIntent );
+    try {
+      // have to use the app context to bind to the service, cuz we're in tabs
+      getApplicationContext().unbindService( state.serviceConnection );
+    }
+    catch ( final IllegalArgumentException ex ) {
+      MainActivity.info( "serviceConnection not registered: " + ex, ex );
+    }    
+    
+    // release the lock before turning wifi off
+    if ( state.wifiLock != null && state.wifiLock.isHeld() ) {
+      try {
+        state.wifiLock.release();
+      }
+      catch ( Exception ex ) {
+        MainActivity.error( "exception releasing wifi lock: " + ex, ex );
+      }
+    }
+    
+    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final boolean wifiWasOff = prefs.getBoolean( ListActivity.PREF_WIFI_WAS_OFF, false );
+    // don't call on emulator, it crashes it
+    if ( wifiWasOff && ! state.inEmulator ) {
+      // tell user, cuz this takes a little while
+      Toast.makeText( this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT ).show();
+      
+      // well turn it of now that we're done
+      final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+      MainActivity.info( "turning back off wifi" );
+      try {
+        wifiManager.setWifiEnabled( false );
+      }
+      catch ( Exception ex ) {
+        MainActivity.error("exception turning wifi back off: " + ex, ex);
+      }
+    }
+    
+    TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
+    if ( tele != null && state.phoneState != null ) {
+      tele.listen( state.phoneState, PhoneStateListener.LISTEN_NONE );
+    }
+    
+    try {
+      unregisterReceiver( state.batteryLevelReceiver );
+    }
+    catch ( final IllegalArgumentException ex ) {
+      info( "batteryLevelReceiver not registered: " + ex );
+    }
+    
+    if ( state.tts != null ) {
+      if ( ! isMuted() ) {
+        // give time for the above "done" to be said
+        sleep( 250 );
+      }
+      state.tts.shutdown();
+    }
+    
+    if ( ListActivity.DEBUG ) {
+      Debug.stopMethodTracing();
+    }
+  
+    // clean up.
+    if ( state.soundPop != null ) {
+      state.soundPop.release();
+    }
+    if ( state.soundNewPop != null ) {
+      state.soundNewPop.release();
+    }
+    
+    super.finish();
+  }
 }

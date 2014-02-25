@@ -16,11 +16,13 @@ import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +32,7 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataActivity extends ActionBarActivity implements FileUploaderListener {
+public final class DataActivity extends Fragment implements FileUploaderListener {
   
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
@@ -41,21 +43,27 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
   public void onCreate( final Bundle savedInstanceState) {
       super.onCreate( savedInstanceState );
       // set language
-      MainActivity.setLocale( this );
-      setContentView( R.layout.data );
+      MainActivity.setLocale( getActivity() );
       
       // force media volume controls
-      this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
-      
-      setupQueryButtons();
-      setupCsvButtons();
-      setupKmlButtons();
-      setupBackupDbButton();
-      setupImportObservedButton();
+      getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
   }  
   
-  private void setupQueryButtons() {
-    Button button = (Button) findViewById( R.id.search_button );
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    final View view = inflater.inflate(R.layout.data, container, false);
+    
+    setupQueryButtons( view );
+    setupCsvButtons( view );
+    setupKmlButtons( view );
+    setupBackupDbButton( view );
+    setupImportObservedButton( view );
+    
+    return view;
+  }
+  
+  private void setupQueryButtons( final View view ) {
+    Button button = (Button) view.findViewById( R.id.search_button );
     button.setOnClickListener(new OnClickListener() {
       public void onClick( final View view ) {
         final QueryArgs queryArgs = new QueryArgs();
@@ -68,7 +76,7 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
             break;
           }
           
-          final EditText editText = (EditText) findViewById( id );
+          final EditText editText = (EditText) view.findViewById( id );
           final String text = editText.getText().toString().trim();
           if ( "".equals(text) ) {
             continue;
@@ -78,7 +86,7 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
             switch( id ) {
               case R.id.query_address:
                 field = getString(R.string.address);
-                Geocoder gc = new Geocoder(DataActivity.this);
+                Geocoder gc = new Geocoder(getActivity());
                 List<Address> addresses = gc.getFromLocationName(text, 1);
                 if ( addresses.size() < 1 ) {
                   fail = getString(R.string.no_address_found);
@@ -113,22 +121,22 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
         
         if ( fail != null ) {
           // toast!
-          Toast.makeText( DataActivity.this, fail, Toast.LENGTH_SHORT ).show();
+          Toast.makeText( getActivity(), fail, Toast.LENGTH_SHORT ).show();
         }
         else {
           ListActivity.lameStatic.queryArgs = queryArgs;
           // start db result activity
-          final Intent settingsIntent = new Intent( DataActivity.this, DBResultActivity.class );
+          final Intent settingsIntent = new Intent( getActivity(), DBResultActivity.class );
           startActivity( settingsIntent );
         }
       }
     });
     
-    button = (Button) findViewById( R.id.reset_button );
+    button = (Button) view.findViewById( R.id.reset_button );
     button.setOnClickListener(new OnClickListener() {
       public void onClick( final View view ) {
         for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid } ) {        
-          final EditText editText = (EditText) findViewById( id );
+          final EditText editText = (EditText) view.findViewById( id );
           editText.setText("");
         }
       }
@@ -143,18 +151,18 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
     // nothing
   }
   
-  private void setupCsvButtons() {
+  private void setupCsvButtons( final View view ) {
     // actually need this Activity context, for dialogs
     
-    final Button csvRunExportButton = (Button) findViewById( R.id.csv_run_export_button );
+    final Button csvRunExportButton = (Button) view.findViewById( R.id.csv_run_export_button );
     csvRunExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_export_csv), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
+            FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(), 
                 ListActivity.lameStatic.dbHelper, DataActivity.this, true );
             fileUploaderTask.setWriteRunOnly();
             fileUploaderTask.start();
@@ -163,15 +171,15 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
       }
     });
     
-    final Button csvExportButton = (Button) findViewById( R.id.csv_export_button );
+    final Button csvExportButton = (Button) view.findViewById( R.id.csv_export_button );
     csvExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_export_csv_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            FileUploaderTask fileUploaderTask = new FileUploaderTask( DataActivity.this, 
+            FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(), 
                 ListActivity.lameStatic.dbHelper, DataActivity.this, true );
             fileUploaderTask.setWriteWholeDb();
             fileUploaderTask.start();
@@ -181,16 +189,16 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
     });
   }
   
-  private void setupKmlButtons() {
-    final Button kmlRunExportButton = (Button) findViewById( R.id.kml_run_export_button );
+  private void setupKmlButtons( final View view ) {
+    final Button kmlRunExportButton = (Button) view.findViewById( R.id.kml_run_export_button );
     kmlRunExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_export_kml_run), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper, 
+            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListActivity.lameStatic.dbHelper, 
                 ListActivity.lameStatic.runNetworks );
             kmlWriter.start();
           }
@@ -198,15 +206,15 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
       }
     });
     
-    final Button kmlExportButton = (Button) findViewById( R.id.kml_export_button );
+    final Button kmlExportButton = (Button) view.findViewById( R.id.kml_export_button );
     kmlExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_export_kml_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( DataActivity.this, ListActivity.lameStatic.dbHelper );
+            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListActivity.lameStatic.dbHelper );
             kmlWriter.start();
           }
         } );
@@ -214,20 +222,20 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
     });    
   }
   
-  private void setupBackupDbButton() {
-    final Button kmlExportButton = (Button) findViewById( R.id.backup_db_button );
+  private void setupBackupDbButton( final View view ) {
+    final Button kmlExportButton = (Button) view.findViewById( R.id.backup_db_button );
     if ( ! ListActivity.hasSD() ) {
       kmlExportButton.setEnabled(false);
     }
     
     kmlExportButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_backup_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            BackupTask task = new BackupTask(DataActivity.this, MainActivity.getListActivity(DataActivity.this));
+            BackupTask task = new BackupTask(getActivity(), MainActivity.getListActivity(getActivity()));
             task.execute();
           }
         } );
@@ -235,21 +243,21 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
     });  
   }
   
-  private void setupImportObservedButton() {
-    final Button importObservedButton = (Button) findViewById( R.id.import_observed_button );
+  private void setupImportObservedButton( final View view ) {
+    final Button importObservedButton = (Button) view.findViewById( R.id.import_observed_button );
     
     importObservedButton.setOnClickListener( new OnClickListener() {
       public void onClick( final View buttonView ) {  
-        MainActivity.createConfirmation( DataActivity.this, 
+        MainActivity.createConfirmation( getActivity(), 
             DataActivity.this.getString(R.string.data_import_observed), new Doer() {
           @Override
           public void execute() {
-            final ListActivity listActivity = MainActivity.getListActivity(DataActivity.this);
+            final ListActivity listActivity = MainActivity.getListActivity(getActivity());
             if ( listActivity != null ) {
               listActivity.setTransferring();
             }
             // actually need this Activity context, for dialogs
-            HttpDownloader task = new HttpDownloader(DataActivity.this, ListActivity.lameStatic.dbHelper,
+            HttpDownloader task = new HttpDownloader(getActivity(), ListActivity.lameStatic.dbHelper,
                 new FileUploaderListener() {
               public void transferComplete() {
                 if ( listActivity != null ) {
@@ -328,50 +336,51 @@ public final class DataActivity extends ActionBarActivity implements FileUploade
     ListActivity.info( "resume data." );    
     super.onResume();
   }
-   
-  /* Creates the menu items */
-  @Override
-  public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-              
-      item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
-      item.setIcon( android.R.drawable.ic_menu_report_image );
-      
-      item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
-      item.setIcon( android.R.drawable.ic_menu_preferences );      
-      
-      return true;
-  }
+//  XXX 
+//  /* Creates the menu items */
+//  @Override
+//  public boolean onCreateOptionsMenu( final Menu menu ) {
+//      MenuItem item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
+//      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+//              
+//      item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
+//      item.setIcon( android.R.drawable.ic_menu_report_image );
+//      
+//      item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
+//      item.setIcon( android.R.drawable.ic_menu_preferences );      
+//      
+//      return true;
+//  }
 
   /* Handles item selections */
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT:
-          MainActivity.finishListActivity( this );
-          finish();
+          MainActivity.finishListActivity( getActivity() );
+//          finish(); XXX
           return true;
         case MENU_SETTINGS:
-          final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+          final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );
           startActivity( settingsIntent );
           break;
         case MENU_ERROR_REPORT:
-          final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
+          final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
           startActivity( errorReportIntent );
           break;
       }
       return false;
   }
   
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_BACK) {
-      ListActivity.info( "onKeyDown: not quitting app on back" );
-      MainActivity.switchTab( this, MainActivity.TAB_LIST );
-      return true;
-    }
-    return super.onKeyDown(keyCode, event);
-  }
+  // XXX
+//  @Override
+//  public boolean onKeyDown(int keyCode, KeyEvent event) {
+//    if (keyCode == KeyEvent.KEYCODE_BACK) {
+//      ListActivity.info( "onKeyDown: not quitting app on back" );
+//      MainActivity.switchTab( this, MainActivity.TAB_LIST );
+//      return true;
+//    }
+//    return super.onKeyDown(keyCode, event);
+//  }
   
 }

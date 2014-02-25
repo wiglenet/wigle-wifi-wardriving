@@ -34,7 +34,6 @@ import net.wigle.wigleandroid.listener.WifiReceiver;
 import org.osmdroid.util.GeoPoint;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -61,25 +60,23 @@ import android.os.Debug;
 import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.Fragment;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public final class ListActivity extends ActionBarActivity implements FileUploaderListener {
+public final class ListActivity extends Fragment implements FileUploaderListener {
     // *** state that is retained ***
     private static class State {
       private DatabaseHelper dbHelper;
@@ -232,20 +229,43 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         }
     };
     
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//      final Context contextThemeWrapper = new ContextThemeWrapper(getActivity(), R.style.Theme_AppCompat);
+//      final LayoutInflater localInflater = inflater.cloneInContext(contextThemeWrapper);
+      final View view = inflater.inflate(R.layout.list, container, false);
+      
+      info( "setupUploadButton" );
+      setupUploadButton( view );
+      info( "setupList" );
+      setupList( view );
+      info( "setupWifi" );
+      setupWifi(); // must be after setupList for wifireceiver
+      info( "setupSound" );
+      setupSound( view );
+      info( "setNetCountUI" );
+      setNetCountUI( view );
+      info( "setStatusUI" );
+      setStatusUI( view, (String) null );
+      info( "setupLocation" );
+      setupLocation( view );      
+      
+      return view;
+    }
+    
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         // set language
-        MainActivity.setLocale( this );
-        setContentView( R.layout.list );
-        
+        MainActivity.setLocale( this.getActivity() );
+
         if ( DEBUG ) {
           Debug.startMethodTracing("wigle");
         }
         
         // set ourselves for later finishing by other activities
-        MainActivity main = MainActivity.getMainActivity( this );
+        MainActivity main = MainActivity.getMainActivity( this.getActivity() );
         if ( main != null ) {
           main.setListActivity( this );
         }
@@ -254,13 +274,13 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
         if ( ! (origHandler instanceof WigleUncaughtExceptionHandler) ) {
           Thread.setDefaultUncaughtExceptionHandler( 
-              new WigleUncaughtExceptionHandler( this.getApplicationContext(), origHandler ) ); 
+              new WigleUncaughtExceptionHandler( this.getActivity().getApplicationContext(), origHandler ) ); 
         }
         
         // test the error reporting
         // if( true ){ throw new RuntimeException( "weee" ); }
-        
-        final Object stored = getLastNonConfigurationInstance();
+
+        final Object stored = this.getActivity().getLastNonConfigurationInstance();
         if ( stored != null && stored instanceof State ) {
           // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
           state = (State) stored;
@@ -269,7 +289,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
           state.gpsListener.setListActivity( this );
           state.wifiReceiver.setListActivity( this );
           if ( state.fileUploaderTask != null ) {
-            state.fileUploaderTask.setContext( this );
+            state.fileUploaderTask.setContext( this.getActivity() );
           }
         }
         else {
@@ -278,7 +298,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
           state.transferring = new AtomicBoolean( false );
           
           // new run, reset
-          final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+          final SharedPreferences prefs = this.getActivity().getSharedPreferences( SHARED_PREFS, 0 );
           final float prevRun = prefs.getFloat( PREF_DISTANCE_RUN, 0f );
           Editor edit = prefs.edit();
           edit.putFloat( PREF_DISTANCE_RUN, 0f );
@@ -286,7 +306,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
           edit.commit();
         }
         
-        final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
+        final String id = Settings.Secure.getString( getActivity().getContentResolver(), Settings.Secure.ANDROID_ID );
 
         // DO NOT turn these into |=, they will cause older dalvik verifiers to freak out
         state.inEmulator = id == null;
@@ -321,42 +341,28 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         setupService();
         info( "setupDatabase" );
         setupDatabase();
-        info( "setupUploadButton" );
-        setupUploadButton();
-        info( "setupList" );
-        setupList();
-        info( "setupSound" );
-        setupSound();
-        info( "setupWifi" );
-        setupWifi();
-        info( "setupLocation" );
-        setupLocation();
         info( "setupBattery" );
         setupBattery();
-        info( "setNetCountUI" );
-        setNetCountUI();
-        info( "setStatusUI" );
-        setStatusUI( (String) null );
         info( "setup complete" );
     }
     
-    public void setNetCountUI() {
-      TextView tv = (TextView) findViewById( R.id.stats_run );
+    public void setNetCountUI( final View view ) {
+      TextView tv = (TextView) view.findViewById( R.id.stats_run );
       tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
-      tv = (TextView) findViewById( R.id.stats_new );
+      tv = (TextView) view.findViewById( R.id.stats_new );
       tv.setText( getString(R.string.new_word) + ": " + state.dbHelper.getNewNetworkCount() );
-      tv = (TextView) findViewById( R.id.stats_dbnets );
+      tv = (TextView) view.findViewById( R.id.stats_dbnets );
       tv.setText( getString(R.string.db) + ": " + state.dbHelper.getNetworkCount() );
     }
     
-    public void setStatusUI( String status ) {
+    public void setStatusUI( final View view, String status ) {
       if ( status == null ) {
         status = previousStatus;
       }
       if ( status != null ) {
         // keep around a previous, for orientation changes
         previousStatus = status;
-        final TextView tv = (TextView) findViewById( R.id.status );
+        final TextView tv = (TextView) view.findViewById( R.id.status );
         tv.setText( status );
       }
     }
@@ -390,7 +396,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
     }
     
     public boolean isScanning() {
-      return isScanning(this);
+      return isScanning(getActivity());
     }
     
     public static boolean isScanning(final Context context) {
@@ -461,23 +467,23 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       super.onStop();
     }
 
-    @Override
-    public void onRestart() {
-      info( "LIST: restart. networks: " + state.wifiReceiver.getRunNetworkCount() );
-      super.onRestart();
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//      if (keyCode == KeyEvent.KEYCODE_BACK) {
+//        info( "onKeyDown: treating back like home, not quitting app" );
+//        moveTaskToBack(true);
+//        if ( getParent() != null ) {
+//          getParent().moveTaskToBack( true );
+//        }
+//        return true;
+//      }
+//      return super.onKeyDown(keyCode, event);
+//    }
     
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-      if (keyCode == KeyEvent.KEYCODE_BACK) {
-        info( "onKeyDown: treating back like home, not quitting app" );
-        moveTaskToBack(true);
-        if ( getParent() != null ) {
-          getParent().moveTaskToBack( true );
-        }
-        return true;
-      }
-      return super.onKeyDown(keyCode, event);
+    public void onDestroyView() {
+      info( "LIST: onDestroyView. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      super.onDestroyView();
     }
     
     @Override
@@ -487,127 +493,133 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
     }
     
     @Override
-    public void finish() {
-      info( "LIST: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
-      
-      final boolean wasFinishing = state.finishing.getAndSet( true );
-      if ( wasFinishing ) {
-        info( "LIST: finish called twice!" );
-      }
-
-      // save our location for later runs
-      state.gpsListener.saveLocation();
-      
-      // close the db. not in destroy, because it'll still write after that.
-      state.dbHelper.close();
-      
-      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-      if ( state.gpsListener != null ) {
-        locationManager.removeGpsStatusListener( state.gpsListener );
-        locationManager.removeUpdates( state.gpsListener );
-      }
-      
-      try {
-        this.unregisterReceiver( state.wifiReceiver );
-      }
-      catch ( final IllegalArgumentException ex ) {
-        info( "wifiReceiver not registered: " + ex );
-      }
-
-      // stop the service, so when we die it's both stopped and unbound and will die
-      final Intent serviceIntent = new Intent( this, WigleService.class );
-      this.stopService( serviceIntent );
-      try {
-        // have to use the app context to bind to the service, cuz we're in tabs
-        getApplicationContext().unbindService( state.serviceConnection );
-      }
-      catch ( final IllegalArgumentException ex ) {
-        info( "serviceConnection not registered: " + ex, ex );
-      }    
-      
-      // release the lock before turning wifi off
-      if ( state.wifiLock != null && state.wifiLock.isHeld() ) {
-        try {
-          state.wifiLock.release();
-        }
-        catch ( Exception ex ) {
-          error( "exception releasing wifi lock: " + ex, ex );
-        }
-      }
-      
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
-      final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
-      // don't call on emulator, it crashes it
-      if ( wifiWasOff && ! state.inEmulator ) {
-        // tell user, cuz this takes a little while
-        Toast.makeText( this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT ).show();
-        
-        // well turn it of now that we're done
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        info( "turning back off wifi" );
-        try {
-          wifiManager.setWifiEnabled( false );
-        }
-        catch ( Exception ex ) {
-          error("exception turning wifi back off: " + ex, ex);
-        }
-      }
-      
-      TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
-      if ( tele != null && state.phoneState != null ) {
-        tele.listen( state.phoneState, PhoneStateListener.LISTEN_NONE );
-      }
-      
-      if ( state.tts != null ) {
-        if ( ! isMuted() ) {
-          // give time for the above "done" to be said
-          sleep( 250 );
-        }
-        state.tts.shutdown();
-      }
-      
-      
-      if ( DEBUG ) {
-        Debug.stopMethodTracing();
-      }
-
-      // clean up.
-      if ( state.soundPop != null ) {
-        state.soundPop.release();
-      }
-      if ( state.soundNewPop != null ) {
-        state.soundNewPop.release();
-      }
-      
-      super.finish();
+    public void onDetach() {
+      info( "LIST: onDestroyView. networks: " + state.wifiReceiver.getRunNetworkCount() );
+      super.onDestroyView();
     }
     
+//    @Override
+//    public void finish() {
+//      info( "LIST: finish. networks: " + state.wifiReceiver.getRunNetworkCount() );
+//      
+//      final boolean wasFinishing = state.finishing.getAndSet( true );
+//      if ( wasFinishing ) {
+//        info( "LIST: finish called twice!" );
+//      }
+//
+//      // save our location for later runs
+//      state.gpsListener.saveLocation();
+//      
+//      // close the db. not in destroy, because it'll still write after that.
+//      state.dbHelper.close();
+//      
+//      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+//      if ( state.gpsListener != null ) {
+//        locationManager.removeGpsStatusListener( state.gpsListener );
+//        locationManager.removeUpdates( state.gpsListener );
+//      }
+//      
+//      try {
+//        getActivity().unregisterReceiver( state.wifiReceiver );
+//      }
+//      catch ( final IllegalArgumentException ex ) {
+//        info( "wifiReceiver not registered: " + ex );
+//      }
+//
+//      // stop the service, so when we die it's both stopped and unbound and will die
+//      final Intent serviceIntent = new Intent( this.getActivity(), WigleService.class );
+//      this.getActivity().stopService( serviceIntent );
+//      try {
+//        // have to use the app context to bind to the service, cuz we're in tabs
+//        getActivity().getApplicationContext().unbindService( state.serviceConnection );
+//      }
+//      catch ( final IllegalArgumentException ex ) {
+//        info( "serviceConnection not registered: " + ex, ex );
+//      }    
+//      
+//      // release the lock before turning wifi off
+//      if ( state.wifiLock != null && state.wifiLock.isHeld() ) {
+//        try {
+//          state.wifiLock.release();
+//        }
+//        catch ( Exception ex ) {
+//          error( "exception releasing wifi lock: " + ex, ex );
+//        }
+//      }
+//      
+//      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+//      final boolean wifiWasOff = prefs.getBoolean( PREF_WIFI_WAS_OFF, false );
+//      // don't call on emulator, it crashes it
+//      if ( wifiWasOff && ! state.inEmulator ) {
+//        // tell user, cuz this takes a little while
+//        Toast.makeText( this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT ).show();
+//        
+//        // well turn it of now that we're done
+//        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+//        info( "turning back off wifi" );
+//        try {
+//          wifiManager.setWifiEnabled( false );
+//        }
+//        catch ( Exception ex ) {
+//          error("exception turning wifi back off: " + ex, ex);
+//        }
+//      }
+//      
+//      TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
+//      if ( tele != null && state.phoneState != null ) {
+//        tele.listen( state.phoneState, PhoneStateListener.LISTEN_NONE );
+//      }
+//      
+//      if ( state.tts != null ) {
+//        if ( ! isMuted() ) {
+//          // give time for the above "done" to be said
+//          sleep( 250 );
+//        }
+//        state.tts.shutdown();
+//      }
+//      
+//      
+//      if ( DEBUG ) {
+//        Debug.stopMethodTracing();
+//      }
+//
+//      // clean up.
+//      if ( state.soundPop != null ) {
+//        state.soundPop.release();
+//      }
+//      if ( state.soundNewPop != null ) {
+//        state.soundNewPop.release();
+//      }
+//      
+//      super.finish();
+//    }
+    
     /* Creates the menu items */
-    @Override
-    public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
-      item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
-      
-      final String scan = isScanning() ? getString(R.string.off) : getString(R.string.on);
-      item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
-      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
-      
-      final String wake = MainActivity.isScreenLocked( this ) ? 
-          getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
-      item = menu.add(0, MENU_WAKELOCK, 0, wake);
-      item.setIcon( android.R.drawable.ic_menu_gallery );
-      
-      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-      
-      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-      item.setIcon( android.R.drawable.ic_menu_search );
-              
-      item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-      item.setIcon( android.R.drawable.ic_menu_preferences );
-        
-      return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu( final Menu menu ) {
+//      MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
+//      item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+//      
+//      final String scan = isScanning() ? getString(R.string.off) : getString(R.string.on);
+//      item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
+//      item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
+//      
+//      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ? 
+//          getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
+//      item = menu.add(0, MENU_WAKELOCK, 0, wake);
+//      item.setIcon( android.R.drawable.ic_menu_gallery );
+//      
+//      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+//      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+//      
+//      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+//      item.setIcon( android.R.drawable.ic_menu_search );
+//              
+//      item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+//      item.setIcon( android.R.drawable.ic_menu_preferences );
+//        
+//      return true;
+//    }
 
     /* Handles item selections */
     @Override
@@ -615,51 +627,51 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         switch ( item.getItemId() ) {
           case MENU_SETTINGS: {
             info("start settings activity");
-            final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+            final Intent settingsIntent = new Intent( this.getActivity(), SettingsActivity.class );
             startActivity( settingsIntent );
             break;
           }
           case MENU_WAKELOCK: {
-            boolean screenLocked = ! MainActivity.isScreenLocked( this );
-            MainActivity.setLockScreen( this, screenLocked );
+            boolean screenLocked = ! MainActivity.isScreenLocked( this.getActivity() );
+            MainActivity.setLockScreen( this.getActivity(), screenLocked );
             final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
             item.setTitle( wake );
             return true;
           }
           case MENU_SORT: {
             info("sort dialog");
-            showDialog( SORT_DIALOG );
+            getActivity().showDialog( SORT_DIALOG );
             return true;
           }
           case MENU_SCAN: {
             boolean scanning = ! isScanning();
-            final Editor edit = this.getSharedPreferences( SHARED_PREFS, 0 ).edit();
+            final Editor edit = getActivity().getSharedPreferences( SHARED_PREFS, 0 ).edit();
             edit.putBoolean(PREF_SCAN_RUNNING, scanning);
             edit.commit();
             String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
             item.setTitle( name );
             item.setIcon( isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
-            handleScanChange();
+            handleScanChange( getView() );
             return true;
           }
           case MENU_EXIT:
             // call over to finish
-            finish();
+        	getActivity().finish();
             return true;
           case MENU_FILTER:
-            showDialog( SSID_FILTER );
+        	getActivity().showDialog( SSID_FILTER );
             return true;          
         }        
         return false;
     }
     
-    private void handleScanChange() {
+    private void handleScanChange( final View view ) {
       final boolean isScanning = isScanning();
       info("handleScanChange: isScanning now: " + isScanning );
       if ( isScanning ) {
         // turn on location updates
         this.setLocationUpdates(LOCATION_UPDATE_INTERVAL, 0f);
-        setStatusUI( "Scanning Turned On" );
+        setStatusUI( view, "Scanning Turned On" );
         if ( ! state.wifiLock.isHeld() ){
           state.wifiLock.acquire();
         }
@@ -667,7 +679,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       else {
         // turn off location updates
         this.setLocationUpdates(0L, 0f);
-        setStatusUI( "Scanning Turned Off" );
+        setStatusUI( getView(), "Scanning Turned Off" );
         state.gpsListener.handleScanStop();
         if ( state.wifiLock.isHeld() ){
           try {
@@ -681,109 +693,109 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       }
     }
     
-    @Override
-    public Dialog onCreateDialog( int which ) {
-      switch ( which ) {
-        case SSID_FILTER:
-          return MappingActivity.createSsidFilterDialog(this, FILTER_PREF_PREFIX);
-        case SORT_DIALOG:
-          final Dialog dialog = new Dialog( this );
-  
-          dialog.setContentView( R.layout.listdialog );
-          dialog.setTitle( getString(R.string.sort_title) );
-  
-          TextView text = (TextView) dialog.findViewById( R.id.text );
-          text.setText( getString(R.string.sort_spin_label) );
-          
-          final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
-          final Editor editor = prefs.edit();
-          
-          Spinner spinner = (Spinner) dialog.findViewById( R.id.sort_spinner );
-          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-              this, android.R.layout.simple_spinner_item);
-          final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
-              WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
-          final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
-              getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-          int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
-          int periodIndex = 0;
-          for ( int i = 0; i < listSorts.length; i++ ) {
-            adapter.add( listSortName[i] );
-            if ( listSort == listSorts[i] ) {
-              periodIndex = i;
-            }
-          }
-          adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-          spinner.setAdapter( adapter );
-          spinner.setSelection( periodIndex );
-          spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-              // set pref
-              final int listSort = listSorts[position];
-              ListActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
-              editor.putInt( PREF_LIST_SORT, listSort );
-              editor.commit();
-            }
-            public void onNothingSelected( final AdapterView<?> arg0 ) {}
-            });
-          
-          Button ok = (Button) dialog.findViewById( R.id.listdialog_button );
-          ok.setOnClickListener( new OnClickListener() {
-              public void onClick( final View buttonView ) {  
-                try {
-                  dialog.dismiss();
-                }
-                catch ( Exception ex ) {
-                  // guess it wasn't there anyways
-                  info( "exception dismissing sort dialog: " + ex );
-                }
-              }
-            } );
-          
-          return dialog;
-        default:
-          error( "unhandled dialog: " + which );
-      }
-      return null;
-    }
+//    @Override
+//    public Dialog onCreateDialog( int which ) {
+//      switch ( which ) {
+//        case SSID_FILTER:
+//          return MappingActivity.createSsidFilterDialog(this, FILTER_PREF_PREFIX);
+//        case SORT_DIALOG:
+//          final Dialog dialog = new Dialog( this );
+//  
+//          dialog.setContentView( R.layout.listdialog );
+//          dialog.setTitle( getString(R.string.sort_title) );
+//  
+//          TextView text = (TextView) dialog.findViewById( R.id.text );
+//          text.setText( getString(R.string.sort_spin_label) );
+//          
+//          final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
+//          final Editor editor = prefs.edit();
+//          
+//          Spinner spinner = (Spinner) dialog.findViewById( R.id.sort_spinner );
+//          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+//              this, android.R.layout.simple_spinner_item);
+//          final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
+//              WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+//          final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+//              getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
+//          int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+//          int periodIndex = 0;
+//          for ( int i = 0; i < listSorts.length; i++ ) {
+//            adapter.add( listSortName[i] );
+//            if ( listSort == listSorts[i] ) {
+//              periodIndex = i;
+//            }
+//          }
+//          adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+//          spinner.setAdapter( adapter );
+//          spinner.setSelection( periodIndex );
+//          spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+//            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+//              // set pref
+//              final int listSort = listSorts[position];
+//              ListActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+//              editor.putInt( PREF_LIST_SORT, listSort );
+//              editor.commit();
+//            }
+//            public void onNothingSelected( final AdapterView<?> arg0 ) {}
+//            });
+//          
+//          Button ok = (Button) dialog.findViewById( R.id.listdialog_button );
+//          ok.setOnClickListener( new OnClickListener() {
+//              public void onClick( final View buttonView ) {  
+//                try {
+//                  dialog.dismiss();
+//                }
+//                catch ( Exception ex ) {
+//                  // guess it wasn't there anyways
+//                  info( "exception dismissing sort dialog: " + ex );
+//                }
+//              }
+//            } );
+//          
+//          return dialog;
+//        default:
+//          error( "unhandled dialog: " + which );
+//      }
+//      return null;
+//    }
 
     // why is this even here? this is retarded. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
       info( "LIST: on config change" );
-      MainActivity.setLocale( this, newConfig);
+      MainActivity.setLocale( this.getActivity(), newConfig);
       super.onConfigurationChanged( newConfig );
-      setContentView( R.layout.list );      
+      getActivity().setContentView( R.layout.list );      
       
       // have to redo linkages/listeners
-      setupUploadButton();
-      setupMuteButton();
-      setupList();
+      setupUploadButton( getView() );
+      setupMuteButton( getView() );
+      setupList( getView() );
       state.wifiReceiver.setListAdapter( listAdapter );
-      setNetCountUI();
-      setLocationUI();
-      setStatusUI( previousStatus );
+      setNetCountUI( getView() );
+      setLocationUI( getView() );
+      setStatusUI( getView(), previousStatus );
     }
     
     private void setupDatabase() {
       // could be set by nonconfig retain
       if ( state.dbHelper == null ) {
-        state.dbHelper = new DatabaseHelper( this.getApplicationContext() );
+        state.dbHelper = new DatabaseHelper( getActivity().getApplicationContext() );
         //state.dbHelper.checkDB();
         state.dbHelper.start();
         lameStatic.dbHelper = state.dbHelper;
       }      
     }
     
-    private void setupList() {
+    private void setupList( final View view ) {
       // not set by nonconfig retain
-      listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
-      setupListAdapter( this, listAdapter, R.id.ListView01 );
+      listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+      setupListAdapter( view, this.getActivity(), listAdapter, R.id.ListView01 );
     }
      
-    public static void setupListAdapter( final Activity activity, final NetworkListAdapter listAdapter, final int id) {
-      final ListView listView = (ListView) activity.findViewById( id );
+    public static void setupListAdapter( final View view, final Activity activity, final NetworkListAdapter listAdapter, final int id) {
+      final ListView listView = (ListView) view.findViewById( id );
       listView.setAdapter( listAdapter ); 
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
         public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
@@ -798,22 +810,22 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
     
     private void setupWifi() {
       // warn about turning off network notification
-      final String notifOn = Settings.Secure.getString(getContentResolver(), 
+      final String notifOn = Settings.Secure.getString(getActivity().getContentResolver(), 
           Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
       if ( notifOn != null && "1".equals( notifOn ) && state.wifiReceiver == null ) {
-        Toast.makeText( this, getString(R.string.best_results), 
+        Toast.makeText( this.getActivity(), getString(R.string.best_results), 
             Toast.LENGTH_LONG ).show();
       }
     
-      final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-      final SharedPreferences prefs = this.getSharedPreferences( SHARED_PREFS, 0 );
+      final WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+      final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
       
       // keep track of for later
       boolean turnedWifiOn = false;
       if ( ! wifiManager.isWifiEnabled() ) {
         // tell user, cuz this takes a little while
-        Toast.makeText( this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG ).show();
+        Toast.makeText( this.getActivity(), getString(R.string.turn_on_wifi), Toast.LENGTH_LONG ).show();
         
         // save so we can turn it back off when we exit  
         edit.putBoolean( PREF_WIFI_WAS_OFF, true );
@@ -842,7 +854,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         info( "register BroadcastReceiver");
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction( WifiManager.SCAN_RESULTS_AVAILABLE_ACTION );
-        this.registerReceiver( state.wifiReceiver, intentFilter );
+        getActivity().registerReceiver( state.wifiReceiver, intentFilter );
       }
       // always set our current list adapter
       state.wifiReceiver.setListAdapter( listAdapter );
@@ -863,7 +875,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       if ( state.batteryLevelReceiver == null ) {
         state.batteryLevelReceiver = new BatteryLevelReceiver();
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(state.batteryLevelReceiver, batteryLevelFilter);
+        getActivity().registerReceiver(state.batteryLevelReceiver, batteryLevelFilter);
       }
     }
     
@@ -898,20 +910,20 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       }
     }
     
-    private void setupLocation() {
+    private void setupLocation( final View view ) {
       // set on UI if we already have one
-      setLocationUI();
+      setLocationUI( view );
       
-      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
       
       // check if there is a gps
       final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
       if ( locProvider == null ) {
-        Toast.makeText( this, getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
+        Toast.makeText( this.getActivity(), getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
       }
       else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
         // gps exists, but isn't on
-        Toast.makeText( this, getString(R.string.turn_on_gps), Toast.LENGTH_SHORT ).show();
+        Toast.makeText( this.getActivity(), getString(R.string.turn_on_gps), Toast.LENGTH_SHORT ).show();
         final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
         try {
           startActivity(myIntent);
@@ -928,12 +940,12 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
 
       if ( state.gpsListener == null ) {
         // force a listener to be created
-        handleScanChange();
+        handleScanChange( view );
       }
     }
     
     public long getLocationSetPeriod() {
-      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL);
       long setPeriod = prefPeriod;
       if (setPeriod == 0 ){
@@ -952,7 +964,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
      * an updateIntervalMillis of <= 0 will not register for updates. 
      */
     public void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
-      final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
       
       if ( state.gpsListener != null ) {
         // remove any old requests
@@ -965,7 +977,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       state.gpsListener.setMapListener(MappingActivity.STATIC_LOCATION_LISTENER);
       locationManager.addGpsStatusListener( state.gpsListener );      
       
-      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean useNetworkLoc = prefs.getBoolean(ListActivity.PREF_USE_NETWORK_LOC, false);
 
       final List<String> providers = locationManager.getAllProviders();
@@ -984,18 +996,18 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       }
     }
     
-    public void setLocationUI() {
+    public void setLocationUI( final View view ) {
       if ( state.gpsListener == null ) {
         return;
       }
       
       try {       
-        TextView tv = (TextView) this.findViewById( R.id.LocationTextView06 );
+        TextView tv = (TextView) view.findViewById( R.id.LocationTextView06 );
         tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
         
         final Location location = state.gpsListener.getLocation();
         
-        tv = (TextView) this.findViewById( R.id.LocationTextView01 );
+        tv = (TextView) view.findViewById( R.id.LocationTextView01 );
         String latText = "";
         if ( location == null ) {
           if ( isScanning() ) {
@@ -1010,24 +1022,24 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         }
         tv.setText( getString(R.string.list_short_lat) + " " + latText );
         
-        tv = (TextView) this.findViewById( R.id.LocationTextView02 );
+        tv = (TextView) view.findViewById( R.id.LocationTextView02 );
         tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
         
-        tv = (TextView) this.findViewById( R.id.LocationTextView03 );
-        tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, this, location.getSpeed()) ) );
+        tv = (TextView) view.findViewById( R.id.LocationTextView03 );
+        tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, getActivity(), location.getSpeed()) ) );
         
-        TextView tv4 = (TextView) this.findViewById( R.id.LocationTextView04 );
-        TextView tv5 = (TextView) this.findViewById( R.id.LocationTextView05 );
+        TextView tv4 = (TextView) view.findViewById( R.id.LocationTextView04 );
+        TextView tv5 = (TextView) view.findViewById( R.id.LocationTextView05 );
         if ( location == null ) {
           tv4.setText( "" );
           tv5.setText( "" );
         }
         else {
           String distString = DashboardActivity.metersToString( 
-              state.numberFormat0, this, location.getAccuracy(), true );
+              state.numberFormat0, getActivity(), location.getAccuracy(), true );
           tv4.setText( "+/- " + distString );
           distString = DashboardActivity.metersToString( 
-              state.numberFormat0, this, (float) location.getAltitude(), true );
+              state.numberFormat0, getActivity(), (float) location.getAltitude(), true );
           tv5.setText( getString(R.string.list_short_alt) + " " + distString );
         }
       }
@@ -1053,15 +1065,15 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       return retval;
     }
     
-    private void setupUploadButton() {
-      final Button button = (Button) findViewById( R.id.upload_button );
+    private void setupUploadButton( final View view ) {
+      final Button button = (Button) view.findViewById( R.id.upload_button );
       button.setOnClickListener( new OnClickListener() { 
           public void onClick( final View view ) {
-            final MainActivity main = MainActivity.getMainActivity( ListActivity.this );
+            final MainActivity main = MainActivity.getMainActivity( getActivity() );
             final SharedPreferences prefs = main.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
             final String username = prefs.getString( ListActivity.PREF_USERNAME, "anonymous" );
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-            MainActivity.createConfirmation( ListActivity.this, text, new Doer() {
+            MainActivity.createConfirmation( getActivity(), text, new Doer() {
               @Override
               public void execute() {                
                 setTransferring();
@@ -1075,8 +1087,8 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
     private void setupService() {
       // could be set by nonconfig retain
       if ( state.serviceConnection == null ) {        
-        final Intent serviceIntent = new Intent( this.getApplicationContext(), WigleService.class );
-        final ComponentName compName = startService( serviceIntent );
+        final Intent serviceIntent = new Intent( getActivity().getApplicationContext(), WigleService.class );
+        final ComponentName compName = getActivity().startService( serviceIntent );
         if ( compName == null ) {
           error( "startService() failed!" );
         }
@@ -1096,12 +1108,12 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         int flags = 0;
         // have to use the app context to bind to the service, cuz we're in tabs
         // http://code.google.com/p/android/issues/detail?id=2483#c2
-        final boolean bound = getApplicationContext().bindService( serviceIntent, state.serviceConnection, flags );
+        final boolean bound = getActivity().getApplicationContext().bindService( serviceIntent, state.serviceConnection, flags );
         info( "service bound: " + bound );        
       }
     }
     
-    private void setupSound() {
+    private void setupSound( final View view ) {
       // could have been retained
       if ( state.soundPop == null ) {
         state.soundPop = createMediaPlayer( R.raw.pop );
@@ -1111,7 +1123,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
       }
 
       // make volume change "media"
-      this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
+      getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
 
       try {
         if ( TTS.hasTTS() ) {
@@ -1120,10 +1132,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
             state.tts.shutdown();
           }
           // this has to have the parent activity, for whatever wacky reasons
-          Activity context = this.getParent();
-          if ( context == null ) {
-            context = this;
-          }
+          Activity context = getActivity();
           state.tts = new TTS( context );        
         }
       }
@@ -1131,7 +1140,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         error( "exception setting TTS: " + ex, ex);
       }
       
-      TelephonyManager tele = (TelephonyManager) getSystemService( TELEPHONY_SERVICE );
+      TelephonyManager tele = (TelephonyManager) getActivity().getSystemService( Context.TELEPHONY_SERVICE );
       if ( tele != null && state.phoneState == null ) {
         state.phoneState = PhoneStateFactory.createPhoneState();
         final int signal_strengths = 256;
@@ -1144,12 +1153,12 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         }
       }
       
-      setupMuteButton();
+      setupMuteButton( view );
     }
      
-    private void setupMuteButton() {
-      final Button mute = (Button) this.findViewById(R.id.mute);
-      final SharedPreferences prefs = this.getSharedPreferences(SHARED_PREFS, 0);
+    private void setupMuteButton( final View view ) {
+      final Button mute = (Button) view.findViewById(R.id.mute);
+      final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);
       mute.setText(getString(muted ? R.string.play : R.string.mute));
       
@@ -1178,7 +1187,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
      * @return the mediaplayer for soundId or null if it could not be created.
      */
     private MediaPlayer createMediaPlayer( final int soundId ) {
-      final MediaPlayer sound = createMp( this.getApplicationContext(), soundId );
+      final MediaPlayer sound = createMp( getActivity().getApplicationContext(), soundId );
       if ( sound == null ) {
         info( "sound null from media player" );
         return null;
@@ -1306,7 +1315,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
         // always be quiet when the phone is active
         return true;
       }
-      boolean retval = this.getSharedPreferences(SHARED_PREFS, 0).getBoolean(PREF_MUTED, false);
+      boolean retval = getActivity().getSharedPreferences(SHARED_PREFS, 0).getBoolean(PREF_MUTED, false);
       // info( "ismuted: " + retval );
       return retval;
     }
@@ -1314,7 +1323,7 @@ public final class ListActivity extends ActionBarActivity implements FileUploade
     private void uploadFile( final DatabaseHelper dbHelper ){
       info( "upload file" );
       // actually need this Activity context, for dialogs
-      state.fileUploaderTask = new FileUploaderTask( this, dbHelper, this, false );
+      state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
       state.fileUploaderTask.start();
     }
     

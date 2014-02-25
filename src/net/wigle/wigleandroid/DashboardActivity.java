@@ -12,13 +12,15 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
-import android.view.KeyEvent;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class DashboardActivity extends ActionBarActivity {
+public class DashboardActivity extends Fragment {
   private Handler timer;
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
@@ -31,11 +33,10 @@ public class DashboardActivity extends ActionBarActivity {
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
     // set language
-    MainActivity.setLocale( this );
-    setContentView( R.layout.dash );
+    MainActivity.setLocale( getActivity() );
     
     // media volume
-    this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
+    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
     
     finishing = new AtomicBoolean( false );
     numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -46,6 +47,13 @@ public class DashboardActivity extends ActionBarActivity {
     setupTimer();
   }
   
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    final View view = inflater.inflate(R.layout.dash, container, false);
+    
+    return view;
+  }
+  
   private void setupTimer() {
     if ( timer == null ) {
       timer = new Handler();
@@ -53,7 +61,10 @@ public class DashboardActivity extends ActionBarActivity {
         public void run() {              
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
-              updateUI();
+              final View view = getView();
+              if (view != null) {
+                updateUI( view );
+              }
               
               final long period = 1000L;
               // info("wifitimer: " + period );
@@ -69,37 +80,37 @@ public class DashboardActivity extends ActionBarActivity {
     }
   }
   
-  private void updateUI() {
-    TextView tv = (TextView) findViewById( R.id.runnets );
+  private void updateUI( final View view ) {
+    TextView tv = (TextView) view.findViewById( R.id.runnets );
     tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.run));
     
-    tv = (TextView) findViewById( R.id.newwifi );
-    final String scanning = ListActivity.isScanning(this) ? "" : getString(R.string.dash_scan_off) + "\n"; 
+    tv = (TextView) view.findViewById( R.id.newwifi );
+    final String scanning = ListActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n"; 
     tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
     
-    tv = (TextView) findViewById( R.id.currnets );
+    tv = (TextView) view.findViewById( R.id.currnets );
     tv.setText( getString(R.string.dash_vis_nets) + " " + ListActivity.lameStatic.currNets );
     
-    tv = (TextView) findViewById( R.id.newNetsSinceUpload );
+    tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
     tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );  
     
-    tv = (TextView) findViewById( R.id.newcells );
+    tv = (TextView) view.findViewById( R.id.newcells );
     tv.setText( getString(R.string.dash_new_cells) + " " + ListActivity.lameStatic.newCells );    
     
-    updateDist( R.id.rundist, ListActivity.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
-    updateDist( R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
-    updateDist( R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
+    updateDist( view, R.id.rundist, ListActivity.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+    updateDist( view, R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
+    updateDist( view, R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
     
-    tv = (TextView) findViewById( R.id.queuesize );
+    tv = (TextView) view.findViewById( R.id.queuesize );
     tv.setText( getString(R.string.dash_db_queue) + " " + ListActivity.lameStatic.preQueueSize );
     
-    tv = (TextView) findViewById( R.id.dbNets );
+    tv = (TextView) view.findViewById( R.id.dbNets );
     tv.setText( getString(R.string.dash_db_nets) + " " + ListActivity.lameStatic.dbNets );
     
-    tv = (TextView) findViewById( R.id.dbLocs );
+    tv = (TextView) view.findViewById( R.id.dbLocs );
     tv.setText( getString(R.string.dash_db_locs) + " " + ListActivity.lameStatic.dbLocs );
         
-    tv = (TextView) findViewById( R.id.gpsstatus );
+    tv = (TextView) view.findViewById( R.id.gpsstatus );
     Location location = ListActivity.lameStatic.location;
     String gpsStatus = getString(R.string.dash_no_loc);
     if ( location != null ) {
@@ -109,7 +120,7 @@ public class DashboardActivity extends ActionBarActivity {
   }
   
   private long newNetsSinceUpload() {
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final long marker = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
     final long uploaded = prefs.getLong( ListActivity.PREF_NETS_UPLOADED, 0L );
     long newSinceUpload = 0;
@@ -125,12 +136,12 @@ public class DashboardActivity extends ActionBarActivity {
     return newSinceUpload;
   }
   
-  private void updateDist( final int id, final String pref, final String title ) {
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+  private void updateDist( final View view, final int id, final String pref, final String title ) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     float dist = prefs.getFloat( pref, 0f );
-    final String distString = metersToString( numberFormat, this, dist, false );
-    final TextView tv = (TextView) findViewById( id );
+    final String distString = metersToString( numberFormat, getActivity(), dist, false );
+    final TextView tv = (TextView) view.findViewById( id );
     tv.setText( title + " " + distString );    
   }
   
@@ -160,13 +171,14 @@ public class DashboardActivity extends ActionBarActivity {
     return retval;
   }
   
-  @Override
-  public void finish() {
-    ListActivity.info( "finish dash." );
-    finishing.set( true );
-    
-    super.finish();
-  }
+  // XXX
+//  @Override
+//  public void finish() {
+//    ListActivity.info( "finish dash." );
+//    finishing.set( true );
+//    
+//    super.finish();
+//  }
   
   @Override
   public void onDestroy() {
@@ -175,42 +187,43 @@ public class DashboardActivity extends ActionBarActivity {
     
     super.onDestroy();
   }
-  
-  /* Creates the menu items */
-  @Override
-  public boolean onCreateOptionsMenu( final Menu menu ) {
-    MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-        
-    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-    item.setIcon( android.R.drawable.ic_menu_preferences );
-    
-    return true;
-  }
+//  XXX
+//  /* Creates the menu items */
+//  @Override
+//  public boolean onCreateOptionsMenu( final Menu menu ) {
+//    MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+//    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+//        
+//    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+//    item.setIcon( android.R.drawable.ic_menu_preferences );
+//    
+//    return true;
+//  }
 
   /* Handles item selections */
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT:
-          MainActivity.finishListActivity( this );
-          finish();
+          MainActivity.finishListActivity( getActivity() );
+//          finish(); XXX
           return true;
         case MENU_SETTINGS:
-          final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+          final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );
           startActivity( settingsIntent );
           break;
       }
       return false;
   }
   
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_BACK) {
-      ListActivity.info( "onKeyDown: not quitting app on back" );
-      MainActivity.switchTab( this, MainActivity.TAB_LIST );
-      return true;
-    }
-    return super.onKeyDown(keyCode, event);
-  }
+  // XXX: onKeyDown
+//  @Override
+//  public boolean onKeyDown(int keyCode, KeyEvent event) {
+//    if (keyCode == KeyEvent.KEYCODE_BACK) {
+//      ListActivity.info( "onKeyDown: not quitting app on back" );
+//      MainActivity.switchTab( getActivity(), MainActivity.TAB_LIST );
+//      return true;
+//    }
+//    return super.onKeyDown(keyCode, event);
+//  }
 }

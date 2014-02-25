@@ -1,27 +1,32 @@
 package net.wigle.wigleandroid;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.app.ActionBarActivity;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.TabHost;
 
-public final class MainActivity extends ActionBarActivity {
+public final class MainActivity extends ActionBarActivity implements TabListener {
   static final String TAB_LIST = "list";
   static final String TAB_MAP = "map";
   static final String TAB_DASH = "dash";
@@ -32,6 +37,7 @@ public final class MainActivity extends ActionBarActivity {
   private ListActivity listActivity;
   private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
+  private List<Fragment> fragList = new ArrayList<Fragment>();
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -46,6 +52,40 @@ public final class MainActivity extends ActionBarActivity {
     }
     
     mainActivity = this;
+    
+    ActionBar bar = getSupportActionBar();
+    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+    
+    final String[] labels = new String[]{
+        "List", "Map", "Dash", "Data"
+    };
+    
+    Fragment list = new ListActivity();
+    Bundle bundle = new Bundle();
+    list.setArguments(bundle);
+    fragList.add(list);
+    
+    Fragment map = new MappingActivity();
+    bundle = new Bundle();
+    map.setArguments(bundle);
+    fragList.add(map);
+    
+    Fragment dash = new DashboardActivity();
+    bundle = new Bundle();
+    dash.setArguments(bundle);
+    fragList.add(dash);
+    
+    Fragment data = new DataActivity();
+    bundle = new Bundle();
+    data.setArguments(bundle);
+    fragList.add(data);
+    
+    for (int i = 0; i <= 3; i++) {
+      Tab tab = bar.newTab();
+      tab.setText(labels[i]);
+      tab.setTabListener(this);
+      bar.addTab(tab);
+    }
     
 //    TabHost tabHost = getTabHost();  // The activity TabHost
 //    TabHost.TabSpec spec;  // Reusable TabSpec for each tab
@@ -91,6 +131,7 @@ public final class MainActivity extends ActionBarActivity {
    */
   static void switchTab( Activity activity, String tab ) {
     final Activity parent = activity.getParent();
+    // XXX: fix
 //    if ( parent != null && parent instanceof TabActivity ) {
 //      ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
 //    }
@@ -113,6 +154,7 @@ public final class MainActivity extends ActionBarActivity {
     return false;
   }
   
+  @SuppressLint("Wakelock")
   private void setLockScreen( boolean lockScreen ) {
     this.screenLocked = lockScreen;
     if ( lockScreen ) {
@@ -203,10 +245,9 @@ public final class MainActivity extends ActionBarActivity {
   }
   
   static MainActivity getMainActivity( Activity activity ) {
-    final Activity parent = activity.getParent();    
-    if ( parent != null && parent instanceof MainActivity ) {
-      return (MainActivity) parent;
-    }
+	if (activity instanceof MainActivity) {
+      return (MainActivity) activity;
+	}
     return null;
   }
   
@@ -252,7 +293,7 @@ public final class MainActivity extends ActionBarActivity {
   
   public void finishListActivity() {
     if ( listActivity != null ) {
-      listActivity.finish();
+//      listActivity.finish();
     }
   }
   
@@ -332,13 +373,12 @@ public final class MainActivity extends ActionBarActivity {
   }
   
   public static void setLocale( final Activity activity ) {
-    final Context context = activity.getBaseContext();
+  final Context context = activity.getBaseContext();
     final Configuration config = context.getResources().getConfiguration();
-    setLocale( activity, config );
+    setLocale( context, config );
   }
   
-  public static void setLocale( final Activity activity, final Configuration config ) {
-    final Context context = activity.getBaseContext();
+  public static void setLocale( final Context context, final Configuration config ) {
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final String lang = prefs.getString( ListActivity.PREF_LANGUAGE, "" );
     final String current = config.locale.getLanguage();
@@ -358,4 +398,25 @@ public final class MainActivity extends ActionBarActivity {
       context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }          
   }
+
+  @Override
+  public void onTabReselected(Tab tab, FragmentTransaction ft) {
+    ListActivity.info("onTabReselected: " + tab.getPosition());
+    Fragment f = fragList.get(tab.getPosition());
+    ft.replace(android.R.id.content, f);
+  }
+  
+  @Override
+  public void onTabSelected(Tab tab, FragmentTransaction ft) {
+    ListActivity.info("onTabSelected: " + tab.getPosition());
+    Fragment f = fragList.get(tab.getPosition());
+    ft.replace(android.R.id.content, f);  
+  }
+
+  @Override
+  public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+    ListActivity.info("onTabUnselected: " + tab.getPosition());
+    ft.remove(fragList.get(tab.getPosition()));
+  }
+
 }

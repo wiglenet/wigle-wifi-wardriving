@@ -69,7 +69,7 @@ public class DBResultActivity extends ActionBarActivity {
   private void setupList() {
     // not set by nonconfig retain
     listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
-    ListActivity.setupListAdapter( this, listAdapter, R.id.dblist );
+// XXX:    ListActivity.setupListAdapter( listActivity.getView(), this, listAdapter, R.id.dblist );
   }
   
   private void setupMap( final IGeoPoint center ) {

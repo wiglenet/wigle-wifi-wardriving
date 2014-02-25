@@ -100,7 +100,8 @@ public class GPSListener implements Listener, LocationListener {
 
   /** newLocation can be null */
   private void updateLocationData( final Location newLocation ) {
-    final LocationManager locationManager = (LocationManager) listActivity.getSystemService(Context.LOCATION_SERVICE);
+    ListActivity.info("listActivity: " + listActivity);
+    final LocationManager locationManager = (LocationManager) listActivity.getActivity().getSystemService(Context.LOCATION_SERVICE);
     // see if we have new data
     gpsStatus = locationManager.getGpsStatus( gpsStatus );
     final int satCount = getSatCount();
@@ -199,8 +200,8 @@ public class GPSListener implements Listener, LocationListener {
 
       final String announce = location == null ? listActivity.getString(R.string.lost_location) 
           : listActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
-      Toast.makeText( listActivity, announce, Toast.LENGTH_SHORT ).show();
-      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      Toast.makeText( listActivity.getActivity(), announce, Toast.LENGTH_SHORT ).show();
+      final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean speechGPS = prefs.getBoolean( ListActivity.PREF_SPEECH_GPS, true );
       if ( speechGPS ) {
         // no quotes or the voice pauses
@@ -217,7 +218,7 @@ public class GPSListener implements Listener, LocationListener {
     }
     
     // update the UI
-    listActivity.setLocationUI();
+    listActivity.setLocationUI( listActivity.getView() );
   }
   
   public void checkLocationOK() {
@@ -283,7 +284,7 @@ public class GPSListener implements Listener, LocationListener {
   public void saveLocation() {
     // save our location for use on later runs
     if ( this.location != null ) {
-      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
       // there is no putDouble
       edit.putFloat( ListActivity.PREF_PREV_LAT, (float) location.getLatitude() );

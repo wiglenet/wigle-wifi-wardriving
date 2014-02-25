@@ -137,7 +137,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final long now = System.currentTimeMillis();
     lastScanResponseTime = now;
     // final long start = now;
-    final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
+    final WifiManager wifiManager = (WifiManager) listActivity.getActivity().getSystemService(Context.WIFI_SERVICE);
     List<ScanResult> results = null;
     try {
       results = wifiManager.getScanResults(); // return can be null!
@@ -147,7 +147,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     
     long nonstopScanRequestTime = Long.MIN_VALUE;
-    final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final long period = getScanPeriod();
     if ( period == 0 ) {
       // treat as "continuous", so request scan in here
@@ -340,7 +340,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final long dbLocs = dbHelper.getLocationCount();
     
     // update stat
-    listActivity.setNetCountUI();
+    listActivity.setNetCountUI( listActivity.getView() );
     
     // set the statics for the map
     ListActivity.lameStatic.runNets = runNetworks.size();
@@ -396,7 +396,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final String status = resultSize + " " + listActivity.getString(R.string.scanned_in) + " " 
         + (now - scanRequestTime) + listActivity.getString(R.string.ms_short) + ". " 
         + listActivity.getString(R.string.dash_db_queue) + " " + preQueueSize;
-    listActivity.setStatusUI( status );
+    listActivity.setStatusUI( listActivity.getView(), status );
     // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
     scanRequestTime = nonstopScanRequestTime;
     
@@ -453,7 +453,7 @@ public class WifiReceiver extends BroadcastReceiver {
   }
   
   public String getNetworkTypeName() {
-    TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
+    TelephonyManager tele = (TelephonyManager) listActivity.getActivity().getSystemService( Context.TELEPHONY_SERVICE );
     if ( tele == null ) {
       return null;
     }
@@ -488,7 +488,7 @@ public class WifiReceiver extends BroadcastReceiver {
   }
   
   private Network recordCellInfo(final Location location) {
-    TelephonyManager tele = (TelephonyManager) listActivity.getSystemService( Context.TELEPHONY_SERVICE );
+    TelephonyManager tele = (TelephonyManager) listActivity.getActivity().getSystemService( Context.TELEPHONY_SERVICE );
     Network network = null;
     if ( tele != null ) {
       /*
@@ -604,7 +604,7 @@ public class WifiReceiver extends BroadcastReceiver {
   }
   
   private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
-    final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     StringBuilder builder = new StringBuilder();
     
     if ( listActivity.getGPSListener().getLocation() == null ) {
@@ -626,7 +626,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_MILES, true ) ) {
       final float dist = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
-      final String distString = DashboardActivity.metersToString( numberFormat1, listActivity, dist, false );
+      final String distString = DashboardActivity.metersToString( numberFormat1, listActivity.getActivity(), dist, false );
       builder.append( listActivity.getString(R.string.tts_from) + " " ).append( distString ).append( ", " );
     }
     if ( prefs.getBoolean( ListActivity.PREF_SPEAK_TIME, true ) ) {
@@ -694,7 +694,7 @@ public class WifiReceiver extends BroadcastReceiver {
   }
   
   public long getScanPeriod() {
-    final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     
     String scanPref = ListActivity.PREF_SCAN_PERIOD;
     long defaultRate = ListActivity.SCAN_DEFAULT;
@@ -725,7 +725,7 @@ public class WifiReceiver extends BroadcastReceiver {
    */
   private boolean doWifiScan() {
     // ListActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
-    final WifiManager wifiManager = (WifiManager) listActivity.getSystemService(Context.WIFI_SERVICE);
+    final WifiManager wifiManager = (WifiManager) listActivity.getActivity().getSystemService(Context.WIFI_SERVICE);
     boolean success = false;
     
     if ( listActivity.isTransferring() ) {
@@ -748,14 +748,14 @@ public class WifiReceiver extends BroadcastReceiver {
       }
       else {
         final long sinceLastScan = now - lastScanResponseTime;
-        final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
         final long resetWifiPeriod = prefs.getLong(
             ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD );
         
         if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
           ListActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
           if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
-            Toast.makeText( listActivity, 
+            Toast.makeText( listActivity.getActivity(), 
                 listActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
             scanInFlight = false;
             try {
@@ -776,9 +776,9 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     else {
       // scanning is off. since we're the only timer, update the UI
-      listActivity.setNetCountUI();
-      listActivity.setLocationUI();
-      listActivity.setStatusUI( "Scanning Turned Off" );
+      listActivity.setNetCountUI( listActivity.getView() );
+      listActivity.setLocationUI( listActivity.getView() );
+      listActivity.setStatusUI( listActivity.getView(), "Scanning Turned Off" );
       // keep the scan times from getting huge
       scanRequestTime = System.currentTimeMillis();
       // reset this
@@ -787,7 +787,7 @@ public class WifiReceiver extends BroadcastReceiver {
     
     // battery kill
     if ( ! listActivity.isTransferring() ) {
-      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = listActivity.getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final long batteryKill = prefs.getLong(
           ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT);
       
@@ -802,9 +802,9 @@ public class WifiReceiver extends BroadcastReceiver {
             && (System.currentTimeMillis() - constructionTime) > 30000L) {
           final String text = listActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
               + listActivity.getString(R.string.battery_postfix);
-          Toast.makeText( listActivity, text, Toast.LENGTH_LONG ).show();
+          Toast.makeText( listActivity.getActivity(), text, Toast.LENGTH_LONG ).show();
           listActivity.speak( "low battery" );
-          listActivity.finish();
+//          listActivity.finish();
         }
       }
     }

@@ -40,6 +40,7 @@ a widget
 heat mapping
 import files, instead of uploading to site and downloading to app
 geofence for "don't record" and/or "do upload"
+set minimum on distance decimal to 2 on dashboard
 
 --- done ---
 * 1.59 (?)

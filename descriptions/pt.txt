@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, exibir redes sem fio, upload para base de dados WiGLE.
+
+Description (4000 characters):
+WiGLE é uma fonte aberta wardriving aplicativo para netstumble, exibição e mapa encontrado redes sem fio e torres de celular em qualquer lugar do mundo, facilmente fazer o upload para o banco de dados WiGLE.net. WiGLE foi iniciado em 2001 e agora tem mais de 125 milhões de redes Wi-Fi em todo o mundo mapeado.
+
+• Competir no ranking mundial WiGLE para a maioria das redes localizadas!
+• Exportar para arquivos CSV no cartão SD (valores separados por vírgula)!
+• Exportar para arquivos KML no cartão SD (para importar para o Google Maps/Earth)!
+• Áudio e text-to-speech alertando!
+• Banco de dados local para rastrear novas redes encontrado!
+• Mapa em tempo real de redes encontradas (OpenStreetMap)!
+• É possível mover aplicativos para o cartão SD!
+• Botão "Silenciar" para desligar todos os sons/discurso imediatamente!
+• GPS Bluetooth suportam através de locais fictícios!
+• Não há anúncios!
+
+Notas de lançamento: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Para Wi-Fi e torres de celular a ser mapeada, você deve esperar para o seu dispositivo para determinar a localização atual, via GPS ou localização de rede.
+No mapa: os círculos são Wi-Fi, praças são torres de celular. As cores claras são redes visto antes, roxas são novos para o banco de dados local.
+Se você tiver problemas para fazer login, ou tem sugestões, envie-nos um e-mail para wigle-admin@wigle.net e teremos todo o gosto em ajudar.
+Necessidades "Lê Estado Telefone", a fim de saber se uma chamada telefônica em curso, para silenciar o áudio (sons e da fala).
+Os arquivos estão disponíveis para ajudar com a tradução humana para idiomas diferentes do inglês. Isto foi principalmente uma tradução mecânica, porque, obviamente, não sei todas as línguas. Você pode ajudar a melhorar as coisas, fazendo pedidos de puxar em:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+ou enviá-los para wigle-admin@wigle.net.
+
+Continue tropeço!

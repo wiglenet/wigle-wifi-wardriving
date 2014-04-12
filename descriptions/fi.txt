@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, näyttö langattomat verkot, lataaminen WiGLE tietokanta.
+
+Description (4000 characters):
+WiGLE on avoimen lähdekoodin Wardriving app netstumble, näyttö ja kartta löytyy langattomia verkkoja ja solun tornit kaikkialla maailmassa, helposti lataamalla WiGLE.net tietokantaan. WiGLE aloitettiin vuonna 2001 ja nyt on yli 125 miljoonaa Wi-Fi-verkot kartoitettu maailmanlaajuisesti.
+
+• Kilpailla maailmanmarkkinoilla WiGLE leaderboard Useimmissa verkoissa paikalla!
+• Vie CSV-tiedostoja SD-kortille (pilkulla erotetut arvot)!
+• Siirrä KML-tiedostoja SD-kortille (tuoda Google Maps/Earth)!
+• Audio ja teksti puheeksi-hälytys!
+• Paikallinen tietokanta seurata uusien verkkojen löytynyt!
+• Reaaliaikainen kartta löytyneistä verkoista (OpenStreetMap)!
+• Voi liikkua sovelluksen SD-kortille!
+• Mykistä-painiketta sulkea kaikki äänet/puhe heti!
+• Bluetooth GPS-tuki kautta tekosijaintien!
+• Ei mainoksia!
+
+Julkaisutiedot: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Wi-Fi ja solujen tornit on kartoitettava, sinun täytyy odottaa laitteen määrittää nykyisen sijainnin kautta GPS tai verkon sijainnista.
+Kartalla: ympyrät ovat Wi-Fi, neliöt ovat solu tornit. Vaaleat värit ovat verkkoja ennen nähnyt, violetti niistä ovat uusia paikalliseen tietokantaan.
+Jos sinulla on ongelmia kirjautumisessa tai on ehdotuksia, lähetä meille sähköpostia osoitteeseen wigle-admin@wigle.net ja me mielellään ulos.
+Tarvitsee "Lukee puhelimen tila", jotta kertoa, jos puhelu on käynnissä, mykistää äänen (ääniä ja puhetta).
+Tiedostot ovat saatavilla apua ihmisen tekemä käännös ei-Englanti kielillä. Tämä oli lähinnä mekaanisen käännös, koska emme tietenkään tiedä kaikkia näitä kieliä. Voit auttaa parantamaan asioita tekemällä vetää pyynnöt:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+tai lähettämällä ne wigle-admin@wigle.net.
+
+Pidä kompastuskivi!

@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, wyświetlanie sieci bezprzewodowych, wgraj do bazy WiGLE.
+
+Description (4000 characters):
+WiGLE jest open source wardriving app netstumble, wyświetlania i mapą znaleziono sieci bezprzewodowych i wież komórkowych na całym świecie, łatwo przesyłając do bazy WiGLE.net. WiGLE został rozpoczęty w 2001 roku i obecnie posiada ponad 125 milionów sieci Wi-Fi odwzorowywane na całym świecie.
+
+• Konkurować na globalnym WiGLE tablicy dla większości sieci zlokalizowanych!
+• Eksport do pliku CSV na karcie SD (w formacie CSV)!
+• Eksport do plików KML na karcie SD (zaimportować do Mapy Google/Earth)!
+• Audio i tekstu na mowę alarmując!
+• Lokalnej bazy danych do śledzenia nowych sieci znaleźć!
+• Na mapie w czasie rzeczywistym sieci znalezione (OpenStreetMap)!
+• Może przenieść aplikację na kartę SD!
+• Przycisk "Wyciszenie", aby natychmiast wyłączyć wszystkie dźwięku/mowy!
+• Bluetooth GPS obsługuje poprzez makiety miejsc!
+• Brak ogłoszeń!
+
+Informacje o wersji: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Do Wi-Fi i wieże komórkowe być odwzorowywane, musi czekać na urządzenie do określenia aktualnej lokalizacji, poprzez GPS lub lokalizacji sieciowej.
+Na mapie: okręgi są Wi-Fi, kwadraty są wieże komórkowe. Jasne kolory są sieci widziałem, fioletowy z nich są nowe dla lokalnej bazy danych.
+Jeśli masz problem z zalogowaniem się, lub sugestie, napisz do nas e-mail na wigle-admin@wigle.net i będziemy szczęśliwi, aby pomóc.
+Potrzebuje "Czyta państwo telefonu", aby stwierdzić, czy telefon jest w toku, aby wyciszyć dźwięk (dźwięki i mowę).
+Pliki są dostępne do pomocy z tłumaczeniem ludzi na językach innych niż angielski. Było to możliwe głównie tłumaczenie mechaniczne, bo oczywiście nie wiem, wszystkie te języki. Możesz przyczynić się do poprawy rzeczy poprzez zgłaszanie ściąganej na:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+lub wysyłanie ich do wigle-admin@wigle.net.
+
+Zachowaj na potknięcia!

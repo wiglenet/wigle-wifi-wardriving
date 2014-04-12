@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, kablosuz ağları görüntülemek, WiGLE veritabanı yükleyin.
+
+Description (4000 characters):
+WiGLE kolayca WiGLE.net veritabanına yükleyerek, dünyanın her yerinde kablosuz ağları ve hücre kuleleri bulundu netstumble, ekran ve harita uygulaması wardriving bir açık kaynak. WiGLE 2001 yılında başladı ve şimdi 125 milyon üzerinde Wi-Fi ağları dünya haritasını çıkarmış durumda.
+
+• Bulunan en ağları için küresel WiGLE afiş yarışın!
+• SD kartta CSV dosyaları ihracat (virgülle ayrılmış değerler)!
+• SD kartta KML dosyaları ihracat (aktarmak Google Haritalar/Earth)!
+• Ses ve text-to-speech uyarı!
+• Yeni ağlar izlemek için yerel veritabanı bulunamadı!
+• Bulunan ağlar gerçek zamanlı harita (OpenStreetMap)!
+• Bir SD karta app taşıyabilirsiniz!
+• Hemen tüm ses/konuşma kapatmak için "Sessiz" düğmesi!
+• Bluetooth GPS sahte yerle yoluyla destek!
+• Hiçbir reklam!
+
+Sürüm notları: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Wi-Fi ve hücre kuleleri eşlenmesi için, GPS veya ağ konumuna yoluyla, mevcut konumu belirlemek için cihazınızın için beklemeniz gerekir.
+Haritada: çevreler kareler hücre kuleleri, Wi-Fi vardır. Açık renkler daha önce görülmemiş ağlar, mor olanları yerel veritabanı için yenidir.
+Eğer sorun giriş varsa, ya da önerileriniz varsa, wigle-admin@wigle.net bize bir e-posta gönderin ve biz yardımcı olmaktan mutluluk duyarız.
+Bir telefon görüşmesi devam ise ses (sesler ve konuşma) susturmak için, anlatmak için, "Telefon Devlet okur" ihtiyacı var.
+Dosyalar İngilizce dışındaki diller için bir insan çeviri ile yardımcı olmak için kullanılabilir. Biz tabii ki bütün bu dilleri bilmiyorum, çünkü bu, çoğunlukla mekanik bir çeviri oldu. Sen de çekme isteklerini yaparak şeyleri iyileştirmek için yardımcı olabilir:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+veya wigle-admin@wigle.net göndererek.
+
+Tökezleyerek devam edin!

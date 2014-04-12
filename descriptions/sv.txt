@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, visar trådlösa nätverk, ladda upp till WiGLE databasen.
+
+Description (4000 characters):
+WiGLE är en öppen källkod wardriving app till netstumble, display-och kart hittade trådlösa nätverk och mobilmaster som helst i världen, lätt att ladda upp till WiGLE.net databasen. WiGLE startades 2001 och har nu över 125 miljoner Wi-Fi-nätverk kartlagt hela världen.
+
+• Konkurrera på den globala WiGLE leaderboarden för de flesta nätverk som finns!
+• Exportera till CSV-filer på SD-kort (kommaseparerade värden)!
+• Exportera till KML-filer på SD-kort (för att importera till Google Maps/Earth)!
+• Ljud-och text-till-tal larma!
+• Lokal databas för att spåra nya nätverk hittas!
+• Realtids karta över nät som finns (OpenStreetMap)!
+• Kan flytta appen till ett SD-kort!
+• Mute-knappen för att stänga av allt ljud/tal genast!
+• Bluetooth GPS-stöd genom mock platser!
+• Inga annonser!
+
+Utgåvan: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+För Wi-Fi och mobilmaster som ska kartläggas, måste du vänta på din enhet för att avgöra den aktuella platsen, via GPS eller nätverksplats.
+På kartan: cirklarna är Wi-Fi, rutorna är mobilmaster. Ljusa färger är nätverk sett förut, lila som är nya för den lokala databasen.
+Om du har problem att logga in, eller har förslag, skicka ett mail till wigle-admin@wigle.net och vi kommer gärna att hjälpa till.
+Needs "Läser Phone stat" för att berätta om ett telefonsamtal pågår, för att stänga av ljudet (ljud och tal).
+Filer som finns tillgängliga för att hjälpa till med en mänsklig översättning till andra språk än engelska. Detta var främst en mekanisk översättning, eftersom vi uppenbarligen inte vet alla dessa språk. Du kan hjälpa till att förbättra saker och ting genom att göra pull förfrågningar på:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+eller skicka dem till wigle-admin@wigle.net.
+
+Fortsätt att snubbla!

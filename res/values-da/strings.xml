@@ -1,662 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="stats">
-    Start
-  </string>
-  <string name="app_name">
-    WiGLE Wifi wardriving
-  </string>
-  <string name="settings_app_name">
-    WiGLE Wifi - Indstillinger
-  </string>
-  <string name="mapping_app_name">
-    WiGLE Wifi - Open Street Map
-  </string>
-  <string name="dashboard_app_name">
-    WiGLE Wifi - Dashboard
-  </string>
-  <string name="error_report_name">
-    Wifi Wifi - seneste Fejlrapport
-  </string>
-  <string name="speech_name">
-    WiGLE Wifi - taleindstillingerne
-  </string>
-  <string name="network_activity_name">
-    Wigle Wifi - Netværk
-  </string>
-  <string name="data_activity_name">
-    Wigle Wifi - Database
-  </string>
-  <string name="dbresult_activity_name">
-    Wigle Wifi - Søgeresultat
-  </string>
-  <string name="upload_button">
-    Upload til \nWiGLE.net
-  </string>
-  <string name="username">
-    WiGLE Brugernavn
-  </string>
-  <string name="password">
-    WiGLE kodeord
-  </string>
-  <string name="show_current">
-    Vis aktuelle net kun
-  </string>
-  <string name="use_metric">
-    Brug metriske enheder
-  </string>
-  <string name="be_anonymous">
-    Upload anonymt
-  </string>
-  <string name="donate">
-    Donér data: Tillad kommerciel brug
-  </string>
-  <string name="found_sound">
-    Afspil lyd, når netværk fundet i løb
-  </string>
-  <string name="found_new_sound">
-    Afspil lyd, når nye netværk i BF
-  </string>
-  <string name="reset_maxid_button">
-    Zero DB markør
-  </string>
-  <string name="reset_maxid_text">
-    Nyeste upload markør:
-  </string>
-  <string name="maxout_maxid_button">
-    Maxout DB markør
-  </string>
-  <string name="maxout_maxid_text">
-    Sæt markør til:
-  </string>
-  <string name="connect_button">
-    Tilslut
-  </string>
-  <string name="connect_text">
-    med tilladelse fra netoperatøren
-  </string>
-  <string name="csv_run_export_button">
-    CSV Export Run
-  </string>
-  <string name="csv_run_export_text">
-    Eksport aktuelle løbetur til CSV-fil
-  </string>
-  <string name="kml_run_export_button">
-    KML Export Run
-  </string>
-  <string name="kml_run_export_text">
-    Eksport aktuelle løbetur til KML-fil
-  </string>
-  <string name="kml_export_button">
-    KML Export DB
-  </string>
-  <string name="kml_export_text">
-    Eksportér hele DB til KML-fil
-  </string>
-  <string name="backup_db_button">
-    Backup Database
-  </string>
-  <string name="backup_db_text">
-    Lav en database backup
-  </string>
-  <string name="import_observed_button">
-    Import Observeret
-  </string>
-  <string name="import_observed_text">
-    Importere min observeret netværk fra WiGLE
-  </string>
-  <string name="periodstill_text">
-    Tid mellem wifi scanninger 0 mph
-  </string>
-  <string name="period_text">
-    Tid mellem wifi scanner &lt;5 km / h
-  </string>
-  <string name="periodfast_text">
-    Tid mellem wifi scanner&gt; 5 km / h
-  </string>
-  <string name="gps_text">
-    Tid mellem GPS opdateringer
-  </string>
-  <string name="speak_text">
-    Tid mellem audio-talen
-  </string>
-  <string name="battery_kill_text">
-    Exit på dette batteri niveau
-  </string>
-  <string name="reset_wifi_text">
-    Beslut Wifi er blokeret
-  </string>
-  <string name="speech_gps">
-    Meddel GPS-status ændres
-  </string>
-  <string name="mute">
-    Mute
-  </string>
-  <string name="play">
-    Spil
-  </string>
-  <string name="unknown">
-    Ukendt
-  </string>
-  <string name="sort_text">
-    Sorter Optioner
-  </string>
-  <string name="listdialog_button">
-    OK
-  </string>
-  <string name="cryptodialog_button">
-    OK
-  </string>
-  <string name="cryptocanceldialog_button">
-    Annuller
-  </string>
-  <string name="circle_size_map">
-    Kort Circles Sized ved Antal
-  </string>
-  <string name="speech_button">
-    Tale konfigurationsskærm&gt;&gt;
-  </string>
-  <string name="speech_text">
-    Audio talen vil omfatte:
-  </string>
-  <string name="speech_run">
-    Net til at køre
-  </string>
-  <string name="speech_new_wifi">
-    Nye wifi til DB
-  </string>
-  <string name="speech_new_cell">
-    Nye celle tårne ​​til DB
-  </string>
-  <string name="speech_queue">
-    Kø størrelse, hvis&gt; 0
-  </string>
-  <string name="speech_miles">
-    Miles i løb
-  </string>
-  <string name="speech_time">
-    Aktuel tid
-  </string>
-  <string name="speech_battery">
-    Batteri niveau procent
-  </string>
-  <string name="speech_ssid">
-    Nyt Netværk SSID\'s
-  </string>
-  <string name="query_address">
-    Adresse (ex: Chicago, IL):
-  </string>
-  <string name="query_ssid">
-    SSID (ex: Linksys) (SQL-wildcards: %,_):
-  </string>
-  <string name="search_button">
-    Query Lokale DB
-  </string>
-  <string name="reset_button">
-    Reset Fields
-  </string>
-  <string name="list_query_clear">
-    Klar Query argumenter
-  </string>
-  <string name="crypto_security">
-    Sikkerhed
-  </string>
-  <string name="crypto_strength">
-    Signalstyrke
-  </string>
-  <string name="crypto_password">
-    Password
-  </string>
-  <string name="crypto_show_password">
-    Vis adgangskode.
-  </string>
-  <string name="filter_show_ssid">
-    Vis SSID\'s Matching (regex):
-  </string>
-  <string name="filter_not_regex">
-    Vis, hvad gør ikke match over regulære udtryk
-  </string>
-  <string name="filter_show_open">
-    Vis åbne
-  </string>
-  <string name="filter_show_cell">
-    Vis Cell
-  </string>
-  <string name="filter_show_wep">
-    Vis WEP
-  </string>
-  <string name="filter_show_wpa">
-    Vis WPA
-  </string>
-  <string name="filter_enabled">
-    Filter Aktiveret
-  </string>
-  <string name="list_waiting_gps">
-    (Venter på GPS-sync ..)
-  </string>
-  <string name="list_scanning_off">
-    (Scanning slukket)
-  </string>
-  <string name="list_short_lat">
-    Lat:
-  </string>
-  <string name="list_short_lon">
-    Lon:
-  </string>
-  <string name="list_short_sats">
-    SATS:
-  </string>
-  <string name="list_short_alt">
-    Alt:
-  </string>
-  <string name="list_status_default">
-    (Status)
-  </string>
-  <string name="list_speed">
-    Hastighed:
-  </string>
-  <string name="list_upload">
-    Upload fil?
-  </string>
-  <string name="network_signal">
-    Signal:
-  </string>
-  <string name="network_type">
-    Type:
-  </string>
-  <string name="network_firstseen">
-    First seen:
-  </string>
-  <string name="network_capa">
-    Kapaciteter:
-  </string>
-  <string name="network_channel">
-    Kanal:
-  </string>
-  <string name="network_observations">
-    Observationer:
-  </string>
-  <string name="network_querying">
-    (Querying. ..)
-  </string>
-  <string name="setting_show_password">
-    Vis adgangskode
-  </string>
-  <string name="setting_db_marker">
-    DB Marker (hvor uploads starter fra):
-  </string>
-  <string name="setting_high_up">
-    Højeste uploadet id:
-  </string>
-  <string name="setting_zero_out">
-    Nul ud DB markør?
-  </string>
-  <string name="setting_max_id">
-    Max upload id:
-  </string>
-  <string name="setting_max_start">
-    Max id ved opstart:
-  </string>
-  <string name="setting_max_out">
-    Max ud DB markør?
-  </string>
-  <string name="setting_tie_wifi">
-    Tie til Wifi Scan Periode
-  </string>
-  <string name="no_tts">
-    Ingen tekst-til-tale motor
-  </string>
-  <string name="sec">
-    sek
-  </string>
-  <string name="min">
-    min
-  </string>
-  <string name="off">
-    Off
-  </string>
-  <string name="on">
-    On
-  </string>
-  <string name="nonstop">
-    Nonstop
-  </string>
-  <string name="tab_list">
-    Liste
-  </string>
-  <string name="tab_map">
-    Kort
-  </string>
-  <string name="tab_dash">
-    Instrumentbræt
-  </string>
-  <string name="tab_data">
-    Data
-  </string>
-  <string name="ok">
-    OK
-  </string>
-  <string name="cancel">
-    Annuller
-  </string>
-  <string name="dash_scan_off">
-    (Scanning slukket)
-  </string>
-  <string name="dash_new_wifi">
-    Nye Wifi
-  </string>
-  <string name="dash_vis_nets">
-    Synlig Net:
-  </string>
-  <string name="dash_new_upload">
-    Nye Nets Siden Upload:
-  </string>
-  <string name="dash_new_cells">
-    Ny Cell Towers:
-  </string>
-  <string name="dash_dist_run">
-    Kør Afstand:
-  </string>
-  <string name="dash_dist_total">
-    Samlet Dist.:
-  </string>
-  <string name="dash_dist_prev">
-    Forrige Run:
-  </string>
-  <string name="dash_db_queue">
-    DB kø:
-  </string>
-  <string name="dash_db_nets">
-    DB Net:
-  </string>
-  <string name="dash_db_locs">
-    DB Steder:
-  </string>
-  <string name="dash_no_loc">
-    Nej Beliggenhed!
-  </string>
-  <string name="dash_short_loc">
-    Loc:
-  </string>
-  <string name="km_short">
-    km
-  </string>
-  <string name="mi_short">
-    mi
-  </string>
-  <string name="miles">
-    miles
-  </string>
-  <string name="m_short">
-    m
-  </string>
-  <string name="meters">
-    meter
-  </string>
-  <string name="ft_short">
-    ft
-  </string>
-  <string name="feet">
-    fødder
-  </string>
-  <string name="kmph">
-    kmph
-  </string>
-  <string name="mph">
-    km / h
-  </string>
-  <string name="ms_short">
-    ms
-  </string>
-  <string name="na">
-    N / A
-  </string>
-  <string name="run">
-    Kør
-  </string>
-  <string name="new_word">
-    Nye
-  </string>
-  <string name="db">
-    DB
-  </string>
-  <string name="scanned_in">
-    scannet i
-  </string>
-  <string name="sort_title">
-    Sorter Optioner
-  </string>
-  <string name="sort_spin_label">
-    Sortér liste efter:
-  </string>
-  <string name="channel">
-    Kanal
-  </string>
-  <string name="crypto">
-    Crypto
-  </string>
-  <string name="found_time">
-    Fundet Time
-  </string>
-  <string name="signal">
-    Signal
-  </string>
-  <string name="ssid">
-    SSID
-  </string>
-  <string name="best_results">
-    For de bedste resultater, frakoblet &quot;Network underretning&quot; i &quot;Trådløs og netværk&quot; -&gt; &quot;Wi-Fi-indstillinger&quot;
-  </string>
-  <string name="turn_on_wifi">
-    Tænde WiFi
-  </string>
-  <string name="no_gps_device">
-    Ingen GPS påvist i enhed!
-  </string>
-  <string name="turn_on_gps">
-    Slå på GPS
-  </string>
-  <string name="address">
-    Adresse
-  </string>
-  <string name="no_address_found">
-    Ingen geokodede fundet adressen
-  </string>
-  <string name="problem_with_field">
-    Problem med feltet
-  </string>
-  <string name="turning_wifi_off">
-    Turning WiFi tilbage fra
-  </string>
-  <string name="lost_location">
-    Lost Lokation
-  </string>
-  <string name="have_location">
-    Nu har placering fra
-  </string>
-  <string name="wifi_jammed">
-    WiFi vises fastklemt, slukke, og så videre, WiFi.
-  </string>
-  <string name="battery_at">
-    Batteri niveau
-  </string>
-  <string name="battery_postfix">
-    procent, lukke Wigle Wifi
-  </string>
-  <string name="scan">
-    Scan
-  </string>
-  <string name="menu_exit">
-    Udgang
-  </string>
-  <string name="menu_settings">
-    Indstillinger
-  </string>
-  <string name="menu_error_report">
-    Fejl Rapport
-  </string>
-  <string name="menu_return">
-    Retur
-  </string>
-  <string name="menu_sort">
-    Sorter Optioner
-  </string>
-  <string name="menu_ssid_filter">
-    SSID Label Filter
-  </string>
-  <string name="menu_screen_sleep">
-    Lad Screen Sleep
-  </string>
-  <string name="menu_screen_wake">
-    Hold Screen On
-  </string>
-  <string name="menu_labels_off">
-    Etiketter Off
-  </string>
-  <string name="menu_labels_on">
-    Etiketter på
-  </string>
-  <string name="menu_zoom_in">
-    Zoom ind
-  </string>
-  <string name="menu_zoom_out">
-    Zoom ud
-  </string>
-  <string name="menu_turn_off_lockon">
-    Sluk Lockon
-  </string>
-  <string name="menu_turn_on_lockon">
-    Tænd Lockon
-  </string>
-  <string name="menu_show_old">
-    Vis Run &amp; Ny
-  </string>
-  <string name="menu_show_new">
-    Vis kun nye
-  </string>
-  <string name="tts_no_gps_fix">
-    Ingen GPS fix
-  </string>
-  <string name="tts_new_wifi">
-    Nye wifi
-  </string>
-  <string name="tts_new_cell">
-    Nye celle
-  </string>
-  <string name="tts_queue">
-    Kø
-  </string>
-  <string name="tts_from">
-    fra
-  </string>
-  <string name="tts_o_clock">
-    skylder ur
-  </string>
-  <string name="tts_o">
-    skylder
-  </string>
-  <string name="tts_battery">
-    batteri
-  </string>
-  <string name="tts_percent">
-    procent
-  </string>
-  <string name="status_unknown">
-    Ukendt
-  </string>
-  <string name="status_unknown_error">
-    Ukendt fejl
-  </string>
-  <string name="status_fail">
-    Fail
-  </string>
-  <string name="status_success">
-    Succes
-  </string>
-  <string name="status_working">
-    Arbejder ...
-  </string>
-  <string name="status_upload_success">
-    Upload Vellykket
-  </string>
-  <string name="status_write_success">
-    Skriv Vellykket
-  </string>
-  <string name="status_no_user">
-    Brugernavn ikke indstillet
-  </string>
-  <string name="status_no_pass">
-    Password ikke er indstillet og brugernavn ikke \'anonyme\';
-  </string>
-  <string name="status_exception">
-    Undtagelse
-  </string>
-  <string name="status_login_fail">
-    Log ind fejlede, check adgangskode?
-  </string>
-  <string name="status_uploading">
-    Upload File
-  </string>
-  <string name="status_writing">
-    Skrivning File
-  </string>
-  <string name="status_nothing">
-    At gøre noget
-  </string>
-  <string name="status_empty">
-    File ville være tom
-  </string>
-  <string name="data_export_csv">
-    Eksport køre til CSV-fil?
-  </string>
-  <string name="data_export_kml_run">
-    Eksport køre til KML-fil?
-  </string>
-  <string name="data_export_kml_db">
-    Eksport DB til KML-fil?
-  </string>
-  <string name="data_backup_db">
-    Backup DB til forskellige fil?
-  </string>
-  <string name="language_en">
-    Engelsk (en)
-  </string>
-  <string name="language_cs">
-    čeština (cs)
-  </string>
-  <string name="language_de">
-    Deutsch (de)
-  </string>
-  <string name="language_es">
-    español (es)
-  </string>
-  <string name="language_fr">
-    français (fr)
-  </string>
-  <string name="language_it">
-    italiano (it)
-  </string>
-  <string name="language_nl">
-    Nederlands (nl)
-  </string>
-  <string name="language_pl">
-    polski (pl)
-  </string>
-  <string name="language_ru">
-    русский (RU)
-  </string>
-  <string name="language_sv">
-    svenska (sv)
-  </string>
-  <string name="language_text">
-    Valgte sprog (kræver genstart)
-  </string>
-  <string name="auto">
-    Automatisk
-  </string>
-  <string name="fatal_title"> Fatal DB Problem </string>
-  <string name="fatal_db_warn"> normalt forårsaget af enheden eller SD-kort problemer! </string>
-  <string name="fatal_pre_message"> FEJL </string>
-  <string name="fatal_post_message"> (Kan se igen med "fejlrapport" i menuen Indstillinger) </string>
-  <string name="use_network_location"> Brug Netværksområde Provider </string>
-  <string name="data_import_observed"> importere min observeret wifi fra WiGLE til lokal database? </string>      
+    <string name="stats">Start</string>
+    <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="settings_app_name">WiGLE Wifi - Indstillinger</string>
+    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
+    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
+    <string name="error_report_name">WiGLE Wifi - seneste Fejlrapport</string>
+    <string name="speech_name">WiGLE Wifi - taleindstillingerne</string>
+    <string name="network_activity_name">WiGLE Wifi - Netværk</string>
+    <string name="data_activity_name">WiGLE Wifi - Database</string>
+    <string name="dbresult_activity_name">WiGLE Wifi - Søgeresultat</string>
+    <string name="upload_button">Upload til\nWiGLE.net</string>
+    <string name="username">WiGLE Brugernavn</string>
+    <string name="password">WiGLE kodeord</string>
+    <string name="show_current">Vis aktuelle net kun</string>
+    <string name="use_metric">Brug metriske enheder</string>
+    <string name="be_anonymous">Upload anonymt</string>
+    <string name="donate">Donér data: Tillad kommerciel brug</string>
+    <string name="found_sound">Afspil lyd, når netværk fundet i løb</string>
+    <string name="found_new_sound">Afspil lyd, når nye netværk i BF</string>
+    <string name="reset_maxid_button">Zero DB markør</string>
+    <string name="reset_maxid_text">Nyeste upload markør:</string>
+    <string name="maxout_maxid_button">Maxout DB markør</string>
+    <string name="maxout_maxid_text">Sæt markør til:</string>
+    <string name="connect_button">Tilslut</string>
+    <string name="connect_text">med tilladelse fra netoperatøren</string>
+    <string name="csv_run_export_button">CSV Export Run</string>
+    <string name="csv_run_export_text">Eksport aktuelle løbetur til CSV-fil</string>
+    <string name="csv_export_button">CSV Export DB</string>
+    <string name="csv_export_text">Export entire DB to CSV file</string>
+    <string name="kml_run_export_button">KML Export Run</string>
+    <string name="kml_run_export_text">Eksport aktuelle løbetur til KML-fil</string>
+    <string name="kml_export_button">KML Export DB</string>
+    <string name="kml_export_text">Eksportér hele DB til KML-fil</string>
+    <string name="backup_db_button">Backup Database</string>
+    <string name="backup_db_text">Lav en database backup</string>
+    <string name="import_observed_button">Import Observeret</string>
+    <string name="import_observed_text">Importere min observeret netværk fra WiGLE</string>
+    <string name="periodstill_text">Tid mellem Wi-Fi scanninger 0 km/h</string>
+    <string name="period_text">Tid mellem Wi-Fi scanner &lt;5 km/h</string>
+    <string name="periodfast_text">Tid mellem Wi-Fi scanner &gt;5 km/h</string>
+    <string name="gps_text">Tid mellem GPS opdateringer</string>
+    <string name="speak_text">Tid mellem audio-talen</string>
+    <string name="battery_kill_text">Exit på dette batteri niveau</string>
+    <string name="reset_wifi_text">Beslut Wi-Fi er blokeret</string>
+    <string name="speech_gps">Meddel GPS-status ændres</string>
+    <string name="mute">Lydløs</string>
+    <string name="play">Spil</string>
+    <string name="unknown">Ukendt</string>
+    <string name="sort_text">Sorter Optioner</string>
+    <string name="listdialog_button">OK</string>
+    <string name="cryptodialog_button">OK</string>
+    <string name="cryptocanceldialog_button">Annuller</string>
+    <string name="circle_size_map">Kort Circles Sized ved Antal</string>
+    <string name="speech_button">Tale konfigurationsskærm&gt;&gt;</string>
+    <string name="speech_text">Audio talen vil omfatte:</string>
+    <string name="speech_run">Net til at køre</string>
+    <string name="speech_new_wifi">Nye Wi-Fi til DB</string>
+    <string name="speech_new_cell">Nye celle tårne ​​til DB</string>
+    <string name="speech_queue">Kø størrelse, hvis&gt; 0</string>
+    <string name="speech_miles">Miles i løb</string>
+    <string name="speech_time">Aktuel tid</string>
+    <string name="speech_battery">Batteri niveau procent</string>
+    <string name="speech_ssid">Nyt Netværk SSID\'s</string>
+    <string name="query_address">Adresse (ex: Chicago, IL):</string>
+    <string name="query_ssid">SSID (ex: Linksys) (SQL-wildcards: %,_):</string>
+    <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL-wildcards: %,_):</string>
+    <string name="search_button">Query Lokale DB</string>
+    <string name="reset_button">Reset Fields</string>
+    <string name="list_query_clear">Klar Query argumenter</string>
+    <string name="crypto_security">Sikkerhed</string>
+    <string name="crypto_strength">Signalstyrke</string>
+    <string name="crypto_password">Password</string>
+    <string name="crypto_show_password">Vis adgangskode.</string>
+    <string name="filter_show_ssid">Vis SSID\'s Matching (regex):</string>
+    <string name="filter_not_regex">Vis, hvad gør ikke match over regulære udtryk</string>
+    <string name="filter_show_open">Vis åbne</string>
+    <string name="filter_show_cell">Vis Cell</string>
+    <string name="filter_show_wep">Vis WEP</string>
+    <string name="filter_show_wpa">Vis WPA</string>
+    <string name="filter_enabled">Filter Aktiveret</string>
+    <string name="list_waiting_gps">(Venter på GPS-sync ..)</string>
+    <string name="list_scanning_off">(Scanning slukket)</string>
+    <string name="list_short_lat">Lat:</string>
+    <string name="list_short_lon">Lon:</string>
+    <string name="list_short_sats">SATS:</string>
+    <string name="list_short_alt">Alt:</string>
+    <string name="list_status_default">(Status)</string>
+    <string name="list_speed">Hastighed:</string>
+    <string name="list_upload">Upload fil?</string>
+    <string name="network_signal">Signal:</string>
+    <string name="network_type">Type:</string>
+    <string name="network_firstseen">First seen:</string>
+    <string name="network_capa">Kapaciteter:</string>
+    <string name="network_channel">Kanal:</string>
+    <string name="network_observations">Observationer:</string>
+    <string name="network_querying">(Querying...)</string>
+    <string name="setting_show_password">Vis adgangskode</string>
+    <string name="setting_db_marker">DB Marker (hvor uploads starter fra):</string>
+    <string name="setting_high_up">Højeste uploadet id:</string>
+    <string name="setting_zero_out">Nul ud DB markør?</string>
+    <string name="setting_max_id">Max upload id:</string>
+    <string name="setting_max_start">Max id ved opstart:</string>
+    <string name="setting_max_out">Max ud DB markør?</string>
+    <string name="setting_tie_wifi">Tie til Wi-Fi Scan Periode</string>
+    <string name="no_tts">Ingen tekst-til-tale motor</string>
+    <string name="sec">sek</string>
+    <string name="min">min</string>
+    <string name="off">Off</string>
+    <string name="on">On</string>
+    <string name="nonstop">Nonstop</string>
+    <string name="tab_list">Liste</string>
+    <string name="tab_map">Kort</string>
+    <string name="tab_dash">Instrumentbræt</string>
+    <string name="tab_data">Data</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuller</string>
+    <string name="dash_scan_off">(Scanning slukket)</string>
+    <string name="dash_new_wifi">Nye Wi-Fi</string>
+    <string name="dash_vis_nets">Synlig Net:</string>
+    <string name="dash_new_upload">Nye Nets Siden Upload:</string>
+    <string name="dash_new_cells">Ny Cell Towers:</string>
+    <string name="dash_dist_run">Kør Afstand:</string>
+    <string name="dash_dist_total">Samlet Dist.:</string>
+    <string name="dash_dist_prev">Forrige Run:</string>
+    <string name="dash_db_queue">DB kø:</string>
+    <string name="dash_db_nets">DB Net:</string>
+    <string name="dash_db_locs">DB Steder:</string>
+    <string name="dash_no_loc">Nej Beliggenhed!</string>
+    <string name="dash_short_loc">Loc:</string>
+    <string name="km_short">km</string>
+    <string name="mi_short">mi</string>
+    <string name="miles">miles</string>
+    <string name="m_short">m</string>
+    <string name="meters">meter</string>
+    <string name="T">ft</string>
+    <string name="feet">fødder</string>
+    <string name="kmph">kmph</string>
+    <string name="mph">km / h</string>
+    <string name="ms_short">ms</string>
+    <string name="na">N/A</string>
+    <string name="run">Kør</string>
+    <string name="new_word">Nye</string>
+    <string name="db">DB</string>
+    <string name="scanned_in">scannet i</string>
+    <string name="sort_title">Sorter Optioner</string>
+    <string name="sort_spin_label">Sortér liste efter:</string>
+    <string name="channel">Kanal</string>
+    <string name="crypto">Crypto</string>
+    <string name="found_time">Fundet Time</string>
+    <string name="signal">Signal</string>
+    <string name="ssid">SSID</string>
+    <string name="bssid">BSSID</string>
+    <string name="best_results">For de bedste resultater, frakoblet &quot;Network underretning&quot; i &quot;Trådløs og netværk&quot; -&gt; &quot;Wi-Fi-indstillinger&quot;</string>
+    <string name="turn_on_wifi">Tænde Wi-Fi</string>
+    <string name="no_gps_device">Ingen GPS påvist i enhed!</string>
+    <string name="turn_on_gps">Slå på GPS</string>
+    <string name="address">Adresse</string>
+    <string name="no_address_found">Ingen geokodede fundet adressen</string>
+    <string name="problem_with_field">Problem med feltet</string>
+    <string name="turning_wifi_off">Turning Wi-Fi tilbage fra</string>
+    <string name="lost_location">Lost Lokation</string>
+    <string name="have_location">Nu har placering fra</string>
+    <string name="wifi_jammed">Wi-Fi vises fastklemt, slukke, og så videre, Wi-Fi.</string>
+    <string name="battery_at">Batteri niveau</string>
+    <string name="battery_postfix">procent, lukke WiGLE Wifi</string>
+    <string name="scan">Scan</string>
+    <string name="menu_exit">Udgang</string>
+    <string name="menu_settings">Indstillinger</string>
+    <string name="menu_error_report">Fejl Rapport</string>
+    <string name="menu_return">Retur</string>
+    <string name="menu_sort">Sorter Optioner</string>
+    <string name="menu_ssid_filter">SSID Label Filter</string>
+    <string name="menu_screen_sleep">Lad Screen Sleep</string>
+    <string name="menu_screen_wake">Hold Screen On</string>
+    <string name="menu_labels_off">Etiketter Off</string>
+    <string name="menu_labels_on">Etiketter på</string>
+    <string name="menu_zoom_in">Zoom ind</string>
+    <string name="menu_zoom_out">Zoom ud</string>
+    <string name="menu_turn_off_lockon">Sluk Lockon</string>
+    <string name="menu_turn_on_lockon">Tænd Lockon</string>
+    <string name="menu_show_old">Vis Run &amp; Ny</string>
+    <string name="menu_show_new">Vis kun nye</string>
+    <string name="menu_copy_network">Copy Network BSSID</string>
+    <string name="tts_no_gps_fix">Ingen GPS fix</string>
+    <string name="tts_new_wifi">Nye Wi-Fi</string>
+    <string name="tts_new_cell">Nye celle</string>
+    <string name="tts_queue">Kø</string>
+    <string name="tts_from">fra</string>
+    <string name="tts_o_clock">skylder ur</string>
+    <string name="tts_o">skylder</string>
+    <string name="tts_battery">batteri</string>
+    <string name="tts_percent">procent</string>
+    <string name="status_unknown">Ukendt</string>
+    <string name="status_unknown_error">Ukendt fejl</string>
+    <string name="status_fail">Fail</string>
+    <string name="status_success">Succes</string>
+    <string name="status_working">Arbejder ...</string>
+    <string name="status_upload_success">Upload Vellykket</string>
+    <string name="status_write_success">Skriv Vellykket</string>
+    <string name="status_no_user">Brugernavn ikke indstillet</string>
+    <string name="status_no_pass">Password ikke er indstillet og brugernavn ikke \'anonymous\';</string>
+    <string name="status_exception">Undtagelse</string>
+    <string name="status_login_fail">Log ind fejlede, check adgangskode?</string>
+    <string name="status_uploading">Upload File</string>
+    <string name="status_writing">Skrivning File</string>
+    <string name="status_nothing">At gøre noget</string>
+    <string name="status_empty">File ville være tom</string>
+    <string name="data_export_csv_run">Eksport køre til CSV-fil?</string>
+    <string name="data_export_csv_db">Eksport DB til CSV-fil?</string>
+    <string name="data_export_kml_run">Eksport køre til KML-fil?</string>
+    <string name="data_export_kml_db">Eksport DB til KML-fil?</string>
+    <string name="data_backup_db">Backup DB til forskellige fil?</string>
+    <string name="auto">Automatisk</string>
+    <string name="language_en">English (engelsk)</string>
+    <string name="language_ar">العربية (arabisk)</string>
+    <string name="language_cs">čeština (tjekkisk)</string>
+    <string name="language_da">dansk</string>
+    <string name="language_de">Deutsch (tysk)</string>
+    <string name="language_es">español (spansk)</string>
+    <string name="language_fi">suomi (finsk)</string>
+    <string name="language_fr">français (fransk)</string>
+    <string name="language_he">עִבְרִית (hebraisk)</string>
+    <string name="language_hi">हिन्दी (hindi)</string>
+    <string name="language_it">italiano (italiensk)</string>
+    <string name="language_ja">日本語 (japansk)</string>
+    <string name="language_ko">한국어 (koreansk)</string>
+    <string name="language_nl">Nederlands (nederlandsk)</string>
+    <string name="language_no">norsk (norsk)</string>
+    <string name="language_pl">polski (polsk)</string>
+    <string name="language_pt">português (portugisisk)</string>
+    <string name="language_pt-rBR">português brasileiro (brasiliansk portugisisk)</string>
+    <string name="language_ru">ру́сский (russisk)</string>
+    <string name="language_sv">svenska (svensk)</string>
+    <string name="language_tr">Türkçe (tyrkisk)</string>
+    <string name="language_zh">繁體中文 (traditionelt kinesisk)</string>
+    <string name="language_text">Valgte sprog (kræver genstart)</string>
+    <string name="fatal_title">Fatal DB Problem</string>
+    <string name="fatal_db_warn">normalt forårsaget af enheden eller SD-kort problemer!</string>
+    <string name="fatal_pre_message">FEJL</string>
+    <string name="fatal_post_message">(Kan se igen med "fejlrapport" i menuen Indstillinger)</string>
+    <string name="use_network_location">Brug Netværksområde Provider</string>
+    <string name="data_import_observed">importere min observeret Wi-Fi fra WiGLE til lokal database?</string>
+    <string name="donate_question">Donate data to WiGLE?</string>
+    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
+    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
+    <string name="speech_wifi_restart">Wi-Fi restarts</string>
+    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
 </resources>

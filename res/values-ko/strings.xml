@@ -1,674 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="stats">
-    시작
-  </string>
-  <string name="app_name">
-    WiGLE 와이파이 Wardriving
-  </string>
-  <string name="settings_app_name">
-    WiGLE 와이파이 - 설정
-  </string>
-  <string name="mapping_app_name">
-    WiGLE 와이파이 - 영업 거리지도
-  </string>
-  <string name="dashboard_app_name">
-    WiGLE 와이파이 - 대시보드
-  </string>
-  <string name="error_report_name">
-    와이파이 와이파이 - 대부분의 최근 오류 보고서
-  </string>
-  <string name="speech_name">
-    WiGLE 와이파이 - 음성 설정
-  </string>
-  <string name="network_activity_name">
-    Wigle 와이파이 - 네트워크
-  </string>
-  <string name="data_activity_name">
-    Wigle 와이파이 - 데이터베이스
-  </string>
-  <string name="dbresult_activity_name">
-    Wigle 와이파이 - 검색 결과
-  </string>
-  <string name="upload_button">
-    WiGLE.net \n 업로드
-  </string>
-  <string name="username">
-    WiGLE 사용자 이름
-  </string>
-  <string name="password">
-    WiGLE 비밀 번호
-  </string>
-  <string name="show_current">
-    현재 네트워크를 표시 전용
-  </string>
-  <string name="use_metric">
-    측정 단위를 사용
-  </string>
-  <string name="be_anonymous">
-    익명 업로드
-  </string>
-  <string name="donate">
-    기부 데이터 상업적인 사용을 허용
-  </string>
-  <string name="found_sound">
-    네트워크에서 실행 발견했을 때 소리 재생
-  </string>
-  <string name="found_new_sound">
-    사운드를 재생할 때 DB에 새로운 네트워크
-  </string>
-  <string name="reset_maxid_button">
-    제로 DB 마커
-  </string>
-  <string name="reset_maxid_text">
-    최근 업로드 마커 :
-  </string>
-  <string name="maxout_maxid_button">
-    Maxout DB 마커
-  </string>
-  <string name="maxout_maxid_text">
-    에 마커를 설정합니다 :
-  </string>
-  <string name="connect_button">
-    연결
-  </string>
-  <string name="connect_text">
-    네트워크 운영자의 승인
-  </string>
-  <string name="csv_run_export_button">
-    CSV 내보내기 실행
-  </string>
-  <string name="csv_run_export_text">
-    CSV 파일에 현재 실행 내보내기
-  </string>
-  <string name="kml_run_export_button">
-    KML 내보내기 실행
-  </string>
-  <string name="kml_run_export_text">
-    KML 파일을 현재 실행 내보내기
-  </string>
-  <string name="kml_export_button">
-    KML 수출 DB
-  </string>
-  <string name="kml_export_text">
-    KML 파일에 전체 DB를 내보내기
-  </string>
-  <string name="backup_db_button">
-    백업 데이터베이스
-  </string>
-  <string name="backup_db_text">
-    데이터베이스 백업 만들기
-  </string>
-  <string name="import_observed_button">
-    가져오기 관찰된
-  </string>
-  <string name="import_observed_text">
-    WiGLE에서 내 관찰 네트워크를 가져오기
-  </string>
-  <string name="periodstill_text">
-    무선랜 사이의 시간 0mph을 스캔
-  </string>
-  <string name="period_text">
-    WiFi를 스캔 사이의 시간 &lt;5mph
-  </string>
-  <string name="periodfast_text">
-    WiFi를 스캔 사이의 시간&gt; 5mph
-  </string>
-  <string name="gps_text">
-    GPS 업데이트 사이의 시간
-  </string>
-  <string name="speak_text">
-    오디오 음성 사이의 시간
-  </string>
-  <string name="battery_kill_text">
-    이 배터리 수준에서 출구
-  </string>
-  <string name="reset_wifi_text">
-    와이파이가 열려요 결정
-  </string>
-  <string name="speech_gps">
-    GPS 상태 변경을 발표
-  </string>
-  <string name="mute">
-    음소거
-  </string>
-  <string name="play">
-    놀이
-  </string>
-  <string name="unknown">
-    알 수없는
-  </string>
-  <string name="sort_text">
-    정렬 옵션
-  </string>
-  <string name="listdialog_button">
-    확인
-  </string>
-  <string name="cryptodialog_button">
-    확인
-  </string>
-  <string name="cryptocanceldialog_button">
-    취소
-  </string>
-  <string name="circle_size_map">
-    수량으로 크기 맵 동아리
-  </string>
-  <string name="speech_button">
-    음성 구성 화면&gt;&gt;
-  </string>
-  <string name="speech_text">
-    오디오 연설은 포함됩니다 :
-  </string>
-  <string name="speech_run">
-    실행을위한 그물
-  </string>
-  <string name="speech_new_wifi">
-    DB에 새로운 와이파이
-  </string>
-  <string name="speech_new_cell">
-    DB에 새로운 셀 타워
-  </string>
-  <string name="speech_queue">
-    대기열 크기가있다면&gt; 0
-  </string>
-  <string name="speech_miles">
-    실행 마일
-  </string>
-  <string name="speech_time">
-    현재 시간
-  </string>
-  <string name="speech_battery">
-    배터리 수준 비율
-  </string>
-  <string name="speech_ssid">
-    새로운 네트워크 SSID\'s 의
-  </string>
-  <string name="query_address">
-    주소 (예 : 시카고, IL) :
-  </string>
-  <string name="query_ssid">
-    SSID (예 : 링크시스) (SQL 와일드 카드 : %,_):
-  </string>
-  <string name="search_button">
-    검색어 로컬 DB
-  </string>
-  <string name="reset_button">
-    재설정 필드
-  </string>
-  <string name="list_query_clear">
-    삭제 쿼리 인수
-  </string>
-  <string name="crypto_security">
-    보안
-  </string>
-  <string name="crypto_strength">
-    신호 강도
-  </string>
-  <string name="crypto_password">
-    암호
-  </string>
-  <string name="crypto_show_password">
-    비밀 번호를 표시합니다.
-  </string>
-  <string name="filter_show_ssid">
-    보기 SSID\'s 의 매칭 (정규식) :
-  </string>
-  <string name="filter_not_regex">
-    표시 어떤 어쩌려 구 는 정규 표현식과 일치하는 위
-  </string>
-  <string name="filter_show_open">
-    오픈보기
-  </string>
-  <string name="filter_show_cell">
-    셀 표시
-  </string>
-  <string name="filter_show_wep">
-    보기 WEP
-  </string>
-  <string name="filter_show_wpa">
-    보기 WPA
-  </string>
-  <string name="filter_enabled">
-    필터 사용
-  </string>
-  <string name="list_waiting_gps">
-    (GPS 동기화 대기 ...)
-  </string>
-  <string name="list_scanning_off">
-    (검색이 꺼져)
-  </string>
-  <string name="list_short_lat">
-    위도 :
-  </string>
-  <string name="list_short_lon">
-    경도 :
-  </string>
-  <string name="list_short_sats">
-    수능 점수 :
-  </string>
-  <string name="list_short_alt">
-    ALT :
-  </string>
-  <string name="list_status_default">
-    (상태)
-  </string>
-  <string name="list_speed">
-    속도 :
-  </string>
-  <string name="list_upload">
-    파일 업로드?
-  </string>
-  <string name="network_signal">
-    신호 :
-  </string>
-  <string name="network_type">
-    유형 :
-  </string>
-  <string name="network_firstseen">
-    먼저 보면 :
-  </string>
-  <string name="network_capa">
-    기능 :
-  </string>
-  <string name="network_channel">
-    채널 :
-  </string>
-  <string name="network_observations">
-    관찰 :
-  </string>
-  <string name="network_querying">
-    (querying. ...)
-  </string>
-  <string name="setting_show_password">
-    비밀 번호를 표시
-  </string>
-  <string name="setting_db_marker">
-    DB 마커 (여기서 업로드부터 시작) :
-  </string>
-  <string name="setting_high_up">
-    최고 업로드 ID :
-  </string>
-  <string name="setting_zero_out">
-    DB 마커 아웃 제로?
-  </string>
-  <string name="setting_max_id">
-    최대 업로드 ID :
-  </string>
-  <string name="setting_max_start">
-    시작시 최대 ID :
-  </string>
-  <string name="setting_max_out">
-    DB 마커 아웃 맥스?
-  </string>
-  <string name="setting_tie_wifi">
-    와이파이 스캔 기간에 타이
-  </string>
-  <string name="no_tts">
-    아무 텍스트 음성 변환 엔진 없습니다
-  </string>
-  <string name="sec">
-    초
-  </string>
-  <string name="min">
-    분
-  </string>
-  <string name="off">
-    끄기
-  </string>
-  <string name="on">
-    에
-  </string>
-  <string name="nonstop">
-    논스톱
-  </string>
-  <string name="tab_list">
-    목록
-  </string>
-  <string name="tab_map">
-    지도
-  </string>
-  <string name="tab_dash">
-    계기판
-  </string>
-  <string name="tab_data">
-    데이터
-  </string>
-  <string name="ok">
-    확인
-  </string>
-  <string name="cancel">
-    취소
-  </string>
-  <string name="dash_scan_off">
-    (검색이 꺼져)
-  </string>
-  <string name="dash_new_wifi">
-    새로운 와이파이
-  </string>
-  <string name="dash_vis_nets">
-    표시 네츠 :
-  </string>
-  <string name="dash_new_upload">
-    업로드 이후 새로운 네츠 :
-  </string>
-  <string name="dash_new_cells">
-    새로운 셀 타워 :
-  </string>
-  <string name="dash_dist_run">
-    거리를 실행합니다 :
-  </string>
-  <string name="dash_dist_total">
-    Dist 총. :
-  </string>
-  <string name="dash_dist_prev">
-    이전이 실행 :
-  </string>
-  <string name="dash_db_queue">
-    DB 대기열 :
-  </string>
-  <string name="dash_db_nets">
-    DB 네츠 :
-  </string>
-  <string name="dash_db_locs">
-    DB 위치 :
-  </string>
-  <string name="dash_no_loc">
-    없음 위치!
-  </string>
-  <string name="dash_short_loc">
-    LOC :
-  </string>
-  <string name="km_short">
-    km
-  </string>
-  <string name="mi_short">
-    미
-  </string>
-  <string name="miles">
-    마일
-  </string>
-  <string name="m_short">
-    m
-  </string>
-  <string name="meters">
-    m
-  </string>
-  <string name="ft_short">
-    피트
-  </string>
-  <string name="feet">
-    피트
-  </string>
-  <string name="kmph">
-    kmph
-  </string>
-  <string name="mph">
-    mph
-  </string>
-  <string name="ms_short">
-    MS
-  </string>
-  <string name="na">
-    N / A
-  </string>
-  <string name="run">
-    실행
-  </string>
-  <string name="new_word">
-    새로운
-  </string>
-  <string name="db">
-    DB
-  </string>
-  <string name="scanned_in">
-    에서 스캔
-  </string>
-  <string name="sort_title">
-    정렬 옵션
-  </string>
-  <string name="sort_spin_label">
-    정렬 목록 :
-  </string>
-  <string name="channel">
-    채널
-  </string>
-  <string name="crypto">
-    암호화
-  </string>
-  <string name="found_time">
-    발견 시간
-  </string>
-  <string name="signal">
-    신호
-  </string>
-  <string name="ssid">
-    SSID
-  </string>
-  <string name="best_results">
-    최상의 결과를 들어, &quot;무선 및 네트워크&quot;의 해제 &quot;네트워크 알​​림&quot;-&gt; &quot;와이파이 설정&quot;
-  </string>
-  <string name="turn_on_wifi">
-    무선랜 켜기
-  </string>
-  <string name="no_gps_device">
-    아무 GPS 장치에 감지되지!
-  </string>
-  <string name="turn_on_gps">
-    GPS를 켜주십시오
-  </string>
-  <string name="address">
-    주소
-  </string>
-  <string name="no_address_found">
-    찾지 코드 화됨 주소 없음
-  </string>
-  <string name="problem_with_field">
-    필드 문제
-  </string>
-  <string name="turning_wifi_off">
-    와이파이를 다시 해제
-  </string>
-  <string name="lost_location">
-    분실 장소
-  </string>
-  <string name="have_location">
-    지금부터 위치를
-  </string>
-  <string name="wifi_jammed">
-    와이파이는 와이파이에 다음 해제하고, 고장이 나타납니다.
-  </string>
-  <string name="battery_at">
-    에서 배터리 수준
-  </string>
-  <string name="battery_postfix">
-    퍼센트 Wigle 와이파이를 종료
-  </string>
-  <string name="scan">
-    스캔
-  </string>
-  <string name="menu_exit">
-    출구
-  </string>
-  <string name="menu_settings">
-    설정
-  </string>
-  <string name="menu_error_report">
-    오류 신고
-  </string>
-  <string name="menu_return">
-    반환
-  </string>
-  <string name="menu_sort">
-    정렬 옵션
-  </string>
-  <string name="menu_ssid_filter">
-    SSID 레이블 필터
-  </string>
-  <string name="menu_screen_sleep">
-    화면 자게
-  </string>
-  <string name="menu_screen_wake">
-    화면 계속
-  </string>
-  <string name="menu_labels_off">
-    오프 라벨
-  </string>
-  <string name="menu_labels_on">
-    레이블
-  </string>
-  <string name="menu_zoom_in">
-    확대
-  </string>
-  <string name="menu_zoom_out">
-    축소
-  </string>
-  <string name="menu_turn_off_lockon">
-    Lockon 끄기
-  </string>
-  <string name="menu_turn_on_lockon">
-    Lockon 켭니다
-  </string>
-  <string name="menu_show_old">
-    실행 및 새보기
-  </string>
-  <string name="menu_show_new">
-    표시 새 전용
-  </string>
-  <string name="tts_no_gps_fix">
-    더 GPS 수정 없음
-  </string>
-  <string name="tts_new_wifi">
-    새로운 와이파이
-  </string>
-  <string name="tts_new_cell">
-    새 휴대폰
-  </string>
-  <string name="tts_queue">
-    대기열
-  </string>
-  <string name="tts_from">
-    부터
-  </string>
-  <string name="tts_o_clock">
-    시계 신세
-  </string>
-  <string name="tts_o">
-    신세
-  </string>
-  <string name="tts_battery">
-    배터리
-  </string>
-  <string name="tts_percent">
-    퍼센트
-  </string>
-  <string name="status_unknown">
-    알 수없는
-  </string>
-  <string name="status_unknown_error">
-    알 수없는 오류
-  </string>
-  <string name="status_fail">
-    실패
-  </string>
-  <string name="status_success">
-    성공
-  </string>
-  <string name="status_working">
-    작업 ...
-  </string>
-  <string name="status_upload_success">
-    성공을 업로드
-  </string>
-  <string name="status_write_success">
-    성공 쓰기
-  </string>
-  <string name="status_no_user">
-    사용자 이름 설정하지
-  </string>
-  <string name="status_no_pass">
-    비밀 번호 설정되지 및 사용자 이름없는 \'익명\'
-  </string>
-  <string name="status_exception">
-    예외
-  </string>
-  <string name="status_login_fail">
-    로그인 실패 비밀 번호를 확인?
-  </string>
-  <string name="status_uploading">
-    업로드 파일
-  </string>
-  <string name="status_writing">
-    파일 쓰기
-  </string>
-  <string name="status_nothing">
-    아무것도하지
-  </string>
-  <string name="status_empty">
-    파일은 비어 될
-  </string>
-  <string name="data_export_csv">
-    CSV 파일을 실행 수출?
-  </string>
-  <string name="data_export_kml_run">
-    KML 파일을 실행 수출?
-  </string>
-  <string name="data_export_kml_db">
-    KML 파일을 DB를 내보내기?
-  </string>
-  <string name="data_backup_db">
-    다른 파일에 대한 DB를 백업?
-  </string>
-  <string name="language_en">
-    영어 (en)
-  </string>
-  <string name="language_cs">
-    čeština (CS)
-  </string>
-  <string name="language_de">
-    Deutsch (DE)
-  </string>
-  <string name="language_es">
-    español (ES)
-  </string>
-  <string name="language_fr">
-    프랑스어 (FR)
-  </string>
-  <string name="language_it">
-    이탈리아어 (IT)
-  </string>
-  <string name="language_nl">
-    Nederlands (NL)
-  </string>
-  <string name="language_pl">
-    폴란드 (PL)
-  </string>
-  <string name="language_ru">
-    русский (RU)
-  </string>
-  <string name="language_sv">
-    svenska (SV)
-  </string>
-  <string name="language_text">
-    선택된 언어 (다시 시작해야 함)
-  </string>
-  <string name="auto">
-    자동
-  </string>
-  <string name="fatal_title">
-  치명적인 DB의 문제
-  </string>
-  <string name="fatal_db_warn">
-  보통 장치 또는 SD 카드 문제로 인해!
-  </string>
-  <string name="fatal_pre_message">
-  오류
-  </string>
-  <string name="fatal_post_message">
-  (설정 메뉴에서 "오류보고"로 다시보실 수 있습니다)
-  </string>
-  <string name="use_network_location">
-  네트워크 위치 공급자를 사용
-  </string>
-  <string name="data_import_observed">
-  로컬 데이터베이스로 WiGLE에서 내 관찰 WiFi를 가져오기?
-  </string>
+    <string name="stats">시작</string>
+    <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="settings_app_name">WiGLE Wifi - 설정</string>
+    <string name="mapping_app_name">WiGLE Wifi - 오픈스트리트맵</string>
+    <string name="dashboard_app_name">WiGLE Wifi - 대시보드</string>
+    <string name="error_report_name">WiGLE Wifi - 대부분의 최근 오류 보고서</string>
+    <string name="speech_name">WiGLE Wifi - 음성 설정</string>
+    <string name="network_activity_name">WiGLE Wifi - 네트워크</string>
+    <string name="data_activity_name">WiGLE Wifi - 데이터베이스</string>
+    <string name="dbresult_activity_name">WiGLE Wifi - 검색 결과</string>
+    <string name="upload_button">WiGLE.net\n업로드</string>
+    <string name="username">WiGLE 사용자 이름</string>
+    <string name="password">WiGLE 비밀 번호</string>
+    <string name="show_current">현재 네트워크를 표시 전용</string>
+    <string name="use_metric">측정 단위를 사용</string>
+    <string name="be_anonymous">익명 업로드</string>
+    <string name="donate">기부 데이터 상업적인 사용을 허용</string>
+    <string name="found_sound">네트워크에서 실행 발견했을 때 소리 재생</string>
+    <string name="found_new_sound">사운드를 재생할 때 DB에 새로운 네트워크</string>
+    <string name="reset_maxid_button">제로 DB 마커</string>
+    <string name="reset_maxid_text">최근 업로드 마커 :</string>
+    <string name="maxout_maxid_button">Maxout DB 마커</string>
+    <string name="maxout_maxid_text">에 마커를 설정합니다 :</string>
+    <string name="connect_button">연결</string>
+    <string name="connect_text">네트워크 운영자의 승인</string>
+    <string name="csv_run_export_button">CSV 내보내기 실행</string>
+    <string name="csv_run_export_text">CSV 파일에 현재 실행 내보내기</string>
+    <string name="csv_export_button">CSV Export DB</string>
+    <string name="csv_export_text">Export entire DB to CSV file</string>
+    <string name="kml_run_export_button">KML 내보내기 실행</string>
+    <string name="kml_run_export_text">KML 파일을 현재 실행 내보내기</string>
+    <string name="kml_export_button">KML 수출 DB</string>
+    <string name="kml_export_text">KML 파일에 전체 DB를 내보내기</string>
+    <string name="backup_db_button">백업 데이터베이스</string>
+    <string name="backup_db_text">데이터베이스 백업 만들기</string>
+    <string name="import_observed_button">가져오기 관찰된</string>
+    <string name="import_observed_text">WiGLE에서 내 관찰 네트워크를 가져오기</string>
+    <string name="periodstill_text">무선랜 사이의 시간 0mph을 스캔</string>
+    <string name="period_text">Wi-Fi를 스캔 사이의 시간 &lt;5mph</string>
+    <string name="periodfast_text">Wi-Fi를 스캔 사이의 시간 &gt;5mph</string>
+    <string name="gps_text">GPS 업데이트 사이의 시간</string>
+    <string name="speak_text">오디오 음성 사이의 시간</string>
+    <string name="battery_kill_text">이 배터리 수준에서 출구</string>
+    <string name="reset_wifi_text">와이파이가 열려요 결정</string>
+    <string name="speech_gps">GPS 상태 변경을 발표</string>
+    <string name="mute">음소거</string>
+    <string name="play">놀이</string>
+    <string name="unknown">알 수없는</string>
+    <string name="sort_text">정렬 옵션</string>
+    <string name="listdialog_button">확인</string>
+    <string name="cryptodialog_button">확인</string>
+    <string name="cryptocanceldialog_button">취소</string>
+    <string name="circle_size_map">수량으로 크기 맵 동아리</string>
+    <string name="speech_button">음성 구성 화면&gt;&gt;</string>
+    <string name="speech_text">오디오 연설은 포함됩니다 :</string>
+    <string name="speech_run">실행을위한 그물</string>
+    <string name="speech_new_wifi">DB에 새로운 와이파이</string>
+    <string name="speech_new_cell">DB에 새로운 셀 타워</string>
+    <string name="speech_queue">대기열 크기가있다면&gt; 0</string>
+    <string name="speech_miles">실행 마일</string>
+    <string name="speech_time">현재 시간</string>
+    <string name="speech_battery">배터리 수준 비율</string>
+    <string name="speech_ssid">새로운 네트워크 SSID\'s 의</string>
+    <string name="query_address">주소 (예 : 시카고, IL) :</string>
+    <string name="query_ssid">SSID (예 : Linksys) (SQL 와일드 카드 : %,_):</string>
+    <string name="query_bssid">BSSID (예 : 0A:2C:EF:3D:25:1B) (SQL 와일드 카드 : %,_):</string>
+    <string name="search_button">검색어 로컬 DB</string>
+    <string name="reset_button">재설정 필드</string>
+    <string name="list_query_clear">삭제 쿼리 인수</string>
+    <string name="crypto_security">보안</string>
+    <string name="crypto_strength">신호 강도</string>
+    <string name="crypto_password">암호</string>
+    <string name="crypto_show_password">비밀 번호를 표시합니다.</string>
+    <string name="filter_show_ssid">보기 SSID\'s 의 매칭 (정규식) :</string>
+    <string name="filter_not_regex">표시 어떤 어쩌려 구 는 정규 표현식과 일치하는 위</string>
+    <string name="filter_show_open">오픈보기</string>
+    <string name="filter_show_cell">셀 표시</string>
+    <string name="filter_show_wep">보기 WEP</string>
+    <string name="filter_show_wpa">보기 WPA</string>
+    <string name="filter_enabled">필터 사용</string>
+    <string name="list_waiting_gps">(GPS 동기화 대기 ...)</string>
+    <string name="list_scanning_off">(검색이 꺼져)</string>
+    <string name="list_short_lat">위도 :</string>
+    <string name="list_short_lon">경도 :</string>
+    <string name="list_short_sats">수능 점수 :</string>
+    <string name="list_short_alt">ALT :</string>
+    <string name="list_status_default">(상태)</string>
+    <string name="list_speed">속도 :</string>
+    <string name="list_upload">파일 업로드?</string>
+    <string name="network_signal">신호 :</string>
+    <string name="network_type">유형 :</string>
+    <string name="network_firstseen">먼저 보면 :</string>
+    <string name="network_capa">기능 :</string>
+    <string name="network_channel">채널 :</string>
+    <string name="network_observations">관찰 :</string>
+    <string name="network_querying">(querying...)</string>
+    <string name="setting_show_password">비밀 번호를 표시</string>
+    <string name="setting_db_marker">DB 마커 (여기서 업로드부터 시작) :</string>
+    <string name="setting_high_up">최고 업로드 ID :</string>
+    <string name="setting_zero_out">DB 마커 아웃 제로?</string>
+    <string name="setting_max_id">최대 업로드 ID :</string>
+    <string name="setting_max_start">시작시 최대 ID :</string>
+    <string name="setting_max_out">DB 마커 아웃 맥스?</string>
+    <string name="setting_tie_wifi">와이파이 스캔 기간에 타이</string>
+    <string name="no_tts">아무 텍스트 음성 변환 엔진 없습니다</string>
+    <string name="sec">초</string>
+    <string name="min">분</string>
+    <string name="off">끄기</string>
+    <string name="on">에</string>
+    <string name="nonstop">논스톱</string>
+    <string name="tab_list">목록</string>
+    <string name="tab_map">지도</string>
+    <string name="tab_dash">계기판</string>
+    <string name="tab_data">데이터</string>
+    <string name="ok">확인</string>
+    <string name="cancel">취소</string>
+    <string name="dash_scan_off">(검색이 꺼져)</string>
+    <string name="dash_new_wifi">새로운 와이파이</string>
+    <string name="dash_vis_nets">표시 네츠 :</string>
+    <string name="dash_new_upload">업로드 이후 새로운 네츠 :</string>
+    <string name="dash_new_cells">새로운 셀 타워 :</string>
+    <string name="dash_dist_run">거리를 실행합니다 :</string>
+    <string name="dash_dist_total">Dist 총. :</string>
+    <string name="dash_dist_prev">이전이 실행 :</string>
+    <string name="dash_db_queue">DB 대기열 :</string>
+    <string name="dash_db_nets">DB 네츠 :</string>
+    <string name="dash_db_locs">DB 위치 :</string>
+    <string name="dash_no_loc">없음 위치!</string>
+    <string name="dash_short_loc">LOC :</string>
+    <string name="km_short">km</string>
+    <string name="mi_short">미</string>
+    <string name="miles">마일</string>
+    <string name="m_short">m</string>
+    <string name="meters">m</string>
+    <string name="T">피트</string>
+    <string name="feet">피트</string>
+    <string name="kmph">kmph</string>
+    <string name="mph">mph</string>
+    <string name="ms_short">MS</string>
+    <string name="na">N/A</string>
+    <string name="run">실행</string>
+    <string name="new_word">새로운</string>
+    <string name="db">DB</string>
+    <string name="scanned_in">에서 스캔</string>
+    <string name="sort_title">정렬 옵션</string>
+    <string name="sort_spin_label">정렬 목록 :</string>
+    <string name="channel">채널</string>
+    <string name="crypto">암호화</string>
+    <string name="found_time">발견 시간</string>
+    <string name="signal">신호</string>
+    <string name="ssid">SSID</string>
+    <string name="bssid">BSSID</string>
+    <string name="best_results">최상의 결과를 들어, &quot;무선 및 네트워크&quot;의 해제 &quot;네트워크 알​​림&quot;-&gt; &quot;와이파이 설정&quot;</string>
+    <string name="turn_on_wifi">무선랜 켜기</string>
+    <string name="no_gps_device">아무 GPS 장치에 감지되지!</string>
+    <string name="turn_on_gps">GPS를 켜주십시오</string>
+    <string name="address">주소</string>
+    <string name="no_address_found">찾지 코드 화됨 주소 없음</string>
+    <string name="problem_with_field">필드 문제</string>
+    <string name="turning_wifi_off">와이파이를 다시 해제</string>
+    <string name="lost_location">분실 장소</string>
+    <string name="have_location">지금부터 위치를</string>
+    <string name="wifi_jammed">와이파이는 와이파이에 다음 해제하고, 고장이 나타납니다.</string>
+    <string name="battery_at">에서 배터리 수준</string>
+    <string name="battery_postfix">퍼센트 WiGLE Wifi 종료</string>
+    <string name="scan">스캔</string>
+    <string name="menu_exit">출구</string>
+    <string name="menu_settings">설정</string>
+    <string name="menu_error_report">오류 신고</string>
+    <string name="menu_return">반환</string>
+    <string name="menu_sort">정렬 옵션</string>
+    <string name="menu_ssid_filter">SSID 레이블 필터</string>
+    <string name="menu_screen_sleep">화면 자게</string>
+    <string name="menu_screen_wake">화면 계속</string>
+    <string name="menu_labels_off">오프 라벨</string>
+    <string name="menu_labels_on">레이블</string>
+    <string name="menu_zoom_in">확대</string>
+    <string name="menu_zoom_out">축소</string>
+    <string name="menu_turn_off_lockon">Lockon 끄기</string>
+    <string name="menu_turn_on_lockon">Lockon 켭니다</string>
+    <string name="menu_show_old">실행 및 새보기</string>
+    <string name="menu_show_new">표시 새 전용</string>
+    <string name="menu_copy_network">Copy Network BSSID</string>
+    <string name="tts_no_gps_fix">더 GPS 수정 없음</string>
+    <string name="tts_new_wifi">새로운 와이파이</string>
+    <string name="tts_new_cell">새 휴대폰</string>
+    <string name="tts_queue">대기열</string>
+    <string name="tts_from">부터</string>
+    <string name="tts_o_clock">시계 신세</string>
+    <string name="tts_o">신세</string>
+    <string name="tts_battery">배터리</string>
+    <string name="tts_percent">퍼센트</string>
+    <string name="status_unknown">알 수없는</string>
+    <string name="status_unknown_error">알 수없는 오류</string>
+    <string name="status_fail">실패</string>
+    <string name="status_success">성공</string>
+    <string name="status_working">작업 ...</string>
+    <string name="status_upload_success">성공을 업로드</string>
+    <string name="status_write_success">성공 쓰기</string>
+    <string name="status_no_user">사용자 이름 설정하지</string>
+    <string name="status_no_pass">비밀 번호 설정되지 및 사용자 이름없는 \'anonymous\'</string>
+    <string name="status_exception">예외</string>
+    <string name="status_login_fail">로그인 실패 비밀 번호를 확인?</string>
+    <string name="status_uploading">업로드 파일</string>
+    <string name="status_writing">파일 쓰기</string>
+    <string name="status_nothing">아무것도하지</string>
+    <string name="status_empty">파일은 비어 될</string>
+    <string name="data_export_csv_run">CSV 파일을 실행 수출?</string>
+    <string name="data_export_csv_db">CSV 파일을 DB를 내보내기?</string>
+    <string name="data_export_kml_run">KML 파일을 실행 수출?</string>
+    <string name="data_export_kml_db">KML 파일을 DB를 내보내기?</string>
+    <string name="data_backup_db">다른 파일에 대한 DB를 백업?</string>
+    <string name="auto">자동</string>
+    <string name="language_en">English (영어)</string>
+    <string name="language_ar">العربية (아랍어)</string>
+    <string name="language_cs">čeština (체코어)</string>
+    <string name="language_da">dansk (덴마크어)</string>
+    <string name="language_de">Deutsch (독일어)</string>
+    <string name="language_es">español (스페인어)</string>
+    <string name="language_fi">suomi (핀란드어)</string>
+    <string name="language_fr">français (프랑스어)</string>
+    <string name="language_he">עִבְרִית (히브리어)</string>
+    <string name="language_hi">हिन्दी (힌디어)</string>
+    <string name="language_it">italiano (이탈리아어)</string>
+    <string name="language_ja">日本語 (일본어)</string>
+    <string name="language_ko">한국어</string>
+    <string name="language_nl">Nederlands (네덜란드어)</string>
+    <string name="language_no">norsk (노르웨이어)</string>
+    <string name="language_pl">polski (폴란드어)</string>
+    <string name="language_pt">português (포르투갈어)</string>
+    <string name="language_pt-rBR">português brasileiro (브라질 포르투갈어)</string>
+    <string name="language_ru">ру́сский (러시아어)</string>
+    <string name="language_sv">svenska (스웨덴어)</string>
+    <string name="language_tr">Türkçe (터키어)</string>
+    <string name="language_zh">繁體中文 (중국어 번체)</string>
+    <string name="language_text">선택된 언어 (다시 시작해야 함)</string>
+    <string name="fatal_title">치명적인 DB의 문제</string>
+    <string name="fatal_db_warn">보통 장치 또는 SD 카드 문제로 인해!</string>
+    <string name="fatal_pre_message">오류</string>
+    <string name="fatal_post_message">(설정 메뉴에서 "오류보고"로 다시보실 수 있습니다)</string>
+    <string name="use_network_location">네트워크 위치 공급자를 사용</string>
+    <string name="data_import_observed">로컬 데이터베이스로 WiGLE에서 내 관찰 Wi-Fi를 가져오기?</string>
+    <string name="donate_question">Donate data to WiGLE?</string>
+    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
+    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
+    <string name="speech_wifi_restart">Wi-Fi restarts</string>
+    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
 </resources>

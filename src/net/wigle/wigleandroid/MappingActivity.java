@@ -24,8 +24,10 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -41,7 +43,7 @@ import android.widget.TextView;
  * show a map!
  */
 @SuppressWarnings("deprecation")
-public final class MappingActivity extends Activity {
+public final class MappingActivity extends Fragment {
   private static class State {
     private boolean locked = true;
     private boolean firstMove = true;
@@ -76,15 +78,22 @@ public final class MappingActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );
+    setHasOptionsMenu(true);
     // set language
-    MainActivity.setLocale( this );
-    setContentView( R.layout.map );
+    MainActivity.setLocale( getActivity() );
     finishing = new AtomicBoolean( false );
     
     // media volume
-    this.setVolumeControlStream( AudioManager.STREAM_MUSIC );  
+    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
     
-    final Object stored = getLastNonConfigurationInstance();
+    setupQuery();
+  }
+  
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    final View view = inflater.inflate(R.layout.map, container, false);
+    
+    final Object stored = getActivity().getLastNonConfigurationInstance();
     IGeoPoint oldCenter = null;
     int oldZoom = Integer.MIN_VALUE;
     if ( stored != null && stored instanceof State ) {
@@ -94,31 +103,32 @@ public final class MappingActivity extends Activity {
       state.firstMove = retained.firstMove;
       oldCenter = retained.oldCenter;
       oldZoom = retained.oldZoom;
-    }
+    }       
     
-    setupMapView( oldCenter, oldZoom );
-    setupTimer();
-    setupQuery();
+    setupMapView( view, oldCenter, oldZoom );
+    setupTimer( view );    
+    
+    return view;
   }
   
-  @Override
-  public Object onRetainNonConfigurationInstance() {
-    ListActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
-    // save the map info
-    state.oldCenter = mapView.getMapCenter();
-    state.oldZoom = mapView.getZoomLevel();
-    // return state class to copy data from
-    return state;
-  }
+//  @Override
+//  public Object onRetainNonConfigurationInstance() {
+//    MainActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
+//    // save the map info
+//    state.oldCenter = mapView.getMapCenter();
+//    state.oldZoom = mapView.getZoomLevel();
+//    // return state class to copy data from
+//    return state;
+//  }
   
-  private void setupMapView( final IGeoPoint oldCenter, final int oldZoom ) {
+  private void setupMapView( final View view, final IGeoPoint oldCenter, final int oldZoom ) {
     // view
-    final RelativeLayout rlView = (RelativeLayout) this.findViewById( R.id.map_rl );
+    final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
 
     // tryEvil();
     
     // possibly choose goog maps here
-    mapView = new MapView( this, 256 );   
+    mapView = new MapView( getActivity(), 256 );   
     
     if ( mapView instanceof View ) {
       ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
@@ -130,7 +140,7 @@ public final class MappingActivity extends Activity {
       final MapView osmMapView = (MapView) mapView;
 
       // conditionally replace the tile source
-      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean wigleTiles = prefs.getBoolean( ListActivity.PREF_USE_WIGLE_TILES, true );
       if ( wigleTiles ) { 
           osmMapView.setTileSource( WigleTileSource.WiGLE );
@@ -141,31 +151,31 @@ public final class MappingActivity extends Activity {
       osmMapView.setMultiTouchControls( true );
       
       // my location overlay
-      myLocationOverlay = new MyLocationOverlay( getApplicationContext(), osmMapView );
-      myLocationOverlay.setLocationUpdateMinTime( ListActivity.LOCATION_UPDATE_INTERVAL );
+      myLocationOverlay = new MyLocationOverlay( getActivity().getApplicationContext(), osmMapView );
+      myLocationOverlay.setLocationUpdateMinTime( MainActivity.LOCATION_UPDATE_INTERVAL );
       myLocationOverlay.setDrawAccuracyEnabled( false );
       osmMapView.getOverlays().add( myLocationOverlay );
       
-      final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( this );
+      final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( getActivity() );
       osmMapView.getOverlays().add( overlay );
     }
     
     // controller
     mapControl = mapView.getController();
-    final IGeoPoint centerPoint = getCenter( this, oldCenter, previousLocation );
+    final IGeoPoint centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
     int zoom = DEFAULT_ZOOM;
     if ( oldZoom >= 0 ) {
       zoom = oldZoom;
     }
     else {
-      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
     }    
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( zoom );
     mapControl.setCenter( centerPoint );
     
-    ListActivity.info("done setupMapView. zoom: " + zoom);
+    MainActivity.info("done setupMapView. zoom: " + zoom);
   }
   
   public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
@@ -214,12 +224,12 @@ public final class MappingActivity extends Activity {
       retval = locationManager.getLastKnownLocation( provider );
     }
     catch ( IllegalArgumentException ex ) {
-      ListActivity.info("exception getting last known location: " + ex);
+      MainActivity.info("exception getting last known location: " + ex);
     }
     return retval;
   }
   
-  private void setupTimer() {
+  private void setupTimer( final View view ) {
     if ( timer == null ) {
       timer = new Handler();
       final Runnable mUpdateTimeTask = new Runnable() {
@@ -229,7 +239,7 @@ public final class MappingActivity extends Activity {
               final Location location = ListActivity.lameStatic.location;
               if ( location != null ) {
                 if ( state.locked ) {
-                  // ListActivity.info( "mapping center location: " + location );
+                  // MainActivity.info( "mapping center location: " + location );
   								final GeoPoint locGeoPoint = new GeoPoint( location );
   								if ( state.firstMove ) {
   								  mapControl.setCenter( locGeoPoint );
@@ -253,11 +263,11 @@ public final class MappingActivity extends Activity {
               
               previousRunNets = ListActivity.lameStatic.runNets;
               
-              TextView tv = (TextView) findViewById( R.id.stats_run );
+              TextView tv = (TextView) view.findViewById( R.id.stats_run );
               tv.setText( getString(R.string.run) + ": " + ListActivity.lameStatic.runNets );
-              tv = (TextView) findViewById( R.id.stats_new );
+              tv = (TextView) view.findViewById( R.id.stats_new );
               tv.setText( getString(R.string.new_word) + ": " + ListActivity.lameStatic.newNets );
-              tv = (TextView) findViewById( R.id.stats_dbnets );
+              tv = (TextView) view.findViewById( R.id.stats_dbnets );
               tv.setText( getString(R.string.db) + ": " + ListActivity.lameStatic.dbNets );
               
               final long period = 1000L;
@@ -265,7 +275,7 @@ public final class MappingActivity extends Activity {
               timer.postDelayed( this, period );
             }
             else {
-              ListActivity.info( "finishing mapping timer" );
+              MainActivity.info( "finishing mapping timer" );
             }
         }
       };
@@ -273,22 +283,23 @@ public final class MappingActivity extends Activity {
       timer.postDelayed( mUpdateTimeTask, 100 );
     }
   }
-    
-  @Override
-  public void finish() {
-    ListActivity.info( "finish mapping." );
-    finishing.set( true );
-    
-    super.finish();
-  }
+  
+// XXX   
+//  @Override
+//  public void finish() {
+//    MainActivity.info( "finish mapping." );
+//    finishing.set( true );
+//    
+//    super.finish();
+//  }
   
   @Override
   public void onDestroy() {
-    ListActivity.info( "destroy mapping." );
+    MainActivity.info( "destroy mapping." );
     finishing.set( true );
     
     // save zoom
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final Editor edit = prefs.edit();
     edit.putInt( ListActivity.PREF_PREV_ZOOM, mapView.getZoomLevel() );
     edit.commit();
@@ -298,7 +309,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public void onPause() {
-    ListActivity.info( "pause mapping." );
+    MainActivity.info( "pause mapping." );
     myLocationOverlay.disableCompass();
     disableLocation();
     
@@ -307,7 +318,7 @@ public final class MappingActivity extends Activity {
   
   @Override
   public void onResume() {
-    ListActivity.info( "resume mapping." );
+    MainActivity.info( "resume mapping." );
     myLocationOverlay.enableCompass();    
     enableLocation();
     
@@ -328,19 +339,19 @@ public final class MappingActivity extends Activity {
       // force it to think it's own location listening is on
       myLocationOverlay.mLocationListener = new LocationListenerProxy(null);
       STATIC_LOCATION_LISTENER = myLocationOverlay;
-      MainActivity.getListActivity(this).getGPSListener().setMapListener(myLocationOverlay);
+      MainActivity.getMainActivity(this).getGPSListener().setMapListener(myLocationOverlay);
       myLocationOverlay.enableMyLocation();
     }
     catch (Exception ex) {
-      ListActivity.error("Could not enableLocation for maps: " + ex, ex);
+      MainActivity.error("Could not enableLocation for maps: " + ex, ex);
     }
   }
   
   /* Creates the menu items */
   @Override
-  public boolean onCreateOptionsMenu( final Menu menu ) {
+  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) { 
     MenuItem item = null;
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
     
@@ -367,9 +378,8 @@ public final class MappingActivity extends Activity {
     
     item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
     item.setIcon( android.R.drawable.ic_menu_revert );
-    
-    
-    return true;
+        
+    super.onCreateOptionsMenu(menu, inflater);  
   }
 
   /* Handles item selections */
@@ -377,8 +387,8 @@ public final class MappingActivity extends Activity {
   public boolean onOptionsItemSelected( final MenuItem item ) {
       switch ( item.getItemId() ) {
         case MENU_EXIT: {
-          MainActivity.finishListActivity( this );
-          finish();
+          final MainActivity main = MainActivity.getMainActivity();
+          main.finish();
           return true;
         }
         case MENU_ZOOM_IN: {
@@ -400,7 +410,7 @@ public final class MappingActivity extends Activity {
           return true;
         }
         case MENU_TOGGLE_NEWDB: {
-          final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+          final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
           final boolean showNewDBOnly = ! prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
@@ -411,7 +421,7 @@ public final class MappingActivity extends Activity {
           return true;
         }
         case MENU_LABEL: {
-          final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+          final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
           final boolean showLabel = ! prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
@@ -422,7 +432,7 @@ public final class MappingActivity extends Activity {
           return true;
         }
         case MENU_FILTER: {
-          showDialog( SSID_FILTER );
+//          showDialog( SSID_FILTER );  XXX
           return true;
         }
       }
@@ -430,27 +440,28 @@ public final class MappingActivity extends Activity {
   }
   
   
-  
-  @Override
-  public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if (keyCode == KeyEvent.KEYCODE_BACK) {
-      ListActivity.info( "onKeyDown: not quitting app on back" );
-      MainActivity.switchTab( this, MainActivity.TAB_LIST );
-      return true;
-    }
-    return super.onKeyDown(keyCode, event);
-  }
-  
-  @Override
-  public Dialog onCreateDialog( int which ) {
-    switch ( which ) {
-      case SSID_FILTER:
-        return createSsidFilterDialog( this, "" );
-      default:
-        ListActivity.error( "unhandled dialog: " + which );
-    }
-    return null;    
-  }
+//  XXX
+//  @Override
+//  public boolean onKeyDown(int keyCode, KeyEvent event) {
+//    if (keyCode == KeyEvent.KEYCODE_BACK) {
+//      MainActivity.info( "onKeyDown: not quitting app on back" );
+//      MainActivity.switchTab( this, MainActivity.TAB_LIST );
+//      return true;
+//    }
+//    return super.onKeyDown(keyCode, event);
+//  }
+
+  //  XXX
+//  @Override
+//  public Dialog onCreateDialog( int which ) {
+//    switch ( which ) {
+//      case SSID_FILTER:
+//        return createSsidFilterDialog( this, "" );
+//      default:
+//        MainActivity.error( "unhandled dialog: " + which );
+//    }
+//    return null;    
+//  }
   
   public static Dialog createSsidFilterDialog( final Activity activity, final String prefix ) {
     final Dialog dialog = new Dialog( activity );
@@ -458,7 +469,7 @@ public final class MappingActivity extends Activity {
     dialog.setContentView( R.layout.filterdialog );
     dialog.setTitle( "SSID Filter" );
     
-    ListActivity.info("make new dialog");
+    MainActivity.info("make new dialog");
     final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final EditText regex = (EditText) dialog.findViewById( R.id.edit_regex );
     regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
@@ -493,7 +504,7 @@ public final class MappingActivity extends Activity {
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing filter dialog: " + ex );
+            MainActivity.info( "exception dismissing filter dialog: " + ex );
           }
         }
       } );
@@ -520,7 +531,7 @@ public final class MappingActivity extends Activity {
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
-            ListActivity.info( "exception dismissing filter dialog: " + ex );
+            MainActivity.info( "exception dismissing filter dialog: " + ex );
           }
         }
       } );
@@ -529,7 +540,7 @@ public final class MappingActivity extends Activity {
   }
 
   private void setupQuery() {
-    if (ListActivity.getNetworkCache().size() > 25) {
+    if (MainActivity.getNetworkCache().size() > 25) {
       // don't load, there's already networks to show
       return;
     }
@@ -540,13 +551,13 @@ public final class MappingActivity extends Activity {
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       public void handleRow( final Cursor cursor ) {
         final String bssid = cursor.getString(0);
-        final ConcurrentLinkedHashMap<String,Network> networkCache = ListActivity.getNetworkCache();
+        final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
         
         Network network = networkCache.get( bssid );        
         if ( network == null ) {
           network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
           networkCache.put( network.getBssid(), network );      
-          // ListActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
+          // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
         
           final GeoPoint geoPoint = network.getGeoPoint();
           final int newWifiForRun = 1;
@@ -570,7 +581,7 @@ public final class MappingActivity extends Activity {
 //    //Object foo = new com.google.android.maps.MapView( this, apiKey );
 //    try {
 //      File file = new File("/sdcard/com.google.android.maps.jar");
-//      ListActivity.info("file exists: " + file.exists() + " " + file.canRead());
+//      MainActivity.info("file exists: " + file.exists() + " " + file.canRead());
 //      //DexFile df = new DexFile(file);
 //      
 //      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
@@ -581,13 +592,13 @@ public final class MappingActivity extends Activity {
 //      Class<?> mapActivityClass = cl.loadClass("EvilMap");
 //      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
 //      Object mapActivity = constructor.newInstance( this );
-//      ListActivity.info("mapActivity: " + mapActivity.getClass().getName());
+//      MainActivity.info("mapActivity: " + mapActivity.getClass().getName());
 //      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
 //      create.invoke(mapActivity, new Bundle());
 //      
 ////      final InvocationHandler handler = new InvocationHandler() {
 ////        public Object invoke( Object object, Method method, Object[] args ) {
-////          ListActivity.info("invoke: " + method.getName() );
+////          MainActivity.info("invoke: " + method.getName() );
 ////          return null;
 ////        }
 ////      };
@@ -597,11 +608,11 @@ public final class MappingActivity extends Activity {
 //      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
 //      constructor = foo.getConstructor(Context.class, String.class);
 //      Object googMap = constructor.newInstance( mapActivity, apiKey );
-//      ListActivity.info("googMap: " + googMap);
+//      MainActivity.info("googMap: " + googMap);
 //
 //    }
 //    catch ( Exception ex)  {
-//      ListActivity.error("ex: " + ex, ex);
+//      MainActivity.error("ex: " + ex, ex);
 //    }
 //        
 //  }

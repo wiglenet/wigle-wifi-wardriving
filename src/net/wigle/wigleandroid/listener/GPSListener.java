@@ -3,6 +3,7 @@ package net.wigle.wigleandroid.listener;
 import static android.location.LocationManager.GPS_PROVIDER;
 import static android.location.LocationManager.NETWORK_PROVIDER;
 import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,7 +21,7 @@ public class GPSListener implements Listener, LocationListener {
   private static final long GPS_TIMEOUT = 15000L;
   private static final long NET_LOC_TIMEOUT = 60000L;
   
-  private ListActivity listActivity;
+  private MainActivity mainActivity;
   private Location location;
   private Location networkLocation;
   private GpsStatus gpsStatus;
@@ -31,39 +32,39 @@ public class GPSListener implements Listener, LocationListener {
   private float previousSpeed = 0f;
   private LocationListener mapLocationListener;
   
-  public GPSListener( ListActivity listActivity ) {
-    this.listActivity = listActivity;
+  public GPSListener( MainActivity mainActivity ) {
+    this.mainActivity = mainActivity;
   }
   
   public void setMapListener( LocationListener mapLocationListener ) {
     this.mapLocationListener = mapLocationListener;
   }
   
-  public void setListActivity( ListActivity listActivity ) {
-    this.listActivity = listActivity;
+  public void setMainActivity( MainActivity mainActivity ) {
+    this.mainActivity = mainActivity;
   }
   
   @Override
   public void onGpsStatusChanged( final int event ) {
     if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
-      ListActivity.info("GPS STOPPED");    
+      MainActivity.info("GPS STOPPED");    
       // this event lies, on one device it gets called when the
       // network provider is disabled :(  so we do nothing...
       // listActivity.setLocationUpdates();
     }
-    // ListActivity.info("GPS event: " + event);
+    // MainActivity.info("GPS event: " + event);
     updateLocationData( (Location) null );
   } 
   
   public void handleScanStop() {
-    ListActivity.info("GPSListener: handleScanStop");
+    MainActivity.info("GPSListener: handleScanStop");
     gpsStatus = null;
     location = null;
   }
   
   @Override
   public void onLocationChanged( final Location newLocation ) {
-    // ListActivity.info("GPS onLocationChanged: " + newLocation);
+    // MainActivity.info("GPS onLocationChanged: " + newLocation);
     updateLocationData( newLocation );
         
     if ( mapLocationListener != null ) {
@@ -73,7 +74,7 @@ public class GPSListener implements Listener, LocationListener {
   
   @Override
   public void onProviderDisabled( final String provider ) {
-    ListActivity.info("provider disabled: " + provider);
+    MainActivity.info("provider disabled: " + provider);
         
     if ( mapLocationListener != null ) {
       mapLocationListener.onProviderDisabled( provider );
@@ -82,7 +83,7 @@ public class GPSListener implements Listener, LocationListener {
   
   @Override
   public void onProviderEnabled( final String provider ) {
-    ListActivity.info("provider enabled: " + provider);
+    MainActivity.info("provider enabled: " + provider);
         
     if ( mapLocationListener != null ) {
       mapLocationListener.onProviderEnabled( provider );
@@ -91,7 +92,7 @@ public class GPSListener implements Listener, LocationListener {
   
   @Override
   public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
-    ListActivity.info("provider status changed: " + provider + " status: " + status);
+    MainActivity.info("provider status changed: " + provider + " status: " + status);
         
     if ( mapLocationListener != null ) {
       mapLocationListener.onStatusChanged( provider, status, extras );
@@ -100,7 +101,7 @@ public class GPSListener implements Listener, LocationListener {
 
   /** newLocation can be null */
   private void updateLocationData( final Location newLocation ) {
-    final LocationManager locationManager = (LocationManager) listActivity.getSystemService(Context.LOCATION_SERVICE);
+    final LocationManager locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
     // see if we have new data
     gpsStatus = locationManager.getGpsStatus( gpsStatus );
     final int satCount = getSatCount();
@@ -122,7 +123,7 @@ public class GPSListener implements Listener, LocationListener {
       }
     }
     
-    if ( listActivity.inEmulator() && newLocation != null ) {
+    if ( mainActivity.inEmulator() && newLocation != null ) {
       newOK = true; 
     }
     
@@ -144,11 +145,11 @@ public class GPSListener implements Listener, LocationListener {
       }
       else if ( location != null ) {
         // transition to null
-        ListActivity.info( "nulling location: " + location );
+        MainActivity.info( "nulling location: " + location );
         location = null;
         wasProviderChange = true;
         // make sure we're registered for updates
-        listActivity.setLocationUpdates();
+        mainActivity.setLocationUpdates();
       }
     }
     else if ( newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
@@ -177,8 +178,8 @@ public class GPSListener implements Listener, LocationListener {
        if ( (previousSpeed == 0f && currentSpeed > 0f)
           || (previousSpeed < 5f && currentSpeed >= 5f)) {
         // moving faster now than before, schedule a scan because the timing config pry changed
-        ListActivity.info("Going faster, scheduling scan");
-        listActivity.scheduleScan();
+        MainActivity.info("Going faster, scheduling scan");
+        mainActivity.scheduleScan();
         scanScheduled = true;
       }
       previousSpeed = currentSpeed;
@@ -187,37 +188,37 @@ public class GPSListener implements Listener, LocationListener {
       previousSpeed = 0f;
     }
     
-    // ListActivity.info("sat count: " + satCount);
+    // MainActivity.info("sat count: " + satCount);
     
     if ( wasProviderChange ) {
-      ListActivity.info( "wasProviderChange: satCount: " + satCount 
+      MainActivity.info( "wasProviderChange: satCount: " + satCount 
         + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
         + " wasProviderChange: " + wasProviderChange
         + (newOK ? " newProvider: " + newLocation.getProvider() : "")
         + (locOK ? " locProvider: " + location.getProvider() : "") 
         + " newLocation: " + newLocation );
 
-      final String announce = location == null ? listActivity.getString(R.string.lost_location) 
-          : listActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
-      Toast.makeText( listActivity, announce, Toast.LENGTH_SHORT ).show();
-      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final String announce = location == null ? mainActivity.getString(R.string.lost_location) 
+          : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
+      Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();
+      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean speechGPS = prefs.getBoolean( ListActivity.PREF_SPEECH_GPS, true );
       if ( speechGPS ) {
         // no quotes or the voice pauses
         final String speakAnnounce = location == null ? "Lost Location" 
           : "Now have location from " + location.getProvider() + ".";
-        listActivity.speak( speakAnnounce );
+        mainActivity.speak( speakAnnounce );
       }
       
       if ( ! scanScheduled ) {
         // get the ball rolling
-        ListActivity.info("Location provider change, scheduling scan");
-        listActivity.scheduleScan();
+        MainActivity.info("Location provider change, scheduling scan");
+        mainActivity.scheduleScan();
       }
     }
     
     // update the UI
-    listActivity.setLocationUI();
+    mainActivity.setLocationUI();
   }
   
   public void checkLocationOK() {
@@ -283,7 +284,7 @@ public class GPSListener implements Listener, LocationListener {
   public void saveLocation() {
     // save our location for use on later runs
     if ( this.location != null ) {
-      final SharedPreferences prefs = listActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
       // there is no putDouble
       edit.putFloat( ListActivity.PREF_PREV_LAT, (float) location.getLatitude() );

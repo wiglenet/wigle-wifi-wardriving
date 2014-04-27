@@ -1,13 +1,13 @@
 package net.wigle.wigleandroid;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 
 /**
  * here for backwards compatibility
  */
-public class WigleAndroid extends Activity {
+public class WigleAndroid extends ActionBarActivity {
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
     super.onCreate( savedInstanceState );

@@ -43,10 +43,10 @@ public final class WigleService extends Service {
     public void run() {
       Thread.currentThread().setName( "GuardThread-" + Thread.currentThread().getName() );
       while ( ! done.get() ) {
-        ListActivity.sleep( 15000L );
+        MainActivity.sleep( 15000L );
         setupNotification();
       }
-      ListActivity.info("GuardThread done");
+      MainActivity.info("GuardThread done");
     }    
   }
   
@@ -57,19 +57,19 @@ public final class WigleService extends Service {
 
   @Override
   public IBinder onBind( final Intent intent ) {
-    ListActivity.info( "service: onbind. intent: " + intent );
+    MainActivity.info( "service: onbind. intent: " + intent );
     return null;
   }
   
   @Override
   public void onRebind( final Intent intent ) {
-    ListActivity.info( "service: onRebind. intent: " + intent );
+    MainActivity.info( "service: onRebind. intent: " + intent );
     super.onRebind( intent );
   }
 
   @Override
   public boolean onUnbind( final Intent intent ) {
-    ListActivity.info( "service: onUnbind. intent: " + intent );
+    MainActivity.info( "service: onUnbind. intent: " + intent );
     shutdownNotification();
 		stopSelf();
     return super.onUnbind( intent );
@@ -77,7 +77,7 @@ public final class WigleService extends Service {
 
   @Override
   public void onCreate() {
-    ListActivity.info( "service: onCreate" );
+    MainActivity.info( "service: onCreate" );
     
     notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
     try {
@@ -107,7 +107,7 @@ public final class WigleService extends Service {
   
   @Override
   public void onDestroy() {
-    ListActivity.info( "service: onDestroy" );
+    MainActivity.info( "service: onDestroy" );
     // Make sure our notification is gone.
     shutdownNotification();
     setDone();
@@ -117,7 +117,7 @@ public final class WigleService extends Service {
   @Override
   public void onLowMemory() {
     super.onLowMemory();
-    ListActivity.info( "service: onLowMemory" );
+    MainActivity.info( "service: onLowMemory" );
   }
   
   //This is the old onStart method that will be called on the pre-2.0
@@ -125,12 +125,12 @@ public final class WigleService extends Service {
   //method will not be called.
   @Override
   public void onStart( Intent intent, int startId ) {
-    ListActivity.info( "service: onStart" );
+    MainActivity.info( "service: onStart" );
     handleCommand( intent );
   }
 
   public int onStartCommand( Intent intent, int flags, int startId ) {
-    ListActivity.info( "service: onStartCommand" );
+    MainActivity.info( "service: onStartCommand" );
     handleCommand( intent );
     // We want this service to continue running until it is explicitly
     // stopped, so return sticky.
@@ -139,7 +139,7 @@ public final class WigleService extends Service {
   }
   
   private void handleCommand( Intent intent ) {
-    ListActivity.info( "service: handleCommand: intent: " + intent );
+    MainActivity.info( "service: handleCommand: intent: " + intent );
   }
 
   private void shutdownNotification() {
@@ -163,7 +163,7 @@ public final class WigleService extends Service {
         text = "Run: " + ListActivity.lameStatic.runNets
           + "  New: " + ListActivity.lameStatic.newNets + "  DB: " + dbNets;
       }      
-      if (! ListActivity.isScanning(context)) {
+      if (! MainActivity.isScanning(context)) {
         text = "(Scanning Turned Off) " + text;
       }
       notification.setLatestEventInfo( context, title, text, contentIntent );
@@ -177,10 +177,10 @@ public final class WigleService extends Service {
         method.invoke(this, args);
     } catch (InvocationTargetException e) {
         // Should not happen.
-        ListActivity.warn("Unable to invoke method", e);
+      MainActivity.warn("Unable to invoke method", e);
     } catch (IllegalAccessException e) {
         // Should not happen.
-        ListActivity.warn("Unable to invoke method", e);
+      MainActivity.warn("Unable to invoke method", e);
     }
   }
   

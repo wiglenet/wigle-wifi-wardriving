@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid.listener;
 
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
@@ -17,39 +17,39 @@ public class PhoneState extends PhoneStateListener {
     switch ( state ) {
       case TelephonyManager.CALL_STATE_IDLE:
         isPhoneActive = false;
-        ListActivity.info( "setting phone inactive. state: " + state );
+        MainActivity.info( "setting phone inactive. state: " + state );
         break;
       case TelephonyManager.CALL_STATE_RINGING:
       case TelephonyManager.CALL_STATE_OFFHOOK:
         isPhoneActive = true;
-        ListActivity.info( "setting phone active. state: " + state );
+        MainActivity.info( "setting phone active. state: " + state );
         break;
       default:
-        ListActivity.info( "unhandled call state: " + state );
+        MainActivity.info( "unhandled call state: " + state );
     }
   }
   
   @Override
   public void onServiceStateChanged(ServiceState serviceState) {
-    // ListActivity.info("serviceState: " + serviceState);
+    // MainActivity.info("serviceState: " + serviceState);
     this.serviceState = serviceState;
   }
   
   @Override
   public void onSignalStrengthChanged(final int asu) {
-    // ListActivity.info("strength: " + asu);
+    // MainActivity.info("strength: " + asu);
     strength = asu;
   }
   
   @Override
   public void onCellLocationChanged(CellLocation cellLoc){  
     if ( cellLoc.getClass().getSimpleName().equals("CdmaCellLocation") ) {
-      ListActivity.info("cell location changed: cdma: " + cellLoc);
+      MainActivity.info("cell location changed: cdma: " + cellLoc);
     }
     else if ( cellLoc instanceof GsmCellLocation) {
       GsmCellLocation gsmCell = (GsmCellLocation) cellLoc;
-      ListActivity.info("cell location changed: gsm Cid: " + gsmCell.getCid());
-      ListActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());
+      MainActivity.info("cell location changed: gsm Cid: " + gsmCell.getCid());
+      MainActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());
     }
   }
   

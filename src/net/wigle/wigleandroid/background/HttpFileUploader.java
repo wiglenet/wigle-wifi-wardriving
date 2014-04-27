@@ -18,7 +18,7 @@ import java.nio.charset.CoderResult;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
@@ -44,7 +44,7 @@ final class HttpFileUploader {
       connectURL = new URL( urlString );
     }
     catch( Exception ex ) {
-      ListActivity.error( "MALFORMATED URL: " + ex, ex );
+      MainActivity.error( "MALFORMATED URL: " + ex, ex );
       return null;
     }
 
@@ -97,9 +97,9 @@ final class HttpFileUploader {
     conn.setReadTimeout(8*60*60*1000);
     
     // connect
-    ListActivity.info( "about to connect" );
+    MainActivity.info( "about to connect" );
     conn.connect();  
-    ListActivity.info( "connected" );
+    MainActivity.info( "connected" );
     
     return conn;
   }
@@ -131,20 +131,20 @@ final class HttpFileUploader {
 
       // reflect out the chunking info
       for ( Method meth : connOutputStream.getClass().getMethods() ) {
-        // ListActivity.info("meth: " + meth.getName() );
+        // MainActivity.info("meth: " + meth.getName() );
         try {
           if ( "isCached".equals(meth.getName()) || "isChunked".equals(meth.getName())) {
             Boolean val = (Boolean) meth.invoke( connOutputStream, (Object[]) null );
-            ListActivity.info( meth.getName() + " " + val );
+            MainActivity.info( meth.getName() + " " + val );
           }
           else if ( "size".equals( meth.getName())) {
             Integer val = (Integer) meth.invoke( connOutputStream, (Object[]) null );
-            ListActivity.info( meth.getName() + " " + val );
+            MainActivity.info( meth.getName() + " " + val );
           }
         }
         catch ( Exception ex ) {
           // this block is just for logging, so don't splode if it has a problem
-          ListActivity.error("ex: " + ex, ex );
+          MainActivity.error("ex: " + ex, ex );
         }
       }      
       
@@ -165,13 +165,13 @@ final class HttpFileUploader {
       header.append( "Content-Type: application/octet_stream" + LINE_END );
       header.append( LINE_END );
 
-      ListActivity.info( "About to write headers, length: " + header.length() );
+      MainActivity.info( "About to write headers, length: " + header.length() );
       CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
       CharBuffer cbuff = CharBuffer.allocate( 1024 );
       ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
-      ListActivity.info( "Headers are written, length: " + header.length() );
+      MainActivity.info( "Headers are written, length: " + header.length() );
       int percentTimesTenDone = ( (int)header.length() * 1000) / (int)filesize;
       if ( handler != null && percentTimesTenDone >= 0 ) {
           handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
@@ -183,19 +183,19 @@ final class HttpFileUploader {
       while ( byteswritten < filesize ) {
         final long bytes = fc.transferTo( byteswritten, chunk, wbc );
         if ( bytes <= 0 ) {
-          ListActivity.info( "giving up transfering file. bytes: " + bytes );
+          MainActivity.info( "giving up transfering file. bytes: " + bytes );
           break;
         }
         byteswritten += bytes;
               
-        ListActivity.info( "transferred " + byteswritten + " of " + filesize );
+        MainActivity.info( "transferred " + byteswritten + " of " + filesize );
         percentTimesTenDone = ((int)byteswritten * 1000) / (int)filesize;
 
         if ( handler != null && percentTimesTenDone >= 0 ) {
           handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + percentTimesTenDone );
         }
       }
-      ListActivity.info( "done. transferred " + byteswritten + " of " + filesize );
+      MainActivity.info( "done. transferred " + byteswritten + " of " + filesize );
 
       // send multipart form data necesssary after file data...
       header.setLength( 0 ); // clear()
@@ -204,13 +204,13 @@ final class HttpFileUploader {
       writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
       // close streams
-      ListActivity.info( "File is written" );
+      MainActivity.info( "File is written" );
       wbc.close();
       fc.close();
       fileInputStream.close();
       
       int responseCode = conn.getResponseCode();
-      ListActivity.info( "connection response code: " + responseCode );
+      MainActivity.info( "connection response code: " + responseCode );
 
       // read the response
       final InputStream is = getInputStream( conn );
@@ -222,11 +222,11 @@ final class HttpFileUploader {
           b.append( new String( buffer, 0, ch, ENCODING ) );
       }
       retval = b.toString();
-      // ListActivity.info( "Response: " + retval );
+      // MainActivity.info( "Response: " + retval );
     }
     finally {
       if ( conn != null ) {
-        ListActivity.info( "conn disconnect" );
+        MainActivity.info( "conn disconnect" );
         conn.disconnect();
       }
     }
@@ -241,7 +241,7 @@ final class HttpFileUploader {
     InputStream input = conn.getInputStream();
 
     String encode = conn.getContentEncoding();
-    ListActivity.info( "Encoding: " + encode );
+    MainActivity.info( "Encoding: " + encode );
     if ( "gzip".equalsIgnoreCase( encode ) ) {
       input = new GZIPInputStream( input );  
     }

@@ -46,7 +46,7 @@ public class QueryThread extends Thread {
       queue.put( request );
     }
     catch ( InterruptedException ex ) {
-      ListActivity.info( getName() + " interrupted" );
+      MainActivity.info( getName() + " interrupted" );
     }
   }
   
@@ -68,7 +68,7 @@ public class QueryThread extends Thread {
         }
       }
       catch ( InterruptedException ex ) {
-        ListActivity.info( getName() + " interrupted" );
+        MainActivity.info( getName() + " interrupted" );
       }
       catch ( DBException ex ) {
         dbHelper.deathDialog("query thread", ex);        

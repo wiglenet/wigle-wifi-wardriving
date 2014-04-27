@@ -9,7 +9,6 @@ import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -19,12 +18,14 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-public class DBResultActivity extends Activity {
+public class DBResultActivity extends ActionBarActivity {
   private static final int MENU_RETURN = 12;
   private static final int MENU_SETTINGS = 13;
   private static final int MSG_QUERY_DONE = 2; 
@@ -38,6 +39,10 @@ public class DBResultActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
     super.onCreate( savedInstanceState );
+    
+    final ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
     // set language
     MainActivity.setLocale( this );
     setContentView( R.layout.dbresult );
@@ -48,7 +53,7 @@ public class DBResultActivity extends Activity {
     setupList();
     
     QueryArgs queryArgs = ListActivity.lameStatic.queryArgs;
-    ListActivity.info("queryArgs: " + queryArgs);
+    MainActivity.info("queryArgs: " + queryArgs);
     final TextView tv = (TextView) findViewById( R.id.dbstatus );    
     
     if ( queryArgs != null ) {
@@ -69,7 +74,7 @@ public class DBResultActivity extends Activity {
   private void setupList() {
     // not set by nonconfig retain
     listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
-    ListActivity.setupListAdapter( this, listAdapter, R.id.dblist );
+// XXX:    ListActivity.setupListAdapter( listActivity.getView(), this, listAdapter, R.id.dblist );
   }
   
   private void setupMap( final IGeoPoint center ) {
@@ -99,7 +104,7 @@ public class DBResultActivity extends Activity {
             listAdapter.add( network );
             if ( address == null && first ) {
               final IGeoPoint center = MappingActivity.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
-              ListActivity.info( "set center: " + center + " network: " + network.getSsid()
+              MainActivity.info( "set center: " + center + " network: " + network.getSsid()
                   + " point: " + network.getGeoPoint());
               mapView.getController().setCenter( center );
               first = false;

@@ -41,9 +41,19 @@ heat mapping
 import files, instead of uploading to site and downloading to app
 geofence for "don't record" and/or "do upload"
 set minimum on distance decimal to 2 on dashboard
+on networkactivity record more observations on that network (site survey)
+
+--- broken ---
+db search
+orientation change
+map filter dialog
+list filter dialog
+dash text disappears
+common menu
 
 --- done ---
-* 1.59 (?)
+* 2.00 (?)
+Major refactor for Action Bar
 Migrate to safe-draw to fix osm drawing distortions
 
 * 1.58 (01/19/2014)

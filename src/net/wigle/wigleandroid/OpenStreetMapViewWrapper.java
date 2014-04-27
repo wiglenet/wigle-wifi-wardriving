@@ -278,7 +278,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
     
     if ( osmv.getZoomLevel() >= 14 && showLabel ) {
       // draw ssid strings
-      final Collection<Network> networks = ListActivity.getNetworkCache().values();
+      final Collection<Network> networks = MainActivity.getNetworkCache().values();
       if ( ! networks.isEmpty() ) { 
         Boolean prevChoice = Boolean.TRUE;
         Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
@@ -481,7 +481,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
         matcher = pattern.matcher( "" );
       }
       catch ( PatternSyntaxException ex ) {
-        ListActivity.error("regex pattern exception: " + ex);
+        MainActivity.error("regex pattern exception: " + ex);
       }
     }
     
@@ -527,7 +527,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
           }
           break;
         default: 
-          ListActivity.error( "unhandled crypto: " + network );
+          MainActivity.error( "unhandled crypto: " + network );
       }
     }
     else {

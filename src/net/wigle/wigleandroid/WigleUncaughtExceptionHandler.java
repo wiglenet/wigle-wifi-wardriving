@@ -16,17 +16,17 @@ public class WigleUncaughtExceptionHandler implements Thread.UncaughtExceptionHa
     
     // set up pending email intent to email stacktrace logs if needed
     final Intent errorReportIntent = new Intent( this.applicationContext, ErrorReportActivity.class );
-    errorReportIntent.putExtra( ListActivity.ERROR_REPORT_DO_EMAIL, true );
+    errorReportIntent.putExtra( MainActivity.ERROR_REPORT_DO_EMAIL, true );
     pendingIntent = PendingIntent.getActivity( this.applicationContext, 0,
         errorReportIntent, errorReportIntent.getFlags() );
   }
   
   public void uncaughtException( Thread thread, Throwable throwable ) {
     String error = "Thread: " + thread + " throwable: " + throwable;
-    ListActivity.error( error );
+    MainActivity.error( error );
     throwable.printStackTrace();
     
-    ListActivity.writeError( thread, throwable, applicationContext );
+    MainActivity.writeError( thread, throwable, applicationContext );
     // set the email intent to go off in a few seconds
     AlarmManager mgr = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
     mgr.set( AlarmManager.RTC, System.currentTimeMillis() + 5000, pendingIntent );

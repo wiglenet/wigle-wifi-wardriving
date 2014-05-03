@@ -10,5 +10,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="lib" path="/android-support-v7-appcompat/libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/android-support-v7-appcompat/libs/android-support-v7-appcompat.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/android-support-v7-appcompat"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

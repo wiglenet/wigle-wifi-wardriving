@@ -376,11 +376,12 @@ public class NetworkActivity extends ActionBarActivity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
+      MenuItem item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
+      item.setIcon( android.R.drawable.ic_menu_save );
+      
+      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_menu_revert );
       
-      item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
-      item.setIcon( android.R.drawable.ic_menu_save );
       return true;
   }
 

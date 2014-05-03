@@ -34,9 +34,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public final class ListActivity extends Fragment implements FileUploaderListener {
-    private NetworkListAdapter listAdapter;
-    private String previousStatus;
-    
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
@@ -151,13 +148,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       final View view = inflater.inflate(R.layout.list, container, false);
+      final State state = MainActivity.getState(this);
       
       MainActivity.info( "setupUploadButton" );
       setupUploadButton( view );
       MainActivity.info( "setupList" );
       setupList( view );
       MainActivity.info( "setNetCountUI" );
-      setNetCountUI( view );
+      setNetCountUI( state, view );
       MainActivity.info( "setStatusUI" );
       setStatusUI( view, (String) null );
       MainActivity.info( "setupLocation" );
@@ -175,8 +173,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         setHasOptionsMenu(true);
     }
     
-    public void setNetCountUI( final View view ) {
-      MainActivity.State state = MainActivity.getState( this );
+    public void setNetCountUI( final State state ) {
+    	setNetCountUI( state, getView() );
+    }
+    
+    private void setNetCountUI( final State state, final View view ) {
+      if (view == null) {
+    	  return;
+      }
       TextView tv = (TextView) view.findViewById( R.id.stats_run );
       tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
       tv = (TextView) view.findViewById( R.id.stats_new );
@@ -185,25 +189,16 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       tv.setText( getString(R.string.db) + ": " + state.dbHelper.getNetworkCount() );
     }
     
-    public void setStatusUI( final View view, String status ) {
-      if ( status == null ) {
-        status = previousStatus;
-      }
-      if ( status != null ) {
-        // keep around a previous, for orientation changes
-        previousStatus = status;
+    public void setStatusUI( String status ) {
+    	setStatusUI( getView(), status );
+    }
+    
+    public void setStatusUI( final View view, final String status ) {
+      if ( status != null && view != null ) {
         final TextView tv = (TextView) view.findViewById( R.id.status );
         tv.setText( status );
       }
     }
-    
-    
-//    @Override
-//    public Object onRetainNonConfigurationInstance() {
-//      MainActivity.info( "onRetainNonConfigurationInstance" );
-//      // return the whole state class to copy data from
-//      return state;
-//    }
     
     @Override
     public void onPause() {
@@ -266,6 +261,9 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
       item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
       
+      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+      item.setIcon( android.R.drawable.ic_menu_search );
+      
       MainActivity main = MainActivity.getMainActivity(this);
       final String scan = main.isScanning() ? getString(R.string.off) : getString(R.string.on);
       item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
@@ -276,14 +274,11 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       item = menu.add(0, MENU_WAKELOCK, 0, wake);
       item.setIcon( android.R.drawable.ic_menu_gallery );
       
-      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-      
-      item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-      item.setIcon( android.R.drawable.ic_menu_search );
-              
       item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
       item.setIcon( android.R.drawable.ic_menu_preferences );
+      
+      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+      item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
       
       super.onCreateOptionsMenu(menu, inflater);           
     }
@@ -411,11 +406,12 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //      return null;
 //    }
 
-    // why is this even here? this is retarded. via:
+    // why is this even here? this is stupid. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-      State state = MainActivity.getState(this);
+      final MainActivity main = MainActivity.getMainActivity( this );
+      final State state = MainActivity.getState(this);
       
       MainActivity.info( "LIST: on config change" );
       MainActivity.setLocale( this.getActivity(), newConfig);
@@ -425,17 +421,15 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       // have to redo linkages/listeners
       setupUploadButton( getView() );
       setupMuteButton( getView() );
-      setupList( getView() );
-      state.wifiReceiver.setListAdapter( listAdapter );
-      setNetCountUI( getView() );
-      setLocationUI( getView() );
-      setStatusUI( getView(), previousStatus );
+      setNetCountUI( state, getView() );
+      setLocationUI( main, getView() );
+      setStatusUI( getView(), state.previousStatus );
     }
     
     private void setupList( final View view ) {
-      // not set by nonconfig retain
-      listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
-      setupListAdapter( view, MainActivity.getMainActivity(this), listAdapter, R.id.ListView01 );
+      State state = MainActivity.getState(this);
+      state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+      setupListAdapter( view, MainActivity.getMainActivity(this), state.listAdapter, R.id.ListView01 );
     }
      
     public static void setupListAdapter( final View view, final MainActivity activity, final NetworkListAdapter listAdapter, final int id) {
@@ -455,21 +449,23 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       });
     }
     
-    public NetworkListAdapter getListAdapter() {
-      return listAdapter;
-    }
-    
     private void setupLocation( final View view ) {
       // set on UI if we already have one
-      setLocationUI( view );
+      setLocationUI( MainActivity.getMainActivity( this ), view );
       handleScanChange( view );
     }
     
-    public void setLocationUI( final View view ) {
-      final MainActivity main = MainActivity.getMainActivity( this );
+    public void setLocationUI( final MainActivity main ) {
+      setLocationUI( main, getView() );
+    }
+    
+    private void setLocationUI( final MainActivity main, final View view ) {
       final State state = main.getState();
       if ( state.gpsListener == null ) {
         return;
+      }
+      if ( view == null ) {
+    	return;
       }
       
       try {       

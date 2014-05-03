@@ -193,12 +193,12 @@ public class DashboardActivity extends Fragment {
   /* Creates the menu items */
   @Override
   public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-    MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-        
-    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+	MenuItem item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
     item.setIcon( android.R.drawable.ic_menu_preferences );
     
+    item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        
     super.onCreateOptionsMenu(menu, inflater);  
   }
 

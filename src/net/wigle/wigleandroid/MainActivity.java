@@ -70,6 +70,7 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
 
@@ -93,6 +94,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     BatteryLevelReceiver batteryLevelReceiver;
     PhoneState phoneState;
     FileUploaderTask fileUploaderTask;
+    NetworkListAdapter listAdapter;
+    String previousStatus;
   }
   private State state;
   // *** end of state that is retained ***
@@ -116,12 +119,14 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;  
   
   private static MainActivity mainActivity;
+  private static ListActivity listActivity;
   private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
   private List<Fragment> fragList = new ArrayList<Fragment>();
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    info("MAIN onCreate. state:  " + state);
     // set language
     setLocale( this );  
     setContentView(R.layout.main);
@@ -158,7 +163,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       
       // tell those that need it that we have a new context
       state.gpsListener.setMainActivity( this );
-      state.wifiReceiver.setListActivity( this );
+      state.wifiReceiver.setMainActivity( this );
       if ( state.fileUploaderTask != null ) {
         state.fileUploaderTask.setContext( this );
       }
@@ -233,10 +238,10 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         "List", "Map", "Dash", "Data"
     };
     
-    final ListActivity list = new ListActivity();
+    listActivity = new ListActivity();
     Bundle bundle = new Bundle();
-    list.setArguments(bundle);
-    fragList.add(list);
+    listActivity.setArguments(bundle);
+    fragList.add(listActivity);
     
     final MappingActivity map = new MappingActivity();
     bundle = new Bundle();
@@ -408,6 +413,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     final Activity activity = fragment.getActivity();
   	if (activity instanceof MainActivity) {
         return (MainActivity) activity;
+  	}
+  	else {
+  		info("not main activity: " + activity);
   	}
     return null;
   }
@@ -1145,15 +1153,25 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
   
   public void setLocationUI() {
-    // XXX: tell list about new location
+    // tell list about new location
+	listActivity.setLocationUI( this );
   }
   
   public void setNetCountUI() {
-    // XXX: tell list
+    // tell list
+	listActivity.setNetCountUI( getState() );
   }
   
-  public void setStatusUI( final String status ) {
-    // XXX: tell list
+  public void setStatusUI( String status ) {
+	if ( status == null ) {
+      status = state.previousStatus;
+    }
+    if ( status != null ) {
+      // keep around a previous, for orientation changes
+      state.previousStatus = status;
+      // tell list
+      listActivity.setStatusUI( status );      
+    }	 
   }
   
   @Override

@@ -117,7 +117,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
   }
   
-  public void setListActivity( final MainActivity mainActivity ) {
+  public void setMainActivity( final MainActivity mainActivity ) {
     this.mainActivity = mainActivity;
     this.ssidSpeaker.setListActivity( mainActivity );
   }
@@ -727,7 +727,7 @@ public class WifiReceiver extends BroadcastReceiver {
    * @return
    */
   private boolean doWifiScan() {
-    // MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
+    MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
     final WifiManager wifiManager = (WifiManager) mainActivity.getSystemService(Context.WIFI_SERVICE);
     boolean success = false;
     

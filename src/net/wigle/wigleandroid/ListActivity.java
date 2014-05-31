@@ -21,6 +21,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -137,6 +138,8 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     }
     public static final LameStatic lameStatic = new LameStatic();
     
+    private MainActivity.State state;
+    
     // cache
     public static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
       new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
@@ -171,6 +174,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setHasOptionsMenu(true);
+    }
+    
+    public void setState( final MainActivity.State state ) {
+      this.state = state;
+    }
+    
+    public MainActivity.State getState() {
+      return state;
     }
     
     public void setNetCountUI( final State state ) {
@@ -263,6 +274,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       
       item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
       item.setIcon( android.R.drawable.ic_menu_search );
+      MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
       
       MainActivity main = MainActivity.getMainActivity(this);
       final String scan = main.isScanning() ? getString(R.string.off) : getString(R.string.on);

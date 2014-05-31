@@ -57,6 +57,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
@@ -70,7 +71,6 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
 
@@ -105,7 +105,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
   private static final String LOG_TAG = "wigle";
   public static final String ENCODING = "ISO-8859-1";
-  
+
   static final String ERROR_STACK_FILENAME = "errorstack";
   static final String ERROR_REPORT_DO_EMAIL = "doEmail";
   static final String ERROR_REPORT_DIALOG = "doDialog";
@@ -123,6 +123,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
   private List<Fragment> fragList = new ArrayList<Fragment>();
+  
+  private static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
+  private static final String MAP_FRAGMENT_TAG = "MapFragmentTag";
+  private static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
+  private static final String DATA_FRAGMENT_TAG = "DataFragmentTag";
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -156,10 +161,12 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     // test the error reporting
     // if( true ){ throw new RuntimeException( "weee" ); }
 
-    final Object stored = getLastNonConfigurationInstance();
-    if ( stored != null && stored instanceof State ) {
-      // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-      state = (State) stored;
+    final FragmentManager fm = getSupportFragmentManager();    
+    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
+    
+    if (listActivity != null && listActivity.getState() != null) {
+      // pry an orientation change, which calls destroy, but we get this from retained fragment
+      state = listActivity.getState();
       
       // tell those that need it that we have a new context
       state.gpsListener.setMainActivity( this );
@@ -229,7 +236,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     setupTabs();    
     info( "setup complete" );
   }
-   
+  
   private void setupTabs() {
     ActionBar bar = getSupportActionBar();
     bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -238,24 +245,47 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         "List", "Map", "Dash", "Data"
     };
     
-    listActivity = new ListActivity();
-    Bundle bundle = new Bundle();
-    listActivity.setArguments(bundle);
+    final FragmentManager fm = getSupportFragmentManager();
+    
+    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
+    if (listActivity == null) {
+      listActivity = new ListActivity();
+      listActivity.setRetainInstance(true);
+      listActivity.setState(state);
+      final Bundle bundle = new Bundle();
+      listActivity.setArguments(bundle);      
+      fm.beginTransaction().add(listActivity, LIST_FRAGMENT_TAG).commit();
+    }
     fragList.add(listActivity);
     
-    final MappingActivity map = new MappingActivity();
-    bundle = new Bundle();
-    map.setArguments(bundle);
+    MappingActivity map = (MappingActivity) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
+    if (map == null) {
+      map = new MappingActivity();
+      map.setRetainInstance(true);
+      final Bundle bundle = new Bundle();
+      map.setArguments(bundle);      
+      fm.beginTransaction().add(map, MAP_FRAGMENT_TAG).commit();
+    }
     fragList.add(map);
     
-    final DashboardActivity dash = new DashboardActivity();
-    bundle = new Bundle();
-    dash.setArguments(bundle);
+    DashboardActivity dash = (DashboardActivity) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
+    if (dash == null) {
+      dash = new DashboardActivity();
+      dash.setRetainInstance(true);
+      final Bundle bundle = new Bundle();
+      dash.setArguments(bundle);      
+      fm.beginTransaction().add(dash, DASH_FRAGMENT_TAG).commit();
+    }
     fragList.add(dash);
     
-    final DataActivity data = new DataActivity();
-    bundle = new Bundle();
-    data.setArguments(bundle);
+    DataActivity data = (DataActivity) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
+    if (data == null) {
+      data = new DataActivity();
+      data.setRetainInstance(true);
+      final Bundle bundle = new Bundle();
+      data.setArguments(bundle);      
+      fm.beginTransaction().add(data, DATA_FRAGMENT_TAG).commit();
+    }
     fragList.add(data);
     
     for (int i = 0; i <= 3; i++) {

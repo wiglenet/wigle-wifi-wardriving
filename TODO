@@ -45,10 +45,9 @@ on networkactivity record more observations on that network (site survey)
 
 --- broken ---
 db search
-orientation change (state object can't be passed back onRetain?)
+map fragment layout
 map filter dialog
 list filter dialog
-dash text disappears
 common menu item icons
 
 --- done ---

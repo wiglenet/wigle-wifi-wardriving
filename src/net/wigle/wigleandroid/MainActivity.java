@@ -95,6 +95,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     FileUploaderTask fileUploaderTask;
     NetworkListAdapter listAdapter;
     String previousStatus;
+    int currentTab;
   }
   private State state;
   // *** end of state that is retained ***
@@ -124,6 +125,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   private final List<Fragment> fragList = new ArrayList<Fragment>();
   private BatteryLevelReceiver batteryLevelReceiver;
 
+  private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
   private static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
   private static final String MAP_FRAGMENT_TAG = "MapFragmentTag";
   private static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
@@ -163,11 +165,14 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     // if( true ){ throw new RuntimeException( "weee" ); }
 
     final FragmentManager fm = getSupportFragmentManager();
-    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
+    // force the retained fragments to live
+    fm.executePendingTransactions();
+    StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
-    if (listActivity != null && listActivity.getState() != null) {
+    if (stateFragment != null && stateFragment.getState() != null) {
+      info("MAIN: using retained stateFragment state");
       // pry an orientation change, which calls destroy, but we get this from retained fragment
-      state = listActivity.getState();
+      state = stateFragment.getState();
 
       // tell those that need it that we have a new context
       state.gpsListener.setMainActivity( this );
@@ -175,12 +180,19 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       if ( state.fileUploaderTask != null ) {
         state.fileUploaderTask.setContext( this );
       }
+
+
     }
     else {
+      info("MAIN: creating new state");
       state = new State();
       state.finishing = new AtomicBoolean( false );
       state.transferring = new AtomicBoolean( false );
 
+      // set it up for retain
+      stateFragment = new StateFragment();
+      stateFragment.setState(state);
+      fm.beginTransaction().add(stateFragment, STATE_FRAGMENT_TAG).commit();
       // new run, reset
       final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final float prevRun = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
@@ -234,59 +246,40 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     info( "setupLocation" ); // must be after setupWifi
     setupLocation();
     info( "setup tabs" );
-    setupTabs();
-    info( "setup complete" );
+    setupTabs(state.currentTab);
+    info( "onCreate setup complete" );
   }
 
-  private void setupTabs() {
-    ActionBar bar = getSupportActionBar();
+  private void setupTabs(int defaultTab) {
+    final ActionBar bar = getSupportActionBar();
     bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
     final String[] labels = new String[]{
         "List", "Map", "Dash", "Data"
     };
 
-    final FragmentManager fm = getSupportFragmentManager();
-
-    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
-    if (listActivity == null) {
-      listActivity = new ListActivity();
-      listActivity.setRetainInstance(true);
-      listActivity.setState(state);
-      final Bundle bundle = new Bundle();
-      listActivity.setArguments(bundle);
-      fm.beginTransaction().add(listActivity, LIST_FRAGMENT_TAG).commit();
-    }
+    info("Creating ListActivity");
+    listActivity = new ListActivity();
+    Bundle bundle = new Bundle();
+    listActivity.setArguments(bundle);
     fragList.add(listActivity);
 
-    MappingActivity map = (MappingActivity) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
-    if (map == null) {
-      map = new MappingActivity();
-      map.setRetainInstance(true);
-      final Bundle bundle = new Bundle();
-      map.setArguments(bundle);
-      fm.beginTransaction().add(map, MAP_FRAGMENT_TAG).commit();
-    }
+    info("Creating MappingActivity");
+    final MappingActivity map = new MappingActivity();
+    bundle = new Bundle();
+    map.setArguments(bundle);
     fragList.add(map);
 
-    DashboardActivity dash = (DashboardActivity) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
-    if (dash == null) {
-      dash = new DashboardActivity();
-      dash.setRetainInstance(true);
-      final Bundle bundle = new Bundle();
-      dash.setArguments(bundle);
-      fm.beginTransaction().add(dash, DASH_FRAGMENT_TAG).commit();
-    }
+    info("Creating DashboardActivity");
+    DashboardActivity dash = new DashboardActivity();
+    bundle = new Bundle();
+    dash.setArguments(bundle);
     fragList.add(dash);
 
-    DataActivity data = (DataActivity) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
-    if (data == null) {
-      data = new DataActivity();
-      data.setRetainInstance(true);
-      final Bundle bundle = new Bundle();
-      data.setArguments(bundle);
-      fm.beginTransaction().add(data, DATA_FRAGMENT_TAG).commit();
-    }
+    info("Creating DataActivity");
+    DataActivity data = new DataActivity();
+    bundle = new Bundle();
+    data.setArguments(bundle);
     fragList.add(data);
 
     for (int i = 0; i <= 3; i++) {
@@ -295,6 +288,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       tab.setTabListener(this);
       bar.addTab(tab);
     }
+
+    info("setting tab: " + defaultTab);
+    bar.setSelectedNavigationItem(defaultTab);
   }
 
   // be careful with this
@@ -587,6 +583,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     MainActivity.info("onTabReselected: " + tab.getPosition());
     Fragment f = fragList.get(tab.getPosition());
     ft.replace(android.R.id.content, f);
+    state.currentTab = tab.getPosition();
   }
 
   @Override
@@ -594,6 +591,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     MainActivity.info("onTabSelected: " + tab.getPosition());
     Fragment f = fragList.get(tab.getPosition());
     ft.replace(android.R.id.content, f);
+    state.currentTab = tab.getPosition();
   }
 
   @Override
@@ -1214,12 +1212,12 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   public void setLocationUI() {
     // tell list about new location
-	listActivity.setLocationUI( this );
+    listActivity.setLocationUI( this );
   }
 
   public void setNetCountUI() {
     // tell list
-	listActivity.setNetCountUI( getState() );
+    listActivity.setNetCountUI( getState() );
   }
 
   public void setStatusUI( String status ) {

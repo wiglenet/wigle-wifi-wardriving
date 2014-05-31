@@ -48,20 +48,20 @@ public final class MappingActivity extends Fragment {
     private boolean locked = true;
     private boolean firstMove = true;
     private IGeoPoint oldCenter = null;
-    private int oldZoom = Integer.MIN_VALUE;
+    private final int oldZoom = Integer.MIN_VALUE;
   }
   private final State state = new State();
-  
+
   private IMapController mapControl;
   private IMapView mapView;
-  private Handler timer;
+  private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private Location previousLocation;
   private int previousRunNets;
   private MyLocationOverlay myLocationOverlay = null;
-  
+
   public static LocationListener STATIC_LOCATION_LISTENER = null;
-  
+
   private static final int DEFAULT_ZOOM = 17;
   public static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
   private static final int MENU_EXIT = 12;
@@ -71,9 +71,9 @@ public final class MappingActivity extends Fragment {
   private static final int MENU_TOGGLE_NEWDB = 16;
   private static final int MENU_LABEL = 17;
   private static final int MENU_FILTER = 18;
-  
+
   private static final int SSID_FILTER = 102;
-  
+
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
@@ -82,84 +82,68 @@ public final class MappingActivity extends Fragment {
     // set language
     MainActivity.setLocale( getActivity() );
     finishing = new AtomicBoolean( false );
-    
+
     // media volume
-    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
-    
+    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
+
     setupQuery();
   }
-  
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final View view = inflater.inflate(R.layout.map, container, false);
-    
-    final Object stored = getActivity().getLastNonConfigurationInstance();
+
     IGeoPoint oldCenter = null;
     int oldZoom = Integer.MIN_VALUE;
-    if ( stored != null && stored instanceof State ) {
-      // pry an orientation change, which calls destroy, but we set this in onRetainNonConfigurationInstance
-      final State retained = (State) stored;
-      state.locked = retained.locked;
-      state.firstMove = retained.firstMove;
-      oldCenter = retained.oldCenter;
-      oldZoom = retained.oldZoom;
-    }       
-    
+    if ( state.oldCenter != null ) {
+      // pry an orientation change, which calls destroy
+      oldCenter = state.oldCenter;
+      oldZoom = state.oldZoom;
+    }
+
     setupMapView( view, oldCenter, oldZoom );
-    setupTimer( view );    
-    
     return view;
   }
-  
-//  @Override
-//  public Object onRetainNonConfigurationInstance() {
-//    MainActivity.info( "MappingActivity: onRetainNonConfigurationInstance" );
-//    // save the map info
-//    state.oldCenter = mapView.getMapCenter();
-//    state.oldZoom = mapView.getZoomLevel();
-//    // return state class to copy data from
-//    return state;
-//  }
-  
+
   private void setupMapView( final View view, final IGeoPoint oldCenter, final int oldZoom ) {
     // view
     final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
 
     // tryEvil();
-    
+
     // possibly choose goog maps here
-    mapView = new MapView( getActivity(), 256 );   
-    
+    mapView = new MapView( getActivity(), 256 );
+
     if ( mapView instanceof View ) {
       ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
         LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
       ((View) mapView).setLayoutParams(params);
     }
-    
+
     if ( mapView instanceof MapView ) {
       final MapView osmMapView = (MapView) mapView;
 
       // conditionally replace the tile source
       final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean wigleTiles = prefs.getBoolean( ListActivity.PREF_USE_WIGLE_TILES, true );
-      if ( wigleTiles ) { 
+      if ( wigleTiles ) {
           osmMapView.setTileSource( WigleTileSource.WiGLE );
       }
 
       rlView.addView( osmMapView );
       osmMapView.setBuiltInZoomControls( true );
       osmMapView.setMultiTouchControls( true );
-      
+
       // my location overlay
       myLocationOverlay = new MyLocationOverlay( getActivity().getApplicationContext(), osmMapView );
       myLocationOverlay.setLocationUpdateMinTime( MainActivity.LOCATION_UPDATE_INTERVAL );
       myLocationOverlay.setDrawAccuracyEnabled( false );
       osmMapView.getOverlays().add( myLocationOverlay );
-      
+
       final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( getActivity() );
       osmMapView.getOverlays().add( overlay );
     }
-    
+
     // controller
     mapControl = mapView.getController();
     final IGeoPoint centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
@@ -170,21 +154,21 @@ public final class MappingActivity extends Fragment {
     else {
       final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
-    }    
+    }
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( zoom );
     mapControl.setCenter( centerPoint );
-    
+
     MainActivity.info("done setupMapView. zoom: " + zoom);
   }
-  
+
   public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
       final Location previousLocation ) {
-    
+
     IGeoPoint centerPoint = DEFAULT_POINT;
     final Location location = ListActivity.lameStatic.location;
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    
+
     if ( priorityCenter != null ) {
       centerPoint = priorityCenter;
     }
@@ -197,26 +181,26 @@ public final class MappingActivity extends Fragment {
     else {
       final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
       final Location networkLocation = safelyGetLast(context, LocationManager.NETWORK_PROVIDER);
-      
+
       if ( gpsLocation != null ) {
         centerPoint = new GeoPoint( gpsLocation );
       }
       else if ( networkLocation != null ) {
         centerPoint = new GeoPoint( networkLocation );
       }
-      else {      
+      else {
         // ok, try the saved prefs
         float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
         float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
         if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
           centerPoint = new GeoPoint( lat, lon );
         }
-      }    
+      }
     }
-    
+
     return centerPoint;
   }
-  
+
   private static Location safelyGetLast( final Context context, final String provider ) {
     Location retval = null;
     try {
@@ -228,103 +212,100 @@ public final class MappingActivity extends Fragment {
     }
     return retval;
   }
-  
-  private void setupTimer( final View view ) {
-    if ( timer == null ) {
-      timer = new Handler();
-      final Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {              
-            // make sure the app isn't trying to finish
-            if ( ! finishing.get() ) {
-              final Location location = ListActivity.lameStatic.location;
-              if ( location != null ) {
-                if ( state.locked ) {
-                  // MainActivity.info( "mapping center location: " + location );
-  								final GeoPoint locGeoPoint = new GeoPoint( location );
-  								if ( state.firstMove ) {
-  								  mapControl.setCenter( locGeoPoint );
-  								  state.firstMove = false;
-  								}
-  								else {
-  								  mapControl.animateTo( locGeoPoint );
-  								}
-                }
-                else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude() 
-                    || previousLocation.getLongitude() != location.getLongitude() 
-                    || previousRunNets != ListActivity.lameStatic.runNets) {
-                  // location or nets have changed, update the view
-                  if ( mapView instanceof View ) {
-                    ((View) mapView).postInvalidate();
-                  }
-                }
-                // set if location isn't null
-                previousLocation = location;
+
+  final Runnable mUpdateTimeTask = new Runnable() {
+    @Override
+    public void run() {
+        // make sure the app isn't trying to finish
+        if ( ! finishing.get() ) {
+          final Location location = ListActivity.lameStatic.location;
+          if ( location != null ) {
+            if ( state.locked ) {
+              // MainActivity.info( "mapping center location: " + location );
+  						final GeoPoint locGeoPoint = new GeoPoint( location );
+  						if ( state.firstMove ) {
+  						  mapControl.setCenter( locGeoPoint );
+  						  state.firstMove = false;
+  						}
+  						else {
+  						  mapControl.animateTo( locGeoPoint );
+  						}
+            }
+            else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
+                || previousLocation.getLongitude() != location.getLongitude()
+                || previousRunNets != ListActivity.lameStatic.runNets) {
+              // location or nets have changed, update the view
+              if ( mapView instanceof View ) {
+                ((View) mapView).postInvalidate();
               }
-              
-              previousRunNets = ListActivity.lameStatic.runNets;
-              
-              TextView tv = (TextView) view.findViewById( R.id.stats_run );
-              tv.setText( getString(R.string.run) + ": " + ListActivity.lameStatic.runNets );
-              tv = (TextView) view.findViewById( R.id.stats_new );
-              tv.setText( getString(R.string.new_word) + ": " + ListActivity.lameStatic.newNets );
-              tv = (TextView) view.findViewById( R.id.stats_dbnets );
-              tv.setText( getString(R.string.db) + ": " + ListActivity.lameStatic.dbNets );
-              
-              final long period = 1000L;
-              // info("wifitimer: " + period );
-              timer.postDelayed( this, period );
             }
-            else {
-              MainActivity.info( "finishing mapping timer" );
-            }
+            // set if location isn't null
+            previousLocation = location;
+          }
+
+          previousRunNets = ListActivity.lameStatic.runNets;
+
+          final View view = getView();
+
+          TextView tv = (TextView) view.findViewById( R.id.stats_run );
+          tv.setText( getString(R.string.run) + ": " + ListActivity.lameStatic.runNets );
+          tv = (TextView) view.findViewById( R.id.stats_new );
+          tv.setText( getString(R.string.new_word) + ": " + ListActivity.lameStatic.newNets );
+          tv = (TextView) view.findViewById( R.id.stats_dbnets );
+          tv.setText( getString(R.string.db) + ": " + ListActivity.lameStatic.dbNets );
+
+          final long period = 1000L;
+          // info("wifitimer: " + period );
+          timer.postDelayed( this, period );
         }
-      };
-      timer.removeCallbacks( mUpdateTimeTask );
-      timer.postDelayed( mUpdateTimeTask, 100 );
+        else {
+          MainActivity.info( "finishing mapping timer" );
+        }
     }
+  };
+
+  private void setupTimer() {
+    timer.removeCallbacks( mUpdateTimeTask );
+    timer.postDelayed( mUpdateTimeTask, 250 );
   }
-  
-// XXX   
-//  @Override
-//  public void finish() {
-//    MainActivity.info( "finish mapping." );
-//    finishing.set( true );
-//    
-//    super.finish();
-//  }
-  
+
   @Override
   public void onDestroy() {
     MainActivity.info( "destroy mapping." );
     finishing.set( true );
-    
+
     // save zoom
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final Editor edit = prefs.edit();
     edit.putInt( ListActivity.PREF_PREV_ZOOM, mapView.getZoomLevel() );
     edit.commit();
-    
+
+    // save center
+    state.oldCenter = mapView.getMapCenter();
+
     super.onDestroy();
   }
-  
+
   @Override
   public void onPause() {
     MainActivity.info( "pause mapping." );
     myLocationOverlay.disableCompass();
     disableLocation();
-    
+
     super.onPause();
   }
-  
+
   @Override
   public void onResume() {
     MainActivity.info( "resume mapping." );
-    myLocationOverlay.enableCompass();    
+    myLocationOverlay.enableCompass();
     enableLocation();
-    
+
     super.onResume();
+
+    setupTimer();
   }
-  
+
   private void disableLocation() {
     myLocationOverlay.mLocationListener = null;
 
@@ -333,7 +314,7 @@ public final class MappingActivity extends Fragment {
       ((View) mapView).postInvalidate();
     }
   }
-  
+
   private void enableLocation() {
     try {
       // force it to think it's own location listening is on
@@ -346,40 +327,40 @@ public final class MappingActivity extends Fragment {
       MainActivity.error("Could not enableLocation for maps: " + ex, ex);
     }
   }
-  
+
   /* Creates the menu items */
   @Override
-  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) { 
+  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
     MenuItem item = null;
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
     final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
-    
+
     String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
     item = menu.add(0, MENU_LABEL, 0, nameLabel);
     item.setIcon( android.R.drawable.ic_dialog_info );
-    
+
     item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-    item.setIcon( android.R.drawable.ic_menu_search );        
-    
+    item.setIcon( android.R.drawable.ic_menu_search );
+
     String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
     item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
     item.setIcon( android.R.drawable.ic_menu_mapmode );
-        
+
     String nameDB = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
     item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
     item.setIcon( android.R.drawable.ic_menu_edit );
-    
+
     item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
     item.setIcon( android.R.drawable.ic_menu_add );
-    
+
     item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
     item.setIcon( android.R.drawable.ic_menu_revert );
-    
+
     item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );       
-        
-    super.onCreateOptionsMenu(menu, inflater);  
+    item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   /* Handles item selections */
@@ -415,7 +396,7 @@ public final class MappingActivity extends Fragment {
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
           edit.commit();
-          
+
           String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
           item.setTitle( name );
           return true;
@@ -426,7 +407,7 @@ public final class MappingActivity extends Fragment {
           Editor edit = prefs.edit();
           edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
           edit.commit();
-          
+
           String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
           item.setTitle( name );
           return true;
@@ -438,8 +419,8 @@ public final class MappingActivity extends Fragment {
       }
       return false;
   }
-  
-  
+
+
 //  XXX
 //  @Override
 //  public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -460,37 +441,38 @@ public final class MappingActivity extends Fragment {
 //      default:
 //        MainActivity.error( "unhandled dialog: " + which );
 //    }
-//    return null;    
+//    return null;
 //  }
-  
+
   public static Dialog createSsidFilterDialog( final Activity activity, final String prefix ) {
     final Dialog dialog = new Dialog( activity );
 
     dialog.setContentView( R.layout.filterdialog );
     dialog.setTitle( "SSID Filter" );
-    
+
     MainActivity.info("make new dialog");
     final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final EditText regex = (EditText) dialog.findViewById( R.id.edit_regex );
     regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
-    
-    final CheckBox invert = MainActivity.prefSetCheckBox( activity, dialog, R.id.showinvert, 
+
+    final CheckBox invert = MainActivity.prefSetCheckBox( activity, dialog, R.id.showinvert,
         prefix + ListActivity.PREF_MAPF_INVERT, false );
-    final CheckBox open = MainActivity.prefSetCheckBox( activity, dialog, R.id.showopen, 
+    final CheckBox open = MainActivity.prefSetCheckBox( activity, dialog, R.id.showopen,
         prefix + ListActivity.PREF_MAPF_OPEN, true );
-    final CheckBox wep = MainActivity.prefSetCheckBox( activity, dialog, R.id.showwep, 
+    final CheckBox wep = MainActivity.prefSetCheckBox( activity, dialog, R.id.showwep,
         prefix + ListActivity.PREF_MAPF_WEP, true );
-    final CheckBox wpa = MainActivity.prefSetCheckBox( activity, dialog, R.id.showwpa, 
+    final CheckBox wpa = MainActivity.prefSetCheckBox( activity, dialog, R.id.showwpa,
         prefix + ListActivity.PREF_MAPF_WPA, true );
-    final CheckBox cell = MainActivity.prefSetCheckBox( activity, dialog, R.id.showcell, 
+    final CheckBox cell = MainActivity.prefSetCheckBox( activity, dialog, R.id.showcell,
         prefix + ListActivity.PREF_MAPF_CELL, true );
-    final CheckBox enabled = MainActivity.prefSetCheckBox( activity, dialog, R.id.enabled, 
+    final CheckBox enabled = MainActivity.prefSetCheckBox( activity, dialog, R.id.enabled,
         prefix + ListActivity.PREF_MAPF_ENABLED, true );
-    
+
     Button ok = (Button) dialog.findViewById( R.id.ok_button );
     ok.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
-          try {                
+        @Override
+        public void onClick( final View buttonView ) {
+          try {
             final Editor editor = prefs.edit();
             editor.putString( prefix + ListActivity.PREF_MAPF_REGEX, regex.getText().toString() );
             editor.putBoolean( prefix + ListActivity.PREF_MAPF_INVERT, invert.isChecked() );
@@ -508,25 +490,26 @@ public final class MappingActivity extends Fragment {
           }
         }
       } );
-    
+
     Button cancel = (Button) dialog.findViewById( R.id.cancel_button );
     cancel.setOnClickListener( new OnClickListener() {
-        public void onClick( final View buttonView ) {  
+        @Override
+        public void onClick( final View buttonView ) {
           try {
             regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.showinvert, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.showinvert,
                 prefix + ListActivity.PREF_MAPF_INVERT, false );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.showopen, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.showopen,
                 prefix + ListActivity.PREF_MAPF_OPEN, true );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.showwep, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.showwep,
                 prefix + ListActivity.PREF_MAPF_WEP, true );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.showwpa, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.showwpa,
                 prefix + ListActivity.PREF_MAPF_WPA, true );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.showcell, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.showcell,
                 prefix + ListActivity.PREF_MAPF_CELL, true );
-            MainActivity.prefSetCheckBox( activity, dialog, R.id.enabled, 
+            MainActivity.prefSetCheckBox( activity, dialog, R.id.enabled,
                 prefix + ListActivity.PREF_MAPF_ENABLED, true );
-            
+
             dialog.dismiss();
           }
           catch ( Exception ex ) {
@@ -535,7 +518,7 @@ public final class MappingActivity extends Fragment {
           }
         }
       } );
-    
+
     return dialog;
   }
 
@@ -544,28 +527,30 @@ public final class MappingActivity extends Fragment {
       // don't load, there's already networks to show
       return;
     }
-    
-    final String sql = "SELECT bssid FROM " 
+
+    final String sql = "SELECT bssid FROM "
       + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT 200";
-    
+
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+      @Override
       public void handleRow( final Cursor cursor ) {
         final String bssid = cursor.getString(0);
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
-        
-        Network network = networkCache.get( bssid );        
+
+        Network network = networkCache.get( bssid );
         if ( network == null ) {
           network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
-          networkCache.put( network.getBssid(), network );      
+          networkCache.put( network.getBssid(), network );
           // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
-        
+
           final GeoPoint geoPoint = network.getGeoPoint();
           final int newWifiForRun = 1;
           final long newWifiForDB = 0;
-          WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);          
+          WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);
         }
       }
-      
+
+      @Override
       public void complete() {
         if ( mapView != null ) {
           // force a redraw
@@ -575,7 +560,7 @@ public final class MappingActivity extends Fragment {
     });
     ListActivity.lameStatic.dbHelper.addToQueue( request );
   }
-  
+
 //  private void tryEvil() {
 //    final String apiKey = "hiuhhkjhkjhkjh";
 //    //Object foo = new com.google.android.maps.MapView( this, apiKey );
@@ -583,28 +568,28 @@ public final class MappingActivity extends Fragment {
 //      File file = new File("/sdcard/com.google.android.maps.jar");
 //      MainActivity.info("file exists: " + file.exists() + " " + file.canRead());
 //      //DexFile df = new DexFile(file);
-//      
+//
 //      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
 //          "/sdcard/", null, MappingActivity.class.getClassLoader() );
 //      // this is abstract, doesn't seem like we can reflect into it, proxy only works for interfaces :(
 ////      Class<?> mapActivityClass = cl.loadClass("com.google.android.maps.MapActivity");
-//      
+//
 //      Class<?> mapActivityClass = cl.loadClass("EvilMap");
 //      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
 //      Object mapActivity = constructor.newInstance( this );
 //      MainActivity.info("mapActivity: " + mapActivity.getClass().getName());
 //      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
 //      create.invoke(mapActivity, new Bundle());
-//      
+//
 ////      final InvocationHandler handler = new InvocationHandler() {
 ////        public Object invoke( Object object, Method method, Object[] args ) {
 ////          MainActivity.info("invoke: " + method.getName() );
 ////          return null;
 ////        }
 ////      };
-////      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(), 
+////      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(),
 ////                                         new Class[]{ mapActivityClass }, handler );
-//      
+//
 //      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
 //      constructor = foo.getConstructor(Context.class, String.class);
 //      Object googMap = constructor.newInstance( mapActivity, apiKey );
@@ -614,7 +599,7 @@ public final class MappingActivity extends Fragment {
 //    catch ( Exception ex)  {
 //      MainActivity.error("ex: " + ex, ex);
 //    }
-//        
+//
 //  }
-  
+
 }

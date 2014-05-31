@@ -41,12 +41,12 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
     private static final int MENU_FILTER = 15;
-    
+
     private static final int SORT_DIALOG = 100;
     private static final int SSID_FILTER = 102;
-    
+
     public static final float MIN_DISTANCE_ACCURACY = 32f;
-    
+
     // preferences
     public static final String SHARED_PREFS = "WiglePrefs";
     public static final String PREF_USERNAME = "username";
@@ -66,7 +66,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
     public static final String PREF_LANGUAGE = "speechLanguage";
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
-    public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";    
+    public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
     public static final String PREF_SPEECH_GPS = "speechGPS";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
@@ -84,7 +84,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
     public static final String PREF_USE_WIGLE_TILES = "useWigleTileSource2"; // bool
-    
+
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
@@ -94,25 +94,25 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public static final String PREF_SPEAK_TIME = "speakTime";
     public static final String PREF_SPEAK_BATTERY = "speakBattery";
     public static final String PREF_SPEAK_SSID = "speakSsid";
-    public static final String PREF_SPEAK_WIFI_RESTART = "speakWifiRestart";    
-    
+    public static final String PREF_SPEAK_WIFI_RESTART = "speakWifiRestart";
+
     // map ssid filter
     public static final String PREF_MAPF_REGEX = "mapfRegex";
     public static final String PREF_MAPF_INVERT = "mapfInvert";
     public static final String PREF_MAPF_OPEN = "mapfOpen";
     public static final String PREF_MAPF_WEP = "mapfWep";
     public static final String PREF_MAPF_WPA = "mapfWpa";
-    public static final String PREF_MAPF_CELL = "mapfCell";    
+    public static final String PREF_MAPF_CELL = "mapfCell";
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
-    
+
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
-    
+
     public static final String ANONYMOUS = "anonymous";
     public static final String WIFI_LOCK_NAME = "wigleWifiLock";
     //static final String THREAD_DEATH_MESSAGE = "threadDeathMessage";
     static final boolean DEBUG = false;
-    
+
     /** cross-activity communication */
     public static class TrailStat {
       public int newWifiForRun = 0;
@@ -121,8 +121,8 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       public int newCellForDB = 0;
     }
     public static class LameStatic {
-      public Location location; 
-      public ConcurrentLinkedHashMap<GeoPoint,TrailStat> trail = 
+      public Location location;
+      public ConcurrentLinkedHashMap<GeoPoint,TrailStat> trail =
         new ConcurrentLinkedHashMap<GeoPoint,TrailStat>( 512 );
       public int runNets;
       public long newNets;
@@ -137,22 +137,21 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       public QueryArgs queryArgs;
     }
     public static final LameStatic lameStatic = new LameStatic();
-    
-    private MainActivity.State state;
-    
+
     // cache
-    public static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache = 
+    public static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache =
       new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
+        @Override
         protected ConcurrentLinkedHashMap<String,Network> initialValue() {
             return new ConcurrentLinkedHashMap<String,Network>( 128 );
         }
     };
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
       final View view = inflater.inflate(R.layout.list, container, false);
       final State state = MainActivity.getState(this);
-      
+
       MainActivity.info( "setupUploadButton" );
       setupUploadButton( view );
       MainActivity.info( "setupList" );
@@ -165,29 +164,21 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       setupLocation( view );
       MainActivity.info( "setupMuteButton" );
       setupMuteButton( view );
-      
+
       return view;
     }
-    
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
         setHasOptionsMenu(true);
     }
-    
-    public void setState( final MainActivity.State state ) {
-      this.state = state;
-    }
-    
-    public MainActivity.State getState() {
-      return state;
-    }
-    
+
     public void setNetCountUI( final State state ) {
     	setNetCountUI( state, getView() );
     }
-    
+
     private void setNetCountUI( final State state, final View view ) {
       if (view == null) {
     	  return;
@@ -199,36 +190,36 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       tv = (TextView) view.findViewById( R.id.stats_dbnets );
       tv.setText( getString(R.string.db) + ": " + state.dbHelper.getNetworkCount() );
     }
-    
+
     public void setStatusUI( String status ) {
     	setStatusUI( getView(), status );
     }
-    
+
     public void setStatusUI( final View view, final String status ) {
       if ( status != null && view != null ) {
         final TextView tv = (TextView) view.findViewById( R.id.status );
         tv.setText( status );
       }
     }
-    
+
     @Override
     public void onPause() {
       MainActivity.info( "LIST: paused.");
       super.onPause();
     }
-    
+
     @Override
     public void onResume() {
       MainActivity.info( "LIST: resumed.");
       super.onResume();
     }
-    
+
     @Override
     public void onStart() {
       MainActivity.info( "LIST: start.");
       super.onStart();
     }
-    
+
     @Override
     public void onStop() {
       MainActivity.info( "LIST: stop.");
@@ -247,52 +238,52 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //      }
 //      return super.onKeyDown(keyCode, event);
 //    }
-    
+
     @Override
     public void onDestroyView() {
       MainActivity.info( "LIST: onDestroyView.");
       super.onDestroyView();
     }
-    
+
     @Override
     public void onDestroy() {
       MainActivity.info( "LIST: destroy.");
       super.onDestroy();
     }
-    
+
     @Override
     public void onDetach() {
       MainActivity.info( "LIST: onDestroyView.");
       super.onDestroyView();
     }
-    
+
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {    
+    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
       MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
       item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
-      
+
       item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
       item.setIcon( android.R.drawable.ic_menu_search );
       MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-      
+
       MainActivity main = MainActivity.getMainActivity(this);
       final String scan = main.isScanning() ? getString(R.string.off) : getString(R.string.on);
       item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
-      item.setIcon( main.isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );      
-      
-      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ? 
+      item.setIcon( main.isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
+
+      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ?
           getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
       item = menu.add(0, MENU_WAKELOCK, 0, wake);
       item.setIcon( android.R.drawable.ic_menu_gallery );
-      
+
       item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
       item.setIcon( android.R.drawable.ic_menu_preferences );
-      
+
       item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
       item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-      
-      super.onCreateOptionsMenu(menu, inflater);           
+
+      super.onCreateOptionsMenu(menu, inflater);
     }
 
     /* Handles item selections */
@@ -335,23 +326,23 @@ public final class ListActivity extends Fragment implements FileUploaderListener
             return true;
           case MENU_FILTER:
         	getActivity().showDialog( SSID_FILTER );
-            return true;          
-        }        
+            return true;
+        }
         return false;
     }
-    
+
     private void handleScanChange( final View view ) {
       MainActivity main = MainActivity.getMainActivity(this);
       final boolean isScanning = main.isScanning();
       MainActivity.info("handleScanChange: isScanning now: " + isScanning );
       if ( isScanning ) {
-        setStatusUI( view, "Scanning Turned On" );        
+        setStatusUI( view, "Scanning Turned On" );
       }
       else {
         setStatusUI( view, "Scanning Turned Off" );
       }
     }
-    
+
 //    @Override
 //    public Dialog onCreateDialog( int which ) {
 //      switch ( which ) {
@@ -359,16 +350,16 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //          return MappingActivity.createSsidFilterDialog(this, FILTER_PREF_PREFIX);
 //        case SORT_DIALOG:
 //          final Dialog dialog = new Dialog( this );
-//  
+//
 //          dialog.setContentView( R.layout.listdialog );
 //          dialog.setTitle( getString(R.string.sort_title) );
-//  
+//
 //          TextView text = (TextView) dialog.findViewById( R.id.text );
 //          text.setText( getString(R.string.sort_spin_label) );
-//          
+//
 //          final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
 //          final Editor editor = prefs.edit();
-//          
+//
 //          Spinner spinner = (Spinner) dialog.findViewById( R.id.sort_spinner );
 //          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 //              this, android.R.layout.simple_spinner_item);
@@ -397,10 +388,10 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //            }
 //            public void onNothingSelected( final AdapterView<?> arg0 ) {}
 //            });
-//          
+//
 //          Button ok = (Button) dialog.findViewById( R.id.listdialog_button );
 //          ok.setOnClickListener( new OnClickListener() {
-//              public void onClick( final View buttonView ) {  
+//              public void onClick( final View buttonView ) {
 //                try {
 //                  dialog.dismiss();
 //                }
@@ -410,7 +401,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 //                }
 //              }
 //            } );
-//          
+//
 //          return dialog;
 //        default:
 //          MainActivity.error( "unhandled dialog: " + which );
@@ -424,12 +415,12 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public void onConfigurationChanged( final Configuration newConfig ) {
       final MainActivity main = MainActivity.getMainActivity( this );
       final State state = MainActivity.getState(this);
-      
+
       MainActivity.info( "LIST: on config change" );
       MainActivity.setLocale( this.getActivity(), newConfig);
       super.onConfigurationChanged( newConfig );
-      getActivity().setContentView( R.layout.list );      
-      
+      getActivity().setContentView( R.layout.list );
+
       // have to redo linkages/listeners
       setupUploadButton( getView() );
       setupMuteButton( getView() );
@@ -437,20 +428,21 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       setLocationUI( main, getView() );
       setStatusUI( getView(), state.previousStatus );
     }
-    
+
     private void setupList( final View view ) {
       State state = MainActivity.getState(this);
       state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
       setupListAdapter( view, MainActivity.getMainActivity(this), state.listAdapter, R.id.ListView01 );
     }
-     
+
     public static void setupListAdapter( final View view, final MainActivity activity, final NetworkListAdapter listAdapter, final int id) {
       // always set our current list adapter
-      activity.getState().wifiReceiver.setListAdapter( listAdapter );    
-      
+      activity.getState().wifiReceiver.setListAdapter( listAdapter );
+
       final ListView listView = (ListView) view.findViewById( id );
-      listView.setAdapter( listAdapter ); 
+      listView.setAdapter( listAdapter );
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
+        @Override
         public void onItemClick( AdapterView<?> parent, View view, final int position, final long id ) {
           final Network network = (Network) parent.getItemAtPosition( position );
           MainActivity.getNetworkCache().put( network.getBssid(), network );
@@ -460,17 +452,17 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         }
       });
     }
-    
+
     private void setupLocation( final View view ) {
       // set on UI if we already have one
       setLocationUI( MainActivity.getMainActivity( this ), view );
       handleScanChange( view );
     }
-    
+
     public void setLocationUI( final MainActivity main ) {
       setLocationUI( main, getView() );
     }
-    
+
     private void setLocationUI( final MainActivity main, final View view ) {
       final State state = main.getState();
       if ( state.gpsListener == null ) {
@@ -479,13 +471,13 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       if ( view == null ) {
     	return;
       }
-      
-      try {       
+
+      try {
         TextView tv = (TextView) view.findViewById( R.id.LocationTextView06 );
         tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
-        
+
         final Location location = state.gpsListener.getLocation();
-        
+
         tv = (TextView) view.findViewById( R.id.LocationTextView01 );
         String latText = "";
         if ( location == null ) {
@@ -500,13 +492,13 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           latText = state.numberFormat8.format( location.getLatitude() );
         }
         tv.setText( getString(R.string.list_short_lat) + " " + latText );
-        
+
         tv = (TextView) view.findViewById( R.id.LocationTextView02 );
         tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
-        
+
         tv = (TextView) view.findViewById( R.id.LocationTextView03 );
         tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, getActivity(), location.getSpeed()) ) );
-        
+
         TextView tv4 = (TextView) view.findViewById( R.id.LocationTextView04 );
         TextView tv5 = (TextView) view.findViewById( R.id.LocationTextView05 );
         if ( location == null ) {
@@ -514,10 +506,10 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           tv5.setText( "" );
         }
         else {
-          String distString = DashboardActivity.metersToString( 
+          String distString = DashboardActivity.metersToString(
               state.numberFormat0, getActivity(), location.getAccuracy(), true );
           tv4.setText( "+/- " + distString );
-          distString = DashboardActivity.metersToString( 
+          distString = DashboardActivity.metersToString(
               state.numberFormat0, getActivity(), (float) location.getAltitude(), true );
           tv5.setText( getString(R.string.list_short_alt) + " " + distString );
         }
@@ -527,13 +519,13 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         MainActivity.error( "wierd ex: " + ex, ex);
       }
     }
-    
+
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
         final float metersPerSecond ) {
-      
+
       final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
       final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
-      
+
       String retval = null;
       if ( metric ) {
         retval = numberFormat.format( metersPerSecond * 3.6 ) + " " + context.getString(R.string.kmph);
@@ -543,10 +535,11 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       }
       return retval;
     }
-    
-    private void setupUploadButton( final View view ) {      
+
+    private void setupUploadButton( final View view ) {
       final Button button = (Button) view.findViewById( R.id.upload_button );
-      button.setOnClickListener( new OnClickListener() { 
+      button.setOnClickListener( new OnClickListener() {
+          @Override
           public void onClick( final View view ) {
             final MainActivity main = MainActivity.getMainActivity( ListActivity.this );
             final SharedPreferences prefs = main.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
@@ -554,30 +547,31 @@ public final class ListActivity extends Fragment implements FileUploaderListener
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
             MainActivity.createConfirmation( getActivity(), text, new Doer() {
               @Override
-              public void execute() {                
-                final State state = MainActivity.getState( ListActivity.this );     
+              public void execute() {
+                final State state = MainActivity.getState( ListActivity.this );
                 uploadFile( state.dbHelper );
               }
             } );
           }
         });
     }
-     
+
     private void setupMuteButton( final View view ) {
       final Button mute = (Button) view.findViewById(R.id.mute);
       final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
       final boolean muted = prefs.getBoolean(PREF_MUTED, false);
       mute.setText(getString(muted ? R.string.play : R.string.mute));
       final MainActivity main = MainActivity.getMainActivity();
-      
+
       mute.setOnClickListener(new OnClickListener(){
+        @Override
         public void onClick( final View buttonView ) {
           boolean muted = prefs.getBoolean(PREF_MUTED, false);
           muted = ! muted;
           Editor editor = prefs.edit();
           editor.putBoolean( PREF_MUTED, muted );
           editor.commit();
-          
+
           if ( muted ) {
             mute.setText(getString(R.string.play));
             main.interruptSpeak();
@@ -588,7 +582,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
         }
       });
     }
- 
+
     public void uploadFile( final DatabaseHelper dbHelper ){
       MainActivity.info( "upload file" );
       final MainActivity main = MainActivity.getMainActivity( this );
@@ -598,14 +592,15 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
       state.fileUploaderTask.start();
     }
-    
+
     /**
      * FileUploaderListener interface
      */
+    @Override
     public void transferComplete() {
       final MainActivity main = MainActivity.getMainActivity( this );
       main.transferComplete();
     }
-    
-    
+
+
 }

@@ -22,96 +22,102 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 public class DashboardActivity extends Fragment {
-  private Handler timer;
+  private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
-  
+
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
-  
+
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
+    MainActivity.info("DASH: onCreate");
     super.onCreate( savedInstanceState );
     setHasOptionsMenu(true);
     // set language
     MainActivity.setLocale( getActivity() );
-    
+
     // media volume
-    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );  
-    
+    getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
+
     finishing = new AtomicBoolean( false );
     numberFormat = NumberFormat.getNumberInstance( Locale.US );
     if ( numberFormat instanceof DecimalFormat ) {
       ((DecimalFormat) numberFormat).setMaximumFractionDigits( 2 );
     }
-    
-    setupTimer();
   }
-  
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    MainActivity.info("DASH: onCreateView");
     final View view = inflater.inflate(R.layout.dash, container, false);
-    
+
     return view;
   }
-  
-  private void setupTimer() {
-    if ( timer == null ) {
-      timer = new Handler();
-      final Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {              
-            // make sure the app isn't trying to finish
-            if ( ! finishing.get() ) {
-              final View view = getView();
-              if (view != null) {
-                updateUI( view );
-              }
-              
-              final long period = 1000L;
-              // info("wifitimer: " + period );
-              timer.postDelayed( this, period );
-            }
-            else {
-              MainActivity.info( "finishing mapping timer" );
-            }
+
+  private final Runnable mUpdateTimeTask = new Runnable() {
+    @Override
+    public void run() {
+        // make sure the app isn't trying to finish
+        if ( ! finishing.get() ) {
+          final View view = getView();
+          if (view != null) {
+            updateUI( view );
+          }
+
+          final long period = 1000L;
+          // info("wifitimer: " + period );
+          timer.postDelayed( this, period );
         }
-      };
-      timer.removeCallbacks( mUpdateTimeTask );
-      timer.postDelayed( mUpdateTimeTask, 100 );
+        else {
+          MainActivity.info( "finishing mapping timer" );
+        }
+    }
+  };
+
+  private void setupTimer() {
+    timer.removeCallbacks( mUpdateTimeTask );
+    timer.postDelayed( mUpdateTimeTask, 250 );
+  }
+
+  public void updateUI() {
+    final View view = getView();
+    if (view != null) {
+      updateUI(view);
     }
   }
-  
+
   private void updateUI( final View view ) {
     TextView tv = (TextView) view.findViewById( R.id.runnets );
     tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.run));
-    
+
     tv = (TextView) view.findViewById( R.id.newwifi );
-    final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n"; 
+    final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
     tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
-    
+
     tv = (TextView) view.findViewById( R.id.currnets );
     tv.setText( getString(R.string.dash_vis_nets) + " " + ListActivity.lameStatic.currNets );
-    
+
     tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
-    tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );  
-    
+    tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
+
     tv = (TextView) view.findViewById( R.id.newcells );
-    tv.setText( getString(R.string.dash_new_cells) + " " + ListActivity.lameStatic.newCells );    
-    
+    tv.setText( getString(R.string.dash_new_cells) + " " + ListActivity.lameStatic.newCells );
+
     updateDist( view, R.id.rundist, ListActivity.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
     updateDist( view, R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
     updateDist( view, R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
-    
+
     tv = (TextView) view.findViewById( R.id.queuesize );
     tv.setText( getString(R.string.dash_db_queue) + " " + ListActivity.lameStatic.preQueueSize );
-    
+
     tv = (TextView) view.findViewById( R.id.dbNets );
     tv.setText( getString(R.string.dash_db_nets) + " " + ListActivity.lameStatic.dbNets );
-    
+
     tv = (TextView) view.findViewById( R.id.dbLocs );
     tv.setText( getString(R.string.dash_db_locs) + " " + ListActivity.lameStatic.dbLocs );
-        
+
     tv = (TextView) view.findViewById( R.id.gpsstatus );
     Location location = ListActivity.lameStatic.location;
     String gpsStatus = getString(R.string.dash_no_loc);
@@ -120,14 +126,14 @@ public class DashboardActivity extends Fragment {
     }
     tv.setText( getString(R.string.dash_short_loc) + " " + gpsStatus );
   }
-  
+
   private long newNetsSinceUpload() {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final long marker = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
     final long uploaded = prefs.getLong( ListActivity.PREF_NETS_UPLOADED, 0L );
     long newSinceUpload = 0;
     if ( marker != 0 && uploaded == 0 ) {
-      // marker is set but no uploaded, a migration situation, so return zero      
+      // marker is set but no uploaded, a migration situation, so return zero
     }
     else {
       newSinceUpload = ListActivity.lameStatic.dbNets - uploaded;
@@ -137,57 +143,64 @@ public class DashboardActivity extends Fragment {
     }
     return newSinceUpload;
   }
-  
+
   private void updateDist( final View view, final int id, final String pref, final String title ) {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    
+
     float dist = prefs.getFloat( pref, 0f );
     final String distString = metersToString( numberFormat, getActivity(), dist, false );
     final TextView tv = (TextView) view.findViewById( id );
-    tv.setText( title + " " + distString );    
+    tv.setText( title + " " + distString );
   }
-  
+
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
       final boolean useShort ) {
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
     final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
-    
+
     String retval = null;
     if ( meters > 1000f ) {
       if ( metric ) {
         retval = numberFormat.format( meters / 1000f ) + " " + context.getString(R.string.km_short);
       }
       else {
-        retval = numberFormat.format( meters / 1609.344f ) + " " + 
+        retval = numberFormat.format( meters / 1609.344f ) + " " +
             (useShort ? context.getString(R.string.mi_short) : context.getString(R.string.miles));
       }
     }
     else if ( metric ){
-      retval = numberFormat.format( meters ) + " " + 
+      retval = numberFormat.format( meters ) + " " +
           (useShort ? context.getString(R.string.m_short) : context.getString(R.string.meters));
     }
     else {
-      retval = numberFormat.format( meters * 3.2808399f  ) + " " + 
+      retval = numberFormat.format( meters * 3.2808399f  ) + " " +
           (useShort ? context.getString(R.string.ft_short) : context.getString(R.string.feet));
     }
     return retval;
   }
-  
+
   // XXX
 //  @Override
 //  public void finish() {
 //    ListActivity.info( "finish dash." );
 //    finishing.set( true );
-//    
+//
 //    super.finish();
 //  }
-  
+
   @Override
   public void onDestroy() {
-    MainActivity.info( "destroy dash." );
+    MainActivity.info( "DASH: onDestroy" );
     finishing.set( true );
-    
+
     super.onDestroy();
+  }
+
+  @Override
+  public void onResume() {
+    MainActivity.info( "DASH: onResume" );
+    super.onResume();
+    setupTimer();
   }
 
   /* Creates the menu items */
@@ -195,11 +208,11 @@ public class DashboardActivity extends Fragment {
   public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
 	MenuItem item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
     item.setIcon( android.R.drawable.ic_menu_preferences );
-    
+
     item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
     item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-        
-    super.onCreateOptionsMenu(menu, inflater);  
+
+    super.onCreateOptionsMenu(menu, inflater);
   }
 
   /* Handles item selections */
@@ -217,7 +230,7 @@ public class DashboardActivity extends Fragment {
       }
       return false;
   }
-  
+
   // XXX: onKeyDown
 //  @Override
 //  public boolean onKeyDown(int keyCode, KeyEvent event) {

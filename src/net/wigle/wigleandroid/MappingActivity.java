@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -309,6 +310,7 @@ public final class MappingActivity extends Fragment {
     super.onResume();
 
     setupTimer();
+    getActivity().setTitle(R.string.mapping_app_name);
   }
 
   private void disableLocation() {
@@ -347,6 +349,7 @@ public final class MappingActivity extends Fragment {
 
     item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
     item.setIcon( android.R.drawable.ic_menu_search );
+    MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
     String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
     item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);

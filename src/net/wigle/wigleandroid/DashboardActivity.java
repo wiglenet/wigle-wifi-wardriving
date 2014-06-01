@@ -201,6 +201,7 @@ public class DashboardActivity extends Fragment {
     MainActivity.info( "DASH: onResume" );
     super.onResume();
     setupTimer();
+    getActivity().setTitle(R.string.dashboard_app_name);
   }
 
   /* Creates the menu items */

@@ -219,6 +219,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public void onResume() {
       MainActivity.info( "LIST: resumed.");
       super.onResume();
+      getActivity().setTitle(R.string.list_app_name);
     }
 
     @Override
@@ -256,6 +257,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
       MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
       item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+      MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
       item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
       item.setIcon( android.R.drawable.ic_menu_search );

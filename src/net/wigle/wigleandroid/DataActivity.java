@@ -348,6 +348,7 @@ MainActivity.info("id: " + id);
   public void onResume() {
     MainActivity.info( "resume data." );
     super.onResume();
+    getActivity().setTitle(R.string.data_activity_name);
   }
 
   /* Creates the menu items */

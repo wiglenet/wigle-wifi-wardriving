@@ -65,6 +65,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -315,7 +316,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
    */
   static void switchTab( final int tab ) {
     final ActionBar bar = mainActivity.getSupportActionBar();
-    bar.setNavigationMode(tab);
+    bar.setSelectedNavigationItem(tab);
   }
 
   static void setLockScreen( Activity activity, boolean lockScreen ) {
@@ -1339,5 +1340,15 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
 
     super.finish();
+  }
+
+  @Override
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if (keyCode == KeyEvent.KEYCODE_BACK) {
+      MainActivity.info( "onKeyDown: not quitting app on back" );
+      MainActivity.switchTab( 0 );
+      return true;
+    }
+    return super.onKeyDown(keyCode, event);
   }
 }

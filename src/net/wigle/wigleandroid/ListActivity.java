@@ -233,19 +233,6 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       super.onStop();
     }
 
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//      if (keyCode == KeyEvent.KEYCODE_BACK) {
-//        MainActivity.info( "onKeyDown: treating back like home, not quitting app" );
-//        moveTaskToBack(true);
-//        if ( getParent() != null ) {
-//          getParent().moveTaskToBack( true );
-//        }
-//        return true;
-//      }
-//      return super.onKeyDown(keyCode, event);
-//    }
-
     @Override
     public void onDestroyView() {
       MainActivity.info( "LIST: onDestroyView.");

@@ -231,14 +231,4 @@ public class DashboardActivity extends Fragment {
       return false;
   }
 
-  // XXX: onKeyDown
-//  @Override
-//  public boolean onKeyDown(int keyCode, KeyEvent event) {
-//    if (keyCode == KeyEvent.KEYCODE_BACK) {
-//      ListActivity.info( "onKeyDown: not quitting app on back" );
-//      MainActivity.switchTab( getActivity(), MainActivity.TAB_LIST );
-//      return true;
-//    }
-//    return super.onKeyDown(keyCode, event);
-//  }
 }

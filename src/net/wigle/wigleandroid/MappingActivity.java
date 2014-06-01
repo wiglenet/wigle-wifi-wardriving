@@ -423,18 +423,6 @@ public final class MappingActivity extends Fragment {
       return false;
   }
 
-
-//  XXX
-//  @Override
-//  public boolean onKeyDown(int keyCode, KeyEvent event) {
-//    if (keyCode == KeyEvent.KEYCODE_BACK) {
-//      MainActivity.info( "onKeyDown: not quitting app on back" );
-//      MainActivity.switchTab( this, MainActivity.TAB_LIST );
-//      return true;
-//    }
-//    return super.onKeyDown(keyCode, event);
-//  }
-
   public void onCreateDialog( int which ) {
     DialogFragment dialogFragment = null;
     switch ( which ) {

@@ -61,6 +61,7 @@ public final class MappingActivity extends Fragment {
   private int previousRunNets;
   private MyLocationOverlay myLocationOverlay = null;
 
+  private static final String DIALOG_PREFIX = "DialogPrefix";
   public static LocationListener STATIC_LOCATION_LISTENER = null;
 
   private static final int DEFAULT_ZOOM = 17;
@@ -216,7 +217,8 @@ public final class MappingActivity extends Fragment {
     return retval;
   }
 
-  final Runnable mUpdateTimeTask = new Runnable() {
+  final Runnable mUpdateTimeTask = new MapRunnable();
+  private class MapRunnable implements Runnable {
     @Override
     public void run() {
         // make sure the app isn't trying to finish
@@ -439,90 +441,96 @@ public final class MappingActivity extends Fragment {
     }
   }
 
+  public static class MapDialogFragment extends DialogFragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+
+      final String prefix = getArguments().getString(DIALOG_PREFIX);
+
+      final Dialog dialog = getDialog();
+      final Activity activity = getActivity();
+      final View view = inflater.inflate(R.layout.filterdialog, container);
+      dialog.setTitle( "SSID Filter" );
+
+      MainActivity.info("make new dialog");
+      final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
+      regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
+
+      final CheckBox invert = MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
+          prefix + ListActivity.PREF_MAPF_INVERT, false );
+      final CheckBox open = MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
+          prefix + ListActivity.PREF_MAPF_OPEN, true );
+      final CheckBox wep = MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
+          prefix + ListActivity.PREF_MAPF_WEP, true );
+      final CheckBox wpa = MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
+          prefix + ListActivity.PREF_MAPF_WPA, true );
+      final CheckBox cell = MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
+          prefix + ListActivity.PREF_MAPF_CELL, true );
+      final CheckBox enabled = MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
+          prefix + ListActivity.PREF_MAPF_ENABLED, true );
+
+      Button ok = (Button) view.findViewById( R.id.ok_button );
+      ok.setOnClickListener( new OnClickListener() {
+          @Override
+          public void onClick( final View buttonView ) {
+            try {
+              final Editor editor = prefs.edit();
+              editor.putString( prefix + ListActivity.PREF_MAPF_REGEX, regex.getText().toString() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_INVERT, invert.isChecked() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_OPEN, open.isChecked() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_WEP, wep.isChecked() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_WPA, wpa.isChecked() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_CELL, cell.isChecked() );
+              editor.putBoolean( prefix + ListActivity.PREF_MAPF_ENABLED, enabled.isChecked() );
+              editor.commit();
+              dialog.dismiss();
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              MainActivity.info( "exception dismissing filter dialog: " + ex );
+            }
+          }
+        } );
+
+      Button cancel = (Button) view.findViewById( R.id.cancel_button );
+      cancel.setOnClickListener( new OnClickListener() {
+          @Override
+          public void onClick( final View buttonView ) {
+            try {
+              regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
+              MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
+                  prefix + ListActivity.PREF_MAPF_INVERT, false );
+              MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
+                  prefix + ListActivity.PREF_MAPF_OPEN, true );
+              MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
+                  prefix + ListActivity.PREF_MAPF_WEP, true );
+              MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
+                  prefix + ListActivity.PREF_MAPF_WPA, true );
+              MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
+                  prefix + ListActivity.PREF_MAPF_CELL, true );
+              MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
+                  prefix + ListActivity.PREF_MAPF_ENABLED, true );
+
+              dialog.dismiss();
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              MainActivity.info( "exception dismissing filter dialog: " + ex );
+            }
+          }
+        } );
+      return view;
+    }
+  }
+
   public static DialogFragment createSsidFilterDialog( final String prefix ) {
-    final DialogFragment dialogFragment = new DialogFragment() {
-      @Override
-      public View onCreateView(LayoutInflater inflater, ViewGroup container,
-              Bundle savedInstanceState) {
-
-        final Dialog dialog = getDialog();
-        final Activity activity = getActivity();
-        final View view = inflater.inflate(R.layout.filterdialog, container);
-        dialog.setTitle( "SSID Filter" );
-
-        MainActivity.info("make new dialog");
-        final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-        final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
-        regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
-
-        final CheckBox invert = MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-            prefix + ListActivity.PREF_MAPF_INVERT, false );
-        final CheckBox open = MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-            prefix + ListActivity.PREF_MAPF_OPEN, true );
-        final CheckBox wep = MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-            prefix + ListActivity.PREF_MAPF_WEP, true );
-        final CheckBox wpa = MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-            prefix + ListActivity.PREF_MAPF_WPA, true );
-        final CheckBox cell = MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-            prefix + ListActivity.PREF_MAPF_CELL, true );
-        final CheckBox enabled = MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-            prefix + ListActivity.PREF_MAPF_ENABLED, true );
-
-        Button ok = (Button) view.findViewById( R.id.ok_button );
-        ok.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-              try {
-                final Editor editor = prefs.edit();
-                editor.putString( prefix + ListActivity.PREF_MAPF_REGEX, regex.getText().toString() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_INVERT, invert.isChecked() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_OPEN, open.isChecked() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_WEP, wep.isChecked() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_WPA, wpa.isChecked() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_CELL, cell.isChecked() );
-                editor.putBoolean( prefix + ListActivity.PREF_MAPF_ENABLED, enabled.isChecked() );
-                editor.commit();
-                dialog.dismiss();
-              }
-              catch ( Exception ex ) {
-                // guess it wasn't there anyways
-                MainActivity.info( "exception dismissing filter dialog: " + ex );
-              }
-            }
-          } );
-
-        Button cancel = (Button) view.findViewById( R.id.cancel_button );
-        cancel.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-              try {
-                regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
-                MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-                    prefix + ListActivity.PREF_MAPF_INVERT, false );
-                MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-                    prefix + ListActivity.PREF_MAPF_OPEN, true );
-                MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-                    prefix + ListActivity.PREF_MAPF_WEP, true );
-                MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-                    prefix + ListActivity.PREF_MAPF_WPA, true );
-                MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-                    prefix + ListActivity.PREF_MAPF_CELL, true );
-                MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-                    prefix + ListActivity.PREF_MAPF_ENABLED, true );
-
-                dialog.dismiss();
-              }
-              catch ( Exception ex ) {
-                // guess it wasn't there anyways
-                MainActivity.info( "exception dismissing filter dialog: " + ex );
-              }
-            }
-          } );
-        return view;
-      }
-    };
-
-    return dialogFragment;
+    final DialogFragment dialog = new MapDialogFragment();
+    final Bundle bundle = new Bundle();
+    bundle.putString(DIALOG_PREFIX, prefix);
+    dialog.setArguments(bundle);
+    return dialog;
   }
 
   private void setupQuery() {

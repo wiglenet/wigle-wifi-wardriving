@@ -344,69 +344,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           dialogFragment = MappingActivity.createSsidFilterDialog(FILTER_PREF_PREFIX);
           break;
         case SORT_DIALOG:
-          dialogFragment = new DialogFragment() {
-            @Override
-            public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                    Bundle savedInstanceState) {
-
-                final Dialog dialog = getDialog();
-                View view = inflater.inflate(R.layout.listdialog, container);
-                dialog.setTitle(getString(R.string.sort_title));
-
-                TextView text = (TextView) view.findViewById( R.id.text );
-                text.setText( getString(R.string.sort_spin_label) );
-
-                final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
-                final Editor editor = prefs.edit();
-
-                Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                    getActivity(), android.R.layout.simple_spinner_item);
-                final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
-                    WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
-                final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
-                    getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-                int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
-                int periodIndex = 0;
-                for ( int i = 0; i < listSorts.length; i++ ) {
-                  adapter.add( listSortName[i] );
-                  if ( listSort == listSorts[i] ) {
-                    periodIndex = i;
-                  }
-                }
-                adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-                spinner.setAdapter( adapter );
-                spinner.setSelection( periodIndex );
-                spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-                  @Override
-                  public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-                    // set pref
-                    final int listSort = listSorts[position];
-                    MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
-                    editor.putInt( PREF_LIST_SORT, listSort );
-                    editor.commit();
-                  }
-                  @Override
-                  public void onNothingSelected( final AdapterView<?> arg0 ) {}
-                  });
-
-                Button ok = (Button) view.findViewById( R.id.listdialog_button );
-                ok.setOnClickListener( new OnClickListener() {
-                    @Override
-                    public void onClick( final View buttonView ) {
-                      try {
-                        dialog.dismiss();
-                      }
-                      catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing sort dialog: " + ex );
-                      }
-                    }
-                  } );
-
-                return view;
-            }
-          };
+          dialogFragment = new SortDialog();
           break;
         default:
           MainActivity.error( "unhandled dialog: " + which );
@@ -415,6 +353,70 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       if (dialogFragment != null) {
         final FragmentManager fm = getActivity().getSupportFragmentManager();
         dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+      }
+    }
+
+    public static class SortDialog extends DialogFragment {
+      @Override
+      public View onCreateView(LayoutInflater inflater, ViewGroup container,
+              Bundle savedInstanceState) {
+
+          final Dialog dialog = getDialog();
+          View view = inflater.inflate(R.layout.listdialog, container);
+          dialog.setTitle(getString(R.string.sort_title));
+
+          TextView text = (TextView) view.findViewById( R.id.text );
+          text.setText( getString(R.string.sort_spin_label) );
+
+          final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
+          final Editor editor = prefs.edit();
+
+          Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
+          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+              getActivity(), android.R.layout.simple_spinner_item);
+          final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
+              WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+          final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+              getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
+          int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+          int periodIndex = 0;
+          for ( int i = 0; i < listSorts.length; i++ ) {
+            adapter.add( listSortName[i] );
+            if ( listSort == listSorts[i] ) {
+              periodIndex = i;
+            }
+          }
+          adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+          spinner.setAdapter( adapter );
+          spinner.setSelection( periodIndex );
+          spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+              // set pref
+              final int listSort = listSorts[position];
+              MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+              editor.putInt( PREF_LIST_SORT, listSort );
+              editor.commit();
+            }
+            @Override
+            public void onNothingSelected( final AdapterView<?> arg0 ) {}
+            });
+
+          Button ok = (Button) view.findViewById( R.id.listdialog_button );
+          ok.setOnClickListener( new OnClickListener() {
+              @Override
+              public void onClick( final View buttonView ) {
+                try {
+                  dialog.dismiss();
+                }
+                catch ( Exception ex ) {
+                  // guess it wasn't there anyways
+                  MainActivity.info( "exception dismissing sort dialog: " + ex );
+                }
+              }
+            } );
+
+          return view;
       }
     }
 
@@ -428,7 +430,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       MainActivity.info( "LIST: on config change" );
       MainActivity.setLocale( this.getActivity(), newConfig);
       super.onConfigurationChanged( newConfig );
-      getActivity().setContentView( R.layout.list );
+      // getActivity().setContentView( R.layout.list );
 
       // have to redo linkages/listeners
       setupUploadButton( getView() );

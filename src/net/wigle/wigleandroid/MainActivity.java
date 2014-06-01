@@ -13,7 +13,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -97,6 +96,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     NetworkListAdapter listAdapter;
     String previousStatus;
     int currentTab;
+    private final Fragment[] fragList = new Fragment[4];
   }
   private State state;
   // *** end of state that is retained ***
@@ -123,7 +123,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   private static ListActivity listActivity;
   private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
-  private final List<Fragment> fragList = new ArrayList<Fragment>();
   private BatteryLevelReceiver batteryLevelReceiver;
 
   private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
@@ -248,59 +247,76 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     info( "setupLocation" ); // must be after setupWifi
     setupLocation();
     info( "setup tabs" );
-    setupTabs(state.currentTab);
+    if (savedInstanceState == null) {
+      setupFragments();
+    }
+    setActionBarTabs();
     info( "onCreate setup complete" );
   }
 
-  private void setupTabs(int defaultTab) {
-    final ActionBar bar = getSupportActionBar();
-    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+  private void setupFragments() {
+    final FragmentManager fm = getSupportFragmentManager();
+    final FragmentTransaction txn = fm.beginTransaction();
 
+    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
+    if (listActivity == null) {
+      info("Creating ListActivity");
+      listActivity = new ListActivity();
+      final Bundle bundle = new Bundle();
+      listActivity.setArguments(bundle);
+      txn.add(listActivity, LIST_FRAGMENT_TAG);
+    }
+    state.fragList[0] = listActivity;
+
+    MappingActivity map = (MappingActivity) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
+    if (fm.findFragmentByTag(MAP_FRAGMENT_TAG) == null) {
+      info("Creating MappingActivity");
+      map = new MappingActivity();
+      final Bundle bundle = new Bundle();
+      map.setArguments(bundle);
+      txn.add(map, MAP_FRAGMENT_TAG);
+    }
+    state.fragList[1] = map;
+
+    DashboardActivity dash = (DashboardActivity) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
+    if (dash == null) {
+      info("Creating DashboardActivity");
+      dash = new DashboardActivity();
+      final Bundle bundle = new Bundle();
+      dash.setArguments(bundle);
+      txn.add(dash, DASH_FRAGMENT_TAG);
+    }
+    state.fragList[2] = dash;
+
+    DataActivity data = (DataActivity) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
+    if (data == null) {
+      info("Creating DataActivity");
+      data = new DataActivity();
+      final Bundle bundle = new Bundle();
+      data.setArguments(bundle);
+      txn.add(data, DATA_FRAGMENT_TAG);
+    }
+    state.fragList[3] = data;
+
+    txn.commit();
+  }
+
+  private void setActionBarTabs() {
+    final int defaultTab = state.currentTab;
     final String[] labels = new String[]{
         "List", "Map", "Dash", "Data"
     };
 
-    final FragmentManager fm = getSupportFragmentManager();
-    final FragmentTransaction txn = fm.beginTransaction();
-
-    info("Creating ListActivity");
-    listActivity = new ListActivity();
-    Bundle bundle = new Bundle();
-    listActivity.setArguments(bundle);
-    fragList.add(listActivity);
-    txn.add(listActivity, LIST_FRAGMENT_TAG);
-
-    info("Creating MappingActivity");
-    final MappingActivity map = new MappingActivity();
-    bundle = new Bundle();
-    map.setArguments(bundle);
-    fragList.add(map);
-    txn.add(map, MAP_FRAGMENT_TAG);
-
-    info("Creating DashboardActivity");
-    DashboardActivity dash = new DashboardActivity();
-    bundle = new Bundle();
-    dash.setArguments(bundle);
-    fragList.add(dash);
-    txn.add(dash, DASH_FRAGMENT_TAG);
-
-    info("Creating DataActivity");
-    DataActivity data = new DataActivity();
-    bundle = new Bundle();
-    data.setArguments(bundle);
-    fragList.add(data);
-    txn.add(data, DATA_FRAGMENT_TAG);
-
-    txn.commit();
+    final ActionBar bar = getSupportActionBar();
+    bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
     for (int i = 0; i <= 3; i++) {
-      Tab tab = bar.newTab();
+      final Tab tab = bar.newTab();
       tab.setText(labels[i]);
       tab.setTabListener(this);
       bar.addTab(tab);
     }
 
-    info("setting tab: " + defaultTab);
     bar.setSelectedNavigationItem(defaultTab);
   }
 
@@ -494,6 +510,13 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     catch ( final IllegalArgumentException ex ) {
       info( "wifiReceiver not registered: " + ex );
     }
+
+  }
+
+  @Override
+  public void onSaveInstanceState(final Bundle outState) {
+    info("MAIN: onSaveInstanceState");
+    super.onSaveInstanceState(outState);
   }
 
   @Override
@@ -518,6 +541,12 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       MainActivity.info("acquire wake lock");
       wakeLock.acquire();
     }
+  }
+
+  @Override
+  public void onPostResume() {
+    MainActivity.info( "MAIN: post resume." );
+    super.onPostResume();
   }
 
   @Override
@@ -588,24 +617,23 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   @Override
   public void onTabReselected(Tab tab, FragmentTransaction ft) {
-    MainActivity.info("onTabReselected: " + tab.getPosition());
-    Fragment f = fragList.get(tab.getPosition());
-    ft.replace(android.R.id.content, f);
-    state.currentTab = tab.getPosition();
+    onTabSelected(tab, ft);
   }
 
   @Override
   public void onTabSelected(Tab tab, FragmentTransaction ft) {
     MainActivity.info("onTabSelected: " + tab.getPosition());
-    Fragment f = fragList.get(tab.getPosition());
-    ft.replace(android.R.id.content, f);
+    final Fragment f = state.fragList[tab.getPosition()];
+    if (f != null) {
+      ft.replace(android.R.id.content, f);
+    }
     state.currentTab = tab.getPosition();
   }
 
   @Override
   public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     MainActivity.info("onTabUnselected: " + tab.getPosition());
-    ft.remove(fragList.get(tab.getPosition()));
+    ft.remove(state.fragList[tab.getPosition()]);
   }
 
 

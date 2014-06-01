@@ -10,9 +10,11 @@ import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.listener.WifiReceiver;
 
 import org.osmdroid.util.GeoPoint;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,7 +22,9 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,8 +34,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 public final class ListActivity extends Fragment implements FileUploaderListener {
@@ -306,7 +313,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           }
           case MENU_SORT: {
             MainActivity.info("sort dialog");
-            getActivity().showDialog( SORT_DIALOG );
+            onCreateDialog( SORT_DIALOG );
             return true;
           }
           case MENU_SCAN: {
@@ -322,10 +329,10 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           }
           case MENU_EXIT:
             // call over to finish
-        	getActivity().finish();
+            getActivity().finish();
             return true;
           case MENU_FILTER:
-        	getActivity().showDialog( SSID_FILTER );
+            onCreateDialog( SSID_FILTER );
             return true;
         }
         return false;
@@ -343,71 +350,86 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       }
     }
 
-//    @Override
-//    public Dialog onCreateDialog( int which ) {
-//      switch ( which ) {
-//        case SSID_FILTER:
-//          return MappingActivity.createSsidFilterDialog(this, FILTER_PREF_PREFIX);
-//        case SORT_DIALOG:
-//          final Dialog dialog = new Dialog( this );
-//
-//          dialog.setContentView( R.layout.listdialog );
-//          dialog.setTitle( getString(R.string.sort_title) );
-//
-//          TextView text = (TextView) dialog.findViewById( R.id.text );
-//          text.setText( getString(R.string.sort_spin_label) );
-//
-//          final SharedPreferences prefs = getSharedPreferences( SHARED_PREFS, 0 );
-//          final Editor editor = prefs.edit();
-//
-//          Spinner spinner = (Spinner) dialog.findViewById( R.id.sort_spinner );
-//          ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-//              this, android.R.layout.simple_spinner_item);
-//          final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
-//              WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
-//          final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
-//              getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-//          int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
-//          int periodIndex = 0;
-//          for ( int i = 0; i < listSorts.length; i++ ) {
-//            adapter.add( listSortName[i] );
-//            if ( listSort == listSorts[i] ) {
-//              periodIndex = i;
-//            }
-//          }
-//          adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-//          spinner.setAdapter( adapter );
-//          spinner.setSelection( periodIndex );
-//          spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-//            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-//              // set pref
-//              final int listSort = listSorts[position];
-//              ListActivity.MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
-//              editor.putInt( PREF_LIST_SORT, listSort );
-//              editor.commit();
-//            }
-//            public void onNothingSelected( final AdapterView<?> arg0 ) {}
-//            });
-//
-//          Button ok = (Button) dialog.findViewById( R.id.listdialog_button );
-//          ok.setOnClickListener( new OnClickListener() {
-//              public void onClick( final View buttonView ) {
-//                try {
-//                  dialog.dismiss();
-//                }
-//                catch ( Exception ex ) {
-//                  // guess it wasn't there anyways
-//                  MainActivity.info( "exception dismissing sort dialog: " + ex );
-//                }
-//              }
-//            } );
-//
-//          return dialog;
-//        default:
-//          MainActivity.error( "unhandled dialog: " + which );
-//      }
-//      return null;
-//    }
+    public void onCreateDialog( int which ) {
+      DialogFragment dialogFragment = null;
+      switch ( which ) {
+        case SSID_FILTER:
+          dialogFragment = MappingActivity.createSsidFilterDialog(FILTER_PREF_PREFIX);
+          break;
+        case SORT_DIALOG:
+          dialogFragment = new DialogFragment() {
+            @Override
+            public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                    Bundle savedInstanceState) {
+
+                final Dialog dialog = getDialog();
+                View view = inflater.inflate(R.layout.listdialog, container);
+                dialog.setTitle(getString(R.string.sort_title));
+
+                TextView text = (TextView) view.findViewById( R.id.text );
+                text.setText( getString(R.string.sort_spin_label) );
+
+                final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
+                final Editor editor = prefs.edit();
+
+                Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                    getActivity(), android.R.layout.simple_spinner_item);
+                final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
+                    WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+                final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+                    getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
+                int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+                int periodIndex = 0;
+                for ( int i = 0; i < listSorts.length; i++ ) {
+                  adapter.add( listSortName[i] );
+                  if ( listSort == listSorts[i] ) {
+                    periodIndex = i;
+                  }
+                }
+                adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+                spinner.setAdapter( adapter );
+                spinner.setSelection( periodIndex );
+                spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+                  @Override
+                  public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+                    // set pref
+                    final int listSort = listSorts[position];
+                    MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+                    editor.putInt( PREF_LIST_SORT, listSort );
+                    editor.commit();
+                  }
+                  @Override
+                  public void onNothingSelected( final AdapterView<?> arg0 ) {}
+                  });
+
+                Button ok = (Button) view.findViewById( R.id.listdialog_button );
+                ok.setOnClickListener( new OnClickListener() {
+                    @Override
+                    public void onClick( final View buttonView ) {
+                      try {
+                        dialog.dismiss();
+                      }
+                      catch ( Exception ex ) {
+                        // guess it wasn't there anyways
+                        MainActivity.info( "exception dismissing sort dialog: " + ex );
+                      }
+                    }
+                  } );
+
+                return view;
+            }
+          };
+          break;
+        default:
+          MainActivity.error( "unhandled dialog: " + which );
+      }
+
+      if (dialogFragment != null) {
+        final FragmentManager fm = getActivity().getSupportFragmentManager();
+        dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+      }
+    }
 
     // why is this even here? this is stupid. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android

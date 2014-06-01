@@ -28,7 +28,6 @@ import net.wigle.wigleandroid.listener.WifiReceiver;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -68,6 +67,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -126,11 +126,12 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   private BatteryLevelReceiver batteryLevelReceiver;
 
   private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
-  private static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
-  private static final String MAP_FRAGMENT_TAG = "MapFragmentTag";
-  private static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
-  private static final String DATA_FRAGMENT_TAG = "DataFragmentTag";
+  public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
+  public static final String MAP_FRAGMENT_TAG = "MapFragmentTag";
+  public static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
+  public static final String DATA_FRAGMENT_TAG = "DataFragmentTag";
 
+  @SuppressWarnings("deprecation")
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -258,29 +259,38 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         "List", "Map", "Dash", "Data"
     };
 
+    final FragmentManager fm = getSupportFragmentManager();
+    final FragmentTransaction txn = fm.beginTransaction();
+
     info("Creating ListActivity");
     listActivity = new ListActivity();
     Bundle bundle = new Bundle();
     listActivity.setArguments(bundle);
     fragList.add(listActivity);
+    txn.add(listActivity, LIST_FRAGMENT_TAG);
 
     info("Creating MappingActivity");
     final MappingActivity map = new MappingActivity();
     bundle = new Bundle();
     map.setArguments(bundle);
     fragList.add(map);
+    txn.add(map, MAP_FRAGMENT_TAG);
 
     info("Creating DashboardActivity");
     DashboardActivity dash = new DashboardActivity();
     bundle = new Bundle();
     dash.setArguments(bundle);
     fragList.add(dash);
+    txn.add(dash, DASH_FRAGMENT_TAG);
 
     info("Creating DataActivity");
     DataActivity data = new DataActivity();
     bundle = new Bundle();
     data.setArguments(bundle);
     fragList.add(data);
+    txn.add(data, DATA_FRAGMENT_TAG);
+
+    txn.commit();
 
     for (int i = 0; i <= 3; i++) {
       Tab tab = bar.newTab();
@@ -303,12 +313,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
    * @param activity
    * @param tab
    */
-  static void switchTab( Activity activity, String tab ) {
-    final Activity parent = activity.getParent();
-    // XXX: fix
-//    if ( parent != null && parent instanceof TabActivity ) {
-//      ((TabActivity) parent).getTabHost().setCurrentTabByTag( tab );
-//    }
+  static void switchTab( final int tab ) {
+    final ActionBar bar = mainActivity.getSupportActionBar();
+    bar.setNavigationMode(tab);
   }
 
   static void setLockScreen( Activity activity, boolean lockScreen ) {
@@ -400,11 +407,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
   }
 
-  public static CheckBox prefSetCheckBox( final Context context, final Dialog dialog, final int id,
+  public static CheckBox prefSetCheckBox( final Context context, final View view, final int id,
       final String pref, final boolean def ) {
 
     final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    final CheckBox checkbox = (CheckBox) dialog.findViewById( id );
+    final CheckBox checkbox = (CheckBox) view.findViewById( id );
     checkbox.setChecked( prefs.getBoolean( pref, def ) );
     return checkbox;
   }
@@ -1120,6 +1127,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     final boolean isScanning = isScanning();
     MainActivity.info("handleScanChange: isScanning now: " + isScanning );
     if ( isScanning ) {
+      if (listActivity != null) {
+        listActivity.setStatusUI( "Scanning Turned On" );
+      }
       // turn on location updates
       this.setLocationUpdates(MainActivity.LOCATION_UPDATE_INTERVAL, 0f);
 
@@ -1128,6 +1138,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       }
     }
     else {
+      if (listActivity != null) {
+        listActivity.setStatusUI( "Scanning Turned Off" );
+      }
       // turn off location updates
       this.setLocationUpdates(0L, 0f);
       state.gpsListener.handleScanStop();
@@ -1141,10 +1154,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         }
       }
     }
-
-    // XXX: tell fragment about scan change
-    // setStatusUI( view, "Scanning Turned On" );
-    // setStatusUI( getView(), "Scanning Turned Off" );
   }
 
   /**

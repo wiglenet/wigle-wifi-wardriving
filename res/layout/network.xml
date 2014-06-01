@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal"
+    <LinearLayout android:orientation="horizontal"
 	    android:layout_width="fill_parent" android:layout_height="wrap_content">
 	    
 	    <ImageView android:text="wepicon" android:id="@+id/wepicon" android:layout_width="wrap_content" 
@@ -41,7 +41,7 @@
     android:gravity="center"
     />
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
     
     </LinearLayout>
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
 		/>
 	</LinearLayout>
 	
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -140,13 +140,14 @@
 	</LinearLayout>
     
     <LinearLayout
+        android:orientation="vertical"
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
 	/> 
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -165,7 +166,8 @@
 	</LinearLayout>
     
     <LinearLayout
-	android:id="@+id/horizontalLine"
+	android:id="@+id/networkhorizontalLine"
+	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"

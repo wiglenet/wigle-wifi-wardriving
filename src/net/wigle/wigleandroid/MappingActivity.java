@@ -32,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -115,13 +114,15 @@ public final class MappingActivity extends Fragment {
     mapView = new MapView( getActivity(), 256 );
 
     if ( mapView instanceof View ) {
+      MainActivity.info("is vew!!!!!");
       ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
       ((View) mapView).setLayoutParams(params);
     }
 
     if ( mapView instanceof MapView ) {
       final MapView osmMapView = (MapView) mapView;
+      osmMapView.setUseSafeCanvas(true);
 
       // conditionally replace the tile source
       final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );

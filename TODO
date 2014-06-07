@@ -44,8 +44,6 @@ set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 
 --- broken ---
-db search
-osm tile listener leak on orientation change
 move upload dialog to fragment for rotation happiness
 test csv dump and friends, pry move those dialogs to fragment
 

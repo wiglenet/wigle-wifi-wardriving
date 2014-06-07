@@ -276,6 +276,13 @@ public final class MappingActivity extends Fragment {
   }
 
   @Override
+  public void onDetach() {
+    MainActivity.info( "Map: onDetach.");
+    super.onDetach();
+    ((MapView)mapView).onDetach();
+  }
+
+  @Override
   public void onDestroy() {
     MainActivity.info( "destroy mapping." );
     finishing.set( true );

@@ -24,6 +24,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -248,8 +249,8 @@ public final class ListActivity extends Fragment implements FileUploaderListener
 
     @Override
     public void onDetach() {
-      MainActivity.info( "LIST: onDestroyView.");
-      super.onDestroyView();
+      MainActivity.info( "LIST: onDetach.");
+      super.onDetach();
     }
 
     /* Creates the menu items */
@@ -445,14 +446,15 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     private void setupList( final View view ) {
       State state = MainActivity.getState(this);
       state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
-      setupListAdapter( view, MainActivity.getMainActivity(this), state.listAdapter, R.id.ListView01 );
+      // always set our current list adapter
+      state.wifiReceiver.setListAdapter( state.listAdapter );
+      final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
+      setupListAdapter( listView, getActivity(), state.listAdapter );
     }
 
-    public static void setupListAdapter( final View view, final MainActivity activity, final NetworkListAdapter listAdapter, final int id) {
-      // always set our current list adapter
-      activity.getState().wifiReceiver.setListAdapter( listAdapter );
+    public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
+        final NetworkListAdapter listAdapter) {
 
-      final ListView listView = (ListView) view.findViewById( id );
       listView.setAdapter( listAdapter );
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
         @Override

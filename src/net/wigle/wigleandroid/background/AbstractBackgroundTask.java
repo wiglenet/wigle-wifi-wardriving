@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -147,19 +147,19 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
   }
   
   protected final String getUsername() {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
-      username = ListActivity.ANONYMOUS;
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
+    if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+      username = ListFragment.ANONYMOUS;
     }
     return username;
   }
   
   protected final String getPassword() {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    String password = prefs.getString( ListFragment.PREF_PASSWORD, "" );
     
-    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+    if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
       password = "";
     }
     return password;
@@ -174,7 +174,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
       MainActivity.error( "username not defined" );
       status = Status.BAD_USERNAME;
     }
-    else if ( "".equals( password ) && ! ListActivity.ANONYMOUS.equals( username.toLowerCase() ) ) {
+    else if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase() ) ) {
       MainActivity.error( "password not defined and username isn't 'anonymous'" );
       status = Status.BAD_PASSWORD;
     }

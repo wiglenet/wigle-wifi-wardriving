@@ -31,7 +31,7 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataActivity extends Fragment implements FileUploaderListener {
+public final class DataFragment extends Fragment implements FileUploaderListener {
 
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
@@ -76,7 +76,7 @@ public final class DataActivity extends Fragment implements FileUploaderListener
           if ( fail != null ) {
             break;
           }
-MainActivity.info("id: " + id);
+
           final EditText editText = (EditText) view.findViewById( id );
           final String text = editText.getText().toString().trim();
           if ( "".equals(text) ) {
@@ -125,7 +125,7 @@ MainActivity.info("id: " + id);
           Toast.makeText( getActivity(), fail, Toast.LENGTH_SHORT ).show();
         }
         else {
-          ListActivity.lameStatic.queryArgs = queryArgs;
+          ListFragment.lameStatic.queryArgs = queryArgs;
           // start db result activity
           final Intent settingsIntent = new Intent( getActivity(), DBResultActivity.class );
           startActivity( settingsIntent );
@@ -162,12 +162,12 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_export_csv), new Doer() {
+            DataFragment.this.getString(R.string.data_export_csv), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
             FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+                ListFragment.lameStatic.dbHelper, DataFragment.this, true );
             fileUploaderTask.setWriteRunOnly();
             fileUploaderTask.start();
           }
@@ -180,12 +180,12 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_export_csv_db), new Doer() {
+            DataFragment.this.getString(R.string.data_export_csv_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
             FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                ListActivity.lameStatic.dbHelper, DataActivity.this, true );
+                ListFragment.lameStatic.dbHelper, DataFragment.this, true );
             fileUploaderTask.setWriteWholeDb();
             fileUploaderTask.start();
           }
@@ -200,12 +200,12 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_export_kml_run), new Doer() {
+            DataFragment.this.getString(R.string.data_export_kml_run), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListActivity.lameStatic.dbHelper,
-                ListActivity.lameStatic.runNetworks );
+            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper,
+                ListFragment.lameStatic.runNetworks );
             kmlWriter.start();
           }
         } );
@@ -217,11 +217,11 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_export_kml_db), new Doer() {
+            DataFragment.this.getString(R.string.data_export_kml_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListActivity.lameStatic.dbHelper );
+            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper );
             kmlWriter.start();
           }
         } );
@@ -239,11 +239,11 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_backup_db), new Doer() {
+            DataFragment.this.getString(R.string.data_backup_db), new Doer() {
           @Override
           public void execute() {
             // actually need this Activity context, for dialogs
-            BackupTask task = new BackupTask(DataActivity.this, MainActivity.getMainActivity(DataActivity.this));
+            BackupTask task = new BackupTask(DataFragment.this, MainActivity.getMainActivity(DataFragment.this));
             task.execute();
           }
         } );
@@ -258,15 +258,15 @@ MainActivity.info("id: " + id);
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataActivity.this.getString(R.string.data_import_observed), new Doer() {
+            DataFragment.this.getString(R.string.data_import_observed), new Doer() {
           @Override
           public void execute() {
-            final MainActivity mainActivity = MainActivity.getMainActivity( DataActivity.this );
+            final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
             if ( mainActivity != null ) {
               mainActivity.setTransferring();
             }
             // actually need this Activity context, for dialogs
-            HttpDownloader task = new HttpDownloader(getActivity(), ListActivity.lameStatic.dbHelper,
+            HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 new FileUploaderListener() {
               @Override
               public void transferComplete() {
@@ -298,7 +298,7 @@ MainActivity.info("id: " + id);
 
     @Override
     protected Integer doInBackground( Object... obj ) {
-      dbResult = ListActivity.lameStatic.dbHelper.copyDatabase(this);
+      dbResult = ListFragment.lameStatic.dbHelper.copyDatabase(this);
       // dbResult = new Pair<Boolean,String>(Boolean.TRUE, "meh");
       return 0;
     }

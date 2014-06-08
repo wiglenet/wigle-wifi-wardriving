@@ -71,7 +71,7 @@ public class NetworkActivity extends ActionBarActivity {
     networkActivity = this;
     
     final Intent intent = getIntent();
-    final String bssid = intent.getStringExtra( ListActivity.NETWORK_EXTRA_BSSID );
+    final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
     MainActivity.info( "bssid: " + bssid );
     
     network = MainActivity.getNetworkCache().get(bssid);
@@ -167,11 +167,11 @@ public class NetworkActivity extends ActionBarActivity {
         }
       }
     });
-    ListActivity.lameStatic.dbHelper.addToQueue( request );
+    ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
     
   private void setupMap( final Network network ) {
-    final IGeoPoint point = MappingActivity.getCenter( this, network.getGeoPoint(), null );
+    final IGeoPoint point = MappingFragment.getCenter( this, network.getGeoPoint(), null );
     mapView = new MapView( this, 256 );
     final OpenStreetMapViewWrapper overlay = setupMap( this, point, mapView, R.id.netmap_rl );
     if ( overlay != null ) {

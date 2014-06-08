@@ -20,7 +20,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import net.wigle.wigleandroid.DataActivity.BackupTask;
+import net.wigle.wigleandroid.DataFragment.BackupTask;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -157,7 +157,7 @@ public final class DatabaseHelper extends Thread {
 
   public DatabaseHelper( final Context context ) {    
     this.context = context.getApplicationContext();
-    this.prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    this.prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     setName("dbworker-" + getName());
     this.deathHandler = new DeathHandler(); 
 
@@ -279,7 +279,7 @@ public final class DatabaseHelper extends Thread {
           }
           
           final long delay = System.currentTimeMillis() - startTime;
-          if ( delay > 1000L || ListActivity.DEBUG ) {
+          if ( delay > 1000L || ListFragment.DEBUG ) {
             MainActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
           }
         }
@@ -404,7 +404,7 @@ public final class DatabaseHelper extends Thread {
         db.execSQL(LOCATION_CREATE);
         // new database, reset a marker, if any
         final Editor edit = prefs.edit();
-        edit.putLong( ListActivity.PREF_DB_MARKER, 0L );
+        edit.putLong( ListFragment.PREF_DB_MARKER, 0L );
         edit.commit();
       }
       catch ( final SQLiteException ex ) {
@@ -675,7 +675,7 @@ public final class DatabaseHelper extends Thread {
     final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
     final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange);
     
-    if ( ListActivity.DEBUG ) {
+    if ( ListFragment.DEBUG ) {
       // do lots of inserts when debug is on
       isNew = true;
     }
@@ -993,17 +993,17 @@ public final class DatabaseHelper extends Thread {
   }
   
   private void setupMaxidDebug( final long locCount ) {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final long maxid = prefs.getLong( ListActivity.PREF_DB_MARKER, -1L );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final long maxid = prefs.getLong( ListFragment.PREF_DB_MARKER, -1L );
     final Editor edit = prefs.edit();
-    edit.putLong( ListActivity.PREF_MAX_DB, locCount );
+    edit.putLong( ListFragment.PREF_MAX_DB, locCount );
     
     if ( maxid == -1L ) {    
       if ( locCount > 0 ) {
         // there is no preference set, yet there are locations, this is likely
         // a developer testing a new install on an old db, so set the pref.
         MainActivity.info( "setting db marker to: " + locCount );
-        edit.putLong( ListActivity.PREF_DB_MARKER, locCount );
+        edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
       }
     }
     edit.commit();

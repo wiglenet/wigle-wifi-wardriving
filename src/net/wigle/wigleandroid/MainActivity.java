@@ -120,7 +120,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
 
   private static MainActivity mainActivity;
-  private static ListActivity listActivity;
+  private static ListFragment listActivity;
   private boolean screenLocked = false;
   private PowerManager.WakeLock wakeLock;
   private BatteryLevelReceiver batteryLevelReceiver;
@@ -151,7 +151,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     // set language
     setLocale( this );
 
-    if ( ListActivity.DEBUG ) {
+    if ( ListFragment.DEBUG ) {
       Debug.startMethodTracing("wigle");
     }
 
@@ -195,11 +195,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       stateFragment.setState(state);
       fm.beginTransaction().add(stateFragment, STATE_FRAGMENT_TAG).commit();
       // new run, reset
-      final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final float prevRun = prefs.getFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
+      final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final float prevRun = prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
       Editor edit = prefs.edit();
-      edit.putFloat( ListActivity.PREF_DISTANCE_RUN, 0f );
-      edit.putFloat( ListActivity.PREF_DISTANCE_PREV_RUN, prevRun );
+      edit.putFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
+      edit.putFloat( ListFragment.PREF_DISTANCE_PREV_RUN, prevRun );
       edit.commit();
     }
 
@@ -211,7 +211,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     state.inEmulator = state.inEmulator || "google_sdk".equals( android.os.Build.PRODUCT );
 
     info( "id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT );
-    info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + ListActivity.DEBUG );
+    info( "android release: '" + Build.VERSION.RELEASE + "' debug: " + ListFragment.DEBUG );
 
     if ( state.numberFormat0 == null ) {
       state.numberFormat0 = NumberFormat.getNumberInstance( Locale.US );
@@ -258,40 +258,40 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     final FragmentManager fm = getSupportFragmentManager();
     final FragmentTransaction txn = fm.beginTransaction();
 
-    listActivity = (ListActivity) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
+    listActivity = (ListFragment) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
     if (listActivity == null) {
       info("Creating ListActivity");
-      listActivity = new ListActivity();
+      listActivity = new ListFragment();
       final Bundle bundle = new Bundle();
       listActivity.setArguments(bundle);
       txn.add(listActivity, LIST_FRAGMENT_TAG);
     }
     state.fragList[0] = listActivity;
 
-    MappingActivity map = (MappingActivity) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
+    MappingFragment map = (MappingFragment) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
     if (fm.findFragmentByTag(MAP_FRAGMENT_TAG) == null) {
       info("Creating MappingActivity");
-      map = new MappingActivity();
+      map = new MappingFragment();
       final Bundle bundle = new Bundle();
       map.setArguments(bundle);
       txn.add(map, MAP_FRAGMENT_TAG);
     }
     state.fragList[1] = map;
 
-    DashboardActivity dash = (DashboardActivity) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
+    DashboardFragment dash = (DashboardFragment) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
     if (dash == null) {
       info("Creating DashboardActivity");
-      dash = new DashboardActivity();
+      dash = new DashboardFragment();
       final Bundle bundle = new Bundle();
       dash.setArguments(bundle);
       txn.add(dash, DASH_FRAGMENT_TAG);
     }
     state.fragList[2] = dash;
 
-    DataActivity data = (DataActivity) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
+    DataFragment data = (DataFragment) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
     if (data == null) {
       info("Creating DataActivity");
-      data = new DataActivity();
+      data = new DataFragment();
       final Bundle bundle = new Bundle();
       data.setArguments(bundle);
       txn.add(data, DATA_FRAGMENT_TAG);
@@ -420,28 +420,28 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       state.dbHelper = new DatabaseHelper( getApplicationContext() );
       //state.dbHelper.checkDB();
       state.dbHelper.start();
-      ListActivity.lameStatic.dbHelper = state.dbHelper;
+      ListFragment.lameStatic.dbHelper = state.dbHelper;
     }
   }
 
   public static CheckBox prefSetCheckBox( final Context context, final View view, final int id,
       final String pref, final boolean def ) {
 
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     final CheckBox checkbox = (CheckBox) view.findViewById( id );
     checkbox.setChecked( prefs.getBoolean( pref, def ) );
     return checkbox;
   }
 
   public static CheckBox prefSetCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
-    final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     final CheckBox checkbox = (CheckBox) activity.findViewById( id );
     checkbox.setChecked( prefs.getBoolean( pref, def ) );
     return checkbox;
   }
 
   public static CheckBox prefBackedCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
-    final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
     final CheckBox checkbox = prefSetCheckBox( activity, id, pref, def );
     checkbox.setOnCheckedChangeListener( new OnCheckedChangeListener() {
@@ -595,8 +595,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   public static void setLocale( final Context context, final Configuration config ) {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final String lang = prefs.getString( ListActivity.PREF_LANGUAGE, "" );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final String lang = prefs.getString( ListFragment.PREF_LANGUAGE, "" );
     final String current = config.locale.getLanguage();
     MainActivity.info("current lang: " + current + " new lang: " + lang);
     Locale newLocale = null;
@@ -772,7 +772,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       // always be quiet when the phone is active
       return true;
     }
-    boolean retval = getSharedPreferences(ListActivity.SHARED_PREFS, 0).getBoolean(ListActivity.PREF_MUTED, false);
+    boolean retval = getSharedPreferences(ListFragment.SHARED_PREFS, 0).getBoolean(ListFragment.PREF_MUTED, false);
     // info( "ismuted: " + retval );
     return retval;
   }
@@ -810,7 +810,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
    * @return per-thread network cache
    */
   public static ConcurrentLinkedHashMap<String,Network> getNetworkCache() {
-    return ListActivity.networkCache.get();
+    return ListFragment.networkCache.get();
   }
 
   public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {
@@ -960,8 +960,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   public static boolean isScanning(final Context context) {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    return prefs.getBoolean( ListActivity.PREF_SCAN_RUNNING, true );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    return prefs.getBoolean( ListFragment.PREF_SCAN_RUNNING, true );
   }
 
   public void playNewNetSound() {
@@ -1006,7 +1006,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
 
     final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-    final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final Editor edit = prefs.edit();
 
     // keep track of for later
@@ -1016,7 +1016,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       Toast.makeText( this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG ).show();
 
       // save so we can turn it back off when we exit
-      edit.putBoolean( ListActivity.PREF_WIFI_WAS_OFF, true );
+      edit.putBoolean( ListFragment.PREF_WIFI_WAS_OFF, true );
 
       // just turn it on, but not in emulator cuz it crashes it
       if ( ! state.inEmulator ) {
@@ -1027,7 +1027,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       }
     }
     else {
-      edit.putBoolean( ListActivity.PREF_WIFI_WAS_OFF, false );
+      edit.putBoolean( ListFragment.PREF_WIFI_WAS_OFF, false );
     }
     edit.commit();
 
@@ -1045,7 +1045,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     if ( state.wifiLock == null ) {
       MainActivity.info( "lock wifi radio on");
       // lock the radio on
-      state.wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, ListActivity.WIFI_LOCK_NAME );
+      state.wifiLock = wifiManager.createWifiLock( WifiManager.WIFI_MODE_SCAN_ONLY, ListFragment.WIFI_LOCK_NAME );
       state.wifiLock.acquire();
     }
   }
@@ -1200,11 +1200,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
     // create a new listener to try and get around the gps stopping bug
     state.gpsListener = new GPSListener( this );
-    state.gpsListener.setMapListener(MappingActivity.STATIC_LOCATION_LISTENER);
+    state.gpsListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
     locationManager.addGpsStatusListener( state.gpsListener );
 
-    final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean useNetworkLoc = prefs.getBoolean(ListActivity.PREF_USE_NETWORK_LOC, false);
+    final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean useNetworkLoc = prefs.getBoolean(ListFragment.PREF_USE_NETWORK_LOC, false);
 
     final List<String> providers = locationManager.getAllProviders();
     if (providers != null) {
@@ -1223,8 +1223,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   public long getLocationSetPeriod() {
-    final SharedPreferences prefs = getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final long prefPeriod = prefs.getLong(ListActivity.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
+    final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final long prefPeriod = prefs.getLong(ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
     long setPeriod = prefPeriod;
     if (setPeriod == 0 ){
       setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), MainActivity.LOCATION_UPDATE_INTERVAL);
@@ -1324,8 +1324,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       }
     }
 
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean wifiWasOff = prefs.getBoolean( ListActivity.PREF_WIFI_WAS_OFF, false );
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean wifiWasOff = prefs.getBoolean( ListFragment.PREF_WIFI_WAS_OFF, false );
     // don't call on emulator, it crashes it
     if ( wifiWasOff && ! state.inEmulator ) {
       // tell user, cuz this takes a little while
@@ -1355,7 +1355,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       state.tts.shutdown();
     }
 
-    if ( ListActivity.DEBUG ) {
+    if ( ListFragment.DEBUG ) {
       Debug.stopMethodTracing();
     }
 

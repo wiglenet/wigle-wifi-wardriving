@@ -45,7 +45,7 @@ import android.widget.TextView;
  * show a map!
  */
 @SuppressWarnings("deprecation")
-public final class MappingActivity extends Fragment {
+public final class MappingFragment extends Fragment {
   private static class State {
     private boolean locked = true;
     private boolean firstMove = true;
@@ -129,8 +129,8 @@ public final class MappingActivity extends Fragment {
       osmMapView.setUseSafeCanvas(true);
 
       // conditionally replace the tile source
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final boolean wigleTiles = prefs.getBoolean( ListActivity.PREF_USE_WIGLE_TILES, true );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean wigleTiles = prefs.getBoolean( ListFragment.PREF_USE_WIGLE_TILES, true );
       if ( wigleTiles ) {
           osmMapView.setTileSource( WigleTileSource.WiGLE );
       }
@@ -157,8 +157,8 @@ public final class MappingActivity extends Fragment {
       zoom = oldZoom;
     }
     else {
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      zoom = prefs.getInt( ListActivity.PREF_PREV_ZOOM, zoom );
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      zoom = prefs.getInt( ListFragment.PREF_PREV_ZOOM, zoom );
     }
     mapControl.setCenter( centerPoint );
     mapControl.setZoom( zoom );
@@ -171,8 +171,8 @@ public final class MappingActivity extends Fragment {
       final Location previousLocation ) {
 
     IGeoPoint centerPoint = DEFAULT_POINT;
-    final Location location = ListActivity.lameStatic.location;
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final Location location = ListFragment.lameStatic.location;
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
     if ( priorityCenter != null ) {
       centerPoint = priorityCenter;
@@ -195,8 +195,8 @@ public final class MappingActivity extends Fragment {
       }
       else {
         // ok, try the saved prefs
-        float lat = prefs.getFloat( ListActivity.PREF_PREV_LAT, Float.MIN_VALUE );
-        float lon = prefs.getFloat( ListActivity.PREF_PREV_LON, Float.MIN_VALUE );
+        float lat = prefs.getFloat( ListFragment.PREF_PREV_LAT, Float.MIN_VALUE );
+        float lon = prefs.getFloat( ListFragment.PREF_PREV_LON, Float.MIN_VALUE );
         if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
           centerPoint = new GeoPoint( lat, lon );
         }
@@ -224,7 +224,7 @@ public final class MappingActivity extends Fragment {
     public void run() {
         // make sure the app isn't trying to finish
         if ( ! finishing.get() ) {
-          final Location location = ListActivity.lameStatic.location;
+          final Location location = ListFragment.lameStatic.location;
           if ( location != null ) {
             if ( state.locked ) {
               // MainActivity.info( "mapping center location: " + location );
@@ -239,7 +239,7 @@ public final class MappingActivity extends Fragment {
             }
             else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
                 || previousLocation.getLongitude() != location.getLongitude()
-                || previousRunNets != ListActivity.lameStatic.runNets) {
+                || previousRunNets != ListFragment.lameStatic.runNets) {
               // location or nets have changed, update the view
               if ( mapView instanceof View ) {
                 ((View) mapView).postInvalidate();
@@ -249,16 +249,16 @@ public final class MappingActivity extends Fragment {
             previousLocation = location;
           }
 
-          previousRunNets = ListActivity.lameStatic.runNets;
+          previousRunNets = ListFragment.lameStatic.runNets;
 
           final View view = getView();
 
           TextView tv = (TextView) view.findViewById( R.id.stats_run );
-          tv.setText( getString(R.string.run) + ": " + ListActivity.lameStatic.runNets );
+          tv.setText( getString(R.string.run) + ": " + ListFragment.lameStatic.runNets );
           tv = (TextView) view.findViewById( R.id.stats_new );
-          tv.setText( getString(R.string.new_word) + ": " + ListActivity.lameStatic.newNets );
+          tv.setText( getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets );
           tv = (TextView) view.findViewById( R.id.stats_dbnets );
-          tv.setText( getString(R.string.db) + ": " + ListActivity.lameStatic.dbNets );
+          tv.setText( getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets );
 
           final long period = 1000L;
           // info("wifitimer: " + period );
@@ -288,9 +288,9 @@ public final class MappingActivity extends Fragment {
     finishing.set( true );
 
     // save zoom
-    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final Editor edit = prefs.edit();
-    edit.putInt( ListActivity.PREF_PREV_ZOOM, mapView.getZoomLevel() );
+    edit.putInt( ListFragment.PREF_PREV_ZOOM, mapView.getZoomLevel() );
     edit.commit();
 
     // save center
@@ -346,9 +346,9 @@ public final class MappingActivity extends Fragment {
   @Override
   public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
     MenuItem item = null;
-    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
-    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, false );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+    final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, false );
 
     String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
     item = menu.add(0, MENU_LABEL, 0, nameLabel);
@@ -406,10 +406,10 @@ public final class MappingActivity extends Fragment {
           return true;
         }
         case MENU_TOGGLE_NEWDB: {
-          final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-          final boolean showNewDBOnly = ! prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
+          final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+          final boolean showNewDBOnly = ! prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
           Editor edit = prefs.edit();
-          edit.putBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
+          edit.putBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
           edit.commit();
 
           String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
@@ -417,10 +417,10 @@ public final class MappingActivity extends Fragment {
           return true;
         }
         case MENU_LABEL: {
-          final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-          final boolean showLabel = ! prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
+          final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+          final boolean showLabel = ! prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
           Editor edit = prefs.edit();
-          edit.putBoolean( ListActivity.PREF_MAP_LABEL, showLabel );
+          edit.putBoolean( ListFragment.PREF_MAP_LABEL, showLabel );
           edit.commit();
 
           String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
@@ -464,22 +464,22 @@ public final class MappingActivity extends Fragment {
       dialog.setTitle( "SSID Filter" );
 
       MainActivity.info("make new dialog");
-      final SharedPreferences prefs = activity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
       final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
-      regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
+      regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
 
       final CheckBox invert = MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-          prefix + ListActivity.PREF_MAPF_INVERT, false );
+          prefix + ListFragment.PREF_MAPF_INVERT, false );
       final CheckBox open = MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-          prefix + ListActivity.PREF_MAPF_OPEN, true );
+          prefix + ListFragment.PREF_MAPF_OPEN, true );
       final CheckBox wep = MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-          prefix + ListActivity.PREF_MAPF_WEP, true );
+          prefix + ListFragment.PREF_MAPF_WEP, true );
       final CheckBox wpa = MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-          prefix + ListActivity.PREF_MAPF_WPA, true );
+          prefix + ListFragment.PREF_MAPF_WPA, true );
       final CheckBox cell = MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-          prefix + ListActivity.PREF_MAPF_CELL, true );
+          prefix + ListFragment.PREF_MAPF_CELL, true );
       final CheckBox enabled = MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-          prefix + ListActivity.PREF_MAPF_ENABLED, true );
+          prefix + ListFragment.PREF_MAPF_ENABLED, true );
 
       Button ok = (Button) view.findViewById( R.id.ok_button );
       ok.setOnClickListener( new OnClickListener() {
@@ -487,13 +487,13 @@ public final class MappingActivity extends Fragment {
           public void onClick( final View buttonView ) {
             try {
               final Editor editor = prefs.edit();
-              editor.putString( prefix + ListActivity.PREF_MAPF_REGEX, regex.getText().toString() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_INVERT, invert.isChecked() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_OPEN, open.isChecked() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_WEP, wep.isChecked() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_WPA, wpa.isChecked() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_CELL, cell.isChecked() );
-              editor.putBoolean( prefix + ListActivity.PREF_MAPF_ENABLED, enabled.isChecked() );
+              editor.putString( prefix + ListFragment.PREF_MAPF_REGEX, regex.getText().toString() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_INVERT, invert.isChecked() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_OPEN, open.isChecked() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_WEP, wep.isChecked() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_WPA, wpa.isChecked() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_CELL, cell.isChecked() );
+              editor.putBoolean( prefix + ListFragment.PREF_MAPF_ENABLED, enabled.isChecked() );
               editor.commit();
               dialog.dismiss();
             }
@@ -509,19 +509,19 @@ public final class MappingActivity extends Fragment {
           @Override
           public void onClick( final View buttonView ) {
             try {
-              regex.setText( prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "") );
+              regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
               MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-                  prefix + ListActivity.PREF_MAPF_INVERT, false );
+                  prefix + ListFragment.PREF_MAPF_INVERT, false );
               MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-                  prefix + ListActivity.PREF_MAPF_OPEN, true );
+                  prefix + ListFragment.PREF_MAPF_OPEN, true );
               MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-                  prefix + ListActivity.PREF_MAPF_WEP, true );
+                  prefix + ListFragment.PREF_MAPF_WEP, true );
               MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-                  prefix + ListActivity.PREF_MAPF_WPA, true );
+                  prefix + ListFragment.PREF_MAPF_WPA, true );
               MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-                  prefix + ListActivity.PREF_MAPF_CELL, true );
+                  prefix + ListFragment.PREF_MAPF_CELL, true );
               MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-                  prefix + ListActivity.PREF_MAPF_ENABLED, true );
+                  prefix + ListFragment.PREF_MAPF_ENABLED, true );
 
               dialog.dismiss();
             }
@@ -560,7 +560,7 @@ public final class MappingActivity extends Fragment {
 
         Network network = networkCache.get( bssid );
         if ( network == null ) {
-          network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
+          network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
           networkCache.put( network.getBssid(), network );
           // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
 
@@ -579,7 +579,7 @@ public final class MappingActivity extends Fragment {
         }
       }
     });
-    ListActivity.lameStatic.dbHelper.addToQueue( request );
+    ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
 
 //  private void tryEvil() {

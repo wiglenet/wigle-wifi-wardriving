@@ -157,11 +157,11 @@ public final class WigleService extends Service {
       final Context context = getApplicationContext();
       final Intent notificationIntent = new Intent( this, MainActivity.class );
       final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
-      final long dbNets = ListActivity.lameStatic.dbNets;
+      final long dbNets = ListFragment.lameStatic.dbNets;
       String text = "Waiting for info...";
       if ( dbNets > 0 ) {
-        text = "Run: " + ListActivity.lameStatic.runNets
-          + "  New: " + ListActivity.lameStatic.newNets + "  DB: " + dbNets;
+        text = "Run: " + ListFragment.lameStatic.runNets
+          + "  New: " + ListFragment.lameStatic.newNets + "  DB: " + dbNets;
       }      
       if (! MainActivity.isScanning(context)) {
         text = "(Scanning Turned Off) " + text;

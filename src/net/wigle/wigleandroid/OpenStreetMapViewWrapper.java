@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.wigle.wigleandroid.ListActivity.TrailStat;
+import net.wigle.wigleandroid.ListFragment.TrailStat;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -254,7 +254,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
   }
    
   private void drawTrail( final ISafeCanvas c, final MapView osmv ) {    
-	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListActivity.lameStatic.trail.entrySet();
+	  final Set<Map.Entry<GeoPoint,TrailStat>> entrySet = ListFragment.lameStatic.trail.entrySet();
 	  
 	  // if zoomed in past 15, give a little boost to circle size
     float boost = osmv.getZoomLevel() - 15;
@@ -269,8 +269,8 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
   }
   
   private void renderSsidStrings( final ISafeCanvas c, final MapView osmv, final float boost ) {
-    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean showLabel = prefs.getBoolean( ListActivity.PREF_MAP_LABEL, true );
+    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
     final Projection proj = osmv.getProjection();
 
     // point to recycle
@@ -283,7 +283,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
         Boolean prevChoice = Boolean.TRUE;
         Map<GeoPoint,Integer> netsMap = new HashMap<GeoPoint,Integer>();
         
-        final boolean filter = prefs.getBoolean( ListActivity.PREF_MAPF_ENABLED, true );
+        final boolean filter = prefs.getBoolean( ListFragment.PREF_MAPF_ENABLED, true );
         final Matcher matcher = getFilterMatcher( prefs, "" );
         
         for( final Network network : networks ) {
@@ -359,7 +359,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
     }
   	 
     // draw user crosshairs
-    Location location = ListActivity.lameStatic.location;
+    Location location = ListFragment.lameStatic.location;
     if ( location != null ) {
       final GeoPoint user = new GeoPoint( location );
       point = proj.toMapPixels( user, point );
@@ -374,9 +374,9 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
   private void renderCircleNumbers( final ISafeCanvas c, final MapView osmv, 
       final Set<Map.Entry<GeoPoint,TrailStat>> entrySet, float boost) {
     
-    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean showNewDBOnly = prefs.getBoolean( ListActivity.PREF_MAP_ONLY_NEWDB, false );
-    final boolean circleSizeMap = prefs.getBoolean(ListActivity.PREF_CIRCLE_SIZE_MAP, false);
+    final SharedPreferences prefs = osmv.getContext().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+    final boolean circleSizeMap = prefs.getBoolean(ListFragment.PREF_CIRCLE_SIZE_MAP, false);
     final Projection proj = osmv.getProjection();
         
     float wifiSize = (5 * boost) + 1;
@@ -469,11 +469,11 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
   }
   
   private static boolean isFilterOn( final SharedPreferences prefs, final String prefix ) {
-    return prefs.getBoolean( prefix + ListActivity.PREF_MAPF_ENABLED, true );
+    return prefs.getBoolean( prefix + ListFragment.PREF_MAPF_ENABLED, true );
   }
   
   public static Matcher getFilterMatcher( final SharedPreferences prefs, final String prefix ) {
-    final String regex = prefs.getString( prefix + ListActivity.PREF_MAPF_REGEX, "" );
+    final String regex = prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "" );
     Matcher matcher = null;
     if ( isFilterOn( prefs, prefix ) && ! "".equals(regex) ) {
       try {
@@ -499,7 +499,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
     
     if ( matcher != null ) {
       matcher.reset(network.getSsid());
-      final boolean invert = prefs.getBoolean( prefix + ListActivity.PREF_MAPF_INVERT, false );
+      final boolean invert = prefs.getBoolean( prefix + ListFragment.PREF_MAPF_INVERT, false );
       final boolean matches = matcher.find();
       if ( ! matches && ! invert) {
         return false;
@@ -512,17 +512,17 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
     if ( NetworkType.WIFI.equals( network.getType() ) ) {
       switch ( network.getCrypto() ) {
         case Network.CRYPTO_NONE:
-          if ( ! prefs.getBoolean( prefix + ListActivity.PREF_MAPF_OPEN, true ) ) {
+          if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_OPEN, true ) ) {
             return false;
           }
           break;
         case Network.CRYPTO_WEP:
-          if ( ! prefs.getBoolean( prefix + ListActivity.PREF_MAPF_WEP, true ) ) {
+          if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_WEP, true ) ) {
             return false;
           }
           break;
         case Network.CRYPTO_WPA:
-          if ( ! prefs.getBoolean( prefix + ListActivity.PREF_MAPF_WPA, true ) ) {
+          if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_WPA, true ) ) {
             return false;
           }
           break;
@@ -531,7 +531,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
       }
     }
     else {
-      if ( ! prefs.getBoolean( prefix + ListActivity.PREF_MAPF_CELL, true ) ) {
+      if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_CELL, true ) ) {
         return false;
       }
     }

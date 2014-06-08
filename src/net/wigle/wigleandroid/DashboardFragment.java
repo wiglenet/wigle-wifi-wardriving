@@ -21,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class DashboardActivity extends Fragment {
+public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
@@ -93,38 +93,38 @@ public class DashboardActivity extends Fragment {
 
   private void updateUI( final View view ) {
     TextView tv = (TextView) view.findViewById( R.id.runnets );
-    tv.setText( ListActivity.lameStatic.runNets + " " + getString(R.string.run));
+    tv.setText( ListFragment.lameStatic.runNets + " " + getString(R.string.run));
 
     tv = (TextView) view.findViewById( R.id.newwifi );
     final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    final String newTitle = ListActivity.lameStatic.newWifi >= 1000 ? getString(R.string.new_word)
+    final String newTitle = ListFragment.lameStatic.newWifi >= 1000 ? getString(R.string.new_word)
         : getString(R.string.dash_new_wifi);
-    tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + newTitle );
+    tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + newTitle );
 
     tv = (TextView) view.findViewById( R.id.currnets );
-    tv.setText( getString(R.string.dash_vis_nets) + " " + ListActivity.lameStatic.currNets );
+    tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
 
     tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
     tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
 
     tv = (TextView) view.findViewById( R.id.newcells );
-    tv.setText( getString(R.string.dash_new_cells) + " " + ListActivity.lameStatic.newCells );
+    tv.setText( getString(R.string.dash_new_cells) + " " + ListFragment.lameStatic.newCells );
 
-    updateDist( view, R.id.rundist, ListActivity.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
-    updateDist( view, R.id.totaldist, ListActivity.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
-    updateDist( view, R.id.prevrundist, ListActivity.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
+    updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+    updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
+    updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
     tv = (TextView) view.findViewById( R.id.queuesize );
-    tv.setText( getString(R.string.dash_db_queue) + " " + ListActivity.lameStatic.preQueueSize );
+    tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
 
     tv = (TextView) view.findViewById( R.id.dbNets );
-    tv.setText( getString(R.string.dash_db_nets) + " " + ListActivity.lameStatic.dbNets );
+    tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
 
     tv = (TextView) view.findViewById( R.id.dbLocs );
-    tv.setText( getString(R.string.dash_db_locs) + " " + ListActivity.lameStatic.dbLocs );
+    tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
 
     tv = (TextView) view.findViewById( R.id.gpsstatus );
-    Location location = ListActivity.lameStatic.location;
+    Location location = ListFragment.lameStatic.location;
     String gpsStatus = getString(R.string.dash_no_loc);
     if ( location != null ) {
       gpsStatus = location.getProvider();
@@ -133,15 +133,15 @@ public class DashboardActivity extends Fragment {
   }
 
   private long newNetsSinceUpload() {
-    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final long marker = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
-    final long uploaded = prefs.getLong( ListActivity.PREF_NETS_UPLOADED, 0L );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final long marker = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+    final long uploaded = prefs.getLong( ListFragment.PREF_NETS_UPLOADED, 0L );
     long newSinceUpload = 0;
     if ( marker != 0 && uploaded == 0 ) {
       // marker is set but no uploaded, a migration situation, so return zero
     }
     else {
-      newSinceUpload = ListActivity.lameStatic.dbNets - uploaded;
+      newSinceUpload = ListFragment.lameStatic.dbNets - uploaded;
       if ( newSinceUpload < 0 ) {
         newSinceUpload = 0;
       }
@@ -150,7 +150,7 @@ public class DashboardActivity extends Fragment {
   }
 
   private void updateDist( final View view, final int id, final String pref, final String title ) {
-    final SharedPreferences prefs = getActivity().getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
     float dist = prefs.getFloat( pref, 0f );
     final String distString = metersToString( numberFormat, getActivity(), dist, false );
@@ -160,8 +160,8 @@ public class DashboardActivity extends Fragment {
 
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
       final boolean useShort ) {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-    final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
 
     String retval = null;
     if ( meters > 1000f ) {

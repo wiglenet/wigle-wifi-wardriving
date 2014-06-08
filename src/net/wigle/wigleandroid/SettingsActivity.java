@@ -71,12 +71,12 @@ public final class SettingsActivity extends ActionBarActivity {
       linearLayout.requestFocus();
       
       // get prefs
-      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
       final Editor editor = prefs.edit();
       
       // donate
       final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-      final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
+      final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
       
       donate.setChecked( isDonate );
       if ( isDonate ) {
@@ -84,7 +84,7 @@ public final class SettingsActivity extends ActionBarActivity {
       }
       donate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
           public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) { 
-            if ( isChecked == prefs.getBoolean( ListActivity.PREF_DONATE, false) ) {
+            if ( isChecked == prefs.getBoolean( ListFragment.PREF_DONATE, false) ) {
               // this would cause no change, bail
               return;
             }
@@ -98,7 +98,7 @@ public final class SettingsActivity extends ActionBarActivity {
                   new Doer() {
                 @Override
                 public void execute() {
-                  editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+                  editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
                   editor.commit();
                                     
                   buttonView.setChecked( true );
@@ -108,7 +108,7 @@ public final class SettingsActivity extends ActionBarActivity {
               });
             }
             else {
-              editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+              editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
               editor.commit();
             }
           }
@@ -118,7 +118,7 @@ public final class SettingsActivity extends ActionBarActivity {
       final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
       final EditText user = (EditText) findViewById(R.id.edit_username);
       final EditText pass = (EditText) findViewById(R.id.edit_password);
-      final boolean isAnonymous = prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false);
+      final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
       if ( isAnonymous ) {
         user.setEnabled( false );
         pass.setEnabled( false );
@@ -127,7 +127,7 @@ public final class SettingsActivity extends ActionBarActivity {
       beAnonymous.setChecked( isAnonymous );
       beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
           public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) { 
-            if ( isChecked == prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+            if ( isChecked == prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
               // this would cause no change, bail
               return;
             }
@@ -143,7 +143,7 @@ public final class SettingsActivity extends ActionBarActivity {
                   user.setEnabled( false );
                   pass.setEnabled( false );
                   
-                  editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
+                  editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, isChecked );
                   editor.commit();
                   
                   buttonView.setChecked( true );
@@ -158,7 +158,7 @@ public final class SettingsActivity extends ActionBarActivity {
               user.setEnabled( true );
               pass.setEnabled( true );
               
-              editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
+              editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, isChecked );
               editor.commit();
               
               // might have to remove or show register link
@@ -174,11 +174,11 @@ public final class SettingsActivity extends ActionBarActivity {
       register.setMovementMethod(LinkMovementMethod.getInstance());
       updateRegister();
             
-      user.setText( prefs.getString( ListActivity.PREF_USERNAME, "" ) );
+      user.setText( prefs.getString( ListFragment.PREF_USERNAME, "" ) );
       user.addTextChangedListener( new SetWatcher() {
         public void onTextChanged( final String s ) {
           // ListActivity.debug("user: " + s);
-          editor.putString( ListActivity.PREF_USERNAME, s.trim() );
+          editor.putString( ListFragment.PREF_USERNAME, s.trim() );
           editor.commit();
           // might have to remove or show register link
           updateRegister();
@@ -197,11 +197,11 @@ public final class SettingsActivity extends ActionBarActivity {
         }
       });
       
-      pass.setText( prefs.getString( ListActivity.PREF_PASSWORD, "" ) );
+      pass.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
       pass.addTextChangedListener( new SetWatcher() {
         public void onTextChanged( final String s ) {
           // ListActivity.debug("pass: " + s);
-          editor.putString( ListActivity.PREF_PASSWORD, s.trim() );
+          editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
           editor.commit();
         } 
       });
@@ -216,7 +216,7 @@ public final class SettingsActivity extends ActionBarActivity {
             
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-      tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );
+      tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListFragment.PREF_DB_MARKER, 0L ) );
       
       final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
       resetMaxidButton.setOnClickListener( new OnClickListener() {
@@ -224,7 +224,7 @@ public final class SettingsActivity extends ActionBarActivity {
           MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), new Doer() {
             @Override
             public void execute() {          
-              editor.putLong( ListActivity.PREF_DB_MARKER, 0L );
+              editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
               editor.commit();
               tv.setText( getString(R.string.setting_max_id) + " 0" );
             }
@@ -234,7 +234,7 @@ public final class SettingsActivity extends ActionBarActivity {
       
       // db marker maxout button and text
       final TextView maxtv = (TextView) findViewById( R.id.maxout_maxid_text );
-      final long maxDB = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
+      final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
       maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
       
       final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
@@ -243,7 +243,7 @@ public final class SettingsActivity extends ActionBarActivity {
           MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), new Doer() {
             @Override
             public void execute() {
-              editor.putLong( ListActivity.PREF_DB_MARKER, maxDB );
+              editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
               editor.commit();
               // set the text on the other button
               tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
@@ -254,22 +254,22 @@ public final class SettingsActivity extends ActionBarActivity {
       
       // period spinners
       doScanSpinner( R.id.periodstill_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_STILL, MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD_STILL, MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.period_spinner, 
-          ListActivity.PREF_SCAN_PERIOD, MainActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD, MainActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.periodfast_spinner, 
-          ListActivity.PREF_SCAN_PERIOD_FAST, MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD_FAST, MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.gps_spinner, 
-          ListActivity.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
+          ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
       
-      MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListActivity.PREF_SHOW_CURRENT, true);
-      MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListActivity.PREF_METRIC, false);
-      MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListActivity.PREF_FOUND_SOUND, true);
-      MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListActivity.PREF_FOUND_NEW_SOUND, true);
-      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListActivity.PREF_SPEECH_GPS, true);
-      MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListActivity.PREF_CIRCLE_SIZE_MAP, false);
-      MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListActivity.PREF_USE_NETWORK_LOC, false);
-      MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListActivity.PREF_USE_WIGLE_TILES, false);
+      MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
+      MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListFragment.PREF_METRIC, false);
+      MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS, true);
+      MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
+      MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
+      MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
 
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
@@ -292,7 +292,7 @@ public final class SettingsActivity extends ActionBarActivity {
           getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt), 
           getString(R.string.language_ru), getString(R.string.language_sv), getString(R.string.language_zh),
           };
-      doSpinner( R.id.language_spinner, ListActivity.PREF_LANGUAGE, "", languages, languageName );   
+      doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName );   
       
       final String off = getString(R.string.off);
       final String sec = " " + getString(R.string.sec);
@@ -302,29 +302,29 @@ public final class SettingsActivity extends ActionBarActivity {
       final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
           "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
       doSpinner( R.id.speak_spinner, 
-          ListActivity.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
+          ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );      
             
       // battery kill spinner
       final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
       final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
       doSpinner( R.id.battery_kill_spinner, 
-          ListActivity.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
+          ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );   
       
       // reset wifi spinner
       final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
       final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
           "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner, 
-          ListActivity.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
+          ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );      
   }
   
   @Override
   public void onResume() {
     MainActivity.info( "resume settings." );
     
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     // donate
-    final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
+    final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
     if ( isDonate ) {
       eraseDonate();
     }
@@ -334,9 +334,9 @@ public final class SettingsActivity extends ActionBarActivity {
   
   private void updateRegister() {
     final TextView register = (TextView) findViewById(R.id.register);
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    final boolean isAnonymous = prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    final String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
+    final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
     if ( "".equals(username) || isAnonymous ) {
       register.setEnabled( true );
       register.setVisibility( View.VISIBLE );        
@@ -374,7 +374,7 @@ public final class SettingsActivity extends ActionBarActivity {
           + " periodName: " + Arrays.toString(periodName));
     }
     
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
     
     Spinner spinner = (Spinner) findViewById( id );

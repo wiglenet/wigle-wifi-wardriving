@@ -53,14 +53,14 @@ public class DBResultActivity extends ActionBarActivity {
 
     setupList();
 
-    QueryArgs queryArgs = ListActivity.lameStatic.queryArgs;
+    QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
     MainActivity.info("queryArgs: " + queryArgs);
     final TextView tv = (TextView) findViewById( R.id.dbstatus );
 
     if ( queryArgs != null ) {
       tv.setText( getString(R.string.status_working) + "...");
       Address address = queryArgs.getAddress();
-      IGeoPoint center = MappingActivity.DEFAULT_POINT;
+      IGeoPoint center = MappingFragment.DEFAULT_POINT;
       if ( address != null ) {
         center = new GeoPoint(address.getLatitude(), address.getLongitude());
       }
@@ -76,7 +76,7 @@ public class DBResultActivity extends ActionBarActivity {
     // not set by nonconfig retain
     listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
     final ListView listView = (ListView) findViewById( R.id.dblist );
-    ListActivity.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter );
+    ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter );
   }
 
   private void setupMap( final IGeoPoint center ) {
@@ -105,7 +105,7 @@ public class DBResultActivity extends ActionBarActivity {
           for ( final Network network : resultList ) {
             listAdapter.add( network );
             if ( address == null && first ) {
-              final IGeoPoint center = MappingActivity.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
+              final IGeoPoint center = MappingFragment.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
               MainActivity.info( "set center: " + center + " network: " + network.getSsid()
                   + " point: " + network.getGeoPoint());
               mapView.getController().setCenter( center );
@@ -175,7 +175,7 @@ public class DBResultActivity extends ActionBarActivity {
       @Override
       public void complete() {
         for ( final String bssid : top.values() ) {
-          final Network network = ListActivity.lameStatic.dbHelper.getNetwork( bssid );
+          final Network network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
           resultList.add( network );
           final IGeoPoint point = network.getGeoPoint();
           final LatLon key = new LatLon(point.getLatitudeE6() / 1e6f, point.getLongitudeE6() / 1e6f);
@@ -191,7 +191,7 @@ public class DBResultActivity extends ActionBarActivity {
     });
 
     // queue it up
-    ListActivity.lameStatic.dbHelper.addToQueue( request );
+    ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
 
   private static void putWithBackoff( TreeMap<Float,String> top, String s, float diff ) {

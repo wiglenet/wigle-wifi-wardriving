@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
 
 import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.R;
@@ -188,8 +188,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
       params.put("observer", username);
       params.put("password", password);
-      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-      if ( prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+      final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+      if ( prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
         params.put("donate","on");
       }
       final String response = HttpFileUploader.upload(
@@ -198,10 +198,10 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
       // as upload() is currently written: response can never be null. leave checks inplace anyhow. -uhtu
 
-      if ( ! prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+      if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
         if ( response != null && response.indexOf("donate=Y") > 0 ) {
           final Editor editor = prefs.edit();
-          editor.putBoolean( ListActivity.PREF_DONATE, true );
+          editor.putBoolean( ListFragment.PREF_DONATE, true );
           editor.commit();
         }
       }
@@ -211,9 +211,9 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
         // save in the prefs
         final Editor editor = prefs.edit();
-        editor.putLong( ListActivity.PREF_DB_MARKER, maxId );
-        editor.putLong( ListActivity.PREF_MAX_DB, maxId );
-        editor.putLong( ListActivity.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
+        editor.putLong( ListFragment.PREF_DB_MARKER, maxId );
+        editor.putLong( ListFragment.PREF_MAX_DB, maxId );
+        editor.putLong( ListFragment.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
         editor.commit();
       }
       else if ( response != null && response.indexOf("does not match login") > 0 ) {
@@ -338,14 +338,14 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   private long writeFile( final OutputStream fos, final Bundle bundle, final CountStats countStats )
       throws IOException, NameNotFoundException, InterruptedException, DBException {
 
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
     if ( writeWholeDb ) {
       maxId = 0;
     }
     else if ( writeRunOnly ) {
       // max id at startup
-      maxId = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
+      maxId = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
     }
     MainActivity.info( "Writing file starting with observation id: " + maxId);
     final Cursor cursor = dbHelper.locationIterator( maxId );
@@ -362,8 +362,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   private long writeFileWithCursor( final OutputStream fos, final Bundle bundle, final CountStats countStats,
       final Cursor cursor ) throws IOException, NameNotFoundException, InterruptedException {
 
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
 
     final long start = System.currentTimeMillis();
     final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

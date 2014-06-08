@@ -2,7 +2,7 @@ package net.wigle.wigleandroid.listener;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 import static android.location.LocationManager.NETWORK_PROVIDER;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import android.content.Context;
@@ -171,7 +171,7 @@ public class GPSListener implements Listener, LocationListener {
     }
     
     // for maps. so lame!
-    ListActivity.lameStatic.location = location;
+    ListFragment.lameStatic.location = location;
     boolean scanScheduled = false;
     if ( location != null ) {
        final float currentSpeed = location.getSpeed();
@@ -201,8 +201,8 @@ public class GPSListener implements Listener, LocationListener {
       final String announce = location == null ? mainActivity.getString(R.string.lost_location) 
           : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
       Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();
-      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final boolean speechGPS = prefs.getBoolean( ListActivity.PREF_SPEECH_GPS, true );
+      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );
       if ( speechGPS ) {
         // no quotes or the voice pauses
         final String speakAnnounce = location == null ? "Lost Location" 
@@ -284,11 +284,11 @@ public class GPSListener implements Listener, LocationListener {
   public void saveLocation() {
     // save our location for use on later runs
     if ( this.location != null ) {
-      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
+      final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
       // there is no putDouble
-      edit.putFloat( ListActivity.PREF_PREV_LAT, (float) location.getLatitude() );
-      edit.putFloat( ListActivity.PREF_PREV_LON, (float) location.getLongitude() );
+      edit.putFloat( ListFragment.PREF_PREV_LAT, (float) location.getLatitude() );
+      edit.putFloat( ListFragment.PREF_PREV_LON, (float) location.getLongitude() );
       edit.commit();
     }
   }

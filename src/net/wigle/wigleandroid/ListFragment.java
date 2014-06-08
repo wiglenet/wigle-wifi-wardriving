@@ -42,7 +42,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public final class ListActivity extends Fragment implements FileUploaderListener {
+public final class ListFragment extends Fragment implements FileUploaderListener {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
@@ -344,7 +344,7 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       DialogFragment dialogFragment = null;
       switch ( which ) {
         case SSID_FILTER:
-          dialogFragment = MappingActivity.createSsidFilterDialog(FILTER_PREF_PREFIX);
+          dialogFragment = MappingFragment.createSsidFilterDialog(FILTER_PREF_PREFIX);
           break;
         case SORT_DIALOG:
           dialogFragment = new SortDialog();
@@ -521,10 +521,10 @@ public final class ListActivity extends Fragment implements FileUploaderListener
           tv5.setText( "" );
         }
         else {
-          String distString = DashboardActivity.metersToString(
+          String distString = DashboardFragment.metersToString(
               state.numberFormat0, getActivity(), location.getAccuracy(), true );
           tv4.setText( "+/- " + distString );
-          distString = DashboardActivity.metersToString(
+          distString = DashboardFragment.metersToString(
               state.numberFormat0, getActivity(), (float) location.getAltitude(), true );
           tv5.setText( getString(R.string.list_short_alt) + " " + distString );
         }
@@ -538,8 +538,8 @@ public final class ListActivity extends Fragment implements FileUploaderListener
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
         final float metersPerSecond ) {
 
-      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-      final boolean metric = prefs.getBoolean( ListActivity.PREF_METRIC, false );
+      final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
 
       String retval = null;
       if ( metric ) {
@@ -556,14 +556,14 @@ public final class ListActivity extends Fragment implements FileUploaderListener
       button.setOnClickListener( new OnClickListener() {
           @Override
           public void onClick( final View view ) {
-            final MainActivity main = MainActivity.getMainActivity( ListActivity.this );
-            final SharedPreferences prefs = main.getSharedPreferences( ListActivity.SHARED_PREFS, 0 );
-            final String username = prefs.getString( ListActivity.PREF_USERNAME, "anonymous" );
+            final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
+            final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
             MainActivity.createConfirmation( getActivity(), text, new Doer() {
               @Override
               public void execute() {
-                final State state = MainActivity.getState( ListActivity.this );
+                final State state = MainActivity.getState( ListFragment.this );
                 uploadFile( state.dbHelper );
               }
             } );

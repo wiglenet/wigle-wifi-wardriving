@@ -50,10 +50,13 @@ public class DashboardActivity extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-    MainActivity.info("DASH: onCreateView");
-    final View view = inflater.inflate(R.layout.dash, container, false);
+    final int orientation = getResources().getConfiguration().orientation;
+    MainActivity.info("DASH: onCreateView. orientation: " + orientation);
+    if (orientation == 2) {
+      return inflater.inflate(R.layout.dashlandscape, container, false);
+    }
 
-    return view;
+    return inflater.inflate(R.layout.dash, container, false);
   }
 
   private final Runnable mUpdateTimeTask = new Runnable() {
@@ -94,7 +97,9 @@ public class DashboardActivity extends Fragment {
 
     tv = (TextView) view.findViewById( R.id.newwifi );
     final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
+    final String newTitle = ListActivity.lameStatic.newWifi >= 1000 ? getString(R.string.new_word)
+        : getString(R.string.dash_new_wifi);
+    tv.setText( scanning + ListActivity.lameStatic.newWifi + " " + newTitle );
 
     tv = (TextView) view.findViewById( R.id.currnets );
     tv.setText( getString(R.string.dash_vis_nets) + " " + ListActivity.lameStatic.currNets );

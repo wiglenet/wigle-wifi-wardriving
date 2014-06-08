@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dasytoplayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true" >
+
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/newwifi"
+    android:textSize="48sp"
+    android:textColor="#AAEE50"
+    />
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/runnets"
+    android:textSize="48sp"
+    android:textColor="#AAAA00"
+    />
+    
+    <TextView
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:id="@+id/gpsstatus"
+    android:textSize="32sp"
+    android:textColor="#46AA00"
+    />
+</LinearLayout>

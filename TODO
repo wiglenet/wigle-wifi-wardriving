@@ -9,6 +9,7 @@ show countdown while trying to close database
 lat/lon in observed import from wigle
 debug logging mode
 download of cell observed as well
+tablet list+map layout
 
 --- user suggested ---
 option to turn off gps on/off toast
@@ -43,19 +44,15 @@ geofence for "don't record" and/or "do upload"
 set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 
---- broken ---
+--- 2.0 blockers ---
 move upload dialog to fragment for rotation happiness
 test csv dump and friends, pry move those dialogs to fragment
 
---- nice to have ---
-swipe to change tabs
-dashboard horizontal layout
-tablet list+map
-
 --- done ---
-* 2.00 (?)
-Major refactor for Action Bar
+* 2.0 (?)
+Complete major refactor for Action Bar
 Migrate to safe-draw to fix osm drawing distortions
+Dashboard landscape-optimized layout
 
 * 1.58 (01/19/2014)
 Use WiGLE's OpenStreetMap tileserver

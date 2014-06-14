@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, mostrare le reti wireless, caricare nel database WiGLE.
+
+Description (4000 characters):
+WiGLE è un open source wardriving app per netstumble, visualizzazione e cartina trovato reti wireless e torri cellulari in tutto il mondo, facilmente caricamento al database WiGLE.net. WiGLE è stato avviato nel 2001 e ora ha oltre 125 milioni di reti Wi-Fi mappato tutto il mondo.
+
+• Competere sul WiGLE classifica globale per la maggior parte delle reti si trovano!
+• Esportazione in file CSV su scheda SD (Comma Separated Values)!
+• Esportazione in file KML su scheda SD (per importare in Google Maps/Earth)!
+• Audio e text-to-speech avviso!
+• Database locale per tracciare nuove reti trovato!
+• In tempo reale la mappa delle reti trovate (OpenStreetMap)!
+• Impossibile spostare app su una scheda SD!
+• Il tasto "Silenzioso" per spegnere tutto il suono/parola subito!
+• Supporto GPS Bluetooth attraverso posizioni simulate!
+• Nessun annuncio!
+
+Note di rilascio: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Per il Wi-Fi e ripetitori per essere mappati, è necessario attendere il dispositivo per determinare la posizione attuale, tramite GPS o percorso di rete.
+Sulla mappa: i cerchi sono Wi-Fi, le piazze sono torri cellulari. I colori chiari sono reti viste prima, quelle viola sono nuovi per il database locale.
+Se avete problemi di accesso, o avete suggerimenti, inviaci una mail a wigle-admin@wigle.net e saremo felici di aiutare.
+Ha bisogno di "Legge di Stato Phone" per dire se una chiamata è in corso, per disattivare l'audio (suoni e di parola).
+I file sono disponibili per aiutare con una traduzione umana per lingue diverse dall'inglese. Questa è stata per lo più una traduzione meccanica, perché ovviamente non conosciamo tutte queste lingue. Si può contribuire a migliorare le cose, facendo richieste tirare a:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+oppure inviarli a wigle-admin@wigle.net.
+
+Continuate a inciampare!

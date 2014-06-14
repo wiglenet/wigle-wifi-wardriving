@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, exhibir redes inalámbricas, subir a la base WiGLE.
+
+Description (4000 characters):
+WiGLE es un código abierto wardriving aplicación para netstumble, pantalla y el mapa encontró las redes inalámbricas y las torres de celulares en cualquier parte del mundo, fácilmente subir a la base de datos WiGLE.net. WiGLE se inició en 2001 y ahora cuenta con más de 125 millones de redes Wi-Fi en todo el mundo mapeado.
+
+• Compite en la clasificación mundial WiGLE para la mayoría de las redes ubicadas!
+• Exportar a archivos CSV en la tarjeta SD (valores separados por comas)!
+• Exportar a archivos KML en la tarjeta SD (para importar a Google Maps/Earth)!
+• Audio y conversión de texto a voz de alerta!
+• Base de datos local para rastrear nuevas redes encontrado!
+• Mapa en tiempo real de redes encontradas (OpenStreetMap)!
+• Puede mover la aplicación a la tarjeta SD!
+• Botón "Silencio" para apagar todos los sonidos/discurso inmediatamente!
+• Bluetooth GPS de apoyo a través de ubicaciones falsas!
+• No hay anuncios!
+
+Notas de la versión: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+Para Wi-Fi y torres de telefonía celular que se asignan, debe esperar a que su dispositivo para determinar la ubicación actual, a través de GPS o la ubicación de red.
+Sobre el mapa: los círculos son Wi-Fi, los cuadrados son las torres de celulares. Los colores claros son redes visto antes, los morados son nuevas para la base de datos local.
+Si tiene problemas para iniciar sesión, o tiene alguna sugerencia, envíenos un correo electrónico a wigle-admin@wigle.net y estaremos encantados de ayudar.
+Necesidades "Lee el estado del teléfono" con el fin de saber si una llamada está en curso, para silenciar el audio (sonidos y el habla).
+Los archivos están disponibles para ayudar con la traducción humana para idiomas distintos del inglés. Esto fue principalmente una traducción mecánica, ya que, obviamente, no conocemos todos estos idiomas. Usted puede ayudar a mejorar las cosas al hacer una solicitud de extracción en:
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+o enviarlos a wigle-admin@wigle.net.
+
+Sigue tropezando!

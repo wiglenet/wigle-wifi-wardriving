@@ -12,7 +12,7 @@
    	android:xlargeScreens="true"
    	android:resizeable="true"
 	/>
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="10" />
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19" />
     
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
@@ -33,9 +33,11 @@
 	<uses-feature android:name="android.hardware.wifi" android:required="false" />
 	
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name"
-        	android:allowBackup="true">
-    	<activity android:name=".MainActivity" android:label="@string/app_name"
-          		  android:theme="@android:style/Theme.NoTitleBar"
+        	android:allowBackup="true"
+        	android:theme="@style/Theme.AppCompat">
+    	<activity android:name=".MainActivity" 
+    	          android:label="@string/list_app_name"
+    	    	  android:theme="@style/Theme.AppCompat"
           		  android:launchMode="singleTask"
           		  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
             <intent-filter>
@@ -46,7 +48,7 @@
         <!-- have this available too for backwards compatibility -->
         <activity android:name=".WigleAndroid" 
             	  android:label="@string/app_name"
-          		  android:theme="@android:style/Theme.NoTitleBar"
+            	  android:theme="@style/Theme.AppCompat"
           		  android:launchMode="singleTask"
           		  android:exported="false"
           		  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
@@ -55,41 +57,18 @@
                 <category android:name="android.intent.category.ALTERNATIVE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListActivity"
-                  android:label="@string/app_name"
-                  android:launchMode="singleTask"
-                  android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
-            <intent-filter>
-            	<action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
-        </activity>
         <activity android:name=".SettingsActivity"
                   android:label="@string/settings_app_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MappingActivity"
-                  android:label="@string/mapping_app_name"
-                  android:launchMode="singleTask"
-                  android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".DashboardActivity"
-                  android:label="@string/dashboard_app_name"
-                  android:launchMode="singleTask"
-                  android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+		        <meta-data
+		            android:name="android.support.PARENT_ACTIVITY"
+		            android:value=".MainActivity" />
+            
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -97,6 +76,7 @@
         </activity>
         <activity android:name=".ErrorReportActivity"
                   android:label="@string/error_report_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
                   android:configChanges="keyboard|keyboardHidden|orientation|locale" >
@@ -107,9 +87,16 @@
         </activity>
         <activity android:name=".SpeechActivity"
                   android:label="@string/speech_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".SettingsActivity" >
+            
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SettingsActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -117,19 +104,15 @@
         </activity>
         <activity android:name=".NetworkActivity"
                   android:label="@string/network_activity_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".DataActivity"
-                  android:label="@string/data_activity_name"
-                  android:launchMode="singleTask"
-                  android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -137,9 +120,15 @@
         </activity>
         <activity android:name=".DBResultActivity"
                   android:label="@string/dbresult_activity_name"
+                  android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />

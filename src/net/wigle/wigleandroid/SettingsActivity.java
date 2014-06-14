@@ -1,19 +1,52 @@
 package net.wigle.wigleandroid;
 
+import java.util.Arrays;
+
 import net.wigle.wigleandroid.MainActivity.Doer;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.media.AudioManager;
+import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.text.method.SingleLineTransformationMethod;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 /**
  * configure settings
  */
-public final class SettingsActivity extends Activity {
+public final class SettingsActivity extends ActionBarActivity {
 
   private static final int MENU_RETURN = 12;
   private static final int MENU_ERROR_REPORT = 13;
 
   /** convenience, just get the darn new string */
   public static abstract class SetWatcher implements TextWatcher {
+    @Override
     public void afterTextChanged( final Editable s ) {}
+    @Override
     public void beforeTextChanged( final CharSequence s, final int start, final int count, final int after ) {}
+    @Override
     public void onTextChanged( final CharSequence s, final int start, final int before, final int count ) {
       onTextChanged( s.toString() );
     }
@@ -24,6 +57,10 @@ public final class SettingsActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
       super.onCreate( savedInstanceState );
+
+      final ActionBar actionBar = getSupportActionBar();
+      actionBar.setDisplayHomeAsUpEnabled(true);
+
       // set language
       MainActivity.setLocale( this );
       setContentView( R.layout.settings );
@@ -37,20 +74,20 @@ public final class SettingsActivity extends Activity {
       linearLayout.requestFocus();
 
       // get prefs
-      final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+      final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
       final Editor editor = prefs.edit();
 
       // donate
       final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-      final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
-
+      final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
       donate.setChecked( isDonate );
       if ( isDonate ) {
         eraseDonate();
       }
       donate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+          @Override
           public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-            if ( isChecked == prefs.getBoolean( ListActivity.PREF_DONATE, false) ) {
+            if ( isChecked == prefs.getBoolean( ListFragment.PREF_DONATE, false) ) {
               // this would cause no change, bail
               return;
             }
@@ -63,9 +100,8 @@ public final class SettingsActivity extends Activity {
                   getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain),
                   new Doer() {
                 @Override
-                @Override
                 public void execute() {
-                  editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+                  editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
                   editor.commit();
 
                   buttonView.setChecked( true );
@@ -75,7 +111,7 @@ public final class SettingsActivity extends Activity {
               });
             }
             else {
-              editor.putBoolean( ListActivity.PREF_DONATE, isChecked );
+              editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
               editor.commit();
             }
           }
@@ -85,7 +121,7 @@ public final class SettingsActivity extends Activity {
       final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
       final EditText user = (EditText) findViewById(R.id.edit_username);
       final EditText pass = (EditText) findViewById(R.id.edit_password);
-      final boolean isAnonymous = prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false);
+      final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
       if ( isAnonymous ) {
         user.setEnabled( false );
         pass.setEnabled( false );
@@ -93,8 +129,9 @@ public final class SettingsActivity extends Activity {
 
       beAnonymous.setChecked( isAnonymous );
       beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+          @Override
           public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-            if ( isChecked == prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+            if ( isChecked == prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
               // this would cause no change, bail
               return;
             }
@@ -105,13 +142,11 @@ public final class SettingsActivity extends Activity {
               // confirm
               MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", new Doer() {
                 @Override
-                @Override
                 public void execute() {
                   // turn anonymous
                   user.setEnabled( false );
                   pass.setEnabled( false );
-
-                  editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
+                  editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, isChecked );
                   editor.commit();
 
                   buttonView.setChecked( true );
@@ -126,7 +161,6 @@ public final class SettingsActivity extends Activity {
               user.setEnabled( true );
               pass.setEnabled( true );
 
-              editor.putBoolean( ListActivity.PREF_BE_ANONYMOUS, isChecked );
               editor.commit();
 
               // might have to remove or show register link
@@ -142,11 +176,12 @@ public final class SettingsActivity extends Activity {
       register.setMovementMethod(LinkMovementMethod.getInstance());
       updateRegister();
 
-      user.setText( prefs.getString( ListActivity.PREF_USERNAME, "" ) );
+      user.setText( prefs.getString( ListFragment.PREF_USERNAME, "" ) );
       user.addTextChangedListener( new SetWatcher() {
+        @Override
         public void onTextChanged( final String s ) {
           // ListActivity.debug("user: " + s);
-          editor.putString( ListActivity.PREF_USERNAME, s.trim() );
+          editor.putString( ListFragment.PREF_USERNAME, s.trim() );
           editor.commit();
           // might have to remove or show register link
           updateRegister();
@@ -155,6 +190,7 @@ public final class SettingsActivity extends Activity {
 
       final CheckBox showPassword = (CheckBox) findViewById(R.id.showpassword);
       showPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        @Override
         public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
           if ( isChecked ) {
             pass.setTransformationMethod(SingleLineTransformationMethod.getInstance());
@@ -165,17 +201,19 @@ public final class SettingsActivity extends Activity {
         }
       });
 
-      pass.setText( prefs.getString( ListActivity.PREF_PASSWORD, "" ) );
+      pass.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
       pass.addTextChangedListener( new SetWatcher() {
+        @Override
         public void onTextChanged( final String s ) {
           // ListActivity.debug("pass: " + s);
-          editor.putString( ListActivity.PREF_PASSWORD, s.trim() );
+          editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
           editor.commit();
         }
       });
 
       final Button button = (Button) findViewById( R.id.speech_button );
       button.setOnClickListener( new OnClickListener() {
+          @Override
           public void onClick( final View view ) {
             final Intent errorReportIntent = new Intent( SettingsActivity.this, SpeechActivity.class );
             SettingsActivity.this.startActivity( errorReportIntent );
@@ -184,16 +222,16 @@ public final class SettingsActivity extends Activity {
 
       // db marker reset button and text
       final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-      tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListActivity.PREF_DB_MARKER, 0L ) );
+      tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListFragment.PREF_DB_MARKER, 0L ) );
 
       final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
       resetMaxidButton.setOnClickListener( new OnClickListener() {
+        @Override
         public void onClick( final View buttonView ) {
           MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), new Doer() {
             @Override
-            @Override
             public void execute() {
-              editor.putLong( ListActivity.PREF_DB_MARKER, 0L );
+              editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
               editor.commit();
               tv.setText( getString(R.string.setting_max_id) + " 0" );
             }
@@ -203,17 +241,17 @@ public final class SettingsActivity extends Activity {
 
       // db marker maxout button and text
       final TextView maxtv = (TextView) findViewById( R.id.maxout_maxid_text );
-      final long maxDB = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
+      final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
       maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
 
       final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
       maxoutMaxidButton.setOnClickListener( new OnClickListener() {
+        @Override
         public void onClick( final View buttonView ) {
           MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), new Doer() {
             @Override
-            @Override
             public void execute() {
-              editor.putLong( ListActivity.PREF_DB_MARKER, maxDB );
+              editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
               editor.commit();
               // set the text on the other button
               tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
@@ -224,22 +262,22 @@ public final class SettingsActivity extends Activity {
 
       // period spinners
       doScanSpinner( R.id.periodstill_spinner,
-          ListActivity.PREF_SCAN_PERIOD_STILL, ListActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD_STILL, MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.period_spinner,
-          ListActivity.PREF_SCAN_PERIOD, ListActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD, MainActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.periodfast_spinner,
-          ListActivity.PREF_SCAN_PERIOD_FAST, ListActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
+          ListFragment.PREF_SCAN_PERIOD_FAST, MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
       doScanSpinner( R.id.gps_spinner,
-          ListActivity.GPS_SCAN_PERIOD, ListActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
+          ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
 
-      MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListActivity.PREF_SHOW_CURRENT, true);
-      MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListActivity.PREF_METRIC, false);
-      MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListActivity.PREF_FOUND_SOUND, true);
-      MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListActivity.PREF_FOUND_NEW_SOUND, true);
-      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListActivity.PREF_SPEECH_GPS, true);
-      MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListActivity.PREF_CIRCLE_SIZE_MAP, false);
-      MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListActivity.PREF_USE_NETWORK_LOC, false);
-      MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListActivity.PREF_USE_WIGLE_TILES, false);
+      MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
+      MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListFragment.PREF_METRIC, false);
+      MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
+      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS, true);
+      MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
+      MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
+      MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
 
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
@@ -263,7 +301,7 @@ public final class SettingsActivity extends Activity {
           getString(R.string.language_pt), getString(R.string.language_pt_rBR), getString(R.string.language_ru),
           getString(R.string.language_sv), getString(R.string.language_tr), getString(R.string.language_zh),
           };
-      doSpinner( R.id.language_spinner, ListActivity.PREF_LANGUAGE, "", languages, languageName );
+      doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName );
 
       final String off = getString(R.string.off);
       final String sec = " " + getString(R.string.sec);
@@ -273,29 +311,29 @@ public final class SettingsActivity extends Activity {
       final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
           "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
       doSpinner( R.id.speak_spinner,
-          ListActivity.PREF_SPEECH_PERIOD, ListActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );
+          ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );
 
       // battery kill spinner
       final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
       final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
       doSpinner( R.id.battery_kill_spinner,
-          ListActivity.PREF_BATTERY_KILL_PERCENT, ListActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );
+          ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );
 
       // reset wifi spinner
       final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
       final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
           "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner,
-          ListActivity.PREF_RESET_WIFI_PERIOD, ListActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
+          ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
   }
 
   @Override
   public void onResume() {
-    ListActivity.info( "resume settings." );
+    MainActivity.info( "resume settings." );
 
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     // donate
-    final boolean isDonate = prefs.getBoolean( ListActivity.PREF_DONATE, false);
+    final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
     if ( isDonate ) {
       eraseDonate();
     }
@@ -305,9 +343,9 @@ public final class SettingsActivity extends Activity {
 
   private void updateRegister() {
     final TextView register = (TextView) findViewById(R.id.register);
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    final String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    final boolean isAnonymous = prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    final String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
+    final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
     if ( "".equals(username) || isAnonymous ) {
       register.setEnabled( true );
       register.setVisibility( View.VISIBLE );
@@ -345,7 +383,7 @@ public final class SettingsActivity extends Activity {
           + " periodName: " + Arrays.toString(periodName));
     }
 
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
     final Editor editor = prefs.edit();
 
     Spinner spinner = (Spinner) findViewById( id );
@@ -360,7 +398,7 @@ public final class SettingsActivity extends Activity {
       period = prefs.getString( pref, (String) spinDefault );
     }
     else {
-        ListActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
+        MainActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
     }
 
     int periodIndex = 0;
@@ -374,10 +412,11 @@ public final class SettingsActivity extends Activity {
     spinner.setAdapter( adapter );
     spinner.setSelection( periodIndex );
     spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+      @Override
       public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
         // set pref
         final V period = periods[position];
-        ListActivity.info( pref + " setting scan period: " + period );
+        MainActivity.info( pref + " setting scan period: " + period );
         if ( period instanceof Long ) {
           editor.putLong( pref, (Long) period );
         }
@@ -385,7 +424,7 @@ public final class SettingsActivity extends Activity {
           editor.putString( pref, (String) period );
         }
         else {
-          ListActivity.error("unhandled object type: " + period + " class: " + period.getClass());
+          MainActivity.error("unhandled object type: " + period + " class: " + period.getClass());
         }
         editor.commit();
 
@@ -394,6 +433,7 @@ public final class SettingsActivity extends Activity {
         }
 
       }
+      @Override
       public void onNothingSelected( final AdapterView<?> arg0 ) {}
       });
   }
@@ -401,11 +441,11 @@ public final class SettingsActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
-      item.setIcon( android.R.drawable.ic_media_previous );
-
-      item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
+      MenuItem item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
       item.setIcon( android.R.drawable.ic_menu_report_image );
+
+      item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
+      item.setIcon( android.R.drawable.ic_media_previous );
 
       return true;
   }

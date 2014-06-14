@@ -1,17 +1,18 @@
 package net.wigle.wigleandroid;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class SpeechActivity extends Activity {
+public class SpeechActivity extends ActionBarActivity {
   private static final int MENU_RETURN = 12;
   
   // used for shutting extraneous activities down on an error
@@ -21,6 +22,10 @@ public class SpeechActivity extends Activity {
   @Override
   public void onCreate( final Bundle savedInstanceState) {
     super.onCreate( savedInstanceState );
+    
+    final ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
     // set language
     MainActivity.setLocale( this );      
     setContentView( R.layout.speech );
@@ -29,16 +34,16 @@ public class SpeechActivity extends Activity {
     // force media volume controls
     this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
     
-    final SharedPreferences prefs = this.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    doCheckbox( prefs, R.id.speech_run, ListActivity.PREF_SPEAK_RUN );
-    doCheckbox( prefs, R.id.speech_new_wifi, ListActivity.PREF_SPEAK_NEW_WIFI );
-    doCheckbox( prefs, R.id.speech_new_cell, ListActivity.PREF_SPEAK_NEW_CELL );
-    doCheckbox( prefs, R.id.speech_queue, ListActivity.PREF_SPEAK_QUEUE );
-    doCheckbox( prefs, R.id.speech_miles, ListActivity.PREF_SPEAK_MILES );
-    doCheckbox( prefs, R.id.speech_time, ListActivity.PREF_SPEAK_TIME );
-    doCheckbox( prefs, R.id.speech_battery, ListActivity.PREF_SPEAK_BATTERY );
-    doCheckbox( prefs, R.id.speech_ssid, ListActivity.PREF_SPEAK_SSID, false );
-    doCheckbox( prefs, R.id.speech_wifi_restart, ListActivity.PREF_SPEAK_WIFI_RESTART );
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    doCheckbox( prefs, R.id.speech_run, ListFragment.PREF_SPEAK_RUN );
+    doCheckbox( prefs, R.id.speech_new_wifi, ListFragment.PREF_SPEAK_NEW_WIFI );
+    doCheckbox( prefs, R.id.speech_new_cell, ListFragment.PREF_SPEAK_NEW_CELL );
+    doCheckbox( prefs, R.id.speech_queue, ListFragment.PREF_SPEAK_QUEUE );
+    doCheckbox( prefs, R.id.speech_miles, ListFragment.PREF_SPEAK_MILES );
+    doCheckbox( prefs, R.id.speech_time, ListFragment.PREF_SPEAK_TIME );
+    doCheckbox( prefs, R.id.speech_battery, ListFragment.PREF_SPEAK_BATTERY );
+    doCheckbox( prefs, R.id.speech_ssid, ListFragment.PREF_SPEAK_SSID, false );
+    doCheckbox( prefs, R.id.speech_wifi_restart, ListFragment.PREF_SPEAK_WIFI_RESTART );
   }
   
   public void onDestroy() {    

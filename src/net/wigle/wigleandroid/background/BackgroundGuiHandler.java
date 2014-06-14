@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid.background;
 
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.SettingsActivity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -46,7 +46,7 @@ public class BackgroundGuiHandler extends Handler {
       }
       
       if ( msg.what >= Status.values().length || msg.what < 0 ) {
-        ListActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
+        MainActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
         return;
       }
       final Status status = Status.values()[ msg.what ];
@@ -69,7 +69,7 @@ public class BackgroundGuiHandler extends Handler {
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing dialog: " + ex );
+          MainActivity.info( "exception dismissing dialog: " + ex );
         }
       }
       // Activity context
@@ -122,17 +122,17 @@ public class BackgroundGuiHandler extends Handler {
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing alert dialog: " + ex );
+          MainActivity.info( "exception dismissing alert dialog: " + ex );
         }
         
         if (status == Status.BAD_USERNAME || status == Status.BAD_PASSWORD || status == Status.BAD_LOGIN) {
-          ListActivity.info("dialog: start settings activity");
+          MainActivity.info("dialog: start settings activity");
           try {
             final Intent settingsIntent = new Intent( context, SettingsActivity.class );
             context.startActivity( settingsIntent );
           }
           catch (Exception ex) {
-            ListActivity.info("failed to start settings activity: " + ex, ex);
+            MainActivity.info("failed to start settings activity: " + ex, ex);
           }
         }
         
@@ -142,7 +142,7 @@ public class BackgroundGuiHandler extends Handler {
       ad.show();
     }
     catch ( WindowManager.BadTokenException ex ) {
-      ListActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+      MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
     }
     
     return ad;

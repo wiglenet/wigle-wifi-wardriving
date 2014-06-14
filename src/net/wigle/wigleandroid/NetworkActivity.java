@@ -21,6 +21,8 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.Menu;
@@ -38,7 +40,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class NetworkActivity extends Activity {
+public class NetworkActivity extends ActionBarActivity {
   private static final int MENU_EXIT = 11;
   private static final int MENU_COPY = 12;
   private static final int CRYPTO_DIALOG = 101;
@@ -59,23 +61,27 @@ public class NetworkActivity extends Activity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    
+    final ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
     // set language
     MainActivity.setLocale( this );
     setContentView(R.layout.network);
     networkActivity = this;
     
     final Intent intent = getIntent();
-    final String bssid = intent.getStringExtra( ListActivity.NETWORK_EXTRA_BSSID );
-    ListActivity.info( "bssid: " + bssid );
+    final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
+    MainActivity.info( "bssid: " + bssid );
     
-    network = ListActivity.getNetworkCache().get(bssid);
+    network = MainActivity.getNetworkCache().get(bssid);
     format = NetworkListAdapter.getConstructionTimeFormater( this );  
     
     TextView tv = (TextView) findViewById( R.id.bssid );
     tv.setText( bssid );
     
     if ( network == null ) {
-      ListActivity.info( "no network found in cache for bssid: " + bssid );
+      MainActivity.info( "no network found in cache for bssid: " + bssid );
     }
     else {
       // do gui work
@@ -161,11 +167,11 @@ public class NetworkActivity extends Activity {
         }
       }
     });
-    ListActivity.lameStatic.dbHelper.addToQueue( request );
+    ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
     
   private void setupMap( final Network network ) {
-    final IGeoPoint point = MappingActivity.getCenter( this, network.getGeoPoint(), null );
+    final IGeoPoint point = MappingFragment.getCenter( this, network.getGeoPoint(), null );
     mapView = new MapView( this, 256 );
     final OpenStreetMapViewWrapper overlay = setupMap( this, point, mapView, R.id.netmap_rl );
     if ( overlay != null ) {
@@ -231,7 +237,7 @@ public class NetworkActivity extends Activity {
     int netId = -2;
     
     for ( final WifiConfiguration config : wifiManager.getConfiguredNetworks() ) {
-      ListActivity.info( "bssid: " + config.BSSID 
+      MainActivity.info( "bssid: " + config.BSSID 
           + " ssid: " + config.SSID 
           + " status: " + config.status
           + " id: " + config.networkId
@@ -342,7 +348,7 @@ public class NetworkActivity extends Activity {
               }
               catch ( Exception ex ) {
                 // guess it wasn't there anyways
-                ListActivity.info( "exception dismissing crypto dialog: " + ex );
+                MainActivity.info( "exception dismissing crypto dialog: " + ex );
               }
             }
           } );
@@ -355,14 +361,14 @@ public class NetworkActivity extends Activity {
               }
               catch ( Exception ex ) {
                 // guess it wasn't there anyways
-                ListActivity.info( "exception dismissing crypto dialog: " + ex );
+                MainActivity.info( "exception dismissing crypto dialog: " + ex );
               }
             }
           } );
         
         return dialog;
       default:
-        ListActivity.error( "NetworkActivity: unhandled dialog: " + which );
+        MainActivity.error( "NetworkActivity: unhandled dialog: " + which );
     }
     return null;
   }
@@ -370,11 +376,12 @@ public class NetworkActivity extends Activity {
   /* Creates the menu items */
   @Override
   public boolean onCreateOptionsMenu( final Menu menu ) {
-      MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
+      MenuItem item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
+      item.setIcon( android.R.drawable.ic_menu_save );
+      
+      item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
       item.setIcon( android.R.drawable.ic_menu_revert );
       
-      item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
-      item.setIcon( android.R.drawable.ic_menu_save );
       return true;
   }
 

@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -59,13 +60,13 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     setName( name + "-" + getName() );
     
     try {
-      ListActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
+      MainActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
       Process.setThreadPriority( THREAD_PRIORITY );
       
       subRun();      
     }
     catch ( InterruptedException ex ) {
-      ListActivity.info( name + " interrupted: " + ex );
+      MainActivity.info( name + " interrupted: " + ex );
     }
     catch ( final Exception ex ) {
       dbHelper.deathDialog(name, ex);
@@ -128,7 +129,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing progress dialog: " + ex );
+          MainActivity.info( "exception dismissing progress dialog: " + ex );
         }
         createProgressDialog( context );
       }
@@ -139,26 +140,26 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          ListActivity.info( "exception dismissing alert dialog: " + ex );
+          MainActivity.info( "exception dismissing alert dialog: " + ex );
         }
       }
     }
   }
   
   protected final String getUsername() {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    String username = prefs.getString( ListActivity.PREF_USERNAME, "" );
-    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
-      username = ListActivity.ANONYMOUS;
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
+    if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+      username = ListFragment.ANONYMOUS;
     }
     return username;
   }
   
   protected final String getPassword() {
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    String password = prefs.getString( ListActivity.PREF_PASSWORD, "" );
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    String password = prefs.getString( ListFragment.PREF_PASSWORD, "" );
     
-    if ( prefs.getBoolean( ListActivity.PREF_BE_ANONYMOUS, false) ) {
+    if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
       password = "";
     }
     return password;
@@ -170,13 +171,11 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
   protected final Status validateUserPass(final String username, final String password) {
     Status status = null;
     if ( "".equals( username ) ) {
-      // TODO: error
-      ListActivity.error( "username not defined" );
+      MainActivity.error( "username not defined" );
       status = Status.BAD_USERNAME;
     }
-    else if ( "".equals( password ) && ! ListActivity.ANONYMOUS.equals( username.toLowerCase() ) ) {
-      // TODO: error
-      ListActivity.error( "password not defined and username isn't 'anonymous'" );
+    else if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase() ) ) {
+      MainActivity.error( "password not defined and username isn't 'anonymous'" );
       status = Status.BAD_PASSWORD;
     }
     

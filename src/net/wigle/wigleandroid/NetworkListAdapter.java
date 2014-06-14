@@ -71,7 +71,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     }
     catch ( final IndexOutOfBoundsException ex ) {
       // yes, this happened to someone
-      ListActivity.info("index out of bounds: " + position + " ex: " + ex);
+      MainActivity.info("index out of bounds: " + position + " ex: " + ex);
       return row;
     }
     // info( "listing net: " + network.getBssid() );

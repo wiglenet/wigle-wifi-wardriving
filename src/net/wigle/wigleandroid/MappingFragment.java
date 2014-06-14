@@ -561,13 +561,15 @@ public final class MappingFragment extends Fragment {
         Network network = networkCache.get( bssid );
         if ( network == null ) {
           network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
-          networkCache.put( network.getBssid(), network );
-          // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
+          if ( network != null ) {
+            networkCache.put( network.getBssid(), network );
+            // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
 
-          final GeoPoint geoPoint = network.getGeoPoint();
-          final int newWifiForRun = 1;
-          final long newWifiForDB = 0;
-          WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);
+            final GeoPoint geoPoint = network.getGeoPoint();
+            final int newWifiForRun = 1;
+            final long newWifiForDB = 0;
+            WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);
+          }
         }
       }
 

@@ -11,7 +11,7 @@ public class QueryThread extends Thread {
   private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
   private final AtomicBoolean done = new AtomicBoolean( false );
   private final DatabaseHelper dbHelper;
-  
+
   public interface ResultHandler {
     public void handleRow( Cursor cursor );
     public void complete();
@@ -19,7 +19,7 @@ public class QueryThread extends Thread {
   public static class Request {
     private final String sql;
     private final ResultHandler handler;
-    
+
     public Request( final String sql, final ResultHandler handler ) {
       if ( sql == null ) {
         throw new IllegalArgumentException( "sql is null" );
@@ -31,16 +31,16 @@ public class QueryThread extends Thread {
       this.handler = handler;
     }
   }
-  
+
   public QueryThread( final DatabaseHelper dbHelper ) {
     this.dbHelper = dbHelper;
     setName( "query-" + getName() );
   }
-  
+
   public void setDone() {
     done.set( true );
   }
-  
+
   public void addToQueue( final Request request ) {
     try {
       queue.put( request );
@@ -49,7 +49,8 @@ public class QueryThread extends Thread {
       MainActivity.info( getName() + " interrupted" );
     }
   }
-  
+
+  @Override
   public void run() {
     while ( ! done.get() ) {
       try {
@@ -68,12 +69,15 @@ public class QueryThread extends Thread {
         }
       }
       catch ( InterruptedException ex ) {
-        MainActivity.info( getName() + " interrupted" );
+        MainActivity.info( getName() + " interrupted: " + ex);
+      }
+      catch ( IllegalStateException ex ) {
+        MainActivity.info( getName() + " illegal state ex: " + ex);
       }
       catch ( DBException ex ) {
-        dbHelper.deathDialog("query thread", ex);        
+        dbHelper.deathDialog("query thread", ex);
       }
     }
   }
-  
+
 }

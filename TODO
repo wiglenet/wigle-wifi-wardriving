@@ -46,7 +46,8 @@ on networkactivity record more observations on that network (site survey)
 
 --- 2.0 blockers ---
 move upload dialog to fragment for rotation happiness
-test csv dump and friends, pry move those dialogs to fragment
+test csv dump and friends move dialogs to fragment
+update translation from email
 
 --- done ---
 * 2.0 (?)

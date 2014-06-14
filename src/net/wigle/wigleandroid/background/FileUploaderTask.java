@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream;
 
 import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.R;
@@ -49,37 +49,38 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
   private final boolean justWriteFile;
   private boolean writeWholeDb;
   private boolean writeRunOnly;
-  
+
   private static final String COMMA = ",";
   private static final String NEWLINE = "\n";
-  
+
   private static class CountStats {
     int byteCount;
     int lineCount;
   }
-  
+
   public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
       final boolean justWriteFile ) {
-    
+
     super( context, dbHelper, "HttpUL" );
     if ( listener == null ) {
       throw new IllegalArgumentException( "listener is null" );
     }
-    
+
     this.listener = listener;
     this.justWriteFile = justWriteFile;
   }
-  
+
   public void setWriteWholeDb() {
     this.writeWholeDb = true;
   }
-  
+
   public void setWriteRunOnly() {
     this.writeRunOnly = true;
   }
-  
+
+  @Override
   public void subRun() {
-    try {      
+    try {
       if ( justWriteFile ) {
         justWriteFile();
       }
@@ -88,10 +89,10 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       }
     }
     catch ( final InterruptedException ex ) {
-      ListActivity.info( "file upload interrupted" );
+      MainActivity.info( "file upload interrupted" );
     }
     catch ( final Throwable throwable ) {
-      ListActivity.writeError( Thread.currentThread(), throwable, context );
+      MainActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "FileUploaderTask throwable: " + throwable, throwable );
     }
     finally {
@@ -99,7 +100,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       listener.transferComplete();
     }
   }
-  
+
   private void doRun() throws InterruptedException {
     final String username = getUsername();
     final String password = getPassword();
@@ -112,14 +113,14 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     // tell the gui thread
     sendBundledMessage( status.ordinal(), bundle );
   }
-  
+
   public static OutputStream getOutputStream(final Context context, final Bundle bundle, final Object[] fileFilename)
       throws IOException {
     final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
-    
+
     String openString = filename;
-    final boolean hasSD = ListActivity.hasSD();
+    final boolean hasSD = MainActivity.hasSD();
     File file = null;
     bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     if ( hasSD ) {
@@ -134,7 +135,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
       bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     }
-    
+
     final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
       : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
 
@@ -143,12 +144,12 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     fileFilename[1] = filename;
     return fos;
   }
-  
-  private Status doUpload( final String username, final String password, final Bundle bundle ) 
-      throws InterruptedException {    
-    
+
+  private Status doUpload( final String username, final String password, final Bundle bundle )
+      throws InterruptedException {
+
     Status status = Status.UNKNOWN;
-    
+
     try {
       final Object[] fileFilename = new Object[2];
       final OutputStream fos = getOutputStream( context, bundle, fileFilename );
@@ -157,13 +158,13 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
       // write file
       CountStats countStats = new CountStats();
-      long maxId = writeFile( fos, bundle, countStats );      
-      
+      long maxId = writeFile( fos, bundle, countStats );
+
       // don't upload empty files
       if ( countStats.lineCount == 0 && ! "bobzilla".equals(username) ) {
         return Status.EMPTY_FILE;
       }
-      
+
       // show on the UI
       sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
 
@@ -173,46 +174,46 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         final FileInputStream fin = context.openFileInput(filename);
         filesize = fin.available();
         fin.close();
-        // ListActivity.info("filesize: " + filesize);
+        // MainActivity.info("filesize: " + filesize);
       }
       if ( filesize <= 0 ) {
         filesize = countStats.byteCount; // as an upper bound
       }
 
       // send file
-      final boolean hasSD = ListActivity.hasSD();
-      final FileInputStream fis = hasSD ? new FileInputStream( file ) 
-        : context.openFileInput( filename ); 
+      final boolean hasSD = MainActivity.hasSD();
+      final FileInputStream fis = hasSD ? new FileInputStream( file )
+        : context.openFileInput( filename );
       final Map<String,String> params = new HashMap<String,String>();
-      
+
       params.put("observer", username);
       params.put("password", password);
-      final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-      if ( prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+      final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+      if ( prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
         params.put("donate","on");
       }
-      final String response = HttpFileUploader.upload( 
-        ListActivity.FILE_POST_URL, filename, "stumblefile", fis, 
+      final String response = HttpFileUploader.upload(
+          MainActivity.FILE_POST_URL, filename, "stumblefile", fis,
         params, context.getResources(), getHandler(), filesize, context );
 
       // as upload() is currently written: response can never be null. leave checks inplace anyhow. -uhtu
 
-      if ( ! prefs.getBoolean(ListActivity.PREF_DONATE, false) ) {
+      if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
         if ( response != null && response.indexOf("donate=Y") > 0 ) {
           final Editor editor = prefs.edit();
-          editor.putBoolean( ListActivity.PREF_DONATE, true );
+          editor.putBoolean( ListFragment.PREF_DONATE, true );
           editor.commit();
         }
       }
-      
+
       if ( response != null && response.indexOf("uploaded successfully") > 0 ) {
         status = Status.SUCCESS;
-        
-        // save in the prefs        
+
+        // save in the prefs
         final Editor editor = prefs.edit();
-        editor.putLong( ListActivity.PREF_DB_MARKER, maxId );
-        editor.putLong( ListActivity.PREF_MAX_DB, maxId );
-        editor.putLong( ListActivity.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
+        editor.putLong( ListFragment.PREF_DB_MARKER, maxId );
+        editor.putLong( ListFragment.PREF_MAX_DB, maxId );
+        editor.putLong( ListFragment.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
         editor.commit();
       }
       else if ( response != null && response.indexOf("does not match login") > 0 ) {
@@ -222,29 +223,29 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         String error = null;
         if ( response != null && response.trim().equals( "" ) ) {
           error = "no response from server";
-        } 
+        }
         else {
           error = "response: " + response;
         }
-        ListActivity.error( error );
+        MainActivity.error( error );
         bundle.putString( BackgroundGuiHandler.ERROR, error );
         status = Status.FAIL;
       }
-    } 
+    }
     catch ( final InterruptedException ex ) {
       throw ex;
     }
     catch ( final FileNotFoundException ex ) {
       ex.printStackTrace();
-      ListActivity.error( "file problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      MainActivity.error( "file problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "file problem: " + ex );
     }
     catch (ConnectException ex) {
       ex.printStackTrace();
-      ListActivity.error( "connect problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      MainActivity.error( "connect problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "connect problem: " + ex );
       if (! hasDataConnection(context)) {
@@ -253,8 +254,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     }
     catch (UnknownHostException ex) {
       ex.printStackTrace();
-      ListActivity.error( "dns problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      MainActivity.error( "dns problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "dns problem: " + ex );
       if (! hasDataConnection(context)) {
@@ -263,41 +264,41 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     }
     catch ( final IOException ex ) {
       ex.printStackTrace();
-      ListActivity.error( "io problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      MainActivity.error( "io problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
-      ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+      MainActivity.error( "ex problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
-    
+
     return status;
   }
-  
+
   public static boolean hasDataConnection(final Context context) {
-    final ConnectivityManager connMgr = 
+    final ConnectivityManager connMgr =
         (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
     final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
     final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
     if (wifi != null && wifi.isAvailable()) {
       return true;
-    } 
+    }
     if (mobile != null && mobile.isAvailable()) {
       return true;
     }
-    return false;    
+    return false;
   }
-  
+
   public Status justWriteFile() {
     Status status = null;
     final CountStats countStats = new CountStats();
     final Bundle bundle = new Bundle();
-    
+
     try {
       OutputStream fos = null;
       try {
@@ -314,41 +315,41 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       }
     }
     catch ( InterruptedException ex ) {
-      ListActivity.info("justWriteFile interrupted: " + ex);
+      MainActivity.info("justWriteFile interrupted: " + ex);
     }
     catch ( IOException ex ) {
       ex.printStackTrace();
-      ListActivity.error( "io problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      MainActivity.error( "io problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
     }
     catch ( final Exception ex ) {
       ex.printStackTrace();
-      ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      MainActivity.error( "ex problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
-        
+
     return status;
   }
-  
-  private long writeFile( final OutputStream fos, final Bundle bundle, final CountStats countStats ) 
+
+  private long writeFile( final OutputStream fos, final Bundle bundle, final CountStats countStats )
       throws IOException, NameNotFoundException, InterruptedException, DBException {
-    
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
+
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
     if ( writeWholeDb ) {
       maxId = 0;
     }
     else if ( writeRunOnly ) {
       // max id at startup
-      maxId = prefs.getLong( ListActivity.PREF_MAX_DB, 0L );
+      maxId = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
     }
-    ListActivity.info( "Writing file starting with observation id: " + maxId);
+    MainActivity.info( "Writing file starting with observation id: " + maxId);
     final Cursor cursor = dbHelper.locationIterator( maxId );
-    
+
     try {
       return writeFileWithCursor( fos, bundle, countStats, cursor );
     }
@@ -357,25 +358,25 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       cursor.close();
     }
   }
-  
-  private long writeFileWithCursor( final OutputStream fos, final Bundle bundle, final CountStats countStats, 
+
+  private long writeFileWithCursor( final OutputStream fos, final Bundle bundle, final CountStats countStats,
       final Cursor cursor ) throws IOException, NameNotFoundException, InterruptedException {
 
-    final SharedPreferences prefs = context.getSharedPreferences( ListActivity.SHARED_PREFS, 0);
-    long maxId = prefs.getLong( ListActivity.PREF_DB_MARKER, 0L );
-    
+    final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+
     final long start = System.currentTimeMillis();
     final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     countStats.lineCount = 0;
     final int total = cursor.getCount();
     long fileWriteMillis = 0;
     long netMillis = 0;
-    
+
     sendBundledMessage( Status.WRITING.ordinal(), bundle );
-    
+
     final PackageManager pm = context.getPackageManager();
     final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-    
+
     // name, version, header
     final String header = "WigleWifi-1.4"
         + ",appRelease=" + pi.versionName
@@ -385,17 +386,17 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         + ",display=" + android.os.Build.DISPLAY
         + ",board=" + android.os.Build.BOARD
         + ",brand=" + android.os.Build.BRAND
-        + "\n" 
+        + "\n"
         + "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
     writeFos( fos, header );
-    
+
     // assume header is all byte per char
     countStats.byteCount = header.length();
 
     if ( total > 0 ) {
       CharBuffer charBuffer = CharBuffer.allocate( 1024 );
       ByteBuffer byteBuffer = ByteBuffer.allocate( 1024 ); // this ensures hasArray() is true
-      final CharsetEncoder encoder = Charset.forName( ListActivity.ENCODING ).newEncoder();
+      final CharsetEncoder encoder = Charset.forName( MainActivity.ENCODING ).newEncoder();
       // don't stop when a goofy character is found
       encoder.onUnmappableCharacter( CodingErrorAction.REPLACE );
       final NumberFormat numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -424,18 +425,18 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         netMillis += System.currentTimeMillis() - netStart;
         if ( network == null ) {
           // weird condition, skipping
-          ListActivity.error("network not in database: " + bssid );
+          MainActivity.error("network not in database: " + bssid );
           continue;
         }
-        
+
         countStats.lineCount++;
         String ssid = network.getSsid();
         if ( ssid.indexOf( COMMA ) >= 0 ) {
           // comma isn't a legal ssid character, but just in case
-          ssid = ssid.replaceAll( COMMA, "_" ); 
+          ssid = ssid.replaceAll( COMMA, "_" );
         }
         // ListActivity.debug("writing network: " + ssid );
-        
+
         // reset the buffers
         charBuffer.clear();
         byteBuffer.clear();
@@ -443,7 +444,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         try {
           charBuffer.append( network.getBssid() );
           charBuffer.append( COMMA );
-          // ssid = "ronan stephens’s iMac";
+          // ssid can be unicode
           charBuffer.append( ssid );
           charBuffer.append( COMMA );
           charBuffer.append( network.getCapabilities() );
@@ -467,11 +468,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
           charBuffer.append( COMMA );
           singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
           charBuffer.append( COMMA );
-          charBuffer.append( network.getType().name() );          
+          charBuffer.append( network.getType().name() );
           charBuffer.append( NEWLINE );
         }
         catch ( BufferOverflowException ex ) {
-          ListActivity.info("buffer overflow: " + ex, ex );
+          MainActivity.info("buffer overflow: " + ex, ex );
           // double the buffer
           charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
           byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
@@ -479,7 +480,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
           cursor.moveToPrevious();
           continue;
         }
-        
+
         // tell the encoder to stop here and to start at the beginning
         charBuffer.flip();
 
@@ -490,11 +491,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
           encoder.flush( byteBuffer );
         }
         catch ( IllegalStateException ex ) {
-          ListActivity.error("exception flushing: " + ex, ex);
+          MainActivity.error("exception flushing: " + ex, ex);
           continue;
         }
-        // byteBuffer = encoder.encode( charBuffer );  (old way)          
-        
+        // byteBuffer = encoder.encode( charBuffer );  (old way)
+
         // figure out where in the byteBuffer to stop
         final int end = byteBuffer.position();
         final int offset = byteBuffer.arrayOffset();
@@ -503,8 +504,8 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
           // byteBuffer position is zero, and the limit and capacity are how long to write for.
         //  end = byteBuffer.limit();
         //}
-        
-        // ListActivity.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
+
+        // MainActivity.info("buffer: arrayOffset: " + byteBuffer.arrayOffset() + " limit: " + byteBuffer.limit()
         //     + " capacity: " + byteBuffer.capacity() + " pos: " + byteBuffer.position() + " end: " + end
         //     + " result: " + result );
         final long writeStart = System.currentTimeMillis();
@@ -515,44 +516,44 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
         // update UI
         final int percentDone = (countStats.lineCount * 1000) / total;
-        sendPercentTimesTen( percentDone, bundle );        
+        sendPercentTimesTen( percentDone, bundle );
       }
     }
-    
-    ListActivity.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
+
+    MainActivity.info("wrote file in: " + (System.currentTimeMillis() - start) + "ms. fileWriteMillis: "
         + fileWriteMillis + " netmillis: " + netMillis );
-    
+
     return maxId;
   }
-  
+
   public static void writeFos( final OutputStream fos, final String data ) throws IOException, UnsupportedEncodingException {
     if ( data != null ) {
-      fos.write( data.getBytes( ListActivity.ENCODING ) );
+      fos.write( data.getBytes( MainActivity.ENCODING ) );
     }
   }
-  
-  private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer, 
+
+  private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer,
       final CharBuffer charBuffer, final FieldPosition fp, final int number ) {
     stringBuffer.setLength( 0 );
     numberFormat.format( number, stringBuffer, fp );
     stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
     charBuffer.position( charBuffer.position() + stringBuffer.length() );
   }
-  
-  private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer, 
+
+  private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer,
       final CharBuffer charBuffer, final FieldPosition fp, final double number ) {
     stringBuffer.setLength( 0 );
     numberFormat.format( number, stringBuffer, fp );
     stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
     charBuffer.position( charBuffer.position() + stringBuffer.length() );
   }
-  
-  private void singleCopyDateFormat( final DateFormat dateFormat, final StringBuffer stringBuffer, 
+
+  private void singleCopyDateFormat( final DateFormat dateFormat, final StringBuffer stringBuffer,
       final CharBuffer charBuffer, final FieldPosition fp, final Date date ) {
     stringBuffer.setLength( 0 );
     dateFormat.format( date, stringBuffer, fp );
     stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
     charBuffer.position( charBuffer.position() + stringBuffer.length() );
   }
-   
+
 }

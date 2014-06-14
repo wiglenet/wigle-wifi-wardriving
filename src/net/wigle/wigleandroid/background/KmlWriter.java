@@ -8,11 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-
 import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
 import net.wigle.wigleandroid.MainActivity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -32,10 +31,11 @@ public class KmlWriter extends AbstractBackgroundTask {
     this.networks = (networks == null) ? null : new HashSet<String>( networks );        
   }
   
+  @SuppressLint("SimpleDateFormat")
   @Override
   protected void subRun() throws IOException {
     final Bundle bundle = new Bundle();
-    final boolean hasSD = ListActivity.hasSD();
+    final boolean hasSD = MainActivity.hasSD();
     if ( ! hasSD ) {
       return;
     }
@@ -47,7 +47,7 @@ public class KmlWriter extends AbstractBackgroundTask {
     final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".kml";
     String openString = filepath + filename;
-    ListActivity.info("openString: " + openString );
+    MainActivity.info("openString: " + openString );
     File file = new File( openString );
     if ( ! file.exists() && hasSD ) {
       file.createNewFile();
@@ -74,7 +74,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         else {
           int count = 0;
           for ( String network : networks ) {
-            // ListActivity.info( "network: " + network );
+            // MainActivity.info( "network: " + network );
             cursor = dbHelper.getSingleNetwork( network ); 
             writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
             cursor.close();
@@ -85,7 +85,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         status = Status.WRITE_SUCCESS;
       }
       catch ( final InterruptedException ex ) {
-        ListActivity.info("Writing Kml Interrupted: " + ex);
+        MainActivity.info("Writing Kml Interrupted: " + ex);
       }      
       catch ( DBException ex ) {
         dbHelper.deathDialog("Writing Kml", ex);
@@ -93,8 +93,8 @@ public class KmlWriter extends AbstractBackgroundTask {
       }
       catch ( final Exception ex ) {
         ex.printStackTrace();
-        ListActivity.error( "ex problem: " + ex, ex );
-        ListActivity.writeError( this, ex, context );
+        MainActivity.error( "ex problem: " + ex, ex );
+        MainActivity.writeError( this, ex, context );
         status = Status.EXCEPTION;
         bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
       }
@@ -111,7 +111,7 @@ public class KmlWriter extends AbstractBackgroundTask {
     
     bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
     bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-    ListActivity.info( "done with kml export" );
+    MainActivity.info( "done with kml export" );
     
     // status is null on interrupted
     if ( status != null ) {
@@ -149,7 +149,7 @@ public class KmlWriter extends AbstractBackgroundTask {
       }
       
       // not unicode. ha ha for them!
-      byte[] ssidFiltered = ssid.getBytes( ListActivity.ENCODING );
+      byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
       filterIllegalXml( ssidFiltered );
       
       FileUploaderTask.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
@@ -164,7 +164,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
       lineCount++;
       if ( (lineCount % 1000) == 0 ) {
-        ListActivity.info("lineCount: " + lineCount + " of " + totalCount );
+        MainActivity.info("lineCount: " + lineCount + " of " + totalCount );
       }
       
       // update UI

@@ -7,7 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 
 import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListActivity;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkType;
 import android.content.Context;
@@ -37,12 +37,12 @@ public class HttpDownloader extends AbstractBackgroundTask {
       
     }
     catch ( final InterruptedException ex ) {
-      ListActivity.info("Download Interrupted: " + ex);
+      MainActivity.info("Download Interrupted: " + ex);
     }      
     catch ( final Exception ex ) {
       ex.printStackTrace();
-      ListActivity.error( "ex problem: " + ex, ex );
-      ListActivity.writeError( this, ex, context );
+      MainActivity.error( "ex problem: " + ex, ex );
+      MainActivity.writeError( this, ex, context );
       status = Status.EXCEPTION;
       bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
     }
@@ -64,7 +64,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
     
     final boolean setBoundary = false;
     HttpURLConnection conn = HttpFileUploader.connect( 
-        ListActivity.OBSERVED_URL, context.getResources(), setBoundary );
+        MainActivity.OBSERVED_URL, context.getResources(), setBoundary );
     
     // Send POST output.
     final DataOutputStream printout = new DataOutputStream (conn.getOutputStream ());
@@ -100,7 +100,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
         }
         else {
           totalCount = Integer.parseInt(line.substring(COUNT_TAG.length()));
-          ListActivity.info("observed totalCount: " + totalCount);
+          MainActivity.info("observed totalCount: " + totalCount);
         }
       }
       if ( line.length() != 12 || line.startsWith( "<" ) ) {
@@ -117,7 +117,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
       }
       
       final String bssid = builder.toString();
-      // ListActivity.info("line: " + line + " bssid: " + bssid);
+      // MainActivity.info("line: " + line + " bssid: " + bssid);
       
       // do the insert      
       final String ssid = "";
@@ -131,7 +131,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
       
       lineCount++;
       if ( (lineCount % 1000) == 0 ) {
-        ListActivity.info("lineCount: " + lineCount + " of " + totalCount );
+        MainActivity.info("lineCount: " + lineCount + " of " + totalCount );
       }
       
       // update UI

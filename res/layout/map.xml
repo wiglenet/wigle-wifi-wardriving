@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mainlayout"
+    android:id="@+id/mainmaplayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
     android:orientation="horizontal" android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
@@ -33,6 +33,7 @@
 	
 	<LinearLayout
 	android:id="@+id/horizontalLine"
+	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
@@ -40,8 +41,9 @@
 
 	<RelativeLayout 
 		android:id="@+id/map_rl"
+		android:orientation="vertical"
 		android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-    </RelativeLayout>
+    android:layout_height="fill_parent"
+  />
 
 </LinearLayout>

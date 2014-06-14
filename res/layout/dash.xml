@@ -6,107 +6,24 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:id="@+id/mainlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
-    
-	<TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/newwifi"
-    android:textSize="48sp"
-    android:textColor="#AAEE50"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/runnets"
-    android:textSize="48sp"
-    android:textColor="#AAAA00"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/gpsstatus"
-    android:textSize="32sp"
-    android:textColor="#46AA00"
-    />
-    
+
+    <include layout="@layout/dashtop"/>
+
     <LinearLayout
-	android:id="@+id/horizontalLine"
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#A07070"
-	/> 
-	
-	<TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/currnets"
-    android:textSize="24sp"
+    android:orientation="vertical"  
+    android:id="@+id/horizontalLine"
+    android:layout_width="fill_parent"
+    android:layout_height="2dip"
+    android:background="#A07070"
     />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/newNetsSinceUpload"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/newcells"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/rundist"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/totaldist"
-    android:textSize="24sp"
-    />
-    
-	<TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/queuesize"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/dbNets"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/dbLocs"
-    android:textSize="24sp"
-    />
-    
-    <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/prevrundist"
-    android:textSize="24sp"
-    android:textColor="#909090"
-    />
-    
+
+    <include layout="@layout/dashbottom"/>
+
 </LinearLayout>
 </ScrollView>

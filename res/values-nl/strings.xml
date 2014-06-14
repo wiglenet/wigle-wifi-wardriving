@@ -134,7 +134,7 @@
     <string name="miles">mijl</string>
     <string name="m_short">m</string>
     <string name="meters">meter</string>
-    <string name="T">vt</string>
+    <string name="ft_short">vt</string>
     <string name="feet">voet</string>
     <string name="kmph">km/h</string>
     <string name="mph">mph</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">Bestand schrijven</string>
     <string name="status_nothing">Geen resultaat</string>
     <string name="status_empty">Er zijn geen nieuwe netwerken om te uploaden</string>
-    <string name="data_export_csv_run">Run exporteren naar een CSV-bestand</string>
+    <string name="data_export_csv">Run exporteren naar een CSV-bestand</string>
     <string name="data_export_csv_db">Database exporteren naar een CSV-bestand</string>
     <string name="data_export_kml_run">Run exporteren naar een KML-bestand</string>
     <string name="data_export_kml_db">Database exporteren naar een KML-bestand</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi herstart</string>
     <string name="wifi_restart_1">Waarschuwing, laatste Wi-Fi-scan is</string>
     <string name="wifi_restart_2">seconden geleden voltooid. Wi-Fi herstarten.</string>
-    <string name="use_WiGLE_tiles">Gebruik WiGLE OSM-tegels</string>
+    <string name="use_wigle_tiles">Gebruik WiGLE OSM-tegels</string>
 </resources>

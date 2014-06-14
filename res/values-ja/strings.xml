@@ -134,7 +134,7 @@
     <string name="miles">miles</string>
     <string name="m_short">m</string>
     <string name="meters">meters</string>
-    <string name="T">ft</string>
+    <string name="ft_short">ft</string>
     <string name="feet">feet</string>
     <string name="kmph">km/h</string>
     <string name="mph">mph</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">ファイルに出力中</string>
     <string name="status_nothing">処理なし</string>
     <string name="status_empty">ファイルは空です</string>
-    <string name="data_export_csv_run">走行をKMLファイルへ出力しますか?</string>
+    <string name="data_export_csv">走行をKMLファイルへ出力しますか?</string>
     <string name="data_export_csv_db">全DBをKML ファイルへ出力しますか?</string>
     <string name="data_export_kml_run">走行をKMLファイルへ出力しますか?</string>
     <string name="data_export_kml_db">全DBをKML ファイルへ出力しますか?</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi restarts</string>
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
-    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

@@ -134,7 +134,7 @@
     <string name="miles">마일</string>
     <string name="m_short">m</string>
     <string name="meters">m</string>
-    <string name="T">피트</string>
+    <string name="ft_short">피트</string>
     <string name="feet">피트</string>
     <string name="kmph">kmph</string>
     <string name="mph">mph</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">파일 쓰기</string>
     <string name="status_nothing">아무것도하지</string>
     <string name="status_empty">파일은 비어 될</string>
-    <string name="data_export_csv_run">CSV 파일을 실행 수출?</string>
+    <string name="data_export_csv">CSV 파일을 실행 수출?</string>
     <string name="data_export_csv_db">CSV 파일을 DB를 내보내기?</string>
     <string name="data_export_kml_run">KML 파일을 실행 수출?</string>
     <string name="data_export_kml_db">KML 파일을 DB를 내보내기?</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi restarts</string>
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
-    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

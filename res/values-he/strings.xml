@@ -134,7 +134,7 @@
     <string name="miles">מייל</string>
     <string name="m_short">מ</string>
     <string name="meters">מטר</string>
-    <string name="T">רגל</string>
+    <string name="ft_short">רגל</string>
     <string name="feet">מטר</string>
     <string name="kmph">kmph</string>
     <string name="mph">קמ&quot;ש</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">כתיבת קובץ</string>
     <string name="status_nothing">עושה שום דבר</string>
     <string name="status_empty">הקובץ יהיה ריק</string>
-    <string name="data_export_csv_run">ייצוא לרוץ קובץ CSV?</string>
+    <string name="data_export_csv">ייצוא לרוץ קובץ CSV?</string>
     <string name="data_export_csv_db">ייצוא DB לקובץ CSV?</string>
     <string name="data_export_kml_run">ייצוא לרוץ קובץ KML?</string>
     <string name="data_export_kml_db">ייצוא DB לקובץ KML?</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi restarts</string>
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
-    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

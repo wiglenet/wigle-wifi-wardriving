@@ -134,7 +134,7 @@
     <string name="miles">英里</string>
     <string name="m_short">米</string>
     <string name="meters">米</string>
-    <string name="T">英尺</string>
+    <string name="ft_short">英尺</string>
     <string name="feet">腳</string>
     <string name="kmph">kmph</string>
     <string name="mph">英里</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">寫入文件</string>
     <string name="status_nothing">無為</string>
     <string name="status_empty">文件將空</string>
-    <string name="data_export_csv_run">進出口運行 CSV文件？</string>
+    <string name="data_export_csv">進出口運行 CSV文件？</string>
     <string name="data_export_csv_db">數據庫導出為 CSV文件？</string>
     <string name="data_export_kml_run">進出口運行 KML文件？</string>
     <string name="data_export_kml_db">數據庫導出為 KML文件？</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi restarts</string>
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
-    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

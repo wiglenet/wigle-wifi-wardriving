@@ -134,7 +134,7 @@
     <string name="miles">мили</string>
     <string name="m_short">метр</string>
     <string name="meters">метров</string>
-    <string name="T">фут</string>
+    <string name="ft_short">фут</string>
     <string name="feet">Футов</string>
     <string name="kmph">км в час</string>
     <string name="mph">миль в ч</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">Запись файла</string>
     <string name="status_nothing">Ничего не делать</string>
     <string name="status_empty">Файл будет пустым</string>
-    <string name="data_export_csv_run">Экспорт пробега в файл CSV?</string>
+    <string name="data_export_csv">Экспорт пробега в файл CSV?</string>
     <string name="data_export_csv_db">Экспорт БД в файл CSV?</string>
     <string name="data_export_kml_run">Экспорт пробега в файл KML?</string>
     <string name="data_export_kml_db">Экспорт БД в файл KML?</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">Wi-Fi restarts</string>
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
-    <string name="use_WiGLE_tiles">Use WiGLE OSM tiles</string>
+    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

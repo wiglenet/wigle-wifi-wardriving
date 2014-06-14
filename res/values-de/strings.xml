@@ -134,7 +134,7 @@
     <string name="miles">Meilen</string>
     <string name="m_short">m</string>
     <string name="meters">Meter</string>
-    <string name="T">ft</string>
+    <string name="ft_short">ft</string>
     <string name="feet">Fuß</string>
     <string name="kmph">km/h</string>
     <string name="mph">m/h</string>
@@ -207,7 +207,7 @@
     <string name="status_writing">Speichern der Datei</string>
     <string name="status_nothing">nichts zu tun</string>
     <string name="status_empty">Datei scheint leer</string>
-    <string name="data_export_csv_run">Export in CSV-Datei ausführen?</string>
+    <string name="data_export_csv">Export in CSV-Datei ausführen?</string>
     <string name="data_export_csv_db">Exportiere DB in CSV-Datei?</string>
     <string name="data_export_kml_run">Export in KML-Datei ausführen?</string>
     <string name="data_export_kml_db">Exportiere DB in KML-Datei?</string>
@@ -248,5 +248,5 @@
     <string name="speech_wifi_restart">WLAN neustartet</string>
     <string name="wifi_restart_1">Achtung, neueste WLAN-Scan abgeschlossen Vor</string>
     <string name="wifi_restart_2">Sekunden. Neustarten WLAN.</string>
-    <string name="use_WiGLE_tiles">Benutz WiGLE OSM-Fliesen</string>
+    <string name="use_wigle_tiles">Benutz WiGLE OSM-Fliesen</string>
 </resources>

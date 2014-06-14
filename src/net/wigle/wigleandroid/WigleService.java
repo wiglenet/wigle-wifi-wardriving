@@ -14,10 +14,10 @@ import android.os.IBinder;
 
 public final class WigleService extends Service {
   private static final int NOTIFICATION_ID = 1;
-  
+
   private GuardThread guardThread;
-  private AtomicBoolean done = new AtomicBoolean( false );
-  
+  private final AtomicBoolean done = new AtomicBoolean( false );
+
   // copied from javadoc
   private static final Class<?>[] mSetForegroundSignature = new Class[] {
     boolean.class};
@@ -32,14 +32,15 @@ public final class WigleService extends Service {
   private Method mSetForeground;
   private Method mStartForeground;
   private Method mStopForeground;
-  private Object[] mSetForegroundArgs = new Object[1];
-  private Object[] mStartForegroundArgs = new Object[2];
-  private Object[] mStopForegroundArgs = new Object[1];
-  
+  private final Object[] mSetForegroundArgs = new Object[1];
+  private final Object[] mStartForegroundArgs = new Object[2];
+  private final Object[] mStopForegroundArgs = new Object[1];
+
   private class GuardThread extends Thread {
-    public GuardThread() {      
+    public GuardThread() {
     }
-    
+
+    @Override
     public void run() {
       Thread.currentThread().setName( "GuardThread-" + Thread.currentThread().getName() );
       while ( ! done.get() ) {
@@ -47,9 +48,9 @@ public final class WigleService extends Service {
         setupNotification();
       }
       MainActivity.info("GuardThread done");
-    }    
+    }
   }
-  
+
   private void setDone() {
     done.set( true );
     guardThread.interrupt();
@@ -60,7 +61,7 @@ public final class WigleService extends Service {
     MainActivity.info( "service: onbind. intent: " + intent );
     return null;
   }
-  
+
   @Override
   public void onRebind( final Intent intent ) {
     MainActivity.info( "service: onRebind. intent: " + intent );
@@ -78,7 +79,7 @@ public final class WigleService extends Service {
   @Override
   public void onCreate() {
     MainActivity.info( "service: onCreate" );
-    
+
     notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
     try {
         mStartForeground = getClass().getMethod("startForeground",
@@ -88,7 +89,7 @@ public final class WigleService extends Service {
     } catch (NoSuchMethodException e) {
         // Running on an older platform.
         mStartForeground = mStopForeground = null;
-    }    
+    }
     try {
         mSetForeground = getClass().getMethod("setForeground",
               mSetForegroundSignature);
@@ -98,13 +99,13 @@ public final class WigleService extends Service {
     }
 
     setupNotification();
-    
+
     // don't use guard thread
     guardThread = new GuardThread();
     guardThread.start();
     super.onCreate();
   }
-  
+
   @Override
   public void onDestroy() {
     MainActivity.info( "service: onDestroy" );
@@ -113,13 +114,13 @@ public final class WigleService extends Service {
     setDone();
     super.onDestroy();
   }
-  
+
   @Override
   public void onLowMemory() {
     super.onLowMemory();
     MainActivity.info( "service: onLowMemory" );
   }
-  
+
   //This is the old onStart method that will be called on the pre-2.0
   //platform.  On 2.0 or later we override onStartCommand() so this
   //method will not be called.
@@ -129,6 +130,7 @@ public final class WigleService extends Service {
     handleCommand( intent );
   }
 
+  @Override
   public int onStartCommand( Intent intent, int flags, int startId ) {
     MainActivity.info( "service: onStartCommand" );
     handleCommand( intent );
@@ -137,7 +139,7 @@ public final class WigleService extends Service {
     final int START_STICKY = 1;
     return START_STICKY;
   }
-  
+
   private void handleCommand( Intent intent ) {
     MainActivity.info( "service: handleCommand: intent: " + intent );
   }
@@ -145,7 +147,8 @@ public final class WigleService extends Service {
   private void shutdownNotification() {
     stopForegroundCompat( NOTIFICATION_ID );
   }
-  
+
+  @SuppressWarnings("deprecation")
   private void setupNotification() {
     if ( ! done.get() ) {
       final int icon = R.drawable.wiglewifi;
@@ -153,7 +156,7 @@ public final class WigleService extends Service {
       final String title = "Wigle Wifi Service";
       final Notification notification = new Notification( icon, title, when );
       notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-  
+
       final Context context = getApplicationContext();
       final Intent notificationIntent = new Intent( this, MainActivity.class );
       final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
@@ -162,16 +165,16 @@ public final class WigleService extends Service {
       if ( dbNets > 0 ) {
         text = "Run: " + ListFragment.lameStatic.runNets
           + "  New: " + ListFragment.lameStatic.newNets + "  DB: " + dbNets;
-      }      
+      }
       if (! MainActivity.isScanning(context)) {
         text = "(Scanning Turned Off) " + text;
       }
       notification.setLatestEventInfo( context, title, text, contentIntent );
-      
+
       startForegroundCompat( NOTIFICATION_ID, notification );
     }
   }
-  
+
   void invokeMethod(Method method, Object[] args) {
     try {
         method.invoke(this, args);
@@ -183,7 +186,7 @@ public final class WigleService extends Service {
       MainActivity.warn("Unable to invoke method", e);
     }
   }
-  
+
   /**
    * This is a wrapper around the new startForeground method, using the older
    * APIs if it is not available.
@@ -221,5 +224,5 @@ public final class WigleService extends Service {
     mSetForegroundArgs[0] = Boolean.FALSE;
     invokeMethod(mSetForeground, mSetForegroundArgs);
   }
-  
+
 }

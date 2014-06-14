@@ -32,6 +32,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.R;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -114,6 +115,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     sendBundledMessage( status.ordinal(), bundle );
   }
 
+  @SuppressLint("SimpleDateFormat")
   public static OutputStream getOutputStream(final Context context, final Bundle bundle, final Object[] fileFilename)
       throws IOException {
     final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -136,6 +138,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
       bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     }
 
+    @SuppressWarnings({ "deprecation", "resource" })
     final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
       : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
 
@@ -359,6 +362,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     }
   }
 
+  @SuppressLint("SimpleDateFormat")
   private long writeFileWithCursor( final OutputStream fos, final Bundle bundle, final CountStats countStats,
       final Cursor cursor ) throws IOException, NameNotFoundException, InterruptedException {
 

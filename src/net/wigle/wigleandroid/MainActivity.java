@@ -22,7 +22,6 @@ import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
-import net.wigle.wigleandroid.listener.PhoneStateFactory;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -679,6 +678,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
    * @param name the file name to write out
    * @return the uri of a file containing resid's resource
    */
+  @SuppressWarnings("deprecation")
   private static Uri resToFile( final Context context, final int resid, final String name ) throws IOException {
       // throw it in our bag of fun.
       String openString = name;
@@ -914,11 +914,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
     TelephonyManager tele = (TelephonyManager) getSystemService( Context.TELEPHONY_SERVICE );
     if ( tele != null && state.phoneState == null ) {
-      state.phoneState = PhoneStateFactory.createPhoneState();
+      state.phoneState = new PhoneState();
       final int signal_strengths = 256;
       try {
         tele.listen( state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
-          | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTH | signal_strengths );
+          | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTHS | signal_strengths );
       }
       catch (SecurityException ex) {
         info("cannot get call state, will play audio over any telephone calls: " + ex);
@@ -998,6 +998,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   private void setupWifi() {
     // warn about turning off network notification
+    @SuppressWarnings("deprecation")
     final String notifOn = Settings.Secure.getString(getContentResolver(),
         Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON );
     if ( notifOn != null && "1".equals( notifOn ) && state.wifiReceiver == null ) {

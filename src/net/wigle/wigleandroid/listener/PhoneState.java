@@ -4,6 +4,7 @@ import net.wigle.wigleandroid.MainActivity;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
+import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 
@@ -11,7 +12,7 @@ public class PhoneState extends PhoneStateListener {
   private boolean isPhoneActive = false;
   protected int strength = 0;
   private ServiceState serviceState;
-  
+
   @Override
   public void onCallStateChanged( int state, String incomingNumber ) {
     switch ( state ) {
@@ -28,21 +29,31 @@ public class PhoneState extends PhoneStateListener {
         MainActivity.info( "unhandled call state: " + state );
     }
   }
-  
+
   @Override
   public void onServiceStateChanged(ServiceState serviceState) {
     // MainActivity.info("serviceState: " + serviceState);
     this.serviceState = serviceState;
   }
-  
+
+  @Override
+  public void onSignalStrengthsChanged (SignalStrength signalStrength) {
+    // ListActivity.info("signalStrength: " + signalStrength);
+    if (signalStrength.isGsm()) {
+      strength = signalStrength.getGsmSignalStrength();
+    }
+    else {
+      strength = signalStrength.getCdmaDbm();
+    }
+  }
+
   @Override
   public void onSignalStrengthChanged(final int asu) {
-    // MainActivity.info("strength: " + asu);
-    strength = asu;
+    // do nothing
   }
-  
+
   @Override
-  public void onCellLocationChanged(CellLocation cellLoc){  
+  public void onCellLocationChanged(CellLocation cellLoc){
     if ( cellLoc.getClass().getSimpleName().equals("CdmaCellLocation") ) {
       MainActivity.info("cell location changed: cdma: " + cellLoc);
     }
@@ -52,15 +63,15 @@ public class PhoneState extends PhoneStateListener {
       MainActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());
     }
   }
-  
+
   public boolean isPhoneActive() {
     return isPhoneActive;
   }
-  
+
   public int getStrength() {
     return strength;
   }
-  
+
   public ServiceState getServiceState() {
     return serviceState;
   }

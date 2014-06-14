@@ -53,16 +53,16 @@ public final class DatabaseHelper extends Thread {
   private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
   private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
   private static final Object TRANS_LOCK = new Object();
-  
+
   private static final long QUEUE_CULL_TIMEOUT = 10000L;
   private long prevQueueCullTime = 0L;
   private long prevPendingQueueCullTime = 0L;
-  
+
   private SQLiteStatement insertNetwork;
   private SQLiteStatement insertLocation;
   private SQLiteStatement updateNetwork;
   private SQLiteStatement updateNetworkMetadata;
-  
+
   public static final String NETWORK_TABLE = "network";
   private static final String NETWORK_CREATE =
     "create table " + NETWORK_TABLE + " ( "
@@ -78,7 +78,7 @@ public final class DatabaseHelper extends Thread {
     + "bestlat double not null default 0,"
     + "bestlon double not null default 0"
     + ")";
-  
+
   public static final String LOCATION_TABLE = "location";
   private static final String LOCATION_CREATE =
     "create table " + LOCATION_TABLE + " ( "
@@ -91,9 +91,9 @@ public final class DatabaseHelper extends Thread {
     + "accuracy float not null,"
     + "time long not null"
     + ")";
-  
+
   private SQLiteDatabase db;
-  
+
   private static final int MAX_QUEUE = 512;
   private static final int MAX_DRAIN = 512; // seems to work fine slurping the whole darn thing
   private static final String ERROR = "error";
@@ -106,32 +106,32 @@ public final class DatabaseHelper extends Thread {
   private final AtomicLong locationCount = new AtomicLong();
   private final AtomicLong newNetworkCount = new AtomicLong();
   private final AtomicLong newWifiCount = new AtomicLong();
-  private final AtomicLong newCellCount = new AtomicLong();  
+  private final AtomicLong newCellCount = new AtomicLong();
   private final QueryThread queryThread;
 
   private Location lastLoc = null;
   private long lastLocWhen = 0L;
   private final DeathHandler deathHandler;
   private final SharedPreferences prefs;
-  
+
   /** used in private addObservation */
-  private final ConcurrentLinkedHashMap<String,CachedLocation> previousWrittenLocationsCache = 
+  private final ConcurrentLinkedHashMap<String,CachedLocation> previousWrittenLocationsCache =
     new ConcurrentLinkedHashMap<String,CachedLocation>( 64 );
-  
+
   private final static class CachedLocation {
     public Location location;
     public int bestlevel;
     public double bestlat;
     public double bestlon;
   }
-  
+
   /** class for queueing updates to the database */
   final static class DBUpdate {
     public final Network network;
     public final int level;
     public final Location location;
     public final boolean newForRun;
-    
+
     public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun ) {
       this.network = network;
       this.level = level;
@@ -155,38 +155,38 @@ public final class DatabaseHelper extends Thread {
     }
   }
 
-  public DatabaseHelper( final Context context ) {    
+  public DatabaseHelper( final Context context ) {
     this.context = context.getApplicationContext();
     this.prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     setName("dbworker-" + getName());
-    this.deathHandler = new DeathHandler(); 
+    this.deathHandler = new DeathHandler();
 
     queryThread = new QueryThread( this );
     queryThread.start();
   }
-  
+
   public SQLiteDatabase getDB() throws DBException {
     checkDB();
     return db;
   }
-  
+
   public void addToQueue( QueryThread.Request request ) {
     queryThread.addToQueue( request );
   }
-  
-  private static class DeathHandler extends Handler {    
+
+  private static class DeathHandler extends Handler {
     private boolean fired = false;
-    
+
     public DeathHandler() {
     }
-    
+
     @Override
     public void handleMessage( final Message msg ) {
       if ( fired ) {
         return;
       }
       fired = true;
-      
+
       final Bundle bundle = msg.peekData();
       String error = "unknown";
       if ( bundle == null ) {
@@ -202,19 +202,19 @@ public final class DatabaseHelper extends Thread {
       mainActivity.startActivity( errorReportIntent );
     }
   }
-  
+
   public int getQueueSize() {
 		return queue.size();
 	}
-  
+
   @Override
   public void run() {
     try {
       MainActivity.info( "starting db thread" );
-      
+
       MainActivity.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
       Process.setThreadPriority( DB_PRIORITY );
-      
+
       try {
         // keep checking done, these counts take a while
         if ( ! done.get() ) {
@@ -223,17 +223,17 @@ public final class DatabaseHelper extends Thread {
         if ( ! done.get() ) {
           getLocationCountFromDB();
         }
-//        if ( ! done.get() ) {        
+//        if ( ! done.get() ) {
 //          MainActivity.info("gsm count: " + getNetworkCountFromDB(NetworkType.GSM));
 //        }
-//        if ( ! done.get() ) {        
+//        if ( ! done.get() ) {
 //          MainActivity.info("cdma count: " + getNetworkCountFromDB(NetworkType.CDMA));
 //        }
       }
       catch ( DBException ex ) {
         deathDialog( "getting counts from DB", ex );
       }
-      
+
       final List<DBUpdate> drain = new ArrayList<DBUpdate>();
       while ( ! done.get() ) {
         try {
@@ -241,17 +241,17 @@ public final class DatabaseHelper extends Thread {
           drain.clear();
           drain.add( queue.take() );
           final long startTime = System.currentTimeMillis();
-          
+
           // give other thread some time
           Thread.yield();
-          
+
           // now that we've taken care of the one, see if there's more we can do in this transaction
           if ( MAX_DRAIN > 1 ) {
             // try to drain some more
             queue.drainTo( drain, MAX_DRAIN - 1 );
           }
           final int drainSize = drain.size();
-          
+
           int countdown = 10;
           while ( countdown > 0 && ! done.get() ) {
             // doubt this will help the exclusive lock problems, but trying anyway
@@ -273,11 +273,11 @@ public final class DatabaseHelper extends Thread {
                   // give up
                   throw ex;
                 }
-                MainActivity.sleep(100L);                
+                MainActivity.sleep(100L);
               }
             }
           }
-          
+
           final long delay = System.currentTimeMillis() - startTime;
           if ( delay > 1000L || ListFragment.DEBUG ) {
             MainActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
@@ -321,10 +321,10 @@ public final class DatabaseHelper extends Thread {
       MainActivity.writeError( Thread.currentThread(), throwable, context );
       throw new RuntimeException( "DatabaseHelper throwable: " + throwable, throwable );
     }
-    
+
     MainActivity.info("db worker thread shutting down");
   }
-  
+
   public void deathDialog( String message, Exception ex ) {
     // send message to the handler that will get this dialog on the activity thread
     MainActivity.error( "db exception. " + message + ": " + ex, ex );
@@ -337,10 +337,10 @@ public final class DatabaseHelper extends Thread {
     msg.setData(bundle);
     deathHandler.sendMessage(msg);
   }
-  
+
   private void open() {
     // if(true) throw new SQLiteException("meat puppets");
-    
+
     String dbFilename = DATABASE_NAME;
     final boolean hasSD = MainActivity.hasSD();
     if ( hasSD ) {
@@ -356,14 +356,14 @@ public final class DatabaseHelper extends Thread {
       doCreateLocation = true;
     }
     MainActivity.info("opening: " + dbFilename );
-    
+
     if ( hasSD ) {
       db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
     }
-    else {      
+    else {
       db = context.openOrCreateDatabase( dbFilename, MAX_PRIORITY, null );
     }
-    
+
     try {
       db.rawQuery( "SELECT count(*) FROM network", (String[]) null ).close();
     }
@@ -371,7 +371,7 @@ public final class DatabaseHelper extends Thread {
       MainActivity.info("exception selecting from network, try to create. ex: " + ex );
       doCreateNetwork = true;
     }
-    
+
     try {
       db.rawQuery( "SELECT count(*) FROM location", (String[]) null ).close();
     }
@@ -379,7 +379,7 @@ public final class DatabaseHelper extends Thread {
       MainActivity.info("exception selecting from location, try to create. ex: " + ex );
       doCreateLocation = true;
     }
-    
+
     if ( doCreateNetwork ) {
       MainActivity.info( "creating network table" );
       try {
@@ -397,7 +397,7 @@ public final class DatabaseHelper extends Thread {
         MainActivity.error( "sqlite exception: " + ex, ex );
       }
     }
-    
+
     if ( doCreateLocation ) {
       MainActivity.info( "creating location table" );
       try {
@@ -411,19 +411,19 @@ public final class DatabaseHelper extends Thread {
         MainActivity.error( "sqlite exception: " + ex, ex );
       }
     }
-    
+
     // VACUUM turned off, this takes a long long time (20 min), and has little effect since we're not using DELETE
     // MainActivity.info("Vacuuming db");
     // db.execSQL( "VACUUM" );
     // MainActivity.info("Vacuuming done");
-    
+
     // we don't need to know how many we wrote
     db.execSQL( "PRAGMA count_changes = false" );
     // keep transactions in memory until committed
     db.execSQL( "PRAGMA temp_store = MEMORY" );
     // keep around the journal file, don't create and delete a ton of times
     db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null ).close();
-    
+
     MainActivity.info( "database version: " + db.getVersion() );
     if ( db.getVersion() == 0 ) {
       MainActivity.info("upgrading db from 0 to 1");
@@ -453,24 +453,24 @@ public final class DatabaseHelper extends Thread {
         }
       }
     }
-    
+
     // drop index, was never publically released
     db.execSQL("DROP INDEX IF EXISTS type");
-    
+
     // compile statements
     insertNetwork = db.compileStatement( "INSERT INTO network"
         + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon) VALUES (?,?,?,?,?,?,?,?,?,?,?)" );
-    
+
     insertLocation = db.compileStatement( "INSERT INTO location"
         + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
-    
+
     updateNetwork = db.compileStatement( "UPDATE network SET"
         + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
-    
+
     updateNetworkMetadata = db.compileStatement( "UPDATE network SET"
         + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ? WHERE bssid = ?" );
   }
-  
+
   /**
    * close db, shut down thread
    */
@@ -486,7 +486,7 @@ public final class DatabaseHelper extends Thread {
       countdown--;
       this.interrupt();
     }
-    
+
     countdown = 50;
     while ( db != null && db.isOpen() && countdown > 0 ) {
       try {
@@ -514,7 +514,7 @@ public final class DatabaseHelper extends Thread {
       }
     }
   }
-  
+
   public synchronized void checkDB() throws DBException {
     if ( db == null || ! db.isOpen() ) {
       MainActivity.info( "re-opening db in checkDB" );
@@ -526,23 +526,23 @@ public final class DatabaseHelper extends Thread {
       }
     }
   }
-  
+
   public void blockingAddObservation( final Network network, final Location location, final boolean newForRun )
       throws InterruptedException {
-    
+
     final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun );
-    queue.put(update);    
+    queue.put(update);
   }
-  
+
   public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
     return addObservation( network, network.getLevel(), location, newForRun );
   }
-  
-  private boolean addObservation( final Network network, final int level, final Location location, 
+
+  private boolean addObservation( final Network network, final int level, final Location location,
       final boolean newForRun ) {
-    
+
     final DBUpdate update = new DBUpdate( network, level, location, newForRun );
-    
+
     // data is lost if queue is full!
     boolean added = queue.offer( update );
     if ( ! added ) {
@@ -563,24 +563,25 @@ public final class DatabaseHelper extends Thread {
         }
         prevQueueCullTime = System.currentTimeMillis();
       }
-      
+
     }
     return added;
   }
-  
+
+  @SuppressWarnings("deprecation")
   private void addObservation( final DBUpdate update, final int drainSize ) throws DBException {
     checkDB();
     if (insertNetwork == null || insertLocation == null
         || updateNetwork == null || updateNetworkMetadata == null) {
-      
+
       MainActivity.warn("A stored procedure is null, not adding observation");
       return;
     }
     final Network network = update.network;
     final Location location = update.location;
     final String bssid = network.getBssid();
-    final String[] bssidArgs = new String[]{ bssid }; 
-    
+    final String[] bssidArgs = new String[]{ bssid };
+
     long lasttime = 0;
     double lastlat = 0;
     double lastlon = 0;
@@ -588,7 +589,7 @@ public final class DatabaseHelper extends Thread {
     double bestlat = 0;
     double bestlon = 0;
     boolean isNew = false;
-    
+
     // first try cache
     final CachedLocation prevWrittenLocation = previousWrittenLocationsCache.get( bssid );
     if ( prevWrittenLocation != null ) {
@@ -619,16 +620,16 @@ public final class DatabaseHelper extends Thread {
         insertNetwork.bindLong( 9, network.getLevel() );
         insertNetwork.bindDouble( 10, location.getLatitude() );
         insertNetwork.bindDouble( 11, location.getLongitude() );
-        
+
         start = System.currentTimeMillis();
         // INSERT
         insertNetwork.execute();
         logTime( start, "db network inserted: " + bssid + " drainSize: " + drainSize );
-        
+
         // update the count
         networkCount.incrementAndGet();
         isNew = true;
-        
+
         // to make sure this new network's location is written
         // don't update stack lasttime,lastlat,lastlon variables
       }
@@ -650,7 +651,7 @@ public final class DatabaseHelper extends Thread {
         MainActivity.info("the weird close-cursor exception: " + ex );
       }
     }
-    
+
     if ( isNew ) {
       newNetworkCount.incrementAndGet();
       if ( NetworkType.WIFI.equals( network.getType() ) ) {
@@ -660,26 +661,26 @@ public final class DatabaseHelper extends Thread {
         newCellCount.incrementAndGet();
       }
     }
-    
+
     final boolean fastMode = isFastMode();
-    
+
     final long now = System.currentTimeMillis();
     final double latDiff = Math.abs(lastlat - location.getLatitude());
     final double lonDiff = Math.abs(lastlon - location.getLongitude());
     final boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
     final boolean mediumChange = latDiff > MEDIUM_LATLON_CHANGE || lonDiff > MEDIUM_LATLON_CHANGE;
     final boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
-    // MainActivity.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid() 
-    //    + " lastlat: " + lastlat + " lat: " + location.getLatitude() 
+    // MainActivity.info( "lasttime: " + lasttime + " now: " + now + " ssid: " + network.getSsid()
+    //    + " lastlat: " + lastlat + " lat: " + location.getLatitude()
     //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
     final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
     final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange);
-    
+
     if ( ListFragment.DEBUG ) {
       // do lots of inserts when debug is on
       isNew = true;
     }
-    
+
     final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
         && location.getAltitude() == 0 && location.getAccuracy() == 0
         && update.level == 0;
@@ -703,7 +704,7 @@ public final class DatabaseHelper extends Thread {
       // INSERT
       insertLocation.execute();
       logTime( start, "db location inserted: " + bssid + " drainSize: " + drainSize );
-      
+
       // update the count
       locationCount.incrementAndGet();
       // update the cache
@@ -713,7 +714,7 @@ public final class DatabaseHelper extends Thread {
       cached.bestlat = location.getLatitude();
       cached.bestlon = location.getLongitude();
       previousWrittenLocationsCache.put( bssid, cached );
-      
+
       if ( ! isNew ) {
         // update the network with the lasttime,lastlat,lastlon
         updateNetwork.bindLong( 1, location.getTime() );
@@ -731,7 +732,7 @@ public final class DatabaseHelper extends Thread {
         updateNetwork.execute();
         logTime( start, "db network updated" );
 
-        
+
         boolean newBest = bestlevel == 0 || update.level > bestlevel;
         // MainActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
         if (newBest) {
@@ -739,7 +740,7 @@ public final class DatabaseHelper extends Thread {
           bestlat = location.getLatitude();
           bestlon = location.getLongitude();
         }
-        
+
         if (smallLocDelay || newBest) {
           // MainActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
           updateNetworkMetadata.bindLong( 1, bestlevel );
@@ -749,7 +750,7 @@ public final class DatabaseHelper extends Thread {
           updateNetworkMetadata.bindLong( 5, network.getFrequency() );
           updateNetworkMetadata.bindString( 6, network.getCapabilities() );
           updateNetworkMetadata.bindString( 7, bssid );
-          
+
           start = System.currentTimeMillis();
           updateNetworkMetadata.execute();
           logTime( start, "db network metadata updated" );
@@ -762,21 +763,21 @@ public final class DatabaseHelper extends Thread {
   }
 
 
-  /* 
+  /*
    * GPS location interpolation strategy:
-   * 
+   *
    *  . keep track of last seen GPS location, either on location updates,
    *    or when we lose a fix (the current approach)
    *    we record both the location, and when the sample was taken.
-   * 
-   *  . when we do not have a location, keep a "pending" list of observations, 
+   *
+   *  . when we do not have a location, keep a "pending" list of observations,
    *    by recording the network information, and a timestamp.
    *
-   *  . when we regain a GPS fix, perform two linear interpolations, 
-   *    one for lat and one for lon, based on the time between the lost and 
+   *  . when we regain a GPS fix, perform two linear interpolations,
+   *    one for lat and one for lon, based on the time between the lost and
    *    regained:
    *
-   * 
+   *
    *   lat
    *    | L
    *    |    ?1
@@ -784,33 +785,33 @@ public final class DatabaseHelper extends Thread {
    *    |        F
    *    +--------- lon
    *
-   *   lost gps at location L (time t0), found gps at location F (time t1), 
-   *   where are "?1" and "?2" at? 
-   * 
+   *   lost gps at location L (time t0), found gps at location F (time t1),
+   *   where are "?1" and "?2" at?
+   *
    *   (t is the time we're interploating for, X is lat/lon):
    *      ?.X = L.X + ( t - t0 ) ( ( F.X - L.X ) / ( t1 - t0 ) )
-   * 
-   *   we know when all four points were sampled, so we can make a broad 
-   *   (i.e. bad) assumption that we moved from L to F at a constant rate 
+   *
+   *   we know when all four points were sampled, so we can make a broad
+   *   (i.e. bad) assumption that we moved from L to F at a constant rate
    *   and along a linear path, and fill in the blanks.
-   * 
-   *   this approach can be improved (perhaps) with inertial data from 
+   *
+   *   this approach can be improved (perhaps) with inertial data from
    *   the accelerometer.
    *
-   *   downsides: . this only interpolates, no extrapolation for early 
+   *   downsides: . this only interpolates, no extrapolation for early
    *                observations before a GPS fix, or late observations after
-   *                a loss but before location is found again. it is no more 
-   *                lossy than previous behavior, which discarded these 
+   *                a loss but before location is found again. it is no more
+   *                lossy than previous behavior, which discarded these
    *                observations entirely.
-   *              . in-memory queue, so we're tossing pending observations if 
+   *              . in-memory queue, so we're tossing pending observations if
    *                the app lifecycles.
    *              . still subject to a "hotel-lobby" effect, where you enter and
-   *                exit a large gps-occluded zone via the same door, which 
+   *                exit a large gps-occluded zone via the same door, which
    *                degenerates to a point observation.
    */
 
-  /** 
-   * mark the last known location where we had a gps fix, when losing it. 
+  /**
+   * mark the last known location where we had a gps fix, when losing it.
    * you can call this all the time, or just on transitions.
    * call order should be lastLocation() -&gt; 0 or more pendingObservation()  -&gt; recoverLocations()
    * @param loc the location we last saw a gps at, assumed to be "now".
@@ -820,11 +821,11 @@ public final class DatabaseHelper extends Thread {
     lastLocWhen = System.currentTimeMillis();
   }
 
-  /** 
-   * enqueue a pending observation. 
-   * if called after lastLocation: when recoverLocations is called, these pending observations will have 
+  /**
+   * enqueue a pending observation.
+   * if called after lastLocation: when recoverLocations is called, these pending observations will have
    * their locations backfilled and then they'll be added to the database.
-   * 
+   *
    * @param network the mutable network, will have it's level saved out.
    * @param newForRun was this new for the run?
    * @return was the pending observation enqueued
@@ -857,7 +858,7 @@ public final class DatabaseHelper extends Thread {
               }
             }
             bssids.clear();
-            
+
             added = pending.offer( update );
             if ( ! added ) {
               MainActivity.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
@@ -872,7 +873,7 @@ public final class DatabaseHelper extends Thread {
     }
   }
 
-  /** 
+  /**
    *  walk any pending observations, lerp from last to recover to fill in their location details, add to the real queue.
    *
    * @param loc where we picked up a gps fix again
@@ -891,7 +892,7 @@ public final class DatabaseHelper extends Thread {
 
       final long d_time = MILLISECONDS.toSeconds( locWhen - lastLocWhen );
       MainActivity.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
-      // walk the locations and 
+      // walk the locations and
       // lerp! y = y0 + (t - t0)((y1-y0)/(t1-t0))
       // y = y0 + (t - lastLocWhen)((y1-y0)/d_time);
       final double lat0 = lastLoc.getLatitude();
@@ -907,7 +908,7 @@ public final class DatabaseHelper extends Thread {
 
         // do lat lerp:
         final double lerp_lat = lat0 + ( tdiff * lat_ratio );
-        
+
         // do lon lerp
         final double lerp_lon = lon0 + ( tdiff * lon_ratio );
 
@@ -941,7 +942,7 @@ public final class DatabaseHelper extends Thread {
       MainActivity.info( string + " in " + diff + " ms" );
     }
   }
-  
+
   public boolean isFastMode() {
     boolean fastMode = false;
     if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
@@ -950,7 +951,7 @@ public final class DatabaseHelper extends Thread {
     }
     return fastMode;
   }
-  
+
   /**
    * get the number of networks new to the db for this run
    * @return number of new networks
@@ -958,31 +959,31 @@ public final class DatabaseHelper extends Thread {
   public long getNewNetworkCount() {
     return newNetworkCount.get();
   }
-  
+
   public long getNewWifiCount() {
     return newWifiCount.get();
   }
-  
+
   public long getNewCellCount() {
     return newCellCount.get();
   }
-  
+
   public long getNetworkCount() {
     return networkCount.get();
   }
-  
+
   private void getNetworkCountFromDB() throws DBException {
     networkCount.set( getCountFromDB( NETWORK_TABLE ) );
   }
-  
+
 //  private long getNetworkCountFromDB(NetworkType type) {
 //    return getCountFromDB( NETWORK_TABLE + " WHERE type = '" + type.getCode() + "'" );
 //  }
-  
+
   public long getLocationCount() {
     return locationCount.get();
   }
-  
+
   private void getLocationCountFromDB() throws DBException {
     long start = System.currentTimeMillis();
     final long count = getMaxIdFromDB( LOCATION_TABLE );
@@ -991,14 +992,14 @@ public final class DatabaseHelper extends Thread {
     locationCount.set( count );
     setupMaxidDebug( count );
   }
-  
+
   private void setupMaxidDebug( final long locCount ) {
     final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final long maxid = prefs.getLong( ListFragment.PREF_DB_MARKER, -1L );
     final Editor edit = prefs.edit();
     edit.putLong( ListFragment.PREF_MAX_DB, locCount );
-    
-    if ( maxid == -1L ) {    
+
+    if ( maxid == -1L ) {
       if ( locCount > 0 ) {
         // there is no preference set, yet there are locations, this is likely
         // a developer testing a new install on an old db, so set the pref.
@@ -1008,7 +1009,7 @@ public final class DatabaseHelper extends Thread {
     }
     edit.commit();
   }
-  
+
   private long getCountFromDB( final String table ) throws DBException {
     checkDB();
     final Cursor cursor = db.rawQuery( "select count(*) FROM " + table, null );
@@ -1017,7 +1018,7 @@ public final class DatabaseHelper extends Thread {
     cursor.close();
     return count;
   }
-  
+
   private long getMaxIdFromDB( final String table ) throws DBException {
     checkDB();
     final Cursor cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
@@ -1026,7 +1027,7 @@ public final class DatabaseHelper extends Thread {
     cursor.close();
     return count;
   }
-  
+
   public Network getNetwork( final String bssid ) {
     // check cache
     Network retval = MainActivity.getNetworkCache().get( bssid );
@@ -1034,7 +1035,7 @@ public final class DatabaseHelper extends Thread {
       try {
         checkDB();
         final String[] args = new String[]{ bssid };
-        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon FROM " + NETWORK_TABLE 
+        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon FROM " + NETWORK_TABLE
             + " WHERE bssid = ?", args);
         if ( cursor.getCount() > 0 ) {
           cursor.moveToFirst();
@@ -1043,7 +1044,7 @@ public final class DatabaseHelper extends Thread {
           final String capabilities = cursor.getString(2);
           final float lastlat = cursor.getFloat(4);
           final float lastlon = cursor.getFloat(5);
-          
+
           final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
           retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
           retval.setGeoPoint( new GeoPoint(lastlat, lastlon) );
@@ -1057,28 +1058,28 @@ public final class DatabaseHelper extends Thread {
     }
     return retval;
   }
-  
+
   public Cursor locationIterator( final long fromId ) throws DBException {
     checkDB();
     MainActivity.info( "locationIterator fromId: " + fromId );
     final String[] args = new String[]{ Long.toString( fromId ) };
     return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
   }
-  
+
   public Cursor networkIterator() throws DBException {
     checkDB();
     MainActivity.info( "networkIterator" );
     final String[] args = new String[]{};
     return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
   }
-  
+
   public Cursor getSingleNetwork( final String bssid ) throws DBException {
     checkDB();
     final String[] args = new String[]{bssid};
-    return db.rawQuery( 
+    return db.rawQuery(
         "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", args );
   }
-  
+
 
   public Pair<Boolean,String> copyDatabase(final BackupTask task) {
     final String dbFilename = DATABASE_PATH + DATABASE_NAME;

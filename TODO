@@ -46,14 +46,14 @@ on networkactivity record more observations on that network (site survey)
 
 --- 2.0 blockers ---
 move upload dialog to fragment for rotation happiness
-test csv dump and friends move dialogs to fragment
-update translation from email
+move csv dump and friends dialogs to fragment for rotation happiness
 
 --- done ---
 * 2.0 (?)
 Complete major refactor for Action Bar
 Migrate to safe-draw to fix osm drawing distortions
 Dashboard landscape-optimized layout
+Many language file fixes (thanks robin0van0der0v!)
 
 * 1.58 (01/19/2014)
 Use WiGLE's OpenStreetMap tileserver

@@ -95,7 +95,7 @@
     <string name="network_capa">יכולות:</string>
     <string name="network_channel">ערוץ:</string>
     <string name="network_observations">תוכן:</string>
-    <string name="network_querying">(Querying...)</string>
+    <string name="network_querying">(Querying&#8230;)</string>
     <string name="setting_show_password">הצג סיסמה</string>
     <string name="setting_db_marker">DB מרקר (שם שנוספו להתחיל):</string>
     <string name="setting_high_up">Id נטען גבוהה ביותר:</string>
@@ -196,7 +196,7 @@
     <string name="status_unknown_error">שגיאה לא ידועה</string>
     <string name="status_fail">Fail</string>
     <string name="status_success">הצלחה</string>
-    <string name="status_working">עובד ...</string>
+    <string name="status_working">עובד &#8230;</string>
     <string name="status_upload_success">העלאה מוצלחת</string>
     <string name="status_write_success">כתוב מוצלחת</string>
     <string name="status_no_user">שם משתמש לא מוגדר</string>

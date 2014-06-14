@@ -215,7 +215,7 @@
     <string name="auto">אוטומטי</string>
     <string name="language_en">English (אנגלית)</string>
     <string name="language_ar">العربية (ערבית)</string>
-    <string name="language_cs">čeština (צ'כית)</string>
+    <string name="language_cs">čeština (צ\'כית)</string>
     <string name="language_da">dansk (דנית)</string>
     <string name="language_de">Deutsch (גרמנית)</string>
     <string name="language_es">español (ספרדית)</string>
@@ -230,7 +230,7 @@
     <string name="language_no">norsk (נורבגית)</string>
     <string name="language_pl">polski (פולנית)</string>
     <string name="language_pt">português (פורטוגזית)</string>
-    <string name="language_pt-rBR">português brasileiro (פורטוגזית ברזילאית)</string>
+    <string name="language_pt_rBR">português brasileiro (פורטוגזית ברזילאית)</string>
     <string name="language_ru">ру́сский (רוסית)</string>
     <string name="language_sv">svenska (שבדית)</string>
     <string name="language_tr">Türkçe (טורקית)</string>

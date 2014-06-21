@@ -26,6 +26,7 @@ import net.wigle.wigleandroid.listener.WifiReceiver;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -53,6 +54,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -366,10 +368,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
   }
 
-  public static interface Doer {
-    public void execute();
-  }
-
+  // Activity-style dialog
   static void createConfirmation( final Activity activity, final String message, final Doer doer ) {
     final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
     builder.setCancelable( true );
@@ -386,7 +385,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing alert dialog: " + ex );
+          MainActivity.info( "exception handling activity alert dialog: " + ex, ex );
         }
         return;
       } });
@@ -400,13 +399,80 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         }
         catch ( Exception ex ) {
           // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing alert dialog: " + ex );
+          MainActivity.info( "exception dismissing activity alert dialog: " + ex, ex );
         }
         return;
       } });
 
     try {
       ad.show();
+    }
+    catch ( WindowManager.BadTokenException ex ) {
+      MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+    }
+  }
+
+  // Fragment-style dialog
+  public static class ConfirmationDialog extends DialogFragment {
+    public static ConfirmationDialog newInstance(final String message, final int dialogId) {
+      final ConfirmationDialog frag = new ConfirmationDialog();
+      Bundle args = new Bundle();
+      args.putString("message", message);
+      args.putInt("dialogId", dialogId);
+      frag.setArguments(args);
+      return frag;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+      final Activity activity = getMainActivity();
+      final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+      builder.setCancelable( true );
+      builder.setTitle( "Confirmation" );
+      builder.setMessage( getArguments().getString("message") );
+      final int dialogId = getArguments().getInt("dialogId");
+      final AlertDialog ad = builder.create();
+      final DialogListener dialogListener = (DialogListener) getTargetFragment();
+      // ok
+      ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick( final DialogInterface dialog, final int which ) {
+          try {
+            dialog.dismiss();
+            dialogListener.handleDialog(dialogId);
+          }
+          catch ( Exception ex ) {
+            // guess it wasn't there anyways
+            MainActivity.info( "exception handling fragment alert dialog: " + ex, ex );
+          }
+          return;
+        } });
+
+      // cancel
+      ad.setButton( DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick( final DialogInterface dialog, final int which ) {
+          try {
+            dialog.dismiss();
+          }
+          catch ( Exception ex ) {
+            // guess it wasn't there anyways
+            MainActivity.info( "exception dismissing fragment alert dialog: " + ex, ex );
+          }
+          return;
+        } });
+
+      return ad;
+    }
+  }
+
+  static void createConfirmation( final Fragment fragment, final String message,
+      final String fragmentTag, final int dialogId ) {
+    try {
+      final FragmentManager fm = fragment.getActivity().getSupportFragmentManager();
+      final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, dialogId);
+      dialog.setTargetFragment(fragment, 0);
+      dialog.show(fm, fragmentTag);
     }
     catch ( WindowManager.BadTokenException ex ) {
       MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );

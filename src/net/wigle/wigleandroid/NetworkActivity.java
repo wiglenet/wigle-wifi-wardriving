@@ -3,8 +3,6 @@ package net.wigle.wigleandroid;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
-import net.wigle.wigleandroid.MainActivity.Doer;
-
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.api.IMapView;

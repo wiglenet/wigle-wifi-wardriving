@@ -6,7 +6,6 @@ package net.wigle.wigleandroid;
 import java.text.NumberFormat;
 import java.util.Set;
 
-import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
@@ -42,7 +41,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public final class ListFragment extends Fragment implements FileUploaderListener {
+public final class ListFragment extends Fragment implements FileUploaderListener, DialogListener {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
@@ -51,6 +50,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     private static final int MENU_FILTER = 15;
 
     private static final int SORT_DIALOG = 100;
+    private static final int UPLOAD_DIALOG = 101;
     private static final int SSID_FILTER = 102;
 
     public static final float MIN_DISTANCE_ACCURACY = 32f;
@@ -560,15 +560,20 @@ public final class ListFragment extends Fragment implements FileUploaderListener
             final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-            MainActivity.createConfirmation( getActivity(), text, new Doer() {
-              @Override
-              public void execute() {
-                final State state = MainActivity.getState( ListFragment.this );
-                uploadFile( state.dbHelper );
-              }
-            } );
+            MainActivity.createConfirmation( ListFragment.this, text, MainActivity.LIST_FRAGMENT_TAG, UPLOAD_DIALOG);
           }
         });
+    }
+
+    @Override
+    public void handleDialog(final int dialogId) {
+      switch (dialogId) {
+        case UPLOAD_DIALOG:
+          final State state = MainActivity.getState( this );
+          uploadFile( state.dbHelper );
+        default:
+          MainActivity.warn("ListFragment unhandled dialogId: " + dialogId);
+      }
     }
 
     private void setupMuteButton( final View view ) {

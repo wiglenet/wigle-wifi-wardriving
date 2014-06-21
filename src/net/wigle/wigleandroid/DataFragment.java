@@ -2,7 +2,6 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
-import net.wigle.wigleandroid.MainActivity.Doer;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.HttpDownloader;

@@ -2,7 +2,6 @@ package net.wigle.wigleandroid;
 
 import java.util.Arrays;
 
-import net.wigle.wigleandroid.MainActivity.Doer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;

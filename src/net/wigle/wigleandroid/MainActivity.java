@@ -132,6 +132,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   public static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
   public static final String DATA_FRAGMENT_TAG = "DataFragmentTag";
 
+  public static final int LIST_TAB_POS = 0;
+  public static final int MAP_TAB_POS = 1;
+  public static final int DASH_TAB_POS = 2;
+  public static final int DATA_TAB_POS = 3;
+
   @SuppressWarnings("deprecation")
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -267,7 +272,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       listActivity.setArguments(bundle);
       txn.add(listActivity, LIST_FRAGMENT_TAG);
     }
-    state.fragList[0] = listActivity;
+    state.fragList[LIST_TAB_POS] = listActivity;
 
     MappingFragment map = (MappingFragment) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
     if (fm.findFragmentByTag(MAP_FRAGMENT_TAG) == null) {
@@ -277,7 +282,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       map.setArguments(bundle);
       txn.add(map, MAP_FRAGMENT_TAG);
     }
-    state.fragList[1] = map;
+    state.fragList[MAP_TAB_POS] = map;
 
     DashboardFragment dash = (DashboardFragment) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
     if (dash == null) {
@@ -287,7 +292,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       dash.setArguments(bundle);
       txn.add(dash, DASH_FRAGMENT_TAG);
     }
-    state.fragList[2] = dash;
+    state.fragList[DASH_TAB_POS] = dash;
 
     DataFragment data = (DataFragment) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
     if (data == null) {
@@ -297,7 +302,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       data.setArguments(bundle);
       txn.add(data, DATA_FRAGMENT_TAG);
     }
-    state.fragList[3] = data;
+    state.fragList[DATA_TAB_POS] = data;
 
     txn.commit();
   }
@@ -414,10 +419,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   // Fragment-style dialog
   public static class ConfirmationDialog extends DialogFragment {
-    public static ConfirmationDialog newInstance(final String message, final int dialogId) {
+    public static ConfirmationDialog newInstance(final String message, final int tabPos, final int dialogId) {
       final ConfirmationDialog frag = new ConfirmationDialog();
       Bundle args = new Bundle();
       args.putString("message", message);
+      args.putInt("tabPos", tabPos);
       args.putInt("dialogId", dialogId);
       frag.setArguments(args);
       return frag;
@@ -430,16 +436,20 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       builder.setCancelable( true );
       builder.setTitle( "Confirmation" );
       builder.setMessage( getArguments().getString("message") );
+      final int tabPos = getArguments().getInt("tabPos");
       final int dialogId = getArguments().getInt("dialogId");
       final AlertDialog ad = builder.create();
-      final DialogListener dialogListener = (DialogListener) getTargetFragment();
       // ok
       ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
         @Override
         public void onClick( final DialogInterface dialog, final int which ) {
           try {
             dialog.dismiss();
-            dialogListener.handleDialog(dialogId);
+            final MainActivity mainActivity = MainActivity.getMainActivity(ConfirmationDialog.this);
+            if (mainActivity != null && mainActivity.getState() != null) {
+              final Fragment fragment = mainActivity.getState().fragList[tabPos];
+              ((DialogListener)fragment).handleDialog(dialogId);
+            }
           }
           catch ( Exception ex ) {
             // guess it wasn't there anyways
@@ -467,12 +477,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   static void createConfirmation( final Fragment fragment, final String message,
-      final String fragmentTag, final int dialogId ) {
+      final int tabPos, final int dialogId ) {
     try {
       final FragmentManager fm = fragment.getActivity().getSupportFragmentManager();
-      final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, dialogId);
-      dialog.setTargetFragment(fragment, 0);
-      dialog.show(fm, fragmentTag);
+      final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, tabPos, dialogId);
+      dialog.show(fm, tabPos+"-"+dialogId);
     }
     catch ( WindowManager.BadTokenException ex ) {
       MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );

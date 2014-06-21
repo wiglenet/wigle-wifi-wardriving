@@ -560,7 +560,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
             final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
             final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-            MainActivity.createConfirmation( ListFragment.this, text, MainActivity.LIST_FRAGMENT_TAG, UPLOAD_DIALOG);
+            MainActivity.createConfirmation( ListFragment.this, text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
           }
         });
     }
@@ -571,6 +571,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
         case UPLOAD_DIALOG:
           final State state = MainActivity.getState( this );
           uploadFile( state.dbHelper );
+          break;
         default:
           MainActivity.warn("ListFragment unhandled dialogId: " + dialogId);
       }

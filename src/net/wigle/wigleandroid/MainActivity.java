@@ -56,6 +56,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
@@ -374,6 +375,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   // Activity-style dialog
+  @Deprecated
   static void createConfirmation( final Activity activity, final String message, final Doer doer ) {
     final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
     builder.setCancelable( true );
@@ -431,7 +433,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-      final Activity activity = getMainActivity();
+      final Activity activity = getActivity();
       final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
       builder.setCancelable( true );
       builder.setTitle( "Confirmation" );
@@ -445,10 +447,19 @@ public final class MainActivity extends ActionBarActivity implements TabListener
         public void onClick( final DialogInterface dialog, final int which ) {
           try {
             dialog.dismiss();
-            final MainActivity mainActivity = MainActivity.getMainActivity(ConfirmationDialog.this);
-            if (mainActivity != null && mainActivity.getState() != null) {
-              final Fragment fragment = mainActivity.getState().fragList[tabPos];
-              ((DialogListener)fragment).handleDialog(dialogId);
+            final Activity activity = getActivity();
+            if (activity == null) {
+              info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
+            }
+            else if (activity instanceof MainActivity) {
+              final MainActivity mainActivity = (MainActivity) activity;
+              if (mainActivity.getState() != null) {
+                final Fragment fragment = mainActivity.getState().fragList[tabPos];
+                ((DialogListener) fragment).handleDialog(dialogId);
+              }
+            }
+            else {
+              ((DialogListener) activity).handleDialog(dialogId);
             }
           }
           catch ( Exception ex ) {
@@ -476,12 +487,14 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
   }
 
-  static void createConfirmation( final Fragment fragment, final String message,
+  static void createConfirmation( final FragmentActivity activity, final String message,
       final int tabPos, final int dialogId ) {
     try {
-      final FragmentManager fm = fragment.getActivity().getSupportFragmentManager();
+      final FragmentManager fm = activity.getSupportFragmentManager();
       final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, tabPos, dialogId);
-      dialog.show(fm, tabPos+"-"+dialogId);
+      final String tag = tabPos+"-"+dialogId+"-"+activity.getClass().getSimpleName();
+      info("tag: " + tag + " fm: " + fm);
+      dialog.show(fm, tag);
     }
     catch ( WindowManager.BadTokenException ex ) {
       MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );

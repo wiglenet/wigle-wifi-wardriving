@@ -34,10 +34,14 @@ import android.widget.TextView;
 /**
  * configure settings
  */
-public final class SettingsActivity extends ActionBarActivity {
+public final class SettingsActivity extends ActionBarActivity implements DialogListener {
 
   private static final int MENU_RETURN = 12;
   private static final int MENU_ERROR_REPORT = 13;
+  private static final int ZERO_OUT_DIALOG=110;
+  private static final int MAX_OUT_DIALOG=111;
+  private static final int DONATE_DIALOG=112;
+  private static final int ANONYMOUS_DIALOG=113;
 
   /** convenience, just get the darn new string */
   public static abstract class SetWatcher implements TextWatcher {
@@ -96,18 +100,7 @@ public final class SettingsActivity extends ActionBarActivity {
               buttonView.setChecked( false );
               // confirm
               MainActivity.createConfirmation( SettingsActivity.this,
-                  getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain),
-                  new Doer() {
-                @Override
-                public void execute() {
-                  editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
-                  editor.commit();
-
-                  buttonView.setChecked( true );
-                  // poof
-                  eraseDonate();
-                }
-              });
+                  getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain), 0, DONATE_DIALOG);
             }
             else {
               editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
@@ -130,7 +123,7 @@ public final class SettingsActivity extends ActionBarActivity {
       beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
           @Override
           public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-            if ( isChecked == prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+            if ( isChecked == prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false) ) {
               // this would cause no change, bail
               return;
             }
@@ -139,27 +132,14 @@ public final class SettingsActivity extends ActionBarActivity {
               // turn off until confirmed
               buttonView.setChecked( false );
               // confirm
-              MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", new Doer() {
-                @Override
-                public void execute() {
-                  // turn anonymous
-                  user.setEnabled( false );
-                  pass.setEnabled( false );
-                  editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, isChecked );
-                  editor.commit();
-
-                  buttonView.setChecked( true );
-
-                  // might have to remove or show register link
-                  updateRegister();
-                }
-              });
+              MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", 0, ANONYMOUS_DIALOG );
             }
             else {
               // unset anonymous
               user.setEnabled( true );
               pass.setEnabled( true );
 
+              editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, false );
               editor.commit();
 
               // might have to remove or show register link
@@ -227,14 +207,7 @@ public final class SettingsActivity extends ActionBarActivity {
       resetMaxidButton.setOnClickListener( new OnClickListener() {
         @Override
         public void onClick( final View buttonView ) {
-          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), new Doer() {
-            @Override
-            public void execute() {
-              editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
-              editor.commit();
-              tv.setText( getString(R.string.setting_max_id) + " 0" );
-            }
-          } );
+          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
         }
       });
 
@@ -247,15 +220,7 @@ public final class SettingsActivity extends ActionBarActivity {
       maxoutMaxidButton.setOnClickListener( new OnClickListener() {
         @Override
         public void onClick( final View buttonView ) {
-          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), new Doer() {
-            @Override
-            public void execute() {
-              editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
-              editor.commit();
-              // set the text on the other button
-              tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
-            }
-          } );
+          MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
         }
       } );
 
@@ -286,8 +251,6 @@ public final class SettingsActivity extends ActionBarActivity {
         final TextView speakText = (TextView) findViewById( R.id.speak_text );
         speakText.setText(getString(R.string.no_tts));
       }
-
-
 
       final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr",
           "he", "hi", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };
@@ -324,6 +287,59 @@ public final class SettingsActivity extends ActionBarActivity {
           "2" + min,"5" + min,"10" + min,off };
       doSpinner( R.id.reset_wifi_spinner,
           ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
+  }
+
+  @Override
+  public void handleDialog(final int dialogId) {
+    final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    final Editor editor = prefs.edit();
+
+    switch (dialogId) {
+      case ZERO_OUT_DIALOG: {
+        editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+        editor.commit();
+        final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
+        tv.setText( getString(R.string.setting_max_id) + " 0" );
+        break;
+      }
+      case MAX_OUT_DIALOG: {
+        final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
+        editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
+        editor.commit();
+        // set the text on the other button
+        final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
+        tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
+        break;
+      }
+      case DONATE_DIALOG: {
+        editor.putBoolean( ListFragment.PREF_DONATE, true );
+        editor.commit();
+
+        final CheckBox donate = (CheckBox) findViewById(R.id.donate);
+        donate.setChecked( true );
+        // poof
+        eraseDonate();
+        break;
+      }
+      case ANONYMOUS_DIALOG: {
+        // turn anonymous
+        final EditText user = (EditText) findViewById(R.id.edit_username);
+        final EditText pass = (EditText) findViewById(R.id.edit_password);
+        user.setEnabled( false );
+        pass.setEnabled( false );
+        editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
+        editor.commit();
+
+        final CheckBox be_anonymous = (CheckBox) findViewById(R.id.be_anonymous);
+        be_anonymous.setChecked( true );
+
+        // might have to remove or show register link
+        updateRegister();
+        break;
+      }
+      default:
+        MainActivity.warn("Settings unhandled dialogId: " + dialogId);
+    }
   }
 
   @Override

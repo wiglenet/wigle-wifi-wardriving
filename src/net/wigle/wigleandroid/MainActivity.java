@@ -374,51 +374,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
   }
 
-  // Activity-style dialog
-  @Deprecated
-  static void createConfirmation( final Activity activity, final String message, final Doer doer ) {
-    final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
-    builder.setCancelable( true );
-    builder.setTitle( "Confirmation" );
-    builder.setMessage( message );
-    AlertDialog ad = builder.create();
-    // ok
-    ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick( final DialogInterface dialog, final int which ) {
-        try {
-          dialog.dismiss();
-          doer.execute();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception handling activity alert dialog: " + ex, ex );
-        }
-        return;
-      } });
-
-    // cancel
-    ad.setButton( DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick( final DialogInterface dialog, final int which ) {
-        try {
-          dialog.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing activity alert dialog: " + ex, ex );
-        }
-        return;
-      } });
-
-    try {
-      ad.show();
-    }
-    catch ( WindowManager.BadTokenException ex ) {
-      MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
-    }
-  }
-
   // Fragment-style dialog
   public static class ConfirmationDialog extends DialogFragment {
     public static ConfirmationDialog newInstance(final String message, final int tabPos, final int dialogId) {
@@ -1339,12 +1294,16 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   public void setLocationUI() {
     // tell list about new location
-    listActivity.setLocationUI( this );
+    if (listActivity != null) {
+      listActivity.setLocationUI( this );
+    }
   }
 
   public void setNetCountUI() {
     // tell list
-    listActivity.setNetCountUI( getState() );
+    if (listActivity != null) {
+      listActivity.setNetCountUI( getState() );
+    }
   }
 
   public void setStatusUI( String status ) {

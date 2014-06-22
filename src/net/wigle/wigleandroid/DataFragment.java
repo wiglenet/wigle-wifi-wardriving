@@ -30,11 +30,18 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataFragment extends Fragment implements FileUploaderListener {
+public final class DataFragment extends Fragment implements FileUploaderListener, DialogListener {
 
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
   private static final int MENU_ERROR_REPORT = 13;
+
+  private static final int CSV_RUN_DIALOG = 120;
+  private static final int CSV_DB_DIALOG = 121;
+  private static final int KML_RUN_DIALOG = 122;
+  private static final int KML_DB_DIALOG = 123;
+  private static final int BACKUP_DIALOG = 124;
+  private static final int IMPORT_DIALOG = 125;
 
   /** Called when the activity is first created. */
   @Override
@@ -161,16 +168,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_export_csv), new Doer() {
-          @Override
-          public void execute() {
-            // actually need this Activity context, for dialogs
-            FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-            fileUploaderTask.setWriteRunOnly();
-            fileUploaderTask.start();
-          }
-        } );
+            DataFragment.this.getString(R.string.data_export_csv), MainActivity.DATA_TAB_POS, CSV_RUN_DIALOG);
       }
     });
 
@@ -179,16 +177,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_export_csv_db), new Doer() {
-          @Override
-          public void execute() {
-            // actually need this Activity context, for dialogs
-            FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-            fileUploaderTask.setWriteWholeDb();
-            fileUploaderTask.start();
-          }
-        } );
+            DataFragment.this.getString(R.string.data_export_csv_db), MainActivity.DATA_TAB_POS, CSV_DB_DIALOG);
       }
     });
   }
@@ -199,15 +188,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_export_kml_run), new Doer() {
-          @Override
-          public void execute() {
-            // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper,
-                ListFragment.lameStatic.runNetworks );
-            kmlWriter.start();
-          }
-        } );
+            DataFragment.this.getString(R.string.data_export_kml_run), MainActivity.DATA_TAB_POS, KML_RUN_DIALOG);
       }
     });
 
@@ -216,14 +197,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_export_kml_db), new Doer() {
-          @Override
-          public void execute() {
-            // actually need this Activity context, for dialogs
-            KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper );
-            kmlWriter.start();
-          }
-        } );
+            DataFragment.this.getString(R.string.data_export_kml_db), MainActivity.DATA_TAB_POS, KML_DB_DIALOG);
       }
     });
   }
@@ -238,14 +212,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_backup_db), new Doer() {
-          @Override
-          public void execute() {
-            // actually need this Activity context, for dialogs
-            BackupTask task = new BackupTask(DataFragment.this, MainActivity.getMainActivity(DataFragment.this));
-            task.execute();
-          }
-        } );
+            DataFragment.this.getString(R.string.data_backup_db), MainActivity.DATA_TAB_POS, BACKUP_DIALOG);
       }
     });
   }
@@ -257,28 +224,66 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_import_observed), new Doer() {
-          @Override
-          public void execute() {
-            final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
-            if ( mainActivity != null ) {
-              mainActivity.setTransferring();
-            }
-            // actually need this Activity context, for dialogs
-            HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                new FileUploaderListener() {
-              @Override
-              public void transferComplete() {
-                if ( mainActivity != null ) {
-                  mainActivity.transferComplete();
-                }
-              }
-            });
-            task.start();
-          }
-        } );
-      }
+            DataFragment.this.getString(R.string.data_import_observed), MainActivity.DATA_TAB_POS, BACKUP_DIALOG);
+        }
     });
+  }
+
+  @Override
+  public void handleDialog(final int dialogId) {
+    switch (dialogId) {
+      case CSV_RUN_DIALOG: {
+        // actually need this Activity context, for dialogs
+        FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
+            ListFragment.lameStatic.dbHelper, DataFragment.this, true );
+        fileUploaderTask.setWriteRunOnly();
+        fileUploaderTask.start();
+        break;
+      }
+      case CSV_DB_DIALOG: {
+        FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
+            ListFragment.lameStatic.dbHelper, DataFragment.this, true );
+        fileUploaderTask.setWriteWholeDb();
+        fileUploaderTask.start();
+        break;
+      }
+      case KML_RUN_DIALOG: {
+        KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper,
+            ListFragment.lameStatic.runNetworks );
+        kmlWriter.start();
+        break;
+      }
+      case KML_DB_DIALOG: {
+        KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper );
+        kmlWriter.start();
+        break;
+      }
+      case BACKUP_DIALOG: {
+        BackupTask task = new BackupTask(DataFragment.this, MainActivity.getMainActivity(DataFragment.this));
+        task.execute();
+        break;
+      }
+      case IMPORT_DIALOG: {
+        final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
+        if ( mainActivity != null ) {
+          mainActivity.setTransferring();
+        }
+        // actually need this Activity context, for dialogs
+        HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+            new FileUploaderListener() {
+          @Override
+          public void transferComplete() {
+            if ( mainActivity != null ) {
+              mainActivity.transferComplete();
+            }
+          }
+        });
+        task.start();
+        break;
+      }
+      default:
+        MainActivity.warn("Data unhandled dialogId: " + dialogId);
+    }
   }
 
   /**

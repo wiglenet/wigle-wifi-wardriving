@@ -19,10 +19,12 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,10 +41,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 @SuppressWarnings("deprecation")
-public class NetworkActivity extends ActionBarActivity {
+public class NetworkActivity extends ActionBarActivity implements DialogListener {
   private static final int MENU_EXIT = 11;
   private static final int MENU_COPY = 12;
-  private static final int CRYPTO_DIALOG = 101;
+  private static final int NON_CRYPTO_DIALOG = 130;
 
   private static final int MSG_OBS_UPDATE = 1;
   private static final int MSG_OBS_DONE = 2;
@@ -225,10 +227,12 @@ public class NetworkActivity extends ActionBarActivity {
       @Override
       public void onClick( final View buttonView ) {
         if ( Network.CRYPTO_NONE == network.getCrypto() ) {
-          doNonCryptoDialog();
+          MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?",
+              0, NON_CRYPTO_DIALOG);
         }
-        else {
-          NetworkActivity.this.showDialog( CRYPTO_DIALOG );
+        else if (network != null){
+          final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
+          cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
         }
       }
     });
@@ -264,13 +268,15 @@ public class NetworkActivity extends ActionBarActivity {
     return netId;
   }
 
-  private void doNonCryptoDialog() {
-    MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?", new Doer() {
-      @Override
-      public void execute() {
+  @Override
+  public void handleDialog(final int dialogId) {
+    switch(dialogId) {
+      case NON_CRYPTO_DIALOG:
         connectToNetwork( null );
-      }
-    } );
+        break;
+      default:
+        MainActivity.warn("Network unhandled dialogId: " + dialogId);
+    }
   }
 
   private void connectToNetwork( final String password ) {
@@ -299,85 +305,90 @@ public class NetworkActivity extends ActionBarActivity {
     }
   }
 
-  @Override
-  public Dialog onCreateDialog( int which ) {
-    switch ( which ) {
-      case CRYPTO_DIALOG:
-        if ( network == null ) {
-          return null;
-        }
-        final Dialog dialog = new Dialog( this );
-
-        dialog.setContentView( R.layout.cryptodialog );
-        dialog.setTitle( network.getSsid() );
-
-        TextView text = (TextView) dialog.findViewById( R.id.security );
-        text.setText( network.getCapabilities() );
-
-        text = (TextView) dialog.findViewById( R.id.signal );
-        text.setText( Integer.toString( network.getLevel() ) );
-
-        final Button ok = (Button) dialog.findViewById( R.id.ok_button );
-
-        final EditText password = (EditText) dialog.findViewById( R.id.edit_password );
-        password.addTextChangedListener( new SettingsActivity.SetWatcher() {
-          @Override
-          public void onTextChanged( final String s ) {
-            if ( s.length() > 0 ) {
-              ok.setEnabled(true);
-            }
-          }
-        });
-
-        final CheckBox showpass = (CheckBox) dialog.findViewById( R.id.showpass );
-        showpass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-          @Override
-          public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-            if ( isChecked ) {
-              password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
-              password.setTransformationMethod( null );
-            }
-            else {
-              password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
-              password.setTransformationMethod(
-                android.text.method.PasswordTransformationMethod.getInstance() );
-            }
-          }
-        });
-
-        ok.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-              try {
-                connectToNetwork( password.getText().toString() );
-                dialog.dismiss();
-              }
-              catch ( Exception ex ) {
-                // guess it wasn't there anyways
-                MainActivity.info( "exception dismissing crypto dialog: " + ex );
-              }
-            }
-          } );
-
-        Button cancel = (Button) dialog.findViewById( R.id.cancel_button );
-        cancel.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-              try {
-                dialog.dismiss();
-              }
-              catch ( Exception ex ) {
-                // guess it wasn't there anyways
-                MainActivity.info( "exception dismissing crypto dialog: " + ex );
-              }
-            }
-          } );
-
-        return dialog;
-      default:
-        MainActivity.error( "NetworkActivity: unhandled dialog: " + which );
+  public static class CryptoDialog extends DialogFragment {
+    public static CryptoDialog newInstance(final Network network) {
+      final CryptoDialog frag = new CryptoDialog();
+      Bundle args = new Bundle();
+      args.putString("ssid", network.getSsid());
+      args.putString("capabilities", network.getCapabilities());
+      args.putString("level", Integer.toString(network.getLevel()));
+      frag.setArguments(args);
+      return frag;
     }
-    return null;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        Bundle savedInstanceState) {
+
+      final Dialog dialog = getDialog();
+      View view = inflater.inflate(R.layout.cryptodialog, container);
+      dialog.setTitle(getArguments().getString("ssid"));
+
+      TextView text = (TextView) view.findViewById( R.id.security );
+      text.setText(getArguments().getString("capabilities"));
+
+      text = (TextView) view.findViewById( R.id.signal );
+      text.setText(getArguments().getString("level"));
+
+      final Button ok = (Button) view.findViewById( R.id.ok_button );
+
+      final EditText password = (EditText) view.findViewById( R.id.edit_password );
+      password.addTextChangedListener( new SettingsActivity.SetWatcher() {
+        @Override
+        public void onTextChanged( final String s ) {
+          if ( s.length() > 0 ) {
+            ok.setEnabled(true);
+          }
+        }
+      });
+
+      final CheckBox showpass = (CheckBox) view.findViewById( R.id.showpass );
+      showpass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
+          if ( isChecked ) {
+            password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
+            password.setTransformationMethod( null );
+          }
+          else {
+            password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
+            password.setTransformationMethod(
+              android.text.method.PasswordTransformationMethod.getInstance() );
+          }
+        }
+      });
+
+      ok.setOnClickListener( new OnClickListener() {
+          @Override
+          public void onClick( final View buttonView ) {
+            try {
+              final NetworkActivity networkActivity = (NetworkActivity) getActivity();
+              networkActivity.connectToNetwork( password.getText().toString() );
+              dialog.dismiss();
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              MainActivity.info( "exception dismissing crypto dialog: " + ex );
+            }
+          }
+        } );
+
+      Button cancel = (Button) view.findViewById( R.id.cancel_button );
+      cancel.setOnClickListener( new OnClickListener() {
+          @Override
+          public void onClick( final View buttonView ) {
+            try {
+              dialog.dismiss();
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              MainActivity.info( "exception dismissing crypto dialog: " + ex );
+            }
+          }
+        } );
+
+      return view;
+    }
   }
 
   /* Creates the menu items */

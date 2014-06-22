@@ -8,7 +8,7 @@
               android:minWidth="280dip"              
               >
               
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
               />
     </LinearLayout>
     
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
@@ -56,11 +56,19 @@
         android:layout_height="wrap_content"
         android:text="@string/crypto_show_password" /> 
 	
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
-              >		  
+              >
+  
+  <Button android:id="@+id/cancel_button"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="@string/cryptocanceldialog_button"
+              android:layout_weight="1"
+              />       
+    		  
 	<Button android:id="@+id/ok_button"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -68,11 +76,5 @@
               android:layout_weight="1"
               android:enabled="false"
               /> 
-    <Button android:id="@+id/cancel_button"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="@string/cryptocanceldialog_button"
-              android:layout_weight="1"
-              />       
-    </LinearLayout>     
+   </LinearLayout>     
 </LinearLayout>

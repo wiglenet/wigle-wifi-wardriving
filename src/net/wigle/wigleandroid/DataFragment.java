@@ -224,7 +224,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       @Override
       public void onClick( final View buttonView ) {
         MainActivity.createConfirmation( getActivity(),
-            DataFragment.this.getString(R.string.data_import_observed), MainActivity.DATA_TAB_POS, BACKUP_DIALOG);
+            DataFragment.this.getString(R.string.data_import_observed), MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
         }
     });
   }

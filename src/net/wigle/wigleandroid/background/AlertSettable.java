@@ -1,8 +1,8 @@
 package net.wigle.wigleandroid.background;
 
-import android.app.AlertDialog;
+import net.wigle.wigleandroid.background.BackgroundGuiHandler.BackgroundAlertDialog;
 
 public interface AlertSettable {
-  public void setAlertDialog(final AlertDialog ad);     
+  public void setAlertDialog(final BackgroundAlertDialog ad);
   public void clearProgressDialog();
 }

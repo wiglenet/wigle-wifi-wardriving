@@ -8,29 +8,30 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 
 public class KmlWriter extends AbstractBackgroundTask {
   private final Set<String> networks;
-  
-  public KmlWriter( final Context context, final DatabaseHelper dbHelper ) {
+
+  public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper ) {
     this( context, dbHelper, (Set<String>) null );
   }
-  
-  public KmlWriter( final Context context, final DatabaseHelper dbHelper, final Set<String> networks ) {
+
+  public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper, final Set<String> networks ) {
     super(context, dbHelper, "KmlWriter");
-    
+
     // make a safe local copy
-    this.networks = (networks == null) ? null : new HashSet<String>( networks );        
+    this.networks = (networks == null) ? null : new HashSet<String>( networks );
   }
-  
+
   @SuppressLint("SimpleDateFormat")
   @Override
   protected void subRun() throws IOException {
@@ -52,7 +53,7 @@ public class KmlWriter extends AbstractBackgroundTask {
     if ( ! file.exists() && hasSD ) {
       file.createNewFile();
     }
-    
+
     FileOutputStream fos = new FileOutputStream( file );
     // header
     FileUploaderTask.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -61,21 +62,21 @@ public class KmlWriter extends AbstractBackgroundTask {
         + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href></Icon></IconStyle></Style>"
         + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href></Icon></IconStyle></Style>"
         + "<Folder><name>Wifi Networks</name>\n" );
-    
+
     // body
     Cursor cursor = null;
     Status status = null;
     if ( true ) {
       try {
         if ( this.networks == null ) {
-          cursor = dbHelper.networkIterator();    
+          cursor = dbHelper.networkIterator();
           writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle );
         }
         else {
           int count = 0;
           for ( String network : networks ) {
             // MainActivity.info( "network: " + network );
-            cursor = dbHelper.getSingleNetwork( network ); 
+            cursor = dbHelper.getSingleNetwork( network );
             writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
             cursor.close();
             cursor = null;
@@ -86,7 +87,7 @@ public class KmlWriter extends AbstractBackgroundTask {
       }
       catch ( final InterruptedException ex ) {
         MainActivity.info("Writing Kml Interrupted: " + ex);
-      }      
+      }
       catch ( DBException ex ) {
         dbHelper.deathDialog("Writing Kml", ex);
         status = Status.EXCEPTION;
@@ -103,33 +104,33 @@ public class KmlWriter extends AbstractBackgroundTask {
           cursor.close();
         }
       }
-    } 
+    }
     // footer
     FileUploaderTask.writeFos( fos, "</Folder>\n</Document></kml>" );
-    
-    fos.close();    
-    
+
+    fos.close();
+
     bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
     bundle.putString( BackgroundGuiHandler.FILENAME, filename );
     MainActivity.info( "done with kml export" );
-    
+
     // status is null on interrupted
     if ( status != null ) {
       // tell gui
       sendBundledMessage( status.ordinal(), bundle );
     }
   }
-  
+
   private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat,
       long startCount, long totalCount, final Bundle bundle ) throws IOException, InterruptedException {
-    
+
     int lineCount = 0;
 
     for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
       if ( wasInterrupted() ) {
         throw new InterruptedException( "we were interrupted" );
       }
-      
+
       // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon
       final String bssid = cursor.getString(0);
       final String ssid = cursor.getString(1);
@@ -139,7 +140,7 @@ public class KmlWriter extends AbstractBackgroundTask {
       final double lastlat = cursor.getDouble(5);
       final double lastlon = cursor.getDouble(6);
       final String date = dateFormat.format( new Date( lasttime ) );
-      
+
       String style = "green";
       if ( capabilities.indexOf("WEP") >= 0 ) {
         style = "yellow";
@@ -147,11 +148,11 @@ public class KmlWriter extends AbstractBackgroundTask {
       if ( capabilities.indexOf("WPA") >= 0 ) {
         style = "red";
       }
-      
+
       // not unicode. ha ha for them!
       byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
       filterIllegalXml( ssidFiltered );
-      
+
       FileUploaderTask.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
       fos.write( ssidFiltered );
       FileUploaderTask.writeFos( fos, "]]></name>\n" );
@@ -166,18 +167,18 @@ public class KmlWriter extends AbstractBackgroundTask {
       if ( (lineCount % 1000) == 0 ) {
         MainActivity.info("lineCount: " + lineCount + " of " + totalCount );
       }
-      
+
       // update UI
       if ( totalCount == 0 ) {
         totalCount = 1;
       }
       final int percentDone = (int)(((lineCount + startCount) * 1000) / totalCount);
-      sendPercentTimesTen( percentDone, bundle );      
+      sendPercentTimesTen( percentDone, bundle );
     }
-    
+
     return true;
   }
-  
+
   private void filterIllegalXml( byte[] data ) {
     for ( int i = 0; i < data.length; i++ ) {
       byte current = data[i];
@@ -191,5 +192,5 @@ public class KmlWriter extends AbstractBackgroundTask {
       }
     }
   }
-      
+
 }

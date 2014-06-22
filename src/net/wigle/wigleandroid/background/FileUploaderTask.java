@@ -44,6 +44,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentActivity;
 
 public final class FileUploaderTask extends AbstractBackgroundTask {
   private final FileUploaderListener listener;
@@ -59,7 +60,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     int lineCount;
   }
 
-  public FileUploaderTask( final Context context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
+  public FileUploaderTask( final FragmentActivity context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
       final boolean justWriteFile ) {
 
     super( context, dbHelper, "HttpUL" );

@@ -11,14 +11,14 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkType;
-import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 
 public class HttpDownloader extends AbstractBackgroundTask {
   private final FileUploaderListener listener;
 
-  public HttpDownloader( final Context context, final DatabaseHelper dbHelper,
+  public HttpDownloader( final FragmentActivity context, final DatabaseHelper dbHelper,
       final FileUploaderListener listener ) {
 
     super(context, dbHelper, "HttpDL");

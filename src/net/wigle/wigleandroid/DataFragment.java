@@ -7,6 +7,7 @@ import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
@@ -14,7 +15,10 @@ import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -322,29 +326,51 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
       tv.setText( mainActivity.getString(R.string.backup_db_text) );
 
-      final AlertDialog.Builder builder = new AlertDialog.Builder( mainActivity );
-      builder.setCancelable( true );
-      builder.setTitle( mainActivity.getString( dbResult.getFirst() ? R.string.status_success : R.string.status_fail ));
-      builder.setMessage( dbResult.getSecond() );
-      final AlertDialog ad = builder.create();
-      // ok
-      ad.setButton( DialogInterface.BUTTON_POSITIVE, mainActivity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick( final DialogInterface dialog, final int which ) {
-          try {
-            dialog.dismiss();
-          }
-          catch ( Exception ex ) {
-            // guess it wasn't there anyways
-            MainActivity.info( "exception dismissing alert dialog: " + ex );
-          }
-          return;
-        } });
-      ad.show();
+      final BackupDialog dialog = BackupDialog.newInstance(dbResult.getFirst(), dbResult.getSecond());
+      final FragmentManager fm = mainActivity.getSupportFragmentManager();
+      dialog.show(fm, "backup-dialog");
     }
 
     public void progress( int progress ) {
       publishProgress(progress);
+    }
+
+    public static class BackupDialog extends DialogFragment {
+      public static BackupDialog newInstance(final boolean status, final String message) {
+        final BackupDialog frag = new BackupDialog();
+        final Bundle args = new Bundle();
+        args.putBoolean("status", status);
+        args.putString("message", message);
+        frag.setArguments(args);
+        return frag;
+      }
+
+      @Override
+      public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final FragmentActivity activity = getActivity();
+        final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+
+        builder.setCancelable( true );
+        final Bundle bundle = getArguments();
+        builder.setTitle( activity.getString( bundle.getBoolean("status") ? R.string.status_success : R.string.status_fail ));
+        builder.setMessage( bundle.getString("message") );
+        final AlertDialog ad = builder.create();
+        // ok
+        ad.setButton( DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick( final DialogInterface dialog, final int which ) {
+            try {
+              dialog.dismiss();
+            }
+            catch ( Exception ex ) {
+              // guess it wasn't there anyways
+              MainActivity.info( "exception dismissing alert dialog: " + ex );
+            }
+            return;
+          } });
+
+        return ad;
+      }
     }
   }
 

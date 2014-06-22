@@ -78,7 +78,12 @@ public class BackgroundGuiHandler extends Handler {
       final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
       alertSettable.setAlertDialog( alertDialog );
       final FragmentManager fm = context.getSupportFragmentManager();
-      alertDialog.show(fm, "background-dialog");
+      try {
+        alertDialog.show(fm, "background-dialog");
+      }
+      catch (IllegalStateException ex) {
+        MainActivity.warn("illegal state in background gui handler: " + ex, ex);
+      }
     }
   }
 

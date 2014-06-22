@@ -2,9 +2,9 @@ package net.wigle.wigleandroid.background;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.SettingsActivity;
+import net.wigle.wigleandroid.background.AbstractBackgroundTask.ProgressDialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,14 +20,14 @@ public class BackgroundGuiHandler extends Handler {
   public static final String FILENAME = "filename";
   public static final String FILEPATH = "filepath";
 
-  private final FragmentActivity context;
+  private FragmentActivity context;
   private final Object lock;
-  private final ProgressDialog pd;
+  private final ProgressDialogFragment pd;
   private final AlertSettable alertSettable;
 
   private String msg_text = "";
 
-  public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressDialog pd,
+  public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressDialogFragment pd,
       final AlertSettable alertSettable) {
 
     this.context = context;
@@ -36,14 +36,20 @@ public class BackgroundGuiHandler extends Handler {
     this.alertSettable = alertSettable;
   }
 
+  public void setContext(final FragmentActivity context) {
+    synchronized(lock) {
+      this.context = context;
+    }
+  }
+
   @Override
   public void handleMessage( final Message msg ) {
     synchronized ( lock ) {
       if ( msg.what >= WRITING_PERCENT_START ) {
         final int percentTimesTen = msg.what - WRITING_PERCENT_START;
-        pd.setMessage( msg_text + " " + (percentTimesTen/10f) + "%" );
+        pd.setMessage( context.getSupportFragmentManager(), msg_text + " " + (percentTimesTen/10f) + "%" );
         // "The progress range is 0..10000."
-        pd.setProgress( percentTimesTen * 10 );
+        pd.setProgress( context.getSupportFragmentManager(), percentTimesTen * 10 );
         return;
       }
 
@@ -55,16 +61,16 @@ public class BackgroundGuiHandler extends Handler {
       if ( Status.UPLOADING.equals( status ) ) {
         //          pd.setMessage( status.getMessage() );
         msg_text = context.getString( status.getMessage() );
-        pd.setProgress(0);
+        pd.setProgress(context.getSupportFragmentManager(), 0);
         return;
       }
       if ( Status.WRITING.equals( status ) ) {
         msg_text = context.getString( status.getMessage() );
-        pd.setProgress(0);
+        pd.setProgress(context.getSupportFragmentManager(), 0);
         return;
       }
       // make sure we didn't progress dialog this somewhere
-      if ( pd != null && pd.isShowing() ) {
+      if ( pd != null ) {
         try {
           pd.dismiss();
           alertSettable.clearProgressDialog();
@@ -76,7 +82,6 @@ public class BackgroundGuiHandler extends Handler {
       }
       // Activity context
       final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
-      alertSettable.setAlertDialog( alertDialog );
       final FragmentManager fm = context.getSupportFragmentManager();
       try {
         alertDialog.show(fm, "background-dialog");
@@ -167,6 +172,4 @@ public class BackgroundGuiHandler extends Handler {
     }
   }
 
-
 }
-

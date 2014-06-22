@@ -7,17 +7,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.background.BackgroundGuiHandler.BackgroundAlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
   private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -25,13 +25,15 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
   protected FragmentActivity context;
   protected final DatabaseHelper dbHelper;
 
-  private final Handler handler;
+  private final BackgroundGuiHandler handler;
   private final AtomicBoolean interrupt = new AtomicBoolean( false );
   private final Object lock = new Object();
   private final String name;
-  private ProgressDialog pd;
-  private BackgroundAlertDialog ad;
+  private ProgressDialogFragment pd;
   private int lastSentPercent = -1;
+
+  private static AbstractBackgroundTask latestTask = null;
+  private static final String PROGRESS_TAG = "background-task-progress";
 
   public AbstractBackgroundTask( final FragmentActivity context, final DatabaseHelper dbHelper, final String name ) {
     if ( context == null ) {
@@ -51,6 +53,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     createProgressDialog( context );
 
     this.handler = new BackgroundGuiHandler(context, lock, pd, this);
+    latestTask = this;
   }
 
   @Override
@@ -94,7 +97,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
   protected abstract void subRun() throws IOException, InterruptedException;
 
-  /** interrupt this upload */
+  /** interrupt this task */
   public final void setInterrupted() {
     interrupt.set( true );
   }
@@ -107,48 +110,74 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     return handler;
   }
 
-  private void createProgressDialog(final Context context) {
+  private void createProgressDialog(final FragmentActivity context) {
     // make an interruptable progress dialog
-    pd = ProgressDialog.show( context, context.getString(Status.WRITING.getTitle()),
-        context.getString(Status.WRITING.getMessage()), true, true,
-      new OnCancelListener(){
-        @Override
-        public void onCancel( DialogInterface di ) {
-          interrupt.set(true);
-        }
-      });
+    pd = ProgressDialogFragment.newInstance();
+    pd.show(context.getSupportFragmentManager(), PROGRESS_TAG);
   }
 
-  @Override
-  public final void setAlertDialog(final BackgroundAlertDialog ad) {
-    this.ad = ad;
+  public static class ProgressDialogFragment extends DialogFragment {
+    public static ProgressDialogFragment newInstance() {
+      ProgressDialogFragment frag = new ProgressDialogFragment ();
+      return frag;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+      final ProgressDialog dialog = new ProgressDialog(getActivity());
+      dialog.setTitle(getString(Status.WRITING.getTitle()));
+      dialog.setMessage(getString(Status.WRITING.getMessage()));
+      dialog.setIndeterminate(true);
+      dialog.setCancelable(true);
+      return dialog;
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+      MainActivity.info("Cancelling dialog for task: " + latestTask);
+      if (latestTask != null) {
+        latestTask.setInterrupted();
+      }
+    }
+
+    private ProgressDialog getDialog(final FragmentManager manager) {
+      final ProgressDialogFragment dialog = (ProgressDialogFragment) manager.findFragmentByTag(PROGRESS_TAG);
+      if (dialog != null) {
+        return (ProgressDialog) dialog.getDialog();
+      }
+      MainActivity.info("No progress dialog");
+      return null;
+    }
+
+    public void setMessage(final FragmentManager manager, final String message) {
+      final ProgressDialog dialog = getDialog(manager);
+      if (dialog != null)
+      {
+        dialog.setMessage(message);
+      }
+    }
+
+    /**
+     * Sets the progress of the dialog, we need to make sure we get the right dialog reference here
+     * which is why we obtain the dialog fragment manually from the fragment manager
+     * @param manager
+     * @param progress
+     */
+    public void setProgress(final FragmentManager manager, final int progress)
+    {
+      final ProgressDialog dialog = getDialog(manager);
+      if (dialog != null)
+      {
+        dialog.setProgress(progress);
+      }
+    }
   }
 
   public final void setContext( final FragmentActivity context ) {
     synchronized ( lock ) {
       this.context = context;
-
-      if ( pd != null && pd.isShowing() ) {
-        try {
-          pd.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing progress dialog: " + ex );
-        }
-        createProgressDialog( context );
-      }
-
-      if ( ad != null && ad.isVisible() ) {
-        try {
-          ad.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing alert dialog: " + ex );
-        }
-      }
     }
+    handler.setContext(context);
   }
 
   protected final String getUsername() {

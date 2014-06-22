@@ -620,7 +620,12 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     @Override
     public void transferComplete() {
       final MainActivity main = MainActivity.getMainActivity( this );
-      main.transferComplete();
+      if (main == null) {
+        MainActivity.warn("No main for transferComplete");
+      }
+      else {
+        main.transferComplete();
+      }
     }
 
 

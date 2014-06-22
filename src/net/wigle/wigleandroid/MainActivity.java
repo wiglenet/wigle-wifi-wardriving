@@ -552,7 +552,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     catch ( final IllegalArgumentException ex ) {
       info( "wifiReceiver not registered: " + ex );
     }
-
   }
 
   @Override
@@ -1337,6 +1336,12 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     final boolean wasFinishing = state.finishing.getAndSet( true );
     if ( wasFinishing ) {
       info( "MAIN: finish called twice!" );
+    }
+
+    // interrupt this just in case
+    final FileUploaderTask fileUploaderTask = state.fileUploaderTask;
+    if (fileUploaderTask != null) {
+      fileUploaderTask.setInterrupted();
     }
 
     // save our location for later runs

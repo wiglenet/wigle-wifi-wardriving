@@ -43,10 +43,13 @@ import files, instead of uploading to site and downloading to app
 geofence for "don't record" and/or "do upload"
 set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
+rssi on kml export
 
 --- 2.0 blockers ---
-move upload dialog to fragment for rotation happiness
-move csv dump and friends dialogs to fragment for rotation happiness
+List detachment on rotate race condition
+Default map zoom
+Lock screen on dashboard fragment
+Mute covering gps on/off speech
 
 --- done ---
 * 2.0 (?)

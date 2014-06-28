@@ -10,13 +10,17 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 
 public final class WigleService extends Service {
   private static final int NOTIFICATION_ID = 1;
 
   private GuardThread guardThread;
   private final AtomicBoolean done = new AtomicBoolean( false );
+  private Bitmap largeIcon = null;
 
   // copied from javadoc
   private static final Class<?>[] mSetForegroundSignature = new Class[] {
@@ -148,29 +152,40 @@ public final class WigleService extends Service {
     stopForegroundCompat( NOTIFICATION_ID );
   }
 
-  @SuppressWarnings("deprecation")
   private void setupNotification() {
     if ( ! done.get() ) {
-      final int icon = R.drawable.wiglewifi;
       final long when = System.currentTimeMillis();
-      final String title = "Wigle Wifi Service";
-      final Notification notification = new Notification( icon, title, when );
-      notification.flags |= Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-
       final Context context = getApplicationContext();
+      final String title = context.getString(R.string.wigle_service);
+
       final Intent notificationIntent = new Intent( this, MainActivity.class );
       final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
       final long dbNets = ListFragment.lameStatic.dbNets;
-      String text = "Waiting for info...";
+      String text = context.getString(R.string.list_waiting_gps);
       if ( dbNets > 0 ) {
-        text = "Run: " + ListFragment.lameStatic.runNets
-          + "  New: " + ListFragment.lameStatic.newNets + "  DB: " + dbNets;
+        text = context.getString(R.string.run) + ": " + ListFragment.lameStatic.runNets
+          + "  "+ context.getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets
+          + "  "+ context.getString(R.string.db) + ": " + dbNets;
       }
       if (! MainActivity.isScanning(context)) {
-        text = "(Scanning Turned Off) " + text;
+        text = context.getString(R.string.list_scanning_off) + " " + text;
       }
-      notification.setLatestEventInfo( context, title, text, contentIntent );
+      if (largeIcon == null) {
+        largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
+      }
 
+      final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+      builder.setContentIntent(contentIntent);
+      builder.setNumber(ListFragment.lameStatic.runNets);
+      builder.setTicker(title);
+      builder.setContentTitle(title);
+      builder.setContentText(text);
+      builder.setWhen(when);
+      builder.setLargeIcon(largeIcon);
+      builder.setSmallIcon(R.drawable.wiglewifi_small);
+      builder.setOngoing(true);
+
+      final Notification notification = builder.build();
       startForegroundCompat( NOTIFICATION_ID, notification );
     }
   }

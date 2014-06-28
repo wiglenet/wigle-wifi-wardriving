@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -69,6 +70,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -324,6 +326,27 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
 
     bar.setSelectedNavigationItem(defaultTab);
+  }
+
+  @Override
+  public boolean onMenuOpened(int featureId, Menu menu) {
+    if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
+      if(menu.getClass().getSimpleName().equals("MenuBuilder")){
+        try{
+          Method m = menu.getClass().getDeclaredMethod(
+            "setOptionalIconsVisible", Boolean.TYPE);
+          m.setAccessible(true);
+          m.invoke(menu, true);
+        }
+        catch(NoSuchMethodException ex){
+          error("onMenuOpened no such method: " + ex, ex);
+        }
+        catch(Exception ex){
+          error("onMenuOpened ex: " + ex, ex);
+        }
+      }
+    }
+    return super.onMenuOpened(featureId, menu);
   }
 
   // be careful with this

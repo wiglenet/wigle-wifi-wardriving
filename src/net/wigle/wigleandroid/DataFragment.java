@@ -314,8 +314,12 @@ public final class DataFragment extends Fragment implements FileUploaderListener
     @Override
     protected void onProgressUpdate( Integer... progress ) {
       final View view = fragment.getView();
-      final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
-      tv.setText( mainActivity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
+      if (view != null) {
+        final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
+        if (tv != null) {
+          tv.setText( mainActivity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
+        }
+      }
     }
 
     @Override
@@ -323,8 +327,12 @@ public final class DataFragment extends Fragment implements FileUploaderListener
       mainActivity.transferComplete();
 
       final View view = fragment.getView();
-      final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
-      tv.setText( mainActivity.getString(R.string.backup_db_text) );
+      if (view != null) {
+        final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
+        if (tv != null) {
+          tv.setText( mainActivity.getString(R.string.backup_db_text) );
+        }
+      }
 
       final BackupDialog dialog = BackupDialog.newInstance(dbResult.getFirst(), dbResult.getSecond());
       final FragmentManager fm = mainActivity.getSupportFragmentManager();

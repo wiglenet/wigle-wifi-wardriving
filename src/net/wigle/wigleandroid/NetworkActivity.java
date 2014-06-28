@@ -210,7 +210,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
       final IMapController mapControl = mapView.getController();
       mapControl.setCenter( center );
-      mapControl.setZoom( 16 );
+      mapControl.setZoom( 18 );
       mapControl.setCenter( center );
     }
 

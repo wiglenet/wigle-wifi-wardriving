@@ -238,10 +238,10 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
       MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListFragment.PREF_METRIC, false);
       MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
       MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
-      MainActivity.prefBackedCheckBox(this, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS, true);
       MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
       MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
       MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
+      MainActivity.prefBackedCheckBox(this, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
       // speech spinner
       Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );

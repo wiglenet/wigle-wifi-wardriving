@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import static android.location.LocationManager.GPS_PROVIDER;
-import static android.location.LocationManager.NETWORK_PROVIDER;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1182,11 +1181,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       catch (Exception ex) {
         MainActivity.error("exception trying to start location activity: " + ex, ex);
       }
-    }
-    // emulator crashes if you ask this
-    if ( ! state.inEmulator && ! locationManager.isProviderEnabled( NETWORK_PROVIDER ) && state.gpsListener == null ) {
-      //Toast.makeText( this, "For best results, set \"Use wireless networks\" in \"Location & security\"",
-      //    Toast.LENGTH_LONG ).show();
     }
 
     if ( state.gpsListener == null ) {

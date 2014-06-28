@@ -45,7 +45,7 @@
     <string name="speak_text">Time between audio speech</string>
     <string name="battery_kill_text">Exit at this Battery Level</string>
     <string name="reset_wifi_text">Decide Wi-Fi is Jammed</string>
-    <string name="speech_gps">Announce GPS status changes</string>
+    <string name="speech_gps">GPS status changes</string>
     <string name="mute">Mute</string>
     <string name="play">Play</string>
     <string name="unknown">Unknown</string>
@@ -81,7 +81,7 @@
     <string name="filter_show_wep">Show WEP</string>
     <string name="filter_show_wpa">Show WPA</string>
     <string name="filter_enabled">Filter Enabled</string>
-    <string name="list_waiting_gps">(Waiting for GPS sync...)</string>
+    <string name="list_waiting_gps">(Waiting for GPS sync&#8230;)</string>
     <string name="list_scanning_off">(Scanning turned off)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Lon:</string>
@@ -96,7 +96,7 @@
     <string name="network_capa">Capabilities:</string>
     <string name="network_channel">Channel:</string>
     <string name="network_observations">Observations:</string>
-    <string name="network_querying">(querying...)</string>
+    <string name="network_querying">(querying&#8230;)</string>
     <string name="setting_show_password">Show Password</string>
     <string name="setting_db_marker">DB Marker (where uploads start from):</string>
     <string name="setting_high_up">Highest uploaded id:</string>
@@ -104,7 +104,7 @@
     <string name="setting_max_id">Max upload id:</string>
     <string name="setting_max_start">Max id at startup:</string>
     <string name="setting_max_out">Max out DB marker?</string>
-    <string name="setting_tie_wifi">Tie to Wi-Fi Scan Period</string>
+    <string name="setting_tie_wifi">Sync with Wi-Fi</string>
     <string name="no_tts">No Text-to-Speech engine</string>
     <string name="sec">sec</string>
     <string name="min">min</string>
@@ -250,5 +250,6 @@
     <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
-    <string name="wigle_service">WiGLE WiFi Service</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable Toast Popups</string>
 </resources>

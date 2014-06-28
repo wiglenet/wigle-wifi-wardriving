@@ -20,7 +20,7 @@ import android.widget.Toast;
 public class GPSListener implements Listener, LocationListener {
   private static final long GPS_TIMEOUT = 15000L;
   private static final long NET_LOC_TIMEOUT = 60000L;
-  
+
   private MainActivity mainActivity;
   private Location location;
   private Location networkLocation;
@@ -31,69 +31,69 @@ public class GPSListener implements Listener, LocationListener {
   private Long satCountLowTime = 0L;
   private float previousSpeed = 0f;
   private LocationListener mapLocationListener;
-  
+
   public GPSListener( MainActivity mainActivity ) {
     this.mainActivity = mainActivity;
   }
-  
+
   public void setMapListener( LocationListener mapLocationListener ) {
     this.mapLocationListener = mapLocationListener;
   }
-  
+
   public void setMainActivity( MainActivity mainActivity ) {
     this.mainActivity = mainActivity;
   }
-  
+
   @Override
   public void onGpsStatusChanged( final int event ) {
     if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
-      MainActivity.info("GPS STOPPED");    
+      MainActivity.info("GPS STOPPED");
       // this event lies, on one device it gets called when the
       // network provider is disabled :(  so we do nothing...
       // listActivity.setLocationUpdates();
     }
     // MainActivity.info("GPS event: " + event);
     updateLocationData( (Location) null );
-  } 
-  
+  }
+
   public void handleScanStop() {
     MainActivity.info("GPSListener: handleScanStop");
     gpsStatus = null;
     location = null;
   }
-  
+
   @Override
   public void onLocationChanged( final Location newLocation ) {
     // MainActivity.info("GPS onLocationChanged: " + newLocation);
     updateLocationData( newLocation );
-        
+
     if ( mapLocationListener != null ) {
       mapLocationListener.onLocationChanged( newLocation );
     }
   }
-  
+
   @Override
   public void onProviderDisabled( final String provider ) {
     MainActivity.info("provider disabled: " + provider);
-        
+
     if ( mapLocationListener != null ) {
       mapLocationListener.onProviderDisabled( provider );
     }
   }
-  
+
   @Override
   public void onProviderEnabled( final String provider ) {
     MainActivity.info("provider enabled: " + provider);
-        
+
     if ( mapLocationListener != null ) {
       mapLocationListener.onProviderEnabled( provider );
     }
   }
-  
+
   @Override
   public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
     MainActivity.info("provider status changed: " + provider + " status: " + status);
-        
+
     if ( mapLocationListener != null ) {
       mapLocationListener.onStatusChanged( provider, status, extras );
     }
@@ -105,11 +105,11 @@ public class GPSListener implements Listener, LocationListener {
     // see if we have new data
     gpsStatus = locationManager.getGpsStatus( gpsStatus );
     final int satCount = getSatCount();
-    
+
     boolean newOK = newLocation != null;
     final boolean locOK = locationOK( location, satCount );
     final long now = System.currentTimeMillis();
-    
+
     if ( newOK ) {
       if ( NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
         // save for later, in case we lose gps
@@ -122,13 +122,13 @@ public class GPSListener implements Listener, LocationListener {
         newOK = locationOK( newLocation, satCount );
       }
     }
-    
+
     if ( mainActivity.inEmulator() && newLocation != null ) {
-      newOK = true; 
+      newOK = true;
     }
-    
+
     final boolean netLocOK = locationOK( networkLocation, satCount );
-    
+
     boolean wasProviderChange = false;
     if ( ! locOK ) {
       if ( newOK ) {
@@ -136,7 +136,7 @@ public class GPSListener implements Listener, LocationListener {
         if ( location != null && ! location.getProvider().equals( newLocation.getProvider() ) ) {
           wasProviderChange = false;
         }
-        
+
         location = newLocation;
       }
       else if ( netLocOK ) {
@@ -169,7 +169,7 @@ public class GPSListener implements Listener, LocationListener {
         location = newLocation;
       }
     }
-    
+
     // for maps. so lame!
     ListFragment.lameStatic.location = location;
     boolean scanScheduled = false;
@@ -187,51 +187,55 @@ public class GPSListener implements Listener, LocationListener {
     else {
       previousSpeed = 0f;
     }
-    
+
     // MainActivity.info("sat count: " + satCount);
-    
+
     if ( wasProviderChange ) {
-      MainActivity.info( "wasProviderChange: satCount: " + satCount 
+      MainActivity.info( "wasProviderChange: satCount: " + satCount
         + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
         + " wasProviderChange: " + wasProviderChange
         + (newOK ? " newProvider: " + newLocation.getProvider() : "")
-        + (locOK ? " locProvider: " + location.getProvider() : "") 
+        + (locOK ? " locProvider: " + location.getProvider() : "")
         + " newLocation: " + newLocation );
 
-      final String announce = location == null ? mainActivity.getString(R.string.lost_location) 
-          : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
-      Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();
       final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean disableToast = prefs.getBoolean( ListFragment.PREF_DISABLE_TOAST, false );
+      if (!disableToast) {
+        final String announce = location == null ? mainActivity.getString(R.string.lost_location)
+            : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
+        Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();
+      }
+
       final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );
       if ( speechGPS ) {
         // no quotes or the voice pauses
-        final String speakAnnounce = location == null ? "Lost Location" 
+        final String speakAnnounce = location == null ? "Lost Location"
           : "Now have location from " + location.getProvider() + ".";
         mainActivity.speak( speakAnnounce );
       }
-      
+
       if ( ! scanScheduled ) {
         // get the ball rolling
         MainActivity.info("Location provider change, scheduling scan");
         mainActivity.scheduleScan();
       }
     }
-    
+
     // update the UI
     mainActivity.setLocationUI();
   }
-  
+
   public void checkLocationOK() {
     if ( ! locationOK( location, getSatCount() ) ) {
       // do a self-check
       updateLocationData(null);
     }
   }
-  
+
   private boolean locationOK( final Location location, final int satCount ) {
     boolean retval = false;
     final long now = System.currentTimeMillis();
-    
+
     if ( location == null ) {
       // bad!
     }
@@ -252,13 +256,13 @@ public class GPSListener implements Listener, LocationListener {
     }
     else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
       boolean gpsLost = now - lastNetworkLocationTime > NET_LOC_TIMEOUT;
-      gpsLost |= horribleGps(location);      
+      gpsLost |= horribleGps(location);
       retval = ! gpsLost;
     }
-    
+
     return retval;
   }
-  
+
   private boolean horribleGps(final Location location) {
     // try to protect against some horrible gps's out there
     boolean horrible = false;
@@ -268,7 +272,7 @@ public class GPSListener implements Listener, LocationListener {
     horrible |= location.getLongitude() < -180 || location.getLongitude() > 180;
     return horrible;
   }
-  
+
   public int getSatCount() {
     int satCount = 0;
     if ( gpsStatus != null ) {
@@ -280,7 +284,7 @@ public class GPSListener implements Listener, LocationListener {
     }
     return satCount;
   }
-  
+
   public void saveLocation() {
     // save our location for use on later runs
     if ( this.location != null ) {
@@ -292,9 +296,9 @@ public class GPSListener implements Listener, LocationListener {
       edit.commit();
     }
   }
-  
+
   public Location getLocation() {
     return location;
   }
-  
+
 }

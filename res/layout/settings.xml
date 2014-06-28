@@ -59,6 +59,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
+	android:orientation="horizontal"
 	/> 
 
 <CheckBox android:id="@+id/found_sound"
@@ -70,11 +71,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/found_new_sound" />
-        
-<CheckBox android:id="@+id/speech_gps"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/speech_gps" />
         
 <CheckBox android:id="@+id/edit_showcurrent"
         android:layout_width="fill_parent"
@@ -101,7 +97,12 @@
         android:layout_height="wrap_content"
         android:text="@string/use_wigle_tiles" />
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<CheckBox android:id="@+id/disable_toast"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/disable_toast" />
+
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -122,7 +123,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -143,7 +144,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -164,7 +165,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -185,7 +186,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -206,7 +207,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -227,7 +228,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -248,7 +249,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -263,14 +264,15 @@
 	<TextView
 		android:id="@+id/language_text"  
 		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:layout_height="fill_parent" 
 		android:text="@string/language_text"
 		android:layout_weight="2"
 		/>
 </LinearLayout>
 
-<Button android:id="@+id/speech_button" android:layout_width="wrap_content" android:layout_height="wrap_content" 
-		android:text="@string/speech_button" android:layout_weight="0"
+<Button android:id="@+id/speech_button" android:layout_width="wrap_content" 
+    android:layout_height="0dip" 
+		android:text="@string/speech_button" android:layout_weight="1"
 		android:paddingTop="10dip" android:paddingBottom="10dip"/>
 
 <LinearLayout
@@ -278,6 +280,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
+	android:orientation="horizontal"
 	/> 
 		
 <TextView android:text="@string/setting_db_marker"
@@ -285,7 +288,7 @@
 	android:layout_height="wrap_content"
 	/>
 	
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
@@ -303,7 +306,7 @@
 		/>
 </LinearLayout>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"

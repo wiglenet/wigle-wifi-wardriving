@@ -12,7 +12,6 @@ download of cell observed as well
 tablet list+map layout
 
 --- user suggested ---
-option to turn off gps on/off toast
 map-page type filter on four csv/kml exports
 exit button as different color
 option to stop scanning when not plugged in
@@ -47,9 +46,7 @@ rssi on kml export
 
 --- 2.0 blockers ---
 List detachment on rotate race condition
-Default map zoom
 Lock screen on dashboard fragment
-Mute covering gps on/off speech
 
 --- done ---
 * 2.0 (?)
@@ -57,6 +54,7 @@ Complete major refactor for Action Bar
 Migrate to safe-draw to fix osm drawing distortions
 Dashboard landscape-optimized layout
 Many language file fixes (thanks robin0van0der0v!)
+Option to turn off gps toast popups
 
 * 1.58 (01/19/2014)
 Use WiGLE's OpenStreetMap tileserver

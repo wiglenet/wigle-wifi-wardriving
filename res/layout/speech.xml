@@ -14,6 +14,11 @@
     android:layout_height="wrap_content"
     android:text="@string/speech_text" />
         
+<CheckBox android:id="@+id/speech_gps"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_gps" />
+
 <!-- run, new, queue, miles, time, battery -->
 <CheckBox android:id="@+id/speech_run"
         android:layout_width="fill_parent"
@@ -52,6 +57,7 @@
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
+	android:orientation="horizontal"
 	/>         
 <CheckBox android:id="@+id/speech_ssid"
         android:layout_width="fill_parent"

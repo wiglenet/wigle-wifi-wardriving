@@ -46,10 +46,10 @@ public class WifiReceiver extends BroadcastReceiver {
   private MainActivity mainActivity;
   private final DatabaseHelper dbHelper;
   private NetworkListAdapter listAdapter;
-  private SimpleDateFormat timeFormat;
-  private NumberFormat numberFormat1;
-  private SsidSpeaker ssidSpeaker;
-  
+  private final SimpleDateFormat timeFormat;
+  private final NumberFormat numberFormat1;
+  private final SsidSpeaker ssidSpeaker;
+
   private Handler wifiTimer;
   private Location prevGpsLocation;
   private long scanRequestTime = Long.MIN_VALUE;
@@ -66,49 +66,54 @@ public class WifiReceiver extends BroadcastReceiver {
   private long prevNewCellCount;
   private long prevScanPeriod;
   private boolean scanInFlight = false;
-  
+
   public static final int SIGNAL_COMPARE = 10;
   public static final int CHANNEL_COMPARE = 11;
   public static final int CRYPTO_COMPARE = 12;
   public static final int FIND_TIME_COMPARE = 13;
   public static final int SSID_COMPARE = 14;
-    
+
   private static final Comparator<Network> signalCompare = new Comparator<Network>() {
+    @Override
     public int compare( Network a, Network b ) {
       return b.getLevel() - a.getLevel();
     }
   };
-  
+
   private static final Comparator<Network> channelCompare = new Comparator<Network>() {
+    @Override
     public int compare( Network a, Network b ) {
       return a.getFrequency() - b.getFrequency();
     }
   };
-  
+
   private static final Comparator<Network> cryptoCompare = new Comparator<Network>() {
+    @Override
     public int compare( Network a, Network b ) {
       return b.getCrypto() - a.getCrypto();
     }
   };
-  
+
   private static final Comparator<Network> findTimeCompare = new Comparator<Network>() {
+    @Override
     public int compare( Network a, Network b ) {
       return (int) (b.getConstructionTime() - a.getConstructionTime());
     }
   };
-  
+
   private static final Comparator<Network> ssidCompare = new Comparator<Network>() {
+    @Override
     public int compare( Network a, Network b ) {
       return a.getSsid().compareTo( b.getSsid() );
     }
   };
-  
+
   public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
     this.mainActivity = mainActivity;
     this.dbHelper = dbHelper;
     ListFragment.lameStatic.runNetworks = runNetworks;
     ssidSpeaker = new SsidSpeaker( mainActivity );
-    
+
     // formats for speech
     timeFormat = new SimpleDateFormat( "h mm aa", Locale.US );
     numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
@@ -116,20 +121,20 @@ public class WifiReceiver extends BroadcastReceiver {
       ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
     }
   }
-  
+
   public void setMainActivity( final MainActivity mainActivity ) {
     this.mainActivity = mainActivity;
     this.ssidSpeaker.setListActivity( mainActivity );
   }
-  
+
   public void setListAdapter( final NetworkListAdapter listAdapter ) {
     this.listAdapter = listAdapter;
   }
-  
+
   public int getRunNetworkCount() {
     return runNetworks.size();
   }
-  
+
   @Override
   public void onReceive( final Context context, final Intent intent ) {
     scanInFlight = false;
@@ -144,7 +149,7 @@ public class WifiReceiver extends BroadcastReceiver {
     catch (NullPointerException ex) {
       // ignore, happens on some vm's
     }
-    
+
     long nonstopScanRequestTime = Long.MIN_VALUE;
     final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final long period = getScanPeriod();
@@ -153,8 +158,8 @@ public class WifiReceiver extends BroadcastReceiver {
       doWifiScan();
       nonstopScanRequestTime = now;
     }
-    
-    final long setPeriod = mainActivity.getLocationSetPeriod();    
+
+    final long setPeriod = mainActivity.getLocationSetPeriod();
     if ( setPeriod != prevScanPeriod && mainActivity.isScanning() ) {
       // update our location scanning speed
       MainActivity.info("setting location updates to: " + setPeriod);
@@ -162,22 +167,22 @@ public class WifiReceiver extends BroadcastReceiver {
 
       prevScanPeriod = setPeriod;
     }
-    
+
     // have the gps listener to a self-check, in case it isn't getting updates anymore
     mainActivity.getGPSListener().checkLocationOK();
-    
+
     final Location location = mainActivity.getGPSListener().getLocation();
-    
-    // save the location every minute, for later runs, or viewing map during loss of location.    
-    if (now - lastSaveLocationTime > 60000L && location != null) {    
+
+    // save the location every minute, for later runs, or viewing map during loss of location.
+    if (now - lastSaveLocationTime > 60000L && location != null) {
       mainActivity.getGPSListener().saveLocation();
       lastSaveLocationTime = now;
     }
-    
+
     if (location != null) {
       lastHaveLocationTime = now;
     }
-    // MainActivity.info("now minus haveloctime: " + (now-lastHaveLocationTime) 
+    // MainActivity.info("now minus haveloctime: " + (now-lastHaveLocationTime)
     //    + " lastHaveLocationTime: " + lastHaveLocationTime);
     if (now - lastHaveLocationTime > 30000L) {
       // no location in a while, make sure we're subscribed to updates
@@ -186,23 +191,23 @@ public class WifiReceiver extends BroadcastReceiver {
       // don't do this until another period has passed
       lastHaveLocationTime = now;
     }
-    
+
     final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
     if ( showCurrent && listAdapter != null ) {
       listAdapter.clear();
     }
-    
+
     final int preQueueSize = dbHelper.getQueueSize();
     final boolean fastMode = dbHelper.isFastMode();
     final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
     boolean somethingAdded = false;
     int resultSize = 0;
     int newWifiForRun = 0;
-    
+
     final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
       && ! mainActivity.isMuted();
     final Matcher ssidMatcher = OpenStreetMapViewWrapper.getFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
-    
+
     // can be null on shutdown
     if ( results != null ) {
       resultSize = results.size();
@@ -216,7 +221,7 @@ public class WifiReceiver extends BroadcastReceiver {
           // cache hit, just set the level
           network.setLevel( result.level );
         }
-        
+
         final boolean added = runNetworks.add( result.BSSID );
         if ( added ) {
             newWifiForRun++;
@@ -225,13 +230,13 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         }
         somethingAdded |= added;
-        
+
         if ( location != null && (added || network.getGeoPoint() == null) ) {
           // set the geopoint for mapping
           final GeoPoint geoPoint = new GeoPoint( location );
           network.setGeoPoint( geoPoint );
-        }                
-        
+        }
+
         // if we're showing current, or this was just added, put on the list
         if ( showCurrent || added ) {
           if ( OpenStreetMapViewWrapper.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
@@ -243,7 +248,7 @@ public class WifiReceiver extends BroadcastReceiver {
           // for ( int i = 0; i< 10; i++) {
           //  listAdapter.add( network );
           // }
-          
+
         }
         else if (listAdapter != null){
           // not showing current, and not a new thing, go find the network and update the level
@@ -255,7 +260,7 @@ public class WifiReceiver extends BroadcastReceiver {
             }
           }
         }
-        
+
         if ( location != null  ) {
           // if in fast mode, only add new-for-run stuff to the db queue
           if ( fastMode && ! added ) {
@@ -283,7 +288,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final long newCellCount = dbHelper.getNewCellCount();
     final long newCellDiff = newCellCount - prevNewCellCount;
     prevNewCellCount = newCellCount;
-    
+
     if ( ! mainActivity.isMuted() ) {
       final boolean playRun = prefs.getBoolean( ListFragment.PREF_FOUND_SOUND, true );
       final boolean playNew = prefs.getBoolean( ListFragment.PREF_FOUND_NEW_SOUND, true );
@@ -294,12 +299,12 @@ public class WifiReceiver extends BroadcastReceiver {
         mainActivity.playRunNetSound();
       }
     }
-    
+
     if ( mainActivity.getPhoneState().isPhoneActive() ) {
-      // a phone call is active, make sure we aren't speaking anything      
+      // a phone call is active, make sure we aren't speaking anything
       mainActivity.interruptSpeak();
-    }    
-    
+    }
+
     // check cell tower info
     final int preCellForRun = runNetworks.size();
     int newCellForRun = 0;
@@ -312,8 +317,8 @@ public class WifiReceiver extends BroadcastReceiver {
       if ( runNetworks.size() > preCellForRun ) {
         newCellForRun++;
       }
-    }    
-    
+    }
+
     final int sort = prefs.getInt(ListFragment.PREF_LIST_SORT, SIGNAL_COMPARE);
     Comparator<Network> comparator = signalCompare;
     switch ( sort ) {
@@ -339,10 +344,10 @@ public class WifiReceiver extends BroadcastReceiver {
 
     final long dbNets = dbHelper.getNetworkCount();
     final long dbLocs = dbHelper.getLocationCount();
-    
+
     // update stat
     mainActivity.setNetCountUI();
-    
+
     // set the statics for the map
     ListFragment.lameStatic.runNets = runNetworks.size();
     ListFragment.lameStatic.newNets = newNetCount;
@@ -352,7 +357,7 @@ public class WifiReceiver extends BroadcastReceiver {
     ListFragment.lameStatic.preQueueSize = preQueueSize;
     ListFragment.lameStatic.dbNets = dbNets;
     ListFragment.lameStatic.dbLocs = dbLocs;
-    
+
     // do this if trail is empty, so as soon as we get first gps location it gets triggered
     // and will show up on map
     if ( newWifiForRun > 0 || newCellForRun > 0 || ListFragment.lameStatic.trail.isEmpty() ) {
@@ -367,8 +372,8 @@ public class WifiReceiver extends BroadcastReceiver {
         final TrailStat trailStat = updateTrailStat( geoPoint, newWifiForRun, newNetDiff );
         // MainActivity.info("newCellForRun: " + newCellForRun);
         trailStat.newCellForRun += newCellForRun;
-        trailStat.newCellForDB += newCellDiff;        
-        
+        trailStat.newCellForDB += newCellDiff;
+
         // add any pendings
         // don't go crazy
         if ( pendingWifiCount > 25 ) {
@@ -376,7 +381,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         trailStat.newWifiForRun += pendingWifiCount;
         pendingWifiCount = 0;
-        
+
         if ( pendingCellCount > 25 ) {
           pendingCellCount = 25;
         }
@@ -384,36 +389,36 @@ public class WifiReceiver extends BroadcastReceiver {
         pendingCellCount = 0;
       }
     }
-    
+
     // info( savedStats );
-    
+
     // notify
     if (listAdapter != null) {
       listAdapter.notifyDataSetChanged();
     }
-    
+
     if ( scanRequestTime <= 0 ) {
       // wasn't set, set to now
       scanRequestTime = now;
     }
-    final String status = resultSize + " " + mainActivity.getString(R.string.scanned_in) + " " 
-        + (now - scanRequestTime) + mainActivity.getString(R.string.ms_short) + ". " 
+    final String status = resultSize + " " + mainActivity.getString(R.string.scanned_in) + " "
+        + (now - scanRequestTime) + mainActivity.getString(R.string.ms_short) + ". "
         + mainActivity.getString(R.string.dash_db_queue) + " " + preQueueSize;
     mainActivity.setStatusUI( status );
     // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
     scanRequestTime = nonstopScanRequestTime;
-    
+
     // do lerp if need be
     if ( location == null ) {
       if ( prevGpsLocation != null ) {
         dbHelper.lastLocation( prevGpsLocation );
         // MainActivity.info("set last location for lerping");
       }
-    } 
+    }
     else {
       dbHelper.recoverLocations( location );
     }
-    
+
     // do distance calcs
     if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
         && location.getAccuracy() <= ListFragment.MIN_DISTANCE_ACCURACY ) {
@@ -429,15 +434,15 @@ public class WifiReceiver extends BroadcastReceiver {
           edit.commit();
         }
       }
-      
+
       // set for next time
       prevGpsLocation = location;
     }
-    
+
     if ( somethingAdded && ssidSpeak ) {
       ssidSpeaker.speak();
     }
-    
+
     final long speechPeriod = prefs.getLong( ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
       doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
@@ -454,7 +459,7 @@ public class WifiReceiver extends BroadcastReceiver {
     trailStat.newWifiForDB += newWifiForDB;
     return trailStat;
   }
-  
+
   public String getNetworkTypeName() {
     TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
     if ( tele == null ) {
@@ -466,7 +471,7 @@ public class WifiReceiver extends BroadcastReceiver {
         case TelephonyManager.NETWORK_TYPE_EDGE:
             return "EDGE";
         case TelephonyManager.NETWORK_TYPE_UMTS:
-            return "UMTS";        
+            return "UMTS";
         case 4:
             return "CDMA";
         case 5:
@@ -482,14 +487,14 @@ public class WifiReceiver extends BroadcastReceiver {
         case 10:
           return "HSPA";
         case 11:
-            return "IDEN";    
+            return "IDEN";
         case 12:
-          return "CDMA - EvDo rev. B";    
+          return "CDMA - EvDo rev. B";
         default:
             return "UNKNOWN";
     }
   }
-  
+
   private Network recordCellInfo(final Location location) {
     TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
     Network network = null;
@@ -498,8 +503,8 @@ public class WifiReceiver extends BroadcastReceiver {
       List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
       for (final NeighboringCellInfo cell : list ) {
         MainActivity.info("neigh cell: " + cell + " class: " + cell.getClass().getCanonicalName() );
-        MainActivity.info("cid: " + cell.getCid());        
-        
+        MainActivity.info("cid: " + cell.getCid());
+
         // api level 5!!!!
         MainActivity.info("lac: " + cell.getLac() );
         MainActivity.info("psc: " + cell.getPsc() );
@@ -509,15 +514,15 @@ public class WifiReceiver extends BroadcastReceiver {
       */
       String bssid = null;
       NetworkType type = null;
-      
+
       CellLocation cellLocation = null;
-      try { 
+      try {
         cellLocation = tele.getCellLocation();
       }
       catch ( NullPointerException ex ) {
         // bug in Archos7 can NPE there, just ignore
       }
-      
+
       if ( cellLocation == null ) {
         // ignore
       }
@@ -526,14 +531,14 @@ public class WifiReceiver extends BroadcastReceiver {
           final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
           final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);
           final int baseStationId = (Integer) cellLocation.getClass().getMethod("getBaseStationId").invoke(cellLocation);
-          if ( systemId > 0 && networkId >= 0 && baseStationId >= 0 ) { 
+          if ( systemId > 0 && networkId >= 0 && baseStationId >= 0 ) {
             bssid = systemId + "_" + networkId + "_" + baseStationId;
             type = NetworkType.CDMA;
           }
         }
         catch ( Exception ex ) {
           MainActivity.error("cdma reflection exception: " + ex);
-        }        
+        }
       }
       else if ( cellLocation instanceof GsmCellLocation ) {
         GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
@@ -542,34 +547,34 @@ public class WifiReceiver extends BroadcastReceiver {
           type = NetworkType.GSM;
         }
       }
-      
+
       if ( bssid != null ) {
-        final String ssid = tele.getNetworkOperatorName();        
+        final String ssid = tele.getNetworkOperatorName();
         final String networkType = getNetworkTypeName();
         final String capabilities = networkType + ";" + tele.getNetworkCountryIso();
-        
+
         int strength = 0;
         PhoneState phoneState = mainActivity.getPhoneState();
         if (phoneState != null) {
           strength = phoneState.getStrength();
         }
-        
+
         if ( NetworkType.GSM.equals(type) ) {
           strength = gsmRssiMagicDecoderRing( strength );
         }
-        
-//          MainActivity.info( "bssid: " + bssid );        
+
+//          MainActivity.info( "bssid: " + bssid );
 //          MainActivity.info( "strength: " + strength );
-//          MainActivity.info( "ssid: " + ssid ); 
-//          MainActivity.info( "capabilities: " + capabilities ); 
-//          MainActivity.info( "networkType: " + networkType ); 
+//          MainActivity.info( "ssid: " + ssid );
+//          MainActivity.info( "capabilities: " + capabilities );
+//          MainActivity.info( "networkType: " + networkType );
 //          MainActivity.info( "location: " + location );
-                
+
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
-        
+
         final boolean newForRun = runNetworks.add( bssid );
-        
-        network = networkCache.get( bssid );        
+
+        network = networkCache.get( bssid );
         if ( network == null ) {
           network = new Network( bssid, ssid, 0, capabilities, strength, type );
           networkCache.put( network.getBssid(), network );
@@ -577,22 +582,22 @@ public class WifiReceiver extends BroadcastReceiver {
         else {
           network.setLevel(strength);
         }
-        
+
         if ( location != null && (newForRun || network.getGeoPoint() == null) ) {
           // set the geopoint for mapping
           final GeoPoint geoPoint = new GeoPoint( location );
           network.setGeoPoint( geoPoint );
-        }  
-        
+        }
+
         if ( location != null ) {
           dbHelper.addObservation(network, location, newForRun);
         }
       }
-    }   
-    
+    }
+
     return network;
   }
-  
+
   private int gsmRssiMagicDecoderRing( int strength ) {
     int retval = -113;
     if ( strength == 99 ) {
@@ -605,15 +610,15 @@ public class WifiReceiver extends BroadcastReceiver {
     // MainActivity.info("strength: " + strength + " retval: " + retval);
     return retval;
   }
-  
+
   private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
     final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     StringBuilder builder = new StringBuilder();
-    
+
     if ( mainActivity.getGPSListener().getLocation() == null ) {
       builder.append( mainActivity.getString(R.string.tts_no_gps_fix) + ", " );
     }
-    
+
     // run, new, queue, miles, time, battery
     if ( prefs.getBoolean( ListFragment.PREF_SPEAK_RUN, true ) ) {
       builder.append( mainActivity.getString(R.string.run) + " " ).append( runNetworks.size() ).append( ", " );
@@ -644,18 +649,19 @@ public class WifiReceiver extends BroadcastReceiver {
       builder.append( mainActivity.getString(R.string.tts_battery) + " " ).append( batteryLevel )
         .append( " " + mainActivity.getString(R.string.tts_percent) + ", " );
     }
-    
+
     MainActivity.info( "speak: " + builder.toString() );
     mainActivity.speak( builder.toString() );
     previousTalkTime = now;
   }
-  
+
   public void setupWifiTimer( final boolean turnedWifiOn ) {
     MainActivity.info( "create wifi timer" );
     if ( wifiTimer == null ) {
       wifiTimer = new Handler();
       final Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {              
+        @Override
+        public void run() {
             // make sure the app isn't trying to finish
             if ( ! mainActivity.isFinishing() ) {
               // info( "timer start scan" );
@@ -679,7 +685,7 @@ public class WifiReceiver extends BroadcastReceiver {
       };
       wifiTimer.removeCallbacks( mUpdateTimeTask );
       wifiTimer.postDelayed( mUpdateTimeTask, 100 );
-  
+
       if ( turnedWifiOn ) {
         MainActivity.info( "not immediately running wifi scan, since it was just turned on"
             + " it will block for a few seconds and fail anyway");
@@ -695,10 +701,10 @@ public class WifiReceiver extends BroadcastReceiver {
       }
     }
   }
-  
+
   public long getScanPeriod() {
     final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-    
+
     String scanPref = ListFragment.PREF_SCAN_PERIOD;
     long defaultRate = MainActivity.SCAN_DEFAULT;
     // if over 5 mph
@@ -711,26 +717,27 @@ public class WifiReceiver extends BroadcastReceiver {
       scanPref = ListFragment.PREF_SCAN_PERIOD_STILL;
       defaultRate = MainActivity.SCAN_STILL_DEFAULT;
     }
-    return prefs.getLong( scanPref, defaultRate );    
+    return prefs.getLong( scanPref, defaultRate );
   }
-  
+
   public void scheduleScan() {
     wifiTimer.post(new Runnable() {
+      @Override
       public void run() {
         doWifiScan();
       }
-    });    
+    });
   }
-  
+
   /**
    * only call this from a Handler
    * @return
    */
   private boolean doWifiScan() {
-    MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
+    // MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
     final WifiManager wifiManager = (WifiManager) mainActivity.getSystemService(Context.WIFI_SERVICE);
     boolean success = false;
-    
+
     if ( mainActivity.isTransferring() ) {
       MainActivity.info( "transferring, not scanning for now" );
       // reset this
@@ -741,9 +748,9 @@ public class WifiReceiver extends BroadcastReceiver {
         success = wifiManager.startScan();
         if ( success ) {
           scanInFlight = true;
-        }      
-      }      
-            
+        }
+      }
+
       final long now = System.currentTimeMillis();
       if ( lastScanResponseTime < 0 ) {
         // use now, since we made a request
@@ -754,12 +761,15 @@ public class WifiReceiver extends BroadcastReceiver {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final long resetWifiPeriod = prefs.getLong(
             ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
-        
+
         if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
           MainActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
           if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
-            Toast.makeText( mainActivity, 
-                mainActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
+            final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
+            if (!disableToast) {
+              Toast.makeText( mainActivity,
+                  mainActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
+            }
             scanInFlight = false;
             try {
               wifiManager.setWifiEnabled(false);
@@ -770,7 +780,7 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             lastWifiUnjamTime = now;
             if (prefs.getBoolean(ListFragment.PREF_SPEAK_WIFI_RESTART, true)) {
-              mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " " 
+              mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
                 + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
             }
           }
@@ -787,32 +797,33 @@ public class WifiReceiver extends BroadcastReceiver {
       // reset this
       lastScanResponseTime = Long.MIN_VALUE;
     }
-    
+
     // battery kill
     if ( ! mainActivity.isTransferring() ) {
       final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-      final long batteryKill = prefs.getLong(
+       long batteryKill = prefs.getLong(
           ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
-      
+
       if ( mainActivity.getBatteryLevelReceiver() != null ) {
-        final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel(); 
+        final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
         final int batteryStatus = mainActivity.getBatteryLevelReceiver().getBatteryStatus();
         // MainActivity.info("batteryStatus: " + batteryStatus);
-  
         // give some time since starting up to change this configuration
-        if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill 
+        if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
             && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
             && (System.currentTimeMillis() - constructionTime) > 30000L) {
           final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
               + mainActivity.getString(R.string.battery_postfix);
           Toast.makeText( mainActivity, text, Toast.LENGTH_LONG ).show();
-          mainActivity.speak( "low battery" );
-//          listActivity.finish();
+          MainActivity.warn("low battery, shutting down");
+          mainActivity.speak( text );
+          MainActivity.sleep(5000L);
+          mainActivity.finish();
         }
       }
     }
-    
+
     return success;
-  }  
-  
+  }
+
 }

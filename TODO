@@ -44,16 +44,13 @@ set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 rssi on kml export
 
---- 2.0 blockers ---
-List detachment on rotate race condition
-
 --- done ---
 * 2.0 (?)
-Complete major refactor for Action Bar
-Migrate to safe-draw to fix osm drawing distortions
+Major refactor for Action Bar support
 Dashboard landscape-optimized layout
-Many language file fixes (thanks robin0van0der0v!)
 Option to turn off gps toast popups
+Many language file fixes (thanks robin0van0der0v!)
+Migrate to safe-draw to fix osm drawing distortions
 
 * 1.58 (01/19/2014)
 Use WiGLE's OpenStreetMap tileserver

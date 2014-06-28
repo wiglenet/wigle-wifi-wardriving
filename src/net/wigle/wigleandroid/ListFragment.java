@@ -446,7 +446,9 @@ public final class ListFragment extends Fragment implements FileUploaderListener
 
     private void setupList( final View view ) {
       State state = MainActivity.getState(this);
-      state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+      if (state.listAdapter == null) {
+        state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+      }
       // always set our current list adapter
       state.wifiReceiver.setListAdapter( state.listAdapter );
       final ListView listView = (ListView) view.findViewById( R.id.ListView01 );

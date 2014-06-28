@@ -46,7 +46,6 @@ rssi on kml export
 
 --- 2.0 blockers ---
 List detachment on rotate race condition
-Lock screen on dashboard fragment
 
 --- done ---
 * 2.0 (?)

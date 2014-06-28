@@ -98,6 +98,8 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     String previousStatus;
     int currentTab;
     private final Fragment[] fragList = new Fragment[4];
+    private boolean screenLocked = false;
+    private PowerManager.WakeLock wakeLock;
   }
   private State state;
   // *** end of state that is retained ***
@@ -122,8 +124,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
   private static MainActivity mainActivity;
   private static ListFragment listActivity;
-  private boolean screenLocked = false;
-  private PowerManager.WakeLock wakeLock;
   private BatteryLevelReceiver batteryLevelReceiver;
 
   private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
@@ -145,12 +145,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     // set language
     setLocale( this );
     setContentView(R.layout.main);
-
-    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-    wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
-    if ( wakeLock.isHeld() ) {
-      wakeLock.release();
-    }
 
     mainActivity = this;
 
@@ -187,8 +181,6 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       if ( state.fileUploaderTask != null ) {
         state.fileUploaderTask.setContext( this );
       }
-
-
     }
     else {
       info("MAIN: creating new state");
@@ -207,6 +199,14 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       edit.putFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
       edit.putFloat( ListFragment.PREF_DISTANCE_PREV_RUN, prevRun );
       edit.commit();
+    }
+
+    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    if (state.wakeLock == null) {
+      state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+      if ( state.wakeLock.isHeld() ) {
+        state.wakeLock.release();
+      }
     }
 
     final String id = Settings.Secure.getString( getContentResolver(), Settings.Secure.ANDROID_ID );
@@ -341,35 +341,33 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     bar.setSelectedNavigationItem(tab);
   }
 
-  static void setLockScreen( Activity activity, boolean lockScreen ) {
-    final Activity parent = activity.getParent();
-    if ( parent != null && parent instanceof MainActivity ) {
-      MainActivity main = (MainActivity) parent;
+  static void setLockScreen( Fragment fragment, boolean lockScreen ) {
+    final MainActivity main = getMainActivity(fragment);
+    if ( main != null ) {
       main.setLockScreen( lockScreen );
     }
   }
 
-  static boolean isScreenLocked( Activity activity ) {
-    final Activity parent = activity.getParent();
-    if ( parent != null && parent instanceof MainActivity ) {
-      MainActivity main = (MainActivity) parent;
-      return main.screenLocked;
+  static boolean isScreenLocked( Fragment fragment ) {
+    final MainActivity main = getMainActivity(fragment);
+    if ( main != null ) {
+      return main.getState().screenLocked;
     }
     return false;
   }
 
   @SuppressLint("Wakelock")
   private void setLockScreen( boolean lockScreen ) {
-    this.screenLocked = lockScreen;
+    state.screenLocked = lockScreen;
     if ( lockScreen ) {
-      if ( ! wakeLock.isHeld() ) {
+      if ( ! state.wakeLock.isHeld() ) {
         MainActivity.info("acquire wake lock");
-        wakeLock.acquire();
+        state.wakeLock.acquire();
       }
     }
-    else if ( wakeLock.isHeld() ) {
+    else if ( state.wakeLock.isHeld() ) {
       MainActivity.info("release wake lock");
-      wakeLock.release();
+      state.wakeLock.release();
     }
   }
 
@@ -565,9 +563,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     super.onPause();
 
     // deal with wake lock
-    if ( wakeLock.isHeld() ) {
+    if ( state.wakeLock.isHeld() ) {
       MainActivity.info("release wake lock");
-      wakeLock.release();
+      state.wakeLock.release();
     }
   }
 
@@ -577,9 +575,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     super.onResume();
 
     // deal with wake lock
-    if ( ! wakeLock.isHeld() && screenLocked ) {
+    if ( ! state.wakeLock.isHeld() && state.screenLocked ) {
       MainActivity.info("acquire wake lock");
-      wakeLock.acquire();
+      state.wakeLock.acquire();
     }
   }
 

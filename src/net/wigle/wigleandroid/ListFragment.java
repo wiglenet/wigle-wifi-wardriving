@@ -270,7 +270,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
       item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
       item.setIcon( main.isScanning() ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
 
-      final String wake = MainActivity.isScreenLocked( this.getActivity() ) ?
+      final String wake = MainActivity.isScreenLocked( this ) ?
           getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
       item = menu.add(0, MENU_WAKELOCK, 0, wake);
       item.setIcon( android.R.drawable.ic_menu_gallery );
@@ -296,8 +296,8 @@ public final class ListFragment extends Fragment implements FileUploaderListener
             break;
           }
           case MENU_WAKELOCK: {
-            boolean screenLocked = ! MainActivity.isScreenLocked( this.getActivity() );
-            MainActivity.setLockScreen( this.getActivity(), screenLocked );
+            boolean screenLocked = ! MainActivity.isScreenLocked( this );
+            MainActivity.setLockScreen( this, screenLocked );
             final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
             item.setTitle( wake );
             return true;

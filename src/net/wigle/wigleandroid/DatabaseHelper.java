@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
@@ -265,6 +266,10 @@ public final class DatabaseHelper extends Thread {
                 db.setTransactionSuccessful();
                 db.endTransaction();
                 countdown = 0;
+              }
+              catch ( SQLiteConstraintException ex ) {
+                MainActivity.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
+                countdown--;
               }
               catch ( Exception ex ) {
                 MainActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );

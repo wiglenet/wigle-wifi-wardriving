@@ -64,7 +64,7 @@ final class HttpFileUploader {
         System.getProperty("os.name") + " " +
         System.getProperty("os.version") +
         " [" + System.getProperty("os.arch") + "]";
-    } catch (Exception e) { }
+    } catch (RuntimeException e) { }
     final String userAgent = "WigleWifi ("+javaVersion+")";
 
     // Open a HTTP connection to the URL

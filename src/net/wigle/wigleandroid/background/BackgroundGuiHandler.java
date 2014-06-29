@@ -114,27 +114,26 @@ public class BackgroundGuiHandler extends Handler {
       final int status = bundle.getInt("status");
 
       String filename = "";
-      if ( bundle != null ) {
-        String filepath = bundle.getString( FILEPATH );
-        filepath = filepath == null ? "" : filepath + "\n";
-        filename = bundle.getString( FILENAME );
-        if ( filename != null ) {
-          // just don't show the gz
-          int index = filename.indexOf( ".gz" );
-          if ( index > 0 ) {
-            filename = filename.substring( 0, index );
-          }
-          index = filename.indexOf( ".kml" );
-          if ( index > 0 ) {
-            filename = filename.substring( 0, index );
-          }
+
+      String filepath = bundle.getString( FILEPATH );
+      filepath = filepath == null ? "" : filepath + "\n";
+      filename = bundle.getString( FILENAME );
+      if ( filename != null ) {
+        // just don't show the gz
+        int index = filename.indexOf( ".gz" );
+        if ( index > 0 ) {
+          filename = filename.substring( 0, index );
         }
-        if ( filename == null ) {
-          filename = "";
+        index = filename.indexOf( ".kml" );
+        if ( index > 0 ) {
+          filename = filename.substring( 0, index );
         }
-        else {
-          filename = "\n\nFile location:\n" + filepath + filename;
-        }
+      }
+      if ( filename == null ) {
+        filename = "";
+      }
+      else {
+        filename = "\n\nFile location:\n" + filepath + filename;
       }
 
       String error = bundle.getString( ERROR );

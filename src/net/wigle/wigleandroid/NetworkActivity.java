@@ -230,7 +230,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
           MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?",
               0, NON_CRYPTO_DIALOG);
         }
-        else if (network != null){
+        else {
           final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
           cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
         }

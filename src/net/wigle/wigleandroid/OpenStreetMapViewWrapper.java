@@ -287,7 +287,7 @@ public final class OpenStreetMapViewWrapper extends SafeDrawOverlay {
         final Matcher matcher = getFilterMatcher( prefs, "" );
         
         for( final Network network : networks ) {
-          if (network.getSsid() == null || network.getSsid() == "") {
+          if (network.getSsid() == null || network.getSsid().isEmpty()) {
             continue;
           }
           if ( filter && ! isOk( matcher, prefs, "", network ) ) {

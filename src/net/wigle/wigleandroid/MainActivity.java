@@ -1327,8 +1327,10 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     if ( status != null ) {
       // keep around a previous, for orientation changes
       state.previousStatus = status;
-      // tell list
-      listActivity.setStatusUI( status );
+      if (listActivity != null) {
+        // tell list
+        listActivity.setStatusUI( status );
+      }
     }
   }
 

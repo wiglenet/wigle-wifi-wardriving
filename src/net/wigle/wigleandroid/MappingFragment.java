@@ -15,6 +15,7 @@ import org.osmdroid.views.overlay.MyLocationOverlay;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
@@ -67,6 +68,7 @@ public final class MappingFragment extends Fragment {
 
   private static final int DEFAULT_ZOOM = 17;
   public static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
+  private static final int MENU_SETTINGS = 10;
   private static final int MENU_EXIT = 12;
   private static final int MENU_ZOOM_IN = 13;
   private static final int MENU_ZOOM_OUT = 14;
@@ -372,6 +374,9 @@ public final class MappingFragment extends Fragment {
     item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
     item.setIcon( android.R.drawable.ic_menu_revert );
 
+    item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
+    item.setIcon( android.R.drawable.ic_menu_preferences );
+
     item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
     item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
@@ -430,6 +435,12 @@ public final class MappingFragment extends Fragment {
         case MENU_FILTER: {
           onCreateDialog( SSID_FILTER );
           return true;
+        }
+        case MENU_SETTINGS: {
+          MainActivity.info("start settings activity");
+          final Intent settingsIntent = new Intent( this.getActivity(), SettingsActivity.class );
+          startActivity( settingsIntent );
+          break;
         }
       }
       return false;

@@ -45,6 +45,10 @@ on networkactivity record more observations on that network (site survey)
 rssi on kml export
 
 --- done ---
+* 2.1 (06/28/2014)
+Add settings to map menu
+Stop NPE in statusUI on startup for some devices
+
 * 2.0 (06/28/2014)
 Major refactor for Action Bar support
 Dashboard landscape-optimized layout

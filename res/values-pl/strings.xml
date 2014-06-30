@@ -43,7 +43,7 @@
     <string name="gps_text">Częstotliwośc aktualizacji GPS</string>
     <string name="speak_text">Częstotliwośc mówienia</string>
     <string name="battery_kill_text">Wyłącz, gdy poziom baterii wynosi</string>
-    <string name="reset_wifi_text">Zresetuj Wi-Fi, gdy zacięło się na</string>
+    <string name="reset_wifi_text">Zresetuj WiFi, gdy zacięło się na</string>
     <string name="speech_gps">Powiedz o zmianie statusu GPS</string>
     <string name="mute">Wyciszenie</string>
     <string name="play">Mów</string>
@@ -56,7 +56,7 @@
     <string name="speech_button">Ekran konfiguracji mowy&gt;&gt;</string>
     <string name="speech_text">Dźwięk mowy będą obejmować:</string>
     <string name="speech_run">Znalezione sieci</string>
-    <string name="speech_new_wifi">Nowe Wi-Fi w bazie</string>
+    <string name="speech_new_wifi">Nowe WiFi w bazie</string>
     <string name="speech_new_cell">Nowe wieże kom. w bazie</string>
     <string name="speech_queue">Rozmiar kolejki, jeśli &gt; 0</string>
     <string name="speech_miles">Przebyty dystans</string>
@@ -103,7 +103,7 @@
     <string name="setting_max_id">Max przesłany id:</string>
     <string name="setting_max_start">Max id przy starcie:</string>
     <string name="setting_max_out">Ustawić znacznik na max?</string>
-    <string name="setting_tie_wifi">Skanuj razem z Wi-Fi</string>
+    <string name="setting_tie_wifi">Skanuj razem z WiFi</string>
     <string name="no_tts">Brak silnika TTS</string>
     <string name="sec">s</string>
     <string name="min">min</string>
@@ -152,17 +152,17 @@
     <string name="signal">Siła sygnału</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">Aby uzyskać najlepsze wyniki, odznacz &quot;Powiadomienie o sieci&quot; w menu &quot;Opcje bezprzewodowe&quot; -&gt; &quot;Ustawienia Wi-Fi&quot;</string>
-    <string name="turn_on_wifi">Włączanie Wi-Fi</string>
+    <string name="best_results">Aby uzyskać najlepsze wyniki, odznacz &quot;Powiadomienie o sieci&quot; w menu &quot;Opcje bezprzewodowe&quot; -&gt; &quot;Ustawienia WiFi&quot;</string>
+    <string name="turn_on_wifi">Włączanie WiFi</string>
     <string name="no_gps_device">Nie wykryto urządzenia GPS!</string>
     <string name="turn_on_gps">Proszę włączyć GPS</string>
     <string name="address">Adres</string>
     <string name="no_address_found">Nie można znaleźć adresu</string>
     <string name="problem_with_field">Problem z polem</string>
-    <string name="turning_wifi_off">Wyłączenie Wi-Fi</string>
+    <string name="turning_wifi_off">Wyłączenie WiFi</string>
     <string name="lost_location">Utracone położenie</string>
     <string name="have_location">Uzyskano położenie z</string>
-    <string name="wifi_jammed">Wi-Fi jest zacięte, wyłaczanie i włączanie...</string>
+    <string name="wifi_jammed">WiFi jest zacięte, wyłaczanie i włączanie...</string>
     <string name="battery_at">Poziom baterii wynosi</string>
     <string name="battery_postfix">procent, zamykanie WiGLE Wifi</string>
     <string name="scan">Skanowanie</string>
@@ -184,7 +184,7 @@
     <string name="menu_show_new">Pokaż nowe tylko</string>
     <string name="menu_copy_network">Copy Network BSSID</string>
     <string name="tts_no_gps_fix">bark pozycji GPS</string>
-    <string name="tts_new_wifi">Nowa sieć Wi-Fi</string>
+    <string name="tts_new_wifi">Nowa sieć WiFi</string>
     <string name="tts_new_cell">Nowe sieć gsm</string>
     <string name="tts_queue">Kolejka</string>
     <string name="tts_from">z</string>
@@ -241,12 +241,12 @@
     <string name="fatal_pre_message">BŁĄD</string>
     <string name="fatal_post_message">(Można zobaczyć ponownie w "Zgłoś błąd" w menu Ustawienia)</string>
     <string name="use_network_location">Użyj lokalizacji opartej na sieci GSM</string>
-    <string name="data_import_observed">Zaimportować zaobserwowane Wi-Fi z WiGLE do lokalnej bazy danych?</string>
+    <string name="data_import_observed">Zaimportować zaobserwowane WiFi z WiGLE do lokalnej bazy danych?</string>
     <string name="donate_question">Włączyć dotację danych dla WiGLE?</string>
     <string name="donate_explain">Pozwól WiGLE stwórzyć anonimową kopię danych, które WiGLE może przeznaczyć do komercyjnego użytku.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi restarts</string>
-    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

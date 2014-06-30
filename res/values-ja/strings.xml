@@ -103,7 +103,7 @@
     <string name="setting_max_id">Max upload id:</string>
     <string name="setting_max_start">Max id at startup:</string>
     <string name="setting_max_out">Max out DB marker?</string>
-    <string name="setting_tie_wifi">Wi-Fiのスキャン周期に接続します</string>
+    <string name="setting_tie_wifi">WiFiのスキャン周期に接続します</string>
     <string name="no_tts">音声読み上げを使用しない</string>
     <string name="sec">秒</string>
     <string name="min">分</string>
@@ -117,9 +117,9 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(スキャン停止中)</string>
-    <string name="dash_new_wifi">新しく発見した Wi-Fi</string>
-    <string name="dash_vis_nets">現在見えている Wi-Fi</string>
-    <string name="dash_new_upload">アップロード以降に発見した Wi-Fi</string>
+    <string name="dash_new_wifi">新しく発見した WiFi</string>
+    <string name="dash_vis_nets">現在見えている WiFi</string>
+    <string name="dash_new_upload">アップロード以降に発見した WiFi</string>
     <string name="dash_new_cells">新しく発見した基地局</string>
     <string name="dash_dist_run">走行距離</string>
     <string name="dash_dist_total">トータル走行距離</string>
@@ -152,7 +152,7 @@
     <string name="signal">RSSI</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">最良の結果を得るためには &quot;無線とネットワーク&quot; - &quot;Wi-Fi&quot; - &quot;詳細設定&quot; - &quot;ネットワークの通知&quot; をオフにしてください</string>
+    <string name="best_results">最良の結果を得るためには &quot;無線とネットワーク&quot; - &quot;WiFi&quot; - &quot;詳細設定&quot; - &quot;ネットワークの通知&quot; をオフにしてください</string>
     <string name="turn_on_wifi">無線LANをオンにする</string>
     <string name="no_gps_device">このデバイスにはGPSがありません</string>
     <string name="turn_on_gps">GPSを有効にしてください</string>
@@ -162,7 +162,7 @@
     <string name="turning_wifi_off">無線LANをオフ</string>
     <string name="lost_location">位置不明</string>
     <string name="have_location">位置</string>
-    <string name="wifi_jammed">Wi-Fi が停止しました。Wi-Fi を一旦無効にしてください</string>
+    <string name="wifi_jammed">WiFi が停止しました。Wi-Fi を一旦無効にしてください</string>
     <string name="battery_at">バッテリーレベル</string>
     <string name="battery_postfix">WiGLE Wifiを停止する</string>
     <string name="scan">スキャン</string>
@@ -245,8 +245,8 @@
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi restarts</string>
-    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

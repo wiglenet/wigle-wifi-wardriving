@@ -38,8 +38,8 @@
     <string name="import_observed_button">가져오기 관찰된</string>
     <string name="import_observed_text">WiGLE에서 내 관찰 네트워크를 가져오기</string>
     <string name="periodstill_text">무선랜 사이의 시간 0mph을 스캔</string>
-    <string name="period_text">Wi-Fi를 스캔 사이의 시간 &lt;5mph</string>
-    <string name="periodfast_text">Wi-Fi를 스캔 사이의 시간 &gt;5mph</string>
+    <string name="period_text">WiFi를 스캔 사이의 시간 &lt;5mph</string>
+    <string name="periodfast_text">WiFi를 스캔 사이의 시간 &gt;5mph</string>
     <string name="gps_text">GPS 업데이트 사이의 시간</string>
     <string name="speak_text">오디오 음성 사이의 시간</string>
     <string name="battery_kill_text">이 배터리 수준에서 출구</string>
@@ -241,12 +241,12 @@
     <string name="fatal_pre_message">오류</string>
     <string name="fatal_post_message">(설정 메뉴에서 "오류보고"로 다시보실 수 있습니다)</string>
     <string name="use_network_location">네트워크 위치 공급자를 사용</string>
-    <string name="data_import_observed">로컬 데이터베이스로 WiGLE에서 내 관찰 Wi-Fi를 가져오기?</string>
+    <string name="data_import_observed">로컬 데이터베이스로 WiGLE에서 내 관찰 WiFi를 가져오기?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi restarts</string>
-    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

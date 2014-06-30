@@ -37,13 +37,13 @@
     <string name="backup_db_text">Haga una copia de seguridad de todos los datos</string>
     <string name="import_observed_button">Importar mis datos desde WiGLE</string>
     <string name="import_observed_text">Importar mis datos subidos desde WiGLE</string>
-    <string name="periodstill_text">Tiempo entre las exploraciones Wi-Fi (a 0 mph)</string>
-    <string name="period_text">Tiempo entre las exploraciones Wi-Fi (a &lt;5 mph)</string>
-    <string name="periodfast_text">Tiempo entre las exploraciones Wi-Fi (a &gt;5 mph)</string>
+    <string name="periodstill_text">Tiempo entre las exploraciones WiFi (a 0 mph)</string>
+    <string name="period_text">Tiempo entre las exploraciones WiFi (a &lt;5 mph)</string>
+    <string name="periodfast_text">Tiempo entre las exploraciones WiFi (a &gt;5 mph)</string>
     <string name="gps_text">Tiempo entre las actualizaciones del GPS</string>
     <string name="speak_text">Tiempo entre los sonidos</string>
     <string name="battery_kill_text">Nivel Crítico de batería</string>
-    <string name="reset_wifi_text">Reiniciar Wi-Fi si no responde durante</string>
+    <string name="reset_wifi_text">Reiniciar WiFi si no responde durante</string>
     <string name="speech_gps">Anunciar cambios de estado de GPS</string>
     <string name="mute">Silencio</string>
     <string name="play">Silenc. Desact.</string>
@@ -56,7 +56,7 @@
     <string name="speech_button">Configuración de speech&gt;&gt;</string>
     <string name="speech_text">Audio de speech incluye:</string>
     <string name="speech_run">Redes por ejecucion</string>
-    <string name="speech_new_wifi">Nuevas Wi-Fi</string>
+    <string name="speech_new_wifi">Nuevas WiFi</string>
     <string name="speech_new_cell">Nuevas antenas de celulares</string>
     <string name="speech_queue">Tamaño de la cola, si es&gt; 0</string>
     <string name="speech_miles">Distancia</string>
@@ -103,7 +103,7 @@
     <string name="setting_max_id">Max id a subir:</string>
     <string name="setting_max_start">Max Id al inicio:</string>
     <string name="setting_max_out">Contador de subida al maximo?</string>
-    <string name="setting_tie_wifi">Víncular con Wi-Fi durante exploración</string>
+    <string name="setting_tie_wifi">Víncular con WiFi durante exploración</string>
     <string name="no_tts">Ningún motor de Text-to-Speech</string>
     <string name="sec">segundos</string>
     <string name="min">minutos</string>
@@ -117,7 +117,7 @@
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Exploración apagada)</string>
-    <string name="dash_new_wifi">Nuevas Wi-Fi</string>
+    <string name="dash_new_wifi">Nuevas WiFi</string>
     <string name="dash_vis_nets">Redes visibles:</string>
     <string name="dash_new_upload">Nuevas redes desde ultima subida:</string>
     <string name="dash_new_cells">Nuevas antenas de celular:</string>
@@ -152,17 +152,17 @@
     <string name="signal">Señal</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">Para mejores resultados, apaga la "Notificación de red" en "Conexiones inalámbricas y redes" -&gt; "configuración Wi-Fi"</string>
-    <string name="turn_on_wifi">Encendiendo Wi-Fi</string>
+    <string name="best_results">Para mejores resultados, apaga la "Notificación de red" en "Conexiones inalámbricas y redes" -&gt; "configuración WiFi"</string>
+    <string name="turn_on_wifi">Encendiendo WiFi</string>
     <string name="no_gps_device">No se detectó GPS en el dispositivo!</string>
     <string name="turn_on_gps">Por favor encienda el GPS</string>
     <string name="address">Dirección</string>
     <string name="no_address_found">No se encontró la dirección</string>
     <string name="problem_with_field">Problema con el campo</string>
-    <string name="turning_wifi_off">Apagando Wi-Fi</string>
+    <string name="turning_wifi_off">Apagando WiFi</string>
     <string name="lost_location">Se perdió la localización</string>
     <string name="have_location">Localización encontrada con</string>
-    <string name="wifi_jammed">Wi-Fi bloqueado, reiniciandolo..</string>
+    <string name="wifi_jammed">WiFi bloqueado, reiniciandolo..</string>
     <string name="battery_at">Nivel de la batería en</string>
     <string name="battery_postfix">por ciento, cerrando WiGLE Wifi</string>
     <string name="scan">Escanear</string>
@@ -184,7 +184,7 @@
     <string name="menu_show_new">Mostrar Solo Nuevos</string>
     <string name="menu_copy_network">Copy Network BSSID</string>
     <string name="tts_no_gps_fix">sin GPS</string>
-    <string name="tts_new_wifi">Nueva Wi-Fi</string>
+    <string name="tts_new_wifi">Nueva WiFi</string>
     <string name="tts_new_cell">Nueva antena celular</string>
     <string name="tts_queue">Lista</string>
     <string name="tts_from">de</string>
@@ -245,8 +245,8 @@
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi restarts</string>
-    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

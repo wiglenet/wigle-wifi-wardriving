@@ -43,7 +43,7 @@
     <string name="gps_text">Čas obnovení GPS souřadnic</string>
     <string name="speak_text">Časové rozmezí hlasového výstupu</string>
     <string name="battery_kill_text">Skončit když baterie je na</string>
-    <string name="reset_wifi_text">Rozhodnout zda je Wi-Fi zaseklá</string>
+    <string name="reset_wifi_text">Rozhodnout zda je WiFi zaseklá</string>
     <string name="speech_gps">Oznamovat změny GPS</string>
     <string name="mute">Ztlumit</string>
     <string name="play">Přehrávat</string>
@@ -55,7 +55,7 @@
     <string name="circle_size_map">Velikost kruhů podle počtu</string>
     <string name="speech_button">Nastavní hlasového výstupu &gt;&gt;</string>
     <string name="speech_text">Hlasový výstup obsahuje:</string>
-    <string name="speech_run">Aktuální počet Wi-Fi v skenu</string>
+    <string name="speech_run">Aktuální počet WiFi v skenu</string>
     <string name="speech_new_wifi">Počet nových sítí v DB</string>
     <string name="speech_new_cell">Počet nových BTS v DB</string>
     <string name="speech_queue">Velikost fronty pokud &gt; 0</string>
@@ -103,7 +103,7 @@
     <string name="setting_max_id">Maximální nahrané id:</string>
     <string name="setting_max_start">Maximální id po startu:</string>
     <string name="setting_max_out">Zvětšit značku DB?</string>
-    <string name="setting_tie_wifi">Tie to Wi-Fi Scan Period</string>
+    <string name="setting_tie_wifi">Tie to WiFi Scan Period</string>
     <string name="no_tts">Nenalezen modul hlasového výstupu</string>
     <string name="sec">sek</string>
     <string name="min">min</string>
@@ -117,7 +117,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Storno</string>
     <string name="dash_scan_off">(Skenování vypnuto)</string>
-    <string name="dash_new_wifi">Nových Wi-Fi</string>
+    <string name="dash_new_wifi">Nových WiFi</string>
     <string name="dash_vis_nets">Viditelných sítí:</string>
     <string name="dash_new_upload">Nových sítí od posledního nahrání:</string>
     <string name="dash_new_cells">Nových BTS:</string>
@@ -125,7 +125,7 @@
     <string name="dash_dist_total">Celková vzdálenost:</string>
     <string name="dash_dist_prev">Minulá vzdálenost:</string>
     <string name="dash_db_queue">Fronta DB:</string>
-    <string name="dash_db_nets">Počet Wi-Fi v DB:</string>
+    <string name="dash_db_nets">Počet WiFi v DB:</string>
     <string name="dash_db_locs">Počet lokací v DB:</string>
     <string name="dash_no_loc">Žádná lokace !</string>
     <string name="dash_short_loc">Loc:</string>
@@ -152,17 +152,17 @@
     <string name="signal">Signál</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">Pro dobré výsledky zrušte oznamování nových sítí v Nastavení - Bezdrátové připojení a sítě - Wi-Fi</string>
-    <string name="turn_on_wifi">Zapnutí Wi-Fi</string>
+    <string name="best_results">Pro dobré výsledky zrušte oznamování nových sítí v Nastavení - Bezdrátové připojení a sítě - WiFi</string>
+    <string name="turn_on_wifi">Zapnutí WiFi</string>
     <string name="no_gps_device">Nenalezeno GPS zařízení!</string>
     <string name="turn_on_gps">Prosím zapněte GPS</string>
     <string name="address">Adresa</string>
     <string name="no_address_found">Nebyla nalezena žádná geocoded adresa</string>
     <string name="problem_with_field">Problém se zadáváním</string>
-    <string name="turning_wifi_off">Vypínám Wi-Fi zpět</string>
+    <string name="turning_wifi_off">Vypínám WiFi zpět</string>
     <string name="lost_location">Pozice ztracena</string>
     <string name="have_location">Nyní mám pozici z</string>
-    <string name="wifi_jammed">Wi-Fi je zaseknutá, vypínám a zapínám Wi-Fi</string>
+    <string name="wifi_jammed">WiFi je zaseknutá, vypínám a zapínám Wi-Fi</string>
     <string name="battery_at">)Úroveň baterie na</string>
     <string name="battery_postfix">procent, vypínám WiGLE Wifi</string>
     <string name="scan">Sken</string>
@@ -184,7 +184,7 @@
     <string name="menu_show_new">Ukázat pouze nové</string>
     <string name="menu_copy_network">Copy Network BSSID</string>
     <string name="tts_no_gps_fix">není gps spojení</string>
-    <string name="tts_new_wifi">Nová Wi-Fi</string>
+    <string name="tts_new_wifi">Nová WiFi</string>
     <string name="tts_new_cell">Nová buňka</string>
     <string name="tts_queue">Fronta</string>
     <string name="tts_from">z</string>
@@ -241,12 +241,12 @@
     <string name="fatal_pre_message">CHYBA</string>
     <string name="fatal_post_message">(lze zobrazit znovu s "Error Report" v menu Settings)</string>
     <string name="use_network_location">Použijte umístění v síti poskytovatele</string>
-    <string name="data_import_observed">importovat pozorovat Wi-Fi z WiGLE do lokální databáze?</string>
+    <string name="data_import_observed">importovat pozorovat WiFi z WiGLE do lokální databáze?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi restarts</string>
-    <string name="wifi_restart_1">Warning, latest Wi-Fi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting Wi-Fi.</string>
+    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
+    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
 </resources>

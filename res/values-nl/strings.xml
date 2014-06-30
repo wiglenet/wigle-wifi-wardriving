@@ -37,13 +37,13 @@
     <string name="backup_db_text">Back-up maken van database</string>
     <string name="import_observed_button">Importeren</string>
     <string name="import_observed_text">Reeds gevonden netwerken importeren uit WiGLE-account</string>
-    <string name="periodstill_text">tijd tussen Wi-Fi scans 0 km/h</string>
-    <string name="period_text">tijd tussen Wi-Fi scans &lt;8 km/h</string>
-    <string name="periodfast_text">tijd tussen Wi-Fi scans &gt;8 km/h</string>
+    <string name="periodstill_text">tijd tussen WiFi scans 0 km/h</string>
+    <string name="period_text">tijd tussen WiFi scans &lt;8 km/h</string>
+    <string name="periodfast_text">tijd tussen WiFi scans &gt;8 km/h</string>
     <string name="gps_text">Tijd tussen GPS-fixes</string>
     <string name="speak_text">Tijd tussen spraakinformatie</string>
     <string name="battery_kill_text">Scan stoppen op dit batterijniveau</string>
-    <string name="reset_wifi_text">Wi-Fi-resettimer</string>
+    <string name="reset_wifi_text">WiFi-resettimer</string>
     <string name="speech_gps">GPS-statusverandering met geluid melden</string>
     <string name="mute">Stil</string>
     <string name="play">Geluid</string>
@@ -56,7 +56,7 @@
     <string name="speech_button">Spraakinstellingen &gt;&gt;</string>
     <string name="speech_text">Audio spraak onder meer:</string>
     <string name="speech_run">Aantal netwerken in run</string>
-    <string name="speech_new_wifi">Aantal nieuwe Wi-Fi-netwerken in DB</string>
+    <string name="speech_new_wifi">Aantal nieuwe WiFi-netwerken in DB</string>
     <string name="speech_new_cell">Aantal nieuwe zendmasten in DB</string>
     <string name="speech_queue">Aantal in wachtrij, als die er is</string>
     <string name="speech_miles">Mijlen in run</string>
@@ -103,7 +103,7 @@
     <string name="setting_max_id">Max upload ID:</string>
     <string name="setting_max_start">Max ID bij het opstarten:</string>
     <string name="setting_max_out">Max uit DB marker?</string>
-    <string name="setting_tie_wifi">Gelijk aan Wi-Fi</string>
+    <string name="setting_tie_wifi">Gelijk aan WiFi</string>
     <string name="no_tts">Geen TTS-engine gevonden</string>
     <string name="sec">sec</string>
     <string name="min">min</string>
@@ -117,7 +117,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Annuleren</string>
     <string name="dash_scan_off">Scan is uit</string>
-    <string name="dash_new_wifi">Nieuwe Wi-Fi</string>
+    <string name="dash_new_wifi">Nieuwe WiFi</string>
     <string name="dash_vis_nets">Zichtbare netwerken:</string>
     <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
     <string name="dash_new_cells">Nieuwe zendmasten:</string>
@@ -153,16 +153,16 @@
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
     <string name="best_results">Schakel \'Netwerkmelding\' (verschilt per apparaat) uit voor de beste resultaten</string>
-    <string name="turn_on_wifi">Wi-Fi wordt ingeschakeld\u2026</string>
+    <string name="turn_on_wifi">WiFi wordt ingeschakeld\u2026</string>
     <string name="no_gps_device">Geen GPS-apparaat gevonden</string>
     <string name="turn_on_gps">Schakel GPS in</string>
     <string name="address">Adres</string>
     <string name="no_address_found">Geen geolocatie gevonden</string>
     <string name="problem_with_field">Probleem met veld</string>
-    <string name="turning_wifi_off">Wi-Fi weer uitschakelen\u2026</string>
+    <string name="turning_wifi_off">WiFi weer uitschakelen\u2026</string>
     <string name="lost_location">Geen locatie meer</string>
     <string name="have_location">Locatie gevonden</string>
-    <string name="wifi_jammed">Wi-Fi lijkt bezet of vastgelopen te zijn; schakel Wi-Fi uit en weer in</string>
+    <string name="wifi_jammed">WiFi lijkt bezet of vastgelopen te zijn; schakel Wi-Fi uit en weer in</string>
     <string name="battery_at">Als het batterijniveau op</string>
     <string name="battery_postfix">procent komt, stopt de app</string>
     <string name="scan">Scannen</string>
@@ -184,7 +184,7 @@
     <string name="menu_show_new">Alleen nieuwe tonen</string>
     <string name="menu_copy_network">Kopieer netwerk-BSSID</string>
     <string name="tts_no_gps_fix">Geen GPS-fix</string>
-    <string name="tts_new_wifi">Nieuwe Wi-Fi-netwerken</string>
+    <string name="tts_new_wifi">Nieuwe WiFi-netwerken</string>
     <string name="tts_new_cell">Nieuwe zendmasten</string>
     <string name="tts_queue">Wachtrij</string>
     <string name="tts_from">van</string>
@@ -245,8 +245,8 @@
     <string name="donate_question">Gegevens doneren aan WiGLE?</string>
     <string name="donate_explain">Hiermee staat u WiGLE toe om uw gegevens anoniem te gebruiken</string>
     <string name="no_data_conn">Geen gegevensverbinding. Kan niet verbinden met het internet.\nDetails:</string>
-    <string name="speech_wifi_restart">Wi-Fi herstart</string>
-    <string name="wifi_restart_1">Waarschuwing, laatste Wi-Fi-scan is</string>
-    <string name="wifi_restart_2">seconden geleden voltooid. Wi-Fi herstarten.</string>
+    <string name="speech_wifi_restart">WiFi herstart</string>
+    <string name="wifi_restart_1">Waarschuwing, laatste WiFi-scan is</string>
+    <string name="wifi_restart_2">seconden geleden voltooid. WiFi herstarten.</string>
     <string name="use_wigle_tiles">Gebruik WiGLE OSM-tegels</string>
 </resources>

@@ -33,13 +33,13 @@
 	<uses-feature android:name="android.hardware.wifi" android:required="false" />
 	
     <application android:icon="@drawable/wiglewifi" android:label="@string/app_name"
-        	android:allowBackup="true"
-        	android:theme="@style/Theme.AppCompat">
-    	<activity android:name=".MainActivity" 
-    	          android:label="@string/list_app_name"
-    	    	  android:theme="@style/Theme.AppCompat"
-          		  android:launchMode="singleTask"
-          		  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+          android:allowBackup="true"
+          android:theme="@style/Theme.AppCompat">
+      <activity android:name=".MainActivity"
+                android:label="@string/list_app_name"
+                android:theme="@style/Theme.AppCompat"
+                android:launchMode="singleTask"
+                android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -47,11 +47,11 @@
         </activity>
         <!-- have this available too for backwards compatibility -->
         <activity android:name=".WigleAndroid" 
-            	  android:label="@string/app_name"
-            	  android:theme="@style/Theme.AppCompat"
-          		  android:launchMode="singleTask"
-          		  android:exported="false"
-          		  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                android:label="@string/app_name"
+                android:theme="@style/Theme.AppCompat"
+                android:launchMode="singleTask"
+                android:exported="false"
+                android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -62,12 +62,12 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
                   android:parentActivityName=".MainActivity" >
             <!-- Parent activity meta-data to support API level 7+ -->
-		        <meta-data
-		            android:name="android.support.PARENT_ACTIVITY"
-		            android:value=".MainActivity" />
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -79,7 +79,7 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale" >
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.ALTERNATIVE" />
@@ -90,7 +90,7 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
                   android:parentActivityName=".SettingsActivity" >
             
             <!-- Parent activity meta-data to support API level 7+ -->
@@ -107,7 +107,7 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
                   android:parentActivityName=".MainActivity" >
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -123,7 +123,7 @@
                   android:theme="@style/Theme.AppCompat"
                   android:launchMode="singleTask"
                   android:exported="false"
-                  android:configChanges="keyboard|keyboardHidden|orientation|locale"
+                  android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
                   android:parentActivityName=".MainActivity" >
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data

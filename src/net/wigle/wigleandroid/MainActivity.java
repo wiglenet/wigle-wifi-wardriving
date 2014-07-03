@@ -263,50 +263,29 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   private void setupFragments() {
-    final FragmentManager fm = getSupportFragmentManager();
-    final FragmentTransaction txn = fm.beginTransaction();
-
-    listActivity = (ListFragment) fm.findFragmentByTag(LIST_FRAGMENT_TAG);
-    if (listActivity == null) {
-      info("Creating ListActivity");
-      listActivity = new ListFragment();
-      final Bundle bundle = new Bundle();
-      listActivity.setArguments(bundle);
-      txn.add(listActivity, LIST_FRAGMENT_TAG);
-    }
+    info("Creating ListActivity");
+    listActivity = new ListFragment();
+    Bundle bundle = new Bundle();
+    listActivity.setArguments(bundle);
     state.fragList[LIST_TAB_POS] = listActivity;
 
-    MappingFragment map = (MappingFragment) fm.findFragmentByTag(MAP_FRAGMENT_TAG);
-    if (fm.findFragmentByTag(MAP_FRAGMENT_TAG) == null) {
-      info("Creating MappingActivity");
-      map = new MappingFragment();
-      final Bundle bundle = new Bundle();
-      map.setArguments(bundle);
-      txn.add(map, MAP_FRAGMENT_TAG);
-    }
+    info("Creating MappingActivity");
+    MappingFragment map = new MappingFragment();
+    bundle = new Bundle();
+    map.setArguments(bundle);
     state.fragList[MAP_TAB_POS] = map;
 
-    DashboardFragment dash = (DashboardFragment) fm.findFragmentByTag(DASH_FRAGMENT_TAG);
-    if (dash == null) {
-      info("Creating DashboardActivity");
-      dash = new DashboardFragment();
-      final Bundle bundle = new Bundle();
-      dash.setArguments(bundle);
-      txn.add(dash, DASH_FRAGMENT_TAG);
-    }
+    info("Creating DashboardActivity");
+    DashboardFragment dash = new DashboardFragment();
+    bundle = new Bundle();
+    dash.setArguments(bundle);
     state.fragList[DASH_TAB_POS] = dash;
 
-    DataFragment data = (DataFragment) fm.findFragmentByTag(DATA_FRAGMENT_TAG);
-    if (data == null) {
-      info("Creating DataActivity");
-      data = new DataFragment();
-      final Bundle bundle = new Bundle();
-      data.setArguments(bundle);
-      txn.add(data, DATA_FRAGMENT_TAG);
-    }
+    info("Creating DataActivity");
+    DataFragment data = new DataFragment();
+    bundle = new Bundle();
+    data.setArguments(bundle);
     state.fragList[DATA_TAB_POS] = data;
-
-    txn.commit();
   }
 
   private void setActionBarTabs() {

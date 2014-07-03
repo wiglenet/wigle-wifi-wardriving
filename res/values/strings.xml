@@ -169,7 +169,7 @@
     <string name="scan">Scan</string>
     <string name="menu_exit">Exit</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_error_report">Error Report</string>
+    <string name="menu_error_report">Send Error Report</string>
     <string name="menu_return">Return</string>
     <string name="menu_sort">Sort Options</string>
     <string name="menu_ssid_filter">SSID Label Filter</string>

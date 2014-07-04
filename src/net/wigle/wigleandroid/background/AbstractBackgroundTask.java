@@ -33,7 +33,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
   private int lastSentPercent = -1;
 
   private static AbstractBackgroundTask latestTask = null;
-  private static final String PROGRESS_TAG = "background-task-progress";
+  static final String PROGRESS_TAG = "background-task-progress";
 
   public AbstractBackgroundTask( final FragmentActivity context, final DatabaseHelper dbHelper, final String name ) {
     if ( context == null ) {

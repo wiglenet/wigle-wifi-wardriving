@@ -69,9 +69,13 @@ public class BackgroundGuiHandler extends Handler {
         pd.setProgress(context.getSupportFragmentManager(), 0);
         return;
       }
-      // make sure we didn't progress dialog this somewhere
+
+      // If we got this far then the task is done
+
+      // make sure we didn't lose this dialog this somewhere
       if ( pd != null ) {
         try {
+          MainActivity.info("fragment from pd: " + pd);
           pd.dismiss();
           alertSettable.clearProgressDialog();
         }
@@ -81,8 +85,20 @@ public class BackgroundGuiHandler extends Handler {
         }
       }
       // Activity context
-      final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
       final FragmentManager fm = context.getSupportFragmentManager();
+      final DialogFragment dialog = (DialogFragment) fm.findFragmentByTag(AbstractBackgroundTask.PROGRESS_TAG);
+      if (dialog != null) {
+        try {
+          MainActivity.info("fragment from dialog: " + dialog);
+          dialog.dismiss();
+        }
+        catch ( Exception ex ) {
+          // guess it wasn't there anyways
+          MainActivity.info( "exception dismissing fm dialog: " + ex );
+        }
+      }
+
+      final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
       try {
         alertDialog.show(fm, "background-dialog");
       }

@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -19,12 +20,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
+  private ScrollView scrollView;
+  private View landscape;
+  private View portrait;
 
   private static final int MENU_EXIT = 11;
   private static final int MENU_SETTINGS = 12;
@@ -52,11 +57,25 @@ public class DashboardFragment extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final int orientation = getResources().getConfiguration().orientation;
     MainActivity.info("DASH: onCreateView. orientation: " + orientation);
-    if (orientation == 2) {
-      return inflater.inflate(R.layout.dashlandscape, container, false);
-    }
+    scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
+    landscape = inflater.inflate(R.layout.dashlandscape, container, false);
+    portrait = inflater.inflate(R.layout.dashportrait, container, false);
 
-    return inflater.inflate(R.layout.dash, container, false);
+    switchView();
+
+    return scrollView;
+  }
+
+  private void switchView() {
+    if (scrollView != null) {
+      final int orientation = getResources().getConfiguration().orientation;
+      View component = portrait;
+      if (orientation == 2) {
+        component = landscape;
+      }
+      scrollView.removeAllViews();
+      scrollView.addView(component);
+    }
   }
 
   private final Runnable mUpdateTimeTask = new Runnable() {
@@ -97,7 +116,7 @@ public class DashboardFragment extends Fragment {
 
     tv = (TextView) view.findViewById( R.id.newwifi );
     final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    final String newTitle = ListFragment.lameStatic.newWifi >= 1000 ? getString(R.string.new_word)
+    final String newTitle = ListFragment.lameStatic.newWifi >= 10 ? getString(R.string.new_word)
         : getString(R.string.dash_new_wifi);
     tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + newTitle );
 
@@ -207,6 +226,31 @@ public class DashboardFragment extends Fragment {
     super.onResume();
     setupTimer();
     getActivity().setTitle(R.string.dashboard_app_name);
+  }
+
+  @Override
+  public void onStart() {
+    MainActivity.info( "DASH: onStart" );
+    super.onStart();
+  }
+
+  @Override
+  public void onPause() {
+    MainActivity.info( "DASH: onPause" );
+    super.onPause();
+  }
+
+  @Override
+  public void onStop() {
+    MainActivity.info( "DASH: onStop" );
+    super.onStop();
+  }
+
+  @Override
+  public void onConfigurationChanged( final Configuration newConfig ) {
+    MainActivity.info( "DASH: config changed" );
+    switchView();
+    super.onConfigurationChanged( newConfig );
   }
 
   /* Creates the menu items */

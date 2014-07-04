@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainlayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true" >
+
+    <include layout="@layout/dashtop"/>
+
+    <LinearLayout
+    android:orientation="vertical"  
+    android:id="@+id/horizontalLine"
+    android:layout_width="fill_parent"
+    android:layout_height="2dip"
+    android:background="#A07070"
+    />
+
+    <include layout="@layout/dashbottom"/>
+
+</LinearLayout>

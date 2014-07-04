@@ -44,11 +44,10 @@ set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 rssi on kml export
 
-* 2.2 blocker: extra upload dialog hanging around
-
 --- done ---
-* 2.2 (07/xx/2014)
+* 2.2 (07/04/2014)
 Fix BackStackRecord exception by avoiding fragment manager
+Fix extra upload dialog after completion
 Fix TabHost exception on android 2.1/2.2
 Fix isEmpty exception on android 2.1/2.2
 

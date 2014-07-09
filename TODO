@@ -45,6 +45,9 @@ on networkactivity record more observations on that network (site survey)
 rssi on kml export
 
 --- done ---
+* 2.3 (07/??/2014)
+French translation fixes (thanks AtomicJo!)
+
 * 2.2 (07/04/2014)
 Fix BackStackRecord exception by avoiding fragment manager
 Fix extra upload dialog after completion

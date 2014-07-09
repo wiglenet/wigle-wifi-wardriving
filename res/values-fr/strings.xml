@@ -70,7 +70,7 @@
     <string name="reset_button">Réinitialiser les champs</string>
     <string name="list_query_clear">Arguments Query Effacer</string>
     <string name="crypto_security">Sécurité</string>
-    <string name="crypto_strength">La puissance du signal</string>
+    <string name="crypto_strength">Puissance du signal</string>
     <string name="crypto_password">Mot de passe</string>
     <string name="crypto_show_password">Montrer mot de passe.</string>
     <string name="filter_show_ssid">Montrer SSID\'s Matching (regex):</string>
@@ -83,10 +83,10 @@
     <string name="list_waiting_gps">(En attente de synchronisation GPS ...)</string>
     <string name="list_scanning_off">(Numérisation éteinte)</string>
     <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Long:</string>
+    <string name="list_short_lon">Lon:</string>
     <string name="list_short_sats">Sats:</string>
     <string name="list_short_alt">Alt:</string>
-    <string name="list_status_default">(Statut)</string>
+    <string name="list_status_default">(État)</string>
     <string name="list_speed">Vitesse:</string>
     <string name="list_upload">Envoyer un fichier?</string>
     <string name="network_signal">Signal:</string>
@@ -162,7 +162,7 @@
     <string name="turning_wifi_off">Revenant WiFi off</string>
     <string name="lost_location">Lieu perdu</string>
     <string name="have_location">Maintenant avez emplacement à partir</string>
-    <string name="wifi_jammed">WiFi semble coincé, en éteignant, puis sur, Wi-Fi.</string>
+    <string name="wifi_jammed">Le WiFi semble coincé, désactivez-le puis réactivez le Wi-Fi.</string>
     <string name="battery_at">Au niveau de la batterie</string>
     <string name="battery_postfix">pour cent, fermant WiGLE Wifi</string>
     <string name="scan">Numérisation</string>
@@ -206,7 +206,7 @@
     <string name="status_uploading">Vous téléchargez un fichier</string>
     <string name="status_writing">Écriture du fichier</string>
     <string name="status_nothing">Ne rien faire</string>
-    <string name="status_empty">Fichier serait vide</string>
+    <string name="status_empty">Le fichier semblerait vide</string>
     <string name="data_export_csv">Exporter courir fichier CSV?</string>
     <string name="data_export_csv_db">Exporter DB fichier CSV?</string>
     <string name="data_export_kml_run">Exporter courir fichier KML?</string>
@@ -242,10 +242,10 @@
     <string name="fatal_post_message">(Peut voir à nouveau avec "Rapport d\'erreur" dans le menu Paramètres)</string>
     <string name="use_network_location">Utilisez réseau de fournisseurs Emplacement</string>
     <string name="data_import_observed">Importer mes WiFi observés à partir de WiGLE dans la base locale ?</string>
-    <string name="donate_question">Offrir les données à WiGLE ?</string>
+    <string name="donate_question">Offrir les données à WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
     <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">WiFi restarts</string>
+    <string name="speech_wifi_restart">WiFi redémarré</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>

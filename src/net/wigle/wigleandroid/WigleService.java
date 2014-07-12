@@ -176,7 +176,7 @@ public final class WigleService extends Service {
 
       final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
       builder.setContentIntent(contentIntent);
-      builder.setNumber(ListFragment.lameStatic.runNets);
+      builder.setNumber((int)ListFragment.lameStatic.newNets);
       builder.setTicker(title);
       builder.setContentTitle(title);
       builder.setContentText(text);

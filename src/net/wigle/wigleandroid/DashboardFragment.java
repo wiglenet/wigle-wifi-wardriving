@@ -49,6 +49,7 @@ public class DashboardFragment extends Fragment {
     finishing = new AtomicBoolean( false );
     numberFormat = NumberFormat.getNumberInstance( Locale.US );
     if ( numberFormat instanceof DecimalFormat ) {
+      ((DecimalFormat) numberFormat).setMinimumFractionDigits( 2 );
       ((DecimalFormat) numberFormat).setMaximumFractionDigits( 2 );
     }
   }

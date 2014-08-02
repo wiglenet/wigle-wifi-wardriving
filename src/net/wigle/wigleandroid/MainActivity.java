@@ -340,7 +340,10 @@ public final class MainActivity extends ActionBarActivity implements TabListener
    */
   static void switchTab( final int tab ) {
     final ActionBar bar = mainActivity.getSupportActionBar();
-    bar.setSelectedNavigationItem(tab);
+    if (bar.getSelectedNavigationIndex() != tab) {
+      info("setting tab to: " + tab);
+      bar.setSelectedNavigationItem(tab);
+    }
   }
 
   static void setLockScreen( Fragment fragment, boolean lockScreen ) {
@@ -663,9 +666,9 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   @Override
   public void onTabSelected(Tab tab, FragmentTransaction ft) {
     MainActivity.info("onTabSelected: " + tab.getPosition());
-    final Fragment f = state.fragList[tab.getPosition()];
-    if (f != null) {
-      ft.replace(android.R.id.content, f);
+    final Fragment frag = state.fragList[tab.getPosition()];
+    if (frag != null) {
+      ft.replace(android.R.id.content, frag);
     }
     state.currentTab = tab.getPosition();
   }
@@ -673,7 +676,10 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   @Override
   public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     MainActivity.info("onTabUnselected: " + tab.getPosition());
-    ft.remove(state.fragList[tab.getPosition()]);
+    final Fragment frag = state.fragList[tab.getPosition()];
+    if (frag != null) {
+      ft.remove(frag);
+    }
   }
 
 

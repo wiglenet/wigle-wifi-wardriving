@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="net.wigle.wigleandroid"
-      android:versionCode="202"
-      android:versionName="2.2"
+      android:versionCode="203"
+      android:versionName="2.3"
       android:installLocation="auto">
       
     <supports-screens android:anyDensity="true"
@@ -12,7 +12,7 @@
    	android:xlargeScreens="true"
    	android:resizeable="true"
 	/>
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="19" />
+    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="20" />
     
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>

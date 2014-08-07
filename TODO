@@ -49,6 +49,7 @@ rssi on kml export
 Fix BackStackRecord.java:651 NPE
 Hungarian translaction added (thanks Danca!)
 French translation fixes (thanks AtomicJo!)
+Turkish translation fixes (thanks Oguska!)
 
 * 2.2 (07/04/2014)
 Fix BackStackRecord exception by avoiding fragment manager

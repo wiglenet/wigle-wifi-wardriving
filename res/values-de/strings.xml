@@ -243,11 +243,11 @@
     <string name="fatal_post_message">(Kann mit "Fehlerreport" im Settings-Menü erneut angesehen werden)</string>
     <string name="use_network_location">Mit Network Location Provider</string>
     <string name="data_import_observed">Import meiner beobachteten WLAN aus WiGLE in die lokale Datenbank?</string>
-    <string name="donate_question">Spende Daten an Wigle?</string>
-    <string name="donate_explain">Lassen WiGLE, um eine anonymisierte Kopie der Daten, die Wigle ist berechtigt, kommerziell zu anderen Parteien eine Lizenz zu machen.</string>
-    <string name="no_data_conn">Keine Datenverbindung, kann nicht mit Internet verbinden.\nDetails:</string>
-    <string name="speech_wifi_restart">WLAN neustartet</string>
-    <string name="wifi_restart_1">Achtung, neueste WLAN-Scan abgeschlossen Vor</string>
-    <string name="wifi_restart_2">Sekunden. Neustarten WLAN.</string>
-    <string name="use_wigle_tiles">Benutz WiGLE OSM-Fliesen</string>
+    <string name="donate_question">Daten an Wigle spenden?</string>
+    <string name="donate_explain">WiGLE gestatten eine anonymisierte Kopie der Daten zu erstellen, die von WiGLE anderen Parteien als kommerzielle Lizenz überlassen werden darf.</string>
+    <string name="no_data_conn">Keine Datenverbindung, kann nicht mit dem Internet verbinden.\nDetails:</string>
+    <string name="speech_wifi_restart">WLAN startet neu</string>
+    <string name="wifi_restart_1">Achtung, neuester WLAN-Scan abgeschlossen vor</string>
+    <string name="wifi_restart_2">Sekunden. WLAN-Neustart.</string>
+    <string name="use_wigle_tiles">Benutze WiGLE OSM-Fliesen</string>
 </resources>

@@ -38,9 +38,9 @@
     <string name="backup_db_text">Adatbázis mentés készítése</string>
     <string name="import_observed_button">Visszaállítás</string>
     <string name="import_observed_text">Adatok visszatöltése a WiGLE-ről</string>
-    <string name="periodstill_text">Szkennelési időköz 0 mph</string>
-    <string name="period_text">Szkennelési időköz &lt;5 mph</string>
-    <string name="periodfast_text">Szkennelési időköz &gt;5 mph</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">GPS frissítési időköz</string>
     <string name="speak_text">Beszédek közti időköz</string>
     <string name="battery_kill_text">Kilép, ha az akku merül</string>
@@ -64,7 +64,7 @@
     <string name="speech_time">Jelenlegi idő</string>
     <string name="speech_battery">Akku töltöttség</string>
     <string name="speech_ssid">Új SSID-k</string>
-    <string name="query_address">Cím (pl.: Budapest, Hungary):</string>
+    <string name="query_address">Cím (ex: Budapest, HU):</string>
     <string name="query_ssid">SSID (ex: Linksys) (SQL helyettesítők: %,_):</string>
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL helyettesítők: %,_):</string>
     <string name="search_button">Lekérdezés</string>
@@ -137,8 +137,8 @@
     <string name="meters">méter</string>
     <string name="ft_short">ft</string>
     <string name="feet">láb</string>
-    <string name="kmph">km/ó</string>
-    <string name="mph">m/ó</string>
+    <string name="kmph">km/h</string>
+    <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
     <string name="run">Futás</string>
@@ -222,6 +222,7 @@
     <string name="language_es">español (Spanyol)</string>
     <string name="language_fi">suomi (Finn)</string>
     <string name="language_fr">français (Francia)</string>
+    <string name="language_fy">Frysk (Fríz)</string>
     <string name="language_he">עִבְרִית (Héber)</string>
     <string name="language_hi">हिन्दी (Hindi)</string>
     <string name="language_hu">Magyar</string>
@@ -253,4 +254,6 @@
     <string name="use_wigle_tiles">Használjon WiGLE OSM csempéket</string>
     <string name="wigle_service">WiGLE Wifi Szolgáltatás</string>
     <string name="disable_toast">Felugró értesítések tiltása</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

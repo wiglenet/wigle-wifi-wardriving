@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Запуск</string>
     <string name="app_name">WiGLE Wifi исследование беспроводных сетей</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Настройки</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Статистика</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Сделайте резервную копию базы данных</string>
     <string name="import_observed_button">Импорт наблюдений</string>
     <string name="import_observed_text">Импорт моих наблюдений из WiGLE</string>
-    <string name="periodstill_text">Время между WiFi сканированием при 0 миль в ч</string>
-    <string name="period_text">Время между WiFi сканированием при &lt;5 миль в ч</string>
-    <string name="periodfast_text">Время между WiFi сканированием при &gt;5 миль в ч</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Время между обновлениями GPS</string>
     <string name="speak_text">Время между произношением речи</string>
     <string name="battery_kill_text">Выход при уровне аккумулятора</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Текущее время</string>
     <string name="speech_battery">Процентный уровень аккумулятора</string>
     <string name="speech_ssid">SSID\'s новых сетей</string>
-    <string name="query_address">Адрес (например: Чикаго, Иллинойс):</string>
+    <string name="query_address">Адрес (например: Moscow, RU):</string>
     <string name="query_ssid">SSID (например: Linksys) (SQL символы: %,_):</string>
     <string name="query_bssid">BSSID (например: 0A:2C:EF:3D:25:1B) (SQL символы: %,_):</string>
     <string name="search_button">Запрос к локальной БД</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">Показывать WEP</string>
     <string name="filter_show_wpa">Показывать WPA</string>
     <string name="filter_enabled">Включен фильтр</string>
-    <string name="list_waiting_gps">(Ожидание GPS ...)</string>
+    <string name="list_waiting_gps">(Ожидание GPS&#8230;)</string>
     <string name="list_scanning_off">(Сканирование выключено)</string>
     <string name="list_short_lat">Широта:</string>
     <string name="list_short_lon">Долгота:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Возможности:</string>
     <string name="network_channel">Канал:</string>
     <string name="network_observations">Наблюдения:</string>
-    <string name="network_querying">(Запрос...)</string>
+    <string name="network_querying">(Запрос&#8230;)</string>
     <string name="setting_show_password">Показывать пароль</string>
     <string name="setting_db_marker">Настройки ID маркера в БД (там, где начинаются добавления):</string>
     <string name="setting_high_up">Текущий ID в БД:</string>
@@ -136,8 +137,8 @@
     <string name="meters">метров</string>
     <string name="ft_short">фут</string>
     <string name="feet">Футов</string>
-    <string name="kmph">км в час</string>
-    <string name="mph">миль в ч</string>
+    <string name="kmph">км/ч</string>
+    <string name="mph">ми/ч</string>
     <string name="ms_short">мс</string>
     <string name="na">Недоступно</string>
     <string name="run">Пробег</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">Неизвестная ошибка</string>
     <string name="status_fail">Неудача</string>
     <string name="status_success">Успешно</string>
-    <string name="status_working">Работает ...</string>
+    <string name="status_working">Работает&#8230;</string>
     <string name="status_upload_success">Загрузка завершилась успешно</string>
     <string name="status_write_success">Запись завершилась успешно</string>
     <string name="status_no_user">Имя пользователя не установлено</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (испанский)</string>
     <string name="language_fi">suomi (финский)</string>
     <string name="language_fr">français (французский)</string>
+    <string name="language_fy">Frysk (фризском)</string>
     <string name="language_he">עִבְרִית (иврит)</string>
     <string name="language_hi">हिन्दी (хинди)</string>
     <string name="language_hu">magyar (венгерский)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

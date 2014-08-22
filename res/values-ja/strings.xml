@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">起動</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - 設定</string>
     <string name="mapping_app_name">WiGLE Wifi - オープンストリートマップ</string>
     <string name="dashboard_app_name">WiGLE Wifi- ダッシュボード</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">データベースのバックアップを作成</string>
     <string name="import_observed_button">WiGLE をインポート</string>
     <string name="import_observed_text">自分が観測したネットワークを WiGLE からインポート</string>
-    <string name="periodstill_text">無線LANのスキャン間隔(静止時)</string>
-    <string name="period_text">無線LANのスキャン間隔&lt;8km/h</string>
-    <string name="periodfast_text">無線LANのスキャン間隔&gt;8km/h</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">GPSの更新間隔</string>
     <string name="speak_text">音声通知の通知間隔</string>
     <string name="battery_kill_text">このバッテリレベルより下にスキャンを停止</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">時刻</string>
     <string name="speech_battery">バッテリーレベル</string>
     <string name="speech_ssid">新しい SSID</string>
-    <string name="query_address">住所(ex: Chicago, IL)</string>
+    <string name="query_address">住所(ex: Tokyo, JP)</string>
     <string name="query_ssid">SSID (ex: Linksys) (SQL wildcards: %,_):</string>
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">ローカルDBを調べる</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">WEP</string>
     <string name="filter_show_wpa">WPA</string>
     <string name="filter_enabled">フィルタ有効</string>
-    <string name="list_waiting_gps">(GPS はまだ Fix していません)</string>
+    <string name="list_waiting_gps">(GPS はまだ Fix していません&#8230;)</string>
     <string name="list_scanning_off">(スキャン停止中)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Lon:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Capabilities:</string>
     <string name="network_channel">チャンネル：</string>
     <string name="network_observations">観測:</string>
-    <string name="network_querying">（querying...）</string>
+    <string name="network_querying">（querying&#8230;）</string>
     <string name="setting_show_password">パスワードを表示する</string>
     <string name="setting_db_marker">DBマーカー (ここからアップロード):</string>
     <string name="setting_high_up">Highest uploaded id:</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">不明なエラー</string>
     <string name="status_fail">Fail</string>
     <string name="status_success">完了</string>
-    <string name="status_working">処理中...</string>
+    <string name="status_working">処理中&#8230;</string>
     <string name="status_upload_success">アップロード完了</string>
     <string name="status_write_success">書き込み完了</string>
     <string name="status_no_user">ユーザ名が設定されていません</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (スペイン語)</string>
     <string name="language_fi">suomi (フィンランド語)</string>
     <string name="language_fr">français (フランス語)</string>
+    <string name="language_fy">Frysk (フリジア語)</string>
     <string name="language_he">עִבְרִית (ヘブライ語)</string>
     <string name="language_hi">हिन्दी (ヒンディー語)</string>
     <string name="language_hu">magyar (ハンガリー語)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

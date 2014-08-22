@@ -5,7 +5,7 @@ Promo (80 characters):
 Wardriving: netstumble, vises trådløse netværk, uploade til WiGLE databasen.
 
 Description (4000 characters):
-WiGLE er en open source wardriving app til netstumble, display og kort fundet trådløse netværk og mobilmaster overalt i verden, nemt at uploade til WiGLE.net databasen. WiGLE blev startet i 2001 og har nu mere end 125 mio Wi-Fi-netværk kortlagt hele verden.
+WiGLE er en open source wardriving app til netstumble, display og kort fundet trådløse netværk og mobilmaster overalt i verden, nemt at uploade til WiGLE.net databasen. WiGLE blev startet i 2001 og har nu mere end 125 mio WiFi-netværk kortlagt hele verden.
 
 • Konkurrere på det globale WiGLE leaderboard for de fleste netværk er placeret!
 • Eksport til CSV-filer på SD-kort (comma-seperated values)!
@@ -20,8 +20,8 @@ WiGLE er en open source wardriving app til netstumble, display og kort fundet tr
 
 Release notes: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-For Wi-Fi og celle tårne ​​skal kortlægges, skal du vente til din enhed til at bestemme den aktuelle placering via GPS eller netværksplacering.
-På kortet: cirklerne er Wi-Fi, firkanter er celle tårne. Lyse farver er netværk set før, lilla dem er nye for den lokale database.
+For WiFi og celle tårne ​​skal kortlægges, skal du vente til din enhed til at bestemme den aktuelle placering via GPS eller netværksplacering.
+På kortet: cirklerne er WiFi, firkanter er celle tårne. Lyse farver er netværk set før, lilla dem er nye for den lokale database.
 Hvis du har problemer med at logge ind, eller har forslag, så send os en e-mail til wigle-admin@wigle.net og vi vil være glade for at hjælpe.
 Needs "Læser Telefon stat" for at fortælle, hvis et telefonopkald er i gang, for at slå lyden (lyde og tale).
 Filer er tilgængelige til at hjælpe med en menneskelig oversættelse til ikke-engelske sprog. Det var for det meste en mekanisk oversættelse, fordi vi naturligvis ikke kender alle disse sprog. Du kan hjælpe til at forbedre tingene ved at gøre pull anmodninger på:

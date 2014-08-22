@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Di partenza</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Impostazioni</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Effettua un backup dell\'intero database</string>
     <string name="import_observed_button">Importa osservate</string>
     <string name="import_observed_text">Importa da WiGLE le mie reti osservate</string>
-    <string name="periodstill_text">Intervallo di scansione WiFi a 0 km/h</string>
-    <string name="period_text">Intervallo di scansione WiFi a &lt;8 km/h</string>
-    <string name="periodfast_text">Intervallo di scansione WiFi a &gt;8 km/h</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Intervallo di aggiornamento GPS</string>
     <string name="speak_text">Intervallo di notifica con sintesi vocale</string>
     <string name="battery_kill_text">Uscita quando la batteria è critica</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Orario corrente</string>
     <string name="speech_battery">Percentuale livello batteria</string>
     <string name="speech_ssid">SSID della nuova rete WiFi</string>
-    <string name="query_address">Indirizzo (ad es. Milano):</string>
+    <string name="query_address">Indirizzo (es: Rome, IT):</string>
     <string name="query_ssid">SSID (es: Linksys) (caratteri jolly SQL: %,_):</string>
     <string name="query_bssid">BSSID (es: 0A:2C:EF:3D:25:1B) (caratteri jolly SQL: %,_):</string>
     <string name="search_button">Cerca nel DB locale</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">Mostra reti WEP</string>
     <string name="filter_show_wpa">Mostra reti WPA</string>
     <string name="filter_enabled">Filtro abilitato</string>
-    <string name="list_waiting_gps">(In attesa del segnale GPS...)</string>
+    <string name="list_waiting_gps">(In attesa del segnale GPS&#8230;)</string>
     <string name="list_scanning_off">(Scansione disattivata)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Long:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Funzionalità:</string>
     <string name="network_channel">Canale:</string>
     <string name="network_observations">Osservazioni:</string>
-    <string name="network_querying">(ricerca...)</string>
+    <string name="network_querying">(ricerca&#8230;)</string>
     <string name="setting_show_password">Mostra password</string>
     <string name="setting_db_marker">Segnalibro del database (da cui inizia il caricamento):</string>
     <string name="setting_high_up">Più alto ID caricato:</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">Errore sconosciuto</string>
     <string name="status_fail">Non riuscito</string>
     <string name="status_success">Riuscito</string>
-    <string name="status_working">In corso...</string>
+    <string name="status_working">In corso&#8230;</string>
     <string name="status_upload_success">Caricamento riuscito</string>
     <string name="status_write_success">Salvataggio riuscito</string>
     <string name="status_no_user">Nome utente non impostato</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (spagnola)</string>
     <string name="language_fi">suomi (finlandese)</string>
     <string name="language_fr">français (francese)</string>
+    <string name="language_fy">Frysk (frisone)</string>
     <string name="language_he">עִבְרִית (ebraica)</string>
     <string name="language_hi">हिन्दी (hindi)</string>
     <string name="language_hu">magyar (ungherese)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

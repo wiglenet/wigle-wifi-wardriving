@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Iniciando</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Configurações</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Indicadores</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Faz um backup do Banco de Dados</string>
     <string name="import_observed_button">Importar Enviadas</string>
     <string name="import_observed_text">Importa as redes que já enviei ao WiGLE.</string>
-    <string name="periodstill_text">Pausa entre os scans WiFi a 0 km/h</string>
-    <string name="period_text">Pausa entre os scans WiFi a menos de &lt;8km/h</string>
-    <string name="periodfast_text">Pausa entre os scans WiFi a mais &gt;8 km/h</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Pausa entre as atualizações de GPS</string>
     <string name="speak_text">Pausa entre as falas de audio</string>
     <string name="battery_kill_text">Sair quando a bateria atingir</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Hora Atual</string>
     <string name="speech_battery">Nível de Bateria</string>
     <string name="speech_ssid">SSIDs de Novas Redes</string>
-    <string name="query_address">Endereços (ex: Chicago, IL):</string>
+    <string name="query_address">Endereços (ex: Brasília, BR):</string>
     <string name="query_ssid">SSID (ex: Linksys) (Coringas SQL: %,_):</string>
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (Coringas SQL: %,_):</string>
     <string name="search_button">Pesquisar no Banco Local</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Tecnologias:</string>
     <string name="network_channel">Canal:</string>
     <string name="network_observations">Observações:</string>
-    <string name="network_querying">(buscando...)</string>
+    <string name="network_querying">(buscando&#8230;)</string>
     <string name="setting_show_password">Mostrar Senha</string>
     <string name="setting_db_marker">Marcador do BD (Da onde os envios começam):</string>
     <string name="setting_high_up">ID mais alto enviado:</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (espanhol)</string>
     <string name="language_fi">suomi (finlandês)</string>
     <string name="language_fr">français (francês)</string>
+    <string name="language_fy">Frysk (frísia)</string>
     <string name="language_he">עִבְרִית (hebraico)</string>
     <string name="language_hi">हिन्दी (hindi)</string>
     <string name="language_hu">magyar (húngaro)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Aviso, o último escaneamento WiFi foi a</string>
     <string name="wifi_restart_2">segundos atrás. Reiniciando o WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

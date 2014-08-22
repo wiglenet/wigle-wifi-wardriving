@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Ayarlar</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Pano</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Veritabanı yedeğini al</string>
     <string name="import_observed_button">Keşfettiklerimi içeri aktar</string>
     <string name="import_observed_text">WiGLE ile keşfettiğim ağları içeri aktar</string>
-    <string name="periodstill_text">WiFi taramaları arası geçen zaman 0 mph</string>
-    <string name="period_text">WiFi taramaları arası geçen zaman &lt;5 mph</string>
-    <string name="periodfast_text">WiFi taramaları arası geçen zaman &gt;5 mph</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">GPS güncellemelesi arası geçen zaman</string>
     <string name="speak_text">Sesli konuşma arası geçen zaman</string>
     <string name="battery_kill_text">Bu Batarya seviyesinde uygulamadan çık</string>
@@ -63,9 +64,9 @@
     <string name="speech_time">Geçerli zaman</string>
     <string name="speech_battery">Batarye seviyesi</string>
     <string name="speech_ssid">Yeni Ağ SSID\'leri</string>
-    <string name="query_address">Addres (örn: Chicago, IL):</string>
-    <string name="query_ssid">SSID (ex: Linksys) (SQL wildcards: %,_):</string>
-    <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
+    <string name="query_address">Addres (örn: Ankara, TR):</string>
+    <string name="query_ssid">SSID (örn: Linksys) (SQL wildcards: %,_):</string>
+    <string name="query_bssid">BSSID (örn: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Yerel Veritabanı sorgusu</string>
     <string name="reset_button">Alanları temizle</string>
     <string name="list_query_clear">Soruguları temizle</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">WEP Göster</string>
     <string name="filter_show_wpa">WPA Göster</string>
     <string name="filter_enabled">Fitre Etkin</string>
-    <string name="list_waiting_gps">(GPS senkronizasyonu bekleniyor..)</string>
+    <string name="list_waiting_gps">(GPS senkronizasyonu bekleniyor&#8230;)</string>
     <string name="list_scanning_off">(Arama Kapalı)</string>
     <string name="list_short_lat">Enlem:</string>
     <string name="list_short_lon">Boylam:</string>
@@ -136,7 +137,7 @@
     <string name="meters">meters</string>
     <string name="ft_short">ft</string>
     <string name="feet">feet</string>
-    <string name="kmph">kmph</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (İspanyolca)</string>
     <string name="language_fi">suomi (Fince)</string>
     <string name="language_fr">français (Fransızca)</string>
+    <string name="language_fy">Frysk (Frizce)</string>
     <string name="language_he">עִבְרִית (İbranice)</string>
     <string name="language_hi">हिन्दी (Hintçe)</string>
     <string name="language_hu">magyar (Macar)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

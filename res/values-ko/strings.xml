@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">시작</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - 설정</string>
     <string name="mapping_app_name">WiGLE Wifi - 오픈스트리트맵</string>
     <string name="dashboard_app_name">WiGLE Wifi - 대시보드</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">데이터베이스 백업 만들기</string>
     <string name="import_observed_button">가져오기 관찰된</string>
     <string name="import_observed_text">WiGLE에서 내 관찰 네트워크를 가져오기</string>
-    <string name="periodstill_text">무선랜 사이의 시간 0mph을 스캔</string>
-    <string name="period_text">WiFi를 스캔 사이의 시간 &lt;5mph</string>
-    <string name="periodfast_text">WiFi를 스캔 사이의 시간 &gt;5mph</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">GPS 업데이트 사이의 시간</string>
     <string name="speak_text">오디오 음성 사이의 시간</string>
     <string name="battery_kill_text">이 배터리 수준에서 출구</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">현재 시간</string>
     <string name="speech_battery">배터리 수준 비율</string>
     <string name="speech_ssid">새로운 네트워크 SSID\'s 의</string>
-    <string name="query_address">주소 (예 : 시카고, IL) :</string>
+    <string name="query_address">주소 (예 : Seoul, KR) :</string>
     <string name="query_ssid">SSID (예 : Linksys) (SQL 와일드 카드 : %,_):</string>
     <string name="query_bssid">BSSID (예 : 0A:2C:EF:3D:25:1B) (SQL 와일드 카드 : %,_):</string>
     <string name="search_button">검색어 로컬 DB</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">보기 WEP</string>
     <string name="filter_show_wpa">보기 WPA</string>
     <string name="filter_enabled">필터 사용</string>
-    <string name="list_waiting_gps">(GPS 동기화 대기 ...)</string>
+    <string name="list_waiting_gps">(GPS 동기화 대기 &#8230;)</string>
     <string name="list_scanning_off">(검색이 꺼져)</string>
     <string name="list_short_lat">위도 :</string>
     <string name="list_short_lon">경도 :</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">기능 :</string>
     <string name="network_channel">채널 :</string>
     <string name="network_observations">관찰 :</string>
-    <string name="network_querying">(querying...)</string>
+    <string name="network_querying">(querying&#8230;)</string>
     <string name="setting_show_password">비밀 번호를 표시</string>
     <string name="setting_db_marker">DB 마커 (여기서 업로드부터 시작) :</string>
     <string name="setting_high_up">최고 업로드 ID :</string>
@@ -136,9 +137,9 @@
     <string name="meters">m</string>
     <string name="ft_short">피트</string>
     <string name="feet">피트</string>
-    <string name="kmph">kmph</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
-    <string name="ms_short">MS</string>
+    <string name="ms_short">ms</string>
     <string name="na">N/A</string>
     <string name="run">실행</string>
     <string name="new_word">새로운</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">알 수없는 오류</string>
     <string name="status_fail">실패</string>
     <string name="status_success">성공</string>
-    <string name="status_working">작업 ...</string>
+    <string name="status_working">작업 &#8230;</string>
     <string name="status_upload_success">성공을 업로드</string>
     <string name="status_write_success">성공 쓰기</string>
     <string name="status_no_user">사용자 이름 설정하지</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (스페인어)</string>
     <string name="language_fi">suomi (핀란드어)</string>
     <string name="language_fr">français (프랑스어)</string>
+    <string name="language_fy">Frysk (프리지아)</string>
     <string name="language_he">עִבְרִית (히브리어)</string>
     <string name="language_hi">हिन्दी (힌디어)</string>
     <string name="language_hu">magyar (헝가리의)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

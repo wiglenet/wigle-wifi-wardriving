@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Starten</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Instellingen</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Back-up maken van database</string>
     <string name="import_observed_button">Importeren</string>
     <string name="import_observed_text">Reeds gevonden netwerken importeren uit WiGLE-account</string>
-    <string name="periodstill_text">tijd tussen WiFi scans 0 km/h</string>
-    <string name="period_text">tijd tussen WiFi scans &lt;8 km/h</string>
-    <string name="periodfast_text">tijd tussen WiFi scans &gt;8 km/h</string>
+    <string name="periodstill_text">Tijd tussen WiFi scans stilstaand</string>
+    <string name="period_text">Tijd tussen WiFi scans wanneer langzamer dan 8 km/h of 5 mph</string>
+    <string name="periodfast_text">Tijd tussen WiFi scans wanneer sneller dan 8 km/h of 5 mph</string>
     <string name="gps_text">Tijd tussen GPS-fixes</string>
     <string name="speak_text">Tijd tussen spraakinformatie</string>
     <string name="battery_kill_text">Scan stoppen op dit batterijniveau</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">WEP</string>
     <string name="filter_show_wpa">WPA</string>
     <string name="filter_enabled">Filter ingeschakeld</string>
-    <string name="list_waiting_gps">(Wachten op GPS-fix...)</string>
+    <string name="list_waiting_gps">(Wachten op GPS-fix&#8230;)</string>
     <string name="list_scanning_off">(Scan is uit)</string>
     <string name="list_short_lat">Bre:</string>
     <string name="list_short_lon">Len:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Beveiliging:</string>
     <string name="network_channel">Kanaal:</string>
     <string name="network_observations">Aantal keren gezien:</string>
-    <string name="network_querying">(query uitvoeren...)</string>
+    <string name="network_querying">(query uitvoeren&#8230;)</string>
     <string name="setting_show_password">Wachtwoord weergeven</string>
     <string name="setting_db_marker">DB Marker (de upload start bij):</string>
     <string name="setting_high_up">Hoogste upload ID:</string>
@@ -152,14 +153,14 @@
     <string name="signal">Signaal</string>
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
-    <string name="best_results">Schakel \'Netwerkmelding\' (verschilt per apparaat) uit voor de beste resultaten</string>
-    <string name="turn_on_wifi">WiFi wordt ingeschakeld\u2026</string>
+    <string name="best_results">Schakel "Netwerkmelding" uit in "Draadloos &amp; netwerken"->"WiFi-instellingen" voor de beste resultaten</string>
+    <string name="turn_on_wifi">WiFi wordt ingeschakeld</string>
     <string name="no_gps_device">Geen GPS-apparaat gevonden</string>
     <string name="turn_on_gps">Schakel GPS in</string>
     <string name="address">Adres</string>
     <string name="no_address_found">Geen geolocatie gevonden</string>
     <string name="problem_with_field">Probleem met veld</string>
-    <string name="turning_wifi_off">WiFi weer uitschakelen\u2026</string>
+    <string name="turning_wifi_off">WiFi weer uitschakelen</string>
     <string name="lost_location">Geen locatie meer</string>
     <string name="have_location">Locatie gevonden</string>
     <string name="wifi_jammed">WiFi lijkt bezet of vastgelopen te zijn; schakel Wi-Fi uit en weer in</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (Spaans)</string>
     <string name="language_fi">suomi (Fins)</string>
     <string name="language_fr">français (Frans)</string>
+    <string name="language_fy">Frysk (Fries)</string>
     <string name="language_he">עִבְרִית (Hebreeuws)</string>
     <string name="language_hi">हिन्दी (Hindi)</string>
     <string name="language_hu">magyar (Hongaars)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Waarschuwing, laatste WiFi-scan is</string>
     <string name="wifi_restart_2">seconden geleden voltooid. WiFi herstarten.</string>
     <string name="use_wigle_tiles">Gebruik WiGLE OSM-tegels</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Toast pop-ups uitschakelen</string>
 </resources>

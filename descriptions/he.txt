@@ -2,30 +2,30 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, להציג רשתות אלחוטיות, להעלות למסד נתוני WiGLE.
+Wardriving: netstumble, affiche réseau sans fil, télécharger à la base WiGLE.
 
 Description (4000 characters):
-WiGLE הוא קוד פתוח wardriving אפליקציה לnetstumble, תצוגה והמפה מצא רשתות אלחוטיות ואנטנות סלולריות בכל מקום בעולם, בקלות להעלות למסד נתוני WiGLE.net. WiGLE החל ב2001 ועכשיו מעל 125 מ'רשתות Wi-Fi ממופות ברחבי העולם.
+WiGLE est une source ouverte wardriving application de netstumble, l'affichage et la carte trouvée réseaux sans fil et des tours cellulaires partout dans le monde, facilement télécharger la base de données de WiGLE.net. WiGLE a été lancé en 2001 et a maintenant plus de 125 millions de réseaux WiFi mappés dans le monde entier.
 
-• להתחרות על leaderboard WiGLE הגלובלי עבור רוב הרשתות נמצאות!
-• יצוא לקבצי CSV על כרטיס SD (מופרד בפסיקים ערכים)!
-• יצוא לקובצי KML על כרטיס SD (כדי לייבא לתוך גוגל מפות / ארת)!
-• אודיו וטקסט לדיבור להתריע!
-• מסד הנתונים מקומיים כדי לעקוב אחר רשתות חדשות מצאו!
-• מפה בזמן אמת של רשתות שנמצאו (OpenStreetMap)!
-• ניתן להעביר אפליקציה לכרטיס SD!
-• כפתור "להשתיק" לכבות את כל הקול / הדיבור באופן מיידי!
-• GPS Bluetooth תומך במיקומים מדומים!
-• אין פרסומות!
+• Rivaliser sur le classement mondial WiGLE pour la plupart des réseaux situés!
+• Exportation vers des fichiers CSV sur la carte SD (comma-separated values)!
+• Export des fichiers KML sur carte SD (à importer dans Google Maps/Earth)!
+• Audio et texte-parole d'alerte!
+• Base de données locale pour suivre les nouveaux réseaux trouvé!
+• Carte des réseaux détectés en temps réel (OpenStreetMap)!
+• Peut se déplacer application sur une carte SD!
+• Bouton "Muet" pour couper tous les sons/parole immédiatement!
+• GPS Bluetooth soutenir par les positions fictives!
+• Aucune annonce!
 
-הערות למוצר: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+Les notes de version: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-לאינטרנט אלחוטי, ותאים סלולריים כדי להיות ממופים, עליך להמתין למכשיר שלך כדי לקבוע את המיקום הנוכחי, באמצעות GPS או מיקום ברשת.
-על המפה: החוגים הם Wi-Fi, ריבועים הם מגדלי תא. צבעים בהירים הם רשתות ראו לפני כן, סגולים אלה הם חדשים עבור מסד הנתונים המקומיים.
-אם יש לך בעיות בכניסה, או שיש הצעות, שלח לנו מייל לwigle-admin@wigle.net ונשמח לעזור.
-צריך "קורא מדינת טלפון" כדי לדעת אם שיחת טלפון במהלכה, כדי להשתיק את השמע (צלילים ודיבור).
-קבצים זמינים כדי לעזור עם תרגום אנושי לשפות שאינן אנגלית. זה היה בעיקר תרגום מכאני, משום שברורים שאנחנו לא יודעים את כל השפות הללו. אתה יכול לעזור כדי לשפר את הדברים על ידי ביצוע בקשות משיכה ב:
+Pour une connexion WiFi et des tours cellulaires pour être mappés, vous devez attendre que votre appareil pour déterminer l'emplacement actuel, via GPS ou un emplacement réseau.
+Sur la carte: les cercles sont WiFi, les places sont des tours cellulaires. Les couleurs claires sont des réseaux vus auparavant, les violets sont nouvelles pour la base de données locale.
+Si vous avez des problèmes pour vous connecter, ou des suggestions, envoyez-nous un email à wigle-admin@wigle.net et nous serons heureux de vous aider.
+Besoins »Lit Etat de téléphone" pour dire si un appel téléphonique est en cours, pour couper le son (sons et de la parole).
+Les fichiers sont disponibles pour aider à la traduction humaine de langues autres que l'anglais. Ce fut surtout une traduction mécanique, parce que nous ne savons évidemment pas toutes ces langues. Vous pouvez aider à améliorer les choses en faisant des demandes de tirage au:
 https://github.com/wiglenet/wigle-wifi-wardriving/pulls
-או לשלוח אותם לwigle-admin@wigle.net.
+ou de les envoyer à wigle-admin@wigle.net.
 
-שמור על נגף!
+Continuez à trébucher!

@@ -5,7 +5,7 @@ Promo (80 characters):
 Wardriving: netstumble, affiche réseau sans fil, télécharger à la base WiGLE.
 
 Description (4000 characters):
-WiGLE est une source ouverte wardriving application de netstumble, l'affichage et la carte trouvée réseaux sans fil et des tours cellulaires partout dans le monde, facilement télécharger la base de données de WiGLE.net. WiGLE a été lancé en 2001 et a maintenant plus de 125 millions de réseaux Wi-Fi mappés dans le monde entier.
+WiGLE est une source ouverte wardriving application de netstumble, l'affichage et la carte trouvée réseaux sans fil et des tours cellulaires partout dans le monde, facilement télécharger la base de données de WiGLE.net. WiGLE a été lancé en 2001 et a maintenant plus de 125 millions de réseaux WiFi mappés dans le monde entier.
 
 • Rivaliser sur le classement mondial WiGLE pour la plupart des réseaux situés!
 • Exportation vers des fichiers CSV sur la carte SD (comma-separated values)!
@@ -20,8 +20,8 @@ WiGLE est une source ouverte wardriving application de netstumble, l'affichage e
 
 Les notes de version: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-Pour une connexion Wi-Fi et des tours cellulaires pour être mappés, vous devez attendre que votre appareil pour déterminer l'emplacement actuel, via GPS ou un emplacement réseau.
-Sur la carte: les cercles sont Wi-Fi, les places sont des tours cellulaires. Les couleurs claires sont des réseaux vus auparavant, les violets sont nouvelles pour la base de données locale.
+Pour une connexion WiFi et des tours cellulaires pour être mappés, vous devez attendre que votre appareil pour déterminer l'emplacement actuel, via GPS ou un emplacement réseau.
+Sur la carte: les cercles sont WiFi, les places sont des tours cellulaires. Les couleurs claires sont des réseaux vus auparavant, les violets sont nouvelles pour la base de données locale.
 Si vous avez des problèmes pour vous connecter, ou des suggestions, envoyez-nous un email à wigle-admin@wigle.net et nous serons heureux de vous aider.
 Besoins »Lit Etat de téléphone" pour dire si un appel téléphonique est en cours, pour couper le son (sons et de la parole).
 Les fichiers sont disponibles pour aider à la traduction humaine de langues autres que l'anglais. Ce fut surtout une traduction mécanique, parce que nous ne savons évidemment pas toutes ces langues. Vous pouvez aider à améliorer les choses en faisant des demandes de tirage au:

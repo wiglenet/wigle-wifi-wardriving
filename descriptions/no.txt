@@ -5,7 +5,7 @@ Promo (80 characters):
 Wardriving: netstumble, vise trådløse nettverk, laste opp til WiGLE database.
 
 Description (4000 characters):
-WiGLE er en åpen kildekode wardriving app til netstumble, skjerm og kart funnet trådløse nettverk og mobilmaster hvor som helst i verden, lett å laste opp til WiGLE.net database. WiGLE ble startet i 2001 og har nå over 125 millioner Wi-Fi-nettverk kartlagt over hele verden.
+WiGLE er en åpen kildekode wardriving app til netstumble, skjerm og kart funnet trådløse nettverk og mobilmaster hvor som helst i verden, lett å laste opp til WiGLE.net database. WiGLE ble startet i 2001 og har nå over 125 millioner WiFi-nettverk kartlagt over hele verden.
 
 • Konkurrer på den globale WiGLE leaderboard for de fleste nettverk lokalisert!
 • Eksporter til CSV-filer på SD-kort (kommadelte verdier)!
@@ -20,8 +20,8 @@ WiGLE er en åpen kildekode wardriving app til netstumble, skjerm og kart funnet
 
 Versjonsmerknader: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-For Wi-Fi og mobilmaster som skal kartlegges, må du vente på at enheten for å fastslå den nåværende plassering, via GPS eller nettverksplassering.
-På kartet: sirklene er Wi-Fi, rutene er celle tårn. Lyse farger er nettverk sett før, lilla de er nye for den lokale databasen.
+For WiFi og mobilmaster som skal kartlegges, må du vente på at enheten for å fastslå den nåværende plassering, via GPS eller nettverksplassering.
+På kartet: sirklene er WiFi, rutene er celle tårn. Lyse farger er nettverk sett før, lilla de er nye for den lokale databasen.
 Hvis du har problemer med å logge inn, eller har forslag, send oss ​​en e-post til wigle-admin@wigle.net og vi vil gjerne hjelpe ut.
 Trenger "Leser telefontilstand" for å fortelle om en telefonsamtale pågår, for å dempe lyden (lyder og tale).
 Filene er tilgjengelig for å hjelpe med en menneskelig oversettelse til ikke-engelske språk. Dette var hovedsakelig en mekanisk oversettelse, fordi vi åpenbart ikke kjenner alle disse språkene. Du kan bidra til å forbedre ting ved å gjøre pull-forespørsler på:

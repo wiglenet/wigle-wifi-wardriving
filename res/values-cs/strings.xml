@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Nastavení</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Přehled</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Proveď zálohu databáze</string>
     <string name="import_observed_button">Import Observed</string>
     <string name="import_observed_text">Import my observed networks from WiGLE</string>
-    <string name="periodstill_text">Čas skenu při 0 mph</string>
-    <string name="period_text">Čas skenu pro &lt;5 mph</string>
-    <string name="periodfast_text">Čas skenu pro &gt;5 mph</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Čas obnovení GPS souřadnic</string>
     <string name="speak_text">Časové rozmezí hlasového výstupu</string>
     <string name="battery_kill_text">Skončit když baterie je na</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Aktuální čas</string>
     <string name="speech_battery">)Úroveň nabití baterie</string>
     <string name="speech_ssid">Nových sítí</string>
-    <string name="query_address">Adresa (např: Chicago, IL):</string>
+    <string name="query_address">Adresa (např: Prague, CZ):</string>
     <string name="query_ssid">SSID (např: Linksys) (SQL divoké karty: %,_):</string>
     <string name="query_bssid">BSSID (např: 0A:2C:EF:3D:25:1B) (SQL divoké karty: %,_):</string>
     <string name="search_button">Dotaz na místní DB</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">Ukázat WEP</string>
     <string name="filter_show_wpa">Ukázat WPA</string>
     <string name="filter_enabled">Filtr zapnut</string>
-    <string name="list_waiting_gps">(Čekání na GPS..)</string>
+    <string name="list_waiting_gps">(Čekání na GPS&#8230;)</string>
     <string name="list_scanning_off">(Skenování vypnuto)</string>
     <string name="list_short_lat">Šíř:</string>
     <string name="list_short_lon">Dél:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Možnosti:</string>
     <string name="network_channel">Kanál:</string>
     <string name="network_observations">Pozorování:</string>
-    <string name="network_querying">(dotazování...)</string>
+    <string name="network_querying">(dotazování&#8230;)</string>
     <string name="setting_show_password">Ukázat heslo</string>
     <string name="setting_db_marker">Značka DB (odkud začíná nahrávání):</string>
     <string name="setting_high_up">Nejvyšší nahrané id:</string>
@@ -136,7 +137,7 @@
     <string name="meters">metry</string>
     <string name="ft_short">ft</string>
     <string name="feet">stop</string>
-    <string name="kmph">km\/h</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">Neznámá chyba</string>
     <string name="status_fail">Neúspěch</string>
     <string name="status_success">Úspěch</string>
-    <string name="status_working">Pracuji...</string>
+    <string name="status_working">Pracuji&#8230;</string>
     <string name="status_upload_success">Nahrání úspěšné</string>
     <string name="status_write_success">Úspěšně zapsáno</string>
     <string name="status_no_user">Nevyplněno uživatelské jméno</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (španělština)</string>
     <string name="language_fi">suomi (finština)</string>
     <string name="language_fr">français (francouzština)</string>
+    <string name="language_fy">Frysk (fríština)</string>
     <string name="language_he">עִבְרִית (hebrejština)</string>
     <string name="language_hi">हिन्दी (hindština)</string>
     <string name="language_hu">magyar (maďarština)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

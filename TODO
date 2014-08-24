@@ -45,6 +45,9 @@ on networkactivity record more observations on that network (site survey)
 rssi on kml export
 
 --- done ---
+* 2.5 (08/??/2014)
+Polish translation fixes (thanks ireun!)
+
 * 2.4 (08/18/2014)
 German translation fixes (thanks bkimminich!)
 Possible fix for TabWidget NPE on android 2.1

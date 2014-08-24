@@ -38,9 +38,9 @@
     <string name="backup_db_text">Gör en säkerhetskopia av databasen</string>
     <string name="import_observed_button">Importera Observerat</string>
     <string name="import_observed_text">Importera mina observerade nätverk från WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Tid mellan WiFi skannar står still</string>
+    <string name="period_text">Tid mellan WiFi skannar då långsammare än 8 km/h eller 5 mph</string>
+    <string name="periodfast_text">Tid mellan WiFi skannar då fortare än 8 km/h eller 5 mph</string>
     <string name="gps_text">Tid mellan GPS uppdateringar</string>
     <string name="speak_text">Tid mellan ljud tal</string>
     <string name="battery_kill_text">Avsluta på denna batterinivå</string>

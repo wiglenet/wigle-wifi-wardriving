@@ -1,0 +1,31 @@
+Title (30 characters):
+WiGLE Wifi Wardriving
+
+Promo (80 characters):
+Wardriving: netstumble, besjoch WiFi-netwurken, upload hja nei WiGLE database.
+
+Description (4000 characters):
+WiGLE is in iepen source wardriving app om to netstumblen, besjoch en bring WiFi-netwurken en stjoermêsten yn kaart oeral yn de wrâld, en upload hja maklik nei de WiGLE.net database. WiGLE is opgestart yn 2001 en hat no mear as 125 miljoen WiFi-netwurken wrâldwiid yn kaart brocht.
+
+• Concurreer op de globale WiGLE ranglisten foar de meast fûn netwurken!
+• Exporteer nei CSV-bestannen op in SD-kaart (kommaskieden bestân)!
+• Exporteer nei KML-bestannen op in SD-kaart (om hja te importeren yn Google Maps/Earth)!
+• Audio en tekst-naar-spraak warskôgingen!
+• Lokale database om nij fûn netwurken by te hâlden!
+• Real-time kaart fan fûn netwurken (OpenStreetMap)!
+• App is verplaatsbaar naarnei in een SD-kaart!
+• Stil-knop om alle lûd/spraak fuortendaliks te stopje!
+• Bluetooth GPS stipe troch middel fan neimakkelokaasjes!
+• Gjin advertinsjes!
+
+Releaseopmerkingen: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+
+As do wolst dat WiFi en stjoermêsten wurde opslein op de kaart, moat do wachtsje op do apparaat om de hjoeddeistige lokaasje fêst te stellen, fia GPS of netwurklokaasje.
+Op de kaart: de cirkels syn WiFi, vierkanten syn stjoermêsten. Lichte kleuren syn netwurken dy earder sjoen syn, paarse syn nij yn de lokale database.
+As do problemen hast om yn te logge, of asto suggestjes hast, stjoer dan in e-mail nei wigle-admin@wigle.net en wy sille do graach helpe mei dyn probleem.
+Hat "Telefoanstatus lêzen" nedich om te kinnen sjen ofst` oan it belje binne, om de audio út te setten (gelûden en spraak).
+Bestannen syn beskikber om te helpe mei oersettingen troch minsken nei net-Ingelske talen. Dit wie foar in grut part in mechanische oersetting, om't wy fansels net al dizze talen kennen. Do kin helpe mei dingen ferbetterejen troch hjir pull requests te meitsjen:\
+https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+of te ferstjoere nei wigle-admin@wigle.net.
+
+Bliuw stumblen!

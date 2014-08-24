@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">शुरू</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - सेटिंग्स</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - डैशबोर्ड</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">एक डेटाबेस बैकअप बनाओ</string>
     <string name="import_observed_button">आयात मनाया</string>
     <string name="import_observed_text">WiGLE से मेरी मनाया नेटवर्क आयात</string>
-    <string name="periodstill_text">वाईफ़ाई के बीच समय 0 मील प्रति स्कैन</string>
-    <string name="period_text">वाईफ़ाई स्कैन के बीच समय &lt;5 मील प्रति घंटा</string>
-    <string name="periodfast_text">वाईफ़ाई स्कैन के बीच समय &gt;5 मील प्रति घंटा</string>
+    <string name="periodstill_text">वाईफाई के बीच समय अभी भी खड़े स्कैन करता है</string>
+    <string name="period_text">वाईफाई के बीच समय जब धीमी से 8 किमी / घंटा या 5 मील स्कैन करता है</string>
+    <string name="periodfast_text">वाईफाई के बीच समय जब तेजी से 8 किमी / घंटा या 5 मील स्कैन करता है</string>
     <string name="gps_text">जीपीएस अद्यतन के बीच समय</string>
     <string name="speak_text">ऑडियो भाषण के बीच में समय</string>
     <string name="battery_kill_text">इस बैटरी स्तर पर बाहर निकलें</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">वर्तमान समय</string>
     <string name="speech_battery">बैटरी स्तर प्रतिशत</string>
     <string name="speech_ssid">नई नेटवर्क SSID\'s</string>
-    <string name="query_address">पता (पूर्व: शिकागो, आईएल):</string>
+    <string name="query_address">पता (पूर्व: New Delhi, IN):</string>
     <string name="query_ssid">SSID (पूर्व: Linksys) (एसक्यूएल वाइल्डकार्ड: %,_):</string>
     <string name="query_bssid">BSSID (पूर्व: 0A:2C:EF:3D:25:1B) (एसक्यूएल वाइल्डकार्ड: %,_):</string>
     <string name="search_button">क्वेरी स्थानीय DB</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">दिखाएँ WEP</string>
     <string name="filter_show_wpa">दिखाएँ डबल्यु पी ए</string>
     <string name="filter_enabled">फ़िल्टर सक्रिय</string>
-    <string name="list_waiting_gps">(जीपीएस सिंक के लिए प्रतीक्षा कर रहा है ..)</string>
+    <string name="list_waiting_gps">(जीपीएस सिंक के लिए प्रतीक्षा कर रहा है &#8230;)</string>
     <string name="list_scanning_off">(स्कैनिंग बंद कर दिया)</string>
     <string name="list_short_lat">अक्षां:</string>
     <string name="list_short_lon">लंदन:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">क्षमताओं:</string>
     <string name="network_channel">चैनल:</string>
     <string name="network_observations">टिप्पणियों:</string>
-    <string name="network_querying">(Querying...)</string>
+    <string name="network_querying">(Querying&#8230;)</string>
     <string name="setting_show_password">पासवर्ड दिखाएँ</string>
     <string name="setting_db_marker">डीबी मार्कर (अपलोड जहां से शुरू):</string>
     <string name="setting_high_up">उच्चतम अपलोड आईडी:</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">अज्ञात त्रुटि</string>
     <string name="status_fail">असफल</string>
     <string name="status_success">सफलता</string>
-    <string name="status_working">कार्य ...</string>
+    <string name="status_working">कार्य &#8230;</string>
     <string name="status_upload_success">सफल अपलोड</string>
     <string name="status_write_success">सफल लिखें</string>
     <string name="status_no_user">सेट नहीं उपयोगकर्ता नाम</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (स्पेनिश)</string>
     <string name="language_fi">suomi (फिनिश)</string>
     <string name="language_fr">français (फ़्रान्सीसी)</string>
+    <string name="language_fy">Frysk (फ़्रिसियाई)</string>
     <string name="language_he">עִבְרִית (इब्रानी)</string>
     <string name="language_hi">हिन्दी</string>
     <string name="language_hu">magyar (हंगेरी)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

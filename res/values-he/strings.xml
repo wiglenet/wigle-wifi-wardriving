@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">החל</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - הגדרות</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">בצע גיבוי מסד הנתונים</string>
     <string name="import_observed_button">ייבוא ​​נצפה</string>
     <string name="import_observed_text">ייבוא ​​רשתות נצפתה שלי WiGLE</string>
-    <string name="periodstill_text">זמן בין סריקות WiFi 0 קמ&quot;ש</string>
-    <string name="period_text">זמן בין סריקות WiFi &lt;5 קמ&quot;ש</string>
-    <string name="periodfast_text">זמן בין סריקות WiFi &gt;5 קמ&quot;ש</string>
+    <string name="periodstill_text">זמן בין WiFi סורק את מעמד עדיין</string>
+    <string name="period_text">זמן בין WiFi סורק כאשר קמ"ש איטי יותר מאשר 8 קילומטר / שעה או 5</string>
+    <string name="periodfast_text">זמן בין WiFi סורק כאשר קמ"ש מהר יותר מאשר 8 קילומטר / שעה או 5</string>
     <string name="gps_text">הזמן בין עדכוני ה-GPS</string>
     <string name="speak_text">זמן בין דיבור אודיו</string>
     <string name="battery_kill_text">יציאה ברמה זו סוללה</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">זמן נוכחי</string>
     <string name="speech_battery">רמת סוללה אחוז</string>
     <string name="speech_ssid">חדש ברשת SSID\'s</string>
-    <string name="query_address">כתובת (לשעבר: שיקגו, אילינוי):</string>
+    <string name="query_address">כתובת (לשעבר: Jerusalem, IL):</string>
     <string name="query_ssid">SSID (לשעבר: Linksys) (SQL בתווים כלליים: %,_):</string>
     <string name="query_bssid">BSSID (לשעבר: 0A:2C:EF:3D:25:1B) (SQL בתווים כלליים: %,_):</string>
     <string name="search_button">DB מקומי Query</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">הצג ב-WEP</string>
     <string name="filter_show_wpa">הצג ב-WPA</string>
     <string name="filter_enabled">סנן מאופשר</string>
-    <string name="list_waiting_gps">(מחכים GPS סנכרון ..)</string>
+    <string name="list_waiting_gps">(מחכים GPS סנכרון &#8230;)</string>
     <string name="list_scanning_off">(סריקה מבוטלת)</string>
     <string name="list_short_lat">קווי רוחב:</string>
     <string name="list_short_lon">לון:</string>
@@ -136,8 +137,8 @@
     <string name="meters">מטר</string>
     <string name="ft_short">רגל</string>
     <string name="feet">מטר</string>
-    <string name="kmph">kmph</string>
-    <string name="mph">קמ&quot;ש</string>
+    <string name="kmph">km/h</string>
+    <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
     <string name="run">לרוץ</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (ספרדית)</string>
     <string name="language_fi">suomi (פינית)</string>
     <string name="language_fr">français (צרפתית)</string>
+    <string name="language_fy">Frysk (פריזית)</string>
     <string name="language_he">עִבְרִית</string>
     <string name="language_hi">हिन्दी (הינדי)</string>
     <string name="language_hu">magyar (הונגרי)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

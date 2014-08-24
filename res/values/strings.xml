@@ -12,10 +12,10 @@
     <string name="data_activity_name">WiGLE Wifi - Database</string>
     <string name="dbresult_activity_name">WiGLE Wifi - Search Result</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
-    <string name="username">WiGLE Username</string>
-    <string name="password">WiGLE Password</string>
+    <string name="username">WiGLE username</string>
+    <string name="password">WiGLE password</string>
     <string name="show_current">Show current networks only</string>
-    <string name="use_metric">Use Metric units</string>
+    <string name="use_metric">Use metric units</string>
     <string name="be_anonymous">Upload anonymously</string>
     <string name="donate">Donate data: Allow commercial use</string>
     <string name="found_sound">Play sound when network found in run</string>
@@ -38,13 +38,13 @@
     <string name="backup_db_text">Make a database backup</string>
     <string name="import_observed_button">Import Observed</string>
     <string name="import_observed_text">Import my observed networks from WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans 0 mph</string>
-    <string name="period_text">Time between WiFi scans &lt;5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans &gt;5 mph</string>
+    <string name="periodstill_text">Time between WiFi scans standing still</string>
+    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
+    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Time between GPS updates</string>
     <string name="speak_text">Time between audio speech</string>
-    <string name="battery_kill_text">Exit at this Battery Level</string>
-    <string name="reset_wifi_text">Decide WiFi is Jammed</string>
+    <string name="battery_kill_text">Exit at this battery level</string>
+    <string name="reset_wifi_text">Decide WiFi is jammed</string>
     <string name="speech_gps">GPS status changes</string>
     <string name="mute">Mute</string>
     <string name="play">Play</string>
@@ -53,7 +53,7 @@
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
     <string name="cryptocanceldialog_button">Cancel</string>
-    <string name="circle_size_map">Map Circles Sized by Qty</string>
+    <string name="circle_size_map">Map circles sized by qty</string>
     <string name="speech_button">Speech Configuration Screen &gt;&gt;</string>
     <string name="speech_text">Audio speech will include:</string>
     <string name="speech_run">Nets for run</string>
@@ -64,7 +64,7 @@
     <string name="speech_time">Current time</string>
     <string name="speech_battery">Battery level percentage</string>
     <string name="speech_ssid">New Network SSID\'s</string>
-    <string name="query_address">Address (ex: Chicago, IL):</string>
+    <string name="query_address">Address (ex: Chicago, US):</string>
     <string name="query_ssid">SSID (ex: Linksys) (SQL wildcards: %,_):</string>
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Query Local DB</string>
@@ -137,7 +137,7 @@
     <string name="meters">meters</string>
     <string name="ft_short">ft</string>
     <string name="feet">feet</string>
-    <string name="kmph">kmph</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
@@ -222,6 +222,7 @@
     <string name="language_es">español (Spanish)</string>
     <string name="language_fi">suomi (Finnish)</string>
     <string name="language_fr">français (French)</string>
+    <string name="language_fy">Frysk (Frisian)</string>
     <string name="language_he">עִבְרִית (Hebrew)</string>
     <string name="language_hi">हिन्दी (Hindi)</string>
     <string name="language_hu">magyar (Hungarian)</string>
@@ -252,5 +253,5 @@
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
-    <string name="disable_toast">Disable Toast Popups</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

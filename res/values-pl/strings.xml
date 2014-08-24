@@ -2,7 +2,7 @@
 <resources>
     <string name="stats">Włączanie</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
-	<string name="list_app_name">WiGLE Wifi</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Ustawienia</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Informacje</string>
@@ -38,9 +38,9 @@
     <string name="backup_db_text">Utwórz kopię zapasową bazy danych</string>
     <string name="import_observed_button">Importuj obserwowane</string>
     <string name="import_observed_text">Import zaobserwowanych sieci z WiGLE</string>
-    <string name="periodstill_text">Częstotliwośc skanowania przy 0 mph</string>
-    <string name="period_text">Częstotliwośc skanowania przy &lt;5 mph</string>
-    <string name="periodfast_text">Częstotliwośc skanowania przy &gt;5 mph</string>
+    <string name="periodstill_text">Czas pomiędzy WiFi skanuje stoi w</string>
+    <string name="period_text">Czas pomiędzy WiFi skanuje gdy wolniej niż 8 km/h lub 5 mph</string>
+    <string name="periodfast_text">Czas pomiędzy WiFi skanuje gdy szybciej niż 8 km/h lub 5 mph</string>
     <string name="gps_text">Częstotliwośc aktualizacji GPS</string>
     <string name="speak_text">Częstotliwośc mówienia</string>
     <string name="battery_kill_text">Wyłącz, gdy poziom baterii wynosi</string>
@@ -64,9 +64,9 @@
     <string name="speech_time">Aktualny czas</string>
     <string name="speech_battery">Poziom baterii</string>
     <string name="speech_ssid">SSID nowej sieci</string>
-    <string name="query_address">Adres (np: Chicago, IL):</string>
-    <string name="query_ssid">SSID (np. Linksys) (wieloznaczniki SQL: %,_):</string>
-    <string name="query_bssid">BSSID (np. 0A:2C:EF:3D:25:1B) (wieloznaczniki SQL: %,_):</string>
+    <string name="query_address">Adres (np: Warsaw, PL):</string>
+    <string name="query_ssid">SSID (np: Linksys) (wieloznaczniki SQL: %,_):</string>
+    <string name="query_bssid">BSSID (np: 0A:2C:EF:3D:25:1B) (wieloznaczniki SQL: %,_):</string>
     <string name="search_button">Zapytanie do lokalnej bazy</string>
     <string name="reset_button">Zresetuj pola</string>
     <string name="list_query_clear">Wyczyść argumenty zapytania</string>
@@ -81,7 +81,7 @@
     <string name="filter_show_wep">Pokaż WEP</string>
     <string name="filter_show_wpa">Pokaż WPA</string>
     <string name="filter_enabled">Filtr włączony</string>
-    <string name="list_waiting_gps">(Czekam na pozycję GPS...)</string>
+    <string name="list_waiting_gps">(Czekam na pozycję GPS&#8230;)</string>
     <string name="list_scanning_off">(Skanowanie wyłączone)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Lon:</string>
@@ -96,7 +96,7 @@
     <string name="network_capa">Możliwości:</string>
     <string name="network_channel">Kanał:</string>
     <string name="network_observations">Il. obserwacji:</string>
-    <string name="network_querying">(Zapytanie...)</string>
+    <string name="network_querying">(Zapytanie&#8230;)</string>
     <string name="setting_show_password">Pokaż hasło</string>
     <string name="setting_db_marker">Znacznik bazy (odkąd rozpocząć przesyłanie):</string>
     <string name="setting_high_up">Najwyższe przesłane id:</string>
@@ -163,7 +163,7 @@
     <string name="turning_wifi_off">Wyłączenie WiFi</string>
     <string name="lost_location">Utracone położenie</string>
     <string name="have_location">Uzyskano położenie z</string>
-    <string name="wifi_jammed">WiFi jest zacięte, wyłaczanie i włączanie...</string>
+    <string name="wifi_jammed">WiFi jest zacięte, wyłaczanie i włączanie.</string>
     <string name="battery_at">Poziom baterii wynosi</string>
     <string name="battery_postfix">procent, zamykanie WiGLE Wifi</string>
     <string name="scan">Skanowanie</string>
@@ -197,7 +197,7 @@
     <string name="status_unknown_error">Nieznany błąd</string>
     <string name="status_fail">Błąd</string>
     <string name="status_success">Sukces</string>
-    <string name="status_working">Pracuję...</string>
+    <string name="status_working">Pracuję&#8230;</string>
     <string name="status_upload_success">Przesłano plik</string>
     <string name="status_write_success">Zapisano plik</string>
     <string name="status_no_user">Nie podano nazwy użytkownika</string>
@@ -222,6 +222,7 @@
     <string name="language_es">español (hiszpański)</string>
     <string name="language_fi">suomi (fiński)</string>
     <string name="language_fr">français (francuski)</string>
+    <string name="language_fy">Frysk (fryzyjski)</string>
     <string name="language_he">עִבְרִית (hebrajski)</string>
     <string name="language_hi">हिन्दी (hindi)</string>
     <string name="language_hu">magyar (węgierski)</string>
@@ -252,5 +253,5 @@
     <string name="wifi_restart_2">sekund temu. Restartowanie WiFi.</string>
     <string name="use_wigle_tiles">Użyj kafelek WiGLE OSM</string>
     <string name="wigle_service">Usługa WiGLE Wifi</string>
-    <string name="disable_toast">Wtłącz dymki Toast</string>
+    <string name="disable_toast">Wtłącz dymki toast</string>
 </resources>

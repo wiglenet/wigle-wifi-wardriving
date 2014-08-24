@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Starte</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Innstillinger</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Lag en database backup</string>
     <string name="import_observed_button">Import Observert</string>
     <string name="import_observed_text">Import min observerte nettverk fra WiGLE</string>
-    <string name="periodstill_text">Tid mellom WiFi skanner 0 km/h</string>
-    <string name="period_text">Tid mellom WiFi skanner &lt;8 km/h</string>
-    <string name="periodfast_text">Tid mellom WiFi skanner &gt;8 km/h</string>
+    <string name="periodstill_text">Tid mellom WiFi skanner står stille</string>
+    <string name="period_text">Tid mellom WiFi skanner når saktere enn 8 km/h eller 5 mph</string>
+    <string name="periodfast_text">Tid mellom WiFi skanner når raskere enn 8 km/h eller 5 mph</string>
     <string name="gps_text">Tid mellom GPS oppdateringer</string>
     <string name="speak_text">Tid mellom lyd tale</string>
     <string name="battery_kill_text">Exit på dette Batterinivå</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Gjeldende tid</string>
     <string name="speech_battery">Batterinivå prosent</string>
     <string name="speech_ssid">Nytt nettverk SSID\'s</string>
-    <string name="query_address">Adresse (ex: Chicago, IL):</string>
+    <string name="query_address">Adresse (ex: Oslo, NO):</string>
     <string name="query_ssid">SSID (ex: Linksys) (SQL jokertegn: %,_):</string>
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL jokertegn: %,_):</string>
     <string name="search_button">Query Lokal DB</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">Vis WEP</string>
     <string name="filter_show_wpa">Vis WPA</string>
     <string name="filter_enabled">Filter Enabled</string>
-    <string name="list_waiting_gps">(Venter på GPS sync ..)</string>
+    <string name="list_waiting_gps">(Venter på GPS sync &#8230;)</string>
     <string name="list_scanning_off">(Scanning slått av)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Lon:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Capabilities:</string>
     <string name="network_channel">Channel:</string>
     <string name="network_observations">Observasjoner:</string>
-    <string name="network_querying">(Querying...)</string>
+    <string name="network_querying">(Querying&#8230;)</string>
     <string name="setting_show_password">Vis passord</string>
     <string name="setting_db_marker">DB Marker (hvor opplastninger start fra):</string>
     <string name="setting_high_up">Høyeste lastet id:</string>
@@ -136,7 +137,7 @@
     <string name="meters">meter</string>
     <string name="ft_short">ft</string>
     <string name="feet">føtter</string>
-    <string name="kmph">kmph</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">Ukjent feil</string>
     <string name="status_fail">Fail</string>
     <string name="status_success">Suksess</string>
-    <string name="status_working">Arbeide ...</string>
+    <string name="status_working">Arbeide &#8230;</string>
     <string name="status_upload_success">Last opp Vellykket</string>
     <string name="status_write_success">Skriv Vellykket</string>
     <string name="status_no_user">Brukernavn ikke satt</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español (spansk)</string>
     <string name="language_fi">suomi (finsk)</string>
     <string name="language_fr">français (fransk)</string>
+    <string name="language_fy">Frysk (frisisk)</string>
     <string name="language_he">עִבְרִית (hebraisk)</string>
     <string name="language_hi">हिन्दी (hindi)</string>
     <string name="language_hu">magyar (ungarsk)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

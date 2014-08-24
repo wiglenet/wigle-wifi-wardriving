@@ -2,10 +2,10 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, bekijk Wi-Fi-netwerken, upload ze naar WiGLE database.
+Wardriving: netstumble, bekijk WiFi-netwerken, upload ze naar WiGLE database.
 
 Description (4000 characters):
-WiGLE is een open source wardriving app om to netstumblen, bekijk en breng Wi-Fi-netwerken en zendmasten in kaart overal in de wereld, en upload ze makkelijk naar de WiGLE.net database. WiGLE is opgestart in 2001 en heeft nu meer dan 125 miljoen Wi-Fi-netwerken wereldwijd in kaart gebracht.
+WiGLE is een open source wardriving app om te netstumblen, bekijk en breng WiFi-netwerken en zendmasten in kaart overal ter wereld, en upload ze gemakkelijk naar de WiGLE.net database. WiGLE is opgestart in 2001 en heeft nu meer dan 125 miljoen WiFi-netwerken wereldwijd in kaart gebracht.
 
 • Concurreer op de globale WiGLE ranglijsten voor de meest gevonden netwerken!
 • Exporteer naar CSV-bestanden op een SD-kaart (kommagescheiden bestand)!
@@ -13,15 +13,15 @@ WiGLE is een open source wardriving app om to netstumblen, bekijk en breng Wi-Fi
 • Audio en tekst-naar-spraak waarschuwingen!
 • Lokale database om nieuw gevonden netwerken bij te houden!
 • Real-time kaart van gevonden netwerken (OpenStreetMap)!
-• App is verplaatsbaar naar een SD card!
+• App is verplaatsbaar naar een SD kaart!
 • Stil-knop om alle geluiden/spraak onmiddelijk te stoppen!
 • Bluetooth GPS ondersteuning door middel van namaaklocaties!
 • Geen advertenties!
 
 Releaseopmerkingen: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-Als je wilt dat Wi-Fi en zendmasten worden opgeslagen op de kaart, moet je wachten op je apparaat om de huidige locatie vast te stellen, via GPS of netwerklocatie.
-Op de kaart: de cirkels zijn Wi-Fi, vierkanten zijn zendmasten. Lichte kleuren zijn netwerken die eerder gezien zijn, paarse zijn nieuw in de lokale database.
+Als je wilt dat WiFi en zendmasten worden opgeslagen op de kaart, moet je wachten op je apparaat om de huidige locatie vast te stellen, via GPS of netwerklocatie.
+Op de kaart: de cirkels zijn WiFi, vierkanten zijn zendmasten. Lichte kleuren zijn netwerken die eerder gezien zijn, paarse zijn nieuw in de lokale database.
 Als je problemen hebt om in te loggen, of als je suggesties hebt, stuur dan een e-mail naar wigle-admin@wigle.net en we zullen je graag helpen met je probleem.
 Heeft "Telefoonstatus lezen" nodig om te kunnen kijken of je aan het bellen bent, om de audio uit te zetten (geluiden en spraak).
 Bestanden zijn beschikbaar om te helpen met vertalingen door mensen naar niet-Engelse talen. Dit was grotendeels een mechanische vertaling, omdat we uiteraard niet al deze talen kennen. Je kan helpen met dingen verbeteren door hier pull requests te maken:\

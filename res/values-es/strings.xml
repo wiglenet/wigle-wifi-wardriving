@@ -2,6 +2,7 @@
 <resources>
     <string name="stats">Iniciando</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
+    <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Configuración</string>
     <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
     <string name="dashboard_app_name">WiGLE Wifi - Resumen</string>
@@ -37,9 +38,9 @@
     <string name="backup_db_text">Haga una copia de seguridad de todos los datos</string>
     <string name="import_observed_button">Importar mis datos desde WiGLE</string>
     <string name="import_observed_text">Importar mis datos subidos desde WiGLE</string>
-    <string name="periodstill_text">Tiempo entre las exploraciones WiFi (a 0 mph)</string>
-    <string name="period_text">Tiempo entre las exploraciones WiFi (a &lt;5 mph)</string>
-    <string name="periodfast_text">Tiempo entre las exploraciones WiFi (a &gt;5 mph)</string>
+    <string name="periodstill_text">Tiempo entre WiFi explora quedarse quieto</string>
+    <string name="period_text">Tiempo entre WiFi escanea cuando más lento de 8 km/h o 5 mph</string>
+    <string name="periodfast_text">Tiempo entre WiFi escanea cuando más rápido de 8 km/h o 5 mph</string>
     <string name="gps_text">Tiempo entre las actualizaciones del GPS</string>
     <string name="speak_text">Tiempo entre los sonidos</string>
     <string name="battery_kill_text">Nivel Crítico de batería</string>
@@ -63,7 +64,7 @@
     <string name="speech_time">Hora actual</string>
     <string name="speech_battery">Nivel de batería</string>
     <string name="speech_ssid">Nueva red SSID\'s</string>
-    <string name="query_address">Dirección (por ejemplo: Chicago, IL):</string>
+    <string name="query_address">Dirección (por ejemplo: Madrid, ES):</string>
     <string name="query_ssid">SSID (e.g.: Linksys) (comodines: %,_):</string>
     <string name="query_bssid">BSSID (e.g.: 0A:2C:EF:3D:25:1B) (comodines: %,_):</string>
     <string name="search_button">Buscar en Datos Locales</string>
@@ -80,7 +81,7 @@
     <string name="filter_show_wep">Mostrar WEP</string>
     <string name="filter_show_wpa">Mostrar WPA</string>
     <string name="filter_enabled">Filtro Activado</string>
-    <string name="list_waiting_gps">(Esperando sincronización con GPS ..)</string>
+    <string name="list_waiting_gps">(Esperando sincronización con GPS&#8230;)</string>
     <string name="list_scanning_off">(Exploración apagada)</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Lon:</string>
@@ -95,7 +96,7 @@
     <string name="network_capa">Encriptación:</string>
     <string name="network_channel">Canal:</string>
     <string name="network_observations">Veces visto:</string>
-    <string name="network_querying">(Lista de Espera...)</string>
+    <string name="network_querying">(Lista de Espera&#8230;)</string>
     <string name="setting_show_password">Mostrar Contraseña</string>
     <string name="setting_db_marker">Inicio de contador (desde donde se inicia la subida de datos):</string>
     <string name="setting_high_up">Cantidad Máxima subida:</string>
@@ -136,7 +137,7 @@
     <string name="meters">metros</string>
     <string name="ft_short">ft</string>
     <string name="feet">pies</string>
-    <string name="kmph">kmph</string>
+    <string name="kmph">km/h</string>
     <string name="mph">mph</string>
     <string name="ms_short">ms</string>
     <string name="na">N/A</string>
@@ -162,7 +163,7 @@
     <string name="turning_wifi_off">Apagando WiFi</string>
     <string name="lost_location">Se perdió la localización</string>
     <string name="have_location">Localización encontrada con</string>
-    <string name="wifi_jammed">WiFi bloqueado, reiniciandolo..</string>
+    <string name="wifi_jammed">WiFi bloqueado, reiniciandolo.</string>
     <string name="battery_at">Nivel de la batería en</string>
     <string name="battery_postfix">por ciento, cerrando WiGLE Wifi</string>
     <string name="scan">Escanear</string>
@@ -196,7 +197,7 @@
     <string name="status_unknown_error">Error desconocido</string>
     <string name="status_fail">Error</string>
     <string name="status_success">Completado con éxito</string>
-    <string name="status_working">Trabajando ...</string>
+    <string name="status_working">Trabajando&#8230;</string>
     <string name="status_upload_success">ARchivo Subido</string>
     <string name="status_write_success">Archivo Guardado</string>
     <string name="status_no_user">Nombre de usuario no configurado</string>
@@ -221,6 +222,7 @@
     <string name="language_es">español</string>
     <string name="language_fi">suomi (finés)</string>
     <string name="language_fr">français (francés)</string>
+    <string name="language_fy">Frysk (frisón)</string>
     <string name="language_he">עִבְרִית (hebreo)</string>
     <string name="language_hi">हिन्दी (hindi)</string>
     <string name="language_hu">magyar (húngaro)</string>
@@ -250,4 +252,6 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
+    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

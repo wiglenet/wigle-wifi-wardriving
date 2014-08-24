@@ -5,7 +5,7 @@ Promo (80 characters):
 Wardriving: netstumble, zobrazit bezdrátové sítě, nahrát do databáze WiGLE.
 
 Description (4000 characters):
-WiGLE je open source wardriving aplikaci netstumble, displej a mapa nalezeno bezdrátové sítě a mobilní věže kdekoli na světě, snadno nahrát do databáze WiGLE.net. WiGLE byla zahájena v roce 2001 a nyní má více než 125 milionů sítě Wi-Fi mapovány na celém světě.
+WiGLE je open source wardriving aplikaci netstumble, displej a mapa nalezeno bezdrátové sítě a mobilní věže kdekoli na světě, snadno nahrát do databáze WiGLE.net. WiGLE byla zahájena v roce 2001 a nyní má více než 125 milionů sítě WiFi mapovány na celém světě.
 
 • Konkurovat na globálním WiGLE žebříčku pro většinu sítí nacházejících se!
 • Export do CSV souborů na SD kartu (hodnoty oddělené čárkami)!
@@ -20,8 +20,8 @@ WiGLE je open source wardriving aplikaci netstumble, displej a mapa nalezeno bez
 
 Poznámky k vydání: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-U Wi-Fi a mobilní věže, které mají být mapovány, musíte čekat na vaše zařízení k určení aktuální polohy, pomocí GPS nebo umístění v síti.
-Na mapě: kruhy jsou Wi-Fi, čtverce jsou mobilní věže. Světlé barvy jsou sítě neviděl, ty fialové jsou nové pro lokální databázi.
+U WiFi a mobilní věže, které mají být mapovány, musíte čekat na vaše zařízení k určení aktuální polohy, pomocí GPS nebo umístění v síti.
+Na mapě: kruhy jsou WiFi, čtverce jsou mobilní věže. Světlé barvy jsou sítě neviděl, ty fialové jsou nové pro lokální databázi.
 Pokud máte problémy s přihlášením, nebo máte připomínky, pošlete nám e-mail na wigle-admin@wigle.net a budeme rádi pomohli.
 Potřebuje "Čte Telefon stát" za účelem zjistit, zda je telefonní hovor, ztlumit zvuk (zvuky a řeč).
 Soubory jsou k dispozici na pomoc s lidským překladem do neanglické jazyky. To bylo většinou mechanický překlad, protože samozřejmě nevím, všechny tyto jazyky. Můžete pomoci zlepšit situaci tím, že požadavky tahat na:

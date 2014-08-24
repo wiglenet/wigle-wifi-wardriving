@@ -5,7 +5,7 @@ Promo (80 characters):
 Wardriving: netstumble, display wireless networks, upload to the WiGLE database.
 
 Description (4000 characters):
-WiGLE is an open source wardriving app to netstumble, display and map found wireless networks and cell towers anywhere in the world, easily uploading to the WiGLE.net database. WiGLE was started in 2001 and now has over 125 million Wi-Fi networks mapped worldwide.
+WiGLE is an open source wardriving app to netstumble, display and map found wireless networks and cell towers anywhere in the world, easily uploading to the WiGLE.net database. WiGLE was started in 2001 and now has over 125 million WiFi networks mapped worldwide.
 
 • Compete on the global WiGLE leaderboard for most networks located!
 • Export to CSV files on SD card (comma separated values)!
@@ -20,8 +20,8 @@ WiGLE is an open source wardriving app to netstumble, display and map found wire
 
 Release notes: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-For Wi-Fi and cell towers to be mapped, you must wait for your device to determine the current location, via GPS or network location.
-On map: the circles are Wi-Fi, squares are cell towers. Light colors are networks seen before, purple ones are new for the local database.
+For WiFi and cell towers to be mapped, you must wait for your device to determine the current location, via GPS or network location.
+On map: the circles are WiFi, squares are cell towers. Light colors are networks seen before, purple ones are new for the local database.
 If you have trouble logging in, or have suggestions, send us an email to wigle-admin@wigle.net and we'll be happy to help out.
 Needs "Reads Phone State" in order to tell if a phone call is in progress, to mute the audio (sounds and speech).
 Files are available to help with a human translation to non-English languages. This was mostly a mechanical translation, because we obviously don't know all these languages. You can help to improve things by making pull requests at:

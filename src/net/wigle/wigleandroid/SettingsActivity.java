@@ -150,8 +150,8 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
 
       // register link
       final TextView register = (TextView) findViewById(R.id.register);
-      register.setText(Html.fromHtml("<a href='http://wigle.net/gps/gps/main/register'>Register</a>"
-          + " at <a href='http://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
+      register.setText(Html.fromHtml("<a href='https://wigle.net/gps/gps/main/register'>Register</a>"
+          + " at <a href='https://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
       register.setMovementMethod(LinkMovementMethod.getInstance());
       updateRegister();
 
@@ -252,17 +252,17 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         speakText.setText(getString(R.string.no_tts));
       }
 
-      final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr",
+      final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
           "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };
       final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
           getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
           getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
-          getString(R.string.language_fr), getString(R.string.language_he), getString(R.string.language_hi),
-          getString(R.string.language_hu), getString(R.string.language_it), getString(R.string.language_ja),
-          getString(R.string.language_ko), getString(R.string.language_nl), getString(R.string.language_no),
-          getString(R.string.language_pl), getString(R.string.language_pt), getString(R.string.language_pt_rBR),
-          getString(R.string.language_ru), getString(R.string.language_sv), getString(R.string.language_tr),
-          getString(R.string.language_zh),
+          getString(R.string.language_fr), getString(R.string.language_fy), getString(R.string.language_he),
+          getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
+          getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
+          getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
+          getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
+          getString(R.string.language_tr), getString(R.string.language_zh),
           };
       doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName );
 

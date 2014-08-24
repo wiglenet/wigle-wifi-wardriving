@@ -38,9 +38,9 @@
     <string name="backup_db_text">Adatbázis mentés készítése</string>
     <string name="import_observed_button">Visszaállítás</string>
     <string name="import_observed_text">Adatok visszatöltése a WiGLE-ről</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Közötti idő WiFi ellenőrzi álló helyzetben is</string>
+    <string name="period_text">Között eltelt idő WiFi vizsgálat akkor, ha lassabb, mint 8 km/h vagy 5 mph</string>
+    <string name="periodfast_text">Között eltelt idő WiFi vizsgálat akkor, ha gyorsabb, mint 8 km/h vagy 5 mph</string>
     <string name="gps_text">GPS frissítési időköz</string>
     <string name="speak_text">Beszédek közti időköz</string>
     <string name="battery_kill_text">Kilép, ha az akku merül</string>

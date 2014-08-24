@@ -38,9 +38,9 @@
     <string name="backup_db_text">בצע גיבוי מסד הנתונים</string>
     <string name="import_observed_button">ייבוא ​​נצפה</string>
     <string name="import_observed_text">ייבוא ​​רשתות נצפתה שלי WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">זמן בין WiFi סורק את מעמד עדיין</string>
+    <string name="period_text">זמן בין WiFi סורק כאשר קמ"ש איטי יותר מאשר 8 קילומטר / שעה או 5</string>
+    <string name="periodfast_text">זמן בין WiFi סורק כאשר קמ"ש מהר יותר מאשר 8 קילומטר / שעה או 5</string>
     <string name="gps_text">הזמן בין עדכוני ה-GPS</string>
     <string name="speak_text">זמן בין דיבור אודיו</string>
     <string name="battery_kill_text">יציאה ברמה זו סוללה</string>

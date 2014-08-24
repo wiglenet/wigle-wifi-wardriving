@@ -38,9 +38,9 @@
     <string name="backup_db_text">Veritabanı yedeğini al</string>
     <string name="import_observed_button">Keşfettiklerimi içeri aktar</string>
     <string name="import_observed_text">WiGLE ile keşfettiğim ağları içeri aktar</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">WiFi arasındaki zmn ayakta tarar</string>
+    <string name="period_text">WiFi arasındaki zaman zaman daha yavaş 8 km/h veya 5 mph tarar</string>
+    <string name="periodfast_text">WiFi arasındaki zaman zaman daha hızlı 8 km/h veya 5 mph tarar</string>
     <string name="gps_text">GPS güncellemelesi arası geçen zaman</string>
     <string name="speak_text">Sesli konuşma arası geçen zaman</string>
     <string name="battery_kill_text">Bu Batarya seviyesinde uygulamadan çık</string>

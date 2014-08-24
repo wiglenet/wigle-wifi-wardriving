@@ -1,4 +1,9 @@
 --- todo ---
+pause/play on notification view, gps+wifi
+implement heatmap
+better exploding of clusters when zoomed in
+back clustering with our own map for memory
+
 "upload every n" setting
 web replace: seen-networks map tile overlays
 web replace: leaderboard
@@ -46,6 +51,7 @@ rssi on kml export
 
 --- done ---
 * 2.5 (08/??/2014)
+Switch to Google maps, with clustering networks
 Polish translation fixes (thanks ireun!)
 Many translation fixes (thanks robin0van0der0v!)
 

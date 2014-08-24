@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapView;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -24,7 +20,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 
 public class DBResultActivity extends ActionBarActivity {
   private static final int MENU_RETURN = 12;
@@ -32,10 +35,13 @@ public class DBResultActivity extends ActionBarActivity {
   private static final int MSG_QUERY_DONE = 2;
   private static final int LIMIT = 50;
 
+  private static final int DEFAULT_ZOOM = 18;
+
   private NetworkListAdapter listAdapter;
-  private IMapView mapView;
+  private MapView mapView;
+  private MapRender mapRender;
   private final List<Network> resultList = new ArrayList<Network>();
-  private final ConcurrentLinkedHashMap<LatLon, Integer> obsMap = new ConcurrentLinkedHashMap<LatLon, Integer>();
+  private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<LatLng, Integer>();
 
   @Override
   public void onCreate( final Bundle savedInstanceState) {
@@ -60,11 +66,11 @@ public class DBResultActivity extends ActionBarActivity {
     if ( queryArgs != null ) {
       tv.setText( getString(R.string.status_working) + "...");
       Address address = queryArgs.getAddress();
-      IGeoPoint center = MappingFragment.DEFAULT_POINT;
+      LatLng center = MappingFragment.DEFAULT_POINT;
       if ( address != null ) {
-        center = new GeoPoint(address.getLatitude(), address.getLongitude());
+        center = new LatLng(address.getLatitude(), address.getLongitude());
       }
-      setupMap( center );
+      setupMap( center, savedInstanceState );
       setupQuery( queryArgs );
     }
     else {
@@ -76,17 +82,29 @@ public class DBResultActivity extends ActionBarActivity {
     // not set by nonconfig retain
     listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
     final ListView listView = (ListView) findViewById( R.id.dblist );
-    ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter );
+    ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
   }
 
-  private void setupMap( final IGeoPoint center ) {
-    mapView = new MapView( this, 256 );
-    final OpenStreetMapViewWrapper overlay = NetworkActivity.setupMap( this, center, mapView, R.id.db_map_rl );
-    if ( overlay != null ) {
-      overlay.setObsMap( obsMap );
+  private void setupMap( final LatLng center, final Bundle savedInstanceState ) {
+    mapView = new MapView( this );
+    mapView.onCreate(savedInstanceState);
+    MapsInitializer.initialize(this);
+
+    if (mapView.getMap() != null) {
+      mapRender = new MapRender(this, mapView.getMap(), true);
+
+      if (center != null) {
+        final CameraPosition cameraPosition = new CameraPosition.Builder()
+          .target(center).zoom(DEFAULT_ZOOM).build();
+        mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+      }
     }
+
+    final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
+    rlView.addView( mapView );
   }
 
+  @SuppressLint("HandlerLeak")
   private void setupQuery( final QueryArgs queryArgs ) {
     final Address address = queryArgs.getAddress();
 
@@ -105,11 +123,20 @@ public class DBResultActivity extends ActionBarActivity {
           for ( final Network network : resultList ) {
             listAdapter.add( network );
             if ( address == null && first ) {
-              final IGeoPoint center = MappingFragment.getCenter( DBResultActivity.this, network.getGeoPoint(), null );
+              final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
               MainActivity.info( "set center: " + center + " network: " + network.getSsid()
-                  + " point: " + network.getGeoPoint());
-              mapView.getController().setCenter( center );
+                  + " point: " + network.getLatLng());
+              if (mapView.getMap() != null) {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                  .target(center).zoom(DEFAULT_ZOOM).build();
+                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+              }
+
               first = false;
+            }
+
+            if (mapView.getMap() != null && network.getLatLng() != null && mapRender != null) {
+              mapRender.addItem(network);
             }
           }
           resultList.clear();
@@ -146,7 +173,7 @@ public class DBResultActivity extends ActionBarActivity {
 
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       @Override
-      public void handleRow( final Cursor cursor ) {
+      public boolean handleRow( final Cursor cursor ) {
         final String bssid = cursor.getString(0);
         final float lat = cursor.getFloat(1);
         final float lon = cursor.getFloat(2);
@@ -170,6 +197,8 @@ public class DBResultActivity extends ActionBarActivity {
             }
           }
         }
+
+        return true;
       }
 
       @Override
@@ -177,9 +206,8 @@ public class DBResultActivity extends ActionBarActivity {
         for ( final String bssid : top.values() ) {
           final Network network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
           resultList.add( network );
-          final IGeoPoint point = network.getGeoPoint();
-          final LatLon key = new LatLon(point.getLatitudeE6() / 1e6f, point.getLongitudeE6() / 1e6f);
-          obsMap.put(key, 0);
+          final LatLng point = network.getLatLng();
+          obsMap.put(point, 0);
         }
 
         handler.sendEmptyMessage( MSG_QUERY_DONE );
@@ -233,5 +261,38 @@ public class DBResultActivity extends ActionBarActivity {
       }
       return false;
   }
+
+  @Override
+  public void onDestroy() {
+    mapView.onDestroy();
+    super.onDestroy();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    mapView.onPause();
+    // save memory
+    mapRender.clear();
+  }
+
+  @Override
+  public void onSaveInstanceState(final Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
 
 }

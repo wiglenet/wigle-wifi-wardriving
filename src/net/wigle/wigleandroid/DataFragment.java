@@ -336,7 +336,12 @@ public final class DataFragment extends Fragment implements FileUploaderListener
 
       final BackupDialog dialog = BackupDialog.newInstance(dbResult.getFirst(), dbResult.getSecond());
       final FragmentManager fm = mainActivity.getSupportFragmentManager();
-      dialog.show(fm, "backup-dialog");
+      try {
+        dialog.show(fm, "backup-dialog");
+      }
+      catch (final IllegalStateException ex) {
+        MainActivity.error("Error showing backup dialog: " + ex, ex);
+      }
     }
 
     public void progress( int progress ) {

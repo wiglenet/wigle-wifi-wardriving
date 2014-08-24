@@ -21,9 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.wigle.wigleandroid.DataFragment.BackupTask;
-
-import org.osmdroid.util.GeoPoint;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,6 +36,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * our database helper, makes a great data meal.
@@ -635,6 +634,12 @@ public final class DatabaseHelper extends Thread {
         networkCount.incrementAndGet();
         isNew = true;
 
+        final Network cacheNetwork = MainActivity.getNetworkCache().get( bssid );
+        if (cacheNetwork != null) {
+          cacheNetwork.setIsNew();
+          MainActivity.updateNetworkOnMap(network);
+        }
+
         // to make sure this new network's location is written
         // don't update stack lasttime,lastlat,lastlon variables
       }
@@ -689,6 +694,10 @@ public final class DatabaseHelper extends Thread {
     final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
         && location.getAltitude() == 0 && location.getAccuracy() == 0
         && update.level == 0;
+
+    // MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
+    //    + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
+    //    + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
 
     if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
       // MainActivity.info("inserting loc: " + network.getSsid() );
@@ -1040,7 +1049,8 @@ public final class DatabaseHelper extends Thread {
       try {
         checkDB();
         final String[] args = new String[]{ bssid };
-        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon FROM " + NETWORK_TABLE
+        final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon FROM "
+            + NETWORK_TABLE
             + " WHERE bssid = ?", args);
         if ( cursor.getCount() > 0 ) {
           cursor.moveToFirst();
@@ -1049,10 +1059,17 @@ public final class DatabaseHelper extends Thread {
           final String capabilities = cursor.getString(2);
           final float lastlat = cursor.getFloat(4);
           final float lastlon = cursor.getFloat(5);
+          final float bestlat = cursor.getFloat(6);
+          final float bestlon = cursor.getFloat(7);
 
           final NetworkType type = NetworkType.typeForCode( cursor.getString(3) );
           retval = new Network( bssid, ssid, frequency, capabilities, 0, type );
-          retval.setGeoPoint( new GeoPoint(lastlat, lastlon) );
+          if (bestlat != 0 && bestlon != 0) {
+            retval.setLatLng( new LatLng(bestlat, bestlon) );
+          }
+          else {
+            retval.setLatLng( new LatLng(lastlat, lastlon) );
+          }
           MainActivity.getNetworkCache().put( bssid, retval );
         }
         cursor.close();

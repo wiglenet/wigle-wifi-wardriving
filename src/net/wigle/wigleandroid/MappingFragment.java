@@ -1,17 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.wigle.wigleandroid.listener.WifiReceiver;
-
-import org.osmdroid.LocationListenerProxy;
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
-import org.osmdroid.api.IMapView;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MyLocationOverlay;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -25,6 +15,7 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,33 +32,39 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * show a map!
  */
-@SuppressWarnings("deprecation")
 public final class MappingFragment extends Fragment {
   private static class State {
     private boolean locked = true;
     private boolean firstMove = true;
-    private IGeoPoint oldCenter = null;
+    private LatLng oldCenter = null;
     private final int oldZoom = Integer.MIN_VALUE;
   }
   private final State state = new State();
 
-  private IMapController mapControl;
-  private IMapView mapView;
+  private MapView mapView;
+  private MapRender mapRender;
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private Location previousLocation;
   private int previousRunNets;
-  private MyLocationOverlay myLocationOverlay = null;
 
   private static final String DIALOG_PREFIX = "DialogPrefix";
   public static LocationListener STATIC_LOCATION_LISTENER = null;
 
   private static final int DEFAULT_ZOOM = 17;
-  public static final GeoPoint DEFAULT_POINT = new GeoPoint( 41950000, -87650000 );
+  public static final LatLng DEFAULT_POINT = new LatLng( 41.95d, -87.65d );
   private static final int MENU_SETTINGS = 10;
   private static final int MENU_EXIT = 12;
   private static final int MENU_ZOOM_IN = 13;
@@ -76,12 +73,19 @@ public final class MappingFragment extends Fragment {
   private static final int MENU_TOGGLE_NEWDB = 16;
   private static final int MENU_LABEL = 17;
   private static final int MENU_FILTER = 18;
+  private static final int MENU_CLUSTER = 19;
+  private static final int MENU_TRAFFIC = 20;
+  private static final int MENU_MAP_TYPE = 21;
+  private static final int MENU_WAKELOCK = 22;
 
   private static final int SSID_FILTER = 102;
+
+  private static final String MESSAGE_BSSID = "messageBssid";
 
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
+    MainActivity.info("MAP: onCreate");
     super.onCreate( savedInstanceState );
     setHasOptionsMenu(true);
     // set language
@@ -96,9 +100,12 @@ public final class MappingFragment extends Fragment {
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    mapView = new MapView(getActivity());
+    mapView.onCreate(savedInstanceState);
+    MapsInitializer.initialize(getActivity());
     final View view = inflater.inflate(R.layout.map, container, false);
 
-    IGeoPoint oldCenter = null;
+    LatLng oldCenter = null;
     int oldZoom = Integer.MIN_VALUE;
     if ( state.oldCenter != null ) {
       // pry an orientation change, which calls destroy
@@ -110,69 +117,48 @@ public final class MappingFragment extends Fragment {
     return view;
   }
 
-  private void setupMapView( final View view, final IGeoPoint oldCenter, final int oldZoom ) {
+  private void setupMapView( final View view, final LatLng oldCenter, final int oldZoom ) {
     // view
     final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
 
-    // tryEvil();
-
-    // possibly choose goog maps here
-    mapView = new MapView( getActivity(), 256 );
-
     if ( mapView instanceof View ) {
-      MainActivity.info("is vew!!!!!");
       ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
       ((View) mapView).setLayoutParams(params);
     }
 
-    if ( mapView instanceof MapView ) {
-      final MapView osmMapView = (MapView) mapView;
-      osmMapView.setUseSafeCanvas(true);
-
-      // conditionally replace the tile source
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-      final boolean wigleTiles = prefs.getBoolean( ListFragment.PREF_USE_WIGLE_TILES, true );
-      if ( wigleTiles ) {
-          osmMapView.setTileSource( WigleTileSource.WiGLE );
-      }
-
-      rlView.addView( osmMapView );
-      osmMapView.setBuiltInZoomControls( true );
-      osmMapView.setMultiTouchControls( true );
-
-      // my location overlay
-      myLocationOverlay = new MyLocationOverlay( getActivity().getApplicationContext(), osmMapView );
-      myLocationOverlay.setLocationUpdateMinTime( MainActivity.LOCATION_UPDATE_INTERVAL );
-      myLocationOverlay.setDrawAccuracyEnabled( false );
-      osmMapView.getOverlays().add( myLocationOverlay );
-
-      final OpenStreetMapViewWrapper overlay = new OpenStreetMapViewWrapper( getActivity() );
-      osmMapView.getOverlays().add( overlay );
-    }
+    // conditionally replace the tile source
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    rlView.addView( mapView );
+    mapView.getMap().setMyLocationEnabled(true);
+    mapView.getMap().setBuildingsEnabled(true);
+    final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
+    mapView.getMap().setTrafficEnabled(showTraffic);
+    final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+    mapView.getMap().setMapType(mapType);
+    mapRender = new MapRender(getActivity(), mapView.getMap(), false);
 
     // controller
-    mapControl = mapView.getController();
-    final IGeoPoint centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
-    int zoom = DEFAULT_ZOOM;
+    final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
+    float zoom = DEFAULT_ZOOM;
     if ( oldZoom >= 0 ) {
       zoom = oldZoom;
     }
     else {
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-      zoom = prefs.getInt( ListFragment.PREF_PREV_ZOOM, zoom );
+      zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
     }
-    mapControl.setCenter( centerPoint );
-    mapControl.setZoom( zoom );
-    mapControl.setCenter( centerPoint );
+
+    final CameraPosition cameraPosition = new CameraPosition.Builder()
+      .target(centerPoint).zoom(zoom).build();
+    mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     MainActivity.info("done setupMapView. zoom: " + zoom);
   }
 
-  public static IGeoPoint getCenter( final Context context, final IGeoPoint priorityCenter,
+  public static LatLng getCenter( final Context context, final LatLng priorityCenter,
       final Location previousLocation ) {
 
-    IGeoPoint centerPoint = DEFAULT_POINT;
+    LatLng centerPoint = DEFAULT_POINT;
     final Location location = ListFragment.lameStatic.location;
     final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
@@ -180,27 +166,27 @@ public final class MappingFragment extends Fragment {
       centerPoint = priorityCenter;
     }
     else if ( location != null ) {
-      centerPoint = new GeoPoint( location );
+      centerPoint = new LatLng( location.getLatitude(), location.getLongitude() );
     }
     else if ( previousLocation != null ) {
-      centerPoint = new GeoPoint( previousLocation );
+      centerPoint = new LatLng( previousLocation.getLatitude(), previousLocation.getLongitude() );
     }
     else {
       final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
       final Location networkLocation = safelyGetLast(context, LocationManager.NETWORK_PROVIDER);
 
       if ( gpsLocation != null ) {
-        centerPoint = new GeoPoint( gpsLocation );
+        centerPoint = new LatLng( gpsLocation.getLatitude(), gpsLocation.getLongitude()  );
       }
       else if ( networkLocation != null ) {
-        centerPoint = new GeoPoint( networkLocation );
+        centerPoint = new LatLng( networkLocation.getLatitude(), networkLocation.getLongitude()  );
       }
       else {
         // ok, try the saved prefs
         float lat = prefs.getFloat( ListFragment.PREF_PREV_LAT, Float.MIN_VALUE );
         float lon = prefs.getFloat( ListFragment.PREF_PREV_LON, Float.MIN_VALUE );
         if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
-          centerPoint = new GeoPoint( lat, lon );
+          centerPoint = new LatLng( lat, lon );
         }
       }
     }
@@ -230,13 +216,14 @@ public final class MappingFragment extends Fragment {
           if ( location != null ) {
             if ( state.locked ) {
               // MainActivity.info( "mapping center location: " + location );
-  						final GeoPoint locGeoPoint = new GeoPoint( location );
+  						final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+  						final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
   						if ( state.firstMove ) {
-  						  mapControl.setCenter( locGeoPoint );
+  						  mapView.getMap().moveCamera(centerUpdate);
   						  state.firstMove = false;
   						}
   						else {
-  						  mapControl.animateTo( locGeoPoint );
+  						  mapView.getMap().animateCamera(centerUpdate);
   						}
             }
             else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
@@ -279,100 +266,146 @@ public final class MappingFragment extends Fragment {
 
   @Override
   public void onDetach() {
-    MainActivity.info( "Map: onDetach.");
+    MainActivity.info( "MAP: onDetach.");
     super.onDetach();
-    ((MapView)mapView).onDetach();
   }
 
   @Override
   public void onDestroy() {
-    MainActivity.info( "destroy mapping." );
+    MainActivity.info( "MAP: destroy mapping." );
     finishing.set( true );
 
     // save zoom
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final Editor edit = prefs.edit();
-    edit.putInt( ListFragment.PREF_PREV_ZOOM, mapView.getZoomLevel() );
+    edit.putFloat( ListFragment.PREF_PREV_ZOOM, mapView.getMap().getCameraPosition().zoom );
     edit.commit();
 
     // save center
-    state.oldCenter = mapView.getMapCenter();
+    state.oldCenter = mapView.getMap().getCameraPosition().target;
+    mapView.onDestroy();
 
     super.onDestroy();
   }
 
   @Override
   public void onPause() {
-    MainActivity.info( "pause mapping." );
-    myLocationOverlay.disableCompass();
-    disableLocation();
-
+    MainActivity.info( "MAP: onPause" );
     super.onPause();
+    mapView.onPause();
+    // save memory
+    mapRender.clear();
   }
 
   @Override
   public void onResume() {
-    MainActivity.info( "resume mapping." );
-    myLocationOverlay.enableCompass();
-    enableLocation();
-
+    MainActivity.info( "MAP: onResume" );
     super.onResume();
 
     setupTimer();
     getActivity().setTitle(R.string.mapping_app_name);
+    mapView.onResume();
   }
 
-  private void disableLocation() {
-    myLocationOverlay.mLocationListener = null;
+  @Override
+  public void onSaveInstanceState(final Bundle outState) {
+    MainActivity.info( "MAP: onSaveInstanceState" );
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
 
-    // Update the screen to see changes take effect
-    if ( mapView instanceof View ) {
-      ((View) mapView).postInvalidate();
+  @Override
+  public void onLowMemory() {
+    MainActivity.info( "MAP: onLowMemory" );
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  public void addNetwork(final Network network) {
+    if (mapRender != null) {
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+      if (!showNewDBOnly || network.isNew()) {
+        mapRender.addItem(network);
+      }
     }
   }
 
-  private void enableLocation() {
-    try {
-      // force it to think it's own location listening is on
-      myLocationOverlay.mLocationListener = new LocationListenerProxy(null);
-      STATIC_LOCATION_LISTENER = myLocationOverlay;
-      MainActivity.getMainActivity(this).getGPSListener().setMapListener(myLocationOverlay);
-      myLocationOverlay.enableMyLocation();
-    }
-    catch (Exception ex) {
-      MainActivity.error("Could not enableLocation for maps: " + ex, ex);
+  public void updateNetwork(final Network network) {
+    if (mapRender != null) {
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+      if (!showNewDBOnly || network.isNew()) {
+        final Bundle data = new Bundle();
+        data.putString(MESSAGE_BSSID, network.getBssid());
+        Message message = new Message();
+        message.setData(data);
+        updateMarkersHandler.sendMessage(message);
+      }
     }
   }
+
+  @SuppressLint("HandlerLeak")
+  final Handler updateMarkersHandler = new Handler() {
+    @Override
+    public void handleMessage(final Message message) {
+      final String bssid = message.getData().getString(MESSAGE_BSSID);
+      final Network network = MainActivity.getNetworkCache().get(bssid);
+      if (network != null && mapRender != null) {
+        mapRender.updateItem(network);
+      }
+    }
+  };
 
   /* Creates the menu items */
   @Override
   public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    MainActivity.info( "MAP: onCreateOptionsMenu" );
     MenuItem item = null;
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
-    final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, false );
+    final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
+    final boolean showCluster = prefs.getBoolean( ListFragment.PREF_MAP_CLUSTER, true );
+    final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
 
     String nameLabel = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
     item = menu.add(0, MENU_LABEL, 0, nameLabel);
     item.setIcon( android.R.drawable.ic_dialog_info );
 
+    String nameCluster = showCluster ? getString(R.string.menu_cluster_off) : getString(R.string.menu_cluster_on);
+    item = menu.add(0, MENU_CLUSTER, 0, nameCluster);
+    item.setIcon( android.R.drawable.ic_menu_add );
+
+    String nameTraffic = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
+    item = menu.add(0, MENU_TRAFFIC, 0, nameTraffic);
+    item.setIcon( android.R.drawable.ic_menu_directions );
+
     item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
     item.setIcon( android.R.drawable.ic_menu_search );
     MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
+    item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
+    item.setIcon( android.R.drawable.ic_menu_mapmode );
+    MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
     String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
     item = menu.add(0, MENU_TOGGLE_LOCK, 0, name);
-    item.setIcon( android.R.drawable.ic_menu_mapmode );
+    item.setIcon( android.R.drawable.ic_lock_lock );
 
     String nameDB = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
     item = menu.add(0, MENU_TOGGLE_NEWDB, 0, nameDB);
     item.setIcon( android.R.drawable.ic_menu_edit );
 
-    item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
-    item.setIcon( android.R.drawable.ic_menu_add );
+    final String wake = MainActivity.isScreenLocked( this ) ?
+        getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
+    item = menu.add(0, MENU_WAKELOCK, 0, wake);
+    item.setIcon( android.R.drawable.ic_menu_gallery );
 
-    item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
-    item.setIcon( android.R.drawable.ic_menu_revert );
+    // item = menu.add(0, MENU_ZOOM_IN, 0, getString(R.string.menu_zoom_in));
+    // item.setIcon( android.R.drawable.ic_menu_add );
+
+    // item = menu.add(0, MENU_ZOOM_OUT, 0, getString(R.string.menu_zoom_out));
+    // item.setIcon( android.R.drawable.ic_menu_revert );
 
     item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
     item.setIcon( android.R.drawable.ic_menu_preferences );
@@ -386,6 +419,7 @@ public final class MappingFragment extends Fragment {
   /* Handles item selections */
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
       switch ( item.getItemId() ) {
         case MENU_EXIT: {
           final MainActivity main = MainActivity.getMainActivity();
@@ -393,15 +427,21 @@ public final class MappingFragment extends Fragment {
           return true;
         }
         case MENU_ZOOM_IN: {
-          int zoom = mapView.getZoomLevel();
+          float zoom = mapView.getMap().getCameraPosition().zoom;
           zoom++;
-          mapControl.setZoom( zoom );
+          final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+          if (mapView.getMap() != null) {
+            mapView.getMap().animateCamera(zoomUpdate);
+          }
           return true;
         }
         case MENU_ZOOM_OUT: {
-          int zoom = mapView.getZoomLevel();
+          float zoom = mapView.getMap().getCameraPosition().zoom;
           zoom--;
-          mapControl.setZoom( zoom );
+          final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+          if (mapView.getMap() != null) {
+            mapView.getMap().animateCamera(zoomUpdate);
+          }
           return true;
         }
         case MENU_TOGGLE_LOCK: {
@@ -411,7 +451,6 @@ public final class MappingFragment extends Fragment {
           return true;
         }
         case MENU_TOGGLE_NEWDB: {
-          final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
           final boolean showNewDBOnly = ! prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
           Editor edit = prefs.edit();
           edit.putBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
@@ -419,10 +458,12 @@ public final class MappingFragment extends Fragment {
 
           String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
           item.setTitle( name );
+          if (mapRender != null) {
+            mapRender.reCluster();
+          }
           return true;
         }
         case MENU_LABEL: {
-          final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
           final boolean showLabel = ! prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
           Editor edit = prefs.edit();
           edit.putBoolean( ListFragment.PREF_MAP_LABEL, showLabel );
@@ -430,6 +471,37 @@ public final class MappingFragment extends Fragment {
 
           String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
           item.setTitle( name );
+
+          if (mapRender != null) {
+            mapRender.reCluster();
+          }
+          return true;
+        }
+        case MENU_CLUSTER: {
+          final boolean showCluster = ! prefs.getBoolean( ListFragment.PREF_MAP_CLUSTER, true );
+          Editor edit = prefs.edit();
+          edit.putBoolean( ListFragment.PREF_MAP_CLUSTER, showCluster );
+          edit.commit();
+
+          String name = showCluster ? getString(R.string.menu_cluster_off) : getString(R.string.menu_cluster_on);
+          item.setTitle( name );
+
+          if (mapRender != null) {
+            mapRender.reCluster();
+          }
+          return true;
+        }
+        case MENU_TRAFFIC: {
+          final boolean showTraffic = ! prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
+          Editor edit = prefs.edit();
+          edit.putBoolean( ListFragment.PREF_MAP_TRAFFIC, showTraffic );
+          edit.commit();
+
+          String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
+          item.setTitle( name );
+          if (mapView.getMap() != null) {
+            mapView.getMap().setTrafficEnabled(showTraffic);
+          }
           return true;
         }
         case MENU_FILTER: {
@@ -441,6 +513,42 @@ public final class MappingFragment extends Fragment {
           final Intent settingsIntent = new Intent( this.getActivity(), SettingsActivity.class );
           startActivity( settingsIntent );
           break;
+        }
+        case MENU_MAP_TYPE: {
+          if (mapView.getMap() != null) {
+            int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+            switch (newMapType) {
+              case GoogleMap.MAP_TYPE_NORMAL:
+                newMapType = GoogleMap.MAP_TYPE_SATELLITE;
+                Toast.makeText( getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT ).show();
+                break;
+              case GoogleMap.MAP_TYPE_SATELLITE:
+                newMapType = GoogleMap.MAP_TYPE_HYBRID;
+                Toast.makeText( getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT ).show();
+                break;
+              case GoogleMap.MAP_TYPE_HYBRID:
+                newMapType = GoogleMap.MAP_TYPE_TERRAIN;
+                Toast.makeText( getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT ).show();
+                break;
+              case GoogleMap.MAP_TYPE_TERRAIN:
+                newMapType = GoogleMap.MAP_TYPE_NORMAL;
+                Toast.makeText( getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT ).show();
+                break;
+              default:
+                MainActivity.error("unhandled mapType: " + newMapType);
+            }
+            Editor edit = prefs.edit();
+            edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
+            edit.commit();
+            mapView.getMap().setMapType(newMapType);
+          }
+        }
+        case MENU_WAKELOCK: {
+          boolean screenLocked = ! MainActivity.isScreenLocked( this );
+          MainActivity.setLockScreen( this, screenLocked );
+          final String wake = screenLocked ? getString(R.string.menu_screen_sleep) : getString(R.string.menu_screen_wake);
+          item.setTitle( wake );
+          return true;
         }
       }
       return false;
@@ -555,33 +663,37 @@ public final class MappingFragment extends Fragment {
   }
 
   private void setupQuery() {
-    if (MainActivity.getNetworkCache().size() > 25) {
+    final int cacheSize = MainActivity.getNetworkCache().size();
+    if (cacheSize > (ListFragment.lameStatic.networkCache.maxSize() / 4)) {
       // don't load, there's already networks to show
+      MainActivity.info("cacheSize: " + cacheSize + ", skipping previous networks");
       return;
     }
 
     final String sql = "SELECT bssid FROM "
-      + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT 200";
+      + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT "
+      + (ListFragment.lameStatic.networkCache.maxSize() * 2);
 
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       @Override
-      public void handleRow( final Cursor cursor ) {
+      public boolean handleRow( final Cursor cursor ) {
         final String bssid = cursor.getString(0);
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
 
         Network network = networkCache.get( bssid );
+        // MainActivity.info("RAW bssid: " + bssid);
         if ( network == null ) {
           network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
           if ( network != null ) {
             networkCache.put( network.getBssid(), network );
-            // MainActivity.info("bssid: " + network.getBssid() + " ssid: " + network.getSsid());
 
-            final GeoPoint geoPoint = network.getGeoPoint();
-            final int newWifiForRun = 1;
-            final long newWifiForDB = 0;
-            WifiReceiver.updateTrailStat(geoPoint, newWifiForRun, newWifiForDB);
+            if (networkCache.isFull()) {
+              MainActivity.info("Cache is full, breaking out of query result handling");
+              return false;
+            }
           }
         }
+        return true;
       }
 
       @Override
@@ -594,46 +706,4 @@ public final class MappingFragment extends Fragment {
     });
     ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
-
-//  private void tryEvil() {
-//    final String apiKey = "hiuhhkjhkjhkjh";
-//    //Object foo = new com.google.android.maps.MapView( this, apiKey );
-//    try {
-//      File file = new File("/sdcard/com.google.android.maps.jar");
-//      MainActivity.info("file exists: " + file.exists() + " " + file.canRead());
-//      //DexFile df = new DexFile(file);
-//
-//      DexClassLoader cl = new DexClassLoader("/system/framework/com.google.android.maps.jar:/sdcard/evil.jar",
-//          "/sdcard/", null, MappingActivity.class.getClassLoader() );
-//      // this is abstract, doesn't seem like we can reflect into it, proxy only works for interfaces :(
-////      Class<?> mapActivityClass = cl.loadClass("com.google.android.maps.MapActivity");
-//
-//      Class<?> mapActivityClass = cl.loadClass("EvilMap");
-//      Constructor<?> constructor = mapActivityClass.getConstructor(Activity.class);
-//      Object mapActivity = constructor.newInstance( this );
-//      MainActivity.info("mapActivity: " + mapActivity.getClass().getName());
-//      Method create = mapActivity.getClass().getMethod("onCreate", Bundle.class);
-//      create.invoke(mapActivity, new Bundle());
-//
-////      final InvocationHandler handler = new InvocationHandler() {
-////        public Object invoke( Object object, Method method, Object[] args ) {
-////          MainActivity.info("invoke: " + method.getName() );
-////          return null;
-////        }
-////      };
-////      Object mapActivity = Proxy.newProxyInstance( mapActivityClass.getClassLoader(),
-////                                         new Class[]{ mapActivityClass }, handler );
-//
-//      Class<?> foo = cl.loadClass("com.google.android.maps.MapView");
-//      constructor = foo.getConstructor(Context.class, String.class);
-//      Object googMap = constructor.newInstance( mapActivity, apiKey );
-//      MainActivity.info("googMap: " + googMap);
-//
-//    }
-//    catch ( Exception ex)  {
-//      MainActivity.error("ex: " + ex, ex);
-//    }
-//
-//  }
-
 }

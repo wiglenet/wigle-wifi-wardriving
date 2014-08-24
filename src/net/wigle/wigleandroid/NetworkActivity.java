@@ -2,18 +2,14 @@ package net.wigle.wigleandroid;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
-import org.osmdroid.api.IMapView;
-import org.osmdroid.views.MapView;
+import java.util.Map;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -30,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -39,6 +34,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends ActionBarActivity implements DialogListener {
@@ -49,11 +52,14 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
   private static final int MSG_OBS_UPDATE = 1;
   private static final int MSG_OBS_DONE = 2;
 
+  private static final int DEFAULT_ZOOM = 18;
+
   private Network network;
-  private IMapView mapView;
+  private MapView mapView;
   private SimpleDateFormat format;
   private int observations = 0;
-  private final ConcurrentLinkedHashMap<LatLon, Integer> obsMap = new ConcurrentLinkedHashMap<LatLon, Integer>( 512 );
+  private boolean isDbResult = false;
+  private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<LatLng, Integer>( 512 );
 
   // used for shutting extraneous activities down on an error
   public static NetworkActivity networkActivity;
@@ -73,7 +79,8 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     final Intent intent = getIntent();
     final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
-    MainActivity.info( "bssid: " + bssid );
+    isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
+    MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
     network = MainActivity.getNetworkCache().get(bssid);
     format = NetworkListAdapter.getConstructionTimeFormater( this );
@@ -119,7 +126,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
       tv = (TextView) findViewById( R.id.na_cap );
       tv.setText( " " + network.getCapabilities().replace("][", "]\n[") );
 
-      setupMap( network );
+      setupMap( network, savedInstanceState );
       // kick off the query now that we have our map
       setupQuery();
       setupButton( network );
@@ -129,7 +136,32 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
   @Override
   public void onDestroy() {
     networkActivity = null;
+    mapView.onDestroy();
     super.onDestroy();
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    mapView.onPause();
+  }
+
+  @Override
+  public void onSaveInstanceState(final Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
   }
 
   @SuppressLint("HandlerLeak")
@@ -144,77 +176,79 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
         }
         else if ( msg.what == MSG_OBS_DONE ) {
           tv.setText( " " + Integer.toString( observations ) );
+
+          if ( mapView != null && mapView.getMap() != null) {
+            final GoogleMap map = mapView.getMap();
+
+            int count = 0;
+            for ( Map.Entry<LatLng, Integer> obs : obsMap.entrySet() ) {
+              final LatLng latLon = obs.getKey();
+              final int level = obs.getValue();
+
+              if (count == 0 && network.getLatLng() == null) {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                  .target(latLon).zoom(DEFAULT_ZOOM).build();
+                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+              }
+
+              map.addCircle(new CircleOptions()
+                .center(latLon)
+                .radius(4)
+                .fillColor(NetworkListAdapter.getSignalColor( level, true ))
+                .strokeWidth(0)
+                .zIndex(level));
+              count++;
+            }
+            MainActivity.info("observation count: " + count);
+          }
         }
       }
     };
 
     final String sql = "SELECT level,lat,lon FROM "
-      + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "'";
+      + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "' limit " + obsMap.maxSize();
 
     final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
       @Override
-      public void handleRow( final Cursor cursor ) {
+      public boolean handleRow( final Cursor cursor ) {
         observations++;
-        obsMap.put( new LatLon( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
+        obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
         if ( ( observations % 10 ) == 0 ) {
           // change things on the gui thread
           handler.sendEmptyMessage( MSG_OBS_UPDATE );
         }
+        return true;
       }
 
       @Override
       public void complete() {
         handler.sendEmptyMessage( MSG_OBS_DONE );
-        if ( mapView != null ) {
-          // force a redraw
-          ((View) mapView).postInvalidate();
-        }
       }
     });
     ListFragment.lameStatic.dbHelper.addToQueue( request );
   }
 
-  private void setupMap( final Network network ) {
-    final IGeoPoint point = MappingFragment.getCenter( this, network.getGeoPoint(), null );
-    mapView = new MapView( this, 256 );
-    final OpenStreetMapViewWrapper overlay = setupMap( this, point, mapView, R.id.netmap_rl );
-    if ( overlay != null ) {
-      overlay.setSingleNetwork( network );
-      overlay.setObsMap( obsMap );
-    }
-  }
+  private void setupMap( final Network network, final Bundle savedInstanceState ) {
+    mapView = new MapView( this );
+    mapView.onCreate(savedInstanceState);
+    MapsInitializer.initialize( this );
 
-  public static OpenStreetMapViewWrapper setupMap( final Activity activity, final IGeoPoint center,
-      final IMapView mapView, final int id ) {
+    if (network.getLatLng() != null && mapView.getMap() != null) {
+      final CameraPosition cameraPosition = new CameraPosition.Builder()
+        .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+      mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-    OpenStreetMapViewWrapper overlay = null;
-    if ( center != null ) {
-      // view
-      final RelativeLayout rlView = (RelativeLayout) activity.findViewById( id );
-
-      if ( mapView instanceof View ) {
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-          LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-        ((View) mapView).setLayoutParams(params);
-      }
-
-      if ( mapView instanceof MapView ) {
-        final MapView osmMapView = (MapView) mapView;
-        rlView.addView( osmMapView );
-        osmMapView.setBuiltInZoomControls( true );
-        osmMapView.setMultiTouchControls( true );
-
-        overlay = new OpenStreetMapViewWrapper( activity );
-        osmMapView.getOverlays().add( overlay );
-      }
-
-      final IMapController mapControl = mapView.getController();
-      mapControl.setCenter( center );
-      mapControl.setZoom( 18 );
-      mapControl.setCenter( center );
+      mapView.getMap().addCircle(new CircleOptions()
+        .center(network.getLatLng())
+        .radius(5)
+        .fillColor(Color.argb( 128, 240, 240, 240 ))
+        .strokeColor(Color.argb( 200, 255, 32, 32 ))
+        .strokeWidth(3f)
+        .zIndex(100));
     }
 
-    return overlay;
+    final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
+    rlView.addView( mapView );
   }
 
   private void setupButton( final Network network ) {
@@ -418,6 +452,13 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
             clipboard.setText(network.getBssid());
           }
           return true;
+        case android.R.id.home:
+          // MainActivity.info("NETWORK: actionbar back");
+          if (isDbResult) {
+            // don't go back to main activity
+            finish();
+            return true;
+          }
       }
       return false;
   }

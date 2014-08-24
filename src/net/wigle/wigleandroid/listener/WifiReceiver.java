@@ -17,16 +17,12 @@ import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.DashboardFragment;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.ListFragment.TrailStat;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.NetworkType;
-import net.wigle.wigleandroid.OpenStreetMapViewWrapper;
+import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
-
-import org.osmdroid.util.GeoPoint;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -41,6 +37,8 @@ import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class WifiReceiver extends BroadcastReceiver {
   private MainActivity mainActivity;
@@ -63,7 +61,6 @@ public class WifiReceiver extends BroadcastReceiver {
   private long previousTalkTime = System.currentTimeMillis();
   private final Set<String> runNetworks = new HashSet<String>();
   private long prevNewNetCount;
-  private long prevNewCellCount;
   private long prevScanPeriod;
   private boolean scanInFlight = false;
 
@@ -206,7 +203,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
       && ! mainActivity.isMuted();
-    final Matcher ssidMatcher = OpenStreetMapViewWrapper.getFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
+    final Matcher ssidMatcher = FilterMatcher.getFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
 
     // can be null on shutdown
     if ( results != null ) {
@@ -231,15 +228,16 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         somethingAdded |= added;
 
-        if ( location != null && (added || network.getGeoPoint() == null) ) {
-          // set the geopoint for mapping
-          final GeoPoint geoPoint = new GeoPoint( location );
-          network.setGeoPoint( geoPoint );
+        if ( location != null && (added || network.getLatLng() == null) ) {
+          // set the LatLng for mapping
+          final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+          network.setLatLng( LatLng );
+          MainActivity.addNetworkToMap(network);
         }
 
         // if we're showing current, or this was just added, put on the list
         if ( showCurrent || added ) {
-          if ( OpenStreetMapViewWrapper.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
+          if ( FilterMatcher.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
             if (listAdapter != null) {
               listAdapter.add( network );
             }
@@ -286,8 +284,6 @@ public class WifiReceiver extends BroadcastReceiver {
     prevNewNetCount = newWifiCount;
     // check for "New" cell towers
     final long newCellCount = dbHelper.getNewCellCount();
-    final long newCellDiff = newCellCount - prevNewCellCount;
-    prevNewCellCount = newCellCount;
 
     if ( ! mainActivity.isMuted() ) {
       final boolean playRun = prefs.getBoolean( ListFragment.PREF_FOUND_SOUND, true );
@@ -311,7 +307,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final Network cellNetwork = recordCellInfo(location);
     if ( cellNetwork != null ) {
       resultSize++;
-      if ( showCurrent && listAdapter != null && OpenStreetMapViewWrapper.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork ) ) {
+      if ( showCurrent && listAdapter != null && FilterMatcher.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork ) ) {
         listAdapter.add(cellNetwork);
       }
       if ( runNetworks.size() > preCellForRun ) {
@@ -360,7 +356,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     // do this if trail is empty, so as soon as we get first gps location it gets triggered
     // and will show up on map
-    if ( newWifiForRun > 0 || newCellForRun > 0 || ListFragment.lameStatic.trail.isEmpty() ) {
+    if ( newWifiForRun > 0 || newCellForRun > 0 || ListFragment.lameStatic.networkCache.isEmpty() ) {
       if ( location == null ) {
         // save for later
         pendingWifiCount += newWifiForRun;
@@ -368,24 +364,16 @@ public class WifiReceiver extends BroadcastReceiver {
         // MainActivity.info("pendingCellCount: " + pendingCellCount);
       }
       else {
-        final GeoPoint geoPoint = new GeoPoint( location );
-        final TrailStat trailStat = updateTrailStat( geoPoint, newWifiForRun, newNetDiff );
-        // MainActivity.info("newCellForRun: " + newCellForRun);
-        trailStat.newCellForRun += newCellForRun;
-        trailStat.newCellForDB += newCellDiff;
-
         // add any pendings
         // don't go crazy
         if ( pendingWifiCount > 25 ) {
           pendingWifiCount = 25;
         }
-        trailStat.newWifiForRun += pendingWifiCount;
         pendingWifiCount = 0;
 
         if ( pendingCellCount > 25 ) {
           pendingCellCount = 25;
         }
-        trailStat.newCellForRun += pendingCellCount;
         pendingCellCount = 0;
       }
     }
@@ -447,17 +435,6 @@ public class WifiReceiver extends BroadcastReceiver {
     if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
       doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
     }
-  }
-
-  public static TrailStat updateTrailStat( final GeoPoint geoPoint, int newWifiForRun, final long newWifiForDB ) {
-    TrailStat trailStat = ListFragment.lameStatic.trail.get( geoPoint );
-    if ( trailStat == null ) {
-      trailStat = new TrailStat();
-      ListFragment.lameStatic.trail.put( geoPoint, trailStat );
-    }
-    trailStat.newWifiForRun += newWifiForRun;
-    trailStat.newWifiForDB += newWifiForDB;
-    return trailStat;
   }
 
   public String getNetworkTypeName() {
@@ -583,10 +560,10 @@ public class WifiReceiver extends BroadcastReceiver {
           network.setLevel(strength);
         }
 
-        if ( location != null && (newForRun || network.getGeoPoint() == null) ) {
-          // set the geopoint for mapping
-          final GeoPoint geoPoint = new GeoPoint( location );
-          network.setGeoPoint( geoPoint );
+        if ( location != null && (newForRun || network.getLatLng() == null) ) {
+          // set the LatLng for mapping
+          final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+          network.setLatLng( LatLng );
         }
 
         if ( location != null ) {

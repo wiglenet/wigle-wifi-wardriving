@@ -2,16 +2,18 @@ package net.wigle.wigleandroid;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-
-import org.osmdroid.util.GeoPoint;
-
+import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
 
 /**
  * network data. not thread-safe.
  */
-public final class Network {
+@SuppressLint("UseSparseArrays")
+public final class Network implements ClusterItem {
   private final String bssid;
   private final String ssid;
   private final int frequency;
@@ -21,33 +23,34 @@ public final class Network {
   private final String showCapabilities;
   private final int crypto;
   private final NetworkType type;
-  private GeoPoint geoPoint;
-  
+  private LatLng geoPoint;
+  private boolean isNew;
+
   private String detail;
   private final long constructionTime = System.currentTimeMillis();
-  
+
   private static final String BAR_STRING = " | ";
   private static final String DASH_STRING = " - ";
   private static final String WPA_CAP = "[WPA";
   private static final String WEP_CAP = "[WEP";
-  
+
   // faster than enums
   public static final int CRYPTO_NONE = 0;
   public static final int CRYPTO_WEP = 1;
   public static final int CRYPTO_WPA = 2;
-  
+
   private static final Map<Integer,Integer> freqToChan;
   static {
     Map<Integer,Integer> freqToChanTemp = new HashMap<Integer,Integer>();
     for ( int i = 237; i <= 255; i++ ) {
       freqToChanTemp.put( 2312 + 5 * (i - 237), i );
     }
-    
+
     for ( int i = 0; i <= 13; i++ ) {
       freqToChanTemp.put(2407 + (5 * i), i);
     }
     freqToChanTemp.put(2484, 14);
-    
+
     freqToChanTemp.put(5170, 34);
     freqToChanTemp.put(5180, 36);
     freqToChanTemp.put(5190, 38);
@@ -60,7 +63,7 @@ public final class Network {
     freqToChanTemp.put(5280, 56);
     freqToChanTemp.put(5300, 58);
     freqToChanTemp.put(5320, 60);
-    
+
     freqToChanTemp.put(5500, 100);
     freqToChanTemp.put(5520, 104);
     freqToChanTemp.put(5540, 108);
@@ -72,39 +75,39 @@ public final class Network {
     freqToChanTemp.put(5660, 132);
     freqToChanTemp.put(5680, 136);
     freqToChanTemp.put(5700, 140);
-    
+
     freqToChanTemp.put(5745, 149);
     freqToChanTemp.put(5765, 153);
     freqToChanTemp.put(5785, 157);
     freqToChanTemp.put(5805, 161);
     freqToChanTemp.put(5825, 165);
-    
+
     freqToChan = Collections.unmodifiableMap( freqToChanTemp );
   }
-  
+
   /**
    * convenience constructor
    * @param scanResult a result from a wifi scan
    */
   public Network( final ScanResult scanResult ) {
-    this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities, 
+    this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
         scanResult.level, NetworkType.WIFI );
   }
-  
+
   public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
       final int level, final NetworkType type ) {
-    
-    this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase();
+
+    this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
     this.ssid = ( ssid == null ) ? "" : ssid;
     this.frequency = frequency;
     this.capabilities = ( capabilities == null ) ? "" : capabilities;
     this.level = level;
     this.type = type;
     this.channel = freqToChan.get( frequency );
-    
+
     if ( ! NetworkType.WIFI.equals( type ) ) {
       int semicolon = this.capabilities.lastIndexOf(";");
-      if ( semicolon > 0 ) {    
+      if ( semicolon > 0 ) {
         this.showCapabilities = this.capabilities.substring(0, semicolon);
       }
       else {
@@ -117,7 +120,7 @@ public final class Network {
     else {
       this.showCapabilities = null;
     }
-    
+
     if ( this.capabilities.indexOf( WPA_CAP ) >= 0 ) {
       crypto = CRYPTO_WPA;
     }
@@ -128,7 +131,7 @@ public final class Network {
       crypto = CRYPTO_NONE;
     }
   }
-  
+
   public String getBssid() {
     return bssid;
   }
@@ -144,7 +147,7 @@ public final class Network {
   public String getCapabilities() {
     return capabilities;
   }
-  
+
   public String getShowCapabilities() {
     if ( showCapabilities == null ) {
       return capabilities;
@@ -155,19 +158,27 @@ public final class Network {
   public int getLevel() {
     return level;
   }
-  
+
   public NetworkType getType() {
     return type;
   }
-  
+
   public Integer getChannel() {
     return channel;
   }
-  
+
   public void setLevel( final int level ) {
     this.level = level;
   }
-  
+
+  public void setIsNew() {
+    this.isNew = true;
+  }
+
+  public boolean isNew() {
+    return isNew;
+  }
+
   /**
    * get crypto category, one of CRYPTO_* defined in this class.
    * @return integer corresponding to an encryption category
@@ -175,11 +186,11 @@ public final class Network {
   public int getCrypto() {
     return crypto;
   }
-  
+
   public long getConstructionTime() {
     return constructionTime;
   }
-  
+
   public String getDetail() {
     if ( detail == null ) {
       final Integer chan = channel != null ? channel : frequency;
@@ -196,16 +207,35 @@ public final class Network {
       detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
       detail = detailBuild.toString();
     }
-    
+
     return detail;
   }
 
-  public void setGeoPoint(GeoPoint geoPoint) {
+  public void setLatLng(LatLng geoPoint) {
     this.geoPoint = geoPoint;
   }
 
-  public GeoPoint getGeoPoint() {
+  public LatLng getLatLng() {
     return geoPoint;
+  }
+
+  @Override
+  public LatLng getPosition() {
+    return geoPoint;
+  }
+
+  @Override
+  public int hashCode() {
+    return bssid.hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Network) {
+      final Network o = (Network) other;
+      return bssid.equals(o.bssid);
+    }
+    return false;
   }
 
 }

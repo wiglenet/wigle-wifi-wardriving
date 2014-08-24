@@ -13,7 +13,7 @@ public class QueryThread extends Thread {
   private final DatabaseHelper dbHelper;
 
   public interface ResultHandler {
-    public void handleRow( Cursor cursor );
+    public boolean handleRow( Cursor cursor );
     public void complete();
   }
   public static class Request {
@@ -61,7 +61,9 @@ public class QueryThread extends Thread {
           if ( db != null ) {
             final Cursor cursor = db.rawQuery( request.sql, null );
             while ( cursor.moveToNext() ) {
-              request.handler.handleRow( cursor );
+              if (!request.handler.handleRow( cursor )) {
+                break;
+              }
             }
             request.handler.complete();
             cursor.close();

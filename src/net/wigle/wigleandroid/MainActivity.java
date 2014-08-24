@@ -77,6 +77,9 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 public final class MainActivity extends ActionBarActivity implements TabListener {
 //*** state that is retained ***
   public static class State {
@@ -271,6 +274,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
     info("Creating MappingActivity");
     MappingFragment map = new MappingFragment();
+    // SupportMapFragment map = new SupportMapFragment();
     bundle = new Bundle();
     map.setArguments(bundle);
     state.fragList[MAP_TAB_POS] = map;
@@ -584,6 +588,14 @@ public final class MainActivity extends ActionBarActivity implements TabListener
       MainActivity.info("acquire wake lock");
       state.wakeLock.acquire();
     }
+
+    final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+    info("GooglePlayServicesAvailable: " + serviceAvailable);
+    if (serviceAvailable != ConnectionResult.SUCCESS) {
+      error("service not available! " + serviceAvailable);
+      final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
+      dialog.show();
+    }
   }
 
   @Override
@@ -853,11 +865,33 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   }
 
   /**
-   * get the per-thread network LRU cache
-   * @return per-thread network cache
+   * get the network LRU cache
+   * @return network cache
    */
   public static ConcurrentLinkedHashMap<String,Network> getNetworkCache() {
-    return ListFragment.networkCache.get();
+    return ListFragment.lameStatic.networkCache;
+  }
+
+  public static void addNetworkToMap(final Network network) {
+    if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+      // Map is visible, give it the new network
+      final State state = mainActivity.getState();
+      final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+      if (f != null) {
+        f.addNetwork(network);
+      }
+    }
+  }
+
+  public static void updateNetworkOnMap(final Network network) {
+    if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+      // Map is visible, give it the new network
+      final State state = mainActivity.getState();
+      final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+      if (f != null) {
+        f.updateNetwork(network);
+      }
+    }
   }
 
   public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {

@@ -4,7 +4,7 @@
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Settings</string>
-    <string name="mapping_app_name">WiGLE Wifi - Map</string>
+    <string name="mapping_app_name">WiGLE - Map</string>
     <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
     <string name="error_report_name">WiGLE Wifi - Most Recent Error Report</string>
     <string name="speech_name">WiGLE Wifi - Speech Settings</string>
@@ -254,4 +254,13 @@
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="menu_cluster_off">Clustering Off</string>
+    <string name="menu_cluster_on">Clustering On</string>
+    <string name="menu_traffic_off">Traffic Off</string>
+    <string name="menu_traffic_on">Traffic On</string>
+    <string name="menu_map_type">Toggle Map Type</string>
+    <string name="map_toast_normal">Map Type: Normal</string>
+    <string name="map_toast_satellite">Map Type: Satellite</string>
+    <string name="map_toast_hybrid">Map Type: Hybrid</string>
+    <string name="map_toast_terrain">Map Type: Terrain</string>
 </resources>

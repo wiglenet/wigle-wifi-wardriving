@@ -10,9 +10,6 @@ import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.FileUploaderListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.listener.WifiReceiver;
-
-import org.osmdroid.util.GeoPoint;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -84,15 +81,18 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     public static final String PREF_PREV_LAT = "prevLat";
     public static final String PREF_PREV_LON = "prevLon";
-    public static final String PREF_PREV_ZOOM = "prevZoom";
+    public static final String PREF_PREV_ZOOM = "prevZoom2";
     public static final String PREF_LIST_SORT = "listSort";
     public static final String PREF_SCAN_RUNNING = "scanRunning";
     public static final String PREF_METRIC = "metric";
     public static final String PREF_MAP_LABEL = "mapLabel";
+    public static final String PREF_MAP_CLUSTER = "mapCluster";
+    public static final String PREF_MAP_TRAFFIC = "mapTraffic";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
     public static final String PREF_USE_WIGLE_TILES = "useWigleTileSource2"; // bool
     public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
+    public static final String PREF_MAP_TYPE = "mapType";
 
     // what to speak on announcements
     public static final String PREF_SPEAK_RUN = "speakRun";
@@ -116,6 +116,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     public static final String FILTER_PREF_PREFIX = "LA";
 
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
+    public static final String NETWORK_EXTRA_IS_DB_RESULT = "extraIsDbResult";
 
     public static final String ANONYMOUS = "anonymous";
     public static final String WIFI_LOCK_NAME = "wigleWifiLock";
@@ -131,8 +132,6 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     }
     public static class LameStatic {
       public Location location;
-      public ConcurrentLinkedHashMap<GeoPoint,TrailStat> trail =
-        new ConcurrentLinkedHashMap<GeoPoint,TrailStat>( 512 );
       public int runNets;
       public long newNets;
       public long newWifi;
@@ -144,17 +143,22 @@ public final class ListFragment extends Fragment implements FileUploaderListener
       public DatabaseHelper dbHelper;
       public Set<String> runNetworks;
       public QueryArgs queryArgs;
+      public ConcurrentLinkedHashMap<String,Network> networkCache;
     }
     public static final LameStatic lameStatic = new LameStatic();
 
-    // cache
-    public static final ThreadLocal<ConcurrentLinkedHashMap<String,Network>> networkCache =
-      new ThreadLocal<ConcurrentLinkedHashMap<String,Network>>() {
-        @Override
-        protected ConcurrentLinkedHashMap<String,Network> initialValue() {
-            return new ConcurrentLinkedHashMap<String,Network>( 128 );
-        }
-    };
+    static {
+      final long maxMemory = Runtime.getRuntime().maxMemory();
+      int cacheSize = 128;
+      if (maxMemory > 200000000L) {
+        cacheSize = 1024;
+      }
+      else if (maxMemory > 100000000L) {
+        cacheSize = 512;
+      }
+      MainActivity.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
+      lameStatic.networkCache = new ConcurrentLinkedHashMap<String,Network>( cacheSize );
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -452,11 +456,11 @@ public final class ListFragment extends Fragment implements FileUploaderListener
       // always set our current list adapter
       state.wifiReceiver.setListAdapter( state.listAdapter );
       final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
-      setupListAdapter( listView, getActivity(), state.listAdapter );
+      setupListAdapter( listView, getActivity(), state.listAdapter, false );
     }
 
     public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
-        final NetworkListAdapter listAdapter) {
+        final NetworkListAdapter listAdapter, final boolean isDbResult) {
 
       listView.setAdapter( listAdapter );
       listView.setOnItemClickListener( new AdapterView.OnItemClickListener() {
@@ -466,6 +470,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
           MainActivity.getNetworkCache().put( network.getBssid(), network );
           final Intent intent = new Intent( activity, NetworkActivity.class );
           intent.putExtra( NETWORK_EXTRA_BSSID, network.getBssid() );
+          intent.putExtra( NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
           activity.startActivity( intent );
         }
       });

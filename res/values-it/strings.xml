@@ -38,9 +38,9 @@
     <string name="backup_db_text">Effettua un backup dell\'intero database</string>
     <string name="import_observed_button">Importa osservate</string>
     <string name="import_observed_text">Importa da WiGLE le mie reti osservate</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Tempo tra WiFi ricerca ancora in piedi</string>
+    <string name="period_text">Tempo tra WiFi ricerca quando più lento di 8 km/h o 5 mph</string>
+    <string name="periodfast_text">Tempo tra WiFi ricerca quando più veloce di 8 km/h o 5 mph</string>
     <string name="gps_text">Intervallo di aggiornamento GPS</string>
     <string name="speak_text">Intervallo di notifica con sintesi vocale</string>
     <string name="battery_kill_text">Uscita quando la batteria è critica</string>

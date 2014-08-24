@@ -38,9 +38,9 @@
     <string name="backup_db_text">Lag en database backup</string>
     <string name="import_observed_button">Import Observert</string>
     <string name="import_observed_text">Import min observerte nettverk fra WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Tid mellom WiFi skanner står stille</string>
+    <string name="period_text">Tid mellom WiFi skanner når saktere enn 8 km/h eller 5 mph</string>
+    <string name="periodfast_text">Tid mellom WiFi skanner når raskere enn 8 km/h eller 5 mph</string>
     <string name="gps_text">Tid mellom GPS oppdateringer</string>
     <string name="speak_text">Tid mellom lyd tale</string>
     <string name="battery_kill_text">Exit på dette Batterinivå</string>

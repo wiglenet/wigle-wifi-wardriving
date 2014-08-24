@@ -38,9 +38,9 @@
     <string name="backup_db_text">Proveď zálohu databáze</string>
     <string name="import_observed_button">Import Observed</string>
     <string name="import_observed_text">Import my observed networks from WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Doba mezi WiFi kontroluje postavení stále</string>
+    <string name="period_text">Doba mezi WiFi skenuje když pomaleji než 8 km/h nebo 5 mph</string>
+    <string name="periodfast_text">Doba mezi WiFi skenuje když rychlejší než 8 km/h nebo 5 mph</string>
     <string name="gps_text">Čas obnovení GPS souřadnic</string>
     <string name="speak_text">Časové rozmezí hlasového výstupu</string>
     <string name="battery_kill_text">Skončit když baterie je na</string>

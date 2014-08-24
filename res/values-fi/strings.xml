@@ -38,9 +38,9 @@
     <string name="backup_db_text">Tee tietokannasta varmuuskopio</string>
     <string name="import_observed_button">Tuo Havaittu</string>
     <string name="import_observed_text">Tuo minun havaittu verkkoja WiGLE</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">Välinen aika WiFi skannaa seisoo edelleen</string>
+    <string name="period_text">Välinen aika WiFi skannaa kun hitaampi kuin 8 km/h tai 5 mph</string>
+    <string name="periodfast_text">Välinen aika WiFi tarkistaa kun nopeampi kuin 8 km/h tai 5 mph</string>
     <string name="gps_text">Aika välillä GPS päivitykset</string>
     <string name="speak_text">Aika välillä audio puheen</string>
     <string name="battery_kill_text">Poistu tällä Akun</string>

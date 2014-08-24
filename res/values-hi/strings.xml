@@ -38,9 +38,9 @@
     <string name="backup_db_text">एक डेटाबेस बैकअप बनाओ</string>
     <string name="import_observed_button">आयात मनाया</string>
     <string name="import_observed_text">WiGLE से मेरी मनाया नेटवर्क आयात</string>
-    <string name="periodstill_text">Time between WiFi scans standing still</string>
-    <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
-    <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
+    <string name="periodstill_text">वाईफाई के बीच समय अभी भी खड़े स्कैन करता है</string>
+    <string name="period_text">वाईफाई के बीच समय जब धीमी से 8 किमी / घंटा या 5 मील स्कैन करता है</string>
+    <string name="periodfast_text">वाईफाई के बीच समय जब तेजी से 8 किमी / घंटा या 5 मील स्कैन करता है</string>
     <string name="gps_text">जीपीएस अद्यतन के बीच समय</string>
     <string name="speak_text">ऑडियो भाषण के बीच में समय</string>
     <string name="battery_kill_text">इस बैटरी स्तर पर बाहर निकलें</string>

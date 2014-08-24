@@ -59,7 +59,7 @@
     <string name="speech_run">Oantal netwurken yn run</string>
     <string name="speech_new_wifi">Oantal nije WiFi-netwurken yn DB</string>
     <string name="speech_new_cell">Oantal nije stjoermêsten yn DB</string>
-    <string name="speech_queue">Oantal yn wachtrige, as dy't der is</string>
+    <string name="speech_queue">Oantal yn wachtrige, as dy\'t der is</string>
     <string name="speech_miles">Mylen yn run</string>
     <string name="speech_time">Hjoeddeistige tiid</string>
     <string name="speech_battery">Batterijnivo yn prosinten</string>

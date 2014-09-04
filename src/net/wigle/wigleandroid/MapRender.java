@@ -170,7 +170,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
           if (marker != null) {
             final boolean inBounds = bounds[0].contains(network.getLatLng());
             if (inBounds) {
-              MainActivity.info("sendupdate: " + network.getBssid());
+              // MainActivity.info("sendupdate: " + network.getBssid());
               sendUpdateNetwork(network.getBssid());
             }
           }
@@ -312,7 +312,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     @Override
     public void handleMessage(final Message message) {
       final String bssid = message.getData().getString(MESSAGE_BSSID);
-      MainActivity.info("handleMessage: " + bssid);
+      // MainActivity.info("handleMessage: " + bssid);
       final Network network = MainActivity.getNetworkCache().get(bssid);
       if (network != null) {
         networkRenderer.updateItem(network);

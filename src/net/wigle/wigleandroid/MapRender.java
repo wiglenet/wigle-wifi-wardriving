@@ -2,13 +2,22 @@ package net.wigle.wigleandroid;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.Cluster;
@@ -25,23 +34,34 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
   private final NetworkRenderer networkRenderer;
   private final boolean isDbResult;
   private final AtomicInteger networkCount = new AtomicInteger();
+  private final SharedPreferences prefs;
+  private final GoogleMap map;
+  private final Matcher ssidMatcher;
+
+  private static final String MESSAGE_BSSID = "messageBssid";
+  private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+  private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
+  private static final float DEFAULT_ICON_ALPHA = 0.75f;
+  private static final float CUSTOM_ICON_ALPHA = 0.80f;
 
   private class NetworkRenderer extends DefaultClusterRenderer<Network> {
     final IconGenerator iconFactory;
-    final SharedPreferences prefs;
 
     public NetworkRenderer(Context context, GoogleMap map, ClusterManager<Network> clusterManager) {
       super(context, map, clusterManager);
       iconFactory = new IconGenerator(context);
-      prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     }
 
     @Override
     protected void onBeforeClusterItemRendered(Network network, MarkerOptions markerOptions) {
       // Draw a single network.
       final BitmapDescriptor icon = getIcon(network);
-      if (icon != null) {
-        markerOptions.icon(icon);
+      markerOptions.icon(icon);
+      if (icon == DEFAULT_ICON || icon == DEFAULT_ICON_NEW) {
+        markerOptions.alpha(DEFAULT_ICON_ALPHA);
+      }
+      else {
+        markerOptions.alpha(CUSTOM_ICON_ALPHA);
       }
 
       markerOptions.title(network.getSsid());
@@ -50,17 +70,28 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     private BitmapDescriptor getIcon(final Network network) {
+      if (showDefaultIcon(network)) {
+        return network.isNew() ? DEFAULT_ICON_NEW : DEFAULT_ICON;
+      }
+
+      if ( network.isNew() ) {
+        iconFactory.setStyle(IconGenerator.STYLE_WHITE);
+      }
+      else {
+        iconFactory.setStyle(IconGenerator.STYLE_BLUE);
+      }
+      return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network.getSsid()));
+    }
+
+    private boolean showDefaultIcon(final Network network) {
       final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
       if (showLabel) {
-        if ( network.isNew() ) {
-          iconFactory.setStyle(IconGenerator.STYLE_WHITE);
+        final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+        if (bounds.contains(network.getLatLng())) {
+          return false;
         }
-        else {
-          iconFactory.setStyle(IconGenerator.STYLE_BLUE);
-        }
-        return BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon(network.getSsid()));
       }
-      return null;
+      return true;
     }
 
     @Override
@@ -93,26 +124,73 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     protected void updateItem(final Network network) {
-      if (network.isNew()) {
-        final Marker marker = this.getMarker(network);
-        if (marker != null) {
-          final BitmapDescriptor icon = getIcon(network);
-          marker.setIcon(icon);
-        }
-        else {
-          final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
-          if (showNewDBOnly) {
-            mClusterManager.addItem(network);
-            reCluster();
+      final Marker marker = this.getMarker(network);
+      if (marker != null) {
+        if (showDefaultIcon(network)) {
+          if (marker.getAlpha() != DEFAULT_ICON_ALPHA) {
+            marker.setIcon(getIcon(network));
+            marker.setAlpha(DEFAULT_ICON_ALPHA);
           }
         }
+        else {
+          if (marker.getAlpha() == DEFAULT_ICON_ALPHA) {
+            marker.setIcon(getIcon(network));
+            marker.setAlpha(CUSTOM_ICON_ALPHA);
+          }
+        }
+      }
+      else if (network.isNew()) {
+        // handle case where network was not added before because it is not new
+        final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+        if (showNewDBOnly) {
+          mClusterManager.addItem(network);
+          mClusterManager.cluster();
+        }
+      }
+    }
+
+    private void setupRelabelingTask() {
+      // setup camera change listener to fire the asynctask
+      map.setOnCameraChangeListener(new OnCameraChangeListener() {
+        @Override
+        public void onCameraChange(CameraPosition position) {
+          new DynamicallyAddMarkerTask().execute(map.getProjection().getVisibleRegion().latLngBounds);
+        }
+      });
+    }
+
+
+
+    private class DynamicallyAddMarkerTask extends AsyncTask<LatLngBounds, Integer, Void> {
+      @Override
+      protected Void doInBackground(LatLngBounds... bounds) {
+        final Collection<Network> nets = MainActivity.getNetworkCache().values();
+        for (final Network network : nets) {
+          final Marker marker = NetworkRenderer.this.getMarker(network);
+          if (marker != null) {
+            final boolean inBounds = bounds[0].contains(network.getLatLng());
+            if (inBounds) {
+              MainActivity.info("sendupdate: " + network.getBssid());
+              sendUpdateNetwork(network.getBssid());
+            }
+          }
+        }
+        return null;
+      }
+
+      @Override
+      protected void onPostExecute(Void result) {
+        mClusterManager.cluster();
       }
     }
 
   }
 
   public MapRender(final Context context, final GoogleMap map, final boolean isDbResult) {
+    this.map = map;
     this.isDbResult = isDbResult;
+    prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+    ssidMatcher = FilterMatcher.getFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
     mClusterManager = new ClusterManager<Network>(context, map);
     networkRenderer = new NetworkRenderer(context, map, mClusterManager);
     mClusterManager.setRenderer(networkRenderer);
@@ -124,6 +202,11 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     mClusterManager.setOnClusterItemClickListener(this);
     mClusterManager.setOnClusterItemInfoWindowClickListener(this);
 
+    if (!isDbResult) {
+      // setup the relabeling background task
+      networkRenderer.setupRelabelingTask();
+    }
+
     reCluster();
   }
 
@@ -132,22 +215,31 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     int cached = 0;
     int added = 0;
     final Collection<Network> nets = MainActivity.getNetworkCache().values();
-    final boolean showNewDBOnly = networkRenderer.prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false )
-         && ! isDbResult;
 
     for (final Network network : nets) {
       cached++;
-      if (network.getPosition() != null) {
-        if (!showNewDBOnly || network.isNew()) {
-          added++;
-          mClusterManager.addItem(network);
-        }
+      if (okForMapTab(network)) {
+        added++;
+        mClusterManager.addItem(network);
       }
     }
     MainActivity.info("MapRender cached: " + cached + " added: " + added);
     networkCount.getAndAdd(added);
 
     mClusterManager.cluster();
+  }
+
+  public boolean okForMapTab( final Network network ) {
+    final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false )
+        && ! isDbResult;
+    if (network.getPosition() != null) {
+      if (!showNewDBOnly || network.isNew()) {
+        if (FilterMatcher.isOk(ssidMatcher, prefs, MappingFragment.MAP_DIALOG_PREFIX, network)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
@@ -186,10 +278,6 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
   }
 
-  public void updateItem(final Network network) {
-    networkRenderer.updateItem(network);
-  }
-
   public void clear() {
     MainActivity.info("MapRender: clear");
     networkCount.set(0);
@@ -204,5 +292,32 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
       addLatestNetworks();
     }
   }
+
+  public void updateNetwork(final Network network) {
+    if (okForMapTab(network)) {
+      sendUpdateNetwork(network.getBssid());
+    }
+  }
+
+  private void sendUpdateNetwork(final String bssid) {
+    final Bundle data = new Bundle();
+    data.putString(MESSAGE_BSSID, bssid);
+    Message message = new Message();
+    message.setData(data);
+    updateMarkersHandler.sendMessage(message);
+  }
+
+  @SuppressLint("HandlerLeak")
+  final Handler updateMarkersHandler = new Handler() {
+    @Override
+    public void handleMessage(final Message message) {
+      final String bssid = message.getData().getString(MESSAGE_BSSID);
+      MainActivity.info("handleMessage: " + bssid);
+      final Network network = MainActivity.getNetworkCache().get(bssid);
+      if (network != null) {
+        networkRenderer.updateItem(network);
+      }
+    }
+  };
 
 }

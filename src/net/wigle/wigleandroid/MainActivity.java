@@ -894,6 +894,17 @@ public final class MainActivity extends ActionBarActivity implements TabListener
     }
   }
 
+  public static void reclusterMap() {
+    if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+      // Map is visible, give it the new network
+      final State state = mainActivity.getState();
+      final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+      if (f != null) {
+        f.reCluster();
+      }
+    }
+  }
+
   public static void writeError( final Thread thread, final Throwable throwable, final Context context ) {
     writeError(thread, throwable, context, null);
   }

@@ -1,7 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import android.annotation.SuppressLint;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -15,7 +15,6 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -33,6 +32,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -61,6 +61,7 @@ public final class MappingFragment extends Fragment {
   private int previousRunNets;
 
   private static final String DIALOG_PREFIX = "DialogPrefix";
+  public static final String MAP_DIALOG_PREFIX = "";
   public static LocationListener STATIC_LOCATION_LISTENER = null;
 
   private static final int DEFAULT_ZOOM = 17;
@@ -79,8 +80,6 @@ public final class MappingFragment extends Fragment {
   private static final int MENU_WAKELOCK = 22;
 
   private static final int SSID_FILTER = 102;
-
-  private static final String MESSAGE_BSSID = "messageBssid";
 
   /** Called when the activity is first created. */
   @Override
@@ -216,15 +215,15 @@ public final class MappingFragment extends Fragment {
           if ( location != null ) {
             if ( state.locked ) {
               // MainActivity.info( "mapping center location: " + location );
-  						final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-  						final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
-  						if ( state.firstMove ) {
-  						  mapView.getMap().moveCamera(centerUpdate);
-  						  state.firstMove = false;
-  						}
-  						else {
-  						  mapView.getMap().animateCamera(centerUpdate);
-  						}
+              final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+              final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
+              if ( state.firstMove ) {
+                mapView.getMap().moveCamera(centerUpdate);
+                state.firstMove = false;
+              }
+              else {
+                mapView.getMap().animateCamera(centerUpdate);
+              }
             }
             else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
                 || previousLocation.getLongitude() != location.getLongitude()
@@ -322,40 +321,22 @@ public final class MappingFragment extends Fragment {
   }
 
   public void addNetwork(final Network network) {
-    if (mapRender != null) {
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-      final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
-      if (!showNewDBOnly || network.isNew()) {
-        mapRender.addItem(network);
-      }
+    if (mapRender != null && mapRender.okForMapTab(network)) {
+      mapRender.addItem(network);
     }
   }
 
   public void updateNetwork(final Network network) {
     if (mapRender != null) {
-      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-      final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
-      if (!showNewDBOnly || network.isNew()) {
-        final Bundle data = new Bundle();
-        data.putString(MESSAGE_BSSID, network.getBssid());
-        Message message = new Message();
-        message.setData(data);
-        updateMarkersHandler.sendMessage(message);
-      }
+      mapRender.updateNetwork(network);
     }
   }
 
-  @SuppressLint("HandlerLeak")
-  final Handler updateMarkersHandler = new Handler() {
-    @Override
-    public void handleMessage(final Message message) {
-      final String bssid = message.getData().getString(MESSAGE_BSSID);
-      final Network network = MainActivity.getNetworkCache().get(bssid);
-      if (network != null && mapRender != null) {
-        mapRender.updateItem(network);
-      }
+  public void reCluster() {
+    if (mapRender != null) {
+      mapRender.reCluster();
     }
-  };
+  }
 
   /* Creates the menu items */
   @Override
@@ -558,7 +539,7 @@ public final class MappingFragment extends Fragment {
     DialogFragment dialogFragment = null;
     switch ( which ) {
       case SSID_FILTER:
-        dialogFragment = createSsidFilterDialog( "" );
+        dialogFragment = createSsidFilterDialog( MAP_DIALOG_PREFIX );
         break;
       default:
         MainActivity.error( "unhandled dialog: " + which );
@@ -582,7 +563,7 @@ public final class MappingFragment extends Fragment {
       final View view = inflater.inflate(R.layout.filterdialog, container);
       dialog.setTitle( "SSID Filter" );
 
-      MainActivity.info("make new dialog");
+      MainActivity.info("make new dialog. prefix: " + prefix);
       final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
       final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
       regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
@@ -614,6 +595,8 @@ public final class MappingFragment extends Fragment {
               editor.putBoolean( prefix + ListFragment.PREF_MAPF_CELL, cell.isChecked() );
               editor.putBoolean( prefix + ListFragment.PREF_MAPF_ENABLED, enabled.isChecked() );
               editor.commit();
+              MainActivity.reclusterMap();
+
               dialog.dismiss();
             }
             catch ( Exception ex ) {

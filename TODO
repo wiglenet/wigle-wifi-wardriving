@@ -1,7 +1,6 @@
 --- todo ---
-pause/play on notification view, gps+wifi
+pause/play on notification view, affects gps+wifi
 implement heatmap
-better exploding of clusters when zoomed in
 back clustering with our own map for memory
 
 "upload every n" setting
@@ -48,11 +47,14 @@ geofence for "don't record" and/or "do upload"
 set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 rssi on kml export
+upload and/or pause on when connected to this network
+start on boot option
+disable notification bar icon option
+pause at battery level instead of kill
 
 --- MVP ---
 Map label list with cap
 No google play services testing
-Performance test of map
 
 --- done ---
 * 2.5 (08/??/2014)

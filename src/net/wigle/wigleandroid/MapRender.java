@@ -1,6 +1,9 @@
 package net.wigle.wigleandroid;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
@@ -37,12 +40,16 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
   private final SharedPreferences prefs;
   private final GoogleMap map;
   private final Matcher ssidMatcher;
+  private final Set<Network> labeledNetworks = Collections.newSetFromMap(
+    new ConcurrentHashMap<Network,Boolean>());
 
   private static final String MESSAGE_BSSID = "messageBssid";
   private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
   private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
   private static final float DEFAULT_ICON_ALPHA = 0.75f;
   private static final float CUSTOM_ICON_ALPHA = 0.80f;
+  // 10% of the cache size can be labels
+  private static final int MAX_LABELS = MainActivity.getNetworkCache().size() / 10;
 
   private class NetworkRenderer extends DefaultClusterRenderer<Network> {
     final IconGenerator iconFactory;
@@ -71,9 +78,11 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
 
     private BitmapDescriptor getIcon(final Network network) {
       if (showDefaultIcon(network)) {
+        MapRender.this.labeledNetworks.remove(network);
         return network.isNew() ? DEFAULT_ICON_NEW : DEFAULT_ICON;
       }
 
+      MapRender.this.labeledNetworks.add(network);
       if ( network.isNew() ) {
         iconFactory.setStyle(IconGenerator.STYLE_WHITE);
       }
@@ -88,6 +97,10 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
       if (showLabel) {
         final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
         if (bounds.contains(network.getLatLng())) {
+          return false;
+        }
+
+        if (MapRender.this.labeledNetworks.size() > MAX_LABELS) {
           return false;
         }
       }
@@ -159,8 +172,6 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
       });
     }
 
-
-
     private class DynamicallyAddMarkerTask extends AsyncTask<LatLngBounds, Integer, Void> {
       @Override
       protected Void doInBackground(LatLngBounds... bounds) {
@@ -169,7 +180,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
           final Marker marker = NetworkRenderer.this.getMarker(network);
           if (marker != null) {
             final boolean inBounds = bounds[0].contains(network.getLatLng());
-            if (inBounds) {
+            if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
               // MainActivity.info("sendupdate: " + network.getBssid());
               sendUpdateNetwork(network.getBssid());
             }

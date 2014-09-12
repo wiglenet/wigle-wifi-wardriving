@@ -264,4 +264,6 @@
     <string name="map_toast_hybrid">Map Type: Hybrid</string>
     <string name="map_toast_terrain">Map Type: Terrain</string>
     <string name="map_needs_playservice">Map requires Google Play Service</string>
+    <string name="register">Register</string>
+    <string name="at">at</string>
 </resources>

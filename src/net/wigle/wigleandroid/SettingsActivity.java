@@ -150,8 +150,15 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
 
       // register link
       final TextView register = (TextView) findViewById(R.id.register);
-      register.setText(Html.fromHtml("<a href='https://wigle.net/gps/gps/main/register'>Register</a>"
-          + " at <a href='https://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
+      final String registerString = getString(R.string.register);
+      final String atString = getString(R.string.at);
+      try {
+        register.setText(Html.fromHtml("<a href='https://wigle.net/gps/gps/main/register'>" + registerString + "</a> "
+            + atString + " <a href='https://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
+      }
+      catch (Exception ex) {
+        register.setText(registerString + " " + atString + " WiGLE.net");
+      }
       register.setMovementMethod(LinkMovementMethod.getInstance());
       updateRegister();
 

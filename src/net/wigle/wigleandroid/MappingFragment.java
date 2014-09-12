@@ -33,6 +33,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -100,7 +102,13 @@ public final class MappingFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     mapView = new MapView(getActivity());
-    mapView.onCreate(savedInstanceState);
+    final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+    if (serviceAvailable == ConnectionResult.SUCCESS) {
+      mapView.onCreate(savedInstanceState);
+    }
+    else {
+      Toast.makeText( getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG ).show();
+    }
     MapsInitializer.initialize(getActivity());
     final View view = inflater.inflate(R.layout.map, container, false);
 
@@ -129,29 +137,31 @@ public final class MappingFragment extends Fragment {
     // conditionally replace the tile source
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     rlView.addView( mapView );
-    mapView.getMap().setMyLocationEnabled(true);
-    mapView.getMap().setBuildingsEnabled(true);
-    final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
-    mapView.getMap().setTrafficEnabled(showTraffic);
-    final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-    mapView.getMap().setMapType(mapType);
-    mapRender = new MapRender(getActivity(), mapView.getMap(), false);
+    // guard against not having google play services
+    if (mapView.getMap() != null) {
+      mapView.getMap().setMyLocationEnabled(true);
+      mapView.getMap().setBuildingsEnabled(true);
+      final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
+      mapView.getMap().setTrafficEnabled(showTraffic);
+      final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+      mapView.getMap().setMapType(mapType);
+      mapRender = new MapRender(getActivity(), mapView.getMap(), false);
 
-    // controller
-    final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
-    float zoom = DEFAULT_ZOOM;
-    if ( oldZoom >= 0 ) {
-      zoom = oldZoom;
+      // controller
+      final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
+      float zoom = DEFAULT_ZOOM;
+      if ( oldZoom >= 0 ) {
+        zoom = oldZoom;
+      }
+      else {
+        zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
+      }
+
+      final CameraPosition cameraPosition = new CameraPosition.Builder()
+        .target(centerPoint).zoom(zoom).build();
+      mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
-    else {
-      zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
-    }
-
-    final CameraPosition cameraPosition = new CameraPosition.Builder()
-      .target(centerPoint).zoom(zoom).build();
-    mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-    MainActivity.info("done setupMapView. zoom: " + zoom);
+    MainActivity.info("done setupMapView.");
   }
 
   public static LatLng getCenter( final Context context, final LatLng priorityCenter,
@@ -214,15 +224,17 @@ public final class MappingFragment extends Fragment {
           final Location location = ListFragment.lameStatic.location;
           if ( location != null ) {
             if ( state.locked ) {
-              // MainActivity.info( "mapping center location: " + location );
-              final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-              final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
-              if ( state.firstMove ) {
-                mapView.getMap().moveCamera(centerUpdate);
-                state.firstMove = false;
-              }
-              else {
-                mapView.getMap().animateCamera(centerUpdate);
+              if (mapView.getMap() != null) {
+                // MainActivity.info( "mapping center location: " + location );
+                final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+                final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
+                if ( state.firstMove ) {
+                  mapView.getMap().moveCamera(centerUpdate);
+                  state.firstMove = false;
+                }
+                else {
+                  mapView.getMap().animateCamera(centerUpdate);
+                }
               }
             }
             else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
@@ -274,14 +286,16 @@ public final class MappingFragment extends Fragment {
     MainActivity.info( "MAP: destroy mapping." );
     finishing.set( true );
 
-    // save zoom
-    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-    final Editor edit = prefs.edit();
-    edit.putFloat( ListFragment.PREF_PREV_ZOOM, mapView.getMap().getCameraPosition().zoom );
-    edit.commit();
+    if (mapView.getMap() != null) {
+      // save zoom
+      final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+      final Editor edit = prefs.edit();
+      edit.putFloat( ListFragment.PREF_PREV_ZOOM, mapView.getMap().getCameraPosition().zoom );
+      edit.commit();
 
-    // save center
-    state.oldCenter = mapView.getMap().getCameraPosition().target;
+      // save center
+      state.oldCenter = mapView.getMap().getCameraPosition().target;
+    }
     mapView.onDestroy();
 
     super.onDestroy();
@@ -292,8 +306,10 @@ public final class MappingFragment extends Fragment {
     MainActivity.info( "MAP: onPause" );
     super.onPause();
     mapView.onPause();
-    // save memory
-    mapRender.clear();
+    if (mapRender != null) {
+      // save memory
+      mapRender.clear();
+    }
   }
 
   @Override

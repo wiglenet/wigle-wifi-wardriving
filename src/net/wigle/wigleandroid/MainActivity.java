@@ -130,6 +130,7 @@ public final class MainActivity extends ActionBarActivity implements TabListener
   private static MainActivity mainActivity;
   private static ListFragment listActivity;
   private BatteryLevelReceiver batteryLevelReceiver;
+  private boolean playServiceShown = false;
 
   private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
   public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
@@ -591,10 +592,11 @@ public final class MainActivity extends ActionBarActivity implements TabListener
 
     final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
     info("GooglePlayServicesAvailable: " + serviceAvailable);
-    if (serviceAvailable != ConnectionResult.SUCCESS) {
+    if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
       error("service not available! " + serviceAvailable);
       final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
       dialog.show();
+      playServiceShown = true;
     }
   }
 

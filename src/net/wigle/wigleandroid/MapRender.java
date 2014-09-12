@@ -175,7 +175,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         final Collection<Network> nets = MainActivity.getNetworkCache().values();
         for (final Network network : nets) {
           final Marker marker = NetworkRenderer.this.getMarker(network);
-          if (marker != null) {
+          if (marker != null && network.getLatLng() != null) {
             final boolean inBounds = bounds[0].contains(network.getLatLng());
             if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
               // MainActivity.info("sendupdate: " + network.getBssid());

@@ -52,10 +52,6 @@ start on boot option
 disable notification bar icon option
 pause at battery level instead of kill
 
---- MVP ---
-Map label list with cap
-No google play services testing
-
 --- done ---
 * 2.5 (08/??/2014)
 Switch to Google maps, with clustering networks

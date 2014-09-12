@@ -207,7 +207,9 @@ public class DBResultActivity extends ActionBarActivity {
           final Network network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
           resultList.add( network );
           final LatLng point = network.getLatLng();
-          obsMap.put(point, 0);
+          if (point != null) {
+            obsMap.put(point, 0);
+          }
         }
 
         handler.sendEmptyMessage( MSG_QUERY_DONE );
@@ -278,8 +280,10 @@ public class DBResultActivity extends ActionBarActivity {
   public void onPause() {
     super.onPause();
     mapView.onPause();
-    // save memory
-    mapRender.clear();
+    if (mapRender != null) {
+      // save memory
+      mapRender.clear();
+    }
   }
 
   @Override

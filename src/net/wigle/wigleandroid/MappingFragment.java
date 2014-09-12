@@ -703,6 +703,8 @@ public final class MappingFragment extends Fragment {
         }
       }
     });
-    ListFragment.lameStatic.dbHelper.addToQueue( request );
+    if (ListFragment.lameStatic.dbHelper != null) {
+      ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
   }
 }

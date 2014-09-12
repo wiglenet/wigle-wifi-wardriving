@@ -48,8 +48,8 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
   private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
   private static final float DEFAULT_ICON_ALPHA = 0.75f;
   private static final float CUSTOM_ICON_ALPHA = 0.80f;
-  // 10% of the cache size can be labels
-  private static final int MAX_LABELS = MainActivity.getNetworkCache().size() / 10;
+  // a % of the cache size can be labels
+  private static final int MAX_LABELS = MainActivity.getNetworkCache().maxSize() / 15;
 
   private class NetworkRenderer extends DefaultClusterRenderer<Network> {
     final IconGenerator iconFactory;
@@ -96,11 +96,8 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
       final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
       if (showLabel) {
         final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
-        if (bounds.contains(network.getLatLng())) {
-          return false;
-        }
-
-        if (MapRender.this.labeledNetworks.size() > MAX_LABELS) {
+        // if on screen, and room in labeled networks, we can show the label
+        if (bounds.contains(network.getLatLng()) && MapRender.this.labeledNetworks.size() <= MAX_LABELS) {
           return false;
         }
       }
@@ -291,6 +288,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
 
   public void clear() {
     MainActivity.info("MapRender: clear");
+    labeledNetworks.clear();
     networkCount.set(0);
     mClusterManager.clearItems();
     // mClusterManager.setRenderer(networkRenderer);

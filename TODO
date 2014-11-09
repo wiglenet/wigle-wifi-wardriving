@@ -55,6 +55,9 @@ pause at battery level instead of kill
 only cluster at 500 if label+clustering off
 
 --- done ---
+* 2.6 ()
+Turkish translation fixes (thanks oguska!)
+
 * 2.5 (09/11/2014)
 Switch to Google maps, with clustering networks
 Polish translation fixes (thanks ireun!)

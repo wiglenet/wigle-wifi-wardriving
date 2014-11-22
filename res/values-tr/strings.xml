@@ -156,14 +156,14 @@
     <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"-&gt;"WiFi settings"</string>
     <string name="turn_on_wifi">WiFi aktif ediliyor</string>
     <string name="no_gps_device">Cihazınızda GPS bulunamadı!</string>
-    <string name="turn_on_gps">Lütfen GPS'i aktifleştirin</string>
+    <string name="turn_on_gps">Lütfen GPS\'i aktifleştirin</string>
     <string name="address">Addres</string>
     <string name="no_address_found">Coğrafik adres bulunamadı!</string>
     <string name="problem_with_field">Problem with field</string>
     <string name="turning_wifi_off">WiFi tekrar kapatılıyor</string>
     <string name="lost_location">Konum kaybedildi</string>
     <string name="have_location">Konum bulundu</string>
-    <string name="wifi_jammed">WiFi engelleniyor gibi, kapatıp, tekrar WiFi'yi açın.</string>
+    <string name="wifi_jammed">WiFi engelleniyor gibi, kapatıp, tekrar WiFi\'yi açın.</string>
     <string name="battery_at">Batarya seviyesinde</string>
     <string name="battery_postfix">yüzde de, WiGLE Wifi kapatılacak</string>
     <string name="scan">Tarama</string>

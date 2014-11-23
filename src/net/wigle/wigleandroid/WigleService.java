@@ -182,8 +182,11 @@ public final class WigleService extends Service {
       builder.setContentText(text);
       builder.setWhen(when);
       builder.setLargeIcon(largeIcon);
-      builder.setSmallIcon(R.drawable.wiglewifi_small);
+      builder.setSmallIcon(R.drawable.wiglewifi_small_white);
       builder.setOngoing(true);
+      builder.setCategory("SERVICE");
+      builder.setPriority(NotificationCompat.PRIORITY_LOW);
+      builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
       final Notification notification = builder.build();
       startForegroundCompat( NOTIFICATION_ID, notification );

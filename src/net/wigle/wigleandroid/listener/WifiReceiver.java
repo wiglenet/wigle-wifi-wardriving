@@ -592,7 +592,7 @@ public class WifiReceiver extends BroadcastReceiver {
     final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     StringBuilder builder = new StringBuilder();
 
-    if ( mainActivity.getGPSListener().getLocation() == null ) {
+    if ( mainActivity.getGPSListener().getLocation() == null && prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true ) ) {
       builder.append( mainActivity.getString(R.string.tts_no_gps_fix) + ", " );
     }
 
@@ -627,8 +627,11 @@ public class WifiReceiver extends BroadcastReceiver {
         .append( " " + mainActivity.getString(R.string.tts_percent) + ", " );
     }
 
-    MainActivity.info( "speak: " + builder.toString() );
-    mainActivity.speak( builder.toString() );
+    final String speak = builder.toString();
+    MainActivity.info( "speak: " + speak );
+    if (! "".equals(speak)) {
+      mainActivity.speak( builder.toString() );
+    }
     previousTalkTime = now;
   }
 

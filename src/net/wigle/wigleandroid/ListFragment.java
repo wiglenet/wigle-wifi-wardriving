@@ -68,11 +68,9 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     public static final String GPS_SCAN_PERIOD = "gpsPeriod";
     public static final String PREF_FOUND_SOUND = "foundSound";
     public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
-    public static final String PREF_SPEECH_PERIOD = "speechPeriod";
     public static final String PREF_LANGUAGE = "speechLanguage";
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
-    public static final String PREF_SPEECH_GPS = "speechGPS";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     public static final String PREF_DISTANCE_RUN = "distRun";
@@ -95,6 +93,8 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     public static final String PREF_MAP_TYPE = "mapType";
 
     // what to speak on announcements
+    public static final String PREF_SPEECH_PERIOD = "speechPeriod";
+    public static final String PREF_SPEECH_GPS = "speechGPS";
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
     public static final String PREF_SPEAK_NEW_CELL = "speakNewCell";

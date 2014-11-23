@@ -15,6 +15,7 @@ debug logging mode
 download of cell observed as well
 tablet list+map layout
 try bluetooth/jfc logging again
+simple map circle mode if label+clustering off
 
 --- user suggested ---
 map-page type filter on four csv/kml exports
@@ -52,10 +53,11 @@ upload and/or pause on when connected to this network
 start on boot option
 disable notification bar icon option
 pause at battery level instead of kill
-only cluster at 500 if label+clustering off
 
 --- done ---
-* 2.6 ()
+* 2.6 (11/22/2014)
+Lollipop notification and icon updates
+GPS lost obeys speech setting
 Turkish translation fixes (thanks oguska!)
 
 * 2.5 (09/11/2014)

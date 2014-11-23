@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -182,7 +183,12 @@ public final class WigleService extends Service {
       builder.setContentText(text);
       builder.setWhen(when);
       builder.setLargeIcon(largeIcon);
-      builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+      }
+      else {
+        builder.setSmallIcon(R.drawable.wiglewifi_small);
+      }
       builder.setOngoing(true);
       builder.setCategory("SERVICE");
       builder.setPriority(NotificationCompat.PRIORITY_LOW);

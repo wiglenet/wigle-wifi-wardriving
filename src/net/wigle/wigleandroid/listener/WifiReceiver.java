@@ -143,8 +143,9 @@ public class WifiReceiver extends BroadcastReceiver {
     try {
       results = wifiManager.getScanResults(); // return can be null!
     }
-    catch (NullPointerException ex) {
+    catch (Exception ex) {
       // ignore, happens on some vm's
+      MainActivity.info("exception getting scan results: " + ex, ex);
     }
 
     long nonstopScanRequestTime = Long.MIN_VALUE;
@@ -725,7 +726,12 @@ public class WifiReceiver extends BroadcastReceiver {
     }
     else if (mainActivity.isScanning()) {
       if ( ! scanInFlight ) {
-        success = wifiManager.startScan();
+        try {
+          success = wifiManager.startScan();
+        }
+        catch (Exception ex) {
+          MainActivity.warn("exception starting scan: " + ex, ex);
+        }
         if ( success ) {
           scanInFlight = true;
         }

@@ -55,6 +55,11 @@ disable notification bar icon option
 pause at battery level instead of kill
 
 --- done ---
+* 2.7 (03/1x/2015)
+Update to Android 5.1 libraries
+German translation fixes (thanks bkimminich!)
+Work around various reported exceptions
+
 * 2.6 (11/22/2014)
 Lollipop notification and icon updates
 GPS lost obeys speech setting

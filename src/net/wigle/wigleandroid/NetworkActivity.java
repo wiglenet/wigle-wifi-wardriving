@@ -136,32 +136,42 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
   @Override
   public void onDestroy() {
     networkActivity = null;
-    mapView.onDestroy();
+    if (mapView != null) {
+      mapView.onDestroy();
+    }
     super.onDestroy();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    mapView.onResume();
+    if (mapView != null) {
+      mapView.onResume();
+    }
   }
 
   @Override
   public void onPause() {
     super.onPause();
-    mapView.onPause();
+    if (mapView != null) {
+      mapView.onPause();
+    }
   }
 
   @Override
   public void onSaveInstanceState(final Bundle outState) {
     super.onSaveInstanceState(outState);
-    mapView.onSaveInstanceState(outState);
+    if (mapView != null) {
+      mapView.onSaveInstanceState(outState);
+    }
   }
 
   @Override
   public void onLowMemory() {
     super.onLowMemory();
-    mapView.onLowMemory();
+    if (mapView != null) {
+      mapView.onLowMemory();
+    }
   }
 
   @SuppressLint("HandlerLeak")
@@ -230,7 +240,12 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
   private void setupMap( final Network network, final Bundle savedInstanceState ) {
     mapView = new MapView( this );
-    mapView.onCreate(savedInstanceState);
+    try {
+      mapView.onCreate(savedInstanceState);
+    }
+    catch (NullPointerException ex) {
+      MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+    }
     MapsInitializer.initialize( this );
 
     if (network.getLatLng() != null && mapView.getMap() != null) {

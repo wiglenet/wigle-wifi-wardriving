@@ -310,7 +310,13 @@ public final class MappingFragment extends Fragment {
       // save center
       state.oldCenter = getMap().getCameraPosition().target;
     }
-    mapView.onDestroy();
+    try {
+      mapView.onDestroy();
+    }
+    catch (NullPointerException ex) {
+      // seen in the wild
+      MainActivity.info("exception in mapView.onDestroy: " + ex, ex);
+    }
 
     super.onDestroy();
   }

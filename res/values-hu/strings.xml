@@ -254,6 +254,4 @@
     <string name="use_wigle_tiles">Használjon WiGLE OSM csempéket</string>
     <string name="wigle_service">WiGLE Wifi Szolgáltatás</string>
     <string name="disable_toast">Felugró értesítések tiltása</string>
-    <string name="wigle_service">WiGLE Wifi Service</string>
-    <string name="disable_toast">Disable toast pop-ups</string>
 </resources>

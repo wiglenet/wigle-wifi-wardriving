@@ -203,7 +203,7 @@
     <string name="status_no_user">Benutzername nicht gesetzt</string>
     <string name="status_no_pass">Passwort nicht gesetzt und Benutzername nicht \'anonymous\'</string>
     <string name="status_exception">Ausnahmefehler</string>
-    <string name="status_login_fail">Anmeldung fehlgeschlagen, überprüfen Login und Passwort überprüfen</string>
+    <string name="status_login_fail">Anmeldung fehlgeschlagen, Passwort überprüfen?</string>
     <string name="status_uploading">lade hoch…</string>
     <string name="status_writing">Speichern der Datei</string>
     <string name="status_nothing">nichts zu tun</string>
@@ -240,18 +240,18 @@
     <string name="language_zh">繁體中文 (Traditionelles Chinesisch)</string>
     <string name="language_text">Gewählte Sprache (Neustart erforderlich)</string>
     <string name="fatal_title">Fatales DB Problem</string>
-    <string name="fatal_db_warn">Probleme meistens von Gerät oder SD-Karte verursacht!</string>
+    <string name="fatal_db_warn">Probleme werden meistens von Gerät oder SD-Karte verursacht!</string>
     <string name="fatal_pre_message">FEHLER</string>
     <string name="fatal_post_message">(Kann mit "Fehlerreport" im Settings-Menü erneut angesehen werden)</string>
     <string name="use_network_location">Mit Network Location Provider</string>
-    <string name="data_import_observed">Import meiner beobachteten WLAN aus WiGLE in die lokale Datenbank?</string>
+    <string name="data_import_observed">Import meiner beobachteten WLANs aus WiGLE in die lokale Datenbank?</string>
     <string name="donate_question">Daten an Wigle spenden?</string>
     <string name="donate_explain">WiGLE gestatten eine anonymisierte Kopie der Daten zu erstellen, die von WiGLE anderen Parteien als kommerzielle Lizenz überlassen werden darf.</string>
     <string name="no_data_conn">Keine Datenverbindung, kann nicht mit dem Internet verbinden.\nDetails:</string>
     <string name="speech_wifi_restart">WLAN startet neu</string>
     <string name="wifi_restart_1">Achtung, neuester WLAN-Scan abgeschlossen vor</string>
     <string name="wifi_restart_2">Sekunden. WLAN-Neustart.</string>
-    <string name="use_wigle_tiles">Benutze WiGLE OSM-Fliesen</string>
+    <string name="use_wigle_tiles">Benutze WiGLE OSM-Kacheln</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
-    <string name="disable_toast">Deaktivier Toast Pop-ups</string>
+    <string name="disable_toast">Deaktiviere Toast Pop-ups</string>
 </resources>

@@ -124,6 +124,20 @@ public final class MappingFragment extends Fragment {
     return view;
   }
 
+  /**
+   * This call has thrown an npe in the wild
+   * @return the google map from the map view, or null
+   */
+  private GoogleMap getMap() {
+    try {
+      return mapView.getMap();
+    }
+    catch (NullPointerException ex) {
+      MainActivity.info("npe in mapView.getMap(): " + ex, ex);
+    }
+    return null;
+  }
+
   private void setupMapView( final View view, final LatLng oldCenter, final int oldZoom ) {
     // view
     final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
@@ -138,14 +152,14 @@ public final class MappingFragment extends Fragment {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     rlView.addView( mapView );
     // guard against not having google play services
-    if (mapView.getMap() != null) {
-      mapView.getMap().setMyLocationEnabled(true);
-      mapView.getMap().setBuildingsEnabled(true);
+    if (getMap() != null) {
+      getMap().setMyLocationEnabled(true);
+      getMap().setBuildingsEnabled(true);
       final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
-      mapView.getMap().setTrafficEnabled(showTraffic);
+      getMap().setTrafficEnabled(showTraffic);
       final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-      mapView.getMap().setMapType(mapType);
-      mapRender = new MapRender(getActivity(), mapView.getMap(), false);
+      getMap().setMapType(mapType);
+      mapRender = new MapRender(getActivity(), getMap(), false);
 
       // controller
       final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
@@ -159,7 +173,7 @@ public final class MappingFragment extends Fragment {
 
       final CameraPosition cameraPosition = new CameraPosition.Builder()
         .target(centerPoint).zoom(zoom).build();
-      mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+      getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
     MainActivity.info("done setupMapView.");
   }
@@ -224,16 +238,16 @@ public final class MappingFragment extends Fragment {
           final Location location = ListFragment.lameStatic.location;
           if ( location != null ) {
             if ( state.locked ) {
-              if (mapView.getMap() != null) {
+              if (getMap() != null) {
                 // MainActivity.info( "mapping center location: " + location );
                 final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
                 final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
                 if ( state.firstMove ) {
-                  mapView.getMap().moveCamera(centerUpdate);
+                  getMap().moveCamera(centerUpdate);
                   state.firstMove = false;
                 }
                 else {
-                  mapView.getMap().animateCamera(centerUpdate);
+                  getMap().animateCamera(centerUpdate);
                 }
               }
             }
@@ -286,15 +300,15 @@ public final class MappingFragment extends Fragment {
     MainActivity.info( "MAP: destroy mapping." );
     finishing.set( true );
 
-    if (mapView.getMap() != null) {
+    if (getMap() != null) {
       // save zoom
       final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
       final Editor edit = prefs.edit();
-      edit.putFloat( ListFragment.PREF_PREV_ZOOM, mapView.getMap().getCameraPosition().zoom );
+      edit.putFloat( ListFragment.PREF_PREV_ZOOM, getMap().getCameraPosition().zoom );
       edit.commit();
 
       // save center
-      state.oldCenter = mapView.getMap().getCameraPosition().target;
+      state.oldCenter = getMap().getCameraPosition().target;
     }
     mapView.onDestroy();
 
@@ -424,20 +438,20 @@ public final class MappingFragment extends Fragment {
           return true;
         }
         case MENU_ZOOM_IN: {
-          float zoom = mapView.getMap().getCameraPosition().zoom;
+          float zoom = getMap().getCameraPosition().zoom;
           zoom++;
           final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-          if (mapView.getMap() != null) {
-            mapView.getMap().animateCamera(zoomUpdate);
+          if (getMap() != null) {
+            getMap().animateCamera(zoomUpdate);
           }
           return true;
         }
         case MENU_ZOOM_OUT: {
-          float zoom = mapView.getMap().getCameraPosition().zoom;
+          float zoom = getMap().getCameraPosition().zoom;
           zoom--;
           final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-          if (mapView.getMap() != null) {
-            mapView.getMap().animateCamera(zoomUpdate);
+          if (getMap() != null) {
+            getMap().animateCamera(zoomUpdate);
           }
           return true;
         }
@@ -496,8 +510,8 @@ public final class MappingFragment extends Fragment {
 
           String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
           item.setTitle( name );
-          if (mapView.getMap() != null) {
-            mapView.getMap().setTrafficEnabled(showTraffic);
+          if (getMap() != null) {
+            getMap().setTrafficEnabled(showTraffic);
           }
           return true;
         }
@@ -512,7 +526,7 @@ public final class MappingFragment extends Fragment {
           break;
         }
         case MENU_MAP_TYPE: {
-          if (mapView.getMap() != null) {
+          if (getMap() != null) {
             int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
             switch (newMapType) {
               case GoogleMap.MAP_TYPE_NORMAL:
@@ -537,7 +551,7 @@ public final class MappingFragment extends Fragment {
             Editor edit = prefs.edit();
             edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
             edit.commit();
-            mapView.getMap().setMapType(newMapType);
+            getMap().setMapType(newMapType);
           }
         }
         case MENU_WAKELOCK: {

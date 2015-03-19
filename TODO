@@ -55,7 +55,7 @@ disable notification bar icon option
 pause at battery level instead of kill
 
 --- done ---
-* 2.7 (03/1x/2015)
+* 2.7 (03/18/2015)
 Update to Android 5.1 libraries
 German translation fixes (thanks bkimminich!)
 Work around various reported exceptions

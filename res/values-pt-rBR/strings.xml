@@ -39,8 +39,8 @@
     <string name="import_observed_button">Importar Enviadas</string>
     <string name="import_observed_text">Importa as redes que já enviei ao WiGLE</string>
     <string name="periodstill_text">Tempo entre os Scans Wifi enquanto parado</string>
-    <string name="period_text">Tempo entre os Scans Wifi quando mais lento 8 km/h ou 5 mph</string>
-    <string name="periodfast_text">Tempo entre os Scans WiFi quando mais rápido de 8 km/h ou 5 mph</string>
+    <string name="period_text">Tempo entre os Scans Wifi quando mais lento que 8 km/h ou 5 mph</string>
+    <string name="periodfast_text">Tempo entre os Scans WiFi quando mais rápido que 8 km/h ou 5 mph</string>
     <string name="gps_text">Pausa entre as atualizações de GPS</string>
     <string name="speak_text">Pausa entre as falas de audio</string>
     <string name="battery_kill_text">Sair quando a bateria atingir</string>

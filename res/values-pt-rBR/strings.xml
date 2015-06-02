@@ -4,7 +4,7 @@
     <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE Wifi</string>
     <string name="settings_app_name">WiGLE Wifi - Configurações</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
+    <string name="mapping_app_name">WiGLE Wifi - Mapa</string>
     <string name="dashboard_app_name">WiGLE Wifi - Indicadores</string>
     <string name="error_report_name">WiGLE Wifi - Relatórios de Erros Recentes</string>
     <string name="speech_name">WiGLE Wifi - Configurações de Fala</string>
@@ -37,10 +37,10 @@
     <string name="backup_db_button">Backup do BD</string>
     <string name="backup_db_text">Faz um backup do Banco de Dados</string>
     <string name="import_observed_button">Importar Enviadas</string>
-    <string name="import_observed_text">Importa as redes que já enviei ao WiGLE.</string>
-    <string name="periodstill_text">Tempo entre WiFi procura parado</string>
-    <string name="period_text">Tempo entre WiFi verifica quando mais lento de 8 km/h ou 5 mph</string>
-    <string name="periodfast_text">Tempo entre WiFi verifica quando mais rápido de 8 km/h ou 5 mph</string>
+    <string name="import_observed_text">Importa as redes que já enviei ao WiGLE</string>
+    <string name="periodstill_text">Tempo entre os Scans Wifi enquanto parado</string>
+    <string name="period_text">Tempo entre os Scans Wifi quando mais lento 8 km/h ou 5 mph</string>
+    <string name="periodfast_text">Tempo entre os Scans WiFi quando mais rápido de 8 km/h ou 5 mph</string>
     <string name="gps_text">Pausa entre as atualizações de GPS</string>
     <string name="speak_text">Pausa entre as falas de audio</string>
     <string name="battery_kill_text">Sair quando a bateria atingir</string>
@@ -183,7 +183,7 @@
     <string name="menu_turn_on_lockon">Travar o Mapa</string>
     <string name="menu_show_old">Todas Desta Sessão</string>
     <string name="menu_show_new">Apenas Redes Novas</string>
-    <string name="menu_copy_network">Copy Network BSSID</string>
+    <string name="menu_copy_network">Copiar BSSID da rede</string>
     <string name="tts_no_gps_fix">sem localização do GPS</string>
     <string name="tts_new_wifi">Novas Redes</string>
     <string name="tts_new_cell">Novas Torres</string>
@@ -253,5 +253,17 @@
     <string name="wifi_restart_2">segundos atrás. Reiniciando o WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
-    <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="disable_toast">Desabilitar popups</string>
+    <string name="menu_cluster_off">Desagrupar</string>
+    <string name="menu_cluster_on">Agrupar</string>
+    <string name="menu_traffic_off">Esconder Tráfego</string>
+    <string name="menu_traffic_on">Mostrar Tráfego</string>
+    <string name="menu_map_type">Mudar estilo do mapa</string>
+    <string name="map_toast_normal">Estilo do Mapa: Normal</string>
+    <string name="map_toast_satellite">Estilo do Mapa: Satélite</string>
+    <string name="map_toast_hybrid">Estilo do Mapa: Híbrido</string>
+    <string name="map_toast_terrain">Estilo do Mapa: Terreno</string>
+    <string name="map_needs_playservice">Mapa precisa do Google Play Services</string>
+    <string name="register">Registre-se</string>
+    <string name="at">em</string>
 </resources>

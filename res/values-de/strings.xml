@@ -254,4 +254,7 @@
     <string name="use_wigle_tiles">Benutze WiGLE OSM-Kacheln</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Deaktiviere Toast Pop-ups</string>
+    <string name="menu_cluster_off">Netzwerke verteilt anzeigen</string>
+    <string name="menu_cluster_on">Netzwerke gruppieren</string>
+
 </resources>

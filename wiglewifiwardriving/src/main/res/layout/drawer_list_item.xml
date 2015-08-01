@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TextView
+    android:id="@+id/drawer_list_text"
+    android:layout_height="20dp"
+    android:layout_width="100dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+</TextView>
+

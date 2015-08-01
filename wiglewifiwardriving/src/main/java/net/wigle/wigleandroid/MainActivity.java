@@ -55,15 +55,16 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBar.TabListener;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -74,9 +75,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -134,6 +138,12 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     private BatteryLevelReceiver batteryLevelReceiver;
     private boolean playServiceShown = false;
 
+    // drawer
+    private String[] mPlanetTitles;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
@@ -154,7 +164,9 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         mainActivity = this;
 
         // set language
-        setLocale( this );
+        setLocale(this);
+
+        setupMenuDrawer();
 
         // do some of our own error handling, write a file with the stack
         final UncaughtExceptionHandler origHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -260,6 +272,78 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         setActionBarTabs();
         info( "onCreate setup complete" );
     }
+
+    private void setupMenuDrawer() {
+        // set up drawer menu
+//        mPlanetTitles = getResources().getStringArray(R.array.planets_array);
+        mPlanetTitles = new String[]{"list","map","dash","data"};
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<>(this,
+                R.layout.drawer_list_item, mPlanetTitles));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+        ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle("asdf1");
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle("asdf2");
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        // end drawer setup
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    /** Swaps fragments in the main content view */
+    private void selectItem(int position) {
+        final Fragment frag = state.fragList[position];
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.tabcontent, frag)
+                .commit();
+
+        // Highlight the selected item, update the title, and close the drawer
+        mDrawerList.setItemChecked(position, true);
+        setTitle(mPlanetTitles[position]);
+        mDrawerLayout.closeDrawer(mDrawerList);
+        state.currentTab = position;
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        getSupportActionBar().setTitle(title);
+    }
+
 
     private void setupFragments() {
         info("Creating ListActivity");
@@ -483,10 +567,10 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox( activity, id, pref, def );
-        checkbox.setOnCheckedChangeListener( new OnCheckedChangeListener() {
+        checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                editor.putBoolean( pref, isChecked );
+            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+                editor.putBoolean(pref, isChecked);
                 editor.apply();
             }
         });
@@ -559,7 +643,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     @Override
     public void onPause() {
-        MainActivity.info( "MAIN: pause." );
+        MainActivity.info("MAIN: pause.");
         super.onPause();
 
         // deal with wake lock
@@ -591,6 +675,13 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
     public void onPostResume() {
         MainActivity.info("MAIN: post resume.");
         super.onPostResume();
@@ -601,6 +692,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         MainActivity.info( "MAIN: config changed" );
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -1365,6 +1457,12 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
         return false;
     }
 

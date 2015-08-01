@@ -266,4 +266,6 @@
     <string name="map_needs_playservice">Map requires Google Play Service</string>
     <string name="register">Register</string>
     <string name="at">at</string>
+    <string name="drawer_open">Drawer Open</string>
+    <string name="drawer_close">Drawer Close</string>
 </resources>

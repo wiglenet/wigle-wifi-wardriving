@@ -54,6 +54,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -135,9 +136,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
-    public static final String MAP_FRAGMENT_TAG = "MapFragmentTag";
-    public static final String DASH_FRAGMENT_TAG = "DashFragmentTag";
-    public static final String DATA_FRAGMENT_TAG = "DataFragmentTag";
 
     public static final int LIST_TAB_POS = 0;
     public static final int MAP_TAB_POS = 1;
@@ -201,7 +199,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             Editor edit = prefs.edit();
             edit.putFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
             edit.putFloat( ListFragment.PREF_DISTANCE_PREV_RUN, prevRun );
-            edit.commit();
+            edit.apply();
         }
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -225,21 +223,21 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         if ( state.numberFormat0 == null ) {
             state.numberFormat0 = NumberFormat.getNumberInstance( Locale.US );
             if ( state.numberFormat0 instanceof DecimalFormat ) {
-                ((DecimalFormat) state.numberFormat0).setMaximumFractionDigits( 0 );
+                state.numberFormat0.setMaximumFractionDigits(0);
             }
         }
 
         if ( state.numberFormat1 == null ) {
             state.numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
             if ( state.numberFormat1 instanceof DecimalFormat ) {
-                ((DecimalFormat) state.numberFormat1).setMaximumFractionDigits( 1 );
+                state.numberFormat1.setMaximumFractionDigits(1);
             }
         }
 
         if ( state.numberFormat8 == null ) {
             state.numberFormat8 = NumberFormat.getNumberInstance( Locale.US );
             if ( state.numberFormat8 instanceof DecimalFormat ) {
-                ((DecimalFormat) state.numberFormat8).setMaximumFractionDigits( 8 );
+                state.numberFormat8.setMaximumFractionDigits(8);
             }
         }
 
@@ -356,10 +354,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     static boolean isScreenLocked( Fragment fragment ) {
         final MainActivity main = getMainActivity(fragment);
-        if ( main != null ) {
-            return main.getState().screenLocked;
-        }
-        return false;
+        return main != null && main.getState().screenLocked;
     }
 
     @SuppressLint("Wakelock")
@@ -389,6 +384,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             return frag;
         }
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
@@ -424,7 +420,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
                         // guess it wasn't there anyways
                         MainActivity.info( "exception handling fragment alert dialog: " + ex, ex );
                     }
-                    return;
                 } });
 
             // cancel
@@ -438,7 +433,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
                         // guess it wasn't there anyways
                         MainActivity.info( "exception dismissing fragment alert dialog: " + ex, ex );
                     }
-                    return;
                 } });
 
             return ad;
@@ -479,9 +473,9 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     public static CheckBox prefSetCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
-        final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final CheckBox checkbox = (CheckBox) activity.findViewById( id );
-        checkbox.setChecked( prefs.getBoolean( pref, def ) );
+        checkbox.setChecked(prefs.getBoolean(pref, def));
         return checkbox;
     }
 
@@ -493,14 +487,14 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             @Override
             public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
                 editor.putBoolean( pref, isChecked );
-                editor.commit();
+                editor.apply();
             }
         });
 
         return checkbox;
     }
 
-    public static State getState( Fragment fragment ) {
+    public static State getState( @SuppressWarnings("UnusedParameters") Fragment fragment ) {
         return getMainActivity().getState();
     }
 
@@ -537,7 +531,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "MAIN: destroy." );
+        MainActivity.info("MAIN: destroy.");
         super.onDestroy();
 
         try {
@@ -598,15 +592,15 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     @Override
     public void onPostResume() {
-        MainActivity.info( "MAIN: post resume." );
+        MainActivity.info("MAIN: post resume.");
         super.onPostResume();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
         MainActivity.info( "MAIN: config changed" );
-        setLocale( this, newConfig );
-        super.onConfigurationChanged( newConfig );
+        setLocale(this, newConfig);
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -708,7 +702,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         sound.setOnErrorListener( new OnErrorListener() {
             @Override
             public boolean onError( final MediaPlayer mp, final int what, final int extra ) {
-                String whatString = null;
+                String whatString;
                 switch ( what ) {
                     case MediaPlayer.MEDIA_ERROR_UNKNOWN:
                         whatString = "error unknown";
@@ -743,6 +737,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         if ( hasSD ) {
             final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
             final File path = new File( filepath );
+            //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             openString = filepath + name;
         }
@@ -753,7 +748,9 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         if ( ! f.exists() ) {
             info( "causing " + MainActivity.safeFilePath( f ) + " to be made" );
             // make it happen:
-            f.createNewFile();
+            if (!f.createNewFile()) {
+                throw new IOException("Could not create file: " + openString);
+            }
 
             InputStream is = null;
             FileOutputStream fos = null;
@@ -767,7 +764,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
                 }
 
                 final byte[] buff = new byte[ 1024 ];
-                int rv = -1;
+                int rv;
                 while( ( rv = is.read( buff ) ) > -1 ) {
                     fos.write( buff, 0, rv );
                 }
@@ -825,13 +822,13 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     public boolean isMuted() {
+        //noinspection SimplifiableIfStatement
         if ( state.phoneState != null && state.phoneState.isPhoneActive() ) {
             // always be quiet when the phone is active
             return true;
         }
-        boolean retval = getSharedPreferences(ListFragment.SHARED_PREFS, 0).getBoolean(ListFragment.PREF_MUTED, false);
-        // info( "ismuted: " + retval );
-        return retval;
+        return getSharedPreferences(ListFragment.SHARED_PREFS, 0)
+                .getBoolean(ListFragment.PREF_MUTED, false);
     }
 
     public static void sleep( final long sleep ) {
@@ -843,20 +840,20 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         }
     }
     public static void info( final String value ) {
-        Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+        Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
     public static void warn( final String value ) {
-        Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+        Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
     public static void error( final String value ) {
-        Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value );
+        Log.e(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
 
     public static void info( final String value, final Throwable t ) {
-        Log.i( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
+        Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
     }
     public static void warn( final String value, final Throwable t ) {
-        Log.w( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
+        Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
     }
     public static void error( final String value, final Throwable t ) {
         Log.e( LOG_TAG, Thread.currentThread().getName() + "] " + value, t );
@@ -912,12 +909,15 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             error( error, throwable );
             if ( hasSD() ) {
                 File file = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
+                //noinspection ResultOfMethodCallIgnored
                 file.mkdirs();
                 file = new File(MainActivity.safeFilePath( Environment.getExternalStorageDirectory() )
                         + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt" );
                 error( "Writing stackfile to: " + MainActivity.safeFilePath( file ) + "/" + file.getName() );
                 if ( ! file.exists() ) {
-                    file.createNewFile();
+                    if (!file.createNewFile()) {
+                        throw new IOException("Cannot create file: " + file);
+                    }
                 }
                 final FileOutputStream fos = new FileOutputStream( file );
 
@@ -960,7 +960,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
                     error( "error getting data for error: " + er, er );
                 }
 
-                fos.write( (error + "\n\n").getBytes( ENCODING ) );
+                fos.write((error + "\n\n").getBytes(ENCODING));
                 throwable.printStackTrace( new PrintStream( fos ) );
                 fos.close();
             }
@@ -973,7 +973,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     public static boolean hasSD() {
         File sdCard = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/" );
-        return sdCard != null && sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
+        return sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }
 
     private void setupSound() {
@@ -1018,10 +1018,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     public boolean inEmulator() {
         return state.inEmulator;
-    }
-
-    public DatabaseHelper getDBHelper() {
-        return state.dbHelper;
     }
 
     public BatteryLevelReceiver getBatteryLevelReceiver() {
@@ -1120,7 +1116,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         else {
             edit.putBoolean( ListFragment.PREF_WIFI_WAS_OFF, false );
         }
-        edit.commit();
+        edit.apply();
 
         if ( state.wifiReceiver == null ) {
             MainActivity.info( "new wifiReceiver");
@@ -1310,8 +1306,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
     public long getLocationSetPeriod() {
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final long prefPeriod = prefs.getLong(ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
-        long setPeriod = prefPeriod;
+        long setPeriod = prefs.getLong(ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
         if (setPeriod == 0 ){
             setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), MainActivity.LOCATION_UPDATE_INTERVAL);
         }

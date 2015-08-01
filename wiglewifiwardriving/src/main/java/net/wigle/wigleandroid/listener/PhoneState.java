@@ -3,7 +3,6 @@ package net.wigle.wigleandroid.listener;
 import net.wigle.wigleandroid.MainActivity;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
-import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
@@ -11,7 +10,6 @@ import android.telephony.gsm.GsmCellLocation;
 public class PhoneState extends PhoneStateListener {
     private boolean isPhoneActive = false;
     protected int strength = 0;
-    private ServiceState serviceState;
 
     @Override
     public void onCallStateChanged( int state, String incomingNumber ) {
@@ -31,12 +29,6 @@ public class PhoneState extends PhoneStateListener {
     }
 
     @Override
-    public void onServiceStateChanged(ServiceState serviceState) {
-        // MainActivity.info("serviceState: " + serviceState);
-        this.serviceState = serviceState;
-    }
-
-    @Override
     public void onSignalStrengthsChanged (SignalStrength signalStrength) {
         // ListActivity.info("signalStrength: " + signalStrength);
         if (signalStrength.isGsm()) {
@@ -45,11 +37,6 @@ public class PhoneState extends PhoneStateListener {
         else {
             strength = signalStrength.getCdmaDbm();
         }
-    }
-
-    @Override
-    public void onSignalStrengthChanged(final int asu) {
-        // do nothing
     }
 
     @Override
@@ -70,9 +57,5 @@ public class PhoneState extends PhoneStateListener {
 
     public int getStrength() {
         return strength;
-    }
-
-    public ServiceState getServiceState() {
-        return serviceState;
     }
 }

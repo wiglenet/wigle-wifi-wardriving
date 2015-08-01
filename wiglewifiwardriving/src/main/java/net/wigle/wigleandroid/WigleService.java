@@ -129,6 +129,7 @@ public final class WigleService extends Service {
     //This is the old onStart method that will be called on the pre-2.0
     //platform.  On 2.0 or later we override onStartCommand() so this
     //method will not be called.
+    @SuppressWarnings("deprecation")
     @Override
     public void onStart( Intent intent, int startId ) {
         MainActivity.info( "service: onStart" );
@@ -141,8 +142,7 @@ public final class WigleService extends Service {
         handleCommand( intent );
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
-        final int START_STICKY = 1;
-        return START_STICKY;
+        return 1;
     }
 
     private void handleCommand( Intent intent ) {
@@ -200,6 +200,7 @@ public final class WigleService extends Service {
     }
 
     void invokeMethod(Method method, Object[] args) {
+        //noinspection TryWithIdenticalCatches
         try {
             method.invoke(this, args);
         } catch (InvocationTargetException e) {
@@ -218,7 +219,7 @@ public final class WigleService extends Service {
     private void startForegroundCompat(int id, Notification notification) {
         // If we have the new startForeground API, then use it.
         if (mStartForeground != null) {
-            mStartForegroundArgs[0] = Integer.valueOf(id);
+            mStartForegroundArgs[0] = id;
             mStartForegroundArgs[1] = notification;
             invokeMethod(mStartForeground, mStartForegroundArgs);
             return;

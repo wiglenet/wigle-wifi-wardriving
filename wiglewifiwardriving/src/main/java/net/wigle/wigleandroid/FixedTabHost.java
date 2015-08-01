@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.widget.TabHost;
 
@@ -23,7 +24,7 @@ public class FixedTabHost extends TabHost {
     }
 
     @Override
-    protected void dispatchDraw(Canvas canvas) {
+    protected void dispatchDraw(@NonNull Canvas canvas) {
         // API LEVEL <7 occasionally throws a NPE here
         try {
             super.dispatchDraw(canvas);

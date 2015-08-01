@@ -8,13 +8,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class QueryThread extends Thread {
-    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<Request>();
+    private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
     private final AtomicBoolean done = new AtomicBoolean( false );
     private final DatabaseHelper dbHelper;
 
     public interface ResultHandler {
-        public boolean handleRow( Cursor cursor );
-        public void complete();
+        boolean handleRow( Cursor cursor );
+        void complete();
     }
     public static class Request {
         private final String sql;

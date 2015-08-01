@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -43,12 +44,12 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
 
     public static SimpleDateFormat getConstructionTimeFormater( final Context context ) {
         final int value = Settings.System.getInt(context.getContentResolver(), Settings.System.TIME_12_24, -1);
-        SimpleDateFormat format = null;
+        SimpleDateFormat format;
         if ( value == 24 ) {
-            format = new SimpleDateFormat("H:mm:ss");
+            format = new SimpleDateFormat("H:mm:ss", Locale.getDefault());
         }
         else {
-            format = new SimpleDateFormat("h:mm:ss a");
+            format = new SimpleDateFormat("h:mm:ss a", Locale.getDefault());
         }
         return format;
     }
@@ -65,7 +66,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
             row = convertView;
         }
 
-        Network network = null;
+        Network network;
         try {
             network = getItem(position);
         }
@@ -125,7 +126,7 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     }
 
     public static int getImage( final Network network ) {
-        int resource = 0;
+        int resource;
         if ( network.getType().equals(NetworkType.WIFI) ) {
             switch ( network.getCrypto() ) {
                 case Network.CRYPTO_WEP:

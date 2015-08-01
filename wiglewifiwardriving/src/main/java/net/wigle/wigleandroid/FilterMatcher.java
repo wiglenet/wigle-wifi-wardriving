@@ -17,7 +17,7 @@ public final class FilterMatcher {
     public static Matcher getFilterMatcher( final SharedPreferences prefs, final String prefix ) {
         final String regex = prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "" );
         Matcher matcher = null;
-        if ( isFilterOn( prefs, prefix ) && ! "".equals(regex) ) {
+        if ( isFilterOn( prefs, prefix ) && regex != null && ! "".equals(regex) ) {
             try {
                 Pattern pattern = Pattern.compile( regex, Pattern.CASE_INSENSITIVE );
                 matcher = pattern.matcher( "" );
@@ -36,8 +36,6 @@ public final class FilterMatcher {
         if ( ! isFilterOn( prefs, prefix ) ) {
             return true;
         }
-
-        boolean retval = true;
 
         if ( matcher != null ) {
             matcher.reset(network.getSsid());
@@ -72,13 +70,11 @@ public final class FilterMatcher {
                     MainActivity.error( "unhandled crypto: " + network );
             }
         }
-        else {
-            if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_CELL, true ) ) {
-                return false;
-            }
+        else if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_CELL, true)) {
+            return false;
         }
 
-        return retval;
+        return true;
     }
 
 }

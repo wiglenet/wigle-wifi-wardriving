@@ -9,8 +9,8 @@ import net.wigle.wigleandroid.MainActivity;
 public final class SsidSpeaker {
     private static final String EMPTY = "";
 
-    private final ConcurrentLinkedHashMap<String,String> recentSsids = new ConcurrentLinkedHashMap<String,String>(128);
-    private final List<String> toSay = new ArrayList<String>();
+    private final ConcurrentLinkedHashMap<String,String> recentSsids = new ConcurrentLinkedHashMap<>(128);
+    private final List<String> toSay = new ArrayList<>();
     private MainActivity mainActivity;
 
     public SsidSpeaker( final MainActivity listActivity ) {

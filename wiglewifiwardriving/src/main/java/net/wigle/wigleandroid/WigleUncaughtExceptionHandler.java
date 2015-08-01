@@ -17,6 +17,7 @@ public class WigleUncaughtExceptionHandler implements Thread.UncaughtExceptionHa
         // set up pending email intent to email stacktrace logs if needed
         final Intent errorReportIntent = new Intent( this.applicationContext, ErrorReportActivity.class );
         errorReportIntent.putExtra( MainActivity.ERROR_REPORT_DO_EMAIL, true );
+        //noinspection ResourceType
         pendingIntent = PendingIntent.getActivity( this.applicationContext, 0,
                 errorReportIntent, errorReportIntent.getFlags() );
     }

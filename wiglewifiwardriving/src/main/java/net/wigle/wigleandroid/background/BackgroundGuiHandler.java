@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -120,6 +121,7 @@ public class BackgroundGuiHandler extends Handler {
         }
 
         @Override
+        @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final FragmentActivity activity = getActivity();
             final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
@@ -129,7 +131,7 @@ public class BackgroundGuiHandler extends Handler {
             final int message = bundle.getInt("message");
             final int status = bundle.getInt("status");
 
-            String filename = "";
+            String filename;
 
             String filepath = bundle.getString( FILEPATH );
             filepath = filepath == null ? "" : filepath + "\n";
@@ -179,8 +181,6 @@ public class BackgroundGuiHandler extends Handler {
                             MainActivity.info("failed to start settings activity: " + ex, ex);
                         }
                     }
-
-                    return;
                 } });
 
             return ad;

@@ -53,7 +53,7 @@ public class GPSListener implements Listener, LocationListener {
             // listActivity.setLocationUpdates();
         }
         // MainActivity.info("GPS event: " + event);
-        updateLocationData( (Location) null );
+        updateLocationData(null);
     }
 
     public void handleScanStop() {
@@ -133,6 +133,7 @@ public class GPSListener implements Listener, LocationListener {
         if ( ! locOK ) {
             if ( newOK ) {
                 wasProviderChange = true;
+                //noinspection RedundantIfStatement
                 if ( location != null && ! location.getProvider().equals( newLocation.getProvider() ) ) {
                     wasProviderChange = false;
                 }
@@ -193,7 +194,6 @@ public class GPSListener implements Listener, LocationListener {
         if ( wasProviderChange ) {
             MainActivity.info( "wasProviderChange: satCount: " + satCount
                     + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
-                    + " wasProviderChange: " + wasProviderChange
                     + (newOK ? " newProvider: " + newLocation.getProvider() : "")
                     + (locOK ? " locProvider: " + location.getProvider() : "")
                     + " newLocation: " + newLocation );
@@ -236,6 +236,7 @@ public class GPSListener implements Listener, LocationListener {
         boolean retval = false;
         final long now = System.currentTimeMillis();
 
+        //noinspection StatementWithEmptyBody
         if ( location == null ) {
             // bad!
         }
@@ -265,9 +266,8 @@ public class GPSListener implements Listener, LocationListener {
 
     private boolean horribleGps(final Location location) {
         // try to protect against some horrible gps's out there
-        boolean horrible = false;
         // check if accuracy is under 10 miles
-        horrible |= location.hasAccuracy() && location.getAccuracy() > 16000;
+        boolean horrible = location.hasAccuracy() && location.getAccuracy() > 16000;
         horrible |= location.getLatitude() < -90 || location.getLatitude() > 90;
         horrible |= location.getLongitude() < -180 || location.getLongitude() > 180;
         return horrible;
@@ -293,7 +293,7 @@ public class GPSListener implements Listener, LocationListener {
             // there is no putDouble
             edit.putFloat( ListFragment.PREF_PREV_LAT, (float) location.getLatitude() );
             edit.putFloat( ListFragment.PREF_PREV_LON, (float) location.getLongitude() );
-            edit.commit();
+            edit.apply();
         }
     }
 

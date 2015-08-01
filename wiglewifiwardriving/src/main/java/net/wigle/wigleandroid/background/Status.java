@@ -17,7 +17,7 @@ public enum Status {
 
     private final int title;
     private final int message;
-    private Status( final int title, final int message ) {
+    Status( final int title, final int message ) {
         this.title = title;
         this.message = message;
     }

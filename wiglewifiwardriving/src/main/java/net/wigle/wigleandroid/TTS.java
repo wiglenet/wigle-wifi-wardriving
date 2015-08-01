@@ -20,7 +20,7 @@ public final class TTS {
 
     // http://groups.google.com/group/tts-for-android/browse_thread/thread/a6db26ac63a5bbb3 "Using TTS Extended on Android 1.5"
     // we link against a copy of http://eyes-free.googlecode.com/svn/trunk/commonlibs/TTS_library_stub.jar
-  /* 
+  /*
      quote:
 
      I had great trouble, but finally got it working.
@@ -35,9 +35,9 @@ public final class TTS {
      not TextToSpeechBeta
      4.  To get the end-of-speech callbacks to work, you have to set the
      listener FIRST thing in your init listener -- no later.
-     
+
      These lessons were hard to discover and learn, and the documentation
-     could easily be improved to minimize the ramp-up time. 
+     could easily be improved to minimize the ramp-up time.
    */
 
     /** this had been a lovely interface/innerclass dance; but we do love us some hax
@@ -47,7 +47,7 @@ public final class TTS {
     /** hint on the 1.5 tts voice to use */
     private static String[] params = new String[]{"VOICE_FEMALE"};
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private static int QUEUE_FLUSH;
     private static int QUEUE_ADD;
     private static Method speak;
@@ -57,7 +57,6 @@ public final class TTS {
     private static Method getlanguage;
 
     private Object speech;
-    private Object listener;
 
     static {
         try {
@@ -92,18 +91,18 @@ public final class TTS {
 
                 if ( useEyesFree ) {
                     speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, String[].class );
-                    stop = SPEECH_CLASS.getMethod( "stop", new Class[]{} );
-                    shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
+                    stop = SPEECH_CLASS.getMethod( "stop");
+                    shutdown = SPEECH_CLASS.getMethod( "shutdown");
                     QUEUE_ADD = 1;
                     setlanguage = SPEECH_CLASS.getMethod( "setLanguage", String.class );
                 } else {
                     QUEUE_FLUSH = SPEECH_CLASS.getDeclaredField("QUEUE_FLUSH").getInt(null);
                     QUEUE_ADD = SPEECH_CLASS.getDeclaredField("QUEUE_ADD").getInt(null);
                     speak = SPEECH_CLASS.getMethod( "speak", String.class, int.class, HashMap.class );
-                    stop = SPEECH_CLASS.getMethod( "stop", new Class[]{} );
-                    shutdown = SPEECH_CLASS.getMethod( "shutdown", new Class[]{} );
+                    stop = SPEECH_CLASS.getMethod( "stop");
+                    shutdown = SPEECH_CLASS.getMethod( "shutdown");
                     setlanguage = SPEECH_CLASS.getMethod( "setLanguage", Locale.class );
-                    getlanguage = SPEECH_CLASS.getMethod( "getLanguage", new Class[]{} );
+                    getlanguage = SPEECH_CLASS.getMethod( "getLanguage");
                 }
             }
             catch ( final NoSuchFieldException ex ) {
@@ -139,15 +138,15 @@ public final class TTS {
                     return null;
                 }
             };
-            listener = Proxy.newProxyInstance( LISTENER_CLASS.getClassLoader(),
-                    new Class[]{ LISTENER_CLASS }, handler );
+            Object listener = Proxy.newProxyInstance(LISTENER_CLASS.getClassLoader(),
+                    new Class[]{LISTENER_CLASS}, handler);
 
             if ( useEyesFree ) {
                 speech = construct.newInstance( context, listener, true );
                 // hrm. do we need this?
                 // PreferenceManager.getDefaultSharedPreferences(context).edit().putInt("toggle_use_default_tts_settings",0).commit();
             } else {
-                speech = construct.newInstance( context, listener );
+                speech = construct.newInstance( context, listener);
             }
         }
         catch ( final NoSuchMethodException ex ) {
@@ -203,7 +202,7 @@ public final class TTS {
                 if ( useEyesFree ) {
                     speak.invoke( speech, string, QUEUE_ADD, params );
                 } else {
-                    speak.invoke( speech, string, QUEUE_ADD, (HashMap<String,String>) null );
+                    speak.invoke( speech, string, QUEUE_ADD, null);
                 }
             }
         }

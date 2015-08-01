@@ -18,7 +18,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,15 +39,17 @@ public class DBResultActivity extends ActionBarActivity {
     private NetworkListAdapter listAdapter;
     private MapView mapView;
     private MapRender mapRender;
-    private final List<Network> resultList = new ArrayList<Network>();
-    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<LatLng, Integer>();
+    private final List<Network> resultList = new ArrayList<>();
+    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>();
 
     @Override
     public void onCreate( final Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
 
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // set language
         MainActivity.setLocale( this );
@@ -74,7 +75,7 @@ public class DBResultActivity extends ActionBarActivity {
             setupQuery( queryArgs );
         }
         else {
-            tv.setText( getString(R.string.status_fail) + "...");
+            tv.setText(getString(R.string.status_fail) + "...");
         }
     }
 
@@ -167,7 +168,7 @@ public class DBResultActivity extends ActionBarActivity {
             sql += " LIMIT " + LIMIT;
         }
 
-        final TreeMap<Float,String> top = new TreeMap<Float,String>();
+        final TreeMap<Float,String> top = new TreeMap<>();
         final float[] results = new float[1];
         final long[] count = new long[1];
 
@@ -215,7 +216,7 @@ public class DBResultActivity extends ActionBarActivity {
                 handler.sendEmptyMessage( MSG_QUERY_DONE );
                 if ( mapView != null ) {
                     // force a redraw
-                    ((View) mapView).postInvalidate();
+                    mapView.postInvalidate();
                 }
             }
         });

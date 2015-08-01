@@ -56,10 +56,9 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     private Network network;
     private MapView mapView;
-    private SimpleDateFormat format;
     private int observations = 0;
     private boolean isDbResult = false;
-    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<LatLng, Integer>( 512 );
+    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
 
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
@@ -70,7 +69,9 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
         super.onCreate(savedInstanceState);
 
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // set language
         MainActivity.setLocale( this );
@@ -83,7 +84,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
         MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
         network = MainActivity.getNetworkCache().get(bssid);
-        format = NetworkListAdapter.getConstructionTimeFormater( this );
+        SimpleDateFormat format = NetworkListAdapter.getConstructionTimeFormater(this);
 
         TextView tv = (TextView) findViewById( R.id.bssid );
         tv.setText( bssid );
@@ -111,7 +112,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
             tv.setText( network.getType().name() );
 
             tv = (TextView) findViewById( R.id.na_firsttime );
-            tv.setText( NetworkListAdapter.getConstructionTime( format, network ) );
+            tv.setText( NetworkListAdapter.getConstructionTime(format, network ) );
 
             tv = (TextView) findViewById( R.id.na_chan );
             if ( ! NetworkType.WIFI.equals(network.getType()) ) {

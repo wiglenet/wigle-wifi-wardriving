@@ -24,7 +24,9 @@ public class SpeechActivity extends ActionBarActivity {
         super.onCreate( savedInstanceState );
 
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // set language
         MainActivity.setLocale( this );
@@ -65,7 +67,7 @@ public class SpeechActivity extends ActionBarActivity {
             public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
                 final Editor editor = prefs.edit();
                 editor.putBoolean( pref, isChecked );
-                editor.commit();
+                editor.apply();
             }
         });
     }

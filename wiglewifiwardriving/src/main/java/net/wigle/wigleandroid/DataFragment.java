@@ -15,6 +15,7 @@ import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -358,6 +359,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
                 return frag;
             }
 
+            @NonNull
             @Override
             public Dialog onCreateDialog(Bundle savedInstanceState) {
                 final FragmentActivity activity = getActivity();
@@ -379,7 +381,6 @@ public final class DataFragment extends Fragment implements FileUploaderListener
                             // guess it wasn't there anyways
                             MainActivity.info( "exception dismissing alert dialog: " + ex );
                         }
-                        return;
                     } });
 
                 return ad;

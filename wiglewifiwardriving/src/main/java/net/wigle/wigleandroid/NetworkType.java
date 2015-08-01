@@ -8,7 +8,7 @@ public enum NetworkType {
     GSM("G"),
     CDMA("C");
 
-    private static final Map<String,NetworkType> types = new HashMap<String,NetworkType>();
+    private static final Map<String,NetworkType> types = new HashMap<>();
 
     static {
         for( NetworkType type : NetworkType.values() ) {
@@ -17,7 +17,7 @@ public enum NetworkType {
     }
 
     private final String code;
-    private NetworkType(final String code) {
+    NetworkType(final String code) {
         this.code = code;
     }
 

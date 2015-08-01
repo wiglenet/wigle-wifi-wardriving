@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
@@ -106,7 +105,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     private void doRun() throws InterruptedException {
         final String username = getUsername();
         final String password = getPassword();
-        Status status = validateUserPass( username, password );
+        Status status = validateUserPass(username, password);
         final Bundle bundle = new Bundle();
         if ( status == null ) {
             status = doUpload( username, password, bundle );
@@ -122,18 +121,21 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
 
-        String openString = filename;
+
         final boolean hasSD = MainActivity.hasSD();
         File file = null;
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         if ( hasSD ) {
             final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
             final File path = new File( filepath );
+            //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
-            openString = filepath + filename;
+            String openString = filepath + filename;
             file = new File( openString );
-            if ( ! file.exists() && hasSD ) {
-                file.createNewFile();
+            if ( ! file.exists() ) {
+                if (!file.createNewFile()) {
+                    throw new IOException("Could not create file: " + openString);
+                }
             }
             bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
             bundle.putString( BackgroundGuiHandler.FILENAME, filename );
@@ -152,7 +154,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     private Status doUpload( final String username, final String password, final Bundle bundle )
             throws InterruptedException {
 
-        Status status = Status.UNKNOWN;
+        Status status;
 
         try {
             final Object[] fileFilename = new Object[2];
@@ -186,9 +188,10 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
             // send file
             final boolean hasSD = MainActivity.hasSD();
+            @SuppressWarnings("ConstantConditions")
             final FileInputStream fis = hasSD ? new FileInputStream( file )
                     : context.openFileInput( filename );
-            final Map<String,String> params = new HashMap<String,String>();
+            final Map<String,String> params = new HashMap<>();
 
             params.put("observer", username);
             params.put("password", password);
@@ -198,7 +201,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
             }
             final String response = HttpFileUploader.upload(
                     MainActivity.FILE_POST_URL, filename, "stumblefile", fis,
-                    params, context.getResources(), getHandler(), filesize, context );
+                    params, getHandler(), filesize );
 
             // as upload() is currently written: response can never be null. leave checks inplace anyhow. -uhtu
 
@@ -206,7 +209,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
                 if ( response != null && response.indexOf("donate=Y") > 0 ) {
                     final Editor editor = prefs.edit();
                     editor.putBoolean( ListFragment.PREF_DONATE, true );
-                    editor.commit();
+                    editor.apply();
                 }
             }
 
@@ -218,13 +221,13 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
                 editor.putLong( ListFragment.PREF_DB_MARKER, maxId );
                 editor.putLong( ListFragment.PREF_MAX_DB, maxId );
                 editor.putLong( ListFragment.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
-                editor.commit();
+                editor.apply();
             }
             else if ( response != null && response.indexOf("does not match login") > 0 ) {
                 status = Status.BAD_LOGIN;
             }
             else {
-                String error = null;
+                String error;
                 if ( response != null && response.trim().equals( "" ) ) {
                     error = "no response from server";
                 }
@@ -289,13 +292,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        //noinspection SimplifiableIfStatement
         if (wifi != null && wifi.isAvailable()) {
             return true;
         }
-        if (mobile != null && mobile.isAvailable()) {
-            return true;
-        }
-        return false;
+        return mobile != null && mobile.isAvailable();
     }
 
     public Status justWriteFile() {
@@ -354,6 +355,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         MainActivity.info( "Writing file starting with observation id: " + maxId);
         final Cursor cursor = dbHelper.locationIterator( maxId );
 
+        //noinspection TryFinallyCanBeTryWithResources
         try {
             return writeFileWithCursor( fos, bundle, countStats, cursor );
         }
@@ -436,7 +438,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
 
                 countStats.lineCount++;
                 String ssid = network.getSsid();
-                if ( ssid.indexOf( COMMA ) >= 0 ) {
+                if (ssid.contains(COMMA)) {
                     // comma isn't a legal ssid character, but just in case
                     ssid = ssid.replaceAll( COMMA, "_" );
                 }
@@ -531,7 +533,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         return maxId;
     }
 
-    public static void writeFos( final OutputStream fos, final String data ) throws IOException, UnsupportedEncodingException {
+    public static void writeFos( final OutputStream fos, final String data ) throws IOException {
         if ( data != null ) {
             fos.write( data.getBytes( MainActivity.ENCODING ) );
         }

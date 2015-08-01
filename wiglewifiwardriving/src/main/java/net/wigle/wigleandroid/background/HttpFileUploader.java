@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import net.wigle.wigleandroid.MainActivity;
-import android.content.Context;
-import android.content.res.Resources;
 import android.os.Handler;
 
 /**
@@ -37,9 +35,9 @@ final class HttpFileUploader {
     private HttpFileUploader(){
     }
 
-    public static HttpURLConnection connect(String urlString, final Resources res,
-                                            final boolean setBoundary) throws IOException {
-        URL connectURL = null;
+    public static HttpURLConnection connect(String urlString, final boolean setBoundary)
+            throws IOException {
+        URL connectURL;
         try{
             connectURL = new URL( urlString );
         }
@@ -48,10 +46,10 @@ final class HttpFileUploader {
             return null;
         }
 
-        return createConnection(connectURL, res, setBoundary);
+        return createConnection(connectURL, setBoundary);
     }
 
-    private static HttpURLConnection createConnection(final URL connectURL, final Resources res,
+    private static HttpURLConnection createConnection(final URL connectURL,
                                                       final boolean setBoundary) throws IOException {
 
         String javaVersion = "unknown";
@@ -64,7 +62,7 @@ final class HttpFileUploader {
                     System.getProperty("os.name") + " " +
                     System.getProperty("os.version") +
                     " [" + System.getProperty("os.arch") + "]";
-        } catch (RuntimeException e) { }
+        } catch (RuntimeException ignored) { }
         final String userAgent = "WigleWifi ("+javaVersion+")";
 
         // Open a HTTP connection to the URL
@@ -112,21 +110,23 @@ final class HttpFileUploader {
      * @param fileParamName the HTML form field name for the file
      * @param fileInputStream an open file stream to the file to post
      * @param params form data fields (key and value)
-     * @param res the app resources (needed for looking up SSL cert)
      * @param handler if non-null gets empty messages with updates on progress
      * @param filesize guess at filesize for UI callbacks
      */
     public static String upload( final String urlString, final String filename, final String fileParamName,
                                  final FileInputStream fileInputStream, final Map<String,String> params,
-                                 final Resources res, final Handler handler, final long filesize,
-                                 final Context context ) throws IOException {
+                                 final Handler handler, final long filesize)
+                                throws IOException {
 
         String retval = null;
         HttpURLConnection conn = null;
 
         try {
             final boolean setBoundary = true;
-            conn = connect( urlString, res, setBoundary);
+            conn = connect(urlString, setBoundary);
+            if (conn == null) {
+                throw new IOException("No connection for: " + urlString);
+            }
             OutputStream connOutputStream = conn.getOutputStream();
 
             // reflect out the chunking info
@@ -153,15 +153,16 @@ final class HttpFileUploader {
             StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
             for ( Map.Entry<String, String> entry : params.entrySet() ) {
                 header.append( TWO_HYPHENS ).append( BOUNDARY ).append( LINE_END );
-                header.append( "Content-Disposition: form-data; name=\""+ entry.getKey() + "\"" + LINE_END );
+                header.append("Content-Disposition: form-data; name=\"")
+                        .append(entry.getKey()).append("\"").append(LINE_END);
                 header.append( LINE_END );
                 header.append( entry.getValue() );
                 header.append( LINE_END );
             }
 
             header.append( TWO_HYPHENS + BOUNDARY + LINE_END );
-            header.append( "Content-Disposition: form-data; name=\"" + fileParamName
-                    + "\";filename=\"" + filename +"\"" + LINE_END );
+            header.append("Content-Disposition: form-data; name=\"").append(fileParamName)
+                    .append("\";filename=\"").append(filename).append("\"").append(LINE_END);
             header.append( "Content-Type: application/octet_stream" + LINE_END );
             header.append( LINE_END );
 

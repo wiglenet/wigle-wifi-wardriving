@@ -142,10 +142,10 @@ public final class MappingFragment extends Fragment {
         // view
         final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
 
-        if ( mapView instanceof View ) {
+        if (mapView != null) {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            ((View) mapView).setLayoutParams(params);
+            mapView.setLayoutParams(params);
         }
 
         // conditionally replace the tile source
@@ -255,8 +255,8 @@ public final class MappingFragment extends Fragment {
                             || previousLocation.getLongitude() != location.getLongitude()
                             || previousRunNets != ListFragment.lameStatic.runNets) {
                         // location or nets have changed, update the view
-                        if ( mapView instanceof View ) {
-                            ((View) mapView).postInvalidate();
+                        if (mapView != null) {
+                            mapView.postInvalidate();
                         }
                     }
                     // set if location isn't null
@@ -267,12 +267,14 @@ public final class MappingFragment extends Fragment {
 
                 final View view = getView();
 
-                TextView tv = (TextView) view.findViewById( R.id.stats_run );
-                tv.setText( getString(R.string.run) + ": " + ListFragment.lameStatic.runNets );
-                tv = (TextView) view.findViewById( R.id.stats_new );
-                tv.setText( getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets );
-                tv = (TextView) view.findViewById( R.id.stats_dbnets );
-                tv.setText( getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets );
+                if (view != null) {
+                    TextView tv = (TextView) view.findViewById(R.id.stats_run);
+                    tv.setText(getString(R.string.run) + ": " + ListFragment.lameStatic.runNets);
+                    tv = (TextView) view.findViewById(R.id.stats_new);
+                    tv.setText(getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets);
+                    tv = (TextView) view.findViewById(R.id.stats_dbnets);
+                    tv.setText(getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets);
+                }
 
                 final long period = 1000L;
                 // info("wifitimer: " + period );
@@ -282,7 +284,7 @@ public final class MappingFragment extends Fragment {
                 MainActivity.info( "finishing mapping timer" );
             }
         }
-    };
+    }
 
     private void setupTimer() {
         timer.removeCallbacks( mUpdateTimeTask );
@@ -305,7 +307,7 @@ public final class MappingFragment extends Fragment {
             final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final Editor edit = prefs.edit();
             edit.putFloat( ListFragment.PREF_PREV_ZOOM, getMap().getCameraPosition().zoom );
-            edit.commit();
+            edit.apply();
 
             // save center
             state.oldCenter = getMap().getCameraPosition().target;
@@ -378,7 +380,7 @@ public final class MappingFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
         MainActivity.info( "MAP: onCreateOptionsMenu" );
-        MenuItem item = null;
+        MenuItem item;
         final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
         final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
@@ -444,19 +446,19 @@ public final class MappingFragment extends Fragment {
                 return true;
             }
             case MENU_ZOOM_IN: {
-                float zoom = getMap().getCameraPosition().zoom;
-                zoom++;
-                final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
                 if (getMap() != null) {
+                    float zoom = getMap().getCameraPosition().zoom;
+                    zoom++;
+                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
                     getMap().animateCamera(zoomUpdate);
                 }
                 return true;
             }
             case MENU_ZOOM_OUT: {
-                float zoom = getMap().getCameraPosition().zoom;
-                zoom--;
-                final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
                 if (getMap() != null) {
+                    float zoom = getMap().getCameraPosition().zoom;
+                    zoom--;
+                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
                     getMap().animateCamera(zoomUpdate);
                 }
                 return true;
@@ -471,7 +473,7 @@ public final class MappingFragment extends Fragment {
                 final boolean showNewDBOnly = ! prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
                 Editor edit = prefs.edit();
                 edit.putBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, showNewDBOnly );
-                edit.commit();
+                edit.apply();
 
                 String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
                 item.setTitle( name );
@@ -484,7 +486,7 @@ public final class MappingFragment extends Fragment {
                 final boolean showLabel = ! prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
                 Editor edit = prefs.edit();
                 edit.putBoolean( ListFragment.PREF_MAP_LABEL, showLabel );
-                edit.commit();
+                edit.apply();
 
                 String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
                 item.setTitle( name );
@@ -498,7 +500,7 @@ public final class MappingFragment extends Fragment {
                 final boolean showCluster = ! prefs.getBoolean( ListFragment.PREF_MAP_CLUSTER, true );
                 Editor edit = prefs.edit();
                 edit.putBoolean( ListFragment.PREF_MAP_CLUSTER, showCluster );
-                edit.commit();
+                edit.apply();
 
                 String name = showCluster ? getString(R.string.menu_cluster_off) : getString(R.string.menu_cluster_on);
                 item.setTitle( name );
@@ -512,7 +514,7 @@ public final class MappingFragment extends Fragment {
                 final boolean showTraffic = ! prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
                 Editor edit = prefs.edit();
                 edit.putBoolean( ListFragment.PREF_MAP_TRAFFIC, showTraffic );
-                edit.commit();
+                edit.apply();
 
                 String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
                 item.setTitle( name );
@@ -556,7 +558,7 @@ public final class MappingFragment extends Fragment {
                     }
                     Editor edit = prefs.edit();
                     edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
-                    edit.commit();
+                    edit.apply();
                     getMap().setMapType(newMapType);
                 }
             }
@@ -630,7 +632,7 @@ public final class MappingFragment extends Fragment {
                         editor.putBoolean( prefix + ListFragment.PREF_MAPF_WPA, wpa.isChecked() );
                         editor.putBoolean( prefix + ListFragment.PREF_MAPF_CELL, cell.isChecked() );
                         editor.putBoolean( prefix + ListFragment.PREF_MAPF_ENABLED, enabled.isChecked() );
-                        editor.commit();
+                        editor.apply();
                         MainActivity.reclusterMap();
 
                         dialog.dismiss();
@@ -719,7 +721,7 @@ public final class MappingFragment extends Fragment {
             public void complete() {
                 if ( mapView != null ) {
                     // force a redraw
-                    ((View) mapView).postInvalidate();
+                    mapView.postInvalidate();
                 }
             }
         });

@@ -41,7 +41,7 @@ public final class Network implements ClusterItem {
 
     private static final Map<Integer,Integer> freqToChan;
     static {
-        Map<Integer,Integer> freqToChanTemp = new HashMap<Integer,Integer>();
+        Map<Integer,Integer> freqToChanTemp = new HashMap<>();
         for ( int i = 237; i <= 255; i++ ) {
             freqToChanTemp.put( 2312 + 5 * (i - 237), i );
         }
@@ -121,10 +121,10 @@ public final class Network implements ClusterItem {
             this.showCapabilities = null;
         }
 
-        if ( this.capabilities.indexOf( WPA_CAP ) >= 0 ) {
+        if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
         }
-        else if ( this.capabilities.indexOf( WEP_CAP ) >= 0 ) {
+        else if (this.capabilities.contains(WEP_CAP)) {
             crypto = CRYPTO_WEP;
         }
         else {

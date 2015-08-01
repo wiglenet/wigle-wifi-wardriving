@@ -34,7 +34,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
             final String password = getPassword();
             status = validateUserPass( username, password );
             if ( status == null ) {
-                status = doDownload( username, password, bundle );
+                status = doDownload( username, password );
             }
 
         }
@@ -61,12 +61,15 @@ public class HttpDownloader extends AbstractBackgroundTask {
         sendBundledMessage( status.ordinal(), bundle );
     }
 
-    private Status doDownload( final String username, final String password, final Bundle bundle )
+    private Status doDownload( final String username, final String password)
             throws IOException, InterruptedException {
 
         final boolean setBoundary = false;
-        HttpURLConnection conn = HttpFileUploader.connect(
-                MainActivity.OBSERVED_URL, context.getResources(), setBoundary );
+        final HttpURLConnection conn = HttpFileUploader.connect(
+                MainActivity.OBSERVED_URL, setBoundary );
+        if (conn == null) {
+            throw new IOException("No connection created");
+        }
 
         // Send POST output.
         final DataOutputStream printout = new DataOutputStream (conn.getOutputStream ());
@@ -96,7 +99,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
     private void insertObserved( final BufferedReader reader )
             throws IOException, InterruptedException {
         final Bundle bundle = new Bundle();
-        String line = null;
+        String line;
         int lineCount = 0;
         int totalCount = -1;
         final String COUNT_TAG = "count=";

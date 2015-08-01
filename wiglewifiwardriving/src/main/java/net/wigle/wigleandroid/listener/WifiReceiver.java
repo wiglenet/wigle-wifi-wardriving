@@ -59,7 +59,7 @@ public class WifiReceiver extends BroadcastReceiver {
     private int pendingCellCount = 0;
     private final long constructionTime = System.currentTimeMillis();
     private long previousTalkTime = System.currentTimeMillis();
-    private final Set<String> runNetworks = new HashSet<String>();
+    private final Set<String> runNetworks = new HashSet<>();
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
@@ -115,7 +115,7 @@ public class WifiReceiver extends BroadcastReceiver {
         timeFormat = new SimpleDateFormat( "h mm aa", Locale.US );
         numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
         if ( numberFormat1 instanceof DecimalFormat ) {
-            ((DecimalFormat) numberFormat1).setMaximumFractionDigits( 1 );
+            numberFormat1.setMaximumFractionDigits(1);
         }
     }
 
@@ -132,6 +132,7 @@ public class WifiReceiver extends BroadcastReceiver {
         return runNetworks.size();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onReceive( final Context context, final Intent intent ) {
         scanInFlight = false;
@@ -420,7 +421,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );
                     edit.putFloat( ListFragment.PREF_DISTANCE_TOTAL,
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
-                    edit.commit();
+                    edit.apply();
                 }
             }
 
@@ -501,6 +502,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 // bug in Archos7 can NPE there, just ignore
             }
 
+            //noinspection StatementWithEmptyBody
             if ( cellLocation == null ) {
                 // ignore
             }
@@ -577,7 +579,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     private int gsmRssiMagicDecoderRing( int strength ) {
-        int retval = -113;
+        int retval;
         if ( strength == 99 ) {
             // unknown
             retval = -113;
@@ -594,26 +596,31 @@ public class WifiReceiver extends BroadcastReceiver {
         StringBuilder builder = new StringBuilder();
 
         if ( mainActivity.getGPSListener().getLocation() == null && prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true ) ) {
-            builder.append( mainActivity.getString(R.string.tts_no_gps_fix) + ", " );
+            builder.append(mainActivity.getString(R.string.tts_no_gps_fix)).append(", ");
         }
 
         // run, new, queue, miles, time, battery
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_RUN, true ) ) {
-            builder.append( mainActivity.getString(R.string.run) + " " ).append( runNetworks.size() ).append( ", " );
+            builder.append(mainActivity.getString(R.string.run)).append(" ")
+                    .append(runNetworks.size()).append( ", " );
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_NEW_WIFI, true ) ) {
-            builder.append( mainActivity.getString(R.string.tts_new_wifi) + " " ).append( newWifiCount ).append( ", " );
+            builder.append(mainActivity.getString(R.string.tts_new_wifi)).append(" ")
+                    .append(newWifiCount).append( ", " );
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_NEW_CELL, true ) ) {
-            builder.append( mainActivity.getString(R.string.tts_new_cell) + " " ).append( newCellCount ).append( ", " );
+            builder.append(mainActivity.getString(R.string.tts_new_cell)).append(" ")
+                    .append(newCellCount).append( ", " );
         }
         if ( preQueueSize > 0 && prefs.getBoolean( ListFragment.PREF_SPEAK_QUEUE, true ) ) {
-            builder.append( mainActivity.getString(R.string.tts_queue) + " " ).append( preQueueSize ).append( ", " );
+            builder.append(mainActivity.getString(R.string.tts_queue)).append(" ")
+                    .append(preQueueSize).append( ", " );
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_MILES, true ) ) {
             final float dist = prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
             final String distString = DashboardFragment.metersToString( numberFormat1, mainActivity, dist, false );
-            builder.append( mainActivity.getString(R.string.tts_from) + " " ).append( distString ).append( ", " );
+            builder.append(mainActivity.getString(R.string.tts_from)).append(" ")
+                    .append(distString).append( ", " );
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_TIME, true ) ) {
             String time = timeFormat.format( new Date() );
@@ -624,8 +631,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
         if ( batteryLevel >= 0 && prefs.getBoolean( ListFragment.PREF_SPEAK_BATTERY, true ) ) {
-            builder.append( mainActivity.getString(R.string.tts_battery) + " " ).append( batteryLevel )
-                    .append( " " + mainActivity.getString(R.string.tts_percent) + ", " );
+            builder.append(mainActivity.getString(R.string.tts_battery)).append(" ").append(batteryLevel).append(" ").append(mainActivity.getString(R.string.tts_percent)).append(", ");
         }
 
         final String speak = builder.toString();
@@ -712,7 +718,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * only call this from a Handler
-     * @return
+     * @return true if startScan success
      */
     private boolean doWifiScan() {
         // MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);

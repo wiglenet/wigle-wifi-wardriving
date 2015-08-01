@@ -199,7 +199,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         this.isDbResult = isDbResult;
         prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         ssidMatcher = FilterMatcher.getFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
-        mClusterManager = new ClusterManager<Network>(context, map);
+        mClusterManager = new ClusterManager<>(context, map);
         networkRenderer = new NetworkRenderer(context, map, mClusterManager);
         mClusterManager.setRenderer(networkRenderer);
         map.setOnCameraChangeListener(mClusterManager);

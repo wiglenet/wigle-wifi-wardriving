@@ -355,7 +355,7 @@ public final class DatabaseHelper extends Thread {
         }
 
         try {
-            db.rawQuery( "SELECT count(*) FROM network", (String[]) null ).close();
+            db.rawQuery( "SELECT count(*) FROM network", null).close();
         }
         catch ( final SQLiteException ex ) {
             MainActivity.info("exception selecting from network, try to create. ex: " + ex );
@@ -363,7 +363,7 @@ public final class DatabaseHelper extends Thread {
         }
 
         try {
-            db.rawQuery( "SELECT count(*) FROM location", (String[]) null ).close();
+            db.rawQuery( "SELECT count(*) FROM location", null).close();
         }
         catch ( final SQLiteException ex ) {
             MainActivity.info("exception selecting from location, try to create. ex: " + ex );
@@ -395,7 +395,7 @@ public final class DatabaseHelper extends Thread {
                 // new database, reset a marker, if any
                 final Editor edit = prefs.edit();
                 edit.putLong( ListFragment.PREF_DB_MARKER, 0L );
-                edit.commit();
+                edit.apply();
             }
             catch ( final SQLiteException ex ) {
                 MainActivity.error( "sqlite exception: " + ex, ex );
@@ -412,7 +412,7 @@ public final class DatabaseHelper extends Thread {
         // keep transactions in memory until committed
         db.execSQL( "PRAGMA temp_store = MEMORY" );
         // keep around the journal file, don't create and delete a ton of times
-        db.rawQuery( "PRAGMA journal_mode = PERSIST", (String[]) null ).close();
+        db.rawQuery( "PRAGMA journal_mode = PERSIST", null).close();
 
         MainActivity.info( "database version: " + db.getVersion() );
         if ( db.getVersion() == 0 ) {
@@ -466,6 +466,9 @@ public final class DatabaseHelper extends Thread {
      */
     public void close() {
         done.set( true );
+        if (queryThread != null) {
+            queryThread.setDone();
+        }
         // interrupt the take, if any
         this.interrupt();
         // give time for db to finish any writes
@@ -502,6 +505,7 @@ public final class DatabaseHelper extends Thread {
                 MainActivity.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
                 MainActivity.sleep( 100L );
             }
+            countdown--;
         }
     }
 
@@ -752,9 +756,9 @@ public final class DatabaseHelper extends Thread {
                 }
             }
         }
-        else {
+        // else {
             // MainActivity.info( "db network not changeworthy: " + bssid );
-        }
+        // }
     }
 
 
@@ -1002,7 +1006,7 @@ public final class DatabaseHelper extends Thread {
                 edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
             }
         }
-        edit.commit();
+        edit.apply();
     }
 
     private long getCountFromDB( final String table ) throws DBException {
@@ -1089,12 +1093,12 @@ public final class DatabaseHelper extends Thread {
         final String outputFilename = DATABASE_PATH + "backup-" + System.currentTimeMillis() + ".sqlite";
         File file = new File(dbFilename);
         File outputFile = new File(outputFilename);
-        Pair<Boolean,String> result = null;
+        Pair<Boolean,String> result;
         try {
             InputStream input = new FileInputStream(file);
             OutputStream output = new FileOutputStream(outputFile);
             byte[] buffer = new byte[1024];
-            int bytesRead = 0;
+            int bytesRead;
             final long total = file.length();
             long read = 0;
             while( (bytesRead = input.read(buffer)) > 0){

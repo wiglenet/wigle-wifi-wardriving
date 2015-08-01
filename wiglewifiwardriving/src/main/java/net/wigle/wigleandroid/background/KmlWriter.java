@@ -22,14 +22,14 @@ public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper ) {
-        this( context, dbHelper, (Set<String>) null );
+        this( context, dbHelper, null);
     }
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper, final Set<String> networks ) {
         super(context, dbHelper, "KmlWriter");
 
         // make a safe local copy
-        this.networks = (networks == null) ? null : new HashSet<String>( networks );
+        this.networks = (networks == null) ? null : new HashSet<>(networks);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -42,6 +42,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
         final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
         final File path = new File( filepath );
+        //noinspection ResultOfMethodCallIgnored
         path.mkdirs();
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -50,8 +51,10 @@ public class KmlWriter extends AbstractBackgroundTask {
         String openString = filepath + filename;
         MainActivity.info("openString: " + openString );
         File file = new File( openString );
-        if ( ! file.exists() && hasSD ) {
-            file.createNewFile();
+        if ( ! file.exists() ) {
+            if (!file.createNewFile()) {
+                throw new IOException("Could not create file: " + openString);
+            }
         }
 
         FileOutputStream fos = new FileOutputStream( file );
@@ -66,43 +69,41 @@ public class KmlWriter extends AbstractBackgroundTask {
         // body
         Cursor cursor = null;
         Status status = null;
-        if ( true ) {
-            try {
-                if ( this.networks == null ) {
-                    cursor = dbHelper.networkIterator();
-                    writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle );
-                }
-                else {
-                    int count = 0;
-                    for ( String network : networks ) {
-                        // MainActivity.info( "network: " + network );
-                        cursor = dbHelper.getSingleNetwork( network );
-                        writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
-                        cursor.close();
-                        cursor = null;
-                        count++;
-                    }
-                }
-                status = Status.WRITE_SUCCESS;
+        try {
+            if ( this.networks == null ) {
+                cursor = dbHelper.networkIterator();
+                writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle );
             }
-            catch ( final InterruptedException ex ) {
-                MainActivity.info("Writing Kml Interrupted: " + ex);
-            }
-            catch ( DBException ex ) {
-                dbHelper.deathDialog("Writing Kml", ex);
-                status = Status.EXCEPTION;
-            }
-            catch ( final Exception ex ) {
-                ex.printStackTrace();
-                MainActivity.error( "ex problem: " + ex, ex );
-                MainActivity.writeError( this, ex, context );
-                status = Status.EXCEPTION;
-                bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
-            }
-            finally {
-                if ( cursor != null ) {
+            else {
+                int count = 0;
+                for ( String network : networks ) {
+                    // MainActivity.info( "network: " + network );
+                    cursor = dbHelper.getSingleNetwork( network );
+                    writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
                     cursor.close();
+                    cursor = null;
+                    count++;
                 }
+            }
+            status = Status.WRITE_SUCCESS;
+        }
+        catch ( final InterruptedException ex ) {
+            MainActivity.info("Writing Kml Interrupted: " + ex);
+        }
+        catch ( DBException ex ) {
+            dbHelper.deathDialog("Writing Kml", ex);
+            status = Status.EXCEPTION;
+        }
+        catch ( final Exception ex ) {
+            ex.printStackTrace();
+            MainActivity.error( "ex problem: " + ex, ex );
+            MainActivity.writeError( this, ex, context );
+            status = Status.EXCEPTION;
+            bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
+        }
+        finally {
+            if ( cursor != null ) {
+                cursor.close();
             }
         }
         // footer
@@ -142,10 +143,10 @@ public class KmlWriter extends AbstractBackgroundTask {
             final String date = dateFormat.format( new Date( lasttime ) );
 
             String style = "green";
-            if ( capabilities.indexOf("WEP") >= 0 ) {
+            if (capabilities.contains("WEP")) {
                 style = "yellow";
             }
-            if ( capabilities.indexOf("WPA") >= 0 ) {
+            if (capabilities.contains("WPA")) {
                 style = "red";
             }
 
@@ -183,6 +184,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         for ( int i = 0; i < data.length; i++ ) {
             byte current = data[i];
             // (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
+            //noinspection ConstantConditions
             if ( (current >= 0x00 && current <= 0x08) ||
                     (current >= 0x0B && current <= 0x1F) ||
                     (current >= 0x7F && current <= 0x84) ||

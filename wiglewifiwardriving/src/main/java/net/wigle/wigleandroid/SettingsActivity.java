@@ -62,7 +62,9 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         super.onCreate( savedInstanceState );
 
         final ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         // set language
         MainActivity.setLocale( this );
@@ -103,8 +105,8 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                             getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain), 0, DONATE_DIALOG);
                 }
                 else {
-                    editor.putBoolean( ListFragment.PREF_DONATE, isChecked );
-                    editor.commit();
+                    editor.putBoolean( ListFragment.PREF_DONATE, false);
+                    editor.apply();
                 }
             }
         });
@@ -140,7 +142,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     pass.setEnabled( true );
 
                     editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, false );
-                    editor.commit();
+                    editor.apply();
 
                     // might have to remove or show register link
                     updateRegister();
@@ -168,7 +170,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             public void onTextChanged( final String s ) {
                 // ListActivity.debug("user: " + s);
                 editor.putString( ListFragment.PREF_USERNAME, s.trim() );
-                editor.commit();
+                editor.apply();
                 // might have to remove or show register link
                 updateRegister();
             }
@@ -193,7 +195,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             public void onTextChanged( final String s ) {
                 // ListActivity.debug("pass: " + s);
                 editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
-                editor.commit();
+                editor.apply();
             }
         });
 
@@ -305,7 +307,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         switch (dialogId) {
             case ZERO_OUT_DIALOG: {
                 editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
-                editor.commit();
+                editor.apply();
                 final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
                 tv.setText( getString(R.string.setting_max_id) + " 0" );
                 break;
@@ -313,7 +315,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             case MAX_OUT_DIALOG: {
                 final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
                 editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
-                editor.commit();
+                editor.apply();
                 // set the text on the other button
                 final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
                 tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
@@ -321,7 +323,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             }
             case DONATE_DIALOG: {
                 editor.putBoolean( ListFragment.PREF_DONATE, true );
-                editor.commit();
+                editor.apply();
 
                 final CheckBox donate = (CheckBox) findViewById(R.id.donate);
                 donate.setChecked( true );
@@ -336,7 +338,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                 user.setEnabled( false );
                 pass.setEnabled( false );
                 editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
-                editor.commit();
+                editor.apply();
 
                 final CheckBox be_anonymous = (CheckBox) findViewById(R.id.be_anonymous);
                 be_anonymous.setChecked( true );
@@ -352,9 +354,9 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
 
     @Override
     public void onResume() {
-        MainActivity.info( "resume settings." );
+        MainActivity.info("resume settings.");
 
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         // donate
         final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
         if ( isDonate ) {
@@ -410,7 +412,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         final Editor editor = prefs.edit();
 
         Spinner spinner = (Spinner) findViewById( id );
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item);
 
         Object period = null;
@@ -422,6 +424,10 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         }
         else {
             MainActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
+        }
+
+        if (period == null) {
+            period = periods[0];
         }
 
         int periodIndex = 0;
@@ -449,7 +455,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                 else {
                     MainActivity.error("unhandled object type: " + period + " class: " + period.getClass());
                 }
-                editor.commit();
+                editor.apply();
 
                 if ( period instanceof String ) {
                     MainActivity.setLocale( SettingsActivity.this );

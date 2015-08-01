@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -118,11 +119,11 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
     public static class ProgressDialogFragment extends DialogFragment {
         public static ProgressDialogFragment newInstance() {
-            ProgressDialogFragment frag = new ProgressDialogFragment ();
-            return frag;
+            return new ProgressDialogFragment ();
         }
 
         @Override
+        @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final ProgressDialog dialog = new ProgressDialog(getActivity());
             dialog.setTitle(getString(Status.WRITING.getTitle()));
@@ -160,8 +161,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         /**
          * Sets the progress of the dialog, we need to make sure we get the right dialog reference here
          * which is why we obtain the dialog fragment manually from the fragment manager
-         * @param manager
-         * @param progress
+         * @param manager fragment manager
+         * @param progress how much progress has been made
          */
         public void setProgress(final FragmentManager manager, final int progress)
         {

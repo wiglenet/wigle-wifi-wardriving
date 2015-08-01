@@ -7,34 +7,34 @@ import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.MainActivity;
 
 public final class SsidSpeaker {
-  private static final String EMPTY = "";
-  
-  private final ConcurrentLinkedHashMap<String,String> recentSsids = new ConcurrentLinkedHashMap<String,String>(128);  
-  private final List<String> toSay = new ArrayList<String>();
-  private MainActivity mainActivity;
-  
-  public SsidSpeaker( final MainActivity listActivity ) {
-    this.mainActivity = listActivity;
-  }
-  
-  public void setListActivity( final MainActivity listActivity ) {
-    this.mainActivity = listActivity;
-  }
-  
-  public void add( final String ssid ) {    
-    final String previous = recentSsids.put(ssid, EMPTY);
-    if ( previous == null ) {
-      toSay.add(ssid);
+    private static final String EMPTY = "";
+
+    private final ConcurrentLinkedHashMap<String,String> recentSsids = new ConcurrentLinkedHashMap<String,String>(128);
+    private final List<String> toSay = new ArrayList<String>();
+    private MainActivity mainActivity;
+
+    public SsidSpeaker( final MainActivity listActivity ) {
+        this.mainActivity = listActivity;
     }
-  }
-  
-  public void speak() {
-    final StringBuilder ssidSpeakBuilder = new StringBuilder();
-    for ( final String ssid : toSay ) {
-      ssidSpeakBuilder.append( ssid ).append( ", " );
+
+    public void setListActivity( final MainActivity listActivity ) {
+        this.mainActivity = listActivity;
     }
-    MainActivity.info( "speak: " + ssidSpeakBuilder.toString() );    
-    mainActivity.speak( ssidSpeakBuilder.toString() );
-    toSay.clear();
-  }
+
+    public void add( final String ssid ) {
+        final String previous = recentSsids.put(ssid, EMPTY);
+        if ( previous == null ) {
+            toSay.add(ssid);
+        }
+    }
+
+    public void speak() {
+        final StringBuilder ssidSpeakBuilder = new StringBuilder();
+        for ( final String ssid : toSay ) {
+            ssidSpeakBuilder.append( ssid ).append( ", " );
+        }
+        MainActivity.info( "speak: " + ssidSpeakBuilder.toString() );
+        mainActivity.speak( ssidSpeakBuilder.toString() );
+        toSay.clear();
+    }
 }

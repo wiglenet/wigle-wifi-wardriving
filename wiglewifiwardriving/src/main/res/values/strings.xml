@@ -46,8 +46,8 @@
     <string name="battery_kill_text">Exit at this battery level</string>
     <string name="reset_wifi_text">Decide WiFi is jammed</string>
     <string name="speech_gps">GPS status changes</string>
-    <string name="mute">Mute</string>
-    <string name="play">Play</string>
+    <string name="mute">Mute Audio</string>
+    <string name="play">Play Audio</string>
     <string name="unknown">Unknown</string>
     <string name="sort_text">Sort Options</string>
     <string name="listdialog_button">OK</string>

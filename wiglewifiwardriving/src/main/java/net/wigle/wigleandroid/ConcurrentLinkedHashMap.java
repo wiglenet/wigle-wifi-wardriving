@@ -13,75 +13,75 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @param <V> value
  */
 public final class ConcurrentLinkedHashMap<K,V> {
-  private final ConcurrentHashMap<K,V> map;
-  private final LinkedBlockingQueue<K> queue;
-  private int count = 0;
+    private final ConcurrentHashMap<K,V> map;
+    private final LinkedBlockingQueue<K> queue;
+    private int count = 0;
 
-  private final int maxSize;
-  private final Object WRITE_LOCK = new Object();
+    private final int maxSize;
+    private final Object WRITE_LOCK = new Object();
 
-  public ConcurrentLinkedHashMap() {
-    this( Integer.MAX_VALUE );
-  }
-
-  public ConcurrentLinkedHashMap( final int maxSize ) {
-    map = new ConcurrentHashMap<K,V>();
-    queue = new LinkedBlockingQueue<K>();
-    this.maxSize = maxSize;
-  }
-
-  public V put( final K key, final V value ) {
-    V previous = null;
-    synchronized( WRITE_LOCK ) {
-      previous = map.put(key, value);
-      if ( previous == null ) {
-        // new key! add to queue
-        queue.add( key );
-        // check if this puts us over
-        if ( count + 1 > maxSize ) {
-          // remove eldest
-          K eldest = queue.remove();
-          map.remove( eldest );
-        }
-        else {
-          // this doesn't put us over, just add to the count
-          count++;
-        }
-      }
+    public ConcurrentLinkedHashMap() {
+        this( Integer.MAX_VALUE );
     }
-    return previous;
-  }
 
-  public V get( K key ) {
-    return map.get( key );
-  }
+    public ConcurrentLinkedHashMap( final int maxSize ) {
+        map = new ConcurrentHashMap<>();
+        queue = new LinkedBlockingQueue<>();
+        this.maxSize = maxSize;
+    }
 
-  /**
-   * make sure this is only used for reading (we only use it for reading currently.) the map is concurrent safe, but it will bugger
-   * our internal accounting for size() if the set is mutated
-   */
-  public Set<Map.Entry<K,V>> entrySet() {
-    return map.entrySet();
-  }
+    public V put( final K key, final V value ) {
+        V previous;
+        synchronized( WRITE_LOCK ) {
+            previous = map.put(key, value);
+            if ( previous == null ) {
+                // new key! add to queue
+                queue.add( key );
+                // check if this puts us over
+                if ( count + 1 > maxSize ) {
+                    // remove eldest
+                    K eldest = queue.remove();
+                    map.remove( eldest );
+                }
+                else {
+                    // this doesn't put us over, just add to the count
+                    count++;
+                }
+            }
+        }
+        return previous;
+    }
 
-  public Collection<V> values() {
-    return map.values();
-  }
+    public V get( K key ) {
+        return map.get( key );
+    }
 
-  public boolean isEmpty() {
-    return map.isEmpty();
-  }
+    /**
+     * make sure this is only used for reading (we only use it for reading currently.) the map is concurrent safe, but it will bugger
+     * our internal accounting for size() if the set is mutated
+     */
+    public Set<Map.Entry<K,V>> entrySet() {
+        return map.entrySet();
+    }
 
-  public int size() {
-    return count;
-  }
+    public Collection<V> values() {
+        return map.values();
+    }
 
-  public boolean isFull() {
-    return count >= maxSize;
-  }
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 
-  public int maxSize() {
-    return maxSize;
-  }
+    public int size() {
+        return count;
+    }
+
+    public boolean isFull() {
+        return count >= maxSize;
+    }
+
+    public int maxSize() {
+        return maxSize;
+    }
 
 }

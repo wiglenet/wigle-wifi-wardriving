@@ -106,13 +106,6 @@
     android:text=""
     android:layout_weight="5"
     />
-<Button android:id="@+id/mute" 
-		android:layout_width="wrap_content" 
-		android:layout_height="24dip"
-		android:paddingTop="0dip"
-		android:paddingBottom="0dip"
-		style="?android:attr/buttonStyleSmall"
-		android:text="@string/mute" android:layout_weight="0"/>
 </LinearLayout>
 
 <LinearLayout

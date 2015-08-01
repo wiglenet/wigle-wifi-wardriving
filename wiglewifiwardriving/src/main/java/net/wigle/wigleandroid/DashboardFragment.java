@@ -49,8 +49,8 @@ public class DashboardFragment extends Fragment {
     finishing = new AtomicBoolean( false );
     numberFormat = NumberFormat.getNumberInstance( Locale.US );
     if ( numberFormat instanceof DecimalFormat ) {
-      ((DecimalFormat) numberFormat).setMinimumFractionDigits( 2 );
-      ((DecimalFormat) numberFormat).setMaximumFractionDigits( 2 );
+      numberFormat.setMinimumFractionDigits(2);
+      numberFormat.setMaximumFractionDigits(2);
     }
   }
 
@@ -104,13 +104,6 @@ public class DashboardFragment extends Fragment {
     timer.postDelayed( mUpdateTimeTask, 250 );
   }
 
-  public void updateUI() {
-    final View view = getView();
-    if (view != null) {
-      updateUI(view);
-    }
-  }
-
   private void updateUI( final View view ) {
     TextView tv = (TextView) view.findViewById( R.id.runnets );
     tv.setText( ListFragment.lameStatic.runNets + " " + getString(R.string.run));
@@ -157,10 +150,8 @@ public class DashboardFragment extends Fragment {
     final long marker = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
     final long uploaded = prefs.getLong( ListFragment.PREF_NETS_UPLOADED, 0L );
     long newSinceUpload = 0;
-    if ( marker != 0 && uploaded == 0 ) {
-      // marker is set but no uploaded, a migration situation, so return zero
-    }
-    else {
+    // marker is set but no uploaded, a migration situation, so return zero
+    if (marker == 0 || uploaded != 0) {
       newSinceUpload = ListFragment.lameStatic.dbNets - uploaded;
       if ( newSinceUpload < 0 ) {
         newSinceUpload = 0;
@@ -183,7 +174,7 @@ public class DashboardFragment extends Fragment {
     final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
 
-    String retval = null;
+    String retval;
     if ( meters > 1000f ) {
       if ( metric ) {
         retval = numberFormat.format( meters / 1000f ) + " " + context.getString(R.string.km_short);

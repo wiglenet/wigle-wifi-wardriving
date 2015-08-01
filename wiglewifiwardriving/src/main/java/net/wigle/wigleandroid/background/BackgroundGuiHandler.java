@@ -15,176 +15,176 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
 public class BackgroundGuiHandler extends Handler {
-  public static final int WRITING_PERCENT_START = 100000;
-  public static final String ERROR = "error";
-  public static final String FILENAME = "filename";
-  public static final String FILEPATH = "filepath";
+    public static final int WRITING_PERCENT_START = 100000;
+    public static final String ERROR = "error";
+    public static final String FILENAME = "filename";
+    public static final String FILEPATH = "filepath";
 
-  private FragmentActivity context;
-  private final Object lock;
-  private final ProgressDialogFragment pd;
-  private final AlertSettable alertSettable;
+    private FragmentActivity context;
+    private final Object lock;
+    private final ProgressDialogFragment pd;
+    private final AlertSettable alertSettable;
 
-  private String msg_text = "";
+    private String msg_text = "";
 
-  public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressDialogFragment pd,
-      final AlertSettable alertSettable) {
+    public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressDialogFragment pd,
+                                final AlertSettable alertSettable) {
 
-    this.context = context;
-    this.lock = lock;
-    this.pd = pd;
-    this.alertSettable = alertSettable;
-  }
-
-  public void setContext(final FragmentActivity context) {
-    synchronized(lock) {
-      this.context = context;
+        this.context = context;
+        this.lock = lock;
+        this.pd = pd;
+        this.alertSettable = alertSettable;
     }
-  }
 
-  @Override
-  public void handleMessage( final Message msg ) {
-    synchronized ( lock ) {
-      if ( msg.what >= WRITING_PERCENT_START ) {
-        final int percentTimesTen = msg.what - WRITING_PERCENT_START;
-        pd.setMessage( context.getSupportFragmentManager(), msg_text + " " + (percentTimesTen/10f) + "%" );
-        // "The progress range is 0..10000."
-        pd.setProgress( context.getSupportFragmentManager(), percentTimesTen * 10 );
-        return;
-      }
-
-      if ( msg.what >= Status.values().length || msg.what < 0 ) {
-        MainActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
-        return;
-      }
-      final Status status = Status.values()[ msg.what ];
-      if ( Status.UPLOADING.equals( status ) ) {
-        //          pd.setMessage( status.getMessage() );
-        msg_text = context.getString( status.getMessage() );
-        pd.setProgress(context.getSupportFragmentManager(), 0);
-        return;
-      }
-      if ( Status.WRITING.equals( status ) ) {
-        msg_text = context.getString( status.getMessage() );
-        pd.setProgress(context.getSupportFragmentManager(), 0);
-        return;
-      }
-
-      // If we got this far then the task is done
-
-      // make sure we didn't lose this dialog this somewhere
-      if ( pd != null ) {
-        try {
-          MainActivity.info("fragment from pd: " + pd);
-          pd.dismiss();
-          alertSettable.clearProgressDialog();
+    public void setContext(final FragmentActivity context) {
+        synchronized(lock) {
+            this.context = context;
         }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing dialog: " + ex );
-        }
-      }
-      // Activity context
-      final FragmentManager fm = context.getSupportFragmentManager();
-      final DialogFragment dialog = (DialogFragment) fm.findFragmentByTag(AbstractBackgroundTask.PROGRESS_TAG);
-      if (dialog != null) {
-        try {
-          MainActivity.info("fragment from dialog: " + dialog);
-          dialog.dismiss();
-        }
-        catch ( Exception ex ) {
-          // guess it wasn't there anyways
-          MainActivity.info( "exception dismissing fm dialog: " + ex );
-        }
-      }
-
-      final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
-      try {
-        alertDialog.show(fm, "background-dialog");
-      }
-      catch (IllegalStateException ex) {
-        MainActivity.warn("illegal state in background gui handler: " + ex, ex);
-      }
-    }
-  }
-
-  public static class BackgroundAlertDialog extends DialogFragment {
-    public static BackgroundAlertDialog newInstance( final Message msg, final Status status ) {
-      final BackgroundAlertDialog frag = new BackgroundAlertDialog();
-      Bundle args = msg.peekData();
-      args.putInt("title", status.getTitle());
-      args.putInt("message", status.getMessage());
-      args.putInt("status", status.ordinal());
-      frag.setArguments(args);
-      return frag;
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-      final FragmentActivity activity = getActivity();
-      final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
-      builder.setCancelable( false );
-      final Bundle bundle = getArguments();
-      builder.setTitle( bundle.getInt("title") );
-      final int message = bundle.getInt("message");
-      final int status = bundle.getInt("status");
+    public void handleMessage( final Message msg ) {
+        synchronized ( lock ) {
+            if ( msg.what >= WRITING_PERCENT_START ) {
+                final int percentTimesTen = msg.what - WRITING_PERCENT_START;
+                pd.setMessage( context.getSupportFragmentManager(), msg_text + " " + (percentTimesTen/10f) + "%" );
+                // "The progress range is 0..10000."
+                pd.setProgress( context.getSupportFragmentManager(), percentTimesTen * 10 );
+                return;
+            }
 
-      String filename = "";
+            if ( msg.what >= Status.values().length || msg.what < 0 ) {
+                MainActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
+                return;
+            }
+            final Status status = Status.values()[ msg.what ];
+            if ( Status.UPLOADING.equals( status ) ) {
+                //          pd.setMessage( status.getMessage() );
+                msg_text = context.getString( status.getMessage() );
+                pd.setProgress(context.getSupportFragmentManager(), 0);
+                return;
+            }
+            if ( Status.WRITING.equals( status ) ) {
+                msg_text = context.getString( status.getMessage() );
+                pd.setProgress(context.getSupportFragmentManager(), 0);
+                return;
+            }
 
-      String filepath = bundle.getString( FILEPATH );
-      filepath = filepath == null ? "" : filepath + "\n";
-      filename = bundle.getString( FILENAME );
-      if ( filename != null ) {
-        // just don't show the gz
-        int index = filename.indexOf( ".gz" );
-        if ( index > 0 ) {
-          filename = filename.substring( 0, index );
-        }
-        index = filename.indexOf( ".kml" );
-        if ( index > 0 ) {
-          filename = filename.substring( 0, index );
-        }
-      }
-      if ( filename == null ) {
-        filename = "";
-      }
-      else {
-        filename = "\n\nFile location:\n" + filepath + filename;
-      }
+            // If we got this far then the task is done
 
-      String error = bundle.getString( ERROR );
-      error = error == null ? "" : " Error: " + error;
-      builder.setMessage( activity.getString( message ) + error + filename );
+            // make sure we didn't lose this dialog this somewhere
+            if ( pd != null ) {
+                try {
+                    MainActivity.info("fragment from pd: " + pd);
+                    pd.dismiss();
+                    alertSettable.clearProgressDialog();
+                }
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    MainActivity.info( "exception dismissing dialog: " + ex );
+                }
+            }
+            // Activity context
+            final FragmentManager fm = context.getSupportFragmentManager();
+            final DialogFragment dialog = (DialogFragment) fm.findFragmentByTag(AbstractBackgroundTask.PROGRESS_TAG);
+            if (dialog != null) {
+                try {
+                    MainActivity.info("fragment from dialog: " + dialog);
+                    dialog.dismiss();
+                }
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    MainActivity.info( "exception dismissing fm dialog: " + ex );
+                }
+            }
 
-      AlertDialog ad = builder.create();
-      ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick( final DialogInterface dialog, final int which ) {
-          try {
-            dialog.dismiss();
-          }
-          catch ( Exception ex ) {
-            // guess it wasn't there anyways
-            MainActivity.info( "exception dismissing alert dialog: " + ex );
-          }
-
-          if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
-              || status == Status.BAD_LOGIN.ordinal()) {
-            MainActivity.info("dialog: start settings activity");
+            final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
             try {
-              final Intent settingsIntent = new Intent( activity, SettingsActivity.class );
-              activity.startActivity( settingsIntent );
+                alertDialog.show(fm, "background-dialog");
             }
-            catch (Exception ex) {
-              MainActivity.info("failed to start settings activity: " + ex, ex);
+            catch (IllegalStateException ex) {
+                MainActivity.warn("illegal state in background gui handler: " + ex, ex);
             }
-          }
-
-          return;
-        } });
-
-      return ad;
+        }
     }
-  }
+
+    public static class BackgroundAlertDialog extends DialogFragment {
+        public static BackgroundAlertDialog newInstance( final Message msg, final Status status ) {
+            final BackgroundAlertDialog frag = new BackgroundAlertDialog();
+            Bundle args = msg.peekData();
+            args.putInt("title", status.getTitle());
+            args.putInt("message", status.getMessage());
+            args.putInt("status", status.ordinal());
+            frag.setArguments(args);
+            return frag;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final FragmentActivity activity = getActivity();
+            final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
+            builder.setCancelable( false );
+            final Bundle bundle = getArguments();
+            builder.setTitle( bundle.getInt("title") );
+            final int message = bundle.getInt("message");
+            final int status = bundle.getInt("status");
+
+            String filename = "";
+
+            String filepath = bundle.getString( FILEPATH );
+            filepath = filepath == null ? "" : filepath + "\n";
+            filename = bundle.getString( FILENAME );
+            if ( filename != null ) {
+                // just don't show the gz
+                int index = filename.indexOf( ".gz" );
+                if ( index > 0 ) {
+                    filename = filename.substring( 0, index );
+                }
+                index = filename.indexOf( ".kml" );
+                if ( index > 0 ) {
+                    filename = filename.substring( 0, index );
+                }
+            }
+            if ( filename == null ) {
+                filename = "";
+            }
+            else {
+                filename = "\n\nFile location:\n" + filepath + filename;
+            }
+
+            String error = bundle.getString( ERROR );
+            error = error == null ? "" : " Error: " + error;
+            builder.setMessage( activity.getString( message ) + error + filename );
+
+            AlertDialog ad = builder.create();
+            ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick( final DialogInterface dialog, final int which ) {
+                    try {
+                        dialog.dismiss();
+                    }
+                    catch ( Exception ex ) {
+                        // guess it wasn't there anyways
+                        MainActivity.info( "exception dismissing alert dialog: " + ex );
+                    }
+
+                    if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
+                            || status == Status.BAD_LOGIN.ordinal()) {
+                        MainActivity.info("dialog: start settings activity");
+                        try {
+                            final Intent settingsIntent = new Intent( activity, SettingsActivity.class );
+                            activity.startActivity( settingsIntent );
+                        }
+                        catch (Exception ex) {
+                            MainActivity.info("failed to start settings activity: " + ex, ex);
+                        }
+                    }
+
+                    return;
+                } });
+
+            return ad;
+        }
+    }
 
 }

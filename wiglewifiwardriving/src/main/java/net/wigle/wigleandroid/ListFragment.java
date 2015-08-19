@@ -156,7 +156,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.list, container, false);
-        final State state = MainActivity.getState(this);
+        final State state = MainActivity.getStaticState();
 
         MainActivity.info("setupUploadButton");
         setupUploadButton(view);
@@ -443,7 +443,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
         final MainActivity main = MainActivity.getMainActivity(this);
-        final State state = MainActivity.getState(this);
+        final State state = MainActivity.getStaticState();
 
         MainActivity.info( "LIST: on config change" );
         MainActivity.setLocale( this.getActivity(), newConfig);
@@ -458,7 +458,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     }
 
     private void setupList( final View view ) {
-        State state = MainActivity.getState(this);
+        State state = MainActivity.getStaticState();
         if (state.listAdapter == null) {
             state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
         }
@@ -587,7 +587,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     public void handleDialog(final int dialogId) {
         switch (dialogId) {
             case UPLOAD_DIALOG:
-                final State state = MainActivity.getState( this );
+                final State state = MainActivity.getStaticState();
                 uploadFile( state.dbHelper );
                 break;
             default:

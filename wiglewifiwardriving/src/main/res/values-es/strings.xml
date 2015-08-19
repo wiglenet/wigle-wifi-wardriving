@@ -245,13 +245,13 @@
     <string name="fatal_post_message">(se puede ver de nuevo con "Notificar un error" en el menú de configuración)</string>
     <string name="use_network_location">Usar Proveedor de Ubicación por red</string>
     <string name="data_import_observed">Importar mis datos desde WiGLE en la base de datos local?</string>
-    <string name="donate_question">Donate data to WiGLE?</string>
-    <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
-    <string name="speech_wifi_restart">WiFi restarts</string>
-    <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
-    <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
-    <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
-    <string name="wigle_service">WiGLE Wifi Service</string>
-    <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="donate_question">Donar datos a WiGLE?</string>
+    <string name="donate_explain">Permitir a WIGLE hacer una copia anónima de los datos de los cuales WIGLE está autorizado licenciar comercialmente a otras partes.</string>
+    <string name="no_data_conn">No hay conexión de datos, no se puede conectar con el Internet.\nDetails:</string>
+    <string name="speech_wifi_restart">reiniciando WiFi</string>
+    <string name="wifi_restart_1">Aviso, ultima búsqueda de WiFi completada</string>
+    <string name="wifi_restart_2">Segundos. Reiniciando WiFi.</string>
+    <string name="use_wigle_tiles">Utiliza WiGLE azulejos OSM</string>
+    <string name="wigle_service">WiGLE Servicio Wifi</string>
+    <string name="disable_toast">Desactiva toast pop-ups</string>
 </resources>

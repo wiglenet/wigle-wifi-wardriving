@@ -145,6 +145,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final int MAP_TAB_POS = 1;
     public static final int DASH_TAB_POS = 2;
     public static final int DATA_TAB_POS = 3;
+    public static final int SETTINGS_TAB_POS = 4;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -367,6 +368,12 @@ public final class MainActivity extends AppCompatActivity {
         bundle = new Bundle();
         data.setArguments(bundle);
         state.fragList[DATA_TAB_POS] = data;
+
+        info("Creating SettingsFragment");
+        SettingsFragment settings = new SettingsFragment();
+        bundle = new Bundle();
+        settings.setArguments(bundle);
+        state.fragList[SETTINGS_TAB_POS] = settings;
     }
 
     @Override

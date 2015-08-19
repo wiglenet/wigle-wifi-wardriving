@@ -419,7 +419,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
                 main.finish();
                 return true;
             case MENU_SETTINGS:
-                final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );
+                final Intent settingsIntent = new Intent( getActivity(), SettingsFragment.class );
                 startActivity( settingsIntent );
                 break;
             case MENU_ERROR_REPORT:

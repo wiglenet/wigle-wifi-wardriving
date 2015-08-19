@@ -1,7 +1,7 @@
 package net.wigle.wigleandroid.background;
 
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.SettingsActivity;
+import net.wigle.wigleandroid.SettingsFragment;
 import net.wigle.wigleandroid.background.AbstractBackgroundTask.ProgressDialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -174,7 +174,7 @@ public class BackgroundGuiHandler extends Handler {
                             || status == Status.BAD_LOGIN.ordinal()) {
                         MainActivity.info("dialog: start settings activity");
                         try {
-                            final Intent settingsIntent = new Intent( activity, SettingsActivity.class );
+                            final Intent settingsIntent = new Intent( activity, SettingsFragment.class );
                             activity.startActivity( settingsIntent );
                         }
                         catch (Exception ex) {

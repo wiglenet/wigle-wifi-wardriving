@@ -258,7 +258,7 @@ public class DBResultActivity extends ActionBarActivity {
                 finish();
                 return true;
             case MENU_SETTINGS:
-                final Intent settingsIntent = new Intent( this, SettingsActivity.class );
+                final Intent settingsIntent = new Intent( this, SettingsFragment.class );
                 startActivity( settingsIntent );
                 break;
         }

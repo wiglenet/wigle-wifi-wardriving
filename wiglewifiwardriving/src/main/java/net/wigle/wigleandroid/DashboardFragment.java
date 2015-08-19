@@ -266,7 +266,7 @@ public class DashboardFragment extends Fragment {
           main.finish();
           return true;
         case MENU_SETTINGS:
-          final Intent settingsIntent = new Intent( getActivity(), SettingsActivity.class );
+          final Intent settingsIntent = new Intent( getActivity(), SettingsFragment.class );
           startActivity( settingsIntent );
           break;
       }

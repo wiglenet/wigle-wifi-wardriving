@@ -293,7 +293,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
         switch ( item.getItemId() ) {
             case MENU_SETTINGS: {
                 MainActivity.info("start settings activity");
-                final Intent settingsIntent = new Intent( this.getActivity(), SettingsActivity.class );
+                final Intent settingsIntent = new Intent( this.getActivity(), SettingsFragment.class );
                 startActivity( settingsIntent );
                 break;
             }

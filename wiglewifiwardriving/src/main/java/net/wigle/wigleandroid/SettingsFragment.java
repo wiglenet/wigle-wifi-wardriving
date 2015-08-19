@@ -7,18 +7,20 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -34,7 +36,7 @@ import android.widget.TextView;
 /**
  * configure settings
  */
-public final class SettingsActivity extends ActionBarActivity implements DialogListener {
+public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_RETURN = 12;
     private static final int MENU_ERROR_REPORT = 13;
@@ -59,15 +61,14 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        super.onCreate(savedInstanceState);
 
         // set language
-        MainActivity.setLocale( this );
+        MainActivity.setLocale(getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setContentView( R.layout.settings );
 
         // force media volume controls
@@ -79,7 +80,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         linearLayout.requestFocus();
 
         // get prefs
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         // donate
@@ -101,7 +102,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( SettingsActivity.this,
+                    MainActivity.createConfirmation( SettingsFragment.this,
                             getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain), 0, DONATE_DIALOG);
                 }
                 else {
@@ -134,7 +135,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", 0, ANONYMOUS_DIALOG );
+                    MainActivity.createConfirmation( SettingsFragment.this, "Upload anonymously?", 0, ANONYMOUS_DIALOG );
                 }
                 else {
                     // unset anonymous
@@ -203,8 +204,8 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         button.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View view ) {
-                final Intent errorReportIntent = new Intent( SettingsActivity.this, SpeechActivity.class );
-                SettingsActivity.this.startActivity( errorReportIntent );
+                final Intent errorReportIntent = new Intent( SettingsFragment.this, SpeechActivity.class );
+                SettingsFragment.this.startActivity( errorReportIntent );
             }
         });
 
@@ -216,7 +217,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         resetMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
+                MainActivity.createConfirmation( SettingsFragment.this, getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
             }
         });
 
@@ -229,7 +230,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         maxoutMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
+                MainActivity.createConfirmation( SettingsFragment.this, getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
             }
         } );
 
@@ -301,47 +302,58 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
 
     @Override
     public void handleDialog(final int dialogId) {
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
+        final View view = getView();
 
         switch (dialogId) {
             case ZERO_OUT_DIALOG: {
                 editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
                 editor.apply();
-                final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-                tv.setText( getString(R.string.setting_max_id) + " 0" );
+                if (view != null) {
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " 0");
+                }
                 break;
             }
             case MAX_OUT_DIALOG: {
                 final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
                 editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
                 editor.apply();
-                // set the text on the other button
-                final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-                tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
+                if (view != null) {
+                    // set the text on the other button
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
+                }
                 break;
             }
             case DONATE_DIALOG: {
-                editor.putBoolean( ListFragment.PREF_DONATE, true );
+                editor.putBoolean(ListFragment.PREF_DONATE, true);
                 editor.apply();
 
-                final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-                donate.setChecked( true );
+                if (view != null) {
+                    final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+                    donate.setChecked(true);
+                }
                 // poof
                 eraseDonate();
                 break;
             }
             case ANONYMOUS_DIALOG: {
                 // turn anonymous
-                final EditText user = (EditText) findViewById(R.id.edit_username);
-                final EditText pass = (EditText) findViewById(R.id.edit_password);
-                user.setEnabled( false );
-                pass.setEnabled( false );
+                if (view != null) {
+                    final EditText user = (EditText) view.findViewById(R.id.edit_username);
+                    final EditText pass = (EditText) view.findViewById(R.id.edit_password);
+                    user.setEnabled(false);
+                    pass.setEnabled(false);
+                }
                 editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
                 editor.apply();
 
-                final CheckBox be_anonymous = (CheckBox) findViewById(R.id.be_anonymous);
-                be_anonymous.setChecked( true );
+                if (view != null) {
+                    final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
+                    be_anonymous.setChecked(true);
+                }
 
                 // might have to remove or show register link
                 updateRegister();
@@ -356,9 +368,9 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     public void onResume() {
         MainActivity.info("resume settings.");
 
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         // donate
-        final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
+        final boolean isDonate = prefs.getBoolean(ListFragment.PREF_DONATE, false);
         if ( isDonate ) {
             eraseDonate();
         }
@@ -367,25 +379,32 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     }
 
     private void updateRegister() {
-        final TextView register = (TextView) findViewById(R.id.register);
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        final String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
-        final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
-        if ( "".equals(username) || isAnonymous ) {
-            register.setEnabled( true );
-            register.setVisibility( View.VISIBLE );
-        }
-        else {
-            // poof
-            register.setEnabled( false );
-            register.setVisibility( View.GONE );
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String username = prefs.getString(ListFragment.PREF_USERNAME, "");
+        final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+
+        final View view = getView();
+        if (view != null) {
+            final TextView register = (TextView) view.findViewById(R.id.register);
+
+            if ("".equals(username) || isAnonymous) {
+                register.setEnabled(true);
+                register.setVisibility(View.VISIBLE);
+            } else {
+                // poof
+                register.setEnabled(false);
+                register.setVisibility(View.GONE);
+            }
         }
     }
 
     private void eraseDonate() {
-        final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-        donate.setEnabled(false);
-        donate.setVisibility(View.GONE);
+        final View view = getView();
+        if (view != null) {
+            final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+            donate.setEnabled(false);
+            donate.setVisibility(View.GONE);
+        }
     }
 
     private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
@@ -408,7 +427,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     + " periodName: " + Arrays.toString(periodName));
         }
 
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         Spinner spinner = (Spinner) findViewById( id );
@@ -458,7 +477,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                 editor.apply();
 
                 if ( period instanceof String ) {
-                    MainActivity.setLocale( SettingsActivity.this );
+                    MainActivity.setLocale( SettingsFragment.this );
                 }
 
             }

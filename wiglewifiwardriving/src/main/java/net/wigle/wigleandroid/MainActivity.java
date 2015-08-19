@@ -49,22 +49,18 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
-import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -86,7 +82,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public final class MainActivity extends AppCompatActivity implements TabListener {
+public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
     public static class State {
         DatabaseHelper dbHelper;
@@ -138,8 +134,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     private BatteryLevelReceiver batteryLevelReceiver;
     private boolean playServiceShown = false;
 
-    // drawer
-    private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -253,30 +247,30 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             }
         }
 
-        info( "setupService" );
+        info("setupService");
         setupService();
-        info( "setupDatabase" );
+        info("setupDatabase");
         setupDatabase();
-        info( "setupBattery" );
+        info("setupBattery");
         setupBattery();
-        info( "setupSound" );
+        info("setupSound");
         setupSound();
-        info( "setupWifi" );
+        info("setupWifi");
         setupWifi();
-        info( "setupLocation" ); // must be after setupWifi
+        info("setupLocation"); // must be after setupWifi
         setupLocation();
         info( "setup tabs" );
         if (savedInstanceState == null) {
             setupFragments();
         }
-        setActionBarTabs();
+        // show the list by default
+        selectItem( state.currentTab );
         info( "onCreate setup complete" );
     }
 
     private void setupMenuDrawer() {
         // set up drawer menu
-//        mPlanetTitles = getResources().getStringArray(R.array.planets_array);
-        mPlanetTitles = new String[]{"list","map","dash","data"};
+        final String[] mPlanetTitles = new String[]{"List", "Map", "Dashboard", "Database"};
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
@@ -297,21 +291,24 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle("asdf1");
             }
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("asdf2");
+                final ActionBar actionBar = getSupportActionBar();
+                if (actionBar != null) actionBar.setTitle("Menu");
             }
         };
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+        }
         // end drawer setup
     }
 
@@ -334,14 +331,14 @@ public final class MainActivity extends AppCompatActivity implements TabListener
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
-        setTitle(mPlanetTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
         state.currentTab = position;
     }
 
     @Override
     public void setTitle(CharSequence title) {
-        getSupportActionBar().setTitle(title);
+        final ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle(title);
     }
 
 
@@ -372,25 +369,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         state.fragList[DATA_TAB_POS] = data;
     }
 
-    private void setActionBarTabs() {
-        final int defaultTab = state.currentTab;
-        final String[] labels = new String[]{
-                "List", "Map", "Dash", "Data"
-        };
-
-        final ActionBar bar = getSupportActionBar();
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        for (int i = 0; i <= 3; i++) {
-            final Tab tab = bar.newTab();
-            tab.setText(labels[i]);
-            tab.setTabListener(this);
-            bar.addTab(tab);
-        }
-
-        bar.setSelectedNavigationItem(defaultTab);
-    }
-
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         if(featureId == Window.FEATURE_ACTION_BAR && menu != null){
@@ -415,18 +393,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     // be careful with this
     public static MainActivity getMainActivity() {
         return mainActivity;
-    }
-
-    /**
-     * switch to the specified tab using the activity's parent, if possible
-     * @param tab the tab to switch to
-     */
-    static void switchTab( final int tab ) {
-        final ActionBar bar = mainActivity.getSupportActionBar();
-        if (bar.getSelectedNavigationIndex() != tab) {
-            info("setting tab to: " + tab);
-            bar.setSelectedNavigationItem(tab);
-        }
     }
 
     static void setLockScreen( Fragment fragment, boolean lockScreen ) {
@@ -578,7 +544,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         return checkbox;
     }
 
-    public static State getState( @SuppressWarnings("UnusedParameters") Fragment fragment ) {
+    public static State getStaticState() {
         return getMainActivity().getState();
     }
 
@@ -739,7 +705,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
         final String current = config.locale.getLanguage();
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
-        if (! "".equals(lang) && ! current.equals(lang) && lang != null) {
+        if (! "".equals(lang) && ! current.equals(lang)) {
             newLocale = new Locale(lang);
         }
         else if ("".equals(lang) && ORIG_LOCALE != null && ! current.equals(ORIG_LOCALE.getLanguage()) ) {
@@ -753,31 +719,6 @@ public final class MainActivity extends AppCompatActivity implements TabListener
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
         }
     }
-
-    @Override
-    public void onTabReselected(Tab tab, FragmentTransaction ft) {
-        onTabSelected(tab, ft);
-    }
-
-    @Override
-    public void onTabSelected(Tab tab, FragmentTransaction ft) {
-        MainActivity.info("onTabSelected: " + tab.getPosition());
-        final Fragment frag = state.fragList[tab.getPosition()];
-        if (frag != null) {
-            ft.replace(android.R.id.content, frag);
-        }
-        state.currentTab = tab.getPosition();
-    }
-
-    @Override
-    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-        MainActivity.info("onTabUnselected: " + tab.getPosition());
-        final Fragment frag = state.fragList[tab.getPosition()];
-        if (frag != null) {
-            ft.remove(frag);
-        }
-    }
-
 
     /**
      * create a mediaplayer for a given raw resource id.
@@ -960,7 +901,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     public static void addNetworkToMap(final Network network) {
-        if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+        if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
@@ -971,7 +912,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     public static void updateNetworkOnMap(final Network network) {
-        if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+        if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
@@ -982,7 +923,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     }
 
     public static void reclusterMap() {
-        if (mainActivity.getSupportActionBar().getSelectedNavigationIndex() == MAP_TAB_POS) {
+        if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
@@ -1459,11 +1400,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     public boolean onOptionsItemSelected( final MenuItem item ) {
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        return false;
+        return mDrawerToggle.onOptionsItemSelected(item);
     }
 
     //@Override
@@ -1561,7 +1498,7 @@ public final class MainActivity extends AppCompatActivity implements TabListener
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             MainActivity.info( "onKeyDown: not quitting app on back" );
-            MainActivity.switchTab( 0 );
+            selectItem( 0 );
             return true;
         }
         return super.onKeyDown(keyCode, event);

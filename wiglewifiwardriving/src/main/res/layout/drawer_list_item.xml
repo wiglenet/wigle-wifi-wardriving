@@ -2,8 +2,13 @@
 
 <TextView
     android:id="@+id/drawer_list_text"
-    android:layout_height="20dp"
-    android:layout_width="100dp"
+    android:layout_height="40dp"
+    android:layout_width="fill_parent"
+    android:background="#ff000000"
+    android:textSize="20sp"
+    android:gravity="center_vertical"
+    android:layout_weight="1"
+    android:textColor="#ffffffff"
     xmlns:android="http://schemas.android.com/apk/res/android">
 </TextView>
 

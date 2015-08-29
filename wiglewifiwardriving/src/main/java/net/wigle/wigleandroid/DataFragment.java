@@ -398,14 +398,14 @@ public final class DataFragment extends Fragment implements FileUploaderListener
     /* Creates the menu items */
     @Override
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-        MenuItem item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
-        item.setIcon( android.R.drawable.ic_menu_preferences );
+        // MenuItem item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
+        // item.setIcon( android.R.drawable.ic_menu_preferences );
 
-        item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
+        MenuItem item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
         item.setIcon( android.R.drawable.ic_menu_report_image );
 
-        item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
-        item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        // item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
+        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
         super.onCreateOptionsMenu(menu, inflater);
     }

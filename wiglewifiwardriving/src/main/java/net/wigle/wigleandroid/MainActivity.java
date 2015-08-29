@@ -104,7 +104,7 @@ public final class MainActivity extends AppCompatActivity {
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
-        private final Fragment[] fragList = new Fragment[4];
+        private final Fragment[] fragList = new Fragment[5];
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
     }
@@ -146,6 +146,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final int DASH_TAB_POS = 2;
     public static final int DATA_TAB_POS = 3;
     public static final int SETTINGS_TAB_POS = 4;
+    public static final int EXIT_TAB_POS = 5;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -271,7 +272,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private void setupMenuDrawer() {
         // set up drawer menu
-        final String[] mPlanetTitles = new String[]{"List", "Map", "Dashboard", "Database"};
+        final String[] mPlanetTitles = new String[]{"List", "Map", "Dashboard", "Database", "Settings", "Exit"};
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
@@ -321,7 +322,12 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     /** Swaps fragments in the main content view */
-    private void selectItem(int position) {
+    public void selectItem(int position) {
+        if (position == EXIT_TAB_POS) {
+            finish();
+            return;
+        }
+
         final Fragment frag = state.fragList[position];
 
         // Insert the fragment by replacing any existing fragment
@@ -529,17 +535,23 @@ public final class MainActivity extends AppCompatActivity {
         return checkbox;
     }
 
-    public static CheckBox prefSetCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
-        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final CheckBox checkbox = (CheckBox) activity.findViewById( id );
-        checkbox.setChecked(prefs.getBoolean(pref, def));
+    private static CheckBox prefSetCheckBox( final SharedPreferences prefs, final View view, final int id, final String pref,
+                                             final boolean def ) {
+        final CheckBox checkbox = (CheckBox) view.findViewById( id );
+        if (checkbox == null) {
+            error("No checkbox for id: " + id);
+        }
+        else {
+            checkbox.setChecked(prefs.getBoolean(pref, def));
+        }
         return checkbox;
     }
 
-    public static CheckBox prefBackedCheckBox( final Activity activity, final int id, final String pref, final boolean def ) {
-        final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+    public static CheckBox prefBackedCheckBox( final Fragment fragment, final View view, final int id,
+                                               final String pref, final boolean def ) {
+        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
-        final CheckBox checkbox = prefSetCheckBox( activity, id, pref, def );
+        final CheckBox checkbox = prefSetCheckBox( prefs, view, id, pref, def );
         checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {

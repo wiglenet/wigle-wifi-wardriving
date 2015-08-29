@@ -7,18 +7,20 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.text.method.SingleLineTransformationMethod;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -34,7 +36,7 @@ import android.widget.TextView;
 /**
  * configure settings
  */
-public final class SettingsActivity extends ActionBarActivity implements DialogListener {
+public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_RETURN = 12;
     private static final int MENU_ERROR_REPORT = 13;
@@ -59,31 +61,30 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-
-        final ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+        super.onCreate(savedInstanceState);
 
         // set language
-        MainActivity.setLocale( this );
-        setContentView( R.layout.settings );
+        MainActivity.setLocale(getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.settings, container, false);
 
         // force media volume controls
-        this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
+        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         // don't let the textbox have focus to start with, so we don't see a keyboard right away
-        final LinearLayout linearLayout = (LinearLayout) findViewById( R.id.linearlayout );
+        final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearlayout);
         linearLayout.setFocusableInTouchMode(true);
         linearLayout.requestFocus();
 
         // get prefs
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         // donate
-        final CheckBox donate = (CheckBox) findViewById(R.id.donate);
+        final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
         final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
         donate.setChecked( isDonate );
         if ( isDonate ) {
@@ -101,8 +102,9 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( SettingsActivity.this,
-                            getString(R.string.donate_question) + "\n\n" + getString(R.string.donate_explain), 0, DONATE_DIALOG);
+                    MainActivity.createConfirmation( getActivity(),
+                            getString(R.string.donate_question) + "\n\n"
+                            + getString(R.string.donate_explain), 0, DONATE_DIALOG);
                 }
                 else {
                     editor.putBoolean( ListFragment.PREF_DONATE, false);
@@ -112,9 +114,9 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         });
 
         // anonymous
-        final CheckBox beAnonymous = (CheckBox) findViewById(R.id.be_anonymous);
-        final EditText user = (EditText) findViewById(R.id.edit_username);
-        final EditText pass = (EditText) findViewById(R.id.edit_password);
+        final CheckBox beAnonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
+        final EditText user = (EditText) view.findViewById(R.id.edit_username);
+        final EditText pass = (EditText) view.findViewById(R.id.edit_password);
         final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
         if ( isAnonymous ) {
             user.setEnabled( false );
@@ -134,7 +136,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( SettingsActivity.this, "Upload anonymously?", 0, ANONYMOUS_DIALOG );
+                    MainActivity.createConfirmation( getActivity(), "Upload anonymously?", 0, ANONYMOUS_DIALOG );
                 }
                 else {
                     // unset anonymous
@@ -151,7 +153,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         });
 
         // register link
-        final TextView register = (TextView) findViewById(R.id.register);
+        final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
         final String atString = getString(R.string.at);
         try {
@@ -176,7 +178,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             }
         });
 
-        final CheckBox showPassword = (CheckBox) findViewById(R.id.showpassword);
+        final CheckBox showPassword = (CheckBox) view.findViewById(R.id.showpassword);
         showPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
@@ -199,65 +201,65 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
             }
         });
 
-        final Button button = (Button) findViewById( R.id.speech_button );
+        final Button button = (Button) view.findViewById(R.id.speech_button);
         button.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View view ) {
-                final Intent errorReportIntent = new Intent( SettingsActivity.this, SpeechActivity.class );
-                SettingsActivity.this.startActivity( errorReportIntent );
+                final Intent errorReportIntent = new Intent( getActivity(), SpeechActivity.class );
+                SettingsFragment.this.startActivity( errorReportIntent );
             }
         });
 
         // db marker reset button and text
-        final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
+        final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
         tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListFragment.PREF_DB_MARKER, 0L ) );
 
-        final Button resetMaxidButton = (Button) findViewById( R.id.reset_maxid_button );
+        final Button resetMaxidButton = (Button) view.findViewById(R.id.reset_maxid_button);
         resetMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
             }
         });
 
         // db marker maxout button and text
-        final TextView maxtv = (TextView) findViewById( R.id.maxout_maxid_text );
+        final TextView maxtv = (TextView) view.findViewById(R.id.maxout_maxid_text);
         final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
         maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
 
-        final Button maxoutMaxidButton = (Button) findViewById( R.id.maxout_maxid_button );
+        final Button maxoutMaxidButton = (Button) view.findViewById(R.id.maxout_maxid_button);
         maxoutMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( SettingsActivity.this, getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
             }
         } );
 
         // period spinners
-        doScanSpinner( R.id.periodstill_spinner,
-                ListFragment.PREF_SCAN_PERIOD_STILL, MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop) );
-        doScanSpinner( R.id.period_spinner,
-                ListFragment.PREF_SCAN_PERIOD, MainActivity.SCAN_DEFAULT, getString(R.string.nonstop) );
-        doScanSpinner( R.id.periodfast_spinner,
-                ListFragment.PREF_SCAN_PERIOD_FAST, MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop) );
-        doScanSpinner( R.id.gps_spinner,
-                ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi) );
+        doScanSpinner( R.id.periodstill_spinner, ListFragment.PREF_SCAN_PERIOD_STILL,
+                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view );
+        doScanSpinner( R.id.period_spinner, ListFragment.PREF_SCAN_PERIOD,
+                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view );
+        doScanSpinner( R.id.periodfast_spinner, ListFragment.PREF_SCAN_PERIOD_FAST,
+                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view );
+        doScanSpinner( R.id.gps_spinner, ListFragment.GPS_SCAN_PERIOD,
+                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view );
 
-        MainActivity.prefBackedCheckBox(this, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
-        MainActivity.prefBackedCheckBox(this, R.id.use_metric, ListFragment.PREF_METRIC, false);
-        MainActivity.prefBackedCheckBox(this, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
-        MainActivity.prefBackedCheckBox(this, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
-        MainActivity.prefBackedCheckBox(this, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
-        MainActivity.prefBackedCheckBox(this, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
-        MainActivity.prefBackedCheckBox(this, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
-        MainActivity.prefBackedCheckBox(this, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
+        MainActivity.prefBackedCheckBox(this, view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
+        MainActivity.prefBackedCheckBox(this, view, R.id.use_metric, ListFragment.PREF_METRIC, false);
+        MainActivity.prefBackedCheckBox(this, view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
+        MainActivity.prefBackedCheckBox(this, view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
+        MainActivity.prefBackedCheckBox(this, view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
+        MainActivity.prefBackedCheckBox(this, view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
+        MainActivity.prefBackedCheckBox(this, view, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
+        MainActivity.prefBackedCheckBox(this, view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
         // speech spinner
-        Spinner spinner = (Spinner) findViewById( R.id.speak_spinner );
+        Spinner spinner = (Spinner) view.findViewById(R.id.speak_spinner );
         if ( ! TTS.hasTTS() ) {
             // no text to speech :(
             spinner.setEnabled( false );
-            final TextView speakText = (TextView) findViewById( R.id.speak_text );
+            final TextView speakText = (TextView) view.findViewById(R.id.speak_text );
             speakText.setText(getString(R.string.no_tts));
         }
 
@@ -273,7 +275,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                 getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
                 getString(R.string.language_tr), getString(R.string.language_zh),
         };
-        doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName );
+        doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName, view );
 
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);
@@ -283,65 +285,78 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
                 "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
         doSpinner( R.id.speak_spinner,
-                ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName );
+                ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, view );
 
         // battery kill spinner
         final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
         final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
-        doSpinner( R.id.battery_kill_spinner,
-                ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );
+        doSpinner( R.id.battery_kill_spinner, ListFragment.PREF_BATTERY_KILL_PERCENT,
+                MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName, view );
 
         // reset wifi spinner
         final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
         final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
                 "2" + min,"5" + min,"10" + min,off };
-        doSpinner( R.id.reset_wifi_spinner,
-                ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
+        doSpinner( R.id.reset_wifi_spinner, ListFragment.PREF_RESET_WIFI_PERIOD,
+                MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, view );
+
+        return view;
     }
 
     @Override
     public void handleDialog(final int dialogId) {
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
+        final View view = getView();
 
         switch (dialogId) {
             case ZERO_OUT_DIALOG: {
                 editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
                 editor.apply();
-                final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-                tv.setText( getString(R.string.setting_max_id) + " 0" );
+                if (view != null) {
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " 0");
+                }
                 break;
             }
             case MAX_OUT_DIALOG: {
                 final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
                 editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
                 editor.apply();
-                // set the text on the other button
-                final TextView tv = (TextView) findViewById( R.id.reset_maxid_text );
-                tv.setText( getString(R.string.setting_max_id) + " " + maxDB );
+                if (view != null) {
+                    // set the text on the other button
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
+                }
                 break;
             }
             case DONATE_DIALOG: {
-                editor.putBoolean( ListFragment.PREF_DONATE, true );
+                editor.putBoolean(ListFragment.PREF_DONATE, true);
                 editor.apply();
 
-                final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-                donate.setChecked( true );
+                if (view != null) {
+                    final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+                    donate.setChecked(true);
+                }
                 // poof
                 eraseDonate();
                 break;
             }
             case ANONYMOUS_DIALOG: {
                 // turn anonymous
-                final EditText user = (EditText) findViewById(R.id.edit_username);
-                final EditText pass = (EditText) findViewById(R.id.edit_password);
-                user.setEnabled( false );
-                pass.setEnabled( false );
+                if (view != null) {
+                    final EditText user = (EditText) view.findViewById(R.id.edit_username);
+                    final EditText pass = (EditText) view.findViewById(R.id.edit_password);
+                    user.setEnabled(false);
+                    pass.setEnabled(false);
+                }
                 editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
                 editor.apply();
 
-                final CheckBox be_anonymous = (CheckBox) findViewById(R.id.be_anonymous);
-                be_anonymous.setChecked( true );
+                if (view != null) {
+                    final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
+                    be_anonymous.setChecked(true);
+                }
 
                 // might have to remove or show register link
                 updateRegister();
@@ -356,39 +371,48 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     public void onResume() {
         MainActivity.info("resume settings.");
 
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         // donate
-        final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
+        final boolean isDonate = prefs.getBoolean(ListFragment.PREF_DONATE, false);
         if ( isDonate ) {
             eraseDonate();
         }
 
         super.onResume();
+        getActivity().setTitle(R.string.settings_app_name);
     }
 
     private void updateRegister() {
-        final TextView register = (TextView) findViewById(R.id.register);
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        final String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
-        final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
-        if ( "".equals(username) || isAnonymous ) {
-            register.setEnabled( true );
-            register.setVisibility( View.VISIBLE );
-        }
-        else {
-            // poof
-            register.setEnabled( false );
-            register.setVisibility( View.GONE );
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String username = prefs.getString(ListFragment.PREF_USERNAME, "");
+        final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+
+        final View view = getView();
+        if (view != null) {
+            final TextView register = (TextView) view.findViewById(R.id.register);
+
+            if ("".equals(username) || isAnonymous) {
+                register.setEnabled(true);
+                register.setVisibility(View.VISIBLE);
+            } else {
+                // poof
+                register.setEnabled(false);
+                register.setVisibility(View.GONE);
+            }
         }
     }
 
     private void eraseDonate() {
-        final CheckBox donate = (CheckBox) findViewById(R.id.donate);
-        donate.setEnabled(false);
-        donate.setVisibility(View.GONE);
+        final View view = getView();
+        if (view != null) {
+            final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+            donate.setEnabled(false);
+            donate.setVisibility(View.GONE);
+        }
     }
 
-    private void doScanSpinner( final int id, final String pref, final long spinDefault, final String zeroName ) {
+    private void doScanSpinner( final int id, final String pref, final long spinDefault,
+                                final String zeroName, final View view ) {
         final String ms = " " + getString(R.string.ms_short);
         final String sec = " " + getString(R.string.sec);
         final String min = " " + getString(R.string.min);
@@ -397,23 +421,23 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
         final String[] periodName = new String[]{ zeroName,"50" + ms,"250" + ms,"500" + ms,"750" + ms,
                 "1" + sec,"1.5" + sec,"2" + sec,
                 "3" + sec,"4" + sec,"5" + sec,"10" + sec,"30" + sec,"1" + min };
-        doSpinner(id, pref, spinDefault, periods, periodName);
+        doSpinner(id, pref, spinDefault, periods, periodName, view);
     }
 
     private <V> void doSpinner( final int id, final String pref, final V spinDefault,
-                                final V[] periods, final String[] periodName ) {
+                                final V[] periods, final String[] periodName, final View view ) {
 
         if ( periods.length != periodName.length ) {
             throw new IllegalArgumentException("lengths don't match, periods: " + Arrays.toString(periods)
                     + " periodName: " + Arrays.toString(periodName));
         }
 
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
-        Spinner spinner = (Spinner) findViewById( id );
+        Spinner spinner = (Spinner) view.findViewById( id );
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item);
+                getActivity(), android.R.layout.simple_spinner_item);
 
         Object period = null;
         if ( periods instanceof Long[] ) {
@@ -458,7 +482,7 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
                 editor.apply();
 
                 if ( period instanceof String ) {
-                    MainActivity.setLocale( SettingsActivity.this );
+                    MainActivity.setLocale( getActivity() );
                 }
 
             }
@@ -469,14 +493,12 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
 
     /* Creates the menu items */
     @Override
-    public boolean onCreateOptionsMenu( final Menu menu ) {
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
         MenuItem item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
         item.setIcon( android.R.drawable.ic_menu_report_image );
 
         item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
         item.setIcon( android.R.drawable.ic_media_previous );
-
-        return true;
     }
 
     /* Handles item selections */
@@ -484,10 +506,11 @@ public final class SettingsActivity extends ActionBarActivity implements DialogL
     public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
             case MENU_RETURN:
-                finish();
+                final MainActivity mainActivity = MainActivity.getMainActivity(this);
+                if (mainActivity != null) mainActivity.selectItem(MainActivity.LIST_TAB_POS);
                 return true;
             case MENU_ERROR_REPORT:
-                final Intent errorReportIntent = new Intent( this, ErrorReportActivity.class );
+                final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 this.startActivity( errorReportIntent );
                 break;
         }

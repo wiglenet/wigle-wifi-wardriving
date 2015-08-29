@@ -2,10 +2,11 @@
 
 <TextView
     android:id="@+id/drawer_list_text"
-    android:layout_height="40dp"
+    android:layout_height="60dp"
+    android:padding="4dp"
     android:layout_width="fill_parent"
     android:background="#b0000000"
-    android:textSize="20sp"
+    android:textSize="22sp"
     android:gravity="center_vertical"
     android:layout_weight="1"
     android:textColor="#ffffffff"

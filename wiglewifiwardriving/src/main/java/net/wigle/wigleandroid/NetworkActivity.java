@@ -383,7 +383,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
             final Button ok = (Button) view.findViewById( R.id.ok_button );
 
             final EditText password = (EditText) view.findViewById( R.id.edit_password );
-            password.addTextChangedListener( new SettingsActivity.SetWatcher() {
+            password.addTextChangedListener( new SettingsFragment.SetWatcher() {
                 @Override
                 public void onTextChanged( final String s ) {
                     if ( s.length() > 0 ) {

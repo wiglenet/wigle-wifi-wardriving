@@ -66,9 +66,11 @@ import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -76,7 +78,9 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -280,12 +284,38 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.menu_settings),
                 getString(R.string.menu_exit),
             };
+        final int[] menuIcons = new int[]{
+                android.R.drawable.ic_menu_sort_by_size ,
+                android.R.drawable.ic_menu_mapmode,
+                android.R.drawable.ic_menu_directions,
+                android.R.drawable.ic_menu_save,
+                android.R.drawable.ic_menu_preferences,
+                android.R.drawable.ic_delete,
+            };
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<>(this,
-                R.layout.drawer_list_item, menuTitles));
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.drawer_list_item, R.id.drawer_list_text, menuTitles){
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                final LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+                View view;
+                if (convertView == null) {
+                    view = inflater.inflate(R.layout.drawer_list_item, parent, false);
+                } else {
+                    view = convertView;
+                }
+                final TextView text = (TextView) view.findViewById(R.id.drawer_list_text);
+                text.setText(menuTitles[position]);
+                final ImageView image = (ImageView) view.findViewById(R.id.drawer_list_icon);
+                image.setImageResource(menuIcons[position]);
+
+                return view;
+            }
+        });
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 

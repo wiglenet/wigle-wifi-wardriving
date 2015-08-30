@@ -272,13 +272,20 @@ public final class MainActivity extends AppCompatActivity {
 
     private void setupMenuDrawer() {
         // set up drawer menu
-        final String[] mPlanetTitles = new String[]{"List", "Map", "Dashboard", "Database", "Settings", "Exit"};
+        final String[] menuTitles = new String[]{
+                getString(R.string.tab_list),
+                getString(R.string.tab_map),
+                getString(R.string.tab_dash),
+                getString(R.string.tab_data),
+                getString(R.string.menu_settings),
+                getString(R.string.menu_exit),
+            };
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
-                R.layout.drawer_list_item, mPlanetTitles));
+                R.layout.drawer_list_item, menuTitles));
         // Set the list's click listener
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
@@ -640,7 +647,7 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override
     public void onResume() {
-        MainActivity.info( "MAIN: resume." );
+        MainActivity.info("MAIN: resume.");
         super.onResume();
 
         // deal with wake lock
@@ -719,7 +726,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void setLocale( final Context context, final Configuration config ) {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final String lang = prefs.getString( ListFragment.PREF_LANGUAGE, "" );
         final String current = config.locale.getLanguage();
         MainActivity.info("current lang: " + current + " new lang: " + lang);
@@ -1210,7 +1217,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void setTransferring() {
-        state.transferring.set( true );
+        state.transferring.set(true);
     }
 
     public void scheduleScan() {
@@ -1219,7 +1226,7 @@ public final class MainActivity extends AppCompatActivity {
 
     public void speak( final String string ) {
         if ( ! MainActivity.getMainActivity().isMuted() && state.tts != null ) {
-            state.tts.speak( string );
+            state.tts.speak(string);
         }
     }
 
@@ -1256,7 +1263,7 @@ public final class MainActivity extends AppCompatActivity {
             // have to use the app context to bind to the service, cuz we're in tabs
             // http://code.google.com/p/android/issues/detail?id=2483#c2
             final boolean bound = getApplicationContext().bindService( serviceIntent, state.serviceConnection, flags );
-            MainActivity.info( "service bound: " + bound );
+            MainActivity.info("service bound: " + bound);
         }
     }
 
@@ -1288,7 +1295,7 @@ public final class MainActivity extends AppCompatActivity {
 
     private void handleScanChange() {
         final boolean isScanning = isScanning();
-        MainActivity.info("handleScanChange: isScanning now: " + isScanning );
+        MainActivity.info("handleScanChange: isScanning now: " + isScanning);
         if ( isScanning ) {
             if (listActivity != null) {
                 listActivity.setStatusUI( "Scanning Turned On" );
@@ -1324,6 +1331,16 @@ public final class MainActivity extends AppCompatActivity {
      * an updateIntervalMillis of <= 0 will not register for updates.
      */
     public void setLocationUpdates(final long updateIntervalMillis, final float updateMeters) {
+        try {
+            internalSetLocationUpdates(updateIntervalMillis, updateMeters);
+        }
+        catch (final SecurityException ex) {
+            error("Security exception in setLocationUpdates: " + ex, ex);
+        }
+    }
+
+    private void internalSetLocationUpdates(final long updateIntervalMillis, final float updateMeters)
+            throws SecurityException {
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         if ( state.gpsListener != null ) {
@@ -1447,7 +1464,12 @@ public final class MainActivity extends AppCompatActivity {
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if ( state.gpsListener != null ) {
             locationManager.removeGpsStatusListener( state.gpsListener );
-            locationManager.removeUpdates( state.gpsListener );
+            try {
+                locationManager.removeUpdates(state.gpsListener);
+            }
+            catch (final SecurityException ex) {
+                error("SecurityException on finish: " + ex, ex);
+            }
         }
 
         // stop the service, so when we die it's both stopped and unbound and will die

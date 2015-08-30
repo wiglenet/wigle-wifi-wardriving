@@ -21,7 +21,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
     public HttpDownloader( final FragmentActivity context, final DatabaseHelper dbHelper,
                            final FileUploaderListener listener ) {
 
-        super(context, dbHelper, "HttpDL");
+        super(context, dbHelper, "HttpDL", true);
         this.listener = listener;
     }
 

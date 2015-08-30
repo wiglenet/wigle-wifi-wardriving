@@ -108,7 +108,7 @@ public final class MainActivity extends AppCompatActivity {
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
-        private final Fragment[] fragList = new Fragment[5];
+        private final Fragment[] fragList = new Fragment[6];
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
     }
@@ -118,6 +118,7 @@ public final class MainActivity extends AppCompatActivity {
     static final Locale ORIG_LOCALE = Locale.getDefault();
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
+    public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
 
@@ -149,8 +150,9 @@ public final class MainActivity extends AppCompatActivity {
     public static final int MAP_TAB_POS = 1;
     public static final int DASH_TAB_POS = 2;
     public static final int DATA_TAB_POS = 3;
-    public static final int SETTINGS_TAB_POS = 4;
-    public static final int EXIT_TAB_POS = 5;
+    public static final int STATS_TAB_POS = 4;
+    public static final int SETTINGS_TAB_POS = 5;
+    public static final int EXIT_TAB_POS = 6;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -281,6 +283,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.tab_map),
                 getString(R.string.tab_dash),
                 getString(R.string.tab_data),
+                getString(R.string.tab_stats),
                 getString(R.string.menu_settings),
                 getString(R.string.menu_exit),
         };
@@ -289,6 +292,7 @@ public final class MainActivity extends AppCompatActivity {
                 android.R.drawable.ic_menu_mapmode,
                 android.R.drawable.ic_menu_directions,
                 android.R.drawable.ic_menu_save,
+                android.R.drawable.ic_menu_today,
                 android.R.drawable.ic_menu_preferences,
                 android.R.drawable.ic_delete,
         };
@@ -371,6 +375,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.mapping_app_name),
                 getString(R.string.dashboard_app_name),
                 getString(R.string.data_activity_name),
+                getString(R.string.stats_app_name),
                 getString(R.string.settings_app_name),
                 getString(R.string.menu_exit),
         };
@@ -405,26 +410,32 @@ public final class MainActivity extends AppCompatActivity {
         state.fragList[LIST_TAB_POS] = listActivity;
 
         info("Creating MappingActivity");
-        MappingFragment map = new MappingFragment();
+        final MappingFragment map = new MappingFragment();
         // SupportMapFragment map = new SupportMapFragment();
         bundle = new Bundle();
         map.setArguments(bundle);
         state.fragList[MAP_TAB_POS] = map;
 
         info("Creating DashboardActivity");
-        DashboardFragment dash = new DashboardFragment();
+        final DashboardFragment dash = new DashboardFragment();
         bundle = new Bundle();
         dash.setArguments(bundle);
         state.fragList[DASH_TAB_POS] = dash;
 
         info("Creating DataActivity");
-        DataFragment data = new DataFragment();
+        final DataFragment data = new DataFragment();
         bundle = new Bundle();
         data.setArguments(bundle);
         state.fragList[DATA_TAB_POS] = data;
 
+        info("Creating StatsActivity");
+        final StatsFragment stats = new StatsFragment();
+        bundle = new Bundle();
+        stats.setArguments(bundle);
+        state.fragList[STATS_TAB_POS] = stats;
+
         info("Creating SettingsFragment");
-        SettingsFragment settings = new SettingsFragment();
+        final SettingsFragment settings = new SettingsFragment();
         bundle = new Bundle();
         settings.setArguments(bundle);
         state.fragList[SETTINGS_TAB_POS] = settings;

@@ -46,6 +46,11 @@ public class BackgroundGuiHandler extends Handler {
     @Override
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
+            if (pd == null) {
+                // no dialog box, just return
+                return;
+            }
+
             if ( msg.what >= WRITING_PERCENT_START ) {
                 final int percentTimesTen = msg.what - WRITING_PERCENT_START;
                 pd.setMessage( context.getSupportFragmentManager(), msg_text + " " + (percentTimesTen/10f) + "%" );

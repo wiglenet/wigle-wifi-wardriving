@@ -36,7 +36,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     private static AbstractBackgroundTask latestTask = null;
     static final String PROGRESS_TAG = "background-task-progress";
 
-    public AbstractBackgroundTask( final FragmentActivity context, final DatabaseHelper dbHelper, final String name ) {
+    public AbstractBackgroundTask(final FragmentActivity context, final DatabaseHelper dbHelper, final String name,
+                                  final boolean createDialog) {
         if ( context == null ) {
             throw new IllegalArgumentException( "context is null" );
         }
@@ -51,7 +52,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         this.dbHelper = dbHelper;
         this.name = name;
 
-        createProgressDialog( context );
+        if (createDialog) createProgressDialog( context );
 
         this.handler = new BackgroundGuiHandler(context, lock, pd, this);
         latestTask = this;

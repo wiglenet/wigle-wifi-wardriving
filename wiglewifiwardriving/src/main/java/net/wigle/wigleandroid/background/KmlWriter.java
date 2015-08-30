@@ -26,7 +26,7 @@ public class KmlWriter extends AbstractBackgroundTask {
     }
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper, final Set<String> networks ) {
-        super(context, dbHelper, "KmlWriter");
+        super(context, dbHelper, "KmlWriter", true);
 
         // make a safe local copy
         this.networks = (networks == null) ? null : new HashSet<>(networks);

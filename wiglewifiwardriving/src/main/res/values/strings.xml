@@ -268,4 +268,6 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
+    <string name="tab_stats">Statistics</string>
+    <string name="stats_app_name">WiGLE Wifi - Statistics</string>
 </resources>

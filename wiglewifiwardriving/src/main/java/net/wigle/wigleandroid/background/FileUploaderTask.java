@@ -62,7 +62,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     public FileUploaderTask( final FragmentActivity context, final DatabaseHelper dbHelper, final FileUploaderListener listener,
                              final boolean justWriteFile ) {
 
-        super( context, dbHelper, "HttpUL" );
+        super( context, dbHelper, "HttpUL", true );
         if ( listener == null ) {
             throw new IllegalArgumentException( "listener is null" );
         }

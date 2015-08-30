@@ -507,7 +507,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         switch ( item.getItemId() ) {
             case MENU_RETURN:
                 final MainActivity mainActivity = MainActivity.getMainActivity(this);
-                if (mainActivity != null) mainActivity.selectItem(MainActivity.LIST_TAB_POS);
+                if (mainActivity != null) mainActivity.selectFragment(MainActivity.LIST_TAB_POS);
                 return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );

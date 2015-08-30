@@ -270,7 +270,7 @@ public final class MainActivity extends AppCompatActivity {
             setupFragments();
         }
         // show the list by default
-        selectItem( state.currentTab );
+        selectFragment(state.currentTab);
         info( "onCreate setup complete" );
     }
 
@@ -283,7 +283,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.tab_data),
                 getString(R.string.menu_settings),
                 getString(R.string.menu_exit),
-            };
+        };
         final int[] menuIcons = new int[]{
                 android.R.drawable.ic_menu_sort_by_size ,
                 android.R.drawable.ic_menu_mapmode,
@@ -291,7 +291,8 @@ public final class MainActivity extends AppCompatActivity {
                 android.R.drawable.ic_menu_save,
                 android.R.drawable.ic_menu_preferences,
                 android.R.drawable.ic_delete,
-            };
+        };
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
@@ -354,16 +355,25 @@ public final class MainActivity extends AppCompatActivity {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectItem(position);
+            selectFragment(position);
         }
     }
 
     /** Swaps fragments in the main content view */
-    public void selectItem(int position) {
+    public void selectFragment(int position) {
         if (position == EXIT_TAB_POS) {
             finish();
             return;
         }
+
+        final String[] fragmentTitles = new String[]{
+                getString(R.string.list_app_name),
+                getString(R.string.mapping_app_name),
+                getString(R.string.dashboard_app_name),
+                getString(R.string.data_activity_name),
+                getString(R.string.settings_app_name),
+                getString(R.string.menu_exit),
+        };
 
         final Fragment frag = state.fragList[position];
 
@@ -377,6 +387,7 @@ public final class MainActivity extends AppCompatActivity {
         mDrawerList.setItemChecked(position, true);
         mDrawerLayout.closeDrawer(mDrawerList);
         state.currentTab = position;
+        setTitle(fragmentTitles[position]);
     }
 
     @Override
@@ -1569,7 +1580,7 @@ public final class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             MainActivity.info( "onKeyDown: not quitting app on back" );
-            selectItem( 0 );
+            selectFragment(0);
             return true;
         }
         return super.onKeyDown(keyCode, event);

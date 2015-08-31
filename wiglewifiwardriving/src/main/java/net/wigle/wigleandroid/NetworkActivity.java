@@ -66,6 +66,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        MainActivity.info("NET: onCreate");
         super.onCreate(savedInstanceState);
 
         final ActionBar actionBar = getSupportActionBar();
@@ -136,6 +137,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     @Override
     public void onDestroy() {
+        MainActivity.info("NET: onDestroy");
         networkActivity = null;
         if (mapView != null) {
             mapView.onDestroy();
@@ -145,6 +147,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     @Override
     public void onResume() {
+        MainActivity.info("NET: onResume");
         super.onResume();
         if (mapView != null) {
             mapView.onResume();
@@ -153,6 +156,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     @Override
     public void onPause() {
+        MainActivity.info("NET: onPause");
         super.onPause();
         if (mapView != null) {
             mapView.onPause();
@@ -161,6 +165,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
+        MainActivity.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (mapView != null) {
             mapView.onSaveInstanceState(outState);
@@ -169,6 +174,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     @Override
     public void onLowMemory() {
+        MainActivity.info("NET: onLowMemory");
         super.onLowMemory();
         if (mapView != null) {
             mapView.onLowMemory();

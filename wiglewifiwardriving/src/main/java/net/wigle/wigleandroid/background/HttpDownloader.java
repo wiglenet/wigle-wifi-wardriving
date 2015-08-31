@@ -16,10 +16,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 public class HttpDownloader extends AbstractBackgroundTask {
-    private final FileUploaderListener listener;
+    private final TransferListener listener;
 
     public HttpDownloader( final FragmentActivity context, final DatabaseHelper dbHelper,
-                           final FileUploaderListener listener ) {
+                           final TransferListener listener ) {
 
         super(context, dbHelper, "HttpDL", true);
         this.listener = listener;

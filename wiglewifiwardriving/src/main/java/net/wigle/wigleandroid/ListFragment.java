@@ -7,7 +7,7 @@ import java.text.NumberFormat;
 import java.util.Set;
 
 import net.wigle.wigleandroid.MainActivity.State;
-import net.wigle.wigleandroid.background.FileUploaderListener;
+import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import android.app.Dialog;
@@ -38,7 +38,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public final class ListFragment extends Fragment implements FileUploaderListener, DialogListener {
+public final class ListFragment extends Fragment implements TransferListener, DialogListener {
     private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
@@ -607,7 +607,7 @@ public final class ListFragment extends Fragment implements FileUploaderListener
     }
 
     /**
-     * FileUploaderListener interface
+     * TransferListener interface
      */
     @Override
     public void transferComplete() {

@@ -1,5 +1,5 @@
 package net.wigle.wigleandroid.background;
 
-public interface FileUploaderListener {
+public interface TransferListener {
     void transferComplete();
 }

@@ -1440,7 +1440,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * FileUploaderListener interface
+     * TransferListener interface
      */
     public void transferComplete() {
         state.transferring.set( false );

@@ -2,10 +2,11 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
-import net.wigle.wigleandroid.background.FileUploaderListener;
+import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -35,7 +36,7 @@ import android.widget.Toast;
 /**
  * configure settings
  */
-public final class DataFragment extends Fragment implements FileUploaderListener, DialogListener {
+public final class DataFragment extends Fragment implements TransferListener, DialogListener {
 
     private static final int MENU_EXIT = 11;
     private static final int MENU_SETTINGS = 12;
@@ -158,7 +159,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
     }
 
     /**
-     * FileUploaderListener interface
+     * TransferListener interface
      */
     @Override
     public void transferComplete() {
@@ -275,7 +276,7 @@ public final class DataFragment extends Fragment implements FileUploaderListener
                 }
                 // actually need this Activity context, for dialogs
                 HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                        new FileUploaderListener() {
+                        new TransferListener() {
                             @Override
                             public void transferComplete() {
                                 if ( mainActivity != null ) {

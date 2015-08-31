@@ -399,12 +399,12 @@ public final class MappingFragment extends Fragment {
         item = menu.add(0, MENU_TRAFFIC, 0, nameTraffic);
         item.setIcon( android.R.drawable.ic_menu_directions );
 
-        item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon( android.R.drawable.ic_menu_search );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
-
         item = menu.add(0, MENU_MAP_TYPE, 0, getString(R.string.menu_map_type));
         item.setIcon( android.R.drawable.ic_menu_mapmode );
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+        item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+        item.setIcon( android.R.drawable.ic_menu_search );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);

@@ -46,6 +46,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     private static final int MENU_SCAN = 14;
     private static final int MENU_FILTER = 15;
     private static final int MENU_MUTE = 16;
+    private static final int MENU_MAP = 17;
 
     private static final int SORT_DIALOG = 100;
     private static final int UPLOAD_DIALOG = 101;
@@ -252,12 +253,16 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     /* Creates the menu items */
     @Override
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-        MenuItem item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
-        item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
+        MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
+        item.setIcon( android.R.drawable.ic_menu_mapmode );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon( android.R.drawable.ic_menu_search );
+        item.setIcon(android.R.drawable.ic_menu_search);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+        item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
+        item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         MainActivity main = MainActivity.getMainActivity(this);
@@ -289,7 +294,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     /* Handles item selections */
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
-        MainActivity main = MainActivity.getMainActivity(this);
+        final MainActivity main = MainActivity.getMainActivity(this);
         switch ( item.getItemId() ) {
             case MENU_SETTINGS: {
                 MainActivity.info("start settings activity");
@@ -327,6 +332,10 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 return true;
             case MENU_FILTER:
                 onCreateDialog(SSID_FILTER);
+                return true;
+            case MENU_MAP:
+                // call over to finish
+                if (main != null) main.selectFragment(MainActivity.MAP_TAB_POS);
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);

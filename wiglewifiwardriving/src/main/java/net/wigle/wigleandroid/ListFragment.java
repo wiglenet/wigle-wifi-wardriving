@@ -90,7 +90,6 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String PREF_MAP_TRAFFIC = "mapTraffic";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
-    public static final String PREF_USE_WIGLE_TILES = "useWigleTileSource2"; // bool
     public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
     public static final String PREF_MAP_TYPE = "mapType";
 

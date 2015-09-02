@@ -4,22 +4,22 @@
 	android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 <LinearLayout
-	android:id="@+id/linearlayout" 
+	android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
 
 <TextView
-	android:id="@+id/register"   
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+	android:id="@+id/register"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:textSize="24sp"
     />
-    
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="@string/username"
     />
 <EditText
@@ -27,10 +27,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="text" />
-        
-<TextView  
-	android:layout_width="fill_parent" 
-	android:layout_height="wrap_content" 
+
+<TextView
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
 	android:text="@string/password"
 	/>
 <EditText
@@ -38,7 +38,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
-        
+
 <CheckBox android:id="@+id/showpassword"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -52,50 +52,45 @@
 <CheckBox android:id="@+id/donate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/donate" />       
-       
+        android:text="@string/donate" />
+
 <LinearLayout
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
 	android:orientation="horizontal"
-	/> 
+	/>
 
 <CheckBox android:id="@+id/found_sound"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/found_sound" />
-   
+
 <CheckBox android:id="@+id/found_new_sound"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/found_new_sound" />
-        
+
 <CheckBox android:id="@+id/edit_showcurrent"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/show_current" />
-        
+
 <CheckBox android:id="@+id/use_metric"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/use_metric" />
-        
+
 <CheckBox android:id="@+id/circle_size_map"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/circle_size_map" />
-        
+
 <CheckBox android:id="@+id/use_network_location"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/use_network_location" />
-
-<CheckBox android:id="@+id/use_wigle_tiles"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/use_wigle_tiles" />
 
 <CheckBox android:id="@+id/disable_toast"
         android:layout_width="fill_parent"
@@ -109,17 +104,17 @@
     >
 	<Spinner android:id="@+id/periodstill_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/periodstill_text"
 		/>
 	<TextView
-		android:id="@+id/periodstill_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/periodstill_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/periodstill_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -130,17 +125,17 @@
     >
 	<Spinner android:id="@+id/period_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/period_text"
 		/>
 	<TextView
-		android:id="@+id/period_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/period_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/period_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -151,17 +146,17 @@
     >
 	<Spinner android:id="@+id/periodfast_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/periodfast_text"
 		/>
 	<TextView
-		android:id="@+id/periodfast_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/periodfast_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/periodfast_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -172,17 +167,17 @@
     >
 	<Spinner android:id="@+id/gps_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/gps_text"
 		/>
 	<TextView
-		android:id="@+id/gps_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/gps_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/gps_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -193,17 +188,17 @@
     >
 	<Spinner android:id="@+id/speak_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/speak_text"
 		/>
 	<TextView
-		android:id="@+id/speak_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/speak_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/speak_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -214,17 +209,17 @@
     >
 	<Spinner android:id="@+id/battery_kill_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/battery_kill_text"
 		/>
 	<TextView
-		android:id="@+id/battery_kill_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/battery_kill_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/battery_kill_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -235,17 +230,17 @@
     >
 	<Spinner android:id="@+id/reset_wifi_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/reset_wifi_text"
 		/>
 	<TextView
-		android:id="@+id/reset_wifi_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/reset_wifi_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/reset_wifi_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
@@ -256,22 +251,22 @@
     >
 	<Spinner android:id="@+id/language_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="fill_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
+		android:layout_weight="0"
 		android:prompt="@string/language_text"
 		/>
 	<TextView
-		android:id="@+id/language_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="fill_parent" 
+		android:id="@+id/language_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
 		android:text="@string/language_text"
-		android:layout_weight="2"
+		android:layout_weight="1"
 		/>
 </LinearLayout>
 
-<Button android:id="@+id/speech_button" android:layout_width="wrap_content" 
-    android:layout_height="0dip" 
+<Button android:id="@+id/speech_button" android:layout_width="wrap_content"
+    android:layout_height="0dip"
 		android:text="@string/speech_button" android:layout_weight="1"
 		android:paddingTop="10dip" android:paddingBottom="10dip"/>
 
@@ -281,26 +276,26 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	android:orientation="horizontal"
-	/> 
-		
+	/>
+
 <TextView android:text="@string/setting_db_marker"
-	android:layout_width="fill_parent" 
+	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	/>
-	
+
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-	<Button android:id="@+id/reset_maxid_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+	<Button android:id="@+id/reset_maxid_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/reset_maxid_button" android:layout_weight="0"/>
 	<TextView
-		android:id="@+id/reset_maxid_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/reset_maxid_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/reset_maxid_text"
 		android:layout_weight="5"
 		/>
@@ -311,14 +306,14 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-	<Button android:id="@+id/maxout_maxid_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+	<Button android:id="@+id/maxout_maxid_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/maxout_maxid_button" android:layout_weight="0"/>
 	<TextView
-		android:id="@+id/maxout_maxid_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/maxout_maxid_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/maxout_maxid_text"
 		android:layout_weight="5"
 		/>

@@ -251,7 +251,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this, view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
         MainActivity.prefBackedCheckBox(this, view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
         MainActivity.prefBackedCheckBox(this, view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
-        MainActivity.prefBackedCheckBox(this, view, R.id.use_wigle_tiles, ListFragment.PREF_USE_WIGLE_TILES, false);
         MainActivity.prefBackedCheckBox(this, view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
         // speech spinner

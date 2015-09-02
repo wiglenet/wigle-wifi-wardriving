@@ -223,7 +223,7 @@ public final class MappingFragment extends Fragment {
             final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             retval = locationManager.getLastKnownLocation( provider );
         }
-        catch ( IllegalArgumentException ex ) {
+        catch ( final IllegalArgumentException | SecurityException ex ) {
             MainActivity.info("exception getting last known location: " + ex);
         }
         return retval;

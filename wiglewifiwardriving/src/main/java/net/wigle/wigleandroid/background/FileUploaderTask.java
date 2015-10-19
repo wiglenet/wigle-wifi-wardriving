@@ -31,6 +31,8 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.WigleAndroid;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -131,6 +133,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             String openString = filepath + filename;
+            MainActivity.info("Opening file: " + openString);
             file = new File( openString );
             if ( ! file.exists() ) {
                 if (!file.createNewFile()) {

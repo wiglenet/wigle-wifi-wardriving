@@ -13,6 +13,7 @@ import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,28 +37,13 @@ public class KmlWriter extends AbstractBackgroundTask {
     @Override
     protected void subRun() throws IOException {
         final Bundle bundle = new Bundle();
-        final boolean hasSD = MainActivity.hasSD();
-        if ( ! hasSD ) {
-            return;
-        }
-        final String filepath = MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
-        final File path = new File( filepath );
-        //noinspection ResultOfMethodCallIgnored
-        path.mkdirs();
+
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".kml";
-        String openString = filepath + filename;
-        MainActivity.info("openString: " + openString );
-        File file = new File( openString );
-        if ( ! file.exists() ) {
-            if (!file.createNewFile()) {
-                throw new IOException("Could not create file: " + openString);
-            }
-        }
 
-        FileOutputStream fos = new FileOutputStream( file );
+        final FileOutputStream fos = MainActivity.createFile(context, filename);
         // header
         FileUploaderTask.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
@@ -111,7 +97,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         fos.close();
 
-        bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
+        bundle.putString( BackgroundGuiHandler.FILEPATH, MainActivity.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         MainActivity.info( "done with kml export" );
 

@@ -23,6 +23,8 @@ import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
+
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -121,6 +123,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
+    private static final int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 1;
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
@@ -168,6 +171,7 @@ public final class MainActivity extends AppCompatActivity {
         // set language
         setLocale(this);
 
+        setupExternalStorage();
         setupMenuDrawer();
 
         // do some of our own error handling, write a file with the stack
@@ -274,6 +278,56 @@ public final class MainActivity extends AppCompatActivity {
         // show the list by default
         selectFragment(state.currentTab);
         info( "onCreate setup complete" );
+    }
+
+    private void setupExternalStorage() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                // The permission is NOT already granted.
+                // Check if the user has been asked about this permission already and denied
+                // it. If so, we want to give more explanation about why the permission is needed.
+                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    // Show our own UI to explain to the user why we need to read the contacts
+                    // before actually requesting the permission and showing the default UI
+                }
+
+                // Fire off an async request to actually get the permission
+                // This will show the standard permission request dialog UI
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, final String permissions[], final int[] grantResults) {
+        switch (requestCode) {
+            case WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                    // restart the app now that we can talk to the database
+                    Intent i = getBaseContext().getPackageManager()
+                            .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    finish();
+                    startActivity(i);
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     private void setupMenuDrawer() {
@@ -657,6 +711,33 @@ public final class MainActivity extends AppCompatActivity {
         return retval;
     }
 
+    public static String getSDPath() {
+        return MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
+    }
+
+    public static FileOutputStream createFile(final Context context, final String filename) throws IOException {
+        final String filepath = getSDPath();
+        final File path = new File( filepath );
+
+        final boolean hasSD = MainActivity.hasSD();
+        if (hasSD) {
+            //noinspection ResultOfMethodCallIgnored
+            path.mkdirs();
+            final String openString = filepath + filename;
+            MainActivity.info("openString: " + openString);
+            final File file = new File(openString);
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
+                    throw new IOException("Could not create file: " + openString);
+                }
+            }
+
+            return new FileOutputStream(file);
+        }
+
+        return context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
+    }
+
     @Override
     public void onDestroy() {
         MainActivity.info("MAIN: destroy.");
@@ -691,7 +772,7 @@ public final class MainActivity extends AppCompatActivity {
         super.onPause();
 
         // deal with wake lock
-        if ( state.wakeLock.isHeld() ) {
+        if ( state.wakeLock.isHeld()) {
             MainActivity.info("release wake lock");
             state.wakeLock.release();
         }
@@ -741,7 +822,7 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override
     public void onStart() {
-        MainActivity.info( "MAIN: start." );
+        MainActivity.info("MAIN: start." );
         super.onStart();
     }
 
@@ -950,20 +1031,20 @@ public final class MainActivity extends AppCompatActivity {
             // no worries
         }
     }
-    public static void info( final String value ) {
+    public static void info(final String value) {
         Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
-    public static void warn( final String value ) {
+    public static void warn(final String value) {
         Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
-    public static void error( final String value ) {
+    public static void error(final String value) {
         Log.e(LOG_TAG, Thread.currentThread().getName() + "] " + value);
     }
 
-    public static void info( final String value, final Throwable t ) {
+    public static void info( final String value, final Throwable t) {
         Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
     }
-    public static void warn( final String value, final Throwable t ) {
+    public static void warn( final String value, final Throwable t) {
         Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
     }
     public static void error( final String value, final Throwable t ) {
@@ -1084,6 +1165,10 @@ public final class MainActivity extends AppCompatActivity {
 
     public static boolean hasSD() {
         File sdCard = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/" );
+        MainActivity.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
+            + " read: " + sdCard.canRead() + " write: " + sdCard.canWrite()
+            + " path: " + sdCard.getAbsolutePath());
+
         return sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }
 

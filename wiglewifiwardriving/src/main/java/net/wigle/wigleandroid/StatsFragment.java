@@ -119,34 +119,45 @@ public class StatsFragment extends Fragment {
         final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
                 getResources());
 
+        final String siteStatsCacheFilename = "site-stats-cache.json";
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+                siteStatsCacheFilename,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
-                        MainActivity.info("transfer complete callback");
-
-                        final Bundle bundle = new Bundle();
-                        try {
-                            for (final String key : ALL_KEYS) {
-                                String jsonKey = key;
-                                if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
-                                bundle.putLong(key, json.getLong(jsonKey));
-                            }
-                        }
-                        catch (final JSONException ex) {
-                            MainActivity.error("json error: " + ex, ex);
-                        }
-
-                        final Message message = new Message();
-                        message.setData(bundle);
-                        message.what = MSG_SITE_DONE;
-                        handler.sendMessage(message);
+                        handleSiteStats(json, handler);
                     }
                 });
+
+        handleSiteStats(task.getCached(), handler);
+
         task.start();
     }
 
+    private void handleSiteStats(final JSONObject json, final Handler handler) {
+        MainActivity.info("handleSiteStats");
+        if (json == null) {
+            MainActivity.info("handleSiteStats null json, returning");
+            return;
+        }
 
+        final Bundle bundle = new Bundle();
+        try {
+            for (final String key : ALL_KEYS) {
+                String jsonKey = key;
+                if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
+                bundle.putLong(key, json.getLong(jsonKey));
+            }
+        }
+        catch (final JSONException ex) {
+            MainActivity.error("json error: " + ex, ex);
+        }
+
+        final Message message = new Message();
+        message.setData(bundle);
+        message.what = MSG_SITE_DONE;
+        handler.sendMessage(message);
+    }
 
     @Override
     public void onDestroy() {

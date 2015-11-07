@@ -341,7 +341,7 @@ public final class DatabaseHelper extends Thread {
         final File dbFile = new File( dbFilename );
         boolean doCreateNetwork = false;
         boolean doCreateLocation = false;
-        if ( ! dbFile.exists() ) {
+        if ( ! dbFile.exists() && hasSD ) {
             doCreateNetwork = true;
             doCreateLocation = true;
         }

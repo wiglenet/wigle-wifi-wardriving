@@ -13,6 +13,8 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -124,6 +126,7 @@ public final class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 1;
+    private static final int LOCATION_PERMISSIONS_REQUEST = 2;
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
@@ -163,7 +166,7 @@ public final class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
         // set language
-        setLocale( this );
+        setLocale(this);
         setContentView(R.layout.main);
 
         mainActivity = this;
@@ -171,6 +174,7 @@ public final class MainActivity extends AppCompatActivity {
         // set language
         setLocale(this);
 
+        setupLocationPermissions();
         setupExternalStorage();
         setupMenuDrawer();
 
@@ -289,7 +293,11 @@ public final class MainActivity extends AppCompatActivity {
                 if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     // Show our own UI to explain to the user why we need to read the contacts
                     // before actually requesting the permission and showing the default UI
+                    Toast.makeText(mainActivity, mainActivity.getString(R.string.allow_storage), Toast.LENGTH_LONG)
+                            .show();
                 }
+
+                MainActivity.info("no permission for external storage");
 
                 // Fire off an async request to actually get the permission
                 // This will show the standard permission request dialog UI
@@ -297,6 +305,58 @@ public final class MainActivity extends AppCompatActivity {
                         WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
             }
         }
+    }
+
+    private void setupLocationPermissions() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            final List<String> permissionsNeeded = new ArrayList<>();
+            final List<String> permissionsList = new ArrayList<>();
+            if (!addPermission(permissionsList, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                permissionsNeeded.add(mainActivity.getString(R.string.gps_permission));
+            }
+            if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
+            }
+
+            if (!permissionsList.isEmpty()) {
+                // The permission is NOT already granted.
+                // Check if the user has been asked about this permission already and denied
+                // it. If so, we want to give more explanation about why the permission is needed.
+                if (!permissionsNeeded.isEmpty()) {
+                    String message = mainActivity.getString(R.string.please_allow);
+                    for (int i = 0; i < permissionsNeeded.size(); i++) {
+                        if (i > 0) message += ", ";
+                        message += permissionsNeeded.get(i);
+                    }
+
+                    // Show our own UI to explain to the user why we need to read the contacts
+                    // before actually requesting the permission and showing the default UI
+                    Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+                }
+
+                MainActivity.info("no permission for gps or cell location");
+
+                // Fire off an async request to actually get the permission
+                // This will show the standard permission request dialog UI
+                requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
+                        LOCATION_PERMISSIONS_REQUEST);
+            }
+        }
+    }
+
+    private boolean addPermission(List<String> permissionsList, String permission) {
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsList.add(permission);
+                // Check for Rationale Option
+                if (!shouldShowRequestPermissionRationale(permission))
+                    return false;
+            }
+        }
+        else {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -325,8 +385,12 @@ public final class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // other 'case' lines to check for other
-            // permissions this app might request
+            case LOCATION_PERMISSIONS_REQUEST: {
+                info("location grant response: " + Arrays.toString(grantResults));
+            }
+
+            default:
+                warn("Unhandled onRequestPermissionsResult code: " + requestCode);
         }
     }
 
@@ -1407,21 +1471,28 @@ public final class MainActivity extends AppCompatActivity {
     private void setupLocation() {
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // check if there is a gps
-        final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
-        if ( locProvider == null ) {
-            Toast.makeText( this, getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
+        try {
+            // check if there is a gps
+            final LocationProvider locProvider = locationManager.getProvider( GPS_PROVIDER );
+
+            if ( locProvider == null ) {
+                Toast.makeText( this, getString(R.string.no_gps_device), Toast.LENGTH_LONG ).show();
+            }
+            else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
+                // gps exists, but isn't on
+                Toast.makeText( this, getString(R.string.turn_on_gps), Toast.LENGTH_LONG ).show();
+                final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
+                try {
+                    startActivity(myIntent);
+                }
+                catch (Exception ex) {
+                    error("exception trying to start location activity: " + ex, ex);
+                }
+            }
         }
-        else if ( ! locationManager.isProviderEnabled( GPS_PROVIDER ) ) {
-            // gps exists, but isn't on
-            Toast.makeText( this, getString(R.string.turn_on_gps), Toast.LENGTH_SHORT ).show();
-            final Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS );
-            try {
-                startActivity(myIntent);
-            }
-            catch (Exception ex) {
-                MainActivity.error("exception trying to start location activity: " + ex, ex);
-            }
+        catch (final SecurityException ex) {
+            info("Security exception in setupLocation: " + ex);
+            return;
         }
 
         if ( state.gpsListener == null ) {
@@ -1432,8 +1503,8 @@ public final class MainActivity extends AppCompatActivity {
 
     private void handleScanChange() {
         final boolean isScanning = isScanning();
-        MainActivity.info("handleScanChange: isScanning now: " + isScanning);
-        if ( isScanning ) {
+        info("handleScanChange: isScanning now: " + isScanning);
+        if (isScanning) {
             if (listActivity != null) {
                 listActivity.setStatusUI( "Scanning Turned On" );
             }
@@ -1489,7 +1560,12 @@ public final class MainActivity extends AppCompatActivity {
         // create a new listener to try and get around the gps stopping bug
         state.gpsListener = new GPSListener( this );
         state.gpsListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
-        locationManager.addGpsStatusListener( state.gpsListener );
+        try {
+            locationManager.addGpsStatusListener(state.gpsListener);
+        }
+        catch (final SecurityException ex) {
+            info("Security exception adding status listener: " + ex, ex);
+        }
 
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean useNetworkLoc = prefs.getBoolean(ListFragment.PREF_USE_NETWORK_LOC, false);
@@ -1504,7 +1580,12 @@ public final class MainActivity extends AppCompatActivity {
                 }
                 if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
                     MainActivity.info("using provider: " + provider);
-                    locationManager.requestLocationUpdates( provider, updateIntervalMillis, updateMeters, state.gpsListener );
+                    try {
+                        locationManager.requestLocationUpdates(provider, updateIntervalMillis, updateMeters, state.gpsListener);
+                    }
+                    catch (final SecurityException ex) {
+                        info("Security exception adding status listener: " + ex, ex);
+                    }
                 }
             }
         }
@@ -1592,8 +1673,10 @@ public final class MainActivity extends AppCompatActivity {
             fileUploaderTask.setInterrupted();
         }
 
-        // save our location for later runs
-        state.gpsListener.saveLocation();
+        if (state.gpsListener != null) {
+            // save our location for later runs
+            state.gpsListener.saveLocation();
+        }
 
         // close the db. not in destroy, because it'll still write after that.
         state.dbHelper.close();

@@ -280,5 +280,9 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
+    <string name="please_allow">Please allow permission to use</string>
+    <string name="gps_permission">GPS (Fine Location)</string>
+    <string name="cell_permission">Cell Location (Coarse Location)</string>
+    <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
 
 </resources>

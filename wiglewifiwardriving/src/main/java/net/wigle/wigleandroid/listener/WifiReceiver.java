@@ -144,7 +144,10 @@ public class WifiReceiver extends BroadcastReceiver {
         try {
             results = wifiManager.getScanResults(); // return can be null!
         }
-        catch (Exception ex) {
+        catch (final SecurityException ex) {
+            MainActivity.info("security exception getting scan results: " + ex, ex);
+        }
+        catch (final Exception ex) {
             // ignore, happens on some vm's
             MainActivity.info("exception getting scan results: " + ex, ex);
         }
@@ -501,6 +504,9 @@ public class WifiReceiver extends BroadcastReceiver {
             catch ( NullPointerException ex ) {
                 // bug in Archos7 can NPE there, just ignore
             }
+            catch (final SecurityException ex) {
+                MainActivity.info("Security exception tele.getCellLocation: " + ex);
+            }
 
             //noinspection StatementWithEmptyBody
             if ( cellLocation == null ) {
@@ -695,7 +701,11 @@ public class WifiReceiver extends BroadcastReceiver {
         String scanPref = ListFragment.PREF_SCAN_PERIOD;
         long defaultRate = MainActivity.SCAN_DEFAULT;
         // if over 5 mph
-        final Location location = mainActivity.getGPSListener().getLocation();
+        Location location = null;
+        final GPSListener gpsListener = mainActivity.getGPSListener();
+        if (gpsListener != null) {
+            location = gpsListener.getLocation();
+        }
         if ( location != null && location.getSpeed() >= 2.2352f ) {
             scanPref = ListFragment.PREF_SCAN_PERIOD_FAST;
             defaultRate = MainActivity.SCAN_FAST_DEFAULT;

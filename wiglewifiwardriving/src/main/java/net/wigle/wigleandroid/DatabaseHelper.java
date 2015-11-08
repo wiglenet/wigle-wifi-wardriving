@@ -21,6 +21,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.wigle.wigleandroid.DataFragment.BackupTask;
+import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.model.Pair;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;

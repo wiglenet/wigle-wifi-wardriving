@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.background;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -6,6 +6,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import net.wigle.wigleandroid.DBException;
+import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.MainActivity;
 
 public class QueryThread extends Thread {
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
@@ -46,7 +50,7 @@ public class QueryThread extends Thread {
             queue.put( request );
         }
         catch ( InterruptedException ex ) {
-            MainActivity.info( getName() + " interrupted" );
+            MainActivity.info(getName() + " interrupted");
         }
     }
 

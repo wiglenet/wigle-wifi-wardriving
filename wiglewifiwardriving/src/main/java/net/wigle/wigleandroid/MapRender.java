@@ -28,6 +28,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
+import net.wigle.wigleandroid.model.Network;
+
 public class MapRender implements ClusterManager.OnClusterClickListener<Network>,
         ClusterManager.OnClusterInfoWindowClickListener<Network>,
         ClusterManager.OnClusterItemClickListener<Network>,

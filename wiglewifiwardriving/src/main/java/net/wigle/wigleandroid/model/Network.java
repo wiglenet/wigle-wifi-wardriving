@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.model;
 
 import java.util.Collections;
 import java.util.HashMap;

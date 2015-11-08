@@ -6,6 +6,9 @@ import java.util.regex.PatternSyntaxException;
 
 import android.content.SharedPreferences;
 
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkType;
+
 /**
  * filter matchers
  */

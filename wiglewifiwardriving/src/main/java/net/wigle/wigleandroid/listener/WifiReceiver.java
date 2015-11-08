@@ -13,14 +13,14 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.DashboardFragment;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.Network;
+import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
-import net.wigle.wigleandroid.NetworkType;
+import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
 import android.content.BroadcastReceiver;

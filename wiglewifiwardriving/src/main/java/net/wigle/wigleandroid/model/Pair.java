@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.model;
 
 public final class Pair<A,B> {
     private A a;

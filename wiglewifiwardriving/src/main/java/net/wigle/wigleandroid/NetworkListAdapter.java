@@ -14,6 +14,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkType;
+
 /**
  * the array adapter for a list of networks.
  * note: separators aren't drawn if areAllItemsEnabled or isEnabled are false

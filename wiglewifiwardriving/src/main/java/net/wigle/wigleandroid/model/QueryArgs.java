@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.model;
 
 import android.location.Address;
 

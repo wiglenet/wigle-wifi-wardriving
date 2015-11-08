@@ -6,6 +6,8 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
+import net.wigle.wigleandroid.model.Pair;
+import net.wigle.wigleandroid.model.QueryArgs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -9,8 +9,8 @@ import java.net.URLEncoder;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.Network;
-import net.wigle.wigleandroid.NetworkType;
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.NetworkType;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

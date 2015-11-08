@@ -29,7 +29,7 @@ import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.Network;
+import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.R;
 
 import android.annotation.SuppressLint;

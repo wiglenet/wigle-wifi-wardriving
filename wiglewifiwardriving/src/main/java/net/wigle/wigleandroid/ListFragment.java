@@ -35,6 +35,9 @@ import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.QueryArgs;
 
 import java.text.NumberFormat;
 import java.util.Set;

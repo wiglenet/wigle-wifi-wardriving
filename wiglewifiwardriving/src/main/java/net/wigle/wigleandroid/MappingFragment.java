@@ -43,6 +43,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.Network;
+
 /**
  * show a map!
  */

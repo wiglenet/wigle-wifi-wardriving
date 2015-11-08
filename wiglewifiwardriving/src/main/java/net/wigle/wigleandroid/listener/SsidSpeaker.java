@@ -3,7 +3,7 @@ package net.wigle.wigleandroid.listener;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.wigle.wigleandroid.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.MainActivity;
 
 public final class SsidSpeaker {

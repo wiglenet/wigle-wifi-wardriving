@@ -31,7 +31,6 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.Network;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.WigleAndroid;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

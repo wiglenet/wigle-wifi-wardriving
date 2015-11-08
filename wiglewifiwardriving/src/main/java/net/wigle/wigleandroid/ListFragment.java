@@ -3,13 +3,6 @@
 
 package net.wigle.wigleandroid;
 
-import java.text.NumberFormat;
-import java.util.Set;
-
-import net.wigle.wigleandroid.MainActivity.State;
-import net.wigle.wigleandroid.background.TransferListener;
-import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.listener.WifiReceiver;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +30,14 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import net.wigle.wigleandroid.MainActivity.State;
+import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.TransferListener;
+import net.wigle.wigleandroid.listener.WifiReceiver;
+
+import java.text.NumberFormat;
+import java.util.Set;
 
 public final class ListFragment extends Fragment implements TransferListener, DialogListener {
     private static final int MENU_SETTINGS = 10;
@@ -547,7 +548,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
             }
             else {
                 String distString = DashboardFragment.metersToString(
-                        state.numberFormat0, getActivity(), location.getAccuracy(), true );
+                        state.numberFormat0, getActivity(), location.getAccuracy(), true);
                 tv4.setText( "+/- " + distString );
                 distString = DashboardFragment.metersToString(
                         state.numberFormat0, getActivity(), (float) location.getAltitude(), true );

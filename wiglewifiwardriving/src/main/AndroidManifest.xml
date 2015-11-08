@@ -53,18 +53,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- have this available too for backwards compatibility -->
-        <activity android:name=".WigleAndroid"
-                android:label="@string/app_name"
-                android:theme="@style/Theme.AppCompat"
-                android:launchMode="singleTask"
-                android:exported="false"
-                android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
-        </activity>
         <activity android:name=".ErrorReportActivity"
                   android:label="@string/error_report_name"
                   android:theme="@style/Theme.AppCompat"

@@ -1,10 +1,5 @@
 package net.wigle.wigleandroid;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();

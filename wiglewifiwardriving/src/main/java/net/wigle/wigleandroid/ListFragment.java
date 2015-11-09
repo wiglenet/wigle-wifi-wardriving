@@ -62,6 +62,8 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String SHARED_PREFS = "WiglePrefs";
     public static final String PREF_USERNAME = "username";
     public static final String PREF_PASSWORD = "password";
+    public static final String PREF_AUTHNAME = "authname";
+    public static final String PREF_TOKEN = "token";
     public static final String PREF_SHOW_CURRENT = "showCurrent";
     public static final String PREF_BE_ANONYMOUS = "beAnonymous";
     public static final String PREF_DONATE = "donate";

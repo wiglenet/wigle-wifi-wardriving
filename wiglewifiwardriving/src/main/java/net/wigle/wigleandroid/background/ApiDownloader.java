@@ -10,35 +10,43 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
 
 public class ApiDownloader extends AbstractBackgroundTask {
     private final ApiListener listener;
     private final String cacheFilename;
+    private final String url;
+    private final boolean doFormLogin;
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
-                         final String cacheFilename, final ApiListener listener) {
+                         final String cacheFilename, final String url, final boolean doFormLogin,
+                         final ApiListener listener) {
 
         super(context, dbHelper, "ApiDL", false);
         this.cacheFilename = cacheFilename;
+        this.url = url;
+        this.doFormLogin = doFormLogin;
         this.listener = listener;
     }
 
     @Override
     protected void subRun() throws IOException, InterruptedException {
+        String result = null;
         try {
-            final String result = doDownload();
-            cacheResult(result);
+            result = doDownload();
+            if (cacheFilename != null) {
+                cacheResult(result);
+            }
             final JSONObject json = new JSONObject(result);
             listener.requestComplete(json);
         }
         catch (final Exception ex) {
-            MainActivity.error("ex: " + ex, ex);
+            MainActivity.error("ex: " + ex + " result: " + result, ex);
         }
     }
 
@@ -104,14 +112,20 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private String doDownload() throws IOException, InterruptedException {
 
         final boolean setBoundary = false;
-        final HttpURLConnection conn = HttpFileUploader.connect(
-                MainActivity.SITE_STATS_URL, setBoundary );
+        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary);
         if (conn == null) {
             throw new IOException("No connection created");
         }
 
         // Send POST output.
         final DataOutputStream printout = new DataOutputStream (conn.getOutputStream ());
+        if (doFormLogin) {
+            final String username = getUsername();
+            final String password = getPassword();
+            final String content = "credential_0=" + URLEncoder.encode(username, HttpFileUploader.ENCODING) +
+                    "&credential_1=" + URLEncoder.encode(password, HttpFileUploader.ENCODING);
+            printout.writeBytes(content);
+        }
         printout.flush();
         printout.close();
 
@@ -142,7 +156,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
             }
             result.append(line);
 
-            MainActivity.info("siteStats: " + line);
+            MainActivity.info("apiDownloader result: " + line);
         }
         return result.toString();
     }

@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -68,6 +69,15 @@ public class StatsFragment extends Fragment {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
+
+        // download token if needed
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final boolean beAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
+        MainActivity.info("authname: " + prefs.getString(ListFragment.PREF_AUTHNAME, null));
+        if (!beAnonymous && prefs.getString(ListFragment.PREF_AUTHNAME, null) == null) {
+            MainActivity.info("No authname, going to request token");
+            downloadToken(null);
+        }
     }
 
     @Override
@@ -77,7 +87,7 @@ public class StatsFragment extends Fragment {
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.stats, container, false);
 
         // XXX: don't do this if it has been done recently
-        downloadLatest(scrollView);
+        downloadLatestSiteStats(scrollView);
 
         return scrollView;
 
@@ -114,14 +124,14 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    public void downloadLatest(final View view) {
+    public void downloadLatestSiteStats(final View view) {
         // what runs on the gui thread
         final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
                 getResources());
 
         final String siteStatsCacheFilename = "site-stats-cache.json";
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                siteStatsCacheFilename,
+                siteStatsCacheFilename, MainActivity.SITE_STATS_URL, false,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
@@ -157,6 +167,40 @@ public class StatsFragment extends Fragment {
         message.setData(bundle);
         message.what = MSG_SITE_DONE;
         handler.sendMessage(message);
+    }
+
+    public void downloadToken(final ApiDownloader pendingTask) {
+        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+                null, MainActivity.TOKEN_URL, true,
+                new ApiListener() {
+                    @Override
+                    public void requestComplete(final JSONObject json) {
+                        try {
+                            // {"success":true,"result":{"authname":"AID...","token":"..."}}
+                            if (json.getBoolean("success")) {
+                                final JSONObject result = json.getJSONObject("result");
+                                final String authname = result.getString("authname");
+                                final String token = result.getString("token");
+                                final SharedPreferences prefs =
+                                        getContext().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                final SharedPreferences.Editor edit = prefs.edit();
+                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
+                                edit.putString(ListFragment.PREF_TOKEN, token);
+                                edit.apply();
+
+                                // execute pending task
+                                if (pendingTask != null) {
+                                    pendingTask.start();
+                                }
+                            }
+                        }
+                        catch (final JSONException ex) {
+                            MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                        }
+                    }
+                });
+
+        task.start();
     }
 
     @Override

@@ -125,6 +125,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
+    public static final String TOKEN_URL = "https://wigle.net/api/v1/jsonActivateClient";
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 1;

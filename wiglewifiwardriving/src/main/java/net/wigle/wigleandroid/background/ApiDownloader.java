@@ -1,8 +1,11 @@
 package net.wigle.wigleandroid.background;
 
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
+import android.util.Base64;
 
 import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 
 import org.json.JSONObject;
@@ -22,15 +25,18 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private final String cacheFilename;
     private final String url;
     private final boolean doFormLogin;
+    private final boolean doBasicLogin;
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
+                         final boolean doBasicLogin,
                          final ApiListener listener) {
 
         super(context, dbHelper, "ApiDL", false);
         this.cacheFilename = cacheFilename;
         this.url = url;
         this.doFormLogin = doFormLogin;
+        this.doBasicLogin = doBasicLogin;
         this.listener = listener;
     }
 
@@ -115,6 +121,15 @@ public class ApiDownloader extends AbstractBackgroundTask {
         final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary);
         if (conn == null) {
             throw new IOException("No connection created");
+        }
+
+        if (doBasicLogin) {
+            final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final String token = prefs.getString(ListFragment.PREF_TOKEN, null);
+            String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+            // TODO: ex: java.lang.IllegalStateException: Cannot set request property after connection is made
+            conn.setRequestProperty("Authorization", "Basic " + encoded);
         }
 
         // Send POST output.

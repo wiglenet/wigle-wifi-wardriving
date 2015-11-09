@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,13 +24,16 @@ import net.wigle.wigleandroid.background.ApiListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class StatsFragment extends Fragment {
+public class SiteStatsFragment extends Fragment {
     private static final int MSG_SITE_DONE = 100;
+    private static final int MSG_USER_DONE = 101;
 
     private static final String KEY_NETLOC = "netloc";
     private static final String KEY_LOCTOTAL = "loctotal";
@@ -43,10 +47,12 @@ public class StatsFragment extends Fragment {
     private static final String KEY_NETWEP_UNKNOWN = "netwepunknown";
 
 
-    private static final String[] ALL_KEYS = new String[] {
+    private static final String[] ALL_SITE_KEYS = new String[] {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
         KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
+    private static final String[] ALL_USER_KEYS = new String[] {
+    };
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
@@ -72,9 +78,10 @@ public class StatsFragment extends Fragment {
 
         // download token if needed
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
-        MainActivity.info("authname: " + prefs.getString(ListFragment.PREF_AUTHNAME, null));
-        if (!beAnonymous && prefs.getString(ListFragment.PREF_AUTHNAME, null) == null) {
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+        MainActivity.info("authname: " + authname);
+        if (!beAnonymous && authname == null) {
             MainActivity.info("No authname, going to request token");
             downloadToken(null);
         }
@@ -88,6 +95,7 @@ public class StatsFragment extends Fragment {
 
         // XXX: don't do this if it has been done recently
         downloadLatestSiteStats(scrollView);
+        downloadLatestUserStats(scrollView);
 
         return scrollView;
 
@@ -114,12 +122,20 @@ public class StatsFragment extends Fragment {
             if (msg.what == MSG_SITE_DONE) {
                 TextView tv;
 
-                for (final String key : ALL_KEYS) {
+                for (final String key : ALL_SITE_KEYS) {
                     int id = resources.getIdentifier(key, "id", packageName);
                     tv = (TextView) view.findViewById(id);
                     tv.setText(numberFormat.format(bundle.getLong(key)));
                 }
+            }
+            else if (msg.what == MSG_USER_DONE) {
+                TextView tv;
 
+                for (final String key : ALL_USER_KEYS) {
+                    int id = resources.getIdentifier(key, "id", packageName);
+                    tv = (TextView) view.findViewById(id);
+                    tv.setText(numberFormat.format(bundle.getLong(key)));
+                }
             }
         }
     }
@@ -131,7 +147,7 @@ public class StatsFragment extends Fragment {
 
         final String siteStatsCacheFilename = "site-stats-cache.json";
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                siteStatsCacheFilename, MainActivity.SITE_STATS_URL, false,
+                siteStatsCacheFilename, MainActivity.SITE_STATS_URL, false, false,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
@@ -153,7 +169,7 @@ public class StatsFragment extends Fragment {
 
         final Bundle bundle = new Bundle();
         try {
-            for (final String key : ALL_KEYS) {
+            for (final String key : ALL_SITE_KEYS) {
                 String jsonKey = key;
                 if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
                 bundle.putLong(key, json.getLong(jsonKey));
@@ -171,7 +187,7 @@ public class StatsFragment extends Fragment {
 
     public void downloadToken(final ApiDownloader pendingTask) {
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true,
+                null, MainActivity.TOKEN_URL, true, false,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
@@ -201,6 +217,53 @@ public class StatsFragment extends Fragment {
                 });
 
         task.start();
+    }
+
+    public void downloadLatestUserStats(final View view) {
+        // what runs on the gui thread
+        final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
+                getResources());
+
+        final String userStatsCacheFilename = "user-stats-cache.json";
+        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+                userStatsCacheFilename, MainActivity.USER_STATS_URL, false, true,
+                new ApiListener() {
+                    @Override
+                    public void requestComplete(final JSONObject json) {
+                        handleUserStats(json, handler);
+                    }
+                });
+
+        handleUserStats(task.getCached(), handler);
+
+        task.start();
+    }
+
+    private void handleUserStats(final JSONObject json, final Handler handler) {
+        MainActivity.info("handleUserStats");
+        if (json == null) {
+            MainActivity.info("handleUserStats null json, returning");
+            return;
+        }
+        MainActivity.info("user stats: " + json);
+        if (true) return;
+
+        final Bundle bundle = new Bundle();
+        try {
+            for (final String key : ALL_SITE_KEYS) {
+                String jsonKey = key;
+                if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
+                bundle.putLong(key, json.getLong(jsonKey));
+            }
+        }
+        catch (final JSONException ex) {
+            MainActivity.error("json error: " + ex, ex);
+        }
+
+        final Message message = new Message();
+        message.setData(bundle);
+        message.what = MSG_SITE_DONE;
+        handler.sendMessage(message);
     }
 
     @Override

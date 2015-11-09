@@ -126,6 +126,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
     public static final String TOKEN_URL = "https://wigle.net/api/v1/jsonActivateClient";
+    public static final String USER_STATS_URL = "https://api.wigle.net/v1/jsonUserStats";
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 1;
@@ -550,7 +551,7 @@ public final class MainActivity extends AppCompatActivity {
         state.fragList[DATA_TAB_POS] = data;
 
         info("Creating StatsActivity");
-        final StatsFragment stats = new StatsFragment();
+        final SiteStatsFragment stats = new SiteStatsFragment();
         bundle = new Bundle();
         stats.setArguments(bundle);
         state.fragList[STATS_TAB_POS] = stats;

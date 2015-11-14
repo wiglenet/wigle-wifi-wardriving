@@ -118,18 +118,25 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private String doDownload() throws IOException, InterruptedException {
 
         final boolean setBoundary = false;
-        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary);
-        if (conn == null) {
-            throw new IOException("No connection created");
-        }
 
+        PreConnectConfigurator preConnectConfigurator = null;
         if (doBasicLogin) {
             final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
             final String token = prefs.getString(ListFragment.PREF_TOKEN, null);
-            String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
-            // TODO: ex: java.lang.IllegalStateException: Cannot set request property after connection is made
-            conn.setRequestProperty("Authorization", "Basic " + encoded);
+            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+            // Cannot set request property after connection is made
+            preConnectConfigurator = new PreConnectConfigurator() {
+                @Override
+                public void configure(HttpURLConnection connection) {
+                    connection.setRequestProperty("Authorization", "Basic " + encoded);
+                }
+            };
+        }
+
+        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary, preConnectConfigurator);
+        if (conn == null) {
+            throw new IOException("No connection created");
         }
 
         // Send POST output.

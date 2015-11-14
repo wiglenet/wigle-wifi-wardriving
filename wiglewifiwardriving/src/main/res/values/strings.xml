@@ -269,7 +269,7 @@
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
     <string name="tab_stats">Statistics</string>
-    <string name="stats_app_name">WiGLE.net Statistics</string>
+    <string name="site_stats_app_name">WiGLE.net Statistics</string>
     <string name="netloc_title">WiGLE.net Wifi Networks with Location</string>
     <string name="loctotal_title">WiGLE.net Wifi Network Observations</string>
     <string name="genloc_title">WiGLE.net Cell Towers with Location</string>
@@ -280,6 +280,17 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
+    <string name="user_stats_app_name">User Statistics</string>
+    <string name="rank_title">User Ranking:</string>
+    <string name="discovered_title">Discovered Wifi Networks (New to WiGLE)</string>
+    <string name="total_title">Total Wifi Networks Seen</string>
+    <string name="totallocs_title">Total Wifi Observations Recorded</string>
+    <string name="gendisc_title">Discovered Cell Networks (New to WiGLE)</string>
+    <string name="gentotal_title">Total Cell Networks Seen</string>
+    <string name="monthcount_title">Wifi Discovered This Month</string>
+    <string name="prevmonthcount_title">Wifi Discovered Last Month</string>
+    <string name="firsttransid_title">First Transaction ID</string>
+    <string name="lasttransid_title">Latest Transaction ID</string>
     <string name="please_allow">Please allow permission to use</string>
     <string name="gps_permission">GPS (Fine Location)</string>
     <string name="cell_permission">Cell Location (Coarse Location)</string>

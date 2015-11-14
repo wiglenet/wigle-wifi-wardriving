@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/stats_scrolllayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:keepScreenOn="true" >
+
+    <LinearLayout
+        android:id="@+id/linearlayout"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netloc_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/netloc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/loctotal_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/loctotal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/genloc_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/genloc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/userstot_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/userstot"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/transtot_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/transtot"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netwpa2_title"
+            android:textSize="16sp"
+            android:textColor="#00ff00"/>
+        <TextView
+            android:id="@+id/netwpa2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netwpa_title"
+            android:textSize="16sp"
+            android:textColor="#ffff00"/>
+        <TextView
+            android:id="@+id/netwpa"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netwep_title"
+            android:textSize="16sp"
+            android:textColor="#ffad00"/>
+        <TextView
+            android:id="@+id/netwep"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netnowep_title"
+            android:textSize="16sp"
+            android:textColor="#ff0000"/>
+        <TextView
+            android:id="@+id/netnowep"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/netwepunknown_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/netwepunknown"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            />
+    </LinearLayout>
+
+</ScrollView>

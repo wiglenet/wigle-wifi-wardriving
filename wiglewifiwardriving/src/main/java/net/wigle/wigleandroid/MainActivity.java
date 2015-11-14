@@ -497,7 +497,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.mapping_app_name),
                 getString(R.string.dashboard_app_name),
                 getString(R.string.data_activity_name),
-                getString(R.string.stats_app_name),
+                getString(R.string.site_stats_app_name),
                 getString(R.string.settings_app_name),
                 getString(R.string.menu_exit),
         };
@@ -525,36 +525,35 @@ public final class MainActivity extends AppCompatActivity {
 
 
     private void setupFragments() {
-        info("Creating ListActivity");
+        info("Creating ListFragment");
         listActivity = new ListFragment();
         Bundle bundle = new Bundle();
         listActivity.setArguments(bundle);
         state.fragList[LIST_TAB_POS] = listActivity;
 
-        info("Creating MappingActivity");
+        info("Creating MappingFragment");
         final MappingFragment map = new MappingFragment();
-        // SupportMapFragment map = new SupportMapFragment();
         bundle = new Bundle();
         map.setArguments(bundle);
         state.fragList[MAP_TAB_POS] = map;
 
-        info("Creating DashboardActivity");
+        info("Creating DashboardFragment");
         final DashboardFragment dash = new DashboardFragment();
         bundle = new Bundle();
         dash.setArguments(bundle);
         state.fragList[DASH_TAB_POS] = dash;
 
-        info("Creating DataActivity");
+        info("Creating DataFragment");
         final DataFragment data = new DataFragment();
         bundle = new Bundle();
         data.setArguments(bundle);
         state.fragList[DATA_TAB_POS] = data;
 
-        info("Creating StatsActivity");
-        final SiteStatsFragment stats = new SiteStatsFragment();
+        info("Creating SiteStatsFragment");
+        final UserStatsFragment userStats = new UserStatsFragment();
         bundle = new Bundle();
-        stats.setArguments(bundle);
-        state.fragList[STATS_TAB_POS] = stats;
+        userStats.setArguments(bundle);
+        state.fragList[STATS_TAB_POS] = userStats;
 
         info("Creating SettingsFragment");
         final SettingsFragment settings = new SettingsFragment();

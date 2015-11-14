@@ -14,140 +14,157 @@
         android:padding="4dp"
         >
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/linearlayout2"
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/netloc_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/netloc"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            />
+            android:paddingBottom="4dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/rank_title"
+                android:textSize="32sp"
+                android:paddingRight="6dp"
+                />
+            <TextView
+                android:id="@+id/rank"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/status_unknown"
+                android:textSize="32sp"
+                android:textColor="#ffff00"/>
+        </LinearLayout>
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/loctotal_title"
-            android:textSize="16sp"
+            android:text="@string/discovered_title"
+            android:textSize="20sp"
             />
         <TextView
-            android:id="@+id/loctotal"
+            android:id="@+id/discovered"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/genloc_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/genloc"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/userstot_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/userstot"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transtot_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/transtot"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/netwpa2_title"
-            android:textSize="16sp"
+            android:textSize="20sp"
+            android:paddingBottom="2dp"
             android:textColor="#00ff00"/>
+
         <TextView
-            android:id="@+id/netwpa2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/total_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/total"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
+            android:paddingBottom="2dp"
             />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/netwpa_title"
+            android:text="@string/totallocs_title"
             android:textSize="16sp"
-            android:textColor="#ffff00"/>
+            />
         <TextView
-            android:id="@+id/netwpa"
+            android:id="@+id/totallocs"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
+            android:paddingBottom="2dp"
             />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/netwep_title"
+            android:text="@string/gendisc_title"
             android:textSize="16sp"
-            android:textColor="#ffad00"/>
+            />
         <TextView
-            android:id="@+id/netwep"
+            android:id="@+id/gendisc"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
+            android:paddingBottom="2dp"
             />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/netnowep_title"
+            android:text="@string/gentotal_title"
             android:textSize="16sp"
-            android:textColor="#ff0000"/>
+            />
         <TextView
-            android:id="@+id/netnowep"
+            android:id="@+id/gentotal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
+            android:paddingBottom="2dp"
             />
 
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/netwepunknown_title"
+            android:text="@string/monthcount_title"
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/netwepunknown"
+            android:id="@+id/monthcount"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prevmonthcount_title"
+            android:textSize="16sp"
+            android:textColor="#909090"/>
+        <TextView
+            android:id="@+id/prevmonthcount"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            android:textColor="#909090"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/firsttransid_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/firsttransid"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lasttransid_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/lasttransid"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"

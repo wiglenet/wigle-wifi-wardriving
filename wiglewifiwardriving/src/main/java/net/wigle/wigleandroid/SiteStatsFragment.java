@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid;
 
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,8 +22,6 @@ import net.wigle.wigleandroid.background.ApiListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -33,7 +29,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SiteStatsFragment extends Fragment {
     private static final int MSG_SITE_DONE = 100;
-    private static final int MSG_USER_DONE = 101;
 
     private static final String KEY_NETLOC = "netloc";
     private static final String KEY_LOCTOTAL = "loctotal";
@@ -51,8 +46,6 @@ public class SiteStatsFragment extends Fragment {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
         KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
-    private static final String[] ALL_USER_KEYS = new String[] {
-    };
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
@@ -60,7 +53,7 @@ public class SiteStatsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("STATS: onCreate");
+        MainActivity.info("SITESTATS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -75,28 +68,15 @@ public class SiteStatsFragment extends Fragment {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
-
-        // download token if needed
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        MainActivity.info("authname: " + authname);
-        if (!beAnonymous && authname == null) {
-            MainActivity.info("No authname, going to request token");
-            downloadToken(null);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("STATS: onCreateView. orientation: " + orientation);
-        final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.stats, container, false);
+        MainActivity.info("SITESTATS: onCreateView. orientation: " + orientation);
+        final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
 
-        // XXX: don't do this if it has been done recently
         downloadLatestSiteStats(scrollView);
-        downloadLatestUserStats(scrollView);
-
         return scrollView;
 
     }
@@ -123,15 +103,6 @@ public class SiteStatsFragment extends Fragment {
                 TextView tv;
 
                 for (final String key : ALL_SITE_KEYS) {
-                    int id = resources.getIdentifier(key, "id", packageName);
-                    tv = (TextView) view.findViewById(id);
-                    tv.setText(numberFormat.format(bundle.getLong(key)));
-                }
-            }
-            else if (msg.what == MSG_USER_DONE) {
-                TextView tv;
-
-                for (final String key : ALL_USER_KEYS) {
                     int id = resources.getIdentifier(key, "id", packageName);
                     tv = (TextView) view.findViewById(id);
                     tv.setText(numberFormat.format(bundle.getLong(key)));
@@ -185,90 +156,9 @@ public class SiteStatsFragment extends Fragment {
         handler.sendMessage(message);
     }
 
-    public void downloadToken(final ApiDownloader pendingTask) {
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json) {
-                        try {
-                            // {"success":true,"result":{"authname":"AID...","token":"..."}}
-                            if (json.getBoolean("success")) {
-                                final JSONObject result = json.getJSONObject("result");
-                                final String authname = result.getString("authname");
-                                final String token = result.getString("token");
-                                final SharedPreferences prefs =
-                                        getContext().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                                final SharedPreferences.Editor edit = prefs.edit();
-                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
-                                edit.putString(ListFragment.PREF_TOKEN, token);
-                                edit.apply();
-
-                                // execute pending task
-                                if (pendingTask != null) {
-                                    pendingTask.start();
-                                }
-                            }
-                        }
-                        catch (final JSONException ex) {
-                            MainActivity.warn("json exception: " + ex + " json: " + json, ex);
-                        }
-                    }
-                });
-
-        task.start();
-    }
-
-    public void downloadLatestUserStats(final View view) {
-        // what runs on the gui thread
-        final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
-                getResources());
-
-        final String userStatsCacheFilename = "user-stats-cache.json";
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                userStatsCacheFilename, MainActivity.USER_STATS_URL, false, true,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json) {
-                        handleUserStats(json, handler);
-                    }
-                });
-
-        handleUserStats(task.getCached(), handler);
-
-        task.start();
-    }
-
-    private void handleUserStats(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleUserStats");
-        if (json == null) {
-            MainActivity.info("handleUserStats null json, returning");
-            return;
-        }
-        MainActivity.info("user stats: " + json);
-        if (true) return;
-
-        final Bundle bundle = new Bundle();
-        try {
-            for (final String key : ALL_SITE_KEYS) {
-                String jsonKey = key;
-                if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
-                bundle.putLong(key, json.getLong(jsonKey));
-            }
-        }
-        catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
-        }
-
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_SITE_DONE;
-        handler.sendMessage(message);
-    }
-
     @Override
     public void onDestroy() {
-        MainActivity.info( "STATS: onDestroy" );
+        MainActivity.info( "SITESTATS: onDestroy" );
         finishing.set( true );
 
         super.onDestroy();
@@ -276,32 +166,32 @@ public class SiteStatsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info("STATS: onResume");
+        MainActivity.info("SITESTATS: onResume");
         super.onResume();
-        getActivity().setTitle(R.string.stats_app_name);
+        getActivity().setTitle(R.string.site_stats_app_name);
     }
 
     @Override
     public void onStart() {
-        MainActivity.info( "STATS: onStart" );
+        MainActivity.info( "SITESTATS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "STATS: onPause" );
+        MainActivity.info( "SITESTATS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "STATS: onStop" );
+        MainActivity.info( "SITESTATS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("STATS: config changed");
+        MainActivity.info("SITESTATS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 

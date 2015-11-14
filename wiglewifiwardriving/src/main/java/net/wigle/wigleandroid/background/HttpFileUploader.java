@@ -37,6 +37,11 @@ final class HttpFileUploader {
 
     public static HttpURLConnection connect(String urlString, final boolean setBoundary)
             throws IOException {
+        return connect(urlString, setBoundary, null);
+    }
+
+    public static HttpURLConnection connect(String urlString, final boolean setBoundary,
+                                            final PreConnectConfigurator preConnectConfigurator) throws IOException {
         URL connectURL;
         try{
             connectURL = new URL( urlString );
@@ -46,11 +51,12 @@ final class HttpFileUploader {
             return null;
         }
 
-        return createConnection(connectURL, setBoundary);
+        return createConnection(connectURL, setBoundary, preConnectConfigurator);
     }
 
-    private static HttpURLConnection createConnection(final URL connectURL,
-                                                      final boolean setBoundary) throws IOException {
+    private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
+                                                      final PreConnectConfigurator preConnectConfigurator)
+            throws IOException {
 
         String javaVersion = "unknown";
         try {
@@ -93,6 +99,11 @@ final class HttpFileUploader {
         conn.setRequestProperty("Transfer-Encoding", "chunked");
         // 8 hours
         conn.setReadTimeout(8*60*60*1000);
+
+        // allow caller to munge
+        if (preConnectConfigurator != null) {
+            preConnectConfigurator.configure(conn);
+        }
 
         // connect
         MainActivity.info( "about to connect" );

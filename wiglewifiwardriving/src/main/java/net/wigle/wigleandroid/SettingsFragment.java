@@ -104,7 +104,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     // confirm
                     MainActivity.createConfirmation( getActivity(),
                             getString(R.string.donate_question) + "\n\n"
-                            + getString(R.string.donate_explain), 0, DONATE_DIALOG);
+                            + getString(R.string.donate_explain),
+                            MainActivity.SETTINGS_TAB_POS, DONATE_DIALOG);
                 }
                 else {
                     editor.putBoolean( ListFragment.PREF_DONATE, false);
@@ -136,7 +137,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( getActivity(), "Upload anonymously?", 0, ANONYMOUS_DIALOG );
+                    MainActivity.createConfirmation( getActivity(), "Upload anonymously?",
+                            MainActivity.SETTINGS_TAB_POS, ANONYMOUS_DIALOG );
                 }
                 else {
                     // unset anonymous
@@ -218,7 +220,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         resetMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out), 0, ZERO_OUT_DIALOG);
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out),
+                        MainActivity.SETTINGS_TAB_POS, ZERO_OUT_DIALOG);
             }
         });
 
@@ -231,7 +234,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         maxoutMaxidButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out), 0, MAX_OUT_DIALOG);
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out),
+                        MainActivity.SETTINGS_TAB_POS, MAX_OUT_DIALOG);
             }
         } );
 

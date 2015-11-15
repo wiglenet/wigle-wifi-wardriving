@@ -74,16 +74,6 @@ public class UserStatsFragment extends Fragment {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
-
-        // download token if needed
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        MainActivity.info("authname: " + authname);
-        if (!beAnonymous && authname == null) {
-            MainActivity.info("No authname, going to request token");
-            downloadToken(null);
-        }
     }
 
     @Override
@@ -92,7 +82,24 @@ public class UserStatsFragment extends Fragment {
         MainActivity.info("USERSTATS: onCreateView. orientation: " + orientation);
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.userstats, container, false);
 
-        downloadLatestUserStats(scrollView);
+        // download token if needed
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+        MainActivity.info("authname: " + authname);
+        if (!beAnonymous) {
+            if (authname == null) {
+                MainActivity.info("No authname, going to request token");
+                final Handler handler = new DownloadHandler(scrollView, numberFormat, getActivity().getPackageName(),
+                        getResources());
+                final ApiDownloader task = getUserStatsTaks(scrollView, handler);
+                downloadToken(task);
+            }
+            else {
+                downloadLatestUserStats(scrollView);
+            }
+        }
 
         return scrollView;
 
@@ -169,13 +176,9 @@ public class UserStatsFragment extends Fragment {
         task.start();
     }
 
-    public void downloadLatestUserStats(final View view) {
-        // what runs on the gui thread
-        final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
-                getResources());
-
+    private ApiDownloader getUserStatsTaks(final View view, final Handler handler) {
         final String userStatsCacheFilename = "user-stats-cache.json";
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+        return new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 userStatsCacheFilename, MainActivity.USER_STATS_URL, false, true,
                 new ApiListener() {
                     @Override
@@ -183,9 +186,14 @@ public class UserStatsFragment extends Fragment {
                         handleUserStats(json, handler);
                     }
                 });
+    }
 
+    private void downloadLatestUserStats(final View view) {
+        // what runs on the gui thread
+        final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
+                getResources());
+        final ApiDownloader task = getUserStatsTaks(view, handler);
         handleUserStats(task.getCached(), handler);
-
         task.start();
     }
 

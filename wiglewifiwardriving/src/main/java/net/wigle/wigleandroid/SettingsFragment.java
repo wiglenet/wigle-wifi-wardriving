@@ -147,7 +147,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     editor.apply();
 
                     // might have to remove or show register link
-                    updateRegister();
+                    updateRegister(view);
                 }
             }
         });
@@ -164,7 +164,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             register.setText(registerString + " " + atString + " WiGLE.net");
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
-        updateRegister();
+        updateRegister(view);
 
         user.setText( prefs.getString( ListFragment.PREF_USERNAME, "" ) );
         user.addTextChangedListener( new SetWatcher() {
@@ -174,7 +174,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 editor.putString( ListFragment.PREF_USERNAME, s.trim() );
                 editor.apply();
                 // might have to remove or show register link
-                updateRegister();
+                updateRegister(view);
             }
         });
 
@@ -355,10 +355,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 if (view != null) {
                     final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
                     be_anonymous.setChecked(true);
+
+                    // might have to remove or show register link
+                    updateRegister(view);
                 }
 
-                // might have to remove or show register link
-                updateRegister();
                 break;
             }
             default:
@@ -381,12 +382,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         getActivity().setTitle(R.string.settings_app_name);
     }
 
-    private void updateRegister() {
+    private void updateRegister(final View view) {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final String username = prefs.getString(ListFragment.PREF_USERNAME, "");
         final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
 
-        final View view = getView();
         if (view != null) {
             final TextView register = (TextView) view.findViewById(R.id.register);
 

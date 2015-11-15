@@ -43,8 +43,6 @@ import java.text.NumberFormat;
 import java.util.Set;
 
 public final class ListFragment extends Fragment implements TransferListener, DialogListener {
-    private static final int MENU_SETTINGS = 10;
-    private static final int MENU_EXIT = 11;
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
@@ -301,12 +299,6 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity(this);
         switch ( item.getItemId() ) {
-            case MENU_SETTINGS: {
-                MainActivity.info("start settings activity");
-                final Intent settingsIntent = new Intent( this.getActivity(), SettingsFragment.class );
-                startActivity( settingsIntent );
-                break;
-            }
             case MENU_WAKELOCK: {
                 boolean screenLocked = ! MainActivity.isScreenLocked( this );
                 MainActivity.setLockScreen( this, screenLocked );
@@ -331,10 +323,6 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 handleScanChange( getView() );
                 return true;
             }
-            case MENU_EXIT:
-                // call over to finish
-                getActivity().finish();
-                return true;
             case MENU_FILTER:
                 onCreateDialog(SSID_FILTER);
                 return true;

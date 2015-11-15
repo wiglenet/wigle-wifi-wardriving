@@ -114,7 +114,7 @@ public final class MainActivity extends AppCompatActivity {
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
-        private final Fragment[] fragList = new Fragment[6];
+        private final Fragment[] fragList = new Fragment[8];
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
     }
@@ -160,9 +160,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final int MAP_TAB_POS = 1;
     public static final int DASH_TAB_POS = 2;
     public static final int DATA_TAB_POS = 3;
-    public static final int STATS_TAB_POS = 4;
+    public static final int USER_STATS_TAB_POS = 4;
     public static final int SETTINGS_TAB_POS = 5;
     public static final int EXIT_TAB_POS = 6;
+    public static final int SITE_STATS_TAB_POS = 7;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -497,9 +498,10 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.mapping_app_name),
                 getString(R.string.dashboard_app_name),
                 getString(R.string.data_activity_name),
-                getString(R.string.site_stats_app_name),
+                getString(R.string.user_stats_app_name),
                 getString(R.string.settings_app_name),
                 getString(R.string.menu_exit),
+                getString(R.string.site_stats_app_name),
         };
 
         final Fragment frag = state.fragList[position];
@@ -549,11 +551,17 @@ public final class MainActivity extends AppCompatActivity {
         data.setArguments(bundle);
         state.fragList[DATA_TAB_POS] = data;
 
-        info("Creating SiteStatsFragment");
+        info("Creating UserStatsFragment");
         final UserStatsFragment userStats = new UserStatsFragment();
         bundle = new Bundle();
         userStats.setArguments(bundle);
-        state.fragList[STATS_TAB_POS] = userStats;
+        state.fragList[USER_STATS_TAB_POS] = userStats;
+
+        info("Creating SiteStatsFragment");
+        final SiteStatsFragment siteStats = new SiteStatsFragment();
+        bundle = new Bundle();
+        siteStats.setArguments(bundle);
+        state.fragList[SITE_STATS_TAB_POS] = siteStats;
 
         info("Creating SettingsFragment");
         final SettingsFragment settings = new SettingsFragment();

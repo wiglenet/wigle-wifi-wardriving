@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserStatsFragment extends Fragment {
     private static final int MSG_USER_DONE = 101;
+    private static final int MENU_SITE_STATS = 201;
 
     // {"success":true,"statistics":{"visible":"Y","gendisc":"6439","total":"897432","discovered":"498732",
     // "prevmonthcount":"1814","lasttransid":"20151114-00277","monthcount":"34","totallocs":"8615324","gentotal":"9421",
@@ -262,11 +264,12 @@ public class UserStatsFragment extends Fragment {
     /* Creates the menu items */
     @Override
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-        // MenuItem item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-        // tem.setIcon( android.R.drawable.ic_menu_preferences );
+        MenuItem item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
+        item.setIcon( R.drawable.wiglewifi );
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        // item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
+        item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
+        item.setIcon(R.drawable.wiglewifi);
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -274,16 +277,12 @@ public class UserStatsFragment extends Fragment {
     /* Handles item selections */
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
-//      switch ( item.getItemId() ) {
-//        case MENU_EXIT:
-//          final MainActivity main = MainActivity.getMainActivity();
-//          main.finish();
-//          return true;
-//        case MENU_SETTINGS:
-//          final Intent settingsIntent = new Intent( getActivity(), SettingsFragment.class );
-//          startActivity( settingsIntent );
-//          break;
-//      }
+        switch ( item.getItemId() ) {
+            case MENU_SITE_STATS:
+                final MainActivity main = MainActivity.getMainActivity();
+                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                return true;
+        }
         return false;
     }
 

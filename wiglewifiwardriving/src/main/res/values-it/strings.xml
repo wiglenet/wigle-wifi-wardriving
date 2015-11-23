@@ -243,7 +243,7 @@
     <string name="fatal_db_warn">Questo errore è di norma causato da problemi della periferica o della scheda SD.</string>
     <string name="fatal_pre_message">ERRORE</string>
     <string name="fatal_post_message">(Visualizzabile nel menu &quot;Impostazioni&quot; alla voce &quot;Segnala errore&quot;)</string>
-    <string name="use_network_location">Utilizza la posizione fornita dalla rete GSM</string>
+    <string name="use_network_location">Utilizza la posizione fornita dalla rete GSM o dalle reti Wifi</string>
     <string name="data_import_observed">Importare le mie reti osservate da WiGLE nel database locale?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>

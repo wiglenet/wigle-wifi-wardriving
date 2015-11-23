@@ -508,9 +508,16 @@ public final class MainActivity extends AppCompatActivity {
 
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.tabcontent, frag)
-                .commit();
+        try {
+            fragmentManager.beginTransaction()
+                    .replace(R.id.tabcontent, frag)
+                    .commit();
+        }
+        catch (final NullPointerException ex) {
+            final String message = "NPE in fragment switch: " + ex;
+            error(message, ex);
+            Toast.makeText( this, message, Toast.LENGTH_LONG ).show();
+        }
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
@@ -701,6 +708,11 @@ public final class MainActivity extends AppCompatActivity {
         }
         catch ( WindowManager.BadTokenException ex ) {
             MainActivity.info( "exception showing dialog, view probably changed: " + ex, ex );
+        }
+        catch (final IllegalStateException ex) {
+            final String errorMessage = "Exception trying to show dialog: " + ex;
+            MainActivity.error(errorMessage, ex);
+            Toast.makeText( activity, errorMessage, Toast.LENGTH_LONG ).show();
         }
     }
 
@@ -1773,6 +1785,16 @@ public final class MainActivity extends AppCompatActivity {
             selectFragment(0);
             return true;
         }
+        // we may want this, but devices with menu button don't get the 3 dots, so we'd have to force on the 3 dots
+        // pry not worth it. leaving in case we do want it in the future
+//        else if (keyCode == KeyEvent.KEYCODE_MENU) {
+//            if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
+//                mDrawerLayout.openDrawer(mDrawerList);
+//            } else if (mDrawerLayout.isDrawerOpen(mDrawerList)) {
+//                mDrawerLayout.closeDrawer(mDrawerList);
+//            }
+//            return true;
+//        }
         return super.onKeyDown(keyCode, event);
     }
 }

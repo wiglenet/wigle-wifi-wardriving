@@ -199,8 +199,17 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
 
-                    if ( mapView != null && mapView.getMap() != null) {
-                        final GoogleMap map = mapView.getMap();
+                    GoogleMap map = null;
+                    try {
+                        if (mapView != null) {
+                            map = mapView.getMap();
+                        }
+                    }
+                    catch (final NullPointerException ex) {
+                        MainActivity.error("MSG_OBS_DONE npe getting map: " + ex, ex);
+                    }
+
+                    if (map != null) {
 
                         int count = 0;
                         for ( Map.Entry<LatLng, Integer> obs : obsMap.entrySet() ) {

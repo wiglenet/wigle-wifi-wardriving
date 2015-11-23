@@ -329,9 +329,14 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public void onPause() {
-        MainActivity.info( "MAP: onPause" );
+        MainActivity.info("MAP: onPause");
         super.onPause();
-        mapView.onPause();
+        try {
+            mapView.onPause();
+        }
+        catch (final NullPointerException ex) {
+            MainActivity.error("npe on mapview pause: " + ex, ex);
+        }
         if (mapRender != null) {
             // save memory
             mapRender.clear();

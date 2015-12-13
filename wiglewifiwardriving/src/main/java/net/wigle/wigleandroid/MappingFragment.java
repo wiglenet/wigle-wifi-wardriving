@@ -72,7 +72,6 @@ public final class MappingFragment extends Fragment {
 
     private static final int DEFAULT_ZOOM = 17;
     public static final LatLng DEFAULT_POINT = new LatLng( 41.95d, -87.65d );
-    private static final int MENU_SETTINGS = 10;
     private static final int MENU_EXIT = 12;
     private static final int MENU_ZOOM_IN = 13;
     private static final int MENU_ZOOM_OUT = 14;
@@ -535,12 +534,6 @@ public final class MappingFragment extends Fragment {
             case MENU_FILTER: {
                 onCreateDialog( SSID_FILTER );
                 return true;
-            }
-            case MENU_SETTINGS: {
-                MainActivity.info("start settings activity");
-                final Intent settingsIntent = new Intent( this.getActivity(), SettingsFragment.class );
-                startActivity( settingsIntent );
-                break;
             }
             case MENU_MAP_TYPE: {
                 if (getMap() != null) {

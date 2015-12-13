@@ -41,7 +41,6 @@ import android.widget.Toast;
 public final class DataFragment extends Fragment implements TransferListener, DialogListener {
 
     private static final int MENU_EXIT = 11;
-    private static final int MENU_SETTINGS = 12;
     private static final int MENU_ERROR_REPORT = 13;
 
     private static final int CSV_RUN_DIALOG = 120;
@@ -421,10 +420,6 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 final MainActivity main = MainActivity.getMainActivity();
                 main.finish();
                 return true;
-            case MENU_SETTINGS:
-                final Intent settingsIntent = new Intent( getActivity(), SettingsFragment.class );
-                startActivity( settingsIntent );
-                break;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 startActivity( errorReportIntent );

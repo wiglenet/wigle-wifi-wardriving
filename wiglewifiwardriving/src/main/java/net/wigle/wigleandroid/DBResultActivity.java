@@ -35,7 +35,6 @@ import net.wigle.wigleandroid.model.QueryArgs;
 
 public class DBResultActivity extends ActionBarActivity {
     private static final int MENU_RETURN = 12;
-    private static final int MENU_SETTINGS = 13;
     private static final int MSG_QUERY_DONE = 2;
     private static final int LIMIT = 50;
 
@@ -249,9 +248,6 @@ public class DBResultActivity extends ActionBarActivity {
         MenuItem item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
         item.setIcon( android.R.drawable.ic_media_previous );
 
-        item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
-        item.setIcon( android.R.drawable.ic_menu_preferences );
-
         return true;
     }
 
@@ -262,10 +258,6 @@ public class DBResultActivity extends ActionBarActivity {
             case MENU_RETURN:
                 finish();
                 return true;
-            case MENU_SETTINGS:
-                final Intent settingsIntent = new Intent( this, SettingsFragment.class );
-                startActivity( settingsIntent );
-                break;
         }
         return false;
     }

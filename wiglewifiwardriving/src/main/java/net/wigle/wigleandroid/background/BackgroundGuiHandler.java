@@ -177,13 +177,12 @@ public class BackgroundGuiHandler extends Handler {
 
                     if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
                             || status == Status.BAD_LOGIN.ordinal()) {
-                        MainActivity.info("dialog: start settings activity");
+                        MainActivity.info("dialog: start settings fragment");
                         try {
-                            final Intent settingsIntent = new Intent( activity, SettingsFragment.class );
-                            activity.startActivity( settingsIntent );
+                            MainActivity.getMainActivity().selectFragment(MainActivity.SETTINGS_TAB_POS);
                         }
                         catch (Exception ex) {
-                            MainActivity.info("failed to start settings activity: " + ex, ex);
+                            MainActivity.info("failed to start settings fragment: " + ex, ex);
                         }
                     }
                 } });

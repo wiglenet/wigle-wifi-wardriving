@@ -26,6 +26,8 @@ some response/info/stat about uploaded files (user stats?)
 configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
 speak similar AP's with count, trying to condense somehow, start with s/\d+$//
+filter for speaking AP's to avoid very regular ones
+  attwifi belkin CableWiFi CenturyLink DIRECT- HOME- HP NETGEAR SLCSD WiFi Hotspot XFINITY xfinitywifi
 summarize AP's since last audio speech
 stats on what is in the local db
 "only new" on map work with labels too

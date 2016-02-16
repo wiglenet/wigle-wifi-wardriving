@@ -2,30 +2,27 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, exibir redes sem fio, upload para base de dados WiGLE.
+Wardriving: detecte, veja redes sem fio e envie para o banco de dados WiGLE.
 
 Description (4000 characters):
-WiGLE é uma fonte aberta wardriving aplicativo para netstumble, exibição e mapa encontrado redes sem fio e torres de celular em qualquer lugar do mundo, facilmente fazer o upload para o banco de dados WiGLE.net. WiGLE foi iniciado em 2001 e agora tem mais de 125 milhões de redes WiFi em todo o mundo mapeado.
+WiGLE é um app open source de wardriving para detectar, exibir e mapear redes sem fio e torres de celular em qualquer lugar do mundo, com upload fácil ao banco de dados do WiGLE.net. O WiGLE foi lançado em 2001 e hoje tem mais de 125 milhões de redes WiFi mapeadas em todo o mundo.
 
-• Competir no ranking mundial WiGLE para a maioria das redes localizadas!
-• Exportar para arquivos CSV no cartão SD (valores separados por vírgula)!
-• Exportar para arquivos KML no cartão SD (para importar para o Google Maps/Earth)!
-• Áudio e text-to-speech alertando!
-• Banco de dados local para rastrear novas redes encontrado!
+• Participe do ranking mundial WiGLE de usuários com mais redes localizadas!
+• Exporte arquivos CSV num cartão SD!
+• Exporte arquivos KML num cartão SD (para importar no Google Maps/Earth)!
+• Alertas por áudio e de voz!
+• Banco de dados local para rastrear novas redes encontradas!
 • Mapa em tempo real de redes encontradas (OpenStreetMap)!
-• É possível mover aplicativos para o cartão SD!
-• Botão "Silenciar" para desligar todos os sons/discurso imediatamente!
-• GPS Bluetooth suportam através de locais fictícios!
-• Não há anúncios!
+• É possível mover o app para um cartão SD!
+• Botão "Silenciar" para desligar todos os sons/alertas imediatamente!
+• Suporte para GPS Bluetooth por locais fictícios!
+• Sem anúncios!
 
 Notas de lançamento: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-Para WiFi e torres de celular a ser mapeada, você deve esperar para o seu dispositivo para determinar a localização atual, via GPS ou localização de rede.
-No mapa: os círculos são WiFi, praças são torres de celular. As cores claras são redes visto antes, roxas são novos para o banco de dados local.
-Se você tiver problemas para fazer login, ou tem sugestões, envie-nos um e-mail para wigle-admin@wigle.net e teremos todo o gosto em ajudar.
-Necessidades "Lê Estado Telefone", a fim de saber se uma chamada telefônica em curso, para silenciar o áudio (sons e da fala).
-Os arquivos estão disponíveis para ajudar com a tradução humana para idiomas diferentes do inglês. Isto foi principalmente uma tradução mecânica, porque, obviamente, não sei todas as línguas. Você pode ajudar a melhorar as coisas, fazendo pedidos de puxar em:
-https://github.com/wiglenet/wigle-wifi-wardriving/pulls
-ou enviá-los para wigle-admin@wigle.net.
+Para mapear WiFi e torres de celular, você deve esperar o aparelho determinar a localização atual, por GPS ou localização de rede.
+No mapa: círculos são WiFi, quadrados são torres de celular. Cores claras são redes já vistas antes, em roxo são novas no banco de dados local.
+Se tiver problemas de login ou sugestões, envie um e-mail para wigle-admin@wigle.net e estaremos felizes em ajudar.
+Necessita de permissão "Ler estado do telefone" para saber se uma chamada está em curso e sileciar os alertas.
 
-Continue tropeço!
+Keep on stumbling!

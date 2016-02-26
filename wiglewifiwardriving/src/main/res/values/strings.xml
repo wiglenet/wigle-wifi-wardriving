@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Starting</string>
-    <string name="app_name">WiGLE Wifi Wardriving</string>
-    <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Settings</string>
-    <string name="mapping_app_name">WiGLE - Map</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - Most Recent Error Report</string>
-    <string name="speech_name">WiGLE Wifi - Speech Settings</string>
-    <string name="network_activity_name">WiGLE Wifi - Network</string>
-    <string name="data_activity_name">WiGLE Wifi - Database</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Search Result</string>
+    <string name="app_name">WiGLE WiFi Wardriving</string>
+    <string name="list_app_name">WiGLE WiFi</string>
+    <string name="settings_app_name">WiGLE WiFi – Settings</string>
+    <string name="mapping_app_name">WiGLE – Map</string>
+    <string name="dashboard_app_name">WiGLE WiFi – Dashboard</string>
+    <string name="error_report_name">WiGLE WiFi – Most Recent Error Report</string>
+    <string name="speech_name">WiGLE WiFi – Speech Settings</string>
+    <string name="network_activity_name">WiGLE WiFi – Network</string>
+    <string name="data_activity_name">WiGLE WiFi – Database</string>
+    <string name="dbresult_activity_name">WiGLE WiFi – Search Result</string>
     <string name="upload_button">Upload to\nWiGLE.net</string>
     <string name="username">WiGLE username</string>
     <string name="password">WiGLE password</string>
@@ -165,7 +165,7 @@
     <string name="have_location">Now have location from</string>
     <string name="wifi_jammed">WiFi appears jammed, turning off, and then on, WiFi.</string>
     <string name="battery_at">Battery level at</string>
-    <string name="battery_postfix">percent, shutting down WiGLE Wifi</string>
+    <string name="battery_postfix">percent, shutting down WiGLE WiFi</string>
     <string name="scan">Scan</string>
     <string name="menu_exit">Exit</string>
     <string name="menu_settings">Settings</string>
@@ -252,7 +252,7 @@
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
-    <string name="wigle_service">WiGLE Wifi Service</string>
+    <string name="wigle_service">WiGLE WiFi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
     <string name="menu_cluster_off">Clustering Off</string>
     <string name="menu_cluster_on">Clustering On</string>
@@ -270,8 +270,8 @@
     <string name="drawer_close">Drawer Close</string>
     <string name="tab_stats">Statistics</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
-    <string name="netloc_title">WiGLE.net Wifi Networks with Location</string>
-    <string name="loctotal_title">WiGLE.net Wifi Network Observations</string>
+    <string name="netloc_title">WiGLE.net WiFi Networks with Location</string>
+    <string name="loctotal_title">WiGLE.net WiFi Network Observations</string>
     <string name="genloc_title">WiGLE.net Cell Towers with Location</string>
     <string name="userstot_title">Total WiGLE.net Registered Users</string>
     <string name="transtot_title">Files Uploaded to WiGLE.net</string>
@@ -282,13 +282,13 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">User Statistics</string>
     <string name="rank_title">User Ranking:</string>
-    <string name="discovered_title">Discovered Wifi Networks (New to WiGLE)</string>
-    <string name="total_title">Total Wifi Networks Seen</string>
-    <string name="totallocs_title">Total Wifi Observations Recorded</string>
+    <string name="discovered_title">Discovered WiFi Networks (New to WiGLE)</string>
+    <string name="total_title">Total WiFi Networks Seen</string>
+    <string name="totallocs_title">Total WiFi Observations Recorded</string>
     <string name="gendisc_title">Discovered Cell Networks (New to WiGLE)</string>
     <string name="gentotal_title">Total Cell Networks Seen</string>
-    <string name="monthcount_title">Wifi Discovered This Month</string>
-    <string name="prevmonthcount_title">Wifi Discovered Last Month</string>
+    <string name="monthcount_title">WiFi Discovered This Month</string>
+    <string name="prevmonthcount_title">WiFi Discovered Last Month</string>
     <string name="firsttransid_title">First Transaction ID</string>
     <string name="lasttransid_title">Latest Transaction ID</string>
     <string name="please_allow">Please allow permission to use</string>

@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SpeechActivity extends ActionBarActivity {
     private static final int MENU_RETURN = 12;
@@ -47,6 +49,25 @@ public class SpeechActivity extends ActionBarActivity {
         doCheckbox( prefs, R.id.speech_battery, ListFragment.PREF_SPEAK_BATTERY );
         doCheckbox( prefs, R.id.speech_ssid, ListFragment.PREF_SPEAK_SSID, false );
         doCheckbox( prefs, R.id.speech_wifi_restart, ListFragment.PREF_SPEAK_WIFI_RESTART );
+
+        // speech spinner
+        Spinner spinner = (Spinner) findViewById(R.id.speak_spinner );
+        if ( ! TTS.hasTTS() ) {
+            // no text to speech :(
+            spinner.setEnabled( false );
+            final TextView speakText = (TextView) findViewById(R.id.speak_text );
+            speakText.setText(getString(R.string.no_tts));
+        }
+
+
+        final String off = getString(R.string.off);
+        final String sec = " " + getString(R.string.sec);
+        final String min = " " + getString(R.string.min);
+        final Long[] speechPeriods = new Long[]{ 10L,15L,30L,60L,120L,300L,600L,900L,1800L,0L };
+        final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
+                "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
+        SettingsFragment.doSpinner((Spinner)findViewById(R.id.speak_spinner), ListFragment.PREF_SPEECH_PERIOD,
+                MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, this);
     }
 
     @Override

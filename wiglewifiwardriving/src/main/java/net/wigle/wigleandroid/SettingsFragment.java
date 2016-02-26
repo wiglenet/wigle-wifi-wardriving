@@ -2,6 +2,8 @@ package net.wigle.wigleandroid;
 
 import java.util.Arrays;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -40,8 +42,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_RETURN = 12;
     private static final int MENU_ERROR_REPORT = 13;
-    private static final int ZERO_OUT_DIALOG=110;
-    private static final int MAX_OUT_DIALOG=111;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
 
@@ -67,6 +67,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.setLocale(getActivity());
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.settings, container, false);
@@ -212,33 +213,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
         });
 
-        // db marker reset button and text
-        final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
-        tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListFragment.PREF_DB_MARKER, 0L ) );
-
-        final Button resetMaxidButton = (Button) view.findViewById(R.id.reset_maxid_button);
-        resetMaxidButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out),
-                        MainActivity.SETTINGS_TAB_POS, ZERO_OUT_DIALOG);
-            }
-        });
-
-        // db marker maxout button and text
-        final TextView maxtv = (TextView) view.findViewById(R.id.maxout_maxid_text);
-        final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
-        maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
-
-        final Button maxoutMaxidButton = (Button) view.findViewById(R.id.maxout_maxid_button);
-        maxoutMaxidButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out),
-                        MainActivity.SETTINGS_TAB_POS, MAX_OUT_DIALOG);
-            }
-        } );
-
         // period spinners
         doScanSpinner( R.id.periodstill_spinner, ListFragment.PREF_SCAN_PERIOD_STILL,
                 MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view );
@@ -257,15 +231,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this, view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this, view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
-        // speech spinner
-        Spinner spinner = (Spinner) view.findViewById(R.id.speak_spinner );
-        if ( ! TTS.hasTTS() ) {
-            // no text to speech :(
-            spinner.setEnabled( false );
-            final TextView speakText = (TextView) view.findViewById(R.id.speak_text );
-            speakText.setText(getString(R.string.no_tts));
-        }
-
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
@@ -278,34 +243,29 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
                 getString(R.string.language_tr), getString(R.string.language_zh),
         };
-        doSpinner( R.id.language_spinner, ListFragment.PREF_LANGUAGE, "", languages, languageName, view );
+        doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName );
 
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);
         final String min = " " + getString(R.string.min);
 
-        final Long[] speechPeriods = new Long[]{ 10L,15L,30L,60L,120L,300L,600L,900L,1800L,0L };
-        final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
-                "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
-        doSpinner( R.id.speak_spinner,
-                ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, view );
-
         // battery kill spinner
         final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
         final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
-        doSpinner( R.id.battery_kill_spinner, ListFragment.PREF_BATTERY_KILL_PERCENT,
-                MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName, view );
+        doSpinner( R.id.battery_kill_spinner, view, ListFragment.PREF_BATTERY_KILL_PERCENT,
+                MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );
 
         // reset wifi spinner
         final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
         final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
                 "2" + min,"5" + min,"10" + min,off };
-        doSpinner( R.id.reset_wifi_spinner, ListFragment.PREF_RESET_WIFI_PERIOD,
-                MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, view );
+        doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
+                MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
 
         return view;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void handleDialog(final int dialogId) {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -313,26 +273,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final View view = getView();
 
         switch (dialogId) {
-            case ZERO_OUT_DIALOG: {
-                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
-                editor.apply();
-                if (view != null) {
-                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
-                    tv.setText(getString(R.string.setting_max_id) + " 0");
-                }
-                break;
-            }
-            case MAX_OUT_DIALOG: {
-                final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
-                editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
-                editor.apply();
-                if (view != null) {
-                    // set the text on the other button
-                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
-                    tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
-                }
-                break;
-            }
             case DONATE_DIALOG: {
                 editor.putBoolean(ListFragment.PREF_DONATE, true);
                 editor.apply();
@@ -424,23 +364,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String[] periodName = new String[]{ zeroName,"50" + ms,"250" + ms,"500" + ms,"750" + ms,
                 "1" + sec,"1.5" + sec,"2" + sec,
                 "3" + sec,"4" + sec,"5" + sec,"10" + sec,"30" + sec,"1" + min };
-        doSpinner(id, pref, spinDefault, periods, periodName, view);
+        doSpinner(id, view, pref, spinDefault, periods, periodName);
     }
 
-    private <V> void doSpinner( final int id, final String pref, final V spinDefault,
-                                final V[] periods, final String[] periodName, final View view ) {
+    private <V> void doSpinner(final int id, final View view, final String pref, final V spinDefault,
+                               final V[] periods, final String[] periodName) {
+        doSpinner((Spinner)view.findViewById(id), pref, spinDefault, periods, periodName, getContext());
+    }
+
+    public static <V> void doSpinner( final Spinner spinner, final String pref, final V spinDefault, final V[] periods,
+                   final String[] periodName, final Context context ) {
 
         if ( periods.length != periodName.length ) {
             throw new IllegalArgumentException("lengths don't match, periods: " + Arrays.toString(periods)
                     + " periodName: " + Arrays.toString(periodName));
         }
 
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
-        Spinner spinner = (Spinner) view.findViewById( id );
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_spinner_item);
+                context, android.R.layout.simple_spinner_item);
 
         Object period = null;
         if ( periods instanceof Long[] ) {
@@ -485,7 +429,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 editor.apply();
 
                 if ( period instanceof String ) {
-                    MainActivity.setLocale( getActivity() );
+                    MainActivity.setLocale( context, context.getResources().getConfiguration() );
                 }
 
             }

@@ -4,16 +4,40 @@
 	android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 <LinearLayout
-	android:id="@+id/linearlayout" 
+	android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
+
+<LinearLayout
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dip"
+    android:layout_marginBottom="6dip"
+    >
+    <Spinner android:id="@+id/speak_spinner"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:drawSelectorOnTop="true"
+             android:layout_weight="0"
+             android:prompt="@string/speak_text"
+        />
+    <TextView
+        android:id="@+id/speak_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/speak_text"
+        android:layout_weight="1"
+        />
+</LinearLayout>
+
 <TextView android:id="@+id/speech_text"
 	android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/speech_text" />
-        
+
 <CheckBox android:id="@+id/speech_gps"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -58,7 +82,7 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	android:orientation="horizontal"
-	/>         
+	/>
 <CheckBox android:id="@+id/speech_ssid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -9,10 +9,12 @@ import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.media.AudioManager;
@@ -49,6 +51,8 @@ public final class DataFragment extends Fragment implements TransferListener, Di
     private static final int KML_DB_DIALOG = 123;
     private static final int BACKUP_DIALOG = 124;
     private static final int IMPORT_DIALOG = 125;
+    private static final int ZERO_OUT_DIALOG = 126;
+    private static final int MAX_OUT_DIALOG = 127;
 
     /** Called when the activity is first created. */
     @Override
@@ -68,9 +72,10 @@ public final class DataFragment extends Fragment implements TransferListener, Di
 
         setupQueryButtons( view );
         setupCsvButtons( view );
-        setupKmlButtons( view );
-        setupBackupDbButton( view );
-        setupImportObservedButton( view );
+        setupKmlButtons(view);
+        setupBackupDbButton(view);
+        setupImportObservedButton(view);
+        setupMarkerButtons(view);
 
         return view;
     }
@@ -79,30 +84,30 @@ public final class DataFragment extends Fragment implements TransferListener, Di
         Button button = (Button) view.findViewById( R.id.search_button );
         button.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick( final View buttonView ) {
+            public void onClick(final View buttonView) {
                 final QueryArgs queryArgs = new QueryArgs();
                 String fail = null;
                 String field = null;
                 boolean okValue = false;
 
-                for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid, R.id.query_bssid } ) {
-                    if ( fail != null ) {
+                for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid}) {
+                    if (fail != null) {
                         break;
                     }
 
-                    final EditText editText = (EditText) view.findViewById( id );
+                    final EditText editText = (EditText) view.findViewById(id);
                     final String text = editText.getText().toString().trim();
-                    if ( "".equals(text) ) {
+                    if ("".equals(text)) {
                         continue;
                     }
 
                     try {
-                        switch( id ) {
+                        switch (id) {
                             case R.id.query_address:
                                 field = getString(R.string.address);
                                 Geocoder gc = new Geocoder(getActivity());
                                 List<Address> addresses = gc.getFromLocationName(text, 1);
-                                if ( addresses.size() < 1 ) {
+                                if (addresses.size() < 1) {
                                     fail = getString(R.string.no_address_found);
                                     break;
                                 }
@@ -122,26 +127,24 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                             default:
                                 MainActivity.error("setupButtons: bad id: " + id);
                         }
-                    }
-                    catch( Exception ex ) {
+                    } catch (Exception ex) {
                         fail = getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage();
                         break;
                     }
                 }
 
-                if ( fail == null && ! okValue ) {
+                if (fail == null && !okValue) {
                     fail = "No query fields specified";
                 }
 
-                if ( fail != null ) {
+                if (fail != null) {
                     // toast!
-                    Toast.makeText( getActivity(), fail, Toast.LENGTH_SHORT ).show();
-                }
-                else {
+                    Toast.makeText(getActivity(), fail, Toast.LENGTH_SHORT).show();
+                } else {
                     ListFragment.lameStatic.queryArgs = queryArgs;
                     // start db result activity
-                    final Intent settingsIntent = new Intent( getActivity(), DBResultActivity.class );
-                    startActivity( settingsIntent );
+                    final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
+                    startActivity(settingsIntent);
                 }
             }
         });
@@ -149,9 +152,9 @@ public final class DataFragment extends Fragment implements TransferListener, Di
         button = (Button) view.findViewById( R.id.reset_button );
         button.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick( final View buttonView ) {
-                for ( final int id : new int[]{ R.id.query_address, R.id.query_ssid } ) {
-                    final EditText editText = (EditText) view.findViewById( id );
+            public void onClick(final View buttonView) {
+                for (final int id : new int[]{R.id.query_address, R.id.query_ssid}) {
+                    final EditText editText = (EditText) view.findViewById(id);
                     editText.setText("");
                 }
             }
@@ -236,8 +239,45 @@ public final class DataFragment extends Fragment implements TransferListener, Di
         });
     }
 
+    @SuppressLint("SetTextI18n")
+    private void setupMarkerButtons( final View view ) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+
+        // db marker reset button and text
+        final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+        tv.setText( getString(R.string.setting_high_up) + " " + prefs.getLong( ListFragment.PREF_DB_MARKER, 0L ) );
+
+        final Button resetMaxidButton = (Button) view.findViewById(R.id.reset_maxid_button);
+        resetMaxidButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out),
+                        MainActivity.DATA_TAB_POS, ZERO_OUT_DIALOG);
+            }
+        });
+
+        // db marker maxout button and text
+        final TextView maxtv = (TextView) view.findViewById(R.id.maxout_maxid_text);
+        final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
+        maxtv.setText( getString(R.string.setting_max_start) + " " + maxDB );
+
+        final Button maxoutMaxidButton = (Button) view.findViewById(R.id.maxout_maxid_button);
+        maxoutMaxidButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out),
+                        MainActivity.DATA_TAB_POS, MAX_OUT_DIALOG);
+            }
+        } );
+    }
+
+    @SuppressLint("SetTextI18n")
     @Override
     public void handleDialog(final int dialogId) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences.Editor editor = prefs.edit();
+        final View view = getView();
+
         switch (dialogId) {
             case CSV_RUN_DIALOG: {
                 // actually need this Activity context, for dialogs
@@ -288,6 +328,26 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 task.start();
                 break;
             }
+            case ZERO_OUT_DIALOG: {
+                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                editor.apply();
+                if (view != null) {
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " 0");
+                }
+                break;
+            }
+            case MAX_OUT_DIALOG: {
+                final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
+                editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
+                editor.apply();
+                if (view != null) {
+                    // set the text on the other button
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
+                }
+                break;
+            }
             default:
                 MainActivity.warn("Data unhandled dialogId: " + dialogId);
         }
@@ -314,6 +374,7 @@ public final class DataFragment extends Fragment implements TransferListener, Di
             return 0;
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         protected void onProgressUpdate( Integer... progress ) {
             final View view = fragment.getView();

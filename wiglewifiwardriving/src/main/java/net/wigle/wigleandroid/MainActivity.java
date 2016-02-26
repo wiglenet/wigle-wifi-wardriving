@@ -365,7 +365,8 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(final int requestCode, final String permissions[], final int[] grantResults) {
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String permissions[],
+                                           @NonNull final int[] grantResults) {
         switch (requestCode) {
             case WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST: {
                 // If request is cancelled, the result arrays are empty.
@@ -386,6 +387,7 @@ public final class MainActivity extends AppCompatActivity {
 
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                    info("permission denied. requestCode: " + requestCode);
                 }
                 return;
             }
@@ -822,6 +824,7 @@ public final class MainActivity extends AppCompatActivity {
             return new FileOutputStream(file);
         }
 
+        //noinspection deprecation
         return context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
     }
 

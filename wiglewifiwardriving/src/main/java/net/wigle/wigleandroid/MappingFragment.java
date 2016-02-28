@@ -33,18 +33,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.common.ConnectionResult;
+//import com.google.android.gms.common.GooglePlayServicesUtil;
+//import com.google.android.gms.maps.CameraUpdate;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.LatLng;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 
 /**
@@ -59,8 +60,8 @@ public final class MappingFragment extends Fragment {
     }
     private final State state = new State();
 
-    private MapView mapView;
-    private MapRender mapRender;
+    private Object mapView;
+//    private MapRender mapRender;
     private final Handler timer = new Handler();
     private AtomicBoolean finishing;
     private Location previousLocation;
@@ -104,15 +105,15 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mapView = new MapView(getActivity());
-        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
-        if (serviceAvailable == ConnectionResult.SUCCESS) {
-            mapView.onCreate(savedInstanceState);
-        }
-        else {
-            Toast.makeText( getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG ).show();
-        }
-        MapsInitializer.initialize(getActivity());
+//        mapView = new MapView(getActivity());
+//        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
+//        if (serviceAvailable == ConnectionResult.SUCCESS) {
+//            mapView.onCreate(savedInstanceState);
+//        }
+//        else {
+//            Toast.makeText( getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG ).show();
+//        }
+//        MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
 
         LatLng oldCenter = null;
@@ -131,13 +132,13 @@ public final class MappingFragment extends Fragment {
      * This call has thrown an npe in the wild
      * @return the google map from the map view, or null
      */
-    private GoogleMap getMap() {
-        try {
-            return mapView.getMap();
-        }
-        catch (NullPointerException ex) {
-            MainActivity.info("npe in mapView.getMap(): " + ex, ex);
-        }
+    private Object getMap() {
+//        try {
+//            return mapView.getMap();
+//        }
+//        catch (NullPointerException ex) {
+//            MainActivity.info("npe in mapView.getMap(): " + ex, ex);
+//        }
         return null;
     }
 
@@ -148,36 +149,36 @@ public final class MappingFragment extends Fragment {
         if (mapView != null) {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            mapView.setLayoutParams(params);
+//            mapView.setLayoutParams(params);
         }
 
         // conditionally replace the tile source
         final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        rlView.addView( mapView );
+//        rlView.addView( mapView );
         // guard against not having google play services
-        if (getMap() != null) {
-            getMap().setMyLocationEnabled(true);
-            getMap().setBuildingsEnabled(true);
-            final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
-            getMap().setTrafficEnabled(showTraffic);
-            final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-            getMap().setMapType(mapType);
-            mapRender = new MapRender(getActivity(), getMap(), false);
-
-            // controller
-            final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
-            float zoom = DEFAULT_ZOOM;
-            if ( oldZoom >= 0 ) {
-                zoom = oldZoom;
-            }
-            else {
-                zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
-            }
-
-            final CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(centerPoint).zoom(zoom).build();
-            getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
+//        if (getMap() != null) {
+//            getMap().setMyLocationEnabled(true);
+//            getMap().setBuildingsEnabled(true);
+//            final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
+//            getMap().setTrafficEnabled(showTraffic);
+//            final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//            getMap().setMapType(mapType);
+//            mapRender = new MapRender(getActivity(), getMap(), false);
+//
+//            // controller
+//            final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
+//            float zoom = DEFAULT_ZOOM;
+//            if ( oldZoom >= 0 ) {
+//                zoom = oldZoom;
+//            }
+//            else {
+//                zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
+//            }
+//
+//            final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                    .target(centerPoint).zoom(zoom).build();
+//            getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//        }
         MainActivity.info("done setupMapView.");
     }
 
@@ -244,14 +245,14 @@ public final class MappingFragment extends Fragment {
                         if (getMap() != null) {
                             // MainActivity.info( "mapping center location: " + location );
                             final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-                            final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
-                            if ( state.firstMove ) {
-                                getMap().moveCamera(centerUpdate);
-                                state.firstMove = false;
-                            }
-                            else {
-                                getMap().animateCamera(centerUpdate);
-                            }
+//                            final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
+//                            if ( state.firstMove ) {
+//                                getMap().moveCamera(centerUpdate);
+//                                state.firstMove = false;
+//                            }
+//                            else {
+//                                getMap().animateCamera(centerUpdate);
+//                            }
                         }
                     }
                     else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
@@ -259,7 +260,7 @@ public final class MappingFragment extends Fragment {
                             || previousRunNets != ListFragment.lameStatic.runNets) {
                         // location or nets have changed, update the view
                         if (mapView != null) {
-                            mapView.postInvalidate();
+//                            mapView.postInvalidate();
                         }
                     }
                     // set if location isn't null
@@ -305,23 +306,23 @@ public final class MappingFragment extends Fragment {
         MainActivity.info( "MAP: destroy mapping." );
         finishing.set( true );
 
-        if (getMap() != null) {
+//        if (getMap() != null) {
             // save zoom
-            final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-            final Editor edit = prefs.edit();
-            edit.putFloat( ListFragment.PREF_PREV_ZOOM, getMap().getCameraPosition().zoom );
-            edit.apply();
-
-            // save center
-            state.oldCenter = getMap().getCameraPosition().target;
-        }
-        try {
-            mapView.onDestroy();
-        }
-        catch (NullPointerException ex) {
-            // seen in the wild
-            MainActivity.info("exception in mapView.onDestroy: " + ex, ex);
-        }
+//            final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+//            final Editor edit = prefs.edit();
+//            edit.putFloat( ListFragment.PREF_PREV_ZOOM, getMap().getCameraPosition().zoom );
+//            edit.apply();
+//
+//            // save center
+//            state.oldCenter = getMap().getCameraPosition().target;
+//        }
+//        try {
+//            mapView.onDestroy();
+//        }
+//        catch (NullPointerException ex) {
+//            // seen in the wild
+//            MainActivity.info("exception in mapView.onDestroy: " + ex, ex);
+//        }
 
         super.onDestroy();
     }
@@ -330,16 +331,16 @@ public final class MappingFragment extends Fragment {
     public void onPause() {
         MainActivity.info("MAP: onPause");
         super.onPause();
-        try {
-            mapView.onPause();
-        }
-        catch (final NullPointerException ex) {
-            MainActivity.error("npe on mapview pause: " + ex, ex);
-        }
-        if (mapRender != null) {
-            // save memory
-            mapRender.clear();
-        }
+//        try {
+//            mapView.onPause();
+//        }
+//        catch (final NullPointerException ex) {
+//            MainActivity.error("npe on mapview pause: " + ex, ex);
+//        }
+//        if (mapRender != null) {
+//            // save memory
+//            mapRender.clear();
+//        }
     }
 
     @Override
@@ -349,39 +350,39 @@ public final class MappingFragment extends Fragment {
 
         setupTimer();
         getActivity().setTitle(R.string.mapping_app_name);
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         MainActivity.info( "MAP: onSaveInstanceState" );
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
         MainActivity.info( "MAP: onLowMemory" );
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
     public void addNetwork(final Network network) {
-        if (mapRender != null && mapRender.okForMapTab(network)) {
-            mapRender.addItem(network);
-        }
+//        if (mapRender != null && mapRender.okForMapTab(network)) {
+//            mapRender.addItem(network);
+//        }
     }
 
     public void updateNetwork(final Network network) {
-        if (mapRender != null) {
-            mapRender.updateNetwork(network);
-        }
+//        if (mapRender != null) {
+//            mapRender.updateNetwork(network);
+//        }
     }
 
     public void reCluster() {
-        if (mapRender != null) {
-            mapRender.reCluster();
-        }
+//        if (mapRender != null) {
+//            mapRender.reCluster();
+//        }
     }
 
     /* Creates the menu items */
@@ -454,21 +455,21 @@ public final class MappingFragment extends Fragment {
                 return true;
             }
             case MENU_ZOOM_IN: {
-                if (getMap() != null) {
-                    float zoom = getMap().getCameraPosition().zoom;
-                    zoom++;
-                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-                    getMap().animateCamera(zoomUpdate);
-                }
+//                if (getMap() != null) {
+//                    float zoom = getMap().getCameraPosition().zoom;
+//                    zoom++;
+//                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+//                    getMap().animateCamera(zoomUpdate);
+//                }
                 return true;
             }
             case MENU_ZOOM_OUT: {
-                if (getMap() != null) {
-                    float zoom = getMap().getCameraPosition().zoom;
-                    zoom--;
-                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-                    getMap().animateCamera(zoomUpdate);
-                }
+//                if (getMap() != null) {
+//                    float zoom = getMap().getCameraPosition().zoom;
+//                    zoom--;
+//                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+//                    getMap().animateCamera(zoomUpdate);
+//                }
                 return true;
             }
             case MENU_TOGGLE_LOCK: {
@@ -485,9 +486,9 @@ public final class MappingFragment extends Fragment {
 
                 String name = showNewDBOnly ? getString(R.string.menu_show_old) : getString(R.string.menu_show_new);
                 item.setTitle( name );
-                if (mapRender != null) {
-                    mapRender.reCluster();
-                }
+//                if (mapRender != null) {
+//                    mapRender.reCluster();
+//                }
                 return true;
             }
             case MENU_LABEL: {
@@ -499,9 +500,9 @@ public final class MappingFragment extends Fragment {
                 String name = showLabel ? getString(R.string.menu_labels_off) : getString(R.string.menu_labels_on);
                 item.setTitle( name );
 
-                if (mapRender != null) {
-                    mapRender.reCluster();
-                }
+//                if (mapRender != null) {
+//                    mapRender.reCluster();
+//                }
                 return true;
             }
             case MENU_CLUSTER: {
@@ -513,9 +514,9 @@ public final class MappingFragment extends Fragment {
                 String name = showCluster ? getString(R.string.menu_cluster_off) : getString(R.string.menu_cluster_on);
                 item.setTitle( name );
 
-                if (mapRender != null) {
-                    mapRender.reCluster();
-                }
+//                if (mapRender != null) {
+//                    mapRender.reCluster();
+//                }
                 return true;
             }
             case MENU_TRAFFIC: {
@@ -526,9 +527,9 @@ public final class MappingFragment extends Fragment {
 
                 String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
                 item.setTitle( name );
-                if (getMap() != null) {
-                    getMap().setTrafficEnabled(showTraffic);
-                }
+//                if (getMap() != null) {
+//                    getMap().setTrafficEnabled(showTraffic);
+//                }
                 return true;
             }
             case MENU_FILTER: {
@@ -536,33 +537,33 @@ public final class MappingFragment extends Fragment {
                 return true;
             }
             case MENU_MAP_TYPE: {
-                if (getMap() != null) {
-                    int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                    switch (newMapType) {
-                        case GoogleMap.MAP_TYPE_NORMAL:
-                            newMapType = GoogleMap.MAP_TYPE_SATELLITE;
-                            Toast.makeText( getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT ).show();
-                            break;
-                        case GoogleMap.MAP_TYPE_SATELLITE:
-                            newMapType = GoogleMap.MAP_TYPE_HYBRID;
-                            Toast.makeText( getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT ).show();
-                            break;
-                        case GoogleMap.MAP_TYPE_HYBRID:
-                            newMapType = GoogleMap.MAP_TYPE_TERRAIN;
-                            Toast.makeText( getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT ).show();
-                            break;
-                        case GoogleMap.MAP_TYPE_TERRAIN:
-                            newMapType = GoogleMap.MAP_TYPE_NORMAL;
-                            Toast.makeText( getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT ).show();
-                            break;
-                        default:
-                            MainActivity.error("unhandled mapType: " + newMapType);
-                    }
-                    Editor edit = prefs.edit();
-                    edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
-                    edit.apply();
-                    getMap().setMapType(newMapType);
-                }
+//                if (getMap() != null) {
+//                    int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                    switch (newMapType) {
+//                        case GoogleMap.MAP_TYPE_NORMAL:
+//                            newMapType = GoogleMap.MAP_TYPE_SATELLITE;
+//                            Toast.makeText( getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT ).show();
+//                            break;
+//                        case GoogleMap.MAP_TYPE_SATELLITE:
+//                            newMapType = GoogleMap.MAP_TYPE_HYBRID;
+//                            Toast.makeText( getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT ).show();
+//                            break;
+//                        case GoogleMap.MAP_TYPE_HYBRID:
+//                            newMapType = GoogleMap.MAP_TYPE_TERRAIN;
+//                            Toast.makeText( getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT ).show();
+//                            break;
+//                        case GoogleMap.MAP_TYPE_TERRAIN:
+//                            newMapType = GoogleMap.MAP_TYPE_NORMAL;
+//                            Toast.makeText( getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT ).show();
+//                            break;
+//                        default:
+//                            MainActivity.error("unhandled mapType: " + newMapType);
+//                    }
+//                    Editor edit = prefs.edit();
+//                    edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
+//                    edit.apply();
+//                    getMap().setMapType(newMapType);
+//                }
             }
             case MENU_WAKELOCK: {
                 boolean screenLocked = ! MainActivity.isScreenLocked( this );
@@ -723,7 +724,7 @@ public final class MappingFragment extends Fragment {
             public void complete() {
                 if ( mapView != null ) {
                     // force a redraw
-                    mapView.postInvalidate();
+//                    mapView.postInvalidate();
                 }
             }
         });

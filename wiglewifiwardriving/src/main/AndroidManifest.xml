@@ -26,12 +26,6 @@
   <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
   <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-  <uses-permission android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE"/>
-  <uses-permission
-    android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
-
-  <permission android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE"
-    android:protectionLevel="signature" />
 
 	<uses-feature android:name="android.hardware.location.network" android:required="false" />
 	<uses-feature android:name="android.hardware.location.gps" android:required="false" />
@@ -116,14 +110,5 @@
 
     <service android:name=".WigleService" android:enabled="true"
       android:icon="@drawable/wiglewifi"/>
-
-    <uses-library android:name="com.google.android.maps" android:required="false" />
-
-    <meta-data android:name="com.google.android.gms.version"
-           android:value="@integer/google_play_services_version"
-            />
-    <meta-data android:name="com.google.android.maps.v2.API_KEY"
-           android:value="AIzaSyACUb8m8fx4iZSafmBe4WznRGW74OfSI_U"/>
-
 </application>
 </manifest>

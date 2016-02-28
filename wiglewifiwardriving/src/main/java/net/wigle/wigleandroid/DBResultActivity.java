@@ -22,14 +22,15 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.LatLng;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
 
@@ -41,8 +42,8 @@ public class DBResultActivity extends ActionBarActivity {
     private static final int DEFAULT_ZOOM = 18;
 
     private NetworkListAdapter listAdapter;
-    private MapView mapView;
-    private MapRender mapRender;
+    private Object mapView;
+//    private MapRender mapRender;
     private final List<Network> resultList = new ArrayList<>();
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>();
 
@@ -91,22 +92,22 @@ public class DBResultActivity extends ActionBarActivity {
     }
 
     private void setupMap( final LatLng center, final Bundle savedInstanceState ) {
-        mapView = new MapView( this );
-        mapView.onCreate(savedInstanceState);
-        MapsInitializer.initialize(this);
-
-        if (mapView.getMap() != null) {
-            mapRender = new MapRender(this, mapView.getMap(), true);
-
-            if (center != null) {
-                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(center).zoom(DEFAULT_ZOOM).build();
-                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            }
-        }
+//        mapView = new MapView( this );
+//        mapView.onCreate(savedInstanceState);
+//        MapsInitializer.initialize(this);
+//
+//        if (mapView.getMap() != null) {
+//            mapRender = new MapRender(this, mapView.getMap(), true);
+//
+//            if (center != null) {
+//                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                        .target(center).zoom(DEFAULT_ZOOM).build();
+//                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//            }
+//        }
 
         final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
-        rlView.addView( mapView );
+//        rlView.addView( mapView );
     }
 
     @SuppressLint("HandlerLeak")
@@ -131,18 +132,18 @@ public class DBResultActivity extends ActionBarActivity {
                             final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
                             MainActivity.info( "set center: " + center + " network: " + network.getSsid()
                                     + " point: " + network.getLatLng());
-                            if (mapView.getMap() != null) {
-                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(center).zoom(DEFAULT_ZOOM).build();
-                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                            }
+//                            if (mapView.getMap() != null) {
+//                                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                        .target(center).zoom(DEFAULT_ZOOM).build();
+//                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                            }
 
                             first = false;
                         }
 
-                        if (mapView.getMap() != null && network.getLatLng() != null && mapRender != null) {
-                            mapRender.addItem(network);
-                        }
+//                        if (mapView.getMap() != null && network.getLatLng() != null && mapRender != null) {
+//                            mapRender.addItem(network);
+//                        }
                     }
                     resultList.clear();
                 }
@@ -220,7 +221,7 @@ public class DBResultActivity extends ActionBarActivity {
                 handler.sendEmptyMessage( MSG_QUERY_DONE );
                 if ( mapView != null ) {
                     // force a redraw
-                    mapView.postInvalidate();
+//                    mapView.postInvalidate();
                 }
             }
         });
@@ -264,36 +265,36 @@ public class DBResultActivity extends ActionBarActivity {
 
     @Override
     public void onDestroy() {
-        mapView.onDestroy();
+//        mapView.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+//        mapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
-        if (mapRender != null) {
-            // save memory
-            mapRender.clear();
-        }
+//        mapView.onPause();
+//        if (mapRender != null) {
+//            // save memory
+//            mapRender.clear();
+//        }
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+//        mapView.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+//        mapView.onLowMemory();
     }
 
 

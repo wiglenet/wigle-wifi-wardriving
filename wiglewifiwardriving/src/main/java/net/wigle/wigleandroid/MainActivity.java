@@ -89,8 +89,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+//import com.google.android.gms.common.ConnectionResult;
+//import com.google.android.gms.common.GooglePlayServicesUtil;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -879,14 +879,14 @@ public final class MainActivity extends AppCompatActivity {
             state.wakeLock.acquire();
         }
 
-        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
-        info("GooglePlayServicesAvailable: " + serviceAvailable);
-        if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
-            error("service not available! " + serviceAvailable);
-            final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
-            dialog.show();
-            playServiceShown = true;
-        }
+//        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+//        info("GooglePlayServicesAvailable: " + serviceAvailable);
+//        if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
+//            error("service not available! " + serviceAvailable);
+//            final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
+//            dialog.show();
+//            playServiceShown = true;
+//        }
     }
 
     @Override

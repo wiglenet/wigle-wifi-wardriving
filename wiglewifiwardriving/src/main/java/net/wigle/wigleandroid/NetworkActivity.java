@@ -35,13 +35,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.CircleOptions;
+//import com.google.android.gms.maps.model.LatLng;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -60,10 +60,10 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     private static final int DEFAULT_ZOOM = 18;
 
     private Network network;
-    private MapView mapView;
+//    private MapView mapView;
     private int observations = 0;
     private boolean isDbResult = false;
-    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
+//    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
 
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
@@ -144,9 +144,9 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     public void onDestroy() {
         MainActivity.info("NET: onDestroy");
         networkActivity = null;
-        if (mapView != null) {
-            mapView.onDestroy();
-        }
+//        if (mapView != null) {
+//            mapView.onDestroy();
+//        }
         super.onDestroy();
     }
 
@@ -154,36 +154,36 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     public void onResume() {
         MainActivity.info("NET: onResume");
         super.onResume();
-        if (mapView != null) {
-            mapView.onResume();
-        }
+//        if (mapView != null) {
+//            mapView.onResume();
+//        }
     }
 
     @Override
     public void onPause() {
         MainActivity.info("NET: onPause");
         super.onPause();
-        if (mapView != null) {
-            mapView.onPause();
-        }
+//        if (mapView != null) {
+//            mapView.onPause();
+//        }
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         MainActivity.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        if (mapView != null) {
-            mapView.onSaveInstanceState(outState);
-        }
+//        if (mapView != null) {
+//            mapView.onSaveInstanceState(outState);
+//        }
     }
 
     @Override
     public void onLowMemory() {
         MainActivity.info("NET: onLowMemory");
         super.onLowMemory();
-        if (mapView != null) {
-            mapView.onLowMemory();
-        }
+//        if (mapView != null) {
+//            mapView.onLowMemory();
+//        }
     }
 
     @SuppressLint("HandlerLeak")
@@ -199,51 +199,51 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
 
-                    GoogleMap map = null;
-                    try {
-                        if (mapView != null) {
-                            map = mapView.getMap();
-                        }
-                    }
-                    catch (final NullPointerException ex) {
-                        MainActivity.error("MSG_OBS_DONE npe getting map: " + ex, ex);
-                    }
-
-                    if (map != null) {
-
-                        int count = 0;
-                        for ( Map.Entry<LatLng, Integer> obs : obsMap.entrySet() ) {
-                            final LatLng latLon = obs.getKey();
-                            final int level = obs.getValue();
-
-                            if (count == 0 && network.getLatLng() == null) {
-                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(latLon).zoom(DEFAULT_ZOOM).build();
-                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                            }
-
-                            map.addCircle(new CircleOptions()
-                                    .center(latLon)
-                                    .radius(4)
-                                    .fillColor(NetworkListAdapter.getSignalColor( level, true ))
-                                    .strokeWidth(0)
-                                    .zIndex(level));
-                            count++;
-                        }
-                        MainActivity.info("observation count: " + count);
-                    }
+//                    GoogleMap map = null;
+//                    try {
+//                        if (mapView != null) {
+//                            map = mapView.getMap();
+//                        }
+//                    }
+//                    catch (final NullPointerException ex) {
+//                        MainActivity.error("MSG_OBS_DONE npe getting map: " + ex, ex);
+//                    }
+//
+//                    if (map != null) {
+//
+//                        int count = 0;
+//                        for ( Map.Entry<LatLng, Integer> obs : obsMap.entrySet() ) {
+//                            final LatLng latLon = obs.getKey();
+//                            final int level = obs.getValue();
+//
+//                            if (count == 0 && network.getLatLng() == null) {
+//                                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                        .target(latLon).zoom(DEFAULT_ZOOM).build();
+//                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                            }
+//
+//                            map.addCircle(new CircleOptions()
+//                                    .center(latLon)
+//                                    .radius(4)
+//                                    .fillColor(NetworkListAdapter.getSignalColor( level, true ))
+//                                    .strokeWidth(0)
+//                                    .zIndex(level));
+//                            count++;
+//                        }
+//                        MainActivity.info("observation count: " + count);
+//                    }
                 }
             }
         };
 
         final String sql = "SELECT level,lat,lon FROM "
-                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "' limit " + obsMap.maxSize();
+                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "' limit " + 512;
 
         final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 observations++;
-                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
+//                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
                 if ( ( observations % 10 ) == 0 ) {
                     // change things on the gui thread
                     handler.sendEmptyMessage( MSG_OBS_UPDATE );
@@ -260,31 +260,31 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     }
 
     private void setupMap( final Network network, final Bundle savedInstanceState ) {
-        mapView = new MapView( this );
-        try {
-            mapView.onCreate(savedInstanceState);
-        }
-        catch (NullPointerException ex) {
-            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
-        }
-        MapsInitializer.initialize( this );
-
-        if (network.getLatLng() != null && mapView.getMap() != null) {
-            final CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-            mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            mapView.getMap().addCircle(new CircleOptions()
-                    .center(network.getLatLng())
-                    .radius(5)
-                    .fillColor(Color.argb( 128, 240, 240, 240 ))
-                    .strokeColor(Color.argb( 200, 255, 32, 32 ))
-                    .strokeWidth(3f)
-                    .zIndex(100));
-        }
-
-        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
-        rlView.addView( mapView );
+//        mapView = new MapView( this );
+//        try {
+//            mapView.onCreate(savedInstanceState);
+//        }
+//        catch (NullPointerException ex) {
+//            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+//        }
+//        MapsInitializer.initialize( this );
+//
+//        if (network.getLatLng() != null && mapView.getMap() != null) {
+//            final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                    .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+//            mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//            mapView.getMap().addCircle(new CircleOptions()
+//                    .center(network.getLatLng())
+//                    .radius(5)
+//                    .fillColor(Color.argb( 128, 240, 240, 240 ))
+//                    .strokeColor(Color.argb( 200, 255, 32, 32 ))
+//                    .strokeWidth(3f)
+//                    .zIndex(100));
+//        }
+//
+//        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
+//        rlView.addView( mapView );
     }
 
     private void setupButton( final Network network ) {

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Starting</string>
-    <string name="app_name">WiGLE WiFi Wardriving</string>
-    <string name="list_app_name">WiGLE WiFi</string>
+    <string name="app_name">WiGLE WiFi Wardriving FOSS</string>
+    <string name="list_app_name">WiGLE WiFi FOSS</string>
     <string name="settings_app_name">WiGLE WiFi – Settings</string>
     <string name="mapping_app_name">WiGLE – Map</string>
     <string name="dashboard_app_name">WiGLE WiFi – Dashboard</string>
@@ -295,5 +295,6 @@
     <string name="gps_permission">GPS (Fine Location)</string>
     <string name="cell_permission">Cell Location (Coarse Location)</string>
     <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
+    <string name="mapless">No Google Maps in this Free and Open-Source Software (FOSS) Version, which has no closed-source libraries</string>
 
 </resources>

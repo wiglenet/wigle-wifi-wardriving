@@ -1,19 +1,20 @@
 package net.wigle.wigleandroid.model;
 
+import android.annotation.SuppressLint;
+import android.net.wifi.ScanResult;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import android.annotation.SuppressLint;
-import android.net.wifi.ScanResult;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.maps.android.clustering.ClusterItem;
 
 /**
  * network data. not thread-safe.
  */
 @SuppressLint("UseSparseArrays")
-public final class Network implements ClusterItem {
+public final class Network {//implements ClusterItem {
     private final String bssid;
     private final String ssid;
     private final int frequency;
@@ -219,7 +220,7 @@ public final class Network implements ClusterItem {
         return geoPoint;
     }
 
-    @Override
+//    @Override
     public LatLng getPosition() {
         return geoPoint;
     }

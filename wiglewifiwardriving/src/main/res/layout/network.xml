@@ -4,180 +4,188 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    
+
     <LinearLayout android:orientation="horizontal"
 	    android:layout_width="fill_parent" android:layout_height="wrap_content">
-	    
-	    <ImageView android:id="@+id/wepicon" android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" android:paddingTop="4dp" 
+
+	    <ImageView android:id="@+id/wepicon" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:paddingTop="4dp"
 		android:paddingLeft="4dp" android:paddingRight="4dp"
 		android:layout_weight="1"
 		android:contentDescription="@string/crypto"
 		/>
-		
+
 		<TextView
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
 	    android:id="@+id/ssid"
 	    android:textSize="24sp"
 	    android:textColor="#AAEE50"
 	    android:gravity="center"
 	    android:layout_weight="10"
 	    />
-	    
-	    <ImageView android:id="@+id/wepicon2" android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" android:paddingTop="4dp" 
+
+	    <ImageView android:id="@+id/wepicon2" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:paddingTop="4dp"
 		android:paddingLeft="4dp" android:paddingRight="4dp"
 		android:layout_weight="1"
 		android:contentDescription="@string/crypto"
 		/>
 	</LinearLayout>
-    
+
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:id="@+id/bssid"
     android:textSize="20sp"
     android:textColor="#AAAA00"
     android:gravity="center"
     />
-    
+
     <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
     	<TextView
-		android:id="@+id/na_signal_text" 
-		android:text="@string/network_signal" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_signal_text"
+		android:text="@string/network_signal"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:layout_weight="1"
 		/>
     	<TextView
-		android:id="@+id/na_signal"  
-		android:layout_width="wrap_content" 
+		android:id="@+id/na_signal"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_weight="1" 
+		android:layout_weight="1"
 		/>
-		
+
 		<TextView
-		android:id="@+id/na_type_text"  
-		android:text="@string/network_type" 		
-		android:layout_width="wrap_content" 
+		android:id="@+id/na_type_text"
+		android:text="@string/network_type"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_weight="1" 
-		/>
-		<TextView
-		android:id="@+id/na_type"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
-		android:layout_weight="1" 
-		/>
-		
-		<TextView
-		android:id="@+id/na_firsttime_text"  
-		android:text="@string/network_firstseen" 		
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content"
-		android:layout_weight="1" 
+		android:layout_weight="1"
 		/>
 		<TextView
-		android:id="@+id/na_firsttime"  
-		android:layout_width="wrap_content" 
+		android:id="@+id/na_type"
+		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_weight="1" 
+		android:layout_weight="1"
 		/>
-    
+
+		<TextView
+		android:id="@+id/na_firsttime_text"
+		android:text="@string/network_firstseen"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		/>
+		<TextView
+		android:id="@+id/na_firsttime"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		/>
+
     </LinearLayout>
-    
+
     <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
     	<TextView
-		android:id="@+id/na_cap_text" 
-		android:text="@string/network_capa" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_cap_text"
+		android:text="@string/network_capa"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
     	<TextView
-		android:id="@+id/na_cap"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_cap"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
 	</LinearLayout>
-	
+
 	<LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
     	<TextView
-		android:id="@+id/na_chan_text" 
-		android:text="@string/network_channel" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_chan_text"
+		android:text="@string/network_channel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
     	<TextView
-		android:id="@+id/na_chan"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_chan"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
-		
+
 		<TextView
-		android:id="@+id/na_observe_text" 
-		android:text="@string/network_observations" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/na_observe_text"
+		android:text="@string/network_observations"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
     	<TextView
 		android:id="@+id/na_observe"
-		android:text="@string/network_querying"   
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:text="@string/network_querying"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		/>
 	</LinearLayout>
-    
+
     <LinearLayout
         android:orientation="vertical"
 	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
-	/> 
-    
+	/>
+
     <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-	<Button android:id="@+id/connect_button" 
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+	<Button android:id="@+id/connect_button"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/connect_button" android:layout_weight="0"/>
 	<TextView
-		android:id="@+id/connect_text"  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		android:id="@+id/connect_text"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:text="@string/connect_text"
 		android:layout_weight="5"
 		/>
 	</LinearLayout>
-    
+
     <LinearLayout
 	android:id="@+id/networkhorizontalLine"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
-	/> 
-	
-	<RelativeLayout 
+	/>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_map"
+        android:textSize="24sp"
+        android:text="@string/mapless"
+        />
+
+	<RelativeLayout
 		android:id="@+id/netmap_rl"
 		android:layout_width="fill_parent"
         android:layout_height="fill_parent">
-    </RelativeLayout>	
-    
+    </RelativeLayout>
+
 </LinearLayout>

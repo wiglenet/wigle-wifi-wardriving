@@ -7,7 +7,7 @@ Wardriving: netstumble, vise trådløse nettverk, laste opp til WiGLE database.
 Description (4000 characters):
 WiGLE er en åpen kildekode wardriving app til netstumble, vis og kartlegg trådløse nettverk og mobilmaster hvor som helst i verden, lett å laste opp til WiGLE.net database. WiGLE ble startet i 2001 og har nå over 125 millioner WiFi-nettverk kartlagt over hele verden.
 
-• Konkurer på den globale WiGLE ledertavlen for flest nettverk lokalisert!
+• Konkurrer på den globale WiGLE ledertavlen for flest nettverk lokalisert!
 • Eksporter til CSV-filer på SD-kort (kommadelte verdier)!
 • Eksport til KML-filer på SD-kort (for å importere til Google Maps/Earth)!
 • Lyd og tekst-til-tale-varsling!

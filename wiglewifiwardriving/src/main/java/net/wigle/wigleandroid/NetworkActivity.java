@@ -39,6 +39,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -199,39 +200,31 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
 
-                    GoogleMap map = null;
-                    try {
-                        if (mapView != null) {
-                            map = mapView.getMap();
-                        }
-                    }
-                    catch (final NullPointerException ex) {
-                        MainActivity.error("MSG_OBS_DONE npe getting map: " + ex, ex);
-                    }
+                    mapView.getMapAsync(new OnMapReadyCallback() {
+                        @Override
+                        public void onMapReady(final GoogleMap googleMap) {
+                            int count = 0;
+                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+                                final LatLng latLon = obs.getKey();
+                                final int level = obs.getValue();
 
-                    if (map != null) {
+                                if (count == 0 && network.getLatLng() == null) {
+                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
+                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                }
 
-                        int count = 0;
-                        for ( Map.Entry<LatLng, Integer> obs : obsMap.entrySet() ) {
-                            final LatLng latLon = obs.getKey();
-                            final int level = obs.getValue();
-
-                            if (count == 0 && network.getLatLng() == null) {
-                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(latLon).zoom(DEFAULT_ZOOM).build();
-                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                googleMap.addCircle(new CircleOptions()
+                                        .center(latLon)
+                                        .radius(4)
+                                        .fillColor(NetworkListAdapter.getSignalColor(level, true))
+                                        .strokeWidth(0)
+                                        .zIndex(level));
+                                count++;
                             }
-
-                            map.addCircle(new CircleOptions()
-                                    .center(latLon)
-                                    .radius(4)
-                                    .fillColor(NetworkListAdapter.getSignalColor( level, true ))
-                                    .strokeWidth(0)
-                                    .zIndex(level));
-                            count++;
+                            MainActivity.info("observation count: " + count);
                         }
-                        MainActivity.info("observation count: " + count);
-                    }
+                    });
                 }
             }
         };
@@ -269,18 +262,23 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
         }
         MapsInitializer.initialize( this );
 
-        if (network.getLatLng() != null && mapView.getMap() != null) {
-            final CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-            mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        if (network.getLatLng() != null) {
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(final GoogleMap googleMap) {
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-            mapView.getMap().addCircle(new CircleOptions()
-                    .center(network.getLatLng())
-                    .radius(5)
-                    .fillColor(Color.argb( 128, 240, 240, 240 ))
-                    .strokeColor(Color.argb( 200, 255, 32, 32 ))
-                    .strokeWidth(3f)
-                    .zIndex(100));
+                    googleMap.addCircle(new CircleOptions()
+                            .center(network.getLatLng())
+                            .radius(5)
+                            .fillColor(Color.argb(128, 240, 240, 240))
+                            .strokeColor(Color.argb(200, 255, 32, 32))
+                            .strokeWidth(3f)
+                            .zIndex(100));
+                }
+            });
         }
 
         final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );

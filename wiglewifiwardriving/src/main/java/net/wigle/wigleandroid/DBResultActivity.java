@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.location.Address;
@@ -23,8 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -95,15 +96,18 @@ public class DBResultActivity extends ActionBarActivity {
         mapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(this);
 
-        if (mapView.getMap() != null) {
-            mapRender = new MapRender(this, mapView.getMap(), true);
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(final GoogleMap googleMap) {
+                mapRender = new MapRender(DBResultActivity.this, googleMap, true);
 
-            if (center != null) {
-                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(center).zoom(DEFAULT_ZOOM).build();
-                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                if (center != null) {
+                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(center).zoom(DEFAULT_ZOOM).build();
+                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
             }
-        }
+        });
 
         final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
         rlView.addView( mapView );
@@ -131,16 +135,19 @@ public class DBResultActivity extends ActionBarActivity {
                             final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
                             MainActivity.info( "set center: " + center + " network: " + network.getSsid()
                                     + " point: " + network.getLatLng());
-                            if (mapView.getMap() != null) {
-                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(center).zoom(DEFAULT_ZOOM).build();
-                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                            }
+                            mapView.getMapAsync(new OnMapReadyCallback() {
+                                @Override
+                                public void onMapReady(final GoogleMap googleMap) {
+                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                            .target(center).zoom(DEFAULT_ZOOM).build();
+                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                }
+                            });
 
                             first = false;
                         }
 
-                        if (mapView.getMap() != null && network.getLatLng() != null && mapRender != null) {
+                        if (network.getLatLng() != null && mapRender != null) {
                             mapRender.addItem(network);
                         }
                     }

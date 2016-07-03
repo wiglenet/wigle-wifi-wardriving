@@ -129,8 +129,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String USER_STATS_URL = "https://api.wigle.net/v1/jsonUserStats";
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
-    private static final int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 1;
-    private static final int LOCATION_PERMISSIONS_REQUEST = 2;
+    private static final int PERMISSIONS_REQUEST = 1;
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
@@ -179,8 +178,7 @@ public final class MainActivity extends AppCompatActivity {
         // set language
         setLocale(this);
 
-        setupLocationPermissions();
-        setupExternalStorage();
+        setupPermissions();
         setupMenuDrawer();
 
         // do some of our own error handling, write a file with the stack
@@ -289,30 +287,7 @@ public final class MainActivity extends AppCompatActivity {
         info( "onCreate setup complete" );
     }
 
-    private void setupExternalStorage() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                // The permission is NOT already granted.
-                // Check if the user has been asked about this permission already and denied
-                // it. If so, we want to give more explanation about why the permission is needed.
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    // Show our own UI to explain to the user why we need to read the contacts
-                    // before actually requesting the permission and showing the default UI
-                    Toast.makeText(mainActivity, mainActivity.getString(R.string.allow_storage), Toast.LENGTH_LONG)
-                            .show();
-                }
-
-                MainActivity.info("no permission for external storage");
-
-                // Fire off an async request to actually get the permission
-                // This will show the standard permission request dialog UI
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
-            }
-        }
-    }
-
-    private void setupLocationPermissions() {
+    private void setupPermissions() {
         if (Build.VERSION.SDK_INT >= 23) {
             final List<String> permissionsNeeded = new ArrayList<>();
             final List<String> permissionsList = new ArrayList<>();
@@ -322,29 +297,32 @@ public final class MainActivity extends AppCompatActivity {
             if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
             }
+            addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied
                 // it. If so, we want to give more explanation about why the permission is needed.
-                if (!permissionsNeeded.isEmpty()) {
-                    String message = mainActivity.getString(R.string.please_allow);
-                    for (int i = 0; i < permissionsNeeded.size(); i++) {
-                        if (i > 0) message += ", ";
-                        message += permissionsNeeded.get(i);
-                    }
-
-                    // Show our own UI to explain to the user why we need to read the contacts
-                    // before actually requesting the permission and showing the default UI
-                    Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+                String message = mainActivity.getString(R.string.please_allow);
+                for (int i = 0; i < permissionsNeeded.size(); i++) {
+                    if (i > 0) message += ", ";
+                    message += permissionsNeeded.get(i);
                 }
 
-                MainActivity.info("no permission for gps or cell location");
+                if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    message = mainActivity.getString(R.string.allow_storage);
+                }
+
+                // Show our own UI to explain to the user why we need to read the contacts
+                // before actually requesting the permission and showing the default UI
+                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+
+                MainActivity.info("no permission for " + permissionsNeeded);
 
                 // Fire off an async request to actually get the permission
                 // This will show the standard permission request dialog UI
                 requestPermissions(permissionsList.toArray(new String[permissionsList.size()]),
-                        LOCATION_PERMISSIONS_REQUEST);
+                        PERMISSIONS_REQUEST);
             }
         }
     }
@@ -368,32 +346,30 @@ public final class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String permissions[],
                                            @NonNull final int[] grantResults) {
         switch (requestCode) {
-            case WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case PERMISSIONS_REQUEST: {
+                info("location grant response permissions: " + Arrays.toString(permissions)
+                        + " grantResults: " + Arrays.toString(grantResults));
 
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                boolean restart = false;
+                for (int i = 0; i < permissions.length; i++) {
+                    final String permission = permissions[i];
+                    if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)
+                            && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        restart = true;
+                    }
+                }
 
+                if (restart) {
                     // restart the app now that we can talk to the database
+                    Toast.makeText(mainActivity, R.string.restart, Toast.LENGTH_LONG).show();
+
                     Intent i = getBaseContext().getPackageManager()
                             .getLaunchIntentForPackage( getBaseContext().getPackageName() );
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     finish();
                     startActivity(i);
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    info("permission denied. requestCode: " + requestCode);
                 }
                 return;
-            }
-
-            case LOCATION_PERMISSIONS_REQUEST: {
-                info("location grant response: " + Arrays.toString(grantResults));
             }
 
             default:

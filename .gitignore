@@ -11,7 +11,7 @@
 bin/
 gen/
 build/
-library/build
+android-maps-utils/build
 wiglewifiwardriving/build
 .idea
 .gradle

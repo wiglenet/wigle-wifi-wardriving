@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
+import net.wigle.wigleandroid.background.DownloadHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SiteStatsFragment extends Fragment {
     private static final int MSG_SITE_DONE = 100;
     private static final int MENU_USER_STATS = 200;
+    private static final int MENU_RANK_STATS = 202;
 
     private static final String KEY_NETLOC = "netloc";
     private static final String KEY_LOCTOTAL = "loctotal";
@@ -83,18 +85,10 @@ public class SiteStatsFragment extends Fragment {
 
     }
 
-    private final static class DownloadHandler extends Handler {
-        private final View view;
-        private final NumberFormat numberFormat;
-        private final String packageName;
-        private final Resources resources;
-
-        private DownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
+    private final static class SiteDownloadHandler extends DownloadHandler {
+        private SiteDownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
                                 final Resources resources) {
-            this.view = view;
-            this.numberFormat = numberFormat;
-            this.packageName = packageName;
-            this.resources = resources;
+            super(view, numberFormat, packageName, resources);
         }
 
         @Override
@@ -115,22 +109,17 @@ public class SiteStatsFragment extends Fragment {
 
     public void downloadLatestSiteStats(final View view) {
         // what runs on the gui thread
-        final Handler handler = new DownloadHandler(view, numberFormat, getActivity().getPackageName(),
+        final Handler handler = new SiteDownloadHandler(view, numberFormat, getActivity().getPackageName(),
                 getResources());
-
-        final String siteStatsCacheFilename = "site-stats-cache.json";
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                siteStatsCacheFilename, MainActivity.SITE_STATS_URL, false, false,
+                "site-stats-cache.json", MainActivity.SITE_STATS_URL, false, false, false,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
                         handleSiteStats(json, handler);
                     }
                 });
-
-        handleSiteStats(task.getCached(), handler);
-
-        task.start();
+        task.startDownload(this);
     }
 
     private void handleSiteStats(final JSONObject json, final Handler handler) {
@@ -207,17 +196,27 @@ public class SiteStatsFragment extends Fragment {
         item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
         item.setIcon(android.R.drawable.ic_menu_myplaces);
 
+        item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
+        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+
+        item = menu.add(0, MENU_RANK_STATS, 0, getString(R.string.rank_stats_app_name));
+        item.setIcon(android.R.drawable.ic_menu_sort_by_size);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     /* Handles item selections */
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
+        final MainActivity main = MainActivity.getMainActivity();
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-              final MainActivity main = MainActivity.getMainActivity();
-              main.selectFragment(MainActivity.USER_STATS_TAB_POS);
-              return true;
+                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                return true;
+            case MENU_RANK_STATS:
+                main.selectFragment(MainActivity.RANK_STATS_TAB_POS);
+                return true;
         }
         return false;
     }

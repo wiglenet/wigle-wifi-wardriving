@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.background;
 
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Base64;
 
@@ -8,6 +9,7 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -26,10 +28,11 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private final String url;
     private final boolean doFormLogin;
     private final boolean doBasicLogin;
+    private final boolean requiresLogin;
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
-                         final boolean doBasicLogin,
+                         final boolean doBasicLogin, final boolean requiresLogin,
                          final ApiListener listener) {
 
         super(context, dbHelper, "ApiDL", false);
@@ -37,6 +40,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
         this.url = url;
         this.doFormLogin = doFormLogin;
         this.doBasicLogin = doBasicLogin;
+        this.requiresLogin = requiresLogin;
         this.listener = listener;
     }
 
@@ -181,6 +185,60 @@ public class ApiDownloader extends AbstractBackgroundTask {
             MainActivity.info("apiDownloader result: " + line);
         }
         return result.toString();
+    }
+
+    public void startDownload(final Fragment fragment) {
+        // if we have cached data, call the handler with that
+        final JSONObject cache = getCached();
+        if (cache != null) listener.requestComplete(cache);
+
+        // download token if needed
+        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+        MainActivity.info("authname: " + authname);
+        if (beAnonymous && requiresLogin) {
+            MainActivity.info("anonymous, not running ApiDownloader: " + this);
+            return;
+        }
+        if (authname == null && doBasicLogin) {
+            MainActivity.info("No authname, going to request token");
+            downloadTokenAndStart(fragment);
+        } else {
+            start();
+        }
+    }
+
+    private void downloadTokenAndStart(final Fragment fragment) {
+        final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
+                null, MainActivity.TOKEN_URL, true, false, true,
+                new ApiListener() {
+                    @Override
+                    public void requestComplete(final JSONObject json) {
+                        try {
+                            // {"success":true,"result":{"authname":"AID...","token":"..."}}
+                            if (json.getBoolean("success")) {
+                                final JSONObject result = json.getJSONObject("result");
+                                final String authname = result.getString("authname");
+                                final String token = result.getString("token");
+                                final SharedPreferences prefs = fragment.getContext()
+                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                final SharedPreferences.Editor edit = prefs.edit();
+                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
+                                edit.putString(ListFragment.PREF_TOKEN, token);
+                                edit.apply();
+
+                                // execute ourselves, the pending task
+                                start();
+                            }
+                        }
+                        catch (final JSONException ex) {
+                            MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                        }
+                    }
+                });
+
+        task.start();
     }
 
 }

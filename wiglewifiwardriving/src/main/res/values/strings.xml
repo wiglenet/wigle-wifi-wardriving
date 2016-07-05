@@ -296,4 +296,8 @@
     <string name="cell_permission">Cell Location (Coarse Location)</string>
     <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
     <string name="restart">Restarting to use external storage</string>
+    <string name="rank_stats_app_name">WiGLE.net Rankings</string>
+    <string name="total_wifi">Total WiFi</string>
+    <string name="total_cell">Total Cell</string>
+    <string name="tab_rank">Rankings</string>
 </resources>

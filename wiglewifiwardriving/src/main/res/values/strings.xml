@@ -300,4 +300,7 @@
     <string name="total_wifi">Total WiFi</string>
     <string name="total_cell">Total Cell</string>
     <string name="tab_rank">Rankings</string>
+    <string name="uploads_app_name">WiGLE.net Uploads</string>
+    <string name="tab_uploads">Uploads</string>
+    <string name="queue_depth">File Processing Queue Depth</string>
 </resources>

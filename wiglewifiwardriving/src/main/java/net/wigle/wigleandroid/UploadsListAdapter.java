@@ -11,23 +11,20 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.model.Upload;
 
 import java.text.NumberFormat;
 import java.util.Locale;
 
 /**
- * the array adapter for a list of users.
+ * the array adapter for a list of uploads.
  */
-public final class RankListAdapter extends ArrayAdapter<RankUser> {
-    private static final String ANONYMOUS = "anonymous";
+public final class UploadsListAdapter extends ArrayAdapter<Upload> {
     private final LayoutInflater mInflater;
     private final NumberFormat numberFormat;
-    private final String username;
 
-    public RankListAdapter(final Context context, final int rowLayout ) {
+    public UploadsListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        username = prefs.getString(ListFragment.PREF_USERNAME, "");
 
         this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         numberFormat = NumberFormat.getNumberInstance( Locale.US );
@@ -40,15 +37,15 @@ public final class RankListAdapter extends ArrayAdapter<RankUser> {
         View row;
 
         if ( null == convertView ) {
-            row = mInflater.inflate( R.layout.rankrow, parent, false );
+            row = mInflater.inflate( R.layout.uploadrow, parent, false );
         }
         else {
             row = convertView;
         }
 
-        RankUser rankUser;
+        Upload upload;
         try {
-            rankUser = getItem(position);
+            upload = getItem(position);
         }
         catch ( final IndexOutOfBoundsException ex ) {
             // yes, this happened to someone
@@ -56,30 +53,19 @@ public final class RankListAdapter extends ArrayAdapter<RankUser> {
             return row;
         }
 
-        TextView tv = (TextView) row.findViewById( R.id.rank );
-        tv.setText(numberFormat.format(rankUser.getRank()));
+        TextView tv = (TextView) row.findViewById( R.id.transid );
+        tv.setText(upload.getTransid());
 
-        tv = (TextView) row.findViewById( R.id.username );
-        String rankUsername = rankUser.getUsername();
-        if (ANONYMOUS.equals(rankUser.getUsername())) {
-            tv.setTypeface(null, Typeface.ITALIC);
-        }
-        if (username.equals(rankUser.getUsername())) {
-            tv.setTypeface(null, Typeface.BOLD);
-            rankUsername = "*** " + rankUsername + " ***";
-        }
-        tv.setText(rankUsername);
-
-        tv = (TextView) row.findViewById( R.id.month_wifi_gps );
-        tv.setText(numberFormat.format(rankUser.getMonthWifiGps()));
+//        tv = (TextView) row.findViewById( R.id.month_wifi_gps );
+//        tv.setText(numberFormat.format(upload.getMonthWifiGps()));
 
         tv = (TextView) row.findViewById( R.id.total_wifi_gps );
         tv.setText(getContext().getString(R.string.total_wifi) + ": "
-                + numberFormat.format(rankUser.getTotalWifiGps()));
+                + numberFormat.format(upload.getTotalWifiGps()));
 
         tv = (TextView) row.findViewById( R.id.total_cell_gps );
         tv.setText(getContext().getString(R.string.total_cell) + ": "
-                + numberFormat.format(rankUser.getTotalCellGps()));
+                + numberFormat.format(upload.getTotalCellGps()));
 
         return row;
     }

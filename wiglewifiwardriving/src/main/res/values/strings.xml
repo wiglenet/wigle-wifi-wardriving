@@ -303,4 +303,6 @@
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Uploads</string>
     <string name="queue_depth">File Processing Queue Depth</string>
+    <string name="news_app_name">WiGLE.net News</string>
+    <string name="tab_news">News</string>
 </resources>

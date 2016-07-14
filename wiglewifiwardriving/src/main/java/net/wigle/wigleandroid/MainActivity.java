@@ -114,7 +114,7 @@ public final class MainActivity extends AppCompatActivity {
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
-        private final Fragment[] fragList = new Fragment[10];
+        private final Fragment[] fragList = new Fragment[11];
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
     }
@@ -129,6 +129,7 @@ public final class MainActivity extends AppCompatActivity {
     // no auth
     public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
     public static final String RANK_STATS_URL = "https://wigle.net/api/v1/jsonStats";
+    public static final String NEWS_URL = "https://wigle.net/api/v1/jsonNews";
     // api token auth
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/v1/jsonTrans";
     public static final String USER_STATS_URL = "https://api.wigle.net/v1/jsonUserStats";
@@ -164,12 +165,13 @@ public final class MainActivity extends AppCompatActivity {
     public static final int MAP_TAB_POS = 1;
     public static final int DASH_TAB_POS = 2;
     public static final int DATA_TAB_POS = 3;
-    public static final int RANK_STATS_TAB_POS = 4;
-    public static final int USER_STATS_TAB_POS = 5;
-    public static final int UPLOADS_TAB_POS = 6;
-    public static final int SETTINGS_TAB_POS = 7;
-    public static final int EXIT_TAB_POS = 8;
-    public static final int SITE_STATS_TAB_POS = 9;
+    public static final int NEWS_TAB_POS = 4;
+    public static final int RANK_STATS_TAB_POS = 5;
+    public static final int USER_STATS_TAB_POS = 6;
+    public static final int UPLOADS_TAB_POS = 7;
+    public static final int SETTINGS_TAB_POS = 8;
+    public static final int EXIT_TAB_POS = 9;
+    public static final int SITE_STATS_TAB_POS = 10;
 
 
     @SuppressWarnings("deprecation")
@@ -392,6 +394,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.tab_map),
                 getString(R.string.tab_dash),
                 getString(R.string.tab_data),
+                getString(R.string.tab_news),
                 getString(R.string.tab_rank),
                 getString(R.string.tab_stats),
                 getString(R.string.tab_uploads),
@@ -403,6 +406,7 @@ public final class MainActivity extends AppCompatActivity {
                 android.R.drawable.ic_menu_mapmode,
                 android.R.drawable.ic_menu_directions,
                 android.R.drawable.ic_menu_save,
+                android.R.drawable.ic_menu_agenda,
                 android.R.drawable.ic_menu_sort_alphabetically,
                 android.R.drawable.ic_menu_today,
                 android.R.drawable.ic_menu_upload,
@@ -488,6 +492,7 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.mapping_app_name),
                 getString(R.string.dashboard_app_name),
                 getString(R.string.data_activity_name),
+                getString(R.string.news_app_name),
                 getString(R.string.rank_stats_app_name),
                 getString(R.string.user_stats_app_name),
                 getString(R.string.uploads_app_name),
@@ -561,6 +566,12 @@ public final class MainActivity extends AppCompatActivity {
         bundle = new Bundle();
         siteStats.setArguments(bundle);
         state.fragList[SITE_STATS_TAB_POS] = siteStats;
+
+        info("Creating NewsFragment");
+        final NewsFragment newsStats = new NewsFragment();
+        bundle = new Bundle();
+        newsStats.setArguments(bundle);
+        state.fragList[NEWS_TAB_POS] = newsStats;
 
         info("Creating RankStatsFragment");
         final RankStatsFragment rankStats = new RankStatsFragment();

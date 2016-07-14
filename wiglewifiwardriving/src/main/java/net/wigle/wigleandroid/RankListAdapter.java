@@ -18,20 +18,14 @@ import java.util.Locale;
 /**
  * the array adapter for a list of users.
  */
-public final class RankListAdapter extends ArrayAdapter<RankUser> {
+public final class RankListAdapter extends AbstractListAdapter<RankUser> {
     private static final String ANONYMOUS = "anonymous";
-    private final LayoutInflater mInflater;
-    private final NumberFormat numberFormat;
     private final String username;
 
     public RankListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
         final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         username = prefs.getString(ListFragment.PREF_USERNAME, "");
-
-        this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        numberFormat = NumberFormat.getNumberInstance( Locale.US );
-        numberFormat.setGroupingUsed(true);
     }
 
     @SuppressLint("SetTextI18n")

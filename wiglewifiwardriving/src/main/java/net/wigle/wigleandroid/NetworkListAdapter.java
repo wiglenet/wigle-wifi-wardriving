@@ -21,7 +21,7 @@ import net.wigle.wigleandroid.model.NetworkType;
  * the array adapter for a list of networks.
  * note: separators aren't drawn if areAllItemsEnabled or isEnabled are false
  */
-public final class NetworkListAdapter extends ArrayAdapter<Network> {
+public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     //color by signal strength
     private static final int COLOR_1 = Color.rgb( 70, 170,  0);
     private static final int COLOR_2 = Color.rgb(170, 170,  0);
@@ -35,13 +35,10 @@ public final class NetworkListAdapter extends ArrayAdapter<Network> {
     private static final int COLOR_4A = Color.argb(128, 180,  60, 40);
     private static final int COLOR_5A = Color.argb(128, 180,  45, 70);
 
-    final LayoutInflater mInflater;
-
     private final SimpleDateFormat format;
 
     public NetworkListAdapter( final Context context, final int rowLayout ) {
         super( context, rowLayout );
-        this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
         format = getConstructionTimeFormater( context );
     }
 

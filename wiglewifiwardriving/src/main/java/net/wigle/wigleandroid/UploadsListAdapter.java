@@ -19,16 +19,9 @@ import java.util.Locale;
 /**
  * the array adapter for a list of uploads.
  */
-public final class UploadsListAdapter extends ArrayAdapter<Upload> {
-    private final LayoutInflater mInflater;
-    private final NumberFormat numberFormat;
-
+public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
     public UploadsListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
-
-        this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        numberFormat = NumberFormat.getNumberInstance( Locale.US );
-        numberFormat.setGroupingUsed(true);
     }
 
     @SuppressLint("SetTextI18n")

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+<LinearLayout android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+    <TextView android:id="@+id/subject" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:textSize="18sp"
+              android:textColor="#60f0f0"
+              android:gravity="center"/>
+
+</LinearLayout>
+
+<LinearLayout android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<!-- Second row -->
+	<TextView android:id="@+id/post" android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:textSize="18sp"
+		android:textColor="#eeeeee"
+		android:gravity="start"/>
+</LinearLayout>
+
+</LinearLayout>
+

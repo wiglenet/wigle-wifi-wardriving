@@ -35,6 +35,14 @@ import java.util.Locale;
 public class NewsFragment extends Fragment {
     private static final int MSG_NEWS_DONE = 100;
 
+    // {"success": true,"results": [
+    // {"link":"http://wigle.net/phpbb/viewtopic.php?p=8783",
+    // "subject":"250 Million Wifi Networks",
+    // "postDateTime":"Sat Apr 30 15:31:41 2016",
+    // "post":"Major congrats to user 'redlukas' can say &quot;quarter billion&quot;",
+    // "id":"8783",
+    // "more":false,
+    // "poster":"bobzilla"}
     private static final String RESULT_LIST_KEY = "results";
 
     private static final String KEY_SUBJECT = "subject";

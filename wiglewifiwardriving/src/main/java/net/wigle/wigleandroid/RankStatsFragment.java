@@ -41,6 +41,18 @@ public class RankStatsFragment extends Fragment {
 
     private static final String RESULT_LIST_KEY = "results";
 
+    // {"discoveredCellGPS":"1773",
+    // "first":"27-Jan-2003",
+    // "last":"13-Jul-2016",
+    // "self":false,
+    // "eventPrevMonthCount":"284489",
+    // "username":"ccie4526",
+    // "discoveredWiFiGPSPercent":"3.751",
+    // "eventMonthCount":"94942",
+    // "discoveredWiFi":"11143854",
+    // "discoveredCell":"2799",
+    // "rank":2,
+    // "discoveredWiFiGPS":"10013307"},
     private static final String KEY_MONTH_WIFI_GPS = "eventMonthCount";
     private static final String KEY_TOTAL_WIFI_GPS = "discoveredWiFiGPS";
     private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";

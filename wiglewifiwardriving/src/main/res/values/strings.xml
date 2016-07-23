@@ -308,5 +308,8 @@
     <string name="wifi_gps">WiFi GPS</string>
     <string name="cell_gps">Cell GPS</string>
     <string name="bytes">Bytes</string>
+    <string name="rank_all_time">All Time Rankings</string>
+    <string name="rank_month">Month Rankings</string>
+    <string name="all_time_title">WiFi Discovered All Time</string>
 
 </resources>

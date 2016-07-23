@@ -38,6 +38,7 @@ public class RankStatsFragment extends Fragment {
     private static final int MSG_RANKING_DONE = 100;
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
+    private static final int MENU_RANK_SWAP = 202;
 
     private static final String RESULT_LIST_KEY = "results";
 
@@ -68,6 +69,8 @@ public class RankStatsFragment extends Fragment {
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
     private RankListAdapter listAdapter;
+    private AtomicBoolean monthRanking;
+    private RankDownloadHandler handler;
 
     /** Called when the activity is first created. */
     @Override
@@ -82,6 +85,7 @@ public class RankStatsFragment extends Fragment {
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         finishing = new AtomicBoolean(false);
+        monthRanking = new AtomicBoolean(true);
         numberFormat = NumberFormat.getNumberInstance(Locale.US);
         if (numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
@@ -96,12 +100,20 @@ public class RankStatsFragment extends Fragment {
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
         setupListView(rootView);
 
-        final RankDownloadHandler handler = new RankDownloadHandler(rootView, numberFormat,
-                getActivity().getPackageName(), getResources());
+        handler = new RankDownloadHandler(rootView, numberFormat,
+                getActivity().getPackageName(), getResources(), monthRanking);
         handler.setRankListAdapter(listAdapter);
-        final String monthUrl = MainActivity.RANK_STATS_URL + "?pageend=" + ROW_COUNT + "&sort=monthcount";
+        downloadRanks(handler);
+
+        return rootView;
+    }
+
+    private void downloadRanks(final RankDownloadHandler handler) {
+        final String sort = monthRanking.get() ? "monthcount" : "discovered";
+        final String cacheName = monthRanking.get() ? "month" : "all";
+        final String monthUrl = MainActivity.RANK_STATS_URL + "?pageend=" + ROW_COUNT + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "rank-stats-month-cache.json", monthUrl, false, false, false,
+                "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json) {
@@ -109,8 +121,6 @@ public class RankStatsFragment extends Fragment {
                     }
                 });
         task.startDownload(this);
-
-        return rootView;
     }
 
     private void setupListView(final View view) {
@@ -125,10 +135,12 @@ public class RankStatsFragment extends Fragment {
 
     private final static class RankDownloadHandler extends DownloadHandler {
         private RankListAdapter rankListAdapter;
+        final AtomicBoolean monthRanking;
 
         private RankDownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
-                                final Resources resources) {
+                                final Resources resources, final AtomicBoolean monthRanking) {
             super(view, numberFormat, packageName, resources);
+            this.monthRanking = monthRanking;
         }
 
         public void setRankListAdapter(final RankListAdapter rankListAdapter) {
@@ -143,9 +155,10 @@ public class RankStatsFragment extends Fragment {
             MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && rankListAdapter != null) {
                 TextView tv = (TextView) view.findViewById(R.id.rankstats_type);
-                tv.setText(R.string.monthcount_title);
+                tv.setText(monthRanking.get() ? R.string.monthcount_title : R.string.all_time_title);
 
                 rankListAdapter.clear();
+                rankListAdapter.setMonthRanking(monthRanking.get());
                 for (final Parcelable result : results) {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
@@ -247,7 +260,14 @@ public class RankStatsFragment extends Fragment {
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
         item.setIcon(R.drawable.wiglewifi_small_black_white);
 
+        item = menu.add(0, MENU_RANK_SWAP, 0, getRankSwapString());
+        item.setIcon(android.R.drawable.ic_menu_sort_alphabetically);
+
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private String getRankSwapString() {
+        return getString(monthRanking.get() ? R.string.rank_all_time : R.string.rank_month);
     }
 
     /* Handles item selections */
@@ -260,6 +280,11 @@ public class RankStatsFragment extends Fragment {
                 return true;
             case MENU_SITE_STATS:
                 main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                return true;
+            case MENU_RANK_SWAP:
+                monthRanking.set(!monthRanking.get());
+                item.setTitle(getRankSwapString());
+                downloadRanks(handler);
                 return true;
         }
         return false;

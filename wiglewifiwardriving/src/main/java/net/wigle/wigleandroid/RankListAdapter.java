@@ -4,28 +4,28 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.model.RankUser;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 /**
- * the array adapter for a list of users.
+ * the array adapter for a list of usersO.
  */
 public final class RankListAdapter extends AbstractListAdapter<RankUser> {
     private static final String ANONYMOUS = "anonymous";
     private final String username;
+    private boolean monthRanking = true;
 
     public RankListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
         final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         username = prefs.getString(ListFragment.PREF_USERNAME, "");
+    }
+
+    public void setMonthRanking(final boolean monthRanking) {
+        this.monthRanking = monthRanking;
     }
 
     @SuppressLint("SetTextI18n")
@@ -65,7 +65,8 @@ public final class RankListAdapter extends AbstractListAdapter<RankUser> {
         tv.setText(rankUsername);
 
         tv = (TextView) row.findViewById( R.id.month_wifi_gps );
-        tv.setText(numberFormat.format(rankUser.getMonthWifiGps()));
+        tv.setText(numberFormat.format(
+                monthRanking ? rankUser.getMonthWifiGps() : rankUser.getTotalWifiGps()));
 
         tv = (TextView) row.findViewById( R.id.total_wifi_gps );
         tv.setText(getContext().getString(R.string.total_wifi) + ": "

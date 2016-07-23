@@ -182,7 +182,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
             }
             result.append(line);
 
-            MainActivity.info("apiDownloader result: " + line);
+            // MainActivity.info("apiDownloader result: " + line);
         }
         return result.toString();
     }

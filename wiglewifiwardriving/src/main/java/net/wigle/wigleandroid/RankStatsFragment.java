@@ -9,6 +9,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -96,19 +97,40 @@ public class RankStatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("RANKSTATS: onCreateView. orientation: " + orientation);
+        MainActivity.info("RANKSTATS: onCreateView.a orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
+        setupSwipeRefresh(rootView);
         setupListView(rootView);
 
         handler = new RankDownloadHandler(rootView, numberFormat,
                 getActivity().getPackageName(), getResources(), monthRanking);
         handler.setRankListAdapter(listAdapter);
-        downloadRanks(handler);
+        downloadRanks();
 
         return rootView;
     }
 
-    private void downloadRanks(final RankDownloadHandler handler) {
+    private void setupSwipeRefresh(final LinearLayout rootView) {
+        // Lookup the swipe container view
+        final SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.rank_swipe_container);
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                downloadRanks();
+            }
+        });
+    }
+
+    private void downloadRanks() {
+        if (handler == null) {
+            MainActivity.error("downloadRanks: handler is null");
+            return;
+        }
         final String sort = monthRanking.get() ? "monthcount" : "discovered";
         final String cacheName = monthRanking.get() ? "month" : "all";
         final String monthUrl = MainActivity.RANK_STATS_URL + "?pageend=" + ROW_COUNT + "&sort=" + sort;
@@ -168,6 +190,10 @@ public class RankStatsFragment extends Fragment {
                         rankListAdapter.add(rankUser);
                     }
                 }
+
+                final SwipeRefreshLayout swipeRefreshLayout =
+                        (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
+                swipeRefreshLayout.setRefreshing(false);
             }
         }
     }
@@ -284,7 +310,7 @@ public class RankStatsFragment extends Fragment {
             case MENU_RANK_SWAP:
                 monthRanking.set(!monthRanking.get());
                 item.setTitle(getRankSwapString());
-                downloadRanks(handler);
+                downloadRanks();
                 return true;
         }
         return false;

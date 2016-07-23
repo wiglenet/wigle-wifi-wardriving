@@ -41,6 +41,9 @@ public final class NewsListAdapter extends AbstractListAdapter<NewsItem> {
         TextView tv = (TextView) row.findViewById( R.id.subject );
         tv.setText(newsItem.getSubject());
 
+        tv = (TextView) row.findViewById( R.id.poster_date );
+        tv.setText(newsItem.getPoster() + " - " + newsItem.getDateTime());
+
         tv = (TextView) row.findViewById( R.id.post );
         tv.setText(newsItem.getPost());
 

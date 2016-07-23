@@ -6,11 +6,15 @@ package net.wigle.wigleandroid.model;
 public final class NewsItem {
     private final String subject;
     private final String post;
+    private final String poster;
+    private final String dateTime;
 
-    public NewsItem(final String subject, final String post) {
+    public NewsItem(final String subject, final String post, final String poster, final String dateTime) {
 
         this.subject = subject;
         this.post = post;
+        this.poster = poster;
+        this.dateTime = dateTime;
     }
 
     public String getSubject() {
@@ -19,5 +23,13 @@ public final class NewsItem {
 
     public String getPost() {
         return post;
+    }
+
+    public String getPoster() {
+        return poster;
+    }
+
+    public String getDateTime() {
+        return dateTime;
     }
 }

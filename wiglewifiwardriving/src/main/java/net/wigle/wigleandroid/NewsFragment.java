@@ -47,9 +47,11 @@ public class NewsFragment extends Fragment {
 
     private static final String KEY_SUBJECT = "subject";
     private static final String KEY_POST = "post";
+    private static final String KEY_DATE_TIME = "postDateTime";
+    private static final String KEY_POSTER = "poster";
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_SUBJECT, KEY_POST
+            KEY_SUBJECT, KEY_POST, KEY_DATE_TIME, KEY_POSTER,
         };
 
     private NumberFormat numberFormat;
@@ -132,7 +134,7 @@ public class NewsFragment extends Fragment {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
                         final NewsItem upload = new NewsItem(row.getString(KEY_SUBJECT),
-                                row.getString(KEY_POST));
+                                row.getString(KEY_POST), row.getString(KEY_POSTER), row.getString(KEY_DATE_TIME));
                         newsListAdapter.add(upload);
                     }
                 }

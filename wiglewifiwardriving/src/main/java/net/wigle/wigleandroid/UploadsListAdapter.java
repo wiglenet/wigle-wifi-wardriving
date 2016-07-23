@@ -49,16 +49,30 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         TextView tv = (TextView) row.findViewById( R.id.transid );
         tv.setText(upload.getTransid());
 
-//        tv = (TextView) row.findViewById( R.id.month_wifi_gps );
-//        tv.setText(numberFormat.format(upload.getMonthWifiGps()));
-
         tv = (TextView) row.findViewById( R.id.total_wifi_gps );
-        tv.setText(getContext().getString(R.string.total_wifi) + ": "
+        tv.setText(getContext().getString(R.string.wifi_gps) + ": "
                 + numberFormat.format(upload.getTotalWifiGps()));
 
         tv = (TextView) row.findViewById( R.id.total_cell_gps );
-        tv.setText(getContext().getString(R.string.total_cell) + ": "
+        tv.setText(getContext().getString(R.string.cell_gps) + ": "
                 + numberFormat.format(upload.getTotalCellGps()));
+
+        tv = (TextView) row.findViewById( R.id.file_size );
+        tv.setText(getContext().getString(R.string.bytes) + ": "
+                + numberFormat.format(upload.getFileSize()));
+
+        final String status = upload.getStatus();
+        String percentDonePrefix = "";
+        String percentDoneSuffix = "%";
+        if ("Queued for Processing".equals(status)) {
+            percentDonePrefix = "#";
+            percentDoneSuffix = "";
+        }
+        tv = (TextView) row.findViewById( R.id.percent_done );
+        tv.setText(percentDonePrefix + upload.getPercentDone() + percentDoneSuffix);
+
+        tv = (TextView) row.findViewById( R.id.status );
+        tv.setText(upload.getStatus());
 
         return row;
     }

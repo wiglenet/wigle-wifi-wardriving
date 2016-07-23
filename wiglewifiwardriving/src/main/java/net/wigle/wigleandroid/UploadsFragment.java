@@ -67,11 +67,14 @@ public class UploadsFragment extends Fragment {
     private static final String KEY_TOTAL_CELL_GPS = "gendiscgps";
     private static final String KEY_QUEUE_DEPTH = "processingQueueDepth";
     private static final String KEY_TRANSID = "transid";
+    private static final String KEY_STATUS = "status";
+    private static final String KEY_PERCENT_DONE = "percentdone";
+    private static final String KEY_FILE_SIZE = "filesize";
 
     private static final int ROW_COUNT = 100;
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS
+            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE,
         };
 
     private AtomicBoolean finishing;
@@ -161,7 +164,8 @@ public class UploadsFragment extends Fragment {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
                         final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_CELL_GPS));
+                                row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
+                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE));
                         uploadsListAdapter.add(upload);
                     }
                 }
@@ -188,6 +192,7 @@ public class UploadsFragment extends Fragment {
                     rowBundle.putLong(key, row.getLong(key));
                 }
                 rowBundle.putString(KEY_TRANSID, row.getString(KEY_TRANSID));
+                rowBundle.putString(KEY_STATUS, row.getString(KEY_STATUS));
                 resultList.add(rowBundle);
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);

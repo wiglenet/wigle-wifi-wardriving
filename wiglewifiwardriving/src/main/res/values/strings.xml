@@ -305,4 +305,8 @@
     <string name="queue_depth">File Processing Queue Depth</string>
     <string name="news_app_name">WiGLE.net News</string>
     <string name="tab_news">News</string>
+    <string name="wifi_gps">WiFi GPS</string>
+    <string name="cell_gps">Cell GPS</string>
+    <string name="bytes">Bytes</string>
+
 </resources>

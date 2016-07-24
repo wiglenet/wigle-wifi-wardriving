@@ -133,7 +133,7 @@ public class UserStatsFragment extends Fragment {
             MainActivity.info("handleUserStats null json, returning");
             return;
         }
-        MainActivity.info("user stats: " + json);
+        // MainActivity.info("user stats: " + json);
 
         final Bundle bundle = new Bundle();
         try {

@@ -127,7 +127,7 @@ public class NewsFragment extends Fragment {
             final Bundle bundle = msg.getData();
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            MainActivity.info("handleMessage. results: " + results);
+            // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_NEWS_DONE && results != null && newsListAdapter != null) {
                 newsListAdapter.clear();
                 for (final Parcelable result : results) {

@@ -10,6 +10,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,6 +81,7 @@ public class UploadsFragment extends Fragment {
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
     private UploadsListAdapter listAdapter;
+    private RankDownloadHandler handler;
 
     /** Called when the activity is first created. */
     @Override
@@ -106,11 +108,38 @@ public class UploadsFragment extends Fragment {
         final int orientation = getResources().getConfiguration().orientation;
         MainActivity.info("UPLOADS: onCreateView. orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.uploads, container, false);
+        setupSwipeRefresh(rootView);
         setupListView(rootView);
 
-        final RankDownloadHandler handler = new RankDownloadHandler(rootView, numberFormat,
+        handler = new RankDownloadHandler(rootView, numberFormat,
                 getActivity().getPackageName(), getResources());
         handler.setUploadsListAdapter(listAdapter);
+        downloadUploads();
+
+        return rootView;
+    }
+
+    private void setupSwipeRefresh(final LinearLayout rootView) {
+        // Lookup the swipe container view
+        final SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.uploads_swipe_container);
+
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                downloadUploads();
+            }
+        });
+    }
+
+    private void downloadUploads() {
+        if (handler == null) {
+            MainActivity.error("downloadUploads handler is null");
+            return;
+        }
         final String monthUrl = MainActivity.UPLOADS_STATS_URL + "?pageend=" + ROW_COUNT;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "uploads-cache.json", monthUrl, false, true, true,
@@ -121,8 +150,6 @@ public class UploadsFragment extends Fragment {
                     }
                 });
         task.startDownload(this);
-
-        return rootView;
     }
 
     private void setupListView(final View view) {
@@ -153,7 +180,7 @@ public class UploadsFragment extends Fragment {
             final Bundle bundle = msg.getData();
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            MainActivity.info("handleMessage. results: " + results);
+            // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null) {
                 TextView tv = (TextView) view.findViewById(R.id.queue_depth);
                 final String queueDepthTitle = resources.getString(R.string.queue_depth);
@@ -169,6 +196,10 @@ public class UploadsFragment extends Fragment {
                         uploadsListAdapter.add(upload);
                     }
                 }
+
+                final SwipeRefreshLayout swipeRefreshLayout =
+                        (SwipeRefreshLayout) view.findViewById(R.id.uploads_swipe_container);
+                swipeRefreshLayout.setRefreshing(false);
             }
         }
     }

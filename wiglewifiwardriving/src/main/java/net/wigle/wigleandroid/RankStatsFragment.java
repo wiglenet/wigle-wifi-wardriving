@@ -174,7 +174,7 @@ public class RankStatsFragment extends Fragment {
             final Bundle bundle = msg.getData();
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            MainActivity.info("handleMessage. results: " + results);
+            // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && rankListAdapter != null) {
                 TextView tv = (TextView) view.findViewById(R.id.rankstats_type);
                 tv.setText(monthRanking.get() ? R.string.monthcount_title : R.string.all_time_title);

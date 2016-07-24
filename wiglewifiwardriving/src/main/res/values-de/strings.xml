@@ -38,14 +38,14 @@
     <string name="backup_db_text">Sicherungskopie der Datenbank erstellen</string>
     <string name="import_observed_button">Import beobachtete Netzwerke</string>
     <string name="import_observed_text">Import meiner beobachtetem Netzwerke WiGLE</string>
-    <string name="periodstill_text">Zeit zwischen WLAN Scans im Stillstand</string>
-    <string name="period_text">Zeit zwischen WLAN Scans wenn langsamer als 8 km/h oder 5 mph</string>
-    <string name="periodfast_text">Zeit zwischen WLAN Scans wenn schneller als 8 km/h oder 5 mph</string>
+    <string name="periodstill_text">Zeit zwischen WLAN-Scans im Stillstand</string>
+    <string name="period_text">Zeit zwischen WLAN-Scans wenn langsamer als 8 km/h oder 5 mph</string>
+    <string name="periodfast_text">Zeit zwischen WLAN-Scans wenn schneller als 8 km/h oder 5 mph</string>
     <string name="gps_text">Zeit zwischen GPS-Updates</string>
     <string name="speak_text">Zeit zwischen Ansagen</string>
     <string name="battery_kill_text">Bei diesem Akkustand beenden</string>
     <string name="reset_wifi_text">WLAN neugestartet</string>
-    <string name="speech_gps">GPS-Statusänderungen ansagen</string>
+    <string name="speech_gps">GPS-Statusänderungen</string>
     <string name="mute">Lautlos</string>
     <string name="play">Laut</string>
     <string name="unknown">Unbekannt</string>
@@ -77,7 +77,7 @@
     <string name="filter_show_ssid">passende SSIDs anzeigen (reguläre Ausdrücke):</string>
     <string name="filter_not_regex">Zeigen, was nicht über reguläre Ausdrücke zutrifft</string>
     <string name="filter_show_open">Offen anzeigen</string>
-    <string name="filter_show_cell">Mobil anzeigen</string>
+    <string name="filter_show_cell">Funkmasten anzeigen</string>
     <string name="filter_show_wep">WEP anzeigen</string>
     <string name="filter_show_wpa">WPA anzeigen</string>
     <string name="filter_enabled">Filter aktiviert</string>
@@ -98,7 +98,7 @@
     <string name="network_observations">Bemerkungen:</string>
     <string name="network_querying">(querying&#8230;)</string>
     <string name="setting_show_password">Passwort anzeigen</string>
-    <string name="setting_db_marker">DB Marker (wo Uploads ab):</string>
+    <string name="setting_db_marker">DB Marker (Uploads ab):</string>
     <string name="setting_high_up">Hochgeladen bis ID:</string>
     <string name="setting_zero_out">DB-Marker zurücksetzen?</string>
     <string name="setting_max_id">Max Upload-ID:</string>
@@ -120,8 +120,8 @@
     <string name="dash_scan_off">(Scanning ausgeschaltet)</string>
     <string name="dash_new_wifi">Neue WLANs</string>
     <string name="dash_vis_nets">WLANs in Reichweite:</string>
-    <string name="dash_new_upload">Neue WLANs seit hochladen:</string>
-    <string name="dash_new_cells">Neue Mobil:</string>
+    <string name="dash_new_upload">Neue WLANs seit letztem Hochladen:</string>
+    <string name="dash_new_cells">Neue Funkmasten:</string>
     <string name="dash_dist_run">Strecke seit Start:</string>
     <string name="dash_dist_total">Gesamtstrecke:.</string>
     <string name="dash_dist_prev">Vorheriger Lauf:</string>
@@ -182,7 +182,7 @@
     <string name="menu_turn_off_lockon">Sperre ausschalten</string>
     <string name="menu_turn_on_lockon">Sperre einschalten</string>
     <string name="menu_show_old">Zeige Lauf &amp; Neu</string>
-    <string name="menu_show_new">Zeige nur Neu</string>
+    <string name="menu_show_new">Zeige nur Neue</string>
     <string name="menu_copy_network">Kopieren Netzwerk-BSSID</string>
     <string name="tts_no_gps_fix">kein GPS-Signal</string>
     <string name="tts_new_wifi">Neue WLANs</string>

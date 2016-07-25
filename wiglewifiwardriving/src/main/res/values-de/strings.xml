@@ -37,7 +37,7 @@
     <string name="backup_db_button">Backup DB</string>
     <string name="backup_db_text">Sicherungskopie der Datenbank erstellen</string>
     <string name="import_observed_button">Import beobachtete Netzwerke</string>
-    <string name="import_observed_text">Import meiner beobachtetem Netzwerke WiGLE</string>
+    <string name="import_observed_text">Import meiner beobachteten Netzwerke aus WiGLE</string>
     <string name="periodstill_text">Zeit zwischen WLAN-Scans im Stillstand</string>
     <string name="period_text">Zeit zwischen WLAN-Scans wenn langsamer als 8 km/h oder 5 mph</string>
     <string name="periodfast_text">Zeit zwischen WLAN-Scans wenn schneller als 8 km/h oder 5 mph</string>

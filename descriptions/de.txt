@@ -2,30 +2,27 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumblen, zeig drahtlose Netzwerke, hochladen zu WiGLE Datenbank.
+Wardriving, zeigt und zeichnet drahtlose Netzwerke auf, Upload in die WiGLE-Datenbank.
 
 Description (4000 characters):
-WiGLE ist eine Open Source App um WLAN-Netzwerke mit deinem Android-Smartphone anzuzeigen, speichern und zu dokumentieren (Wardriving), die gefundenen Netzwerke werden in einer lokalen Datenbank gespeichert, diese kannst du einfach nach die WiGLE.net database hochladen. WiGLE wurde in 2001 gestartet und hat mittlerweile mehr als 125 Millionen WLAN-Netzwerke weltweit in seiner Datenbank gespeichert.
+WiGLE ist eine Open-Source-App um WLAN-Netzwerke und Mobilfunkmasten mit deinem Android-Smartphone anzuzeigen und zu speichern (Wardriving). Die gefundenen Netzwerke werden in einer lokalen Datenbank gespeichert, diese kannst du einfach zu WiGLE.net hochladen. WiGLE wurde 2001 gestartet und hat mittlerweile mehr als 271 Millionen Netzwerke weltweit erfasst.
 
 • Finde die meisten Netzwerke und steige in der WiGLE-Bestenliste auf!
-• Die Datenbank kann in das CSV-Format exportiert werden auf eine SD-Karte (comma separated values)!
-• Die Datenbank kann in das KML-Format exportiert werden auf eine SD-Karte (zu exportieren in Google Maps/Earth)!
-• Tonbenachrichtigungen und Sprachsynthese!
-• Lokale Datenbank um die gefunden Netzwerke zu speichern!
-• Echtzeit-Karte, die die gefunden Netzwerke anzeigt (OpenStreetMap)!
-• Kann App auf einer SD-Karte verschieben!
-• Mit dem "Lautlos"-Button werden die Sprachausgabe alle Sounds gedeaktiviert!
-• Support von Bluetooth-GPS mit Pseudostandorte!
+• Die Datenbank kann in das CSV-Format exportiert werden.
+• Die Datenbank kann in das KML-Format (Google Maps/Earth) exportiert werden.
+• Tonbenachrichtigungen und Sprachausgabe
+• Lokale Datenbank, um die gefunden Netzwerke zu speichern
+• Echtzeit-Karte, die die gefunden Netzwerke zeigt (OpenStreetMap)
+• App kann auf SD-Karte verschoben werden
+• Mit dem "lautlos"-Button werden die Sprachausgabe und alle Sounds deaktiviert
+• Support von Bluetooth-GPS-Sensoren mit Pseudostandorten
 • Keine Werbung!
 
 Versionshinweise: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-Um WLAN-Netzwerke und Funkzellen zu loggen, ist es nötig den Standort via GPS oder Mobilfunknetz bestimmen zu lassen.
-Auf der Echtzeit-Karte werden WLAN-Netzwerke durch Kreise angezeigt, Funkzellen durch Vierecke. Helle Farben signalisieren Netzwerke die bereits in der Datenbank erfasst wurden, lila steht für neue und unbekannte Netzwerke.
-Falls du Probleme oder Vorschläge hast, schicke uns eine E-mail an wigle-admin@wigle.net und wir werden dir helfen.
-WiGLE benötigt "Telefonstatus lesen" lediglich um die Tonausgabe und die Sprachsynthese zu deaktivieren wenn ein Anruf eingeht.
-The files are available for a human translation into languages ​​other than English to help. Dies war vor allem eine mechanische Übersetzung, weil wir natürlich nicht alle diese Sprachen wissen. Sie können helfen mit verbesseren mit pull requests zu machen:
-https://github.com/wiglenet/wigle-wifi-wardriving/pulls
-oder schickst du uns an wigle-admin@wigle.net.
+Um WLAN-Netzwerke und Funkzellen zu loggen ist es nötig, den Standort via GPS oder Mobilfunknetz bestimmen zu lassen.
+Auf der Echtzeit-Karte werden WLAN-Netzwerke durch Kreise angezeigt, Funkzellen durch Vierecke. Helle Farben signalisieren Netzwerke die bereits in der Datenbank erfasst wurden, lila steht für lokal noch nicht erfasste Netzwerke.
+WiGLE benötigt die Berechtigung "Telefonstatus lesen", die aber nur um die Ton- und Sprachausgabe zu deaktivieren wenn ein Anruf eingeht.
+Es ist möglich, die App in andere Sprachen als Englisch manuell über die Sprachdateien zu übersetzen. Dies ist vor allem eine mechanische Übersetzung, weil wir natürlich nicht alle diese Sprachen kennen. Sie können helfen, die App zu verbessern, indem sie Pull Requests auf Github einreichen (https://github.com/wiglenet/wigle-wifi-wardriving/pulls) oder uns eine E-Mail an wigle-admin@wigle.net schicken. Dort erreichst du uns auch, wenn du Probleme oder Vorschläge hast.
 
-Halten Sie auf stumblen!
+Viel Spaß beim Wardriven!

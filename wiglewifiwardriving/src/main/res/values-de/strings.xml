@@ -296,7 +296,7 @@
     <string name="lasttransid_title">Letzte Upload-ID</string>
     <string name="please_allow">Bitte Recthe für die Benutzung geben</string>
     <string name="gps_permission">GPS (genaue Ortung)</string>
-    <string name="cell_permission">Mobilfunk-Ortung (Grobe Ortung)</string>
+    <string name="cell_permission">Mobilfunk-Ortung (grobe Ortung)</string>
     <string name="allow_storage">Die Datenbank wird standardmäßig auf einem externen Speicher gespeichert. Bitte erlaube den Zugriff.</string>
     <string name="restart">Neustart, um externen Speicher zu nutzen</string>
     <string name="rank_stats_app_name">WiGLE.net Ränge</string>
@@ -313,6 +313,6 @@
     <string name="bytes">Bytes</string>
     <string name="rank_all_time">Langzeitränge</string>
     <string name="rank_month">monatliche Ränge</string>
-    <string name="all_time_title">gefundene WLAN (all time)</string>
+    <string name="all_time_title">gefundene WLAN (alle Zeit)</string>
 
 </resources>

@@ -1,7 +1,10 @@
 package net.wigle.wigleandroid;
 
+import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +26,7 @@ import net.wigle.wigleandroid.background.DownloadHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -36,9 +40,12 @@ public class UserStatsFragment extends Fragment {
 
     // {"success":true,"statistics":{"visible":"Y","gendisc":"6439","total":"897432","discovered":"498732",
     // "prevmonthcount":"1814","lasttransid":"20151114-00277","monthcount":"34","totallocs":"8615324","gentotal":"9421",
-    // "firsttransid":"20010907-01998"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
+    // "firsttransid":"20010907-01998", "prevrank":"20"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
 
     private static final String KEY_RANK = "rank";
+    private static final String KEY_PREV_RANK = "prevrank";
+    private static final String KEY_MONTH_RANK = "monthRank";
+    private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
     private static final String KEY_DISCOVERED = "discovered";
     private static final String KEY_TOTAL = "total";
     private static final String KEY_TOTAL_LOCS = "totallocs";
@@ -49,9 +56,12 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_FIRST_TRANS = "firsttransid";
     private static final String KEY_LAST_TRANS = "lasttransid";
 
+    private static final int COLOR_UP = Color.rgb( 30, 200, 30);
+    private static final int COLOR_DOWN = Color.rgb( 200, 30, 30);
+
     private static final String[] ALL_USER_KEYS = new String[] {
-            KEY_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS, KEY_GEN_DISC,
-            KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
+            KEY_RANK, KEY_PREV_RANK, KEY_MONTH_RANK, KEY_PREV_MONTH_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS,
+            KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
         };
 
     private AtomicBoolean finishing;
@@ -104,6 +114,7 @@ public class UserStatsFragment extends Fragment {
             super(view, numberFormat, packageName, resources);
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
@@ -119,12 +130,36 @@ public class UserStatsFragment extends Fragment {
                         case KEY_LAST_TRANS:
                             tv.setText(bundle.getString(key));
                             break;
+                        case KEY_PREV_RANK: {
+                            final long diff = bundle.getLong(KEY_RANK) - bundle.getLong(key);
+                            diffToString(diff, tv);
+                            break;
+                        }
+                        case KEY_PREV_MONTH_RANK: {
+                            final long diff = bundle.getLong(KEY_MONTH_RANK) - bundle.getLong(key);
+                            diffToString(diff, tv);
+                            break;
+                        }
                         default:
                             tv.setText(numberFormat.format(bundle.getLong(key)));
                     }
                 }
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private static void diffToString(final long diff, final TextView tv) {
+        String plus = "   ";
+        if (diff > 0) {
+            plus = "  ↑";
+            tv.setTextColor(COLOR_UP);
+        }
+        if (diff < 0) {
+            plus = "  ↓";
+            tv.setTextColor(COLOR_DOWN);
+        }
+        tv.setText(plus + Long.toString(diff));
     }
 
     private void handleUserStats(final JSONObject json, final Handler handler) {
@@ -139,7 +174,8 @@ public class UserStatsFragment extends Fragment {
         try {
             final JSONObject stats = json.getJSONObject("statistics");
             for (final String key : ALL_USER_KEYS) {
-                final JSONObject lookupJson = (KEY_RANK.equals(key)) ? json : stats;
+                final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
+                if (!lookupJson.has(key)) continue;
                 switch (key) {
                     case KEY_FIRST_TRANS:
                     case KEY_LAST_TRANS:

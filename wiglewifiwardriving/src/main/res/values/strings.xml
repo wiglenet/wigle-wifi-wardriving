@@ -268,7 +268,7 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
-    <string name="tab_stats">Statistics</string>
+    <string name="tab_stats">User Statistics</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
     <string name="netloc_title">WiGLE.net WiFi Networks with Location</string>
     <string name="loctotal_title">WiGLE.net WiFi Network Observations</string>
@@ -311,5 +311,6 @@
     <string name="rank_all_time">All Time Rankings</string>
     <string name="rank_month">Month Rankings</string>
     <string name="all_time_title">WiFi Discovered All Time</string>
+    <string name="month_rank_title">Month Ranking:</string>
 
 </resources>

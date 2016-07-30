@@ -53,14 +53,20 @@ public final class RankListAdapter extends AbstractListAdapter<RankUser> {
         TextView tv = (TextView) row.findViewById( R.id.rank );
         tv.setText(numberFormat.format(rankUser.getRank()));
 
+        tv = (TextView) row.findViewById( R.id.rankdiff );
+        UserStatsFragment.diffToString(rankUser.getRankDiff(), tv);
+
         tv = (TextView) row.findViewById( R.id.username );
         String rankUsername = rankUser.getUsername();
         if (ANONYMOUS.equals(rankUser.getUsername())) {
             tv.setTypeface(null, Typeface.ITALIC);
         }
-        if (username.equals(rankUser.getUsername())) {
+        else if (username.equals(rankUser.getUsername())) {
             tv.setTypeface(null, Typeface.BOLD);
-            rankUsername = "*** " + rankUsername + " ***";
+            rankUsername = "**** " + rankUsername + " ****";
+        }
+        else {
+            tv.setTypeface(null, Typeface.NORMAL);
         }
         tv.setText(rankUsername);
 

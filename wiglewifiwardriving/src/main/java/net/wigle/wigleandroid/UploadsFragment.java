@@ -145,7 +145,7 @@ public class UploadsFragment extends Fragment {
                 "uploads-cache.json", monthUrl, false, true, true,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json) {
+                    public void requestComplete(final JSONObject json, final boolean isCache) {
                         handleUploads(json, handler);
                     }
                 });

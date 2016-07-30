@@ -21,7 +21,7 @@
     <string name="found_sound">Jouer un son  quand un réseau est trouvé en course</string>
     <string name="found_new_sound">Jouer un son quand un nouveau réseau est dans la BD</string>
     <string name="reset_maxid_button">Zéro marqueur de DB</string>
-    <string name="reset_maxid_text">Dernier marqueur d'upload :</string>
+    <string name="reset_maxid_text">Dernier marqueur d\'upload :</string>
     <string name="maxout_maxid_button">Maxout DB marqueur</string>
     <string name="maxout_maxid_text">Règler le marqueur :</string>
     <string name="connect_button">Se connecter</string>
@@ -59,7 +59,7 @@
     <string name="speech_run">Réseaux pour lancer le scan</string>
     <string name="speech_new_wifi">Nouveau WiFi dans la BD</string>
     <string name="speech_new_cell">Nouvelle tour cellulaire dans la BD</string>
-    <string name="speech_queue">Taille de la file d'attente si &gt; 0</string>
+    <string name="speech_queue">Taille de la file d\'attente si &gt; 0</string>
     <string name="speech_miles">Miles en cours</string>
     <string name="speech_time">Heure actuelle</string>
     <string name="speech_battery">Pourcentage du niveau de batterie</string>
@@ -125,7 +125,7 @@
     <string name="dash_dist_run">Distance de course :</string>
     <string name="dash_dist_total">Distance totale :</string>
     <string name="dash_dist_prev">Course précédente :</string>
-    <string name="dash_db_queue">File d'attente BD :</string>
+    <string name="dash_db_queue">File d\'attente BD :</string>
     <string name="dash_db_nets">Réseaux dans la BD :</string>
     <string name="dash_db_locs">Emplacements dans la BD :</string>
     <string name="dash_no_loc">Aucune localisation !</string>
@@ -173,15 +173,15 @@
     <string name="menu_return">Retour</string>
     <string name="menu_sort">Options de tri</string>
     <string name="menu_ssid_filter">Filtre étiquette SSID</string>
-    <string name="menu_screen_sleep">Laissez l'écran en veille</string>
-    <string name="menu_screen_wake">Gardez l'écran allumé</string>
+    <string name="menu_screen_sleep">Laissez l\'écran en veille</string>
+    <string name="menu_screen_wake">Gardez l\'écran allumé</string>
     <string name="menu_labels_off">Étiquettes désactivées</string>
     <string name="menu_labels_on">Étiquettes activées</string>
     <string name="menu_zoom_in">Zoom avant</string>
     <string name="menu_zoom_out">Zoom arrière</string>
     <string name="menu_turn_off_lockon">Verrouillage désactivé</string>
     <string name="menu_turn_on_lockon">Verrouillage activé</string>
-    <string name="menu_show_old">Voir En cours &amp Nouveaus</string>
+    <string name="menu_show_old">Voir En cours &amp; Nouveaus</string>
     <string name="menu_show_new">Montrer les nouveaux seulement</string>
     <string name="menu_copy_network">Copier le BSSID du réseau</string>
     <string name="tts_no_gps_fix">Aucune position GPS fixée</string>
@@ -246,7 +246,7 @@
     <string name="use_network_location">Utilisez le fournisseur de localisation réseau</string>
     <string name="data_import_observed">Importer mes WiFi observés à partir de WiGLE dans la base locale ?</string>
     <string name="donate_question">Offrir les données à WiGLE ?</string>
-    <string name="donate_explain">Permettre à WiGLE à faire une copie anonyme des données, et autoriser WiGLE à octroyer une licence commerciale à d'autres parties.</string>
+    <string name="donate_explain">Permettre à WiGLE à faire une copie anonyme des données, et autoriser WiGLE à octroyer une licence commerciale à d\'autres parties.</string>
     <string name="no_data_conn">Aucune connexion de données, impossible de se connecter à internet.\nDetails :</string>
     <string name="speech_wifi_restart">Le WiFi redémarre</string>
     <string name="wifi_restart_1">Attention, dernier scan WiFi complété</string>
@@ -273,7 +273,7 @@
     <string name="netloc_title">WiGLE.net : réseaux WiFi avec localisation</string>
     <string name="loctotal_title">WiGLE.net : observations de réseaux WiFi</string>
     <string name="genloc_title">WiGLE.net : tours cellulaires avec localisation</string>
-    <string name="userstot_title">Total d'utilisateurs enregistrés sur WiGLE.net</string>
+    <string name="userstot_title">Total d\'utilisateurs enregistrés sur WiGLE.net</string>
     <string name="transtot_title">Fichiers uploadés vers WiGLE.net</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
@@ -291,7 +291,7 @@
     <string name="prevmonthcount_title">WiFi découverts le mois dernier</string>
     <string name="firsttransid_title">ID première transaction</string>
     <string name="lasttransid_title">ID dernière transaction</string>
-    <string name="please_allow">Svp, donnez l'autorisation d'utilisation</string>
+    <string name="please_allow">Svp, donnez l\'autorisation d\'utilisation</string>
     <string name="gps_permission">GPS (localisation exacte)</string>
     <string name="cell_permission">Localisation Cellulaire (localisation grossière)</string>
     <string name="allow_storage">La base de données est sauvegardée sur un support externe par défaut, svp autorisez le stockage du média/fichier</string>

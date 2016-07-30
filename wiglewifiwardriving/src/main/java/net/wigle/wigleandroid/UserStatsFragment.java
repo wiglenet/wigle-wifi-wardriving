@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -26,7 +25,6 @@ import net.wigle.wigleandroid.background.DownloadHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -42,9 +40,9 @@ public class UserStatsFragment extends Fragment {
     // "prevmonthcount":"1814","lasttransid":"20151114-00277","monthcount":"34","totallocs":"8615324","gentotal":"9421",
     // "firsttransid":"20010907-01998", "prevrank":"20"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
 
-    private static final String KEY_RANK = "rank";
+    public static final String KEY_RANK = "rank";
     private static final String KEY_PREV_RANK = "prevrank";
-    private static final String KEY_MONTH_RANK = "monthRank";
+    public static final String KEY_MONTH_RANK = "monthRank";
     private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
     private static final String KEY_DISCOVERED = "discovered";
     private static final String KEY_TOTAL = "total";
@@ -55,6 +53,7 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_PREV_MONTH = "prevmonthcount";
     private static final String KEY_FIRST_TRANS = "firsttransid";
     private static final String KEY_LAST_TRANS = "lasttransid";
+    public static final String KEY_IS_CACHE = "iscache";
 
     private static final int COLOR_UP = Color.rgb( 30, 200, 30);
     private static final int COLOR_DOWN = Color.rgb( 200, 30, 30);
@@ -95,17 +94,59 @@ public class UserStatsFragment extends Fragment {
 
         final Handler handler = new UserDownloadHandler(scrollView, numberFormat, getActivity().getPackageName(),
                 getResources());
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json) {
-                        handleUserStats(json, handler);
-                    }
-                });
-        task.startDownload(this);
+        executeUserDownload(this, new UserDownloadApiListener(handler));
 
         return scrollView;
+    }
+
+    public static void executeUserDownload(final Fragment fragment, final ApiListener apiListener) {
+        final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
+                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                apiListener);
+        task.startDownload(fragment);
+    }
+
+    public static class UserDownloadApiListener implements ApiListener {
+        final Handler handler;
+        public UserDownloadApiListener(final Handler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public void requestComplete(final JSONObject json, final boolean isCache) {
+            MainActivity.info("handleUserStats");
+            if (json == null) {
+                MainActivity.info("handleUserStats null json, returning");
+                return;
+            }
+            // MainActivity.info("user stats: " + json);
+
+            final Bundle bundle = new Bundle();
+            bundle.putBoolean(KEY_IS_CACHE, isCache);
+            try {
+                final JSONObject stats = json.getJSONObject("statistics");
+                for (final String key : ALL_USER_KEYS) {
+                    final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
+                    if (!lookupJson.has(key)) continue;
+                    switch (key) {
+                        case KEY_FIRST_TRANS:
+                        case KEY_LAST_TRANS:
+                            bundle.putString(key, lookupJson.getString(key));
+                            break;
+                        default:
+                            bundle.putLong(key, lookupJson.getLong(key));
+                    }
+                }
+            }
+            catch (final JSONException ex) {
+                MainActivity.error("json error: " + ex, ex);
+            }
+
+            final Message message = new Message();
+            message.setData(bundle);
+            message.what = MSG_USER_DONE;
+            handler.sendMessage(message);
+        }
     }
 
     private final static class UserDownloadHandler extends DownloadHandler {
@@ -149,7 +190,7 @@ public class UserStatsFragment extends Fragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private static void diffToString(final long diff, final TextView tv) {
+    public static void diffToString(final long diff, final TextView tv) {
         String plus = "   ";
         if (diff > 0) {
             plus = "  ↑";
@@ -160,40 +201,6 @@ public class UserStatsFragment extends Fragment {
             tv.setTextColor(COLOR_DOWN);
         }
         tv.setText(plus + Long.toString(diff));
-    }
-
-    private void handleUserStats(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleUserStats");
-        if (json == null) {
-            MainActivity.info("handleUserStats null json, returning");
-            return;
-        }
-        // MainActivity.info("user stats: " + json);
-
-        final Bundle bundle = new Bundle();
-        try {
-            final JSONObject stats = json.getJSONObject("statistics");
-            for (final String key : ALL_USER_KEYS) {
-                final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
-                if (!lookupJson.has(key)) continue;
-                switch (key) {
-                    case KEY_FIRST_TRANS:
-                    case KEY_LAST_TRANS:
-                        bundle.putString(key, lookupJson.getString(key));
-                        break;
-                    default:
-                        bundle.putLong(key, lookupJson.getLong(key));
-                }
-            }
-        }
-        catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
-        }
-
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_USER_DONE;
-        handler.sendMessage(message);
     }
 
     @Override

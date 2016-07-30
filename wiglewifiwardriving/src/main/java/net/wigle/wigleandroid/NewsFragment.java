@@ -90,7 +90,7 @@ public class NewsFragment extends Fragment {
                 "news-cache.json", MainActivity.NEWS_URL, false, false, false,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json) {
+                    public void requestComplete(final JSONObject json, final boolean isCache) {
                         handleNews(json, handler);
                     }
                 });

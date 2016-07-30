@@ -55,8 +55,9 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_LAST_TRANS = "lasttransid";
     public static final String KEY_IS_CACHE = "iscache";
 
-    private static final int COLOR_UP = Color.rgb( 30, 200, 30);
-    private static final int COLOR_DOWN = Color.rgb( 200, 30, 30);
+    private static final int COLOR_UP = Color.rgb(30, 200, 30);
+    private static final int COLOR_DOWN = Color.rgb(200, 30, 30);
+    private static final int COLOR_BLANK = Color.rgb(80, 80, 80);
 
     private static final String[] ALL_USER_KEYS = new String[] {
             KEY_RANK, KEY_PREV_RANK, KEY_MONTH_RANK, KEY_PREV_MONTH_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS,
@@ -191,12 +192,18 @@ public class UserStatsFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     public static void diffToString(final long diff, final TextView tv) {
+        if (diff == 0) {
+            tv.setText("");
+            tv.setTextColor(COLOR_BLANK);
+            return;
+        }
+
         String plus = "   ";
         if (diff > 0) {
             plus = "  ↑";
             tv.setTextColor(COLOR_UP);
         }
-        if (diff < 0) {
+        else if (diff < 0) {
             plus = "  ↓";
             tv.setTextColor(COLOR_DOWN);
         }

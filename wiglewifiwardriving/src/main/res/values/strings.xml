@@ -312,7 +312,7 @@
     <string name="rank_month">Month Rankings</string>
     <string name="all_time_title">WiFi Discovered All Time</string>
     <string name="month_rank_title">Month Ranking:</string>
-    <string name="user_centric">User Centric Rankings</string>
+    <string name="user_centric">My Rankings</string>
     <string name="not_user_centric">Top Rankings</string>
 
 </resources>

@@ -64,6 +64,7 @@ public class RankStatsFragment extends Fragment {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PREV_RANK = "prevrank";
     private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
+    private static final String KEY_SELECTED = "selected";
 
     private static final int ROW_COUNT = 100;
 
@@ -156,14 +157,19 @@ public class RankStatsFragment extends Fragment {
         final String sort = doMonthRanking ? "monthcount" : "discovered";
         String top = "top";
         long pageStart = 0;
+        long selected = 0;
         if (userCentric.get()) {
             top = "";
             final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
             final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final long userRank = prefs.getLong(userRankKey, 0);
-            final long startRank = userRank - 5;
+            final long startRank = userRank - 50;
             pageStart = startRank > 0 ? startRank : 0;
+            selected = startRank < 0 ? userRank : 50;
+            selected -= 5;
+            if (selected < 0) selected = 0;
         }
+        final long finalSelected = selected;
 
         final String cacheName = (doMonthRanking ? "month" : "all") + top;
 
@@ -174,7 +180,7 @@ public class RankStatsFragment extends Fragment {
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleRankStats(json, handler);
+                        handleRankStats(json, handler, finalSelected);
                     }
                 });
         task.setCacheOnly(isCache);
@@ -216,6 +222,7 @@ public class RankStatsFragment extends Fragment {
                 final boolean doMonthRanking = monthRanking.get();
                 tv.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
                 final String rankDiffKey = doMonthRanking ? KEY_PREV_MONTH_RANK : KEY_PREV_RANK;
+                final long selected = bundle.getLong(KEY_SELECTED);
 
                 rankListAdapter.clear();
                 rankListAdapter.setMonthRanking(monthRanking.get());
@@ -229,6 +236,8 @@ public class RankStatsFragment extends Fragment {
                         rankListAdapter.add(rankUser);
                     }
                 }
+                final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
+                listView.setSelectionFromTop((int)selected, 20);
 
                 final SwipeRefreshLayout swipeRefreshLayout =
                         (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
@@ -237,7 +246,7 @@ public class RankStatsFragment extends Fragment {
         }
     }
 
-    private void handleRankStats(final JSONObject json, final Handler handler) {
+    private void handleRankStats(final JSONObject json, final Handler handler, final long selected) {
         MainActivity.info("handleRankStats");
         if (json == null) {
             MainActivity.info("handleRankStats null json, returning");
@@ -245,6 +254,7 @@ public class RankStatsFragment extends Fragment {
         }
 
         final Bundle bundle = new Bundle();
+        bundle.putLong(KEY_SELECTED, selected);
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
             final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());

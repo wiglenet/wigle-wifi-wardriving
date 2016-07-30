@@ -1,11 +1,14 @@
 * 2.11 (07/??/2016)
-Added monthly rankings list
+Added monthly/all-time rankings list
+Added list of uploaded files
+Added WiGLE News section
 Updated Brazilian Portuguese store description (thanks artjacob!)
 Updated Norwegian store description (thanks Znerox!)
 Consistently use WiFi (thanks Aeyoun!)
+Updated French translation (thanks AtomicJo!)
 Updated German translation (thanks mcliquid, kill0rz!)
-Update Italian translation (thanks bellingeri!)
-Update Japanese translation (thanks tinbotu!)
+Updated Italian translation (thanks bellingeri!)
+Updated Japanese translation (thanks tinbotu!)
 
 * 2.10 (12/12/2015)
 Remove deprecated reference to settings activity

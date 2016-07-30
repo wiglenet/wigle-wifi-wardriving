@@ -131,12 +131,12 @@ public class UserStatsFragment extends Fragment {
                             tv.setText(bundle.getString(key));
                             break;
                         case KEY_PREV_RANK: {
-                            final long diff = bundle.getLong(KEY_RANK) - bundle.getLong(key);
+                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_RANK);
                             diffToString(diff, tv);
                             break;
                         }
                         case KEY_PREV_MONTH_RANK: {
-                            final long diff = bundle.getLong(KEY_MONTH_RANK) - bundle.getLong(key);
+                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_MONTH_RANK);
                             diffToString(diff, tv);
                             break;
                         }

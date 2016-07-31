@@ -175,11 +175,17 @@ public class UserStatsFragment extends Fragment {
                         case KEY_PREV_RANK: {
                             final long diff = bundle.getLong(key) - bundle.getLong(KEY_RANK);
                             diffToString(diff, tv);
+
+                            tv = (TextView) view.findViewById(R.id.actual_prevrank);
+                            tv.setText(numberFormat.format(bundle.getLong(key)));
                             break;
                         }
                         case KEY_PREV_MONTH_RANK: {
                             final long diff = bundle.getLong(key) - bundle.getLong(KEY_MONTH_RANK);
                             diffToString(diff, tv);
+
+                            tv = (TextView) view.findViewById(R.id.actual_prevmonthrank);
+                            tv.setText(numberFormat.format(bundle.getLong(key)));
                             break;
                         }
                         default:

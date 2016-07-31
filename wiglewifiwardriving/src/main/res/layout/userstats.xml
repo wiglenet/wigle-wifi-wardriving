@@ -205,6 +205,34 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prevrank_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/actual_prevrank"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prevmonthrank_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/actual_prevmonthrank"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            />
     </LinearLayout>
 
 </ScrollView>

@@ -314,5 +314,7 @@
     <string name="month_rank_title">Month Ranking:</string>
     <string name="user_centric">My Rankings</string>
     <string name="not_user_centric">Top Rankings</string>
+    <string name="prevrank_title">User Ranking Last Month</string>
+    <string name="prevmonthrank_title">Month Ranking Last Month</string>
 
 </resources>

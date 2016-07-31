@@ -77,7 +77,6 @@
         android:layout_height="wrap_content"
         android:text="@string/speech_wifi_restart" />
 <LinearLayout
-	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"

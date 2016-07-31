@@ -1,10 +1,11 @@
-* 2.11 (07/??/2016)
+* 2.11 (07/30/2016)
 Added monthly/all-time rankings list
 Added list of uploaded files
 Added WiGLE News section
+User stats and Rankings show diff from last month
+Consistently use string WiFi (thanks Aeyoun!)
 Updated Brazilian Portuguese store description (thanks artjacob!)
 Updated Norwegian store description (thanks Znerox!)
-Consistently use WiFi (thanks Aeyoun!)
 Updated French translation (thanks AtomicJo!)
 Updated German translation (thanks mcliquid, kill0rz!)
 Updated Italian translation (thanks bellingeri!)

@@ -56,7 +56,6 @@
         android:text="@string/donate" />
 
 <LinearLayout
-	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"

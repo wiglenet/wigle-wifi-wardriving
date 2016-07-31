@@ -10,14 +10,14 @@
     android:layout_height="wrap_content"
     >
 <TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:layout_width="fill_parent" android:layout_height="wrap_content"
     android:id="@+id/stats_run"
     android:textSize="16sp"
     android:layout_weight="1"
     android:textColor="#AAAA00"
     />
 <TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:layout_width="fill_parent" android:layout_height="wrap_content"
     android:id="@+id/stats_new"
     android:textSize="16sp"
     android:layout_weight="1"
@@ -25,7 +25,7 @@
     android:text="@string/stats"
     />
 <TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content" 
+    android:layout_width="fill_parent" android:layout_height="wrap_content"
     android:id="@+id/stats_dbnets"
     android:textSize="16sp"
     android:layout_weight="1"
@@ -37,7 +37,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-    <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="fill_parent" 
+    <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="fill_parent"
 		android:text="@string/upload_button" android:layout_weight="0"
 		android:paddingTop="10px" android:paddingBottom="10px"/>
 	<LinearLayout
@@ -46,21 +46,21 @@
 	    android:layout_height="fill_parent"
 	    android:layout_weight="6"
 	    >
-		<TextView  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:id="@+id/LocationTextView01"
 		android:text="@string/list_waiting_gps"
 		/>
-		<TextView  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:id="@+id/LocationTextView02"
 		android:text="@string/list_short_lon"
 		/>
-		<TextView  
-		android:layout_width="wrap_content" 
-		android:layout_height="wrap_content" 
+		<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:id="@+id/LocationTextView03"
 		android:text="@string/list_short_sats"
 		/>
@@ -71,19 +71,19 @@
 	    android:layout_height="fill_parent"
 	    android:layout_weight="5"
 	    >
-		<TextView  
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:id="@+id/LocationTextView04"
 			/>
-		<TextView  
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:id="@+id/LocationTextView05"
 			/>
-		<TextView  
-			android:layout_width="wrap_content" 
-			android:layout_height="wrap_content" 
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
 			android:id="@+id/LocationTextView06"
 			/>
 		</LinearLayout>
@@ -91,17 +91,17 @@
 
 <LinearLayout
 	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"> 
+	android:layout_height="wrap_content">
 <TextView
-    android:layout_width="wrap_content" 
-    android:layout_height="wrap_content" 
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:id="@+id/status"
     android:text="@string/list_status_default"
     android:layout_weight="0"
     />
 <TextView
-    android:layout_width="wrap_content" 
-    android:layout_height="wrap_content" 
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:id="@+id/blank"
     android:text=""
     android:layout_weight="5"
@@ -109,11 +109,10 @@
 </LinearLayout>
 
 <LinearLayout
-	android:id="@+id/horizontalLine"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
 	android:background="#A07070"
-	/> 
+	/>
 <ListView android:id="@+id/ListView01" android:layout_width="fill_parent" android:layout_height="fill_parent"/>
 </LinearLayout>

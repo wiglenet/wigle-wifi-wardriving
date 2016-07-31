@@ -4,25 +4,23 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
-    
+
     <TextView android:id="@+id/dbstatus" android:layout_width="fill_parent" android:layout_height="wrap_content"/>
-    
+
     <LinearLayout
-	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
-	android:background="#A07070"/> 
-	
+	android:background="#A07070"/>
+
     <ListView android:id="@+id/dblist" android:layout_width="fill_parent" android:layout_height="fill_parent"
     	android:layout_weight="1"/>
-	
+
 	<LinearLayout
-	android:id="@+id/horizontalLine"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
-	android:background="#A07070"/> 
+	android:background="#A07070"/>
 
-	<RelativeLayout 
+	<RelativeLayout
 		android:id="@+id/db_map_rl"
 		android:layout_width="fill_parent"
         android:layout_height="fill_parent"

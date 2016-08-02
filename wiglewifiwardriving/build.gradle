@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
@@ -20,7 +20,7 @@ android {
 
 dependencies {
     compile project(':android-maps-utils')
-    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.google.android.gms:play-services-maps:9.2.1'
     compile files('libs/TTS_library_stub.jar')
     compile files('libs/slf4j-android-1.5.8.jar')

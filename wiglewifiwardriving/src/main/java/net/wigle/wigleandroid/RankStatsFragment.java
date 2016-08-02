@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -40,6 +41,7 @@ public class RankStatsFragment extends Fragment {
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_SWAP = 202;
+    private static final int MENU_USER_CENTRIC_SWAP = 203;
 
     private static final String RESULT_LIST_KEY = "results";
 
@@ -60,17 +62,21 @@ public class RankStatsFragment extends Fragment {
     private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";
     private static final String KEY_RANK = "rank";
     private static final String KEY_USERNAME = "username";
+    private static final String KEY_PREV_RANK = "prevrank";
+    private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
+    private static final String KEY_SELECTED = "selected";
 
     private static final int ROW_COUNT = 100;
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK
+            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK, KEY_PREV_MONTH_RANK,
         };
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
     private RankListAdapter listAdapter;
     private AtomicBoolean monthRanking;
+    private AtomicBoolean userCentric;
     private RankDownloadHandler handler;
 
     /** Called when the activity is first created. */
@@ -86,7 +92,8 @@ public class RankStatsFragment extends Fragment {
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         finishing = new AtomicBoolean(false);
-        monthRanking = new AtomicBoolean(true);
+        monthRanking = new AtomicBoolean(false);
+        userCentric = new AtomicBoolean(true);
         numberFormat = NumberFormat.getNumberInstance(Locale.US);
         if (numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
@@ -105,7 +112,22 @@ public class RankStatsFragment extends Fragment {
         handler = new RankDownloadHandler(rootView, numberFormat,
                 getActivity().getPackageName(), getResources(), monthRanking);
         handler.setRankListAdapter(listAdapter);
-        downloadRanks();
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+
+        UserStatsFragment.executeUserDownload(this, new UserStatsFragment.UserDownloadApiListener(new Handler() {
+            @Override
+            public void handleMessage(final Message msg) {
+                final Bundle bundle = msg.getData();
+                final boolean isCache = bundle.getBoolean(UserStatsFragment.KEY_IS_CACHE);
+                MainActivity.info("got user message, isCache: " + isCache);
+
+                final SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong( ListFragment.PREF_RANK, bundle.getLong(UserStatsFragment.KEY_RANK) );
+                editor.putLong( ListFragment.PREF_MONTH_RANK, bundle.getLong(UserStatsFragment.KEY_MONTH_RANK) );
+                editor.apply();
+                downloadRanks(isCache);
+            }
+        }));
 
         return rootView;
     }
@@ -121,27 +143,47 @@ public class RankStatsFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                downloadRanks();
+                downloadRanks(false);
             }
         });
     }
 
-    private void downloadRanks() {
+    private void downloadRanks(final boolean isCache) {
         if (handler == null) {
             MainActivity.error("downloadRanks: handler is null");
             return;
         }
-        final String sort = monthRanking.get() ? "monthcount" : "discovered";
-        final String cacheName = monthRanking.get() ? "month" : "all";
-        final String monthUrl = MainActivity.RANK_STATS_URL + "?pageend=" + ROW_COUNT + "&sort=" + sort;
+        final boolean doMonthRanking = monthRanking.get();
+        final String sort = doMonthRanking ? "monthcount" : "discovered";
+        String top = "top";
+        long pageStart = 0;
+        long selected = 0;
+        if (userCentric.get()) {
+            top = "";
+            final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
+            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final long userRank = prefs.getLong(userRankKey, 0);
+            final long startRank = userRank - 50;
+            pageStart = startRank > 0 ? startRank : 0;
+            selected = startRank < 0 ? userRank : 50;
+            selected -= 5;
+            if (selected < 0) selected = 0;
+        }
+        final long finalSelected = selected;
+
+        final String cacheName = (doMonthRanking ? "month" : "all") + top;
+
+        final String monthUrl = MainActivity.RANK_STATS_URL + "?pagestart=" + pageStart
+                + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json) {
-                        handleRankStats(json, handler);
+                    public void requestComplete(final JSONObject json, final boolean isCache) {
+                        handleRankStats(json, handler, finalSelected);
                     }
                 });
+        task.setCacheOnly(isCache);
         task.startDownload(this);
     }
 
@@ -177,19 +219,25 @@ public class RankStatsFragment extends Fragment {
             // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && rankListAdapter != null) {
                 TextView tv = (TextView) view.findViewById(R.id.rankstats_type);
-                tv.setText(monthRanking.get() ? R.string.monthcount_title : R.string.all_time_title);
+                final boolean doMonthRanking = monthRanking.get();
+                tv.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
+                final String rankDiffKey = doMonthRanking ? KEY_PREV_MONTH_RANK : KEY_PREV_RANK;
+                final long selected = bundle.getLong(KEY_SELECTED);
 
                 rankListAdapter.clear();
                 rankListAdapter.setMonthRanking(monthRanking.get());
                 for (final Parcelable result : results) {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
-                        final RankUser rankUser = new RankUser(row.getLong(KEY_RANK), row.getString(KEY_USERNAME),
-                                row.getLong(KEY_MONTH_WIFI_GPS), row.getLong(KEY_TOTAL_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_CELL_GPS));
+                        final long rankDiff = row.getLong(rankDiffKey) - row.getLong(KEY_RANK);
+                        final RankUser rankUser = new RankUser(row.getLong(KEY_RANK), rankDiff,
+                                row.getString(KEY_USERNAME), row.getLong(KEY_MONTH_WIFI_GPS),
+                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_CELL_GPS));
                         rankListAdapter.add(rankUser);
                     }
                 }
+                final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
+                listView.setSelectionFromTop((int)selected, 20);
 
                 final SwipeRefreshLayout swipeRefreshLayout =
                         (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
@@ -198,7 +246,7 @@ public class RankStatsFragment extends Fragment {
         }
     }
 
-    private void handleRankStats(final JSONObject json, final Handler handler) {
+    private void handleRankStats(final JSONObject json, final Handler handler, final long selected) {
         MainActivity.info("handleRankStats");
         if (json == null) {
             MainActivity.info("handleRankStats null json, returning");
@@ -206,6 +254,7 @@ public class RankStatsFragment extends Fragment {
         }
 
         final Bundle bundle = new Bundle();
+        bundle.putLong(KEY_SELECTED, selected);
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
             final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
@@ -289,11 +338,18 @@ public class RankStatsFragment extends Fragment {
         item = menu.add(0, MENU_RANK_SWAP, 0, getRankSwapString());
         item.setIcon(android.R.drawable.ic_menu_sort_alphabetically);
 
+        item = menu.add(0, MENU_USER_CENTRIC_SWAP, 0, getUserCentricSwapString());
+        item.setIcon(android.R.drawable.picture_frame);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     private String getRankSwapString() {
         return getString(monthRanking.get() ? R.string.rank_all_time : R.string.rank_month);
+    }
+
+    private String getUserCentricSwapString() {
+        return getString(userCentric.get() ? R.string.not_user_centric : R.string.user_centric);
     }
 
     /* Handles item selections */
@@ -310,7 +366,12 @@ public class RankStatsFragment extends Fragment {
             case MENU_RANK_SWAP:
                 monthRanking.set(!monthRanking.get());
                 item.setTitle(getRankSwapString());
-                downloadRanks();
+                downloadRanks(false);
+                return true;
+            case MENU_USER_CENTRIC_SWAP:
+                userCentric.set(!userCentric.get());
+                item.setTitle(getUserCentricSwapString());
+                downloadRanks(false);
                 return true;
         }
         return false;

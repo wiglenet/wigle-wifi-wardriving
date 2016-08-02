@@ -35,6 +35,41 @@
                 android:text="@string/status_unknown"
                 android:textSize="32sp"
                 android:textColor="#ffff00"/>
+
+            <TextView
+                android:id="@+id/prevrank"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/status_unknown"
+                android:textSize="32sp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/month_rank_title"
+                android:textSize="20sp"
+                android:paddingRight="6dp"
+                />
+            <TextView
+                android:id="@+id/monthRank"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/status_unknown"
+                android:textSize="20sp"
+                android:textColor="#d0d000"/>
+            <TextView
+                android:id="@+id/prevmonthrank"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/status_unknown"
+                android:textSize="20sp"/>
         </LinearLayout>
 
         <TextView
@@ -165,6 +200,34 @@
             />
         <TextView
             android:id="@+id/lasttransid"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prevrank_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/actual_prevrank"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_unknown"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/prevmonthrank_title"
+            android:textSize="16sp"
+            />
+        <TextView
+            android:id="@+id/actual_prevmonthrank"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"

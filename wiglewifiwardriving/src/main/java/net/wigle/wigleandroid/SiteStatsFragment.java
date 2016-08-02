@@ -115,7 +115,7 @@ public class SiteStatsFragment extends Fragment {
                 "site-stats-cache.json", MainActivity.SITE_STATS_URL, false, false, false,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json) {
+                    public void requestComplete(final JSONObject json, final boolean isCache) {
                         handleSiteStats(json, handler);
                     }
                 });

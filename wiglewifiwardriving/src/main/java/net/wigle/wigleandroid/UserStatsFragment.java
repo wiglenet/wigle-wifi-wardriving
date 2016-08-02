@@ -1,7 +1,9 @@
 package net.wigle.wigleandroid;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,9 +38,12 @@ public class UserStatsFragment extends Fragment {
 
     // {"success":true,"statistics":{"visible":"Y","gendisc":"6439","total":"897432","discovered":"498732",
     // "prevmonthcount":"1814","lasttransid":"20151114-00277","monthcount":"34","totallocs":"8615324","gentotal":"9421",
-    // "firsttransid":"20010907-01998"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
+    // "firsttransid":"20010907-01998", "prevrank":"20"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
 
-    private static final String KEY_RANK = "rank";
+    public static final String KEY_RANK = "rank";
+    private static final String KEY_PREV_RANK = "prevrank";
+    public static final String KEY_MONTH_RANK = "monthRank";
+    private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
     private static final String KEY_DISCOVERED = "discovered";
     private static final String KEY_TOTAL = "total";
     private static final String KEY_TOTAL_LOCS = "totallocs";
@@ -48,10 +53,15 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_PREV_MONTH = "prevmonthcount";
     private static final String KEY_FIRST_TRANS = "firsttransid";
     private static final String KEY_LAST_TRANS = "lasttransid";
+    public static final String KEY_IS_CACHE = "iscache";
+
+    private static final int COLOR_UP = Color.rgb(30, 200, 30);
+    private static final int COLOR_DOWN = Color.rgb(200, 30, 30);
+    private static final int COLOR_BLANK = Color.rgb(80, 80, 80);
 
     private static final String[] ALL_USER_KEYS = new String[] {
-            KEY_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS, KEY_GEN_DISC,
-            KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
+            KEY_RANK, KEY_PREV_RANK, KEY_MONTH_RANK, KEY_PREV_MONTH_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS,
+            KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
         };
 
     private AtomicBoolean finishing;
@@ -85,17 +95,59 @@ public class UserStatsFragment extends Fragment {
 
         final Handler handler = new UserDownloadHandler(scrollView, numberFormat, getActivity().getPackageName(),
                 getResources());
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json) {
-                        handleUserStats(json, handler);
-                    }
-                });
-        task.startDownload(this);
+        executeUserDownload(this, new UserDownloadApiListener(handler));
 
         return scrollView;
+    }
+
+    public static void executeUserDownload(final Fragment fragment, final ApiListener apiListener) {
+        final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
+                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                apiListener);
+        task.startDownload(fragment);
+    }
+
+    public static class UserDownloadApiListener implements ApiListener {
+        final Handler handler;
+        public UserDownloadApiListener(final Handler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public void requestComplete(final JSONObject json, final boolean isCache) {
+            MainActivity.info("handleUserStats");
+            if (json == null) {
+                MainActivity.info("handleUserStats null json, returning");
+                return;
+            }
+            // MainActivity.info("user stats: " + json);
+
+            final Bundle bundle = new Bundle();
+            bundle.putBoolean(KEY_IS_CACHE, isCache);
+            try {
+                final JSONObject stats = json.getJSONObject("statistics");
+                for (final String key : ALL_USER_KEYS) {
+                    final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
+                    if (!lookupJson.has(key)) continue;
+                    switch (key) {
+                        case KEY_FIRST_TRANS:
+                        case KEY_LAST_TRANS:
+                            bundle.putString(key, lookupJson.getString(key));
+                            break;
+                        default:
+                            bundle.putLong(key, lookupJson.getLong(key));
+                    }
+                }
+            }
+            catch (final JSONException ex) {
+                MainActivity.error("json error: " + ex, ex);
+            }
+
+            final Message message = new Message();
+            message.setData(bundle);
+            message.what = MSG_USER_DONE;
+            handler.sendMessage(message);
+        }
     }
 
     private final static class UserDownloadHandler extends DownloadHandler {
@@ -104,6 +156,7 @@ public class UserStatsFragment extends Fragment {
             super(view, numberFormat, packageName, resources);
         }
 
+        @SuppressLint("SetTextI18n")
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
@@ -119,6 +172,22 @@ public class UserStatsFragment extends Fragment {
                         case KEY_LAST_TRANS:
                             tv.setText(bundle.getString(key));
                             break;
+                        case KEY_PREV_RANK: {
+                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_RANK);
+                            diffToString(diff, tv);
+
+                            tv = (TextView) view.findViewById(R.id.actual_prevrank);
+                            tv.setText(numberFormat.format(bundle.getLong(key)));
+                            break;
+                        }
+                        case KEY_PREV_MONTH_RANK: {
+                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_MONTH_RANK);
+                            diffToString(diff, tv);
+
+                            tv = (TextView) view.findViewById(R.id.actual_prevmonthrank);
+                            tv.setText(numberFormat.format(bundle.getLong(key)));
+                            break;
+                        }
                         default:
                             tv.setText(numberFormat.format(bundle.getLong(key)));
                     }
@@ -127,37 +196,24 @@ public class UserStatsFragment extends Fragment {
         }
     }
 
-    private void handleUserStats(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleUserStats");
-        if (json == null) {
-            MainActivity.info("handleUserStats null json, returning");
+    @SuppressLint("SetTextI18n")
+    public static void diffToString(final long diff, final TextView tv) {
+        if (diff == 0) {
+            tv.setText("");
+            tv.setTextColor(COLOR_BLANK);
             return;
         }
-        // MainActivity.info("user stats: " + json);
 
-        final Bundle bundle = new Bundle();
-        try {
-            final JSONObject stats = json.getJSONObject("statistics");
-            for (final String key : ALL_USER_KEYS) {
-                final JSONObject lookupJson = (KEY_RANK.equals(key)) ? json : stats;
-                switch (key) {
-                    case KEY_FIRST_TRANS:
-                    case KEY_LAST_TRANS:
-                        bundle.putString(key, lookupJson.getString(key));
-                        break;
-                    default:
-                        bundle.putLong(key, lookupJson.getLong(key));
-                }
-            }
+        String plus = "   ";
+        if (diff > 0) {
+            plus = "  ↑";
+            tv.setTextColor(COLOR_UP);
         }
-        catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
+        else if (diff < 0) {
+            plus = "  ↓";
+            tv.setTextColor(COLOR_DOWN);
         }
-
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_USER_DONE;
-        handler.sendMessage(message);
+        tv.setText(plus + Long.toString(diff));
     }
 
     @Override

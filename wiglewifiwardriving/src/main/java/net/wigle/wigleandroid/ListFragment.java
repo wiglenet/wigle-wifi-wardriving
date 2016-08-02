@@ -120,6 +120,10 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 
+    // rank stats data
+    public static final String PREF_RANK = "rank";
+    public static final String PREF_MONTH_RANK = "monthRank";
+
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
     public static final String NETWORK_EXTRA_IS_DB_RESULT = "extraIsDbResult";
 

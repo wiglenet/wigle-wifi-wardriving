@@ -6,12 +6,19 @@
 <LinearLayout android:orientation="horizontal"
 	    android:layout_width="fill_parent" android:layout_height="fill_parent">
 
-	<TextView android:id="@+id/rank" android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:gravity="start"
-              android:textSize="18sp"
-	          android:textColor="#ffff00"/>
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:gravity="start">
+            <TextView android:id="@+id/rank" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textSize="18sp"
+                      android:textColor="#ffff00"/>
+            <TextView android:id="@+id/rankdiff" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:textSize="16sp"/>
+        </LinearLayout>
+
     <TextView android:id="@+id/username" android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_weight="1"

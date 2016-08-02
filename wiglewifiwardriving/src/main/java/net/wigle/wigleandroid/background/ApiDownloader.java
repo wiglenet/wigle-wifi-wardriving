@@ -29,6 +29,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private final boolean doFormLogin;
     private final boolean doBasicLogin;
     private final boolean requiresLogin;
+    private boolean cacheOnly = false;
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
@@ -44,6 +45,10 @@ public class ApiDownloader extends AbstractBackgroundTask {
         this.listener = listener;
     }
 
+    public void setCacheOnly(final boolean cacheOnly) {
+        this.cacheOnly = cacheOnly;
+    }
+
     @Override
     protected void subRun() throws IOException, InterruptedException {
         String result = null;
@@ -53,7 +58,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
                 cacheResult(result);
             }
             final JSONObject json = new JSONObject(result);
-            listener.requestComplete(json);
+            listener.requestComplete(json, false);
         }
         catch (final Exception ex) {
             MainActivity.error("ex: " + ex + " result: " + result, ex);
@@ -96,7 +101,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     }
 
     private void cacheResult(final String result) {
-        if (cacheFilename == null) return;
+        if (cacheFilename == null || result == null || result.length() < 1) return;
 
         FileOutputStream fos = null;
         try {
@@ -120,7 +125,6 @@ public class ApiDownloader extends AbstractBackgroundTask {
     }
 
     private String doDownload() throws IOException, InterruptedException {
-
         final boolean setBoundary = false;
 
         PreConnectConfigurator preConnectConfigurator = null;
@@ -165,7 +169,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
             try {
                 input.close();
             }
-            catch (Exception ex) {
+            catch (final Exception ex) {
                 MainActivity.warn("Exception closing downloader reader: " + ex, ex);
             }
         }
@@ -175,7 +179,6 @@ public class ApiDownloader extends AbstractBackgroundTask {
         // final Bundle bundle = new Bundle();
         String line;
         final StringBuilder result = new StringBuilder();
-
         while ( (line = reader.readLine()) != null ) {
             if ( wasInterrupted() ) {
                 throw new InterruptedException( "we were interrupted" );
@@ -190,7 +193,8 @@ public class ApiDownloader extends AbstractBackgroundTask {
     public void startDownload(final Fragment fragment) {
         // if we have cached data, call the handler with that
         final JSONObject cache = getCached();
-        if (cache != null) listener.requestComplete(cache);
+        if (cache != null) listener.requestComplete(cache, true);
+        if (cacheOnly) return;
 
         // download token if needed
         final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -214,7 +218,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
                 null, MainActivity.TOKEN_URL, true, false, true,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json) {
+                    public void requestComplete(final JSONObject json, final boolean isCache) {
                         try {
                             // {"success":true,"result":{"authname":"AID...","token":"..."}}
                             if (json.getBoolean("success")) {

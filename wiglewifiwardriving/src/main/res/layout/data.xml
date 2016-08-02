@@ -76,7 +76,6 @@
 </LinearLayout>
 
 <LinearLayout
-	android:id="@+id/horizontalLine"
     android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
@@ -157,7 +156,6 @@
 </LinearLayout>
 
 <LinearLayout
-	android:id="@+id/horizontalLine2"
     android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
@@ -203,7 +201,6 @@
 </LinearLayout>
 
 <LinearLayout
-    android:id="@+id/horizontalLine3"
     android:layout_width="fill_parent"
     android:layout_height="2dip"
     android:background="#A07070"

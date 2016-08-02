@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation" >
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
@@ -268,7 +270,7 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
-    <string name="tab_stats">Statistics</string>
+    <string name="tab_stats">User Statistics</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
     <string name="netloc_title">WiGLE.net WiFi Networks with Location</string>
     <string name="loctotal_title">WiGLE.net WiFi Network Observations</string>
@@ -311,5 +313,10 @@
     <string name="rank_all_time">All Time Rankings</string>
     <string name="rank_month">Month Rankings</string>
     <string name="all_time_title">WiFi Discovered All Time</string>
+    <string name="month_rank_title">Month Ranking:</string>
+    <string name="user_centric">My Rankings</string>
+    <string name="not_user_centric">Top Rankings</string>
+    <string name="prevrank_title">User Ranking Last Month</string>
+    <string name="prevmonthrank_title">Month Ranking Last Month</string>
 
 </resources>

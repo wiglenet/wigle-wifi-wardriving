@@ -31,7 +31,7 @@
     <string name="csv_export_button">CSV Export DB</string>
     <string name="csv_export_text">Exportiere ganze DB in CSV-Datei</string>
     <string name="kml_run_export_button">KML Export Lauf</string>
-    <string name="kml_run_export_text">Exportiere ganze DB in CSV-Datei</string>
+    <string name="kml_run_export_text">Exportiere ganze DB in KML-Datei</string>
     <string name="kml_export_button">KML Export DB</string>
     <string name="kml_export_text">Exportiere DB als KML-Datei</string>
     <string name="backup_db_button">Backup DB</string>
@@ -297,12 +297,12 @@
     <string name="allow_storage">Die Datenbank wird standardmäßig auf einem externen Speicher gespeichert. Bitte erlaube den Zugriff.</string>
     <string name="restart">Neustart, um externen Speicher zu nutzen</string>
     <string name="rank_stats_app_name">WiGLE.net Ränge</string>
-    <string name="total_wifi">WLAN</string>
-    <string name="total_cell">Funkzellen</string>
+    <string name="total_wifi">Alle WLAN</string>
+    <string name="total_cell">Alle Funkzellen</string>
     <string name="tab_rank">Ränge</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Uploads</string>
-    <string name="queue_depth">Warteschlange</string>
+    <string name="queue_depth">Dateien in Warteschlange</string>
     <string name="news_app_name">WiGLE.net News</string>
     <string name="tab_news">Neuigkeiten</string>
     <string name="wifi_gps">WLAN (GPS)</string>

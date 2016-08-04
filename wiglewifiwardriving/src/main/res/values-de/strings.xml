@@ -162,7 +162,7 @@
     <string name="problem_with_field">Problem mit Feld</string>
     <string name="turning_wifi_off">WLAN ausgeschaltet</string>
     <string name="lost_location">Position verloren</string>
-    <string name="have_location">Jetziger Standort aus</string>
+    <string name="have_location">Aktueller Standort aus</string>
     <string name="wifi_jammed">WLAN scheint abgestürzt, ausschalten und dann wieder auf WLAN.</string>
     <string name="battery_at">Akku-Ladestand</string>
     <string name="battery_postfix">Prozent, bei denen WiGLE Wifi beendet wird</string>

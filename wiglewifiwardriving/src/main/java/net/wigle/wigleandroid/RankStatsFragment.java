@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -161,13 +162,16 @@ public class RankStatsFragment extends Fragment {
         if (userCentric.get()) {
             top = "";
             final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
-            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            final long userRank = prefs.getLong(userRankKey, 0);
-            final long startRank = userRank - 50;
-            pageStart = startRank > 0 ? startRank : 0;
-            selected = startRank < 0 ? userRank : 50;
-            selected -= 5;
-            if (selected < 0) selected = 0;
+            final FragmentActivity fragmentActivity = getActivity();
+            if (fragmentActivity != null) {
+                final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                final long userRank = prefs.getLong(userRankKey, 0);
+                final long startRank = userRank - 50;
+                pageStart = startRank > 0 ? startRank : 0;
+                selected = startRank < 0 ? userRank : 50;
+                selected -= 5;
+                if (selected < 0) selected = 0;
+            }
         }
         final long finalSelected = selected;
 

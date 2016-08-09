@@ -300,7 +300,12 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
                 }
                 else {
                     final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
-                    cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
+                    try {
+                        cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
+                    }
+                    catch (final IllegalStateException ex) {
+                        MainActivity.error("exception showing crypto dialog: " + ex, ex);
+                    }
                 }
             }
         });

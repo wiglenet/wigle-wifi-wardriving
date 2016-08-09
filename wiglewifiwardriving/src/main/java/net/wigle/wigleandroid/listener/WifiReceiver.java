@@ -171,7 +171,8 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         // have the gps listener to a self-check, in case it isn't getting updates anymore
-        mainActivity.getGPSListener().checkLocationOK();
+        final GPSListener gpsListener = mainActivity.getGPSListener();
+        if (gpsListener != null) gpsListener.checkLocationOK();
 
         final Location location = mainActivity.getGPSListener().getLocation();
 

@@ -510,8 +510,8 @@ public final class MainActivity extends AppCompatActivity {
                     .replace(R.id.tabcontent, frag)
                     .commit();
         }
-        catch (final NullPointerException ex) {
-            final String message = "NPE in fragment switch: " + ex;
+        catch (final NullPointerException|IllegalStateException ex) {
+            final String message = "exception in fragment switch: " + ex;
             error(message, ex);
             Toast.makeText( this, message, Toast.LENGTH_LONG ).show();
         }

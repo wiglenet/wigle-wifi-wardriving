@@ -26,12 +26,12 @@
     <string name="maxout_maxid_text">Setze Marker auf:</string>
     <string name="connect_button">Verbinden</string>
     <string name="connect_text">mit Genehmigung der Netzbetreiber</string>
-    <string name="csv_run_export_button">CSV Export Run</string>
-    <string name="csv_run_export_text">Export aktuellen Laufs in CSV-Datei</string>
+    <string name="csv_run_export_button">CSV Export Lauf</string>
+    <string name="csv_run_export_text">Exportiere aktuellen Lauf in CSV-Datei</string>
     <string name="csv_export_button">CSV Export DB</string>
-    <string name="csv_export_text">Export ganze DB in CSV-Datei</string>
-    <string name="kml_run_export_button">KML Export Run</string>
-    <string name="kml_run_export_text">Aktuellen Lauf als KML-Datei exportieren</string>
+    <string name="csv_export_text">Exportiere ganze DB in CSV-Datei</string>
+    <string name="kml_run_export_button">KML Export Lauf</string>
+    <string name="kml_run_export_text">Exportiere ganze DB in KML-Datei</string>
     <string name="kml_export_button">KML Export DB</string>
     <string name="kml_export_text">Exportiere DB als KML-Datei</string>
     <string name="backup_db_button">Backup DB</string>
@@ -64,9 +64,9 @@
     <string name="speech_time">Aktuelle Uhrzeit</string>
     <string name="speech_battery">Akkustand</string>
     <string name="speech_ssid">Neue WLAN SSIDs</string>
-    <string name="query_address">Adresse (zb: Berlin, DE):</string>
-    <string name="query_ssid">SSID (zb: Linksys) (SQL Platzhalter: %,_):</string>
-    <string name="query_bssid">BSSID (zb: 0A:2C:EF:3D:25:1B) (SQL Platzhalter: %,_):</string>
+    <string name="query_address">Adresse (z.B.: Berlin, DE):</string>
+    <string name="query_ssid">SSID (z.B.: Linksys) (SQL Platzhalter: %,_):</string>
+    <string name="query_bssid">BSSID (z.B.: 0A:2C:EF:3D:25:1B) (SQL Platzhalter: %,_):</string>
     <string name="search_button">Abfrage der lokalen DB</string>
     <string name="reset_button">Felder zurücksetzen</string>
     <string name="list_query_clear">Query-Argumente zurücksetzen</string>
@@ -74,7 +74,7 @@
     <string name="crypto_strength">Signalstärke</string>
     <string name="crypto_password">Passwort</string>
     <string name="crypto_show_password">Passwort einblenden.</string>
-    <string name="filter_show_ssid">passende SSIDs anzeigen (reguläre Ausdrücke):</string>
+    <string name="filter_show_ssid">Passende SSIDs anzeigen (reguläre Ausdrücke):</string>
     <string name="filter_not_regex">Zeigen, was nicht über reguläre Ausdrücke zutrifft</string>
     <string name="filter_show_open">Offen anzeigen</string>
     <string name="filter_show_cell">Funkmasten anzeigen</string>
@@ -125,7 +125,7 @@
     <string name="dash_dist_run">Strecke seit Start:</string>
     <string name="dash_dist_total">Gesamtstrecke:.</string>
     <string name="dash_dist_prev">Vorheriger Lauf:</string>
-    <string name="dash_db_queue">DB Queue:</string>
+    <string name="dash_db_queue">DB Warteschlange:</string>
     <string name="dash_db_nets">WLANs in DB:</string>
     <string name="dash_db_locs">Standorte in DB:</string>
     <string name="dash_no_loc">Keine Position!</string>
@@ -162,10 +162,10 @@
     <string name="problem_with_field">Problem mit Feld</string>
     <string name="turning_wifi_off">WLAN ausgeschaltet</string>
     <string name="lost_location">Position verloren</string>
-    <string name="have_location">Jetziger Standort aus</string>
+    <string name="have_location">Aktueller Standort aus</string>
     <string name="wifi_jammed">WLAN scheint abgestürzt, ausschalten und dann wieder auf WLAN.</string>
     <string name="battery_at">Akku-Ladestand</string>
-    <string name="battery_postfix">Prozent, wo WiGLE Wifi beendet wird</string>
+    <string name="battery_postfix">Prozent, bei denen WiGLE Wifi beendet wird</string>
     <string name="scan">Scan</string>
     <string name="menu_exit">Beenden</string>
     <string name="menu_settings">Einstellungen</string>
@@ -256,9 +256,6 @@
     <string name="disable_toast">Deaktiviere Toast Pop-ups</string>
     <string name="menu_cluster_off">Netzwerke verteilt anzeigen</string>
     <string name="menu_cluster_on">Netzwerke gruppieren</string>
-
-
-
     <string name="menu_traffic_off">Traffic aus</string>
     <string name="menu_traffic_on">Traffic an</string>
     <string name="menu_map_type">ändere Kartentyp</string>
@@ -287,8 +284,8 @@
     <string name="rank_title">Rang:</string>
     <string name="discovered_title">für WiGLE neue WLAN-Netzwerke gefunden</string>
     <string name="total_title">WLAN-Netzwerke gefunden</string>
-    <string name="totallocs_title">insgesamt WLAN-Netzwerke gesehenen</string>
-    <string name="gendisc_title">gefundene Funkzellen Netzwerke (neu für WiGLE)</string>
+    <string name="totallocs_title">WLAN-Netzwerke gesehenen</string>
+    <string name="gendisc_title">gefundene Funkzellen (neu für WiGLE)</string>
     <string name="gentotal_title">insgesamt Funkzellen gesehen</string>
     <string name="monthcount_title">WLAN gefunden (dieser Monat)</string>
     <string name="prevmonthcount_title">WLAN gefunden (letzter Monat)</string>
@@ -300,19 +297,23 @@
     <string name="allow_storage">Die Datenbank wird standardmäßig auf einem externen Speicher gespeichert. Bitte erlaube den Zugriff.</string>
     <string name="restart">Neustart, um externen Speicher zu nutzen</string>
     <string name="rank_stats_app_name">WiGLE.net Ränge</string>
-    <string name="total_wifi">Alle WiFi</string>
+    <string name="total_wifi">Alle WLAN</string>
     <string name="total_cell">Alle Funkzellen</string>
     <string name="tab_rank">Ränge</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Uploads</string>
-    <string name="queue_depth">File Processing Queue Depth</string>
+    <string name="queue_depth">Dateien in Warteschlange</string>
     <string name="news_app_name">WiGLE.net News</string>
-    <string name="tab_news">News</string>
-    <string name="wifi_gps">WLAN GPS</string>
-    <string name="cell_gps">Mobilfunk GPS</string>
+    <string name="tab_news">Neuigkeiten</string>
+    <string name="wifi_gps">WLAN (GPS)</string>
+    <string name="cell_gps">Mobilfunk (GPS)</string>
     <string name="bytes">Bytes</string>
     <string name="rank_all_time">Langzeitränge</string>
     <string name="rank_month">monatliche Ränge</string>
-    <string name="all_time_title">gefundene WLAN (alle Zeit)</string>
-
+    <string name="all_time_title">gefundene WLAN (allzeit)</string>
+    <string name="month_rank_title">Monatsrang:</string>
+    <string name="user_centric">Mein Rang</string>
+    <string name="not_user_centric">Top Ränge</string>
+    <string name="prevrank_title">Rang letzter Monat</string>
+    <string name="prevmonthrank_title">Monatsrang letzter Monat</string>
 </resources>

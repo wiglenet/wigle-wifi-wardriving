@@ -158,7 +158,14 @@ public class NewsFragment extends Fragment {
                 final JSONObject row = list.getJSONObject(i);
                 final Bundle rowBundle = new Bundle();
                 for (final String key : ALL_ROW_KEYS) {
-                    rowBundle.putString(key, row.getString(key));
+                    String value = row.getString(key);
+                    if (KEY_POST.equals(key)) {
+                        value = value.replace("\\n", "\n");
+                        value = value.replace("&quot;", "\"");
+                        value = value.replace("&amp;", "&");
+                        value = value.replaceAll("<.*?>", "");
+                    }
+                    rowBundle.putString(key, value);
                 }
                 resultList.add(rowBundle);
             }

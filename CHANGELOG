@@ -1,3 +1,9 @@
+* 2.12 (08/10/2016)
+Bump support and tools library versions
+Workaround reported ranking exception
+Clean up news items and add links
+Updated German translation (thanks kill0rz!)
+
 * 2.11 (07/30/2016)
 Added monthly/all-time rankings list
 Added list of uploaded files

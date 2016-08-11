@@ -7,13 +7,6 @@
     android:padding="4dp"
     >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/queue_depth"
-        android:textSize="18sp"
-        />
-
     <ListView
         android:id="@+id/news_list_view"
         android:layout_width="fill_parent"

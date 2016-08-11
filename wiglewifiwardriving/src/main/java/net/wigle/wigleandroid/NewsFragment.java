@@ -49,9 +49,10 @@ public class NewsFragment extends Fragment {
     private static final String KEY_POST = "post";
     private static final String KEY_DATE_TIME = "postDateTime";
     private static final String KEY_POSTER = "poster";
+    private static final String KEY_LINK = "link";
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_SUBJECT, KEY_POST, KEY_DATE_TIME, KEY_POSTER,
+            KEY_SUBJECT, KEY_POST, KEY_DATE_TIME, KEY_POSTER, KEY_LINK,
         };
 
     private NumberFormat numberFormat;
@@ -101,7 +102,7 @@ public class NewsFragment extends Fragment {
 
     private void setupListView(final View view) {
         if (listAdapter == null) {
-            listAdapter = new NewsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow);
+            listAdapter = new NewsListAdapter(getActivity(), R.layout.uploadrow);
         }
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.news_list_view);
@@ -133,8 +134,8 @@ public class NewsFragment extends Fragment {
                 for (final Parcelable result : results) {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
-                        final NewsItem upload = new NewsItem(row.getString(KEY_SUBJECT),
-                                row.getString(KEY_POST), row.getString(KEY_POSTER), row.getString(KEY_DATE_TIME));
+                        final NewsItem upload = new NewsItem(row.getString(KEY_SUBJECT), row.getString(KEY_POST),
+                                row.getString(KEY_POSTER), row.getString(KEY_DATE_TIME), row.getString(KEY_LINK));
                         newsListAdapter.add(upload);
                     }
                 }

@@ -2,6 +2,8 @@ package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -46,6 +48,10 @@ public final class NewsListAdapter extends AbstractListAdapter<NewsItem> {
 
         tv = (TextView) row.findViewById( R.id.post );
         tv.setText(newsItem.getPost());
+
+        tv = (TextView) row.findViewById( R.id.link );
+        tv.setText(Html.fromHtml("<a href=\""+newsItem.getLink()+"\">"+newsItem.getLink()+"</a>"));
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         return row;
     }

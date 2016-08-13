@@ -154,6 +154,11 @@ public class RankStatsFragment extends Fragment {
             MainActivity.error("downloadRanks: handler is null");
             return;
         }
+        final FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity == null) {
+            MainActivity.error("downloadRanks: fragmentActivity is null");
+            return;
+        }
         final boolean doMonthRanking = monthRanking.get();
         final String sort = doMonthRanking ? "monthcount" : "discovered";
         String top = "top";
@@ -162,16 +167,13 @@ public class RankStatsFragment extends Fragment {
         if (userCentric.get()) {
             top = "";
             final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
-            final FragmentActivity fragmentActivity = getActivity();
-            if (fragmentActivity != null) {
-                final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                final long userRank = prefs.getLong(userRankKey, 0);
-                final long startRank = userRank - 50;
-                pageStart = startRank > 0 ? startRank : 0;
-                selected = startRank < 0 ? userRank : 50;
-                selected -= 5;
-                if (selected < 0) selected = 0;
-            }
+            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final long userRank = prefs.getLong(userRankKey, 0);
+            final long startRank = userRank - 50;
+            pageStart = startRank > 0 ? startRank : 0;
+            selected = startRank < 0 ? userRank : 50;
+            selected -= 5;
+            if (selected < 0) selected = 0;
         }
         final long finalSelected = selected;
 

@@ -1,21 +1,20 @@
 package net.wigle.wigleandroid;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.provider.Settings;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.model.OUI;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * the array adapter for a list of networks.
@@ -40,6 +39,9 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     public NetworkListAdapter( final Context context, final int rowLayout ) {
         super( context, rowLayout );
         format = getConstructionTimeFormater( context );
+        if (ListFragment.lameStatic.oui == null) {
+            ListFragment.lameStatic.oui = new OUI(context.getAssets());
+        }
     }
 
     public static SimpleDateFormat getConstructionTimeFormater( final Context context ) {
@@ -82,6 +84,11 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
 
         TextView tv = (TextView) row.findViewById( R.id.ssid );
         tv.setText( network.getSsid() + " ");
+
+        tv = (TextView) row.findViewById( R.id.oui );
+        final String ouiString = network.getOui(ListFragment.lameStatic.oui);
+        final String sep = ouiString.length() > 0 ? " - " : "";
+        tv.setText( ouiString + sep );
 
         tv = (TextView) row.findViewById( R.id.time );
         tv.setText( getConstructionTime( format, network ) );

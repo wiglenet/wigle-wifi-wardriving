@@ -37,6 +37,7 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
 
 import java.text.NumberFormat;
@@ -145,6 +146,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         public Set<String> runNetworks;
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
+        public OUI oui;
     }
     public static final LameStatic lameStatic = new LameStatic();
 

@@ -20,7 +20,7 @@ android {
 
 dependencies {
     compile project(':android-maps-utils')
-    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.google.android.gms:play-services-maps:9.4.0'
     compile 'org.slf4j:slf4j-android:1.7.19'
     compile files('libs/TTS_library_stub.jar')

@@ -220,10 +220,13 @@ public final class Network implements ClusterItem {
     }
 
     public String getOui(final OUI oui) {
-        final String lookup = getBssid().replace(":", "").toUpperCase();
-        String retval = oui.getOui(lookup.substring(0,9));
-        if (retval == null) retval = oui.getOui(lookup.substring(0,7));
-        if (retval == null) retval = oui.getOui(lookup.substring(0,6));
+        String retval = "";
+        if (oui != null) {
+            final String lookup = getBssid().replace(":", "").toUpperCase();
+            retval = oui.getOui(lookup.substring(0, 9));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 6));
+        }
         return retval == null ? "" : retval;
     }
 

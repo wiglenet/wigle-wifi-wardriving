@@ -1,3 +1,8 @@
+* 2.13 (08/19/2016)
+Add manufacturers to network list and instance views
+Workaround rankstats-without-context exception
+Bump appcompat-v7 library to 24.2.0
+
 * 2.12 (08/10/2016)
 Bump support and tools library versions
 Workaround reported ranking exception

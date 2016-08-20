@@ -14,10 +14,11 @@ public final class OUI {
     public OUI(final AssetManager assetManager) {
         try {
             final InputStream stream = assetManager.open("oui.properties");
-            MainActivity.info("stream: " + stream);
+            MainActivity.info("oui stream: " + stream);
 
             InputStreamReader isr = new InputStreamReader(stream, "UTF-8");
             properties.load(isr);
+            MainActivity.info("oui load complete");
         }
         catch (final IOException ex) {
             MainActivity.error("exception loading oui: " + ex, ex);

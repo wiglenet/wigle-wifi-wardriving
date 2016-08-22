@@ -55,3 +55,4 @@ upload and/or pause on when connected to this network
 start on boot option
 disable notification bar icon option
 pause at battery level instead of kill
+don't cancel file write/upload when we touch the screen

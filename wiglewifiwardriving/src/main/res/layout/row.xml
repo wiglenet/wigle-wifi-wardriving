@@ -13,7 +13,7 @@
 
 	<TextView android:id="@+id/ssid" android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-	   android:textColor="#B0B0B0"/>
+	   android:textColor="#eeeeee"/>
     <LinearLayout android:orientation="horizontal"
                   android:layout_width="fill_parent" android:layout_height="fill_parent"
                   android:gravity="right">
@@ -23,7 +23,8 @@
                   style="@android:style/TextAppearance.Small"/>
         <TextView android:id="@+id/time" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@android:style/TextAppearance.Small"/>
+            style="@android:style/TextAppearance.Small"
+            android:textColor="#B0B0B0"/>
     </LinearLayout>
 </LinearLayout>
 
@@ -34,7 +35,8 @@
 		android:layout_height="wrap_content"/>
 	<TextView android:id="@+id/detail" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_weight="5"
-		style="@android:style/TextAppearance.Small"/>
+		style="@android:style/TextAppearance.Small"
+        android:textColor="#B0B0B0"/>
 </LinearLayout>
 
 </LinearLayout>

@@ -327,6 +327,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 item.setIcon((main == null || main.isScanning())
                         ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
                 handleScanChange( getView() );
+                if (main != null) main.handleScanChange();
                 return true;
             }
             case MENU_FILTER:
@@ -354,12 +355,12 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     private void handleScanChange( final View view ) {
         MainActivity main = MainActivity.getMainActivity(this);
         final boolean isScanning = main == null || main.isScanning();
-        MainActivity.info("handleScanChange: isScanning now: " + isScanning );
+        MainActivity.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
-            setStatusUI( view, "Scanning Turned On" );
+            setStatusUI(view, getString(R.string.list_scanning_on));
         }
         else {
-            setStatusUI(view, "Scanning Turned Off");
+            setStatusUI(view, getString(R.string.list_scanning_off));
         }
     }
 

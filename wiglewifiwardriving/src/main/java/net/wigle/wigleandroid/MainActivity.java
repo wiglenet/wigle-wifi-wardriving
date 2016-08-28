@@ -1,34 +1,5 @@
 package net.wigle.wigleandroid;
 
-import static android.location.LocationManager.GPS_PROVIDER;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.reflect.Method;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
-import net.wigle.wigleandroid.listener.GPSListener;
-import net.wigle.wigleandroid.listener.PhoneState;
-import net.wigle.wigleandroid.listener.WifiReceiver;
-import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
-import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.model.OUI;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -61,13 +32,13 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -92,6 +63,34 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
+import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.PhoneState;
+import net.wigle.wigleandroid.listener.WifiReceiver;
+import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.Network;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.Method;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static android.location.LocationManager.GPS_PROVIDER;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -1541,15 +1540,18 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void handleScanChange() {
+    public void handleScanChange() {
         final boolean isScanning = isScanning();
-        info("handleScanChange: isScanning now: " + isScanning);
+        info("main handleScanChange: isScanning now: " + isScanning);
         if (isScanning) {
             if (listActivity != null) {
-                listActivity.setStatusUI( "Scanning Turned On" );
+                listActivity.setStatusUI(getString(R.string.list_scanning_on));
+            }
+            if (state.wifiReceiver != null) {
+                state.wifiReceiver.updateLastScanResponseTime();
             }
             // turn on location updates
-            this.setLocationUpdates(MainActivity.LOCATION_UPDATE_INTERVAL, 0f);
+            this.setLocationUpdates(getLocationSetPeriod(), 0f);
 
             if ( ! state.wifiLock.isHeld() ){
                 state.wifiLock.acquire();
@@ -1557,7 +1559,7 @@ public final class MainActivity extends AppCompatActivity {
         }
         else {
             if (listActivity != null) {
-                listActivity.setStatusUI( "Scanning Turned Off" );
+                listActivity.setStatusUI(getString(R.string.list_scanning_off));
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
@@ -1618,7 +1620,7 @@ public final class MainActivity extends AppCompatActivity {
                     // skip!
                     continue;
                 }
-                if ( ! "passive".equals( provider ) && updateIntervalMillis > 0 ) {
+                if ( ! "passive".equals( provider ) && updateIntervalMillis > 0L ) {
                     MainActivity.info("using provider: " + provider);
                     try {
                         locationManager.requestLocationUpdates(provider, updateIntervalMillis, updateMeters, state.gpsListener);
@@ -1626,6 +1628,16 @@ public final class MainActivity extends AppCompatActivity {
                     catch (final SecurityException ex) {
                         info("Security exception adding status listener: " + ex, ex);
                     }
+                }
+            }
+
+            if (updateIntervalMillis <= 0L) {
+                info("removing location listener: " + state.gpsListener);
+                try {
+                    locationManager.removeUpdates(state.gpsListener);
+                }
+                catch (final SecurityException ex) {
+                    info("Security exception removing status listener: " + ex, ex);
                 }
             }
         }

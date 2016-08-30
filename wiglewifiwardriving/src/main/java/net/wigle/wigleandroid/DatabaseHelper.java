@@ -535,7 +535,13 @@ public final class DatabaseHelper extends Thread {
     }
 
     public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
-        return addObservation( network, network.getLevel(), location, newForRun );
+        try {
+            return addObservation(network, network.getLevel(), location, newForRun);
+        }
+        catch (final IllegalMonitorStateException ex) {
+            MainActivity.error("exception adding network: " + ex, ex);
+        }
+        return false;
     }
 
     private boolean addObservation( final Network network, final int level, final Location location,

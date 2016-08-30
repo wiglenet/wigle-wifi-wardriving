@@ -31,6 +31,7 @@ public class GPSListener implements Listener, LocationListener {
     private Long satCountLowTime = 0L;
     private float previousSpeed = 0f;
     private LocationListener mapLocationListener;
+    private int prevStatus = 0;
 
     public GPSListener( MainActivity mainActivity ) {
         this.mainActivity = mainActivity;
@@ -92,7 +93,11 @@ public class GPSListener implements Listener, LocationListener {
 
     @Override
     public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
-        MainActivity.info("provider status changed: " + provider + " status: " + status);
+        final boolean isgps = "gps".equals(provider);
+        if (!isgps || status != prevStatus) {
+            MainActivity.info("provider status changed: " + provider + " status: " + status);
+            if (isgps) prevStatus = status;
+        }
 
         if ( mapLocationListener != null ) {
             mapLocationListener.onStatusChanged( provider, status, extras );

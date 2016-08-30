@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -151,6 +152,11 @@ public class RankStatsFragment extends Fragment {
     private void downloadRanks(final boolean isCache) {
         if (handler == null) {
             MainActivity.error("downloadRanks: handler is null");
+            return;
+        }
+        final FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity == null) {
+            MainActivity.error("downloadRanks: fragmentActivity is null");
             return;
         }
         final boolean doMonthRanking = monthRanking.get();

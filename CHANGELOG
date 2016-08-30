@@ -1,3 +1,20 @@
+* 2.15 (??/??/2016)
+Disable GPS when scanning turned off
+
+* 2.14 (08/20/2016)
+Oui substring bugfix
+
+* 2.13 (08/19/2016)
+Add manufacturers to network list and instance views
+Workaround rankstats-without-context exception
+Bump appcompat-v7 library to 24.2.0
+
+* 2.12 (08/10/2016)
+Bump support and tools library versions
+Workaround reported ranking exception
+Clean up news items and add links
+Updated German translation (thanks kill0rz!)
+
 * 2.11 (07/30/2016)
 Added monthly/all-time rankings list
 Added list of uploaded files

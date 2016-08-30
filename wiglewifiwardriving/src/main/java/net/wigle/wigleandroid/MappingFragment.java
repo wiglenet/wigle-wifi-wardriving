@@ -111,7 +111,13 @@ public final class MappingFragment extends Fragment {
         mapView = new MapView(getActivity());
         final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
         if (serviceAvailable == ConnectionResult.SUCCESS) {
-            mapView.onCreate(savedInstanceState);
+            try {
+                mapView.onCreate(savedInstanceState);
+            }
+            catch (final SecurityException ex) {
+                MainActivity.error("security exception oncreateview map: " + ex, ex);
+                Toast.makeText(getActivity(), getString(R.string.status_fail), Toast.LENGTH_LONG).show();
+            }
         } else {
             Toast.makeText(getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG).show();
         }
@@ -601,7 +607,12 @@ public final class MappingFragment extends Fragment {
 
         if (dialogFragment != null) {
             final FragmentManager fm = getActivity().getSupportFragmentManager();
-            dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+            try {
+                dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+            }
+            catch (final IllegalStateException ex) {
+                MainActivity.error("dialog error: " + ex, ex);
+            }
         }
     }
 

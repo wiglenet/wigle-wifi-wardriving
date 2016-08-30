@@ -219,6 +219,17 @@ public final class Network implements ClusterItem {
         return geoPoint;
     }
 
+    public String getOui(final OUI oui) {
+        String retval = "";
+        final String lookup = getBssid().replace(":", "").toUpperCase();
+        if (oui != null && lookup.length() >= 9) {
+            retval = oui.getOui(lookup.substring(0, 9));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 6));
+        }
+        return retval == null ? "" : retval;
+    }
+
     @Override
     public LatLng getPosition() {
         return geoPoint;

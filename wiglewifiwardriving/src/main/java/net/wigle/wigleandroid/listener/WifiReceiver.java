@@ -108,6 +108,7 @@ public class WifiReceiver extends BroadcastReceiver {
     public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
+        prevScanPeriod = mainActivity.getLocationSetPeriod();
         ListFragment.lameStatic.runNetworks = runNetworks;
         ssidSpeaker = new SsidSpeaker( mainActivity );
 
@@ -122,6 +123,10 @@ public class WifiReceiver extends BroadcastReceiver {
     public void setMainActivity( final MainActivity mainActivity ) {
         this.mainActivity = mainActivity;
         this.ssidSpeaker.setListActivity( mainActivity );
+        if (mainActivity != null) {
+            prevScanPeriod = mainActivity.getLocationSetPeriod();
+            MainActivity.info("WifiReceiver setting prevScanPeriod: " + prevScanPeriod);
+        }
     }
 
     public void setListAdapter( final NetworkListAdapter listAdapter ) {
@@ -130,6 +135,10 @@ public class WifiReceiver extends BroadcastReceiver {
 
     public int getRunNetworkCount() {
         return runNetworks.size();
+    }
+
+    public void updateLastScanResponseTime() {
+        lastHaveLocationTime = System.currentTimeMillis();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -171,7 +180,8 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         // have the gps listener to a self-check, in case it isn't getting updates anymore
-        mainActivity.getGPSListener().checkLocationOK();
+        final GPSListener gpsListener = mainActivity.getGPSListener();
+        if (gpsListener != null) gpsListener.checkLocationOK();
 
         final Location location = mainActivity.getGPSListener().getLocation();
 

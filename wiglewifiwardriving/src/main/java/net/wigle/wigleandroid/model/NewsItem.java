@@ -8,13 +8,16 @@ public final class NewsItem {
     private final String post;
     private final String poster;
     private final String dateTime;
+    private final String link;
 
-    public NewsItem(final String subject, final String post, final String poster, final String dateTime) {
+    public NewsItem(final String subject, final String post, final String poster, final String dateTime,
+                    final String link) {
 
         this.subject = subject;
         this.post = post;
         this.poster = poster;
         this.dateTime = dateTime;
+        this.link = link;
     }
 
     public String getSubject() {
@@ -31,5 +34,9 @@ public final class NewsItem {
 
     public String getDateTime() {
         return dateTime;
+    }
+
+    public String getLink() {
+        return link;
     }
 }

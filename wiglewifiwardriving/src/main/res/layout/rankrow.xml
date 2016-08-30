@@ -42,14 +42,16 @@
 	<TextView android:id="@+id/total_wifi_gps" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_weight="2"
         android:gravity="center"
-        style="@android:style/TextAppearance.Small"/>
+        style="@android:style/TextAppearance.Small"
+        android:textColor="#B0B0B0"/>
     <TextView
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_weight="1"/>
     <TextView android:id="@+id/total_cell_gps" android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_weight="2"
         android:gravity="center"
-		style="@android:style/TextAppearance.Small"/>
+		style="@android:style/TextAppearance.Small"
+        android:textColor="#B0B0B0"/>
     <TextView
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_weight="1"/>

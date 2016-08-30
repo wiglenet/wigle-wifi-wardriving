@@ -48,6 +48,7 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.model.OUI;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends ActionBarActivity implements DialogListener {
@@ -74,6 +75,10 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     public void onCreate(Bundle savedInstanceState) {
         MainActivity.info("NET: onCreate");
         super.onCreate(savedInstanceState);
+
+        if (ListFragment.lameStatic.oui == null) {
+            ListFragment.lameStatic.oui = new OUI(getAssets());
+        }
 
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -103,6 +108,10 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
             // do gui work
             tv = (TextView) findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
+
+            final String ouiString = network.getOui(ListFragment.lameStatic.oui);
+            tv = (TextView) findViewById( R.id.oui );
+            tv.setText( ouiString );
 
             final int image = NetworkListAdapter.getImage( network );
             final ImageView ico = (ImageView) findViewById( R.id.wepicon );
@@ -300,7 +309,12 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
                 }
                 else {
                     final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
-                    cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
+                    try {
+                        cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
+                    }
+                    catch (final IllegalStateException ex) {
+                        MainActivity.error("exception showing crypto dialog: " + ex, ex);
+                    }
                 }
             }
         });

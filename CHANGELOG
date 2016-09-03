@@ -1,5 +1,7 @@
-* 2.15 (??/??/2016)
+* 2.15 (09/02/2016)
 Disable GPS when scanning turned off
+Add Pause/Scan buttons to notification
+Force text colors for Nougat
 
 * 2.14 (08/20/2016)
 Oui substring bugfix

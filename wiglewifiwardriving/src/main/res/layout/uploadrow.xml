@@ -21,7 +21,8 @@
     <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_weight="1"
-              android:gravity="end"/>
+              android:gravity="end"
+              android:textColor="#B0B0B0"/>
 </LinearLayout>
 
 <LinearLayout android:orientation="horizontal"

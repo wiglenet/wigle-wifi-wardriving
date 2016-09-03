@@ -1659,7 +1659,12 @@ public final class MainActivity extends AppCompatActivity {
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         long setPeriod = prefs.getLong(ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
         if (setPeriod == 0) {
-            setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), MainActivity.LOCATION_UPDATE_INTERVAL);
+            if (state.wifiReceiver == null) {
+                setPeriod = MainActivity.LOCATION_UPDATE_INTERVAL;
+            }
+            else {
+                setPeriod = Math.max(state.wifiReceiver.getScanPeriod(), MainActivity.LOCATION_UPDATE_INTERVAL);
+            }
         }
         return setPeriod;
     }

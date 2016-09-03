@@ -52,6 +52,21 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_SYNC"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_INSERT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_DELETE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
         <activity android:name=".ErrorReportActivity"
                   android:label="@string/error_report_name"
@@ -59,10 +74,6 @@
                   android:launchMode="singleTask"
                   android:exported="false"
                   android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
         </activity>
         <activity android:name=".SpeechActivity"
                   android:label="@string/speech_name"
@@ -76,10 +87,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
         </activity>
         <activity android:name=".NetworkActivity"
                   android:label="@string/network_activity_name"
@@ -92,10 +99,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
-            </intent-filter>
         </activity>
         <activity android:name=".DBResultActivity"
                   android:label="@string/dbresult_activity_name"
@@ -108,9 +111,28 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
+        </activity>
+
+        <activity android:name="ShareActivity"
+                  android:parentActivityName=".MainActivity" >
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.ALTERNATIVE" />
+                <action android:name="android.intent.action.ACTION_SYNC"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_INSERT"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_DELETE"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 

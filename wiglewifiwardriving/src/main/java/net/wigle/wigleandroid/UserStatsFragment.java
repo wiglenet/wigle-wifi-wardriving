@@ -102,7 +102,7 @@ public class UserStatsFragment extends Fragment {
 
     public static void executeUserDownload(final Fragment fragment, final ApiListener apiListener) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true, "POST",
                 apiListener);
         task.startDownload(fragment);
     }

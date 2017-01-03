@@ -26,6 +26,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private final ApiListener listener;
     private final String cacheFilename;
     private final String url;
+    private final String connectionMethod;
     private final boolean doFormLogin;
     private final boolean doBasicLogin;
     private final boolean requiresLogin;
@@ -34,7 +35,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
                          final boolean doBasicLogin, final boolean requiresLogin,
-                         final ApiListener listener) {
+                         final String connectionMethod, final ApiListener listener) {
 
         super(context, dbHelper, "ApiDL", false);
         this.cacheFilename = cacheFilename;
@@ -42,6 +43,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
         this.doFormLogin = doFormLogin;
         this.doBasicLogin = doBasicLogin;
         this.requiresLogin = requiresLogin;
+        this.connectionMethod = connectionMethod;
         this.listener = listener;
     }
 
@@ -53,7 +55,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     protected void subRun() throws IOException, InterruptedException {
         String result = null;
         try {
-            result = doDownload();
+            result = doDownload(this.connectionMethod);
             if (cacheFilename != null) {
                 cacheResult(result);
             }
@@ -124,7 +126,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
         }
     }
 
-    private String doDownload() throws IOException, InterruptedException {
+    private String doDownload(final String connectionMethod) throws IOException, InterruptedException {
         final boolean setBoundary = false;
 
         PreConnectConfigurator preConnectConfigurator = null;
@@ -142,22 +144,27 @@ public class ApiDownloader extends AbstractBackgroundTask {
             };
         }
 
-        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary, preConnectConfigurator);
+        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary,
+                preConnectConfigurator, connectionMethod);
         if (conn == null) {
             throw new IOException("No connection created");
         }
 
-        // Send POST output.
-        final DataOutputStream printout = new DataOutputStream (conn.getOutputStream ());
-        if (doFormLogin) {
-            final String username = getUsername();
-            final String password = getPassword();
-            final String content = "credential_0=" + URLEncoder.encode(username, HttpFileUploader.ENCODING) +
-                    "&credential_1=" + URLEncoder.encode(password, HttpFileUploader.ENCODING);
-            printout.writeBytes(content);
+        if ("POST".equals(connectionMethod)) {
+            // Send request output.
+            final DataOutputStream printout = new DataOutputStream(conn.getOutputStream());
+            if (doFormLogin) {
+                final String username = getUsername();
+                final String password = getPassword();
+                final String content = "credential_0=" + URLEncoder.encode(username, HttpFileUploader.ENCODING) +
+                        "&credential_1=" + URLEncoder.encode(password, HttpFileUploader.ENCODING);
+                printout.writeBytes(content);
+            }
+            printout.flush();
+            printout.close();
+        } else if ("GET".equals(connectionMethod)) {
+            MainActivity.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
         }
-        printout.flush();
-        printout.close();
 
         // get response data
         final BufferedReader input = new BufferedReader(
@@ -207,15 +214,15 @@ public class ApiDownloader extends AbstractBackgroundTask {
         }
         if (authname == null && doBasicLogin) {
             MainActivity.info("No authname, going to request token");
-            downloadTokenAndStart(fragment);
+            downloadTokenAndStart(fragment, this.connectionMethod);
         } else {
             start();
         }
     }
 
-    private void downloadTokenAndStart(final Fragment fragment) {
+    private void downloadTokenAndStart(final Fragment fragment, final String connectionMethod) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true,
+                null, MainActivity.TOKEN_URL, true, false, true, connectionMethod,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

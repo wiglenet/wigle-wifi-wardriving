@@ -182,7 +182,7 @@ public class RankStatsFragment extends Fragment {
         final String monthUrl = MainActivity.RANK_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
+                "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false, "POST",
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

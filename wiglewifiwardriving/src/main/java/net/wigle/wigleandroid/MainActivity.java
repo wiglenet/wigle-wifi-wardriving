@@ -130,7 +130,7 @@ public final class MainActivity extends AppCompatActivity {
     // no auth
     public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
     public static final String RANK_STATS_URL = "https://wigle.net/api/v1/jsonStats";
-    public static final String NEWS_URL = "https://wigle.net/api/v1/jsonNews";
+    public static final String NEWS_URL = "https://api.wigle.net/api/v2/news/latest";
     // api token auth
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/v1/jsonTrans";
     public static final String USER_STATS_URL = "https://api.wigle.net/v1/jsonUserStats";

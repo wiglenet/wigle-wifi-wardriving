@@ -214,24 +214,23 @@ public class ApiDownloader extends AbstractBackgroundTask {
         }
         if (authname == null && doBasicLogin) {
             MainActivity.info("No authname, going to request token");
-            downloadTokenAndStart(fragment, this.connectionMethod);
+            downloadTokenAndStart(fragment);
         } else {
             start();
         }
     }
 
-    private void downloadTokenAndStart(final Fragment fragment, final String connectionMethod) {
+    private void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, connectionMethod,
+                null, MainActivity.TOKEN_URL, true, false, true, "POST",
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {
                         try {
-                            // {"success":true,"result":{"authname":"AID...","token":"..."}}
+                            // {"success":true,"authname":"AID...","token":"..."}
                             if (json.getBoolean("success")) {
-                                final JSONObject result = json.getJSONObject("result");
-                                final String authname = result.getString("authname");
-                                final String token = result.getString("token");
+                                final String authname = json.getString("authname");
+                                final String token = json.getString("token");
                                 final SharedPreferences prefs = fragment.getContext()
                                         .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor edit = prefs.edit();

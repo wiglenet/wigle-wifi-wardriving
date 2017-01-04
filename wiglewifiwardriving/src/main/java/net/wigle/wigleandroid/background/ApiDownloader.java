@@ -32,6 +32,9 @@ public class ApiDownloader extends AbstractBackgroundTask {
     private final boolean requiresLogin;
     private boolean cacheOnly = false;
 
+    public static final String REQUEST_GET = "GET";
+    public static final String REQUEST_POST = "POST";
+
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
                          final boolean doBasicLogin, final boolean requiresLogin,
@@ -150,7 +153,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
             throw new IOException("No connection created");
         }
 
-        if ("POST".equals(connectionMethod)) {
+        if (ApiDownloader.REQUEST_POST.equals(connectionMethod)) {
             // Send request output.
             final DataOutputStream printout = new DataOutputStream(conn.getOutputStream());
             if (doFormLogin) {
@@ -162,7 +165,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
             }
             printout.flush();
             printout.close();
-        } else if ("GET".equals(connectionMethod)) {
+        } else if (ApiDownloader.REQUEST_GET.equals(connectionMethod)) {
             MainActivity.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
         }
 
@@ -222,7 +225,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
 
     private void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, "POST",
+                null, MainActivity.TOKEN_URL, true, false, true, ApiDownloader.REQUEST_POST,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

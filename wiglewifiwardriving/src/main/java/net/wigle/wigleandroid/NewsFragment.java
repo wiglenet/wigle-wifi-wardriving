@@ -88,7 +88,8 @@ public class NewsFragment extends Fragment {
                 getActivity().getPackageName(), getResources());
         handler.setNewsListAdapter(listAdapter);
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "news-cache.json", MainActivity.NEWS_URL, false, false, false, "GET",
+                "news-cache.json", MainActivity.NEWS_URL, false, false, false,
+                ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

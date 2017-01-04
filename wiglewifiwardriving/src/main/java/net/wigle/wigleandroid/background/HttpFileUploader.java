@@ -77,7 +77,7 @@ final class HttpFileUploader {
         HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
 
         // IFF it's a POST, Allow Outputs
-        if ("POST".equals(connectionMethod)) {
+        if (ApiDownloader.REQUEST_POST.equals(connectionMethod)) {
             conn.setDoOutput(true);
             // Allow Inputs
             conn.setDoInput(true);
@@ -143,7 +143,7 @@ final class HttpFileUploader {
 
         try {
             final boolean setBoundary = true;
-            conn = connect(urlString, setBoundary, "POST");
+            conn = connect(urlString, setBoundary, ApiDownloader.REQUEST_POST);
             if (conn == null) {
                 throw new IOException("No connection for: " + urlString);
             }

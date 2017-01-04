@@ -66,7 +66,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
 
         final boolean setBoundary = false;
         final HttpURLConnection conn = HttpFileUploader.connect(
-                MainActivity.OBSERVED_URL, setBoundary, "POST" );
+                MainActivity.OBSERVED_URL, setBoundary, ApiDownloader.REQUEST_POST );
         if (conn == null) {
             throw new IOException("No connection created");
         }

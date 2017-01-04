@@ -152,7 +152,7 @@ public class UploadsFragment extends Fragment {
         }
         final String monthUrl = MainActivity.UPLOADS_STATS_URL + "?pageend=" + ROW_COUNT;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "uploads-cache.json", monthUrl, false, true, true, "GET",
+                "uploads-cache.json", monthUrl, false, true, true, ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

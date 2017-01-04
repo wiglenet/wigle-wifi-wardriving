@@ -128,8 +128,8 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
     // no auth
-    public static final String SITE_STATS_URL = "https://wigle.net/api/v1/jsonSiteStats";
-    public static final String RANK_STATS_URL = "https://wigle.net/api/v1/jsonStats";
+    public static final String SITE_STATS_URL = "https://api.wigle.net/api/v2/stats/site";
+    public static final String RANK_STATS_URL = "https://api.wigle.net/api/v2/stats/standings";
     public static final String NEWS_URL = "https://api.wigle.net/api/v2/news/latest";
     // api token auth
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/api/v2/file/transactions";

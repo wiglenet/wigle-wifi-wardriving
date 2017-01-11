@@ -36,23 +36,47 @@ public class UserStatsFragment extends Fragment {
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_STATS = 202;
 
-    // {"success":true,"statistics":{"visible":"Y","gendisc":"6439","total":"897432","discovered":"498732",
-    // "prevmonthcount":"1814","lasttransid":"20151114-00277","monthcount":"34","totallocs":"8615324","gentotal":"9421",
-    // "firsttransid":"20010907-01998", "prevrank":"20"},"imageBadgeUrl":"\/bi\/asdf.png","user":"bobzilla","rank":43}
-
+    /*
+    {
+      imageBadgeUrl: "/bi/64f3oBpg41EH9bOo2TXr0w.png",
+      monthRank: 128,
+      rank: 44,
+      statistics : {
+        discoveredCell: 6766,
+        discoveredCellGPS: 3702,
+        discoveredWiFi: 1305884,
+        discoveredWiFiGPS: 668555,
+        discoveredWiFiGPSPercent: 0,
+        eventMonthCount: 743,
+        eventPrevMonthCount: 10908,
+        first: "20011125-00000",
+        last: "20170101-00928",
+        monthRank: 128,
+        prevMonthRank: 128,
+        prevRank: 44,
+        rank: 44,
+        self : true,
+        totalWiFiLocations: 12255273,
+        userName: "arkasha"
+      }
+      success: true,
+      user: "arkasha"
+     }
+     */
     public static final String KEY_RANK = "rank";
-    private static final String KEY_PREV_RANK = "prevrank";
+    private static final String KEY_PREV_RANK = "prevRank";
     public static final String KEY_MONTH_RANK = "monthRank";
-    private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
-    private static final String KEY_DISCOVERED = "discovered";
-    private static final String KEY_TOTAL = "total";
-    private static final String KEY_TOTAL_LOCS = "totallocs";
-    private static final String KEY_GEN_DISC = "gendisc";
-    private static final String KEY_GEN_TOTAL = "gentotal";
-    private static final String KEY_MONTH_COUNT = "monthcount";
-    private static final String KEY_PREV_MONTH = "prevmonthcount";
-    private static final String KEY_FIRST_TRANS = "firsttransid";
-    private static final String KEY_LAST_TRANS = "lasttransid";
+    private static final String KEY_PREV_MONTH_RANK = "prevMonthRank";
+    private static final String KEY_DISCOVERED = "discoveredWiFiGPS";
+    private static final String KEY_TOTAL = "discoveredWiFi";
+    private static final String KEY_TOTAL_LOCS = "totalWiFiLocations";
+    private static final String KEY_GEN_DISC = "discoveredCellGPS";
+    private static final String KEY_GEN_TOTAL = "discoveredCell";
+    private static final String KEY_MONTH_COUNT = "eventMonthCount";
+    private static final String KEY_PREV_MONTH = "eventPrevMonthCount";
+    private static final String KEY_FIRST_TRANS = "first";
+    private static final String KEY_LAST_TRANS = "last";
+
     public static final String KEY_IS_CACHE = "iscache";
 
     private static final int COLOR_UP = Color.rgb(30, 200, 30);
@@ -103,6 +127,7 @@ public class UserStatsFragment extends Fragment {
     public static void executeUserDownload(final Fragment fragment, final ApiListener apiListener) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
                 "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                ApiDownloader.REQUEST_GET,
                 apiListener);
         task.startDownload(fragment);
     }
@@ -125,17 +150,27 @@ public class UserStatsFragment extends Fragment {
             final Bundle bundle = new Bundle();
             bundle.putBoolean(KEY_IS_CACHE, isCache);
             try {
-                final JSONObject stats = json.getJSONObject("statistics");
-                for (final String key : ALL_USER_KEYS) {
-                    final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
-                    if (!lookupJson.has(key)) continue;
-                    switch (key) {
-                        case KEY_FIRST_TRANS:
-                        case KEY_LAST_TRANS:
-                            bundle.putString(key, lookupJson.getString(key));
-                            break;
-                        default:
-                            bundle.putLong(key, lookupJson.getLong(key));
+                if (!json.getBoolean("success")) {
+                    MainActivity.info("handleUserStats json success is false");
+                    bundle.putString("error", "Unable to load user statistics.");
+                } else {
+                    if (json.isNull("statistics")) {
+                        MainActivity.info("handleUserStats json stats null, returning");
+                        bundle.putString("error", "Unable to load user statistics.");
+                    } else {
+                        final JSONObject stats = json.getJSONObject("statistics");
+                        for (final String key : ALL_USER_KEYS) {
+                            final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
+                            if (!lookupJson.has(key)) continue;
+                            switch (key) {
+                                case KEY_FIRST_TRANS:
+                                case KEY_LAST_TRANS:
+                                    bundle.putString(key, lookupJson.getString(key));
+                                    break;
+                                default:
+                                    bundle.putLong(key, lookupJson.getLong(key));
+                            }
+                        }
                     }
                 }
             }
@@ -160,36 +195,39 @@ public class UserStatsFragment extends Fragment {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-
             if (msg.what == MSG_USER_DONE) {
-                TextView tv;
+                if (bundle.containsKey("error")) {
+                    MainActivity.info("handleMessage error loading user stats. TODO: show warning");
+                } else {
+                    TextView tv;
 
-                for (final String key : ALL_USER_KEYS) {
-                    int id = resources.getIdentifier(key, "id", packageName);
-                    tv = (TextView) view.findViewById(id);
-                    switch (key) {
-                        case KEY_FIRST_TRANS:
-                        case KEY_LAST_TRANS:
-                            tv.setText(bundle.getString(key));
-                            break;
-                        case KEY_PREV_RANK: {
-                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_RANK);
-                            diffToString(diff, tv);
+                    for (final String key : ALL_USER_KEYS) {
+                        int id = resources.getIdentifier(key, "id", packageName);
+                        tv = (TextView) view.findViewById(id);
+                        switch (key) {
+                            case KEY_FIRST_TRANS:
+                            case KEY_LAST_TRANS:
+                                tv.setText(bundle.getString(key));
+                                break;
+                            case KEY_PREV_RANK: {
+                                final long diff = bundle.getLong(key) - bundle.getLong(KEY_RANK);
+                                diffToString(diff, tv);
 
-                            tv = (TextView) view.findViewById(R.id.actual_prevrank);
-                            tv.setText(numberFormat.format(bundle.getLong(key)));
-                            break;
+                                tv = (TextView) view.findViewById(R.id.actual_prevrank);
+                                tv.setText(numberFormat.format(bundle.getLong(key)));
+                                break;
+                            }
+                            case KEY_PREV_MONTH_RANK: {
+                                final long diff = bundle.getLong(key) - bundle.getLong(KEY_MONTH_RANK);
+                                diffToString(diff, tv);
+
+                                tv = (TextView) view.findViewById(R.id.actual_prevmonthrank);
+                                tv.setText(numberFormat.format(bundle.getLong(key)));
+                                break;
+                            }
+                            default:
+                                tv.setText(numberFormat.format(bundle.getLong(key)));
                         }
-                        case KEY_PREV_MONTH_RANK: {
-                            final long diff = bundle.getLong(key) - bundle.getLong(KEY_MONTH_RANK);
-                            diffToString(diff, tv);
-
-                            tv = (TextView) view.findViewById(R.id.actual_prevmonthrank);
-                            tv.setText(numberFormat.format(bundle.getLong(key)));
-                            break;
-                        }
-                        default:
-                            tv.setText(numberFormat.format(bundle.getLong(key)));
                     }
                 }
             }

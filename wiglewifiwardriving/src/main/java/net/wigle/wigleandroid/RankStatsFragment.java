@@ -45,26 +45,40 @@ public class RankStatsFragment extends Fragment {
     private static final int MENU_USER_CENTRIC_SWAP = 203;
 
     private static final String RESULT_LIST_KEY = "results";
-
-    // {"discoveredCellGPS":"1773",
-    // "first":"27-Jan-2003",
-    // "last":"13-Jul-2016",
-    // "self":false,
-    // "eventPrevMonthCount":"284489",
-    // "username":"ccie4526",
-    // "discoveredWiFiGPSPercent":"3.751",
-    // "eventMonthCount":"94942",
-    // "discoveredWiFi":"11143854",
-    // "discoveredCell":"2799",
-    // "rank":2,
-    // "discoveredWiFiGPS":"10013307"},
+    /*
+    {
+      eventView: false,
+      myUsername: "arkasha",
+      pageEnd: 100,
+      pageStart: 0,
+      results:[
+        {
+          discoveredCell: 999911,
+          discoveredCellGPS: 718583,
+          discoveredWiFi: 41781793,
+          discoveredWiFiGPS: 26209080,
+          discoveredWiFiGPSPercent: 8.64536,
+          eventMonthCount: 20526,
+          eventPrevMonthCount: 431245,
+          first: "20011003-00001",
+          last: "20170103-00583",
+          monthRank: 1,
+          prevMonthRank: 1,
+          prevRank: 1,
+          rank: 1,
+          self: false,
+          totalWiFiLocations: 185993637,
+          userName: "anonymous"
+        },
+        ...]}
+     */
     private static final String KEY_MONTH_WIFI_GPS = "eventMonthCount";
     private static final String KEY_TOTAL_WIFI_GPS = "discoveredWiFiGPS";
     private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";
     private static final String KEY_RANK = "rank";
-    private static final String KEY_USERNAME = "username";
-    private static final String KEY_PREV_RANK = "prevrank";
-    private static final String KEY_PREV_MONTH_RANK = "prevmonthrank";
+    private static final String KEY_USERNAME = "userName";
+    private static final String KEY_PREV_RANK = "prevRank";
+    private static final String KEY_PREV_MONTH_RANK = "prevMonthRank";
     private static final String KEY_SELECTED = "selected";
 
     private static final int ROW_COUNT = 100;
@@ -183,6 +197,7 @@ public class RankStatsFragment extends Fragment {
                 + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
+                ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {
@@ -268,7 +283,9 @@ public class RankStatsFragment extends Fragment {
                 final JSONObject row = list.getJSONObject(i);
                 final Bundle rowBundle = new Bundle();
                 for (final String key : ALL_ROW_KEYS) {
-                    rowBundle.putLong(key, row.getLong(key));
+                    if (row.has(key)) {
+                        rowBundle.putLong(key, row.getLong(key));
+                    }
                 }
                 rowBundle.putString(KEY_USERNAME, row.getString(KEY_USERNAME));
                 resultList.add(rowBundle);

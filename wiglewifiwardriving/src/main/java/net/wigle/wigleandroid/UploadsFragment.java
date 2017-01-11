@@ -41,36 +41,46 @@ public class UploadsFragment extends Fragment {
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
 
-    // { "success": true, "processingQueueDepth":0, "pageStart":0,"pageEnd":100,
-    // "myUserName":"asdf",
-    // "results":[{
-    // "transid":"20130313-00330",
-    // "status":"Completed Successfully",
-    // "percentdone":100,
-    // "timeparsing":7,
-    // "firsttime":"2016-07-16 11:29:27",
-    // "filename":"WigleWifi_20120213132323.csv",
-    // "filesize":154003,
-    // "filelines":1341,
-    // "discgps":821,
-    // "discovered":823,
-    // "totalgps":559,
-    // "total":595,
-    // "totallocs":893,
-    // "gendiscgps":2,
-    // "gendisc":2,
-    // "gentotalgps":43,
-    // "gentotal":43,
-    // "gentotallocs":479},
+    /*
+     {
+       "success":true,
+       "processingQueueDepth":1,
+       "results":[
+         {
+           "transid":"20170101-00928",
+           "username":"arkasha",
+           "firstTime":"2017-01-01T23:59:24.000Z",
+           "lastupdt":"2017-01-02T00:00:06.000Z",
+           "fileName":"1483315164_WigleWifi_20170101155922.csv",
+           "fileSize":20846,
+           "fileLines":174,
+           "status":"D",
+           "discoveredGps":0,
+           "discovered":0,
+           "total":118,
+           "totalGps":117,
+           "totalLocations":172,
+           "percentDone":100.0,
+           "timeParsing":5,
+           "genDiscovered":0,
+           "genDiscoveredGps":0,
+           "genTotal":1,
+           "genTotalGps":1,
+           "genTotalLocations":1,
+           "wait":null
+         }, ...
+       ]
+     }
+     */
     private static final String RESULT_LIST_KEY = "results";
 
-    private static final String KEY_TOTAL_WIFI_GPS = "discgps";
-    private static final String KEY_TOTAL_CELL_GPS = "gendiscgps";
+    private static final String KEY_TOTAL_WIFI_GPS = "discoveredGps";
+    private static final String KEY_TOTAL_CELL_GPS = "genDiscoveredGps";
     private static final String KEY_QUEUE_DEPTH = "processingQueueDepth";
     private static final String KEY_TRANSID = "transid";
     private static final String KEY_STATUS = "status";
-    private static final String KEY_PERCENT_DONE = "percentdone";
-    private static final String KEY_FILE_SIZE = "filesize";
+    private static final String KEY_PERCENT_DONE = "percentDone";
+    private static final String KEY_FILE_SIZE = "fileSize";
 
     private static final int ROW_COUNT = 100;
 
@@ -142,7 +152,7 @@ public class UploadsFragment extends Fragment {
         }
         final String monthUrl = MainActivity.UPLOADS_STATS_URL + "?pageend=" + ROW_COUNT;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "uploads-cache.json", monthUrl, false, true, true,
+                "uploads-cache.json", monthUrl, false, true, true, ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

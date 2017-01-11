@@ -37,7 +37,7 @@
                 android:textColor="#ffff00"/>
 
             <TextView
-                android:id="@+id/prevrank"
+                android:id="@+id/prevRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
@@ -65,7 +65,7 @@
                 android:textSize="20sp"
                 android:textColor="#d0d000"/>
             <TextView
-                android:id="@+id/prevmonthrank"
+                android:id="@+id/prevMonthRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
@@ -79,7 +79,7 @@
             android:textSize="20sp"
             />
         <TextView
-            android:id="@+id/discovered"
+            android:id="@+id/discoveredWiFiGPS"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -94,7 +94,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/total"
+            android:id="@+id/discoveredWiFi"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -109,7 +109,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/totallocs"
+            android:id="@+id/totalWiFiLocations"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -124,7 +124,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/gendisc"
+            android:id="@+id/discoveredCellGPS"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -139,7 +139,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/gentotal"
+            android:id="@+id/discoveredCell"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -154,7 +154,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/monthcount"
+            android:id="@+id/eventMonthCount"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -169,7 +169,7 @@
             android:textSize="16sp"
             android:textColor="#909090"/>
         <TextView
-            android:id="@+id/prevmonthcount"
+            android:id="@+id/eventPrevMonthCount"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -184,7 +184,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/firsttransid"
+            android:id="@+id/first"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
@@ -199,7 +199,7 @@
             android:textSize="16sp"
             />
         <TextView
-            android:id="@+id/lasttransid"
+            android:id="@+id/last"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"

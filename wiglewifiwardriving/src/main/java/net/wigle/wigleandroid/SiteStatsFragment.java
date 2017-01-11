@@ -113,6 +113,7 @@ public class SiteStatsFragment extends Fragment {
                 getResources());
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "site-stats-cache.json", MainActivity.SITE_STATS_URL, false, false, false,
+                ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {

@@ -231,11 +231,11 @@ public class ApiDownloader extends AbstractBackgroundTask {
                     public void requestComplete(final JSONObject json, final boolean isCache) {
                         try {
                             // {"success":true,"authname":"AID...","token":"..."}
+                            final SharedPreferences prefs = fragment.getContext()
+                                    .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                             if (json.getBoolean("success")) {
                                 final String authname = json.getString("authname");
                                 final String token = json.getString("token");
-                                final SharedPreferences prefs = fragment.getContext()
-                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor edit = prefs.edit();
                                 edit.putString(ListFragment.PREF_AUTHNAME, authname);
                                 edit.putString(ListFragment.PREF_TOKEN, token);
@@ -243,6 +243,8 @@ public class ApiDownloader extends AbstractBackgroundTask {
 
                                 // execute ourselves, the pending task
                                 start();
+                            } else {
+                                MainActivity.warn("login failed. json: " + json);
                             }
                         }
                         catch (final JSONException ex) {

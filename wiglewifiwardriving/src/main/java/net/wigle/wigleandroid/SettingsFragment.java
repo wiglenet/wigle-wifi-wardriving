@@ -1,13 +1,17 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 
 import android.annotation.SuppressLint;
+import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -160,10 +164,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String registerString = getString(R.string.register);
         final String atString = getString(R.string.at);
         try {
-            register.setText(Html.fromHtml("<a href='https://wigle.net/gps/gps/main/register'>" + registerString + "</a> "
-                    + atString + " <a href='https://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
-        }
-        catch (Exception ex) {
+            if (Build.VERSION.SDK_INT >= 24) {
+                //Html.fromHtml(String, int) // for 24 api and more
+                register.setText(Html.fromHtml("<a href='https://wigle.net/register'>" + registerString + "</a> "
+                        + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>",
+                        Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                register.setText(Html.fromHtml("<a href='https://wigle.net/register'>" +
+                        registerString + "</a> " + atString +
+                        " <a href='https://wigle.net/register'>WiGLE.net</a>"));
+            }
+        } catch (Exception ex) {
             register.setText(registerString + " " + atString + " WiGLE.net");
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
@@ -175,7 +186,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onTextChanged( final String s ) {
                 // ListActivity.debug("user: " + s);
                 editor.putString( ListFragment.PREF_USERNAME, s.trim() );
+                // ALIBI: if the username changes, refetch token
+                editor.remove(ListFragment.PREF_AUTHNAME);
+                editor.remove(ListFragment.PREF_TOKEN);
                 editor.apply();
+                clearCachefiles();
+
                 // might have to remove or show register link
                 updateRegister(view);
             }
@@ -200,7 +216,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onTextChanged( final String s ) {
                 // ListActivity.debug("pass: " + s);
                 editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
+                // ALIBI: if the password changes, refetch token
+                editor.remove(ListFragment.PREF_AUTHNAME);
+                editor.remove(ListFragment.PREF_TOKEN);
                 editor.apply();
+                clearCachefiles();
             }
         });
 
@@ -342,6 +362,23 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 register.setEnabled(false);
                 register.setVisibility(View.GONE);
             }
+        }
+    }
+
+    /**
+     * clear cache files (i.e. on creds change)
+     */
+    private void clearCachefiles() {
+        final File cacheDir = new File(MainActivity.getSDPath());
+        final File[] cacheFiles = cacheDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept( final File dir,
+                                   final String name ) {
+                return name.matches( ".*-cache\\.json" );
+            }
+        } );
+        for (File cache: cacheFiles) {
+            cache.delete();
         }
     }
 

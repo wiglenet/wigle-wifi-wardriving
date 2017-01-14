@@ -129,7 +129,12 @@ public class UserStatsFragment extends Fragment {
                 "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
                 ApiDownloader.REQUEST_GET,
                 apiListener);
-        task.startDownload(fragment);
+        try {
+            task.startDownload(fragment);
+        } catch (WiGLEAuthException waex) {
+            //TODO: generate toast
+            MainActivity.info("User Stats Download Failed due to failed auth");
+        }
     }
 
     public static class UserDownloadApiListener implements ApiListener {

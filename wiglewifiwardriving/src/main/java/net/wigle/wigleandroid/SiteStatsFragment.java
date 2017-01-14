@@ -120,7 +120,9 @@ public class SiteStatsFragment extends Fragment {
                         handleSiteStats(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {} //unauthenticated call
     }
 
     private void handleSiteStats(final JSONObject json, final Handler handler) {

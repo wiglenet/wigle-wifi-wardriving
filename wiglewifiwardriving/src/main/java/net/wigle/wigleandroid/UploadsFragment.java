@@ -159,7 +159,12 @@ public class UploadsFragment extends Fragment {
                         handleUploads(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.info("Transactions Download Failed due to failed auth");
+            //TODO: generate toast
+        }
     }
 
     private void setupListView(final View view) {

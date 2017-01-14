@@ -96,7 +96,9 @@ public class NewsFragment extends Fragment {
                         handleNews(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {} //unauthenticated call
 
         return rootView;
     }

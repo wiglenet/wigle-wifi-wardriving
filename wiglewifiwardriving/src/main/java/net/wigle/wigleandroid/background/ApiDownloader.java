@@ -8,6 +8,7 @@ import android.util.Base64;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.WiGLEAuthException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +56,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
     }
 
     @Override
-    protected void subRun() throws IOException, InterruptedException {
+    protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
         String result = null;
         try {
             result = doDownload(this.connectionMethod);
@@ -64,6 +65,10 @@ public class ApiDownloader extends AbstractBackgroundTask {
             }
             final JSONObject json = new JSONObject(result);
             listener.requestComplete(json, false);
+        }
+        catch (final WiGLEAuthException waex) {
+            // ALIBI: allow auth exception through
+            throw waex;
         }
         catch (final Exception ex) {
             MainActivity.error("ex: " + ex + " result: " + result, ex);
@@ -200,7 +205,7 @@ public class ApiDownloader extends AbstractBackgroundTask {
         return result.toString();
     }
 
-    public void startDownload(final Fragment fragment) {
+    public void startDownload(final Fragment fragment) throws WiGLEAuthException {
         // if we have cached data, call the handler with that
         final JSONObject cache = getCached();
         if (cache != null) listener.requestComplete(cache, true);
@@ -228,27 +233,33 @@ public class ApiDownloader extends AbstractBackgroundTask {
                 null, MainActivity.TOKEN_URL, true, false, true, ApiDownloader.REQUEST_POST,
                 new ApiListener() {
                     @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
+                    public void requestComplete(final JSONObject json, final boolean isCache)
+                            throws WiGLEAuthException {
                         try {
-                            // {"success":true,"authname":"AID...","token":"..."}
-                            final SharedPreferences prefs = fragment.getContext()
-                                    .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                            // {"success": true, "authname": "AID...", "token": "..."}
                             if (json.getBoolean("success")) {
                                 final String authname = json.getString("authname");
                                 final String token = json.getString("token");
+                                final SharedPreferences prefs = fragment.getContext()
+                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor edit = prefs.edit();
                                 edit.putString(ListFragment.PREF_AUTHNAME, authname);
                                 edit.putString(ListFragment.PREF_TOKEN, token);
                                 edit.apply();
-
                                 // execute ourselves, the pending task
                                 start();
+                            } else if (json.has("credential_0")) {
+                                String message = "login failed for " +
+                                        json.getString("credential_0");
+                                MainActivity.warn(message);
+                                throw new WiGLEAuthException(message);
                             } else {
-                                MainActivity.warn("login failed. json: " + json);
+                                throw new WiGLEAuthException("Unable to log in.");
                             }
                         }
                         catch (final JSONException ex) {
                             MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                            throw new WiGLEAuthException("Unable to log in.");
                         }
                     }
                 });

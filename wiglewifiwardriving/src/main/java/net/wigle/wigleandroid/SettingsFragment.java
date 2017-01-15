@@ -162,16 +162,15 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
         final String atString = getString(R.string.at);
+        final String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
+                "</a> " + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>";
         try {
             if (Build.VERSION.SDK_INT >= 24) {
                 //Html.fromHtml(String, int) // for 24 api and more
-                register.setText(Html.fromHtml("<a href='https://wigle.net/register'>" + registerString + "</a> "
-                        + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>",
+                register.setText(Html.fromHtml(registerBlurb,
                         Html.FROM_HTML_MODE_LEGACY));
             } else {
-                register.setText(Html.fromHtml("<a href='https://wigle.net/register'>" +
-                        registerString + "</a> " + atString +
-                        " <a href='https://wigle.net/register'>WiGLE.net</a>"));
+                register.setText(Html.fromHtml(registerBlurb));
             }
         } catch (Exception ex) {
             register.setText(registerString + " " + atString + " WiGLE.net");

@@ -14,9 +14,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.Toast;
 
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
+    public static final int AUTHENTICATION_ERROR = 1;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
     public static final String FILEPATH = "filepath";
@@ -46,7 +48,10 @@ public class BackgroundGuiHandler extends Handler {
     @Override
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
-            if (pd == null) {
+            if (msg.what == AUTHENTICATION_ERROR) {
+                Toast.makeText(this.context, msg.getData().getString("AUTH_ERROR"), Toast.LENGTH_LONG).show();
+                return;
+            } else if (pd == null) {
                 // no dialog box, just return
                 return;
             }

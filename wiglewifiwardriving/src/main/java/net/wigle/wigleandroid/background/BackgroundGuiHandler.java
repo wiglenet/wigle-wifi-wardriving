@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.background;
 
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.SettingsFragment;
 import net.wigle.wigleandroid.background.AbstractBackgroundTask.ProgressDialogFragment;
 import android.app.AlertDialog;
@@ -49,7 +50,8 @@ public class BackgroundGuiHandler extends Handler {
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
             if (msg.what == AUTHENTICATION_ERROR) {
-                Toast.makeText(this.context, msg.getData().getString("AUTH_ERROR"), Toast.LENGTH_LONG).show();
+                Toast.makeText(this.context, R.string.status_login_fail
+                        /*msg.getData().getString("AUTH_ERROR")*/, Toast.LENGTH_LONG).show();
                 return;
             } else if (pd == null) {
                 // no dialog box, just return

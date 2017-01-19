@@ -10,7 +10,7 @@
               android:layout_height="wrap_content"
               android:layout_weight="1"
               android:textSize="18sp"
-              android:textColor="#f000f0"
+              android:textColor="#eaba44"
               android:gravity="start"/>
     <TextView android:id="@+id/status" android:layout_width="wrap_content"
               android:layout_height="wrap_content"

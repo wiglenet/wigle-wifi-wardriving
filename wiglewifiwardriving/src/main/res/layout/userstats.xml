@@ -20,28 +20,30 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="4dp"
-            >
+            android:weightSum="1">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/rank_title"
-                android:textSize="32sp"
+                android:textSize="24sp"
                 android:paddingRight="6dp"
                 />
+
             <TextView
                 android:id="@+id/rank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
-                android:textSize="32sp"
-                android:textColor="#ffff00"/>
+                android:textSize="24sp"
+                android:textColor="#ffff00"
+                android:layout_weight="0.89" />
 
             <TextView
                 android:id="@+id/prevRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
-                android:textSize="32sp"/>
+                android:textSize="24sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -49,7 +51,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="4dp"
-            >
+            android:weightSum="1">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
@@ -63,13 +65,15 @@
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
                 android:textSize="20sp"
-                android:textColor="#d0d000"/>
+                android:textColor="#d0d000"
+                android:layout_weight="0.47" />
             <TextView
                 android:id="@+id/prevMonthRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/status_unknown"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_weight="0.35" />
         </LinearLayout>
 
         <TextView
@@ -93,6 +97,7 @@
             android:text="@string/total_title"
             android:textSize="16sp"
             />
+
         <TextView
             android:id="@+id/discoveredWiFi"
             android:layout_width="fill_parent"
@@ -100,7 +105,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -108,6 +113,7 @@
             android:text="@string/totallocs_title"
             android:textSize="16sp"
             />
+
         <TextView
             android:id="@+id/totalWiFiLocations"
             android:layout_width="fill_parent"
@@ -115,7 +121,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -130,7 +136,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -145,7 +151,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -160,7 +166,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -175,7 +181,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            android:textColor="#909090"/>
+            android:textColor="#4aceff"/>
 
         <TextView
             android:layout_width="fill_parent"
@@ -190,7 +196,7 @@
             android:text="@string/status_unknown"
             android:textSize="16sp"
             android:paddingBottom="2dp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -204,7 +210,7 @@
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -218,7 +224,7 @@
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
-            />
+            android:textColor="#4aceff" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -232,7 +238,7 @@
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="16sp"
-            />
+            android:textColor="#4aceff" />
     </LinearLayout>
 
 </ScrollView>

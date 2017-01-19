@@ -23,7 +23,7 @@
               android:layout_height="wrap_content"
               android:layout_weight="1"
               android:textSize="18sp"
-              android:textColor="#f000f0"
+              android:textColor="#4aceff"
               android:gravity="center"/>
 	<TextView android:id="@+id/month_wifi_gps" android:layout_width="wrap_content"
               android:layout_height="wrap_content"

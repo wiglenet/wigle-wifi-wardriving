@@ -98,7 +98,10 @@ public class NewsFragment extends Fragment {
                 });
         try {
             task.startDownload(this);
-        } catch (WiGLEAuthException waex) {} //unauthenticated call
+        } catch (WiGLEAuthException waex) {
+            //unauthenticated call - should never trip
+            MainActivity.warn("Authentication error on news load (should not happen)", waex);
+        }
 
         return rootView;
     }

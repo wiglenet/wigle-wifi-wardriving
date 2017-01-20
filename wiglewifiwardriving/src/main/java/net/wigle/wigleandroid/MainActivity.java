@@ -817,7 +817,7 @@ public final class MainActivity extends AppCompatActivity {
         try {
             retval = file.getCanonicalPath();
         } catch (Exception ex) {
-            // ignore
+            MainActivity.error("Failed to get filepath", ex);
         }
 
         if (retval == null) {

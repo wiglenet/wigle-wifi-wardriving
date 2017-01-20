@@ -375,8 +375,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 return name.matches( ".*-cache\\.json" );
             }
         } );
-        for (File cache: cacheFiles) {
-            cache.delete();
+        if (null != cacheFiles) {
+            for (File cache: cacheFiles) {
+                cache.delete();
+            }
         }
     }
 

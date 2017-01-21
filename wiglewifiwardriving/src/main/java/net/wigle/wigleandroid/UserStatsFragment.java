@@ -132,7 +132,6 @@ public class UserStatsFragment extends Fragment {
         try {
             task.startDownload(fragment);
         } catch (WiGLEAuthException waex) {
-            //TODO: generate toast
             MainActivity.info("User Stats Download Failed due to failed auth");
         }
     }

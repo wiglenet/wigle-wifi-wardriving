@@ -163,7 +163,6 @@ public class UploadsFragment extends Fragment {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
             MainActivity.info("Transactions Download Failed due to failed auth");
-            //TODO: generate toast
         }
     }
 

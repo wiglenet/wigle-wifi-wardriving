@@ -182,13 +182,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         user.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
-                // ListActivity.debug("user: " + s);
-                editor.putString( ListFragment.PREF_USERNAME, s.trim() );
-                // ALIBI: if the username changes, refetch token
-                editor.remove(ListFragment.PREF_AUTHNAME);
-                editor.remove(ListFragment.PREF_TOKEN);
-                editor.apply();
-                clearCachefiles();
+                credentialsUpdate(ListFragment.PREF_USERNAME, editor, prefs, s);
 
                 // might have to remove or show register link
                 updateRegister(view);
@@ -212,13 +206,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         pass.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
-                // ListActivity.debug("pass: " + s);
-                editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
-                // ALIBI: if the password changes, refetch token
-                editor.remove(ListFragment.PREF_AUTHNAME);
-                editor.remove(ListFragment.PREF_TOKEN);
-                editor.apply();
-                clearCachefiles();
+                credentialsUpdate(ListFragment.PREF_PASSWORD, editor, prefs, s);
             }
         });
 
@@ -364,6 +352,28 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     }
 
     /**
+     * The little dance we do when we update username or password, removing old creds/cache
+     * @param key the ListFragment key (u or p)
+     * @param editor prefs editor reference
+     * @param prefs preferences for checks
+     * @param newValue the new value for the username or pass
+     */
+    public void credentialsUpdate(String key, Editor editor, SharedPreferences prefs, String newValue) {
+        //DEBUG: MainActivity.info(key + ": " + newValue.trim());
+        String currentValue = prefs.getString(key, "");
+        if (currentValue.equals(newValue.trim())) {
+            return;
+        }
+        editor.putString( key, newValue.trim() );
+        // ALIBI: if the u|p changes, force refetch token
+        editor.remove(ListFragment.PREF_AUTHNAME);
+        editor.remove(ListFragment.PREF_TOKEN);
+        editor.apply();
+        this.clearCachefiles();
+    }
+
+
+    /**
      * clear cache files (i.e. on creds change)
      */
     private void clearCachefiles() {
@@ -377,7 +387,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         } );
         if (null != cacheFiles) {
             for (File cache: cacheFiles) {
-                cache.delete();
+                //DEBUG: MainActivity.info("deleting: " + cache.getAbsolutePath());
+                boolean deleted = cache.delete();
+                if (!deleted) {
+                    MainActivity.warn("failed to delete cache file: "+cache.getAbsolutePath());
+                }
             }
         }
     }

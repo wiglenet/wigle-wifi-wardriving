@@ -215,9 +215,13 @@ public class RankStatsFragment extends Fragment {
     }
 
     private void setupListView(final View view) {
-        //if (listAdapter == null) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        if (listAdapter == null) {
             listAdapter = new RankListAdapter(getActivity().getApplicationContext(), R.layout.rankrow);
-        //}
+        } else if (!listAdapter.isEmpty() && prefs.getString(ListFragment.PREF_TOKEN,"").isEmpty()) {
+            listAdapter.clear();
+        }
+
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
         listView.setAdapter(listAdapter);

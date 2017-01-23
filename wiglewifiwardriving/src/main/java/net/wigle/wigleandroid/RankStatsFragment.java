@@ -129,6 +129,7 @@ public class RankStatsFragment extends Fragment {
         handler.setRankListAdapter(listAdapter);
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
+        //TODO: we should only perform user DL if there's a user set
         UserStatsFragment.executeUserDownload(this, new UserStatsFragment.UserDownloadApiListener(new Handler() {
             @Override
             public void handleMessage(final Message msg) {
@@ -205,13 +206,22 @@ public class RankStatsFragment extends Fragment {
                     }
                 });
         task.setCacheOnly(isCache);
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            //TODO: toast? *shouldn't* be authed, but a UserStats call may have been issued in error
+            MainActivity.info("Rank Stats Download Failed due to failed auth");
+        }
     }
 
     private void setupListView(final View view) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (listAdapter == null) {
             listAdapter = new RankListAdapter(getActivity().getApplicationContext(), R.layout.rankrow);
+        } else if (!listAdapter.isEmpty() && prefs.getString(ListFragment.PREF_TOKEN,"").isEmpty()) {
+            listAdapter.clear();
         }
+
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
         listView.setAdapter(listAdapter);

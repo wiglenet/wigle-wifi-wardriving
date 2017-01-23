@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.media.AudioManager;
@@ -159,12 +160,19 @@ public class UploadsFragment extends Fragment {
                         handleUploads(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.info("Transactions Download Failed due to failed auth");
+        }
     }
 
     private void setupListView(final View view) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (listAdapter == null) {
             listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow);
+        } else if (!listAdapter.isEmpty() && prefs.getString(ListFragment.PREF_TOKEN,"").isEmpty()) {
+            listAdapter.clear();
         }
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.uploads_list_view);

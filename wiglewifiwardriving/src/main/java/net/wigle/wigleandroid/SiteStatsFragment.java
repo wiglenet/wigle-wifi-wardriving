@@ -120,7 +120,12 @@ public class SiteStatsFragment extends Fragment {
                         handleSiteStats(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            //unauthenticated call - should never trip
+            MainActivity.warn("Authentication error on site stats load (should not happen)", waex);
+        }
     }
 
     private void handleSiteStats(final JSONObject json, final Handler handler) {

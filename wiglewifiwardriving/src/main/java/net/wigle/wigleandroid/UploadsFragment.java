@@ -167,9 +167,9 @@ public class UploadsFragment extends Fragment {
     }
 
     private void setupListView(final View view) {
-        if (listAdapter == null) {
+        //if (listAdapter == null) {
             listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow);
-        }
+        //}
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.uploads_list_view);
         listView.setAdapter(listAdapter);

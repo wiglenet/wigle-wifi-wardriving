@@ -215,9 +215,9 @@ public class RankStatsFragment extends Fragment {
     }
 
     private void setupListView(final View view) {
-        if (listAdapter == null) {
+        //if (listAdapter == null) {
             listAdapter = new RankListAdapter(getActivity().getApplicationContext(), R.layout.rankrow);
-        }
+        //}
         // always set our current list adapter
         final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
         listView.setAdapter(listAdapter);

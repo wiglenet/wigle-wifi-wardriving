@@ -254,4 +254,6 @@
     <string name="use_wigle_tiles">Utiliza WiGLE azulejos OSM</string>
     <string name="wigle_service">WiGLE Servicio Wifi</string>
     <string name="disable_toast">Desactiva toast pop-ups</string>
+    <string name="activate">activa ahora</string>
+
 </resources>

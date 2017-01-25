@@ -254,4 +254,5 @@
     <string name="use_wigle_tiles">Gebrûk WiGLE OSM-tegels</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Toast pop-ups uitschakelen</string>
+    <string name="activate">no aktivearje</string>
 </resources>

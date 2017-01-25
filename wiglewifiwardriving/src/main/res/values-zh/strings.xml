@@ -255,4 +255,5 @@
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
     <string name="activate">激活</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

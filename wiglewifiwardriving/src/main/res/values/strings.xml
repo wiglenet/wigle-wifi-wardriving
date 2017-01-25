@@ -319,4 +319,5 @@
     <string name="list_scanning_on">(Scanning turned on)</string>
     <string name="activate">activate now</string>
     <string name="title_activity_activate">ActivateActivity</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

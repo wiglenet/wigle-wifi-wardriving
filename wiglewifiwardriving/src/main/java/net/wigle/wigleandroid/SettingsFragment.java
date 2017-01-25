@@ -49,7 +49,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private static final int ANONYMOUS_DIALOG=113;
 
     public boolean allowRefresh = false;
-    public ViewGroup container;
 
     /** convenience, just get the darn new string */
     public static abstract class SetWatcher implements TextWatcher {
@@ -77,7 +76,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.settings, container, false);
-        this.container = container;
 
         // force media volume controls
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);

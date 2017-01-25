@@ -14,7 +14,7 @@
         />
 
     <TextView
-        android:text="visit https://wigle.net/activate for activation code"
+        android:text="@string/setting_activate_prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

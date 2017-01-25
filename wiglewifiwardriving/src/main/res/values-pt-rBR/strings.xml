@@ -267,4 +267,5 @@
     <string name="register">Registre-se</string>
     <string name="at">em</string>
     <string name="activate">ative agora</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

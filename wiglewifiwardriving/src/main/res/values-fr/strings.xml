@@ -312,4 +312,5 @@
     <string name="rank_month">Classements mensuels</string>
     <string name="all_time_title">WiFi découverts depuis tous les temps</string>
     <string name="activate">Activer maintenant</string>
+    <string name="setting_activate_prompt">visiter https://wigle.net/activate pour votre code utilisateur</string>
 </resources>

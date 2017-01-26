@@ -31,8 +31,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- confine camera activation to Marshmallow and up. -->
+    <!-- NB: this functionality exists as early as JellyBean (4.2.2), but not worth the thrash -->
+    <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
 
     <permission
         android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE"

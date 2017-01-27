@@ -357,7 +357,7 @@ public final class DatabaseHelper extends Thread {
             db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
         }
         else {
-            db = context.openOrCreateDatabase( dbFilename, MAX_PRIORITY, null );
+            db = context.openOrCreateDatabase( dbFilename, Context.MODE_PRIVATE, null );
         }
 
         try {

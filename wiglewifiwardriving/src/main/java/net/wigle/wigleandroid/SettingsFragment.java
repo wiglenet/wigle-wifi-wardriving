@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.Arrays;
 
 import android.annotation.SuppressLint;
@@ -8,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -159,11 +162,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
         final String atString = getString(R.string.at);
+        final String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
+                "</a> " + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>";
         try {
-            register.setText(Html.fromHtml("<a href='https://wigle.net/gps/gps/main/register'>" + registerString + "</a> "
-                    + atString + " <a href='https://wigle.net/gps/gps/main/register'>WiGLE.net</a>"));
-        }
-        catch (Exception ex) {
+            if (Build.VERSION.SDK_INT >= 24) {
+                //Html.fromHtml(String, int) // for 24 api and more
+                register.setText(Html.fromHtml(registerBlurb,
+                        Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                register.setText(Html.fromHtml(registerBlurb));
+            }
+        } catch (Exception ex) {
             register.setText(registerString + " " + atString + " WiGLE.net");
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
@@ -173,9 +182,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         user.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
-                // ListActivity.debug("user: " + s);
-                editor.putString( ListFragment.PREF_USERNAME, s.trim() );
-                editor.apply();
+                credentialsUpdate(ListFragment.PREF_USERNAME, editor, prefs, s);
+
                 // might have to remove or show register link
                 updateRegister(view);
             }
@@ -198,9 +206,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         pass.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
-                // ListActivity.debug("pass: " + s);
-                editor.putString( ListFragment.PREF_PASSWORD, s.trim() );
-                editor.apply();
+                credentialsUpdate(ListFragment.PREF_PASSWORD, editor, prefs, s);
             }
         });
 
@@ -341,6 +347,51 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 // poof
                 register.setEnabled(false);
                 register.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    /**
+     * The little dance we do when we update username or password, removing old creds/cache
+     * @param key the ListFragment key (u or p)
+     * @param editor prefs editor reference
+     * @param prefs preferences for checks
+     * @param newValue the new value for the username or pass
+     */
+    public void credentialsUpdate(String key, Editor editor, SharedPreferences prefs, String newValue) {
+        //DEBUG: MainActivity.info(key + ": " + newValue.trim());
+        String currentValue = prefs.getString(key, "");
+        if (currentValue.equals(newValue.trim())) {
+            return;
+        }
+        editor.putString( key, newValue.trim() );
+        // ALIBI: if the u|p changes, force refetch token
+        editor.remove(ListFragment.PREF_AUTHNAME);
+        editor.remove(ListFragment.PREF_TOKEN);
+        editor.apply();
+        this.clearCachefiles();
+    }
+
+
+    /**
+     * clear cache files (i.e. on creds change)
+     */
+    private void clearCachefiles() {
+        final File cacheDir = new File(MainActivity.getSDPath());
+        final File[] cacheFiles = cacheDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept( final File dir,
+                                   final String name ) {
+                return name.matches( ".*-cache\\.json" );
+            }
+        } );
+        if (null != cacheFiles) {
+            for (File cache: cacheFiles) {
+                //DEBUG: MainActivity.info("deleting: " + cache.getAbsolutePath());
+                boolean deleted = cache.delete();
+                if (!deleted) {
+                    MainActivity.warn("failed to delete cache file: "+cache.getAbsolutePath());
+                }
             }
         }
     }

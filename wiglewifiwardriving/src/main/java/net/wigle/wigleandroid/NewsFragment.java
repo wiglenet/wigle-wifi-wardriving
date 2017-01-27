@@ -38,17 +38,17 @@ public class NewsFragment extends Fragment {
     // {"success": true,"results": [
     // {"link":"http://wigle.net/phpbb/viewtopic.php?p=8783",
     // "subject":"250 Million Wifi Networks",
-    // "postDateTime":"Sat Apr 30 15:31:41 2016",
-    // "post":"Major congrats to user 'redlukas' can say &quot;quarter billion&quot;",
-    // "id":"8783",
+    // "postDate":"Sat Apr 30 15:31:41 2016",
+    // "story":"Major congrats to user 'redlukas' can say &quot;quarter billion&quot;",
+    // "storyId":"8783",
     // "more":false,
-    // "poster":"bobzilla"}
+    // "userName":"bobzilla"}
     private static final String RESULT_LIST_KEY = "results";
 
     private static final String KEY_SUBJECT = "subject";
-    private static final String KEY_POST = "post";
-    private static final String KEY_DATE_TIME = "postDateTime";
-    private static final String KEY_POSTER = "poster";
+    private static final String KEY_POST = "story";
+    private static final String KEY_DATE_TIME = "postDate";
+    private static final String KEY_POSTER = "userName";
     private static final String KEY_LINK = "link";
 
     private static final String[] ALL_ROW_KEYS = new String[] {
@@ -89,13 +89,19 @@ public class NewsFragment extends Fragment {
         handler.setNewsListAdapter(listAdapter);
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "news-cache.json", MainActivity.NEWS_URL, false, false, false,
+                ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {
                         handleNews(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            //unauthenticated call - should never trip
+            MainActivity.warn("Authentication error on news load (should not happen)", waex);
+        }
 
         return rootView;
     }

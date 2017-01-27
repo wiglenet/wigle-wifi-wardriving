@@ -113,13 +113,19 @@ public class SiteStatsFragment extends Fragment {
                 getResources());
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "site-stats-cache.json", MainActivity.SITE_STATS_URL, false, false, false,
+                ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache) {
                         handleSiteStats(json, handler);
                     }
                 });
-        task.startDownload(this);
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            //unauthenticated call - should never trip
+            MainActivity.warn("Authentication error on site stats load (should not happen)", waex);
+        }
     }
 
     private void handleSiteStats(final JSONObject json, final Handler handler) {

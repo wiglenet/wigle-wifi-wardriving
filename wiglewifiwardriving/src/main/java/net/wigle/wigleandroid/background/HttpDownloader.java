@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import android.location.Location;
@@ -26,7 +27,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
     }
 
     @Override
-    protected void subRun() throws IOException, InterruptedException {
+    protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
         Status status = Status.UNKNOWN;
         final Bundle bundle = new Bundle();
         try {
@@ -35,6 +36,8 @@ public class HttpDownloader extends AbstractBackgroundTask {
             status = validateUserPass( username, password );
             if ( status == null ) {
                 status = doDownload( username, password );
+            } else {
+                throw new WiGLEAuthException("Unable to authenticate "+username);
             }
 
         }
@@ -66,7 +69,7 @@ public class HttpDownloader extends AbstractBackgroundTask {
 
         final boolean setBoundary = false;
         final HttpURLConnection conn = HttpFileUploader.connect(
-                MainActivity.OBSERVED_URL, setBoundary );
+                MainActivity.OBSERVED_URL, setBoundary, ApiDownloader.REQUEST_POST );
         if (conn == null) {
             throw new IOException("No connection created");
         }

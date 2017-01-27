@@ -7,6 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.WiGLEAuthException;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -19,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.Toast;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -77,6 +81,12 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         catch ( InterruptedException ex ) {
             MainActivity.info( name + " interrupted: " + ex );
         }
+        catch ( final WiGLEAuthException waex) {
+            //DEBUG: MainActivity.info("auth error", waex);
+            Bundle errorBundle = new Bundle();
+            errorBundle.putCharSequence("AUTH_ERROR", waex.getMessage());
+            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+        }
         catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         }
@@ -97,7 +107,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.sendMessage(msg);
     }
 
-    protected abstract void subRun() throws IOException, InterruptedException;
+    protected abstract void subRun() throws IOException, InterruptedException, WiGLEAuthException;
 
     /** interrupt this task */
     public final void setInterrupted() {

@@ -181,9 +181,11 @@ public class WifiReceiver extends BroadcastReceiver {
 
         // have the gps listener to a self-check, in case it isn't getting updates anymore
         final GPSListener gpsListener = mainActivity.getGPSListener();
-        if (gpsListener != null) gpsListener.checkLocationOK();
-
-        final Location location = mainActivity.getGPSListener().getLocation();
+        Location location = null;
+        if (gpsListener != null) {
+            gpsListener.checkLocationOK();
+            location = gpsListener.getLocation();
+        }
 
         // save the location every minute, for later runs, or viewing map during loss of location.
         if (now - lastSaveLocationTime > 60000L && location != null) {

@@ -318,16 +318,15 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 return true;
             }
             case MENU_SCAN: {
-                boolean scanning = ! (main == null || main.isScanning());
-                final Editor edit = getActivity().getSharedPreferences( SHARED_PREFS, 0 ).edit();
-                edit.putBoolean(PREF_SCAN_RUNNING, scanning);
-                edit.apply();
-                String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
-                item.setTitle( name );
-                item.setIcon((main == null || main.isScanning())
-                        ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
-                handleScanChange( getView() );
-                if (main != null) main.handleScanChange();
+                if (main != null) {
+                    final boolean scanning = !main.isScanning();
+                    main.handleScanChange(scanning);
+                    String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
+                    item.setTitle(name);
+                    item.setIcon(scanning ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+                    handleScanChange(main, getView());
+                }
+
                 return true;
             }
             case MENU_FILTER:
@@ -352,8 +351,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         return false;
     }
 
-    private void handleScanChange( final View view ) {
-        MainActivity main = MainActivity.getMainActivity(this);
+    private void handleScanChange(final MainActivity main, final View view ) {
         final boolean isScanning = main == null || main.isScanning();
         MainActivity.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
@@ -496,8 +494,9 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
     private void setupLocation( final View view ) {
         // set on UI if we already have one
-        setLocationUI( MainActivity.getMainActivity( this ), view );
-        handleScanChange(view);
+        final MainActivity main = MainActivity.getMainActivity(this);
+        setLocationUI(main, view);
+        handleScanChange(main, view);
     }
 
     public void setLocationUI( final MainActivity main ) {
@@ -584,12 +583,16 @@ public final class ListFragment extends Fragment implements TransferListener, Di
             public void onClick( final View view ) {
                 final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
                 if (main == null) {return;}
-                final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
-                final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-                MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
+                makeUploadDialog(main);
             }
         });
+    }
+
+    public void makeUploadDialog(final MainActivity main) {
+        final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+        final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
+        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
     }
 
     @Override

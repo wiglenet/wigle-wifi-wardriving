@@ -73,7 +73,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         setName( name + "-" + getName() );
 
         try {
-            MainActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
+            MainActivity.info( "setting background thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
             Process.setThreadPriority( THREAD_PRIORITY );
 
             subRun();

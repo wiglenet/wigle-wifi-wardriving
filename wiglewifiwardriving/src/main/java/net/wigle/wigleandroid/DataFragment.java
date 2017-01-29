@@ -2,9 +2,9 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
+import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
@@ -36,6 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 /**
  * configure settings
@@ -311,21 +312,22 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 break;
             }
             case IMPORT_DIALOG: {
-                final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
-                if ( mainActivity != null ) {
+                final MainActivity mainActivity = MainActivity.getMainActivity(DataFragment.this);
+                if (mainActivity != null) {
                     mainActivity.setTransferring();
                 }
                 // actually need this Activity context, for dialogs
-                HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+                final ObservationImporter task = new ObservationImporter(getActivity(),
+                        ListFragment.lameStatic.dbHelper,
                         new TransferListener() {
                             @Override
                             public void transferComplete() {
-                                if ( mainActivity != null ) {
+                                if (mainActivity != null) {
                                     mainActivity.transferComplete();
                                 }
                             }
                         });
-                task.start();
+                task.startDownload(this);
                 break;
             }
             case ZERO_OUT_DIALOG: {

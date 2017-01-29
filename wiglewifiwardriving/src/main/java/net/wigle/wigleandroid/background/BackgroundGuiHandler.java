@@ -51,9 +51,9 @@ public class BackgroundGuiHandler extends Handler {
         synchronized ( lock ) {
             if (msg.what == AUTHENTICATION_ERROR) {
                 Toast.makeText(this.context, R.string.status_login_fail
-                        /*msg.getData().getString("AUTH_ERROR")*/, Toast.LENGTH_LONG).show();
-                return;
-            } else if (pd == null) {
+                        , Toast.LENGTH_LONG).show();
+            }
+            if (pd == null) {
                 // no dialog box, just return
                 return;
             }

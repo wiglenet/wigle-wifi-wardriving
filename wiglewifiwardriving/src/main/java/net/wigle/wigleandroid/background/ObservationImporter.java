@@ -25,33 +25,12 @@ import java.io.IOException;
  */
 
 public class ObservationImporter extends AbstractApiRequest {
-    private final TransferListener listener;
 
     public ObservationImporter(final FragmentActivity context,
-                               final DatabaseHelper dbHelper, final TransferListener listener) {
+                               final DatabaseHelper dbHelper, final ApiListener listener) {
         super(context, dbHelper, "HttpDL", "observed-cache.json", MainActivity.OBSERVED_URL, false,
-                true, true,
-                AbstractApiRequest.REQUEST_GET, true);
-        this.listener = listener;
-    }
-
-    public void startDownload(final Fragment fragment) {
-        // download token if needed
-        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(
-                ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        MainActivity.info("authname: " + authname);
-        if (beAnonymous && requiresLogin) {
-            MainActivity.info("anonymous, not running ApiDownloader: " + this);
-            return;
-        }
-        if (authname == null && doBasicLogin) {
-            MainActivity.info("No authname, going to request token");
-            downloadTokenAndStart(fragment);
-        } else {
-            start();
-        }
+                true, true, false,
+                AbstractApiRequest.REQUEST_GET, listener, true);
     }
 
     @Override
@@ -109,7 +88,7 @@ public class ObservationImporter extends AbstractApiRequest {
                 status = Status.EXCEPTION;
                 bundle.putString(BackgroundGuiHandler.ERROR, "ex problem: " + e);
             } finally {
-                listener.transferComplete();
+                listener.requestComplete(null, false);
             }
 
             if (status == null) {
@@ -124,6 +103,7 @@ public class ObservationImporter extends AbstractApiRequest {
         }
     }
 
+    @Override
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
                 null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,

@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
+import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
@@ -37,11 +38,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 /**
  * configure settings
  */
-public final class DataFragment extends Fragment implements TransferListener, DialogListener {
+public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
     private static final int MENU_EXIT = 11;
     private static final int MENU_ERROR_REPORT = 13;
@@ -167,8 +171,14 @@ public final class DataFragment extends Fragment implements TransferListener, Di
      * TransferListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         // nothing
+    }
+
+    @Override
+    public void transferComplete() {
+        // also nothing
     }
 
     private void setupCsvButtons( final View view ) {
@@ -319,15 +329,19 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 // actually need this Activity context, for dialogs
                 final ObservationImporter task = new ObservationImporter(getActivity(),
                         ListFragment.lameStatic.dbHelper,
-                        new TransferListener() {
+                        new ApiListener() {
                             @Override
-                            public void transferComplete() {
+                            public void requestComplete(JSONObject object, boolean cached) {
                                 if (mainActivity != null) {
                                     mainActivity.transferComplete();
                                 }
                             }
                         });
-                task.startDownload(this);
+                try {
+                    task.startDownload(this);
+                } catch (WiGLEAuthException waex) {
+                    //moot due to budle handling
+                }
                 break;
             }
             case ZERO_OUT_DIALOG: {

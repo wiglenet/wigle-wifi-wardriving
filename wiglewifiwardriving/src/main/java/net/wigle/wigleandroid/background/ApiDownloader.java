@@ -24,15 +24,13 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 
 public class ApiDownloader extends AbstractApiRequest {
-    private final ApiListener listener;
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String cacheFilename, final String url, final boolean doFormLogin,
                          final boolean doBasicLogin, final boolean requiresLogin,
                          final String connectionMethod, final ApiListener listener) {
         super(context, dbHelper, "ApiDL", cacheFilename, url, doFormLogin, doBasicLogin,
-                requiresLogin, connectionMethod, false);
-        this.listener = listener;
+                requiresLogin, true, connectionMethod, listener, false);
     }
 
     @Override
@@ -55,29 +53,7 @@ public class ApiDownloader extends AbstractApiRequest {
         }
     }
 
-    public void startDownload(final Fragment fragment) throws WiGLEAuthException {
-        // if we have cached data, call the handler with that
-        final JSONObject cache = getCached();
-        if (cache != null) listener.requestComplete(cache, true);
-        if (cacheOnly) return;
-
-        // download token if needed
-        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        MainActivity.info("authname: " + authname);
-        if (beAnonymous && requiresLogin) {
-            MainActivity.info("anonymous, not running ApiDownloader: " + this);
-            return;
-        }
-        if (authname == null && doBasicLogin) {
-            MainActivity.info("No authname, going to request token");
-            downloadTokenAndStart(fragment);
-        } else {
-            start();
-        }
-    }
-
+    @Override
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
                 null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,

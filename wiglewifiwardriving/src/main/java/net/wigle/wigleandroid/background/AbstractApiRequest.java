@@ -1,12 +1,14 @@
 package net.wigle.wigleandroid.background;
 
 import android.content.SharedPreferences;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Base64;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.WiGLEAuthException;
 
 import org.json.JSONObject;
 
@@ -32,7 +34,10 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     protected final boolean doFormLogin;
     protected final boolean doBasicLogin;
     protected final boolean requiresLogin;
+    protected final boolean useCacheIfPresent;
     protected boolean cacheOnly = false;
+    protected final ApiListener listener;
+
 
     public static final String REQUEST_GET = "GET";
     public static final String REQUEST_POST = "POST";
@@ -40,7 +45,8 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     public AbstractApiRequest(final FragmentActivity context, final DatabaseHelper dbHelper,
                               final String name, final String cacheFilename, final String url,
                               final boolean doFormLogin, final boolean doBasicLogin,
-                              final boolean requiresLogin, final String connectionMethod,
+                              final boolean requiresLogin, final boolean useCacheIfPresent,
+                              final String connectionMethod, final ApiListener listener,
                               final boolean createDialog) {
         super(context, dbHelper, name,createDialog);
         this.cacheFilename = cacheFilename;
@@ -49,7 +55,8 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         this.doFormLogin = doFormLogin;
         this.doBasicLogin = doBasicLogin;
         this.requiresLogin = requiresLogin;
-
+        this.useCacheIfPresent = useCacheIfPresent;
+        this.listener = listener;
     }
 
     public void setCacheOnly(final boolean cacheOnly) {
@@ -112,6 +119,32 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                     MainActivity.error("exception closing fos: " + ex, ex);
                 }
             }
+        }
+    }
+
+    public void startDownload(final Fragment fragment) throws WiGLEAuthException {
+        // if we have cached data, and are meant to use it, call the handler with that
+        if (useCacheIfPresent) {
+            final JSONObject cache = getCached();
+            if (cache != null) listener.requestComplete(cache, true);
+            if (cacheOnly) return;
+        }
+
+        // download token if needed
+        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(
+                ListFragment.SHARED_PREFS, 0);
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+        MainActivity.info("authname: " + authname);
+        if (beAnonymous && requiresLogin) {
+            MainActivity.info("anonymous, not running ApiRequest: " + this);
+            return;
+        }
+        if (authname == null && doBasicLogin) {
+            MainActivity.info("No authname, going to request token");
+            downloadTokenAndStart(fragment);
+        } else {
+            start();
         }
     }
 
@@ -185,4 +218,6 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             }
         }
     }
+
+    abstract void downloadTokenAndStart(final Fragment fragment);
 }

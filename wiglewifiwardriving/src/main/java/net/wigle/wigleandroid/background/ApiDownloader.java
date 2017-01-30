@@ -3,7 +3,6 @@ package net.wigle.wigleandroid.background;
 import android.content.SharedPreferences;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Base64;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
@@ -13,16 +12,11 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 
+/**
+ * general-purpose downloader for WiGLE API connections
+ */
 public class ApiDownloader extends AbstractApiRequest {
 
     public ApiDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
@@ -54,6 +48,9 @@ public class ApiDownloader extends AbstractApiRequest {
     }
 
     @Override
+    /**
+     * need to DRY this up vs. the bundle-notification in ObservationImporter
+     */
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
                 null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,

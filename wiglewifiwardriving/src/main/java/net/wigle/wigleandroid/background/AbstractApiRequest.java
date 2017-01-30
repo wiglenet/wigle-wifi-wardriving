@@ -23,9 +23,9 @@ import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 
 /**
+ * Abstract base class for WiGLE API connections
  * Created by arkasha on 1/28/17.
  */
-
 public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
     protected final String cacheFilename;

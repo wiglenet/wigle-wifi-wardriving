@@ -23,7 +23,6 @@ import java.io.IOException;
  * Use the ApiDL infra to get points from the v2 API
  * Created by arkasha on 1/28/17.
  */
-
 public class ObservationImporter extends AbstractApiRequest {
 
     public ObservationImporter(final FragmentActivity context,
@@ -104,6 +103,9 @@ public class ObservationImporter extends AbstractApiRequest {
     }
 
     @Override
+    /**
+     * need to DRY this up vs. the exception-based version in ApiDownloader
+     */
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
                 null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,

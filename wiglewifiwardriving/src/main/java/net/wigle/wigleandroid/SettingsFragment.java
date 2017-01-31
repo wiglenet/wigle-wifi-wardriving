@@ -251,8 +251,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
                 "</a> @WiGLE.net";
 
-        // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work. -rksh
-        if (Build.VERSION.SDK_INT >= 18) {
+        // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...
+        // but we're only supporting qr in v23+ via the uses-permission-sdk-23 tag -rksh
+        if (Build.VERSION.SDK_INT >= 23) {
             registerBlurb += " or <a href='net.wigle.wigleandroid://activate'>" + activateString +
                     "</a>";
         }

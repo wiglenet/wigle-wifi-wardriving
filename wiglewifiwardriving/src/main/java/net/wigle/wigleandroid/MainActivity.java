@@ -125,7 +125,6 @@ public final class MainActivity extends AppCompatActivity {
     static final Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
     public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
-    public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
     // no auth
     public static final String SITE_STATS_URL = "https://api.wigle.net/api/v2/stats/site";
@@ -134,6 +133,8 @@ public final class MainActivity extends AppCompatActivity {
     // api token auth
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/api/v2/file/transactions";
     public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
+    public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
+
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;

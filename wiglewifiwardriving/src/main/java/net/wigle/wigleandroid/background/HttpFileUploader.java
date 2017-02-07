@@ -135,6 +135,7 @@ final class HttpFileUploader {
      */
     public static String upload( final String urlString, final String filename, final String fileParamName,
                                  final FileInputStream fileInputStream, final Map<String,String> params,
+                                 final PreConnectConfigurator preConnectConfigurator,
                                  final Handler handler, final long filesize)
                                 throws IOException {
 
@@ -143,7 +144,8 @@ final class HttpFileUploader {
 
         try {
             final boolean setBoundary = true;
-            conn = connect(urlString, setBoundary, ApiDownloader.REQUEST_POST);
+            conn = connect(urlString, setBoundary, preConnectConfigurator,
+                    ApiDownloader.REQUEST_POST);
             if (conn == null) {
                 throw new IOException("No connection for: " + urlString);
             }
@@ -204,7 +206,7 @@ final class HttpFileUploader {
             while ( byteswritten < filesize ) {
                 final long bytes = fc.transferTo( byteswritten, chunk, wbc );
                 if ( bytes <= 0 ) {
-                    MainActivity.info( "giving up transfering file. bytes: " + bytes );
+                    MainActivity.info( "giving up transferring file. bytes: " + bytes );
                     break;
                 }
                 byteswritten += bytes;

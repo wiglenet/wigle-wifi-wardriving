@@ -166,7 +166,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "</a> " + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>";
         try {
             if (Build.VERSION.SDK_INT >= 24) {
-                //Html.fromHtml(String, int) // for 24 api and more
                 register.setText(Html.fromHtml(registerBlurb,
                         Html.FROM_HTML_MODE_LEGACY));
             } else {
@@ -364,7 +363,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (currentValue.equals(newValue.trim())) {
             return;
         }
-        editor.putString( key, newValue.trim() );
+        if (newValue.trim().isEmpty()) {
+            //ALIBI: empty values should unset
+            editor.remove(key);
+        } else {
+            editor.putString(key, newValue.trim());
+        }
         // ALIBI: if the u|p changes, force refetch token
         editor.remove(ListFragment.PREF_AUTHNAME);
         editor.remove(ListFragment.PREF_TOKEN);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.KmlWriter;
@@ -292,17 +293,15 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         switch (dialogId) {
             case CSV_RUN_DIALOG: {
                 // actually need this Activity context, for dialogs
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteRunOnly();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, false, true);
+                observationUploader.start();
                 break;
             }
             case CSV_DB_DIALOG: {
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteWholeDb();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, true, false);
+                observationUploader.start();
                 break;
             }
             case KML_RUN_DIALOG: {
@@ -340,7 +339,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 try {
                     task.startDownload(this);
                 } catch (WiGLEAuthException waex) {
-                    //moot due to budle handling
+                    //moot due to bundle handling
                 }
                 break;
             }

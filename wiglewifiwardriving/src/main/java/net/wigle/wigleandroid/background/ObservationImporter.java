@@ -145,5 +145,4 @@ public class ObservationImporter extends AbstractApiRequest {
                 });
         task.start();
     }
-
 }

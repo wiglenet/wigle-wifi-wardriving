@@ -65,6 +65,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
@@ -110,7 +111,7 @@ public final class MainActivity extends AppCompatActivity {
         TTS tts;
         boolean inEmulator;
         PhoneState phoneState;
-        FileUploaderTask fileUploaderTask;
+        ObservationUploader observationUploader;
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
@@ -124,7 +125,6 @@ public final class MainActivity extends AppCompatActivity {
 
     static final Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
-    public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
     // no auth
     public static final String SITE_STATS_URL = "https://api.wigle.net/api/v2/stats/site";
@@ -134,6 +134,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/api/v2/file/transactions";
     public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
+    public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
 
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
@@ -216,8 +217,8 @@ public final class MainActivity extends AppCompatActivity {
             // tell those that need it that we have a new context
             state.gpsListener.setMainActivity(this);
             state.wifiReceiver.setMainActivity(this);
-            if (state.fileUploaderTask != null) {
-                state.fileUploaderTask.setContext(this);
+            if (state.observationUploader != null) {
+                state.observationUploader.setContext(this);
             }
         } else {
             info("MAIN: creating new state");
@@ -1683,7 +1684,7 @@ public final class MainActivity extends AppCompatActivity {
         MainActivity.info("transfer complete");
         // start a scan to get the ball rolling again if this is non-stop mode
         scheduleScan();
-        state.fileUploaderTask = null;
+        state.observationUploader = null;
     }
 
     public void setLocationUI() {
@@ -1738,9 +1739,9 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // interrupt this just in case
-        final FileUploaderTask fileUploaderTask = state.fileUploaderTask;
-        if (fileUploaderTask != null) {
-            fileUploaderTask.setInterrupted();
+        final ObservationUploader observationUploader = state.observationUploader;
+        if (observationUploader != null) {
+            observationUploader.setInterrupted();
         }
 
         if (state.gpsListener != null) {

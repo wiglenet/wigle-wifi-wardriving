@@ -32,7 +32,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.MainActivity.State;
+import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -40,10 +42,12 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
 
+import org.json.JSONObject;
+
 import java.text.NumberFormat;
 import java.util.Set;
 
-public final class ListFragment extends Fragment implements TransferListener, DialogListener {
+public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
@@ -614,18 +618,24 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         final State state = main.getState();
         main.setTransferring();
         // actually need this Activity context, for dialogs
-        state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
-        state.fileUploaderTask.start();
+        state.observationUploader = new ObservationUploader(main,
+                ListFragment.lameStatic.dbHelper, this, false, false, true);
+        try {
+            state.observationUploader.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.warn("Authentication failure on run upload");
+        }
     }
 
     /**
-     * TransferListener interface
+     * ApiListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         final MainActivity main = MainActivity.getMainActivity( this );
         if (main == null) {
-            MainActivity.warn("No main for transferComplete");
+            MainActivity.warn("No main for requestComplete");
         }
         else {
             main.transferComplete();

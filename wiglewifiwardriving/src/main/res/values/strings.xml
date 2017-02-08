@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation" >
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
@@ -319,5 +317,7 @@
     <string name="prevrank_title">User Ranking Last Month</string>
     <string name="prevmonthrank_title">Month Ranking Last Month</string>
     <string name="list_scanning_on">(Scanning turned on)</string>
-
+    <string name="activate">activate now</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
+    <string name="title_activity_activate">Scan to activate</string>
 </resources>

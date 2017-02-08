@@ -274,6 +274,7 @@ public class RankStatsFragment extends Fragment {
                         (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
                 swipeRefreshLayout.setRefreshing(false);
             }
+            //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
         }
     }
 

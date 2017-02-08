@@ -266,4 +266,6 @@
     <string name="map_needs_playservice">Карта требует Google Play Service</string>
     <string name="register">Зарегистрированный</string>
     <string name="at">на</string>
+    <string name="activate">Активировать сейчас</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

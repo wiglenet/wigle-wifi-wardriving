@@ -295,4 +295,6 @@
     <string name="gps_permission">GPS (Localizzazione precisa)</string>
     <string name="cell_permission">GSM (Localizzazione grossolana)</string>
     <string name="allow_storage">Per impostazione predefinita, il database à posizionato sull\'unità esterna, si prega di consentire la scrittura sui supporti/file</string>
+    <string name="activate">attivate ora</string>
+    <string name="setting_activate_prompt">vai a https://wigle.net/activate per il tuo codice</string>
 </resources>

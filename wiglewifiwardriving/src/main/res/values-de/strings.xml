@@ -316,4 +316,6 @@
     <string name="not_user_centric">Top Ränge</string>
     <string name="prevrank_title">Rang letzter Monat</string>
     <string name="prevmonthrank_title">Monatsrang letzter Monat</string>
+    <string name="activate">jetzt aktivieren</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

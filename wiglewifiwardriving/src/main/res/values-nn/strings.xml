@@ -295,5 +295,6 @@
     <string name="gps_permission">GPS (Fine Location)</string>
     <string name="cell_permission">Cell Location (Coarse Location)</string>
     <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
-
+    <string name="activate">activate now</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
 </resources>

@@ -48,6 +48,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
 
+    public boolean allowRefresh = false;
+
     /** convenience, just get the darn new string */
     public static abstract class SetWatcher implements TextWatcher {
         @Override
@@ -82,8 +84,92 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearlayout);
         linearLayout.setFocusableInTouchMode(true);
         linearLayout.requestFocus();
+        updateView(view);
+        return view;
+    }
 
-        // get prefs
+    @SuppressLint("SetTextI18n")
+    @Override
+    public void handleDialog(final int dialogId) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Editor editor = prefs.edit();
+        final View view = getView();
+
+        switch (dialogId) {
+            case DONATE_DIALOG: {
+                editor.putBoolean(ListFragment.PREF_DONATE, true);
+                editor.apply();
+
+                if (view != null) {
+                    final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+                    donate.setChecked(true);
+                }
+                // poof
+                eraseDonate();
+                break;
+            }
+            case ANONYMOUS_DIALOG: {
+                // turn anonymous
+                if (view != null) {
+                    final EditText user = (EditText) view.findViewById(R.id.edit_username);
+                    final EditText pass = (EditText) view.findViewById(R.id.edit_password);
+                    user.setEnabled(false);
+                    pass.setEnabled(false);
+                }
+                editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
+                editor.apply();
+
+                if (view != null) {
+                    final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
+                    be_anonymous.setChecked(true);
+
+                    // might have to remove or show register link
+                    updateRegister(view);
+                }
+
+                break;
+            }
+            default:
+                MainActivity.warn("Settings unhandled dialogId: " + dialogId);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        MainActivity.info("resume settings.");
+
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        // donate
+        final boolean isDonate = prefs.getBoolean(ListFragment.PREF_DONATE, false);
+        if ( isDonate ) {
+            eraseDonate();
+        }
+        super.onResume();
+        MainActivity.info("Resume with allow: "+allowRefresh);
+        if (allowRefresh) {
+            allowRefresh = false;
+            final View view = getView();
+
+            updateView(view);
+
+            //ALIBI: what doesn't work here:
+            //does not successfully reload
+            //getFragmentManager().beginTransaction().replace(this.container.getId(),this).commit();
+
+            // WTF: actually re-pauses and resumes.
+            //getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+        }
+        getActivity().setTitle(R.string.settings_app_name);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MainActivity.info("Pause; setting allowRefresh");
+        allowRefresh = true;
+    }
+
+    private void updateView(final View view) {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
@@ -108,7 +194,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     // confirm
                     MainActivity.createConfirmation( getActivity(),
                             getString(R.string.donate_question) + "\n\n"
-                            + getString(R.string.donate_explain),
+                                    + getString(R.string.donate_explain),
                             MainActivity.SETTINGS_TAB_POS, DONATE_DIALOG);
                 }
                 else {
@@ -161,9 +247,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         // register link
         final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
-        final String atString = getString(R.string.at);
-        final String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
-                "</a> " + atString + " <a href='https://wigle.net/register'>WiGLE.net</a>";
+        final String activateString = getString(R.string.activate);
+        String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
+                "</a> @WiGLE.net";
+
+        // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...
+        // but we're only supporting qr in v23+ via the uses-permission-sdk-23 tag -rksh
+        if (Build.VERSION.SDK_INT >= 23) {
+            registerBlurb += " or <a href='net.wigle.wigleandroid://activate'>" + activateString +
+                    "</a>";
+        }
         try {
             if (Build.VERSION.SDK_INT >= 24) {
                 register.setText(Html.fromHtml(registerBlurb,
@@ -172,7 +265,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 register.setText(Html.fromHtml(registerBlurb));
             }
         } catch (Exception ex) {
-            register.setText(registerString + " " + atString + " WiGLE.net");
+            register.setText(registerString + " @WiGLE.net");
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
         updateRegister(view);
@@ -266,69 +359,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
-
-        return view;
-    }
-
-    @SuppressLint("SetTextI18n")
-    @Override
-    public void handleDialog(final int dialogId) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final Editor editor = prefs.edit();
-        final View view = getView();
-
-        switch (dialogId) {
-            case DONATE_DIALOG: {
-                editor.putBoolean(ListFragment.PREF_DONATE, true);
-                editor.apply();
-
-                if (view != null) {
-                    final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
-                    donate.setChecked(true);
-                }
-                // poof
-                eraseDonate();
-                break;
-            }
-            case ANONYMOUS_DIALOG: {
-                // turn anonymous
-                if (view != null) {
-                    final EditText user = (EditText) view.findViewById(R.id.edit_username);
-                    final EditText pass = (EditText) view.findViewById(R.id.edit_password);
-                    user.setEnabled(false);
-                    pass.setEnabled(false);
-                }
-                editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
-                editor.apply();
-
-                if (view != null) {
-                    final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
-                    be_anonymous.setChecked(true);
-
-                    // might have to remove or show register link
-                    updateRegister(view);
-                }
-
-                break;
-            }
-            default:
-                MainActivity.warn("Settings unhandled dialogId: " + dialogId);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        MainActivity.info("resume settings.");
-
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        // donate
-        final boolean isDonate = prefs.getBoolean(ListFragment.PREF_DONATE, false);
-        if ( isDonate ) {
-            eraseDonate();
-        }
-
-        super.onResume();
-        getActivity().setTitle(R.string.settings_app_name);
     }
 
     private void updateRegister(final View view) {

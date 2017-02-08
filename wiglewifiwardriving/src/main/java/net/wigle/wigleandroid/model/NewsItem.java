@@ -77,11 +77,9 @@ public final class NewsItem {
         String htmlBreaks = "";
         for (String s: chunked) {
             htmlBreaks += "<p>"+s+"</p>";
-            MainActivity.info(htmlBreaks);
         }
         for (int i = 0; i < format_search.length; i++) {
             htmlBreaks = htmlBreaks.replaceAll(format_search[i], format_replace[i]);
-            MainActivity.info(htmlBreaks);
         }
         if (Build.VERSION.SDK_INT >= 24) {
             return Html.fromHtml(htmlBreaks,

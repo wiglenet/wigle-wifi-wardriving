@@ -56,7 +56,7 @@ import java.util.zip.GZIPOutputStream;
  * Created by arkasha on 2/6/17.
  */
 
-public class ObservationUploader extends AbstractApiRequest {
+public class ObservationUploader extends AbstractProgressApiRequest {
 
     private static final String COMMA = ",";
     private static final String NEWLINE = "\n";
@@ -110,50 +110,6 @@ public class ObservationUploader extends AbstractApiRequest {
             listener.requestComplete(null, false);
         }
 
-    }
-
-    @Override
-    /**
-     * need to DRY this up vs. the exception-based version in ApiDownloader
-     */
-    protected void downloadTokenAndStart(final Fragment fragment) {
-        final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache)
-                            throws WiGLEAuthException {
-                        try {
-                            // {"success": true, "authname": "AID...", "token": "..."}
-                            if (json.getBoolean("success")) {
-                                final String authname = json.getString("authname");
-                                final String token = json.getString("token");
-                                final SharedPreferences prefs = fragment.getContext()
-                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                                final SharedPreferences.Editor edit = prefs.edit();
-                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
-                                edit.putString(ListFragment.PREF_TOKEN, token);
-                                edit.apply();
-                                // execute ourselves, the pending task
-                                start();
-                            } else if (json.has("credential_0")) {
-                                String message = "login failed for " +
-                                        json.getString("credential_0");
-                                MainActivity.warn(message);
-                                final Bundle bundle = new Bundle();
-                                sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                            } else {
-                                final Bundle bundle = new Bundle();
-                                sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                            }
-                        }
-                        catch (final JSONException ex) {
-                            final Bundle bundle = new Bundle();
-                            sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                        }
-                    }
-                });
-        task.start();
     }
 
     private void doRun() throws InterruptedException, WiGLEAuthException {
@@ -231,7 +187,7 @@ public class ObservationUploader extends AbstractApiRequest {
                         Base64.NO_WRAP) : null;
 
             // don't upload empty files
-            if ( countStats.lineCount == 0 && ! "bobzilla".equals(userName) ) {
+            if ( countStats.lineCount == 0 && ! "ark-mobile".equals(userName) ) {
                 return Status.EMPTY_FILE;
             }
             MainActivity.info("preparing upload...");

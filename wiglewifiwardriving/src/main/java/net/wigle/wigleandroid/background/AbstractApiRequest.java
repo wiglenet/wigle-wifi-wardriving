@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 
 /**
@@ -43,6 +44,8 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     public static final String REQUEST_GET = "GET";
     public static final String REQUEST_POST = "POST";
 
+    public static final String BOUNDARY = "*****";
+
     public AbstractApiRequest(final FragmentActivity context, final DatabaseHelper dbHelper,
                               final String name, final String cacheFilename, final String url,
                               final boolean doFormLogin, final boolean doBasicLogin,
@@ -58,6 +61,93 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         this.requiresLogin = requiresLogin;
         this.useCacheIfPresent = useCacheIfPresent;
         this.listener = listener;
+    }
+
+    public static HttpURLConnection connect(String urlString, final boolean setBoundary,
+                                            final String connectionMethod) throws IOException {
+        return connect(urlString, setBoundary, null, connectionMethod);
+    }
+
+    public static HttpURLConnection connect(String urlString, final boolean setBoundary,
+                                            final PreConnectConfigurator preConnectConfigurator,
+                                            final String connectionMethod) throws IOException {
+        URL connectURL;
+        try{
+            connectURL = new URL( urlString );
+        }
+        catch( Exception ex ) {
+            MainActivity.error( "MALFORMED URL: " + ex, ex );
+            return null;
+        }
+
+        return createConnection(connectURL, setBoundary, preConnectConfigurator, connectionMethod);
+    }
+
+    private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
+                                                      final PreConnectConfigurator preConnectConfigurator,
+                                                      final String connectionMethod)
+            throws IOException {
+
+        String javaVersion = "unknown";
+        try {
+            javaVersion =  System.getProperty("java.vendor") + " " +
+                    System.getProperty("java.version") + ", jvm: " +
+                    System.getProperty("java.vm.vendor") + " " +
+                    System.getProperty("java.vm.name") + " " +
+                    System.getProperty("java.vm.version") + " on " +
+                    System.getProperty("os.name") + " " +
+                    System.getProperty("os.version") +
+                    " [" + System.getProperty("os.arch") + "]";
+        } catch (RuntimeException ignored) { }
+        final String userAgent = "WigleWifi ("+javaVersion+")";
+
+        // Open a HTTP connection to the URL
+        HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
+
+        // IFF it's a POST, Allow Outputs
+        if (ApiDownloader.REQUEST_POST.equals(connectionMethod)) {
+            conn.setDoOutput(true);
+            // Allow Inputs
+            conn.setDoInput(true);
+            conn.setRequestProperty("Connection", "Keep-Alive");
+            if ( setBoundary ) {
+                conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
+            }
+            else {
+                conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            }
+            // chunk large stuff
+            conn.setChunkedStreamingMode( 32*1024 );
+
+            // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
+            conn.setRequestProperty("Transfer-Encoding", "chunked");
+        }
+
+        // Don't use a cached copy.
+        conn.setUseCaches(false);
+
+        // Don't follow redirects.
+        conn.setInstanceFollowRedirects( false );
+
+        // Use the specified method.
+        conn.setRequestMethod(connectionMethod);
+        conn.setRequestProperty( "Accept-Encoding", "gzip" );
+        conn.setRequestProperty( "User-Agent", userAgent );
+
+        // 8 hours
+        conn.setReadTimeout(8*60*60*1000);
+
+        // allow caller to munge
+        if (preConnectConfigurator != null) {
+            preConnectConfigurator.configure(conn);
+        }
+
+        // connect
+        MainActivity.info( "about to connect" );
+        conn.connect();
+        MainActivity.info( "connected" );
+
+        return conn;
     }
 
     public void setCacheOnly(final boolean cacheOnly) {
@@ -182,7 +272,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             };
         }
 
-        final HttpURLConnection conn = HttpFileUploader.connect(url, setBoundary,
+        final HttpURLConnection conn = AbstractApiRequest.connect(url, setBoundary,
                 preConnectConfigurator, connectionMethod);
         if (conn == null) {
             throw new IOException("No connection created");

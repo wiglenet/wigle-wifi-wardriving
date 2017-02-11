@@ -34,7 +34,10 @@ import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UploadsFragment extends Fragment {
@@ -94,6 +97,17 @@ public class UploadsFragment extends Fragment {
     private UploadsListAdapter listAdapter;
     private RankDownloadHandler handler;
 
+    private static final Map<String, String> uploadStatusMap;
+    static {
+        Map<String, String> statusMap = new HashMap<String, String>();
+        statusMap.put("W", "upload_queued");
+        statusMap.put("I", "upload_parsing");
+        statusMap.put("T", "upload_trilaterating");
+        statusMap.put("S", "upload_stats");
+        statusMap.put("D", "upload_success");
+        statusMap.put("E", "upload_failed");
+        uploadStatusMap = Collections.unmodifiableMap(statusMap);
+    }
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
@@ -180,6 +194,16 @@ public class UploadsFragment extends Fragment {
 
     }
 
+    private String statusValue(String statusCode) {
+        String packageName = "net.wigle.wigleandroid";
+        int stringId =  getResources().getIdentifier("upload_unknown", "string", packageName);
+        if (uploadStatusMap.containsKey(statusCode)) {
+            stringId = getResources().getIdentifier(uploadStatusMap.get(statusCode), "string",
+                    packageName);
+        }
+        return getString(stringId);
+    }
+
     private final static class RankDownloadHandler extends DownloadHandler {
         private UploadsListAdapter uploadsListAdapter;
 
@@ -241,7 +265,7 @@ public class UploadsFragment extends Fragment {
                     rowBundle.putLong(key, row.getLong(key));
                 }
                 rowBundle.putString(KEY_TRANSID, row.getString(KEY_TRANSID));
-                rowBundle.putString(KEY_STATUS, row.getString(KEY_STATUS));
+                rowBundle.putString(KEY_STATUS, this.statusValue(row.getString(KEY_STATUS)));
                 resultList.add(rowBundle);
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);

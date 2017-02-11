@@ -187,7 +187,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                         Base64.NO_WRAP) : null;
 
             // don't upload empty files
-            if ( countStats.lineCount == 0 && ! "ark-mobile".equals(userName) ) {
+            if ( countStats.lineCount == 0 && ! "ark-mobile".equals(userName) &&
+                    ! "bobzilla".equals(userName) ) {
                 return Status.EMPTY_FILE;
             }
             MainActivity.info("preparing upload...");

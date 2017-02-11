@@ -23,7 +23,7 @@ import java.io.IOException;
  * Use the ApiDL infra to get points from the v2 API
  * Created by arkasha on 1/28/17.
  */
-public class ObservationImporter extends AbstractApiRequest {
+public class ObservationImporter extends AbstractProgressApiRequest {
 
     public ObservationImporter(final FragmentActivity context,
                                final DatabaseHelper dbHelper, final ApiListener listener) {
@@ -100,49 +100,5 @@ public class ObservationImporter extends AbstractApiRequest {
         } finally {
             sendBundledMessage(status.ordinal(), bundle);
         }
-    }
-
-    @Override
-    /**
-     * need to DRY this up vs. the exception-based version in ApiDownloader
-     */
-    protected void downloadTokenAndStart(final Fragment fragment) {
-        final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache)
-                            throws WiGLEAuthException {
-                        try {
-                            // {"success": true, "authname": "AID...", "token": "..."}
-                            if (json.getBoolean("success")) {
-                                final String authname = json.getString("authname");
-                                final String token = json.getString("token");
-                                final SharedPreferences prefs = fragment.getContext()
-                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                                final SharedPreferences.Editor edit = prefs.edit();
-                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
-                                edit.putString(ListFragment.PREF_TOKEN, token);
-                                edit.apply();
-                                // execute ourselves, the pending task
-                                start();
-                            } else if (json.has("credential_0")) {
-                                String message = "login failed for " +
-                                        json.getString("credential_0");
-                                MainActivity.warn(message);
-                                final Bundle bundle = new Bundle();
-                                sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                            } else {
-                                final Bundle bundle = new Bundle();
-                                sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                            }
-                        }
-                        catch (final JSONException ex) {
-                            final Bundle bundle = new Bundle();
-                            sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
-                        }
-                    }
-                });
-        task.start();
     }
 }

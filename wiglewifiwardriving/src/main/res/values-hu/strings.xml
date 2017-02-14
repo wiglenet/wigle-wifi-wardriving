@@ -256,4 +256,11 @@
     <string name="disable_toast">Felugró értesítések tiltása</string>
     <string name="activate">aktiváld most</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
+    <string name="upload_queued">Queued</string>
+    <string name="upload_parsing">Parsing…</string>
+    <string name="upload_trilaterating">Trilaterating…</string>
+    <string name="upload_stats">Final Stats…</string>
+    <string name="upload_success">Completed</string>
+    <string name="upload_failed">Failed</string>
+    <string name="upload_unknown">Unknown</string>
 </resources>

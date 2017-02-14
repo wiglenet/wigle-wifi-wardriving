@@ -319,5 +319,12 @@
     <string name="list_scanning_on">(Scanning turned on)</string>
     <string name="activate">activate now</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
+    <string name="upload_queued">Queued</string>
+    <string name="upload_parsing">Parsing…</string>
+    <string name="upload_trilaterating">Trilaterating…</string>
+    <string name="upload_stats">Final Stats…</string>
+    <string name="upload_success">Completed</string>
+    <string name="upload_failed">Failed</string>
+    <string name="upload_unknown">Unknown</string>
     <string name="title_activity_activate">Scan to activate</string>
 </resources>

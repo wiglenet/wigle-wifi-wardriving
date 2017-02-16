@@ -141,6 +141,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             dialog.setMessage(getString(Status.WRITING.getMessage()));
             dialog.setIndeterminate(true);
             dialog.setCancelable(true);
+            dialog.setCanceledOnTouchOutside(false);
             return dialog;
         }
 

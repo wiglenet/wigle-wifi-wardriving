@@ -55,7 +55,7 @@ public final class DatabaseHelper extends Thread {
     private static final double SMALL_LATLON_CHANGE = 0.0001D;
     private static final double MEDIUM_LATLON_CHANGE = 0.001D;
     private static final double BIG_LATLON_CHANGE = 0.01D;
-    private static final int LEVEL_CHANGE = 3;
+    private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi.sqlite";
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -688,7 +688,7 @@ public final class DatabaseHelper extends Thread {
         //    + " lastlat: " + lastlat + " lat: " + location.getLatitude()
         //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
         final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
-        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange);
+        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange;
 
         final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
@@ -698,7 +698,7 @@ public final class DatabaseHelper extends Thread {
         //    + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
         //    + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
 
-        if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy ) || levelChange) ) {
+        if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
             // MainActivity.info("inserting loc: " + network.getSsid() );
             insertLocation.bindString( 1, bssid );
             insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...

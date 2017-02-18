@@ -82,6 +82,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_LANGUAGE = "speechLanguage";
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
+    public static final String PREF_GPS_ACCURACY = "gpsAccuracyThreshold";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     public static final String PREF_DISTANCE_RUN = "distRun";

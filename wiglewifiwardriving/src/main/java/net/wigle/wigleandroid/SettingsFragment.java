@@ -353,6 +353,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         doSpinner( R.id.battery_kill_spinner, view, ListFragment.PREF_BATTERY_KILL_PERCENT,
                 MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName );
 
+        // GPS ACCURACY THRESHOLD spinner
+        final Long[] accuracyThreshold = new Long[]{ 4L,10L,20L,0L };
+        final String[] accuracyName = new String[]{ "High","Medium","Low",off };
+        doSpinner( R.id.gps_accuracy_spinner, view, ListFragment.PREF_GPS_ACCURACY,
+                MainActivity.DEFAULT_GPS_ACCURACY_THRESHOLD, accuracyThreshold, accuracyName );
+
         // reset wifi spinner
         final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
         final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,

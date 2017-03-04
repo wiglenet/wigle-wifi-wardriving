@@ -64,7 +64,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
@@ -80,6 +79,13 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -90,6 +96,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -294,9 +304,68 @@ public final class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             setupFragments();
         }
+
+        // rksh 20160202 - api/authuser secure preferences storage
+        checkInitKeystore();
+
         // show the list by default
         selectFragment(state.currentTab);
         info("onCreate setup complete");
+    }
+
+    /**
+     * migration method for viable APIs to switch to encrypted AUTH_TOKENs
+     */
+    private void checkInitKeystore() {
+        try {
+            final SharedPreferences prefs = getApplicationContext().
+                    getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
+                    TokenAccess.hasApiToken(prefs)) {
+                if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+                    // successful migration should remove the password value
+                    if (!prefs.getString(ListFragment.PREF_PASSWORD,
+                            "").isEmpty()) {
+                        final Editor editor = prefs.edit();
+                        editor.remove(ListFragment.PREF_PASSWORD);
+                        editor.apply();
+                    }
+                }
+            }
+        } catch (CertificateException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (KeyStoreException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (IOException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (NoSuchProviderException e){
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (UnrecoverableEntryException e) {
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            MainActivity.error("Encryption error", e);
+            e.printStackTrace();
+        }
     }
 
     private void setupPermissions() {
@@ -940,6 +1009,7 @@ public final class MainActivity extends AppCompatActivity {
     public void onStart() {
         MainActivity.info("MAIN: start.");
         super.onStart();
+
     }
 
     @Override

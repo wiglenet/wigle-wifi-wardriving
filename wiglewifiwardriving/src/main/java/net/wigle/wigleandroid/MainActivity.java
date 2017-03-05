@@ -317,54 +317,21 @@ public final class MainActivity extends AppCompatActivity {
      * migration method for viable APIs to switch to encrypted AUTH_TOKENs
      */
     private void checkInitKeystore() {
-        try {
-            final SharedPreferences prefs = getApplicationContext().
-                    getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
-                    TokenAccess.hasApiToken(prefs)) {
-                if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
-                    // successful migration should remove the password value
-                    if (!prefs.getString(ListFragment.PREF_PASSWORD,
-                            "").isEmpty()) {
-                        final Editor editor = prefs.edit();
-                        editor.remove(ListFragment.PREF_PASSWORD);
-                        editor.apply();
-                    }
+        final SharedPreferences prefs = getApplicationContext().
+                getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
+                TokenAccess.hasApiToken(prefs)) {
+            if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+                // successful migration should remove the password value
+                if (!prefs.getString(ListFragment.PREF_PASSWORD,
+                        "").isEmpty()) {
+                    final Editor editor = prefs.edit();
+                    editor.remove(ListFragment.PREF_PASSWORD);
+                    editor.apply();
                 }
+            } else {
+                MainActivity.info("Not able to upgrade key storage.");
             }
-        } catch (CertificateException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (KeyStoreException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (IOException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (InvalidAlgorithmParameterException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (NoSuchProviderException e){
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            MainActivity.error("Encryption error", e);
-            e.printStackTrace();
         }
     }
 

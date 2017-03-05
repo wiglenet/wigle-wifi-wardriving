@@ -228,23 +228,8 @@ public class TokenAccess {
      * @param prefs preferences from root context
      * @param context root context
      * @return true if successful encryption takes place, else false.
-     * @throws KeyStoreException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws NoSuchProviderException
-     * @throws InvalidAlgorithmParameterException
-     * @throws IllegalBlockSizeException
-     * @throws InvalidKeyException
-     * @throws BadPaddingException
-     * @throws UnrecoverableEntryException
-     * @throws NoSuchPaddingException
      */
-    public static boolean checkMigrateKeystoreVersion(SharedPreferences prefs, Context context)
-            throws KeyStoreException,
-            CertificateException, NoSuchAlgorithmException, IOException, NoSuchProviderException,
-            InvalidAlgorithmParameterException, IllegalBlockSizeException, InvalidKeyException,
-            BadPaddingException, UnrecoverableEntryException, NoSuchPaddingException {
+    public static boolean checkMigrateKeystoreVersion(SharedPreferences prefs, Context context) {
 
         if (prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) {
             MainActivity.info("[TOKEN] No auth token stored - no preference migration possible.");
@@ -257,85 +242,91 @@ public class TokenAccess {
             MainActivity.info("[TOKEN] No KeyStore support - no preference migration possible.");
             return false;
         } else {
+            try {
+                MainActivity.info("[TOKEN] Using Android Keystore; attempting to generate a new key.");
+                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
+                keyStore.load(null);
+                KeyPairGenerator kpg = KeyPairGenerator.getInstance(
+                        KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEYSTORE);
 
-            MainActivity.info("[TOKEN] Using Android Keystore; attempting to generate a new key.");
-            KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-            keyStore.load(null);
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance(
-                    KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEYSTORE);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                        MainActivity.info("Key present and up-to-date M - no action required.");
+                        return false;
+                    }
+                    MainActivity.info("[TOKEN] Initializing SDKv23 Key...");
+                    String token = "";
+                    if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
+                        //ALIBI: fetch token with V0 key if it's stored that way
+                        token = TokenAccess.getApiToken(prefs);
+                    }
+                    KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
+                            KEYSTORE_WIGLE_CREDS_KEY_V1,
+                            KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
+                            .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
+                            .build();
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                    MainActivity.info("Key present and up-to-date M - no action required.");
-                    return false;
+                    kpg.initialize(spec);
+                    kpg.generateKeyPair();
+
+                    if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
+                        MainActivity.info("[TOKEN] Upgrading from v0->v1 token...");
+                        if ((null == token) || token.isEmpty()) return false;
+                        keyStore.deleteEntry(KEYSTORE_WIGLE_CREDS_KEY_V0);
+                    } else {
+                        token = prefs.getString(ListFragment.PREF_TOKEN, "");
+                        MainActivity.info("[TOKEN] Encrypting token at v1...");
+                        if ((null == token) || token.isEmpty()) return false;
+                    }
+                    if (TokenAccess.setApiToken(prefs, token)) {
+                        MainActivity.info("[TOKEN] ...token set at v1.");
+                        return true;
+                    } else {
+                        MainActivity.error("[TOKEN] Failed token update.");
+                    }
+                } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
+                        MainActivity.info(
+                                "[TOKEN] Key present and up-to-date JB-MR2 - no action required.");
+                        return false;
+                    }
+                    MainActivity.info("[TOKEN] Initializing SDKv18 Key...");
+                    Calendar notBefore = Calendar.getInstance();
+                    Calendar notAfter = Calendar.getInstance();
+                    notAfter.add(Calendar.YEAR, 3);
+                    KeyPairGeneratorSpec spec = null;
+                    spec = new KeyPairGeneratorSpec.Builder(context)
+                            .setAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)
+                            // TODO: for some reason, type/size only supported >= SDKv19
+                            //.setKeyType(KeyProperties.KEY_ALGORITHM_RSA)
+                            //.setKeySize(4096)
+                            .setSubject(new X500Principal("CN=wigle"))
+                            .setSerialNumber(BigInteger.ONE)
+                            .setStartDate(notBefore.getTime())
+                            //TODO: does endDate for the generation cert => key expiration?
+                            .setEndDate(notAfter.getTime())
+                            .build();
+
+                    kpg.initialize(spec);
+                    kpg.generateKeyPair();
+
+                    String token = prefs.getString(ListFragment.PREF_TOKEN, "");
+                    if (token.isEmpty()) return false;
+                    MainActivity.info("[TOKEN] Encrypting token at v0...");
+
+                    if (TokenAccess.setApiToken(prefs, token)) {
+                        MainActivity.info("[TOKEN] ...token set at v0.");
+                        return true;
+                    } else {
+                        MainActivity.error("[TOKEN] ...Failed token encryption.");
+                    }
                 }
-                MainActivity.info("[TOKEN] Initializing SDKv23 Key...");
-                String token = "";
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                    //ALIBI: fetch token with V0 key if it's stored that way
-                    token = TokenAccess.getApiToken(prefs);
-                }
-                KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
-                    KEYSTORE_WIGLE_CREDS_KEY_V1,
-                    KeyProperties.PURPOSE_DECRYPT | KeyProperties.PURPOSE_ENCRYPT)
-                    .setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP)
-                    .build();
-
-                kpg.initialize(spec);
-                kpg.generateKeyPair();
-
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                    MainActivity.info("[TOKEN] Upgrading from v0->v1 token...");
-                    if ((null == token) || token.isEmpty()) return false;
-                    keyStore.deleteEntry(KEYSTORE_WIGLE_CREDS_KEY_V0);
-                } else {
-                    token = prefs.getString(ListFragment.PREF_TOKEN,"");
-                    MainActivity.info("[TOKEN] Encrypting token at v1...");
-                    if ((null == token) || token.isEmpty()) return false;
-                }
-                if (TokenAccess.setApiToken(prefs, token)) {
-                    MainActivity.info("[TOKEN] ...token set at v1.");
-                    return true;
-                } else {
-                    MainActivity.error("[TOKEN] Failed token update.");
-                }
-            } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                    MainActivity.info(
-                            "[TOKEN] Key present and up-to-date JB-MR2 - no action required.");
-                    return false;
-                }
-                MainActivity.info("[TOKEN] Initializing SDKv18 Key...");
-                Calendar notBefore = Calendar.getInstance();
-                Calendar notAfter = Calendar.getInstance();
-                notAfter.add(Calendar.YEAR, 3);
-                KeyPairGeneratorSpec spec = null;
-                spec = new KeyPairGeneratorSpec.Builder(context)
-                        .setAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)
-                        // TODO: for some reason, type/size only supported >= SDKv19
-                        //.setKeyType(KeyProperties.KEY_ALGORITHM_RSA)
-                        //.setKeySize(4096)
-                        .setSubject(new X500Principal("CN=wigle"))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(notBefore.getTime())
-                        //TODO: does endDate for the generation cert => key expiration?
-                        .setEndDate(notAfter.getTime())
-                        .build();
-
-                kpg.initialize(spec);
-                kpg.generateKeyPair();
-
-                String token = prefs.getString(ListFragment.PREF_TOKEN,"");
-                if (token.isEmpty()) return false;
-                MainActivity.info("[TOKEN] Encrypting token at v0...");
-
-                if (TokenAccess.setApiToken(prefs, token)) {
-                    MainActivity.info("[TOKEN] ...token set at v0.");
-                    return true;
-                } else {
-                    MainActivity.error("[TOKEN] ...Failed token encryption.");
-                }
+            } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
+                    IOException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
+                MainActivity.error("Upgrade of token storage failed: ", ex);
+                ex.printStackTrace();
+                return false;
             }
         }
         return false;

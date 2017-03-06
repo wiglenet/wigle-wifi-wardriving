@@ -79,13 +79,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -96,10 +89,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -320,7 +309,7 @@ public final class MainActivity extends AppCompatActivity {
         final SharedPreferences prefs = getApplicationContext().
                 getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
-                TokenAccess.hasApiToken(prefs)) {
+                TokenAccess.isApiTokenSet(prefs)) {
             if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
                 // successful migration should remove the password value
                 if (!prefs.getString(ListFragment.PREF_PASSWORD,

@@ -185,7 +185,7 @@ public class UploadsFragment extends Fragment {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (listAdapter == null) {
             listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow);
-        } else if (!listAdapter.isEmpty() && !TokenAccess.hasValidApiToken(prefs)) {
+        } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
             listAdapter.clear();
         }
         // always set our current list adapter

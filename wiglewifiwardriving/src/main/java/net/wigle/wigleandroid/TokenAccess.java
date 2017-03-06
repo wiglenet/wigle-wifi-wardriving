@@ -47,7 +47,7 @@ public class TokenAccess {
      * @param prefs
      * @return true if present, otherwise false
      */
-    public static boolean hasApiToken(SharedPreferences prefs) {
+    public static boolean isApiTokenSet(SharedPreferences prefs) {
         if (!prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) return true;
         return false;
     }
@@ -57,7 +57,7 @@ public class TokenAccess {
      * @param prefs
      * @return true if present, otherwise false
      */
-    public static boolean hasValidApiToken(SharedPreferences prefs) {
+    public static boolean hasApiToken(SharedPreferences prefs) {
         if (!prefs.getString(ListFragment.PREF_TOKEN,"").isEmpty()) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
 

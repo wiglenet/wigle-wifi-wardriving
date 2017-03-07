@@ -106,8 +106,11 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
     private void doRun() throws InterruptedException {
         final String username = getUsername();
         final String password = getPassword();
-        Status status = validateUserPass(username, password);
+        Status status = null;
         final Bundle bundle = new Bundle();
+        if (!validAuth()) {
+            status = validateUserPass(username, password);
+        }
         if ( status == null ) {
             status = doUpload( username, password, bundle );
         }

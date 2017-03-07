@@ -116,8 +116,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private void doRun() throws InterruptedException, WiGLEAuthException {
         final String username = getUsername();
         final String password = getPassword();
-        Status status = validateUserPass(username, password);
+
+        Status status = null;
         final Bundle bundle = new Bundle();
+        if (!validAuth()) {
+            status = validateUserPass(username, password);
+        }
         if ( status == null ) {
             status = doUpload(bundle);
         }

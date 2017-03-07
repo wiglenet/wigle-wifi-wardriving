@@ -194,6 +194,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.setContext(context);
     }
 
+    protected final boolean validAuth() {
+        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        if ( (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
+            return true;
+        }
+        return false;
+
+    }
+
+
     protected final String getUsername() {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
         String username = prefs.getString( ListFragment.PREF_USERNAME, "" );

@@ -37,9 +37,18 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-    <Button android:id="@+id/upload_button" android:layout_width="wrap_content" android:layout_height="fill_parent"
-		android:text="@string/upload_button" android:layout_weight="0"
-		android:paddingTop="10px" android:paddingBottom="10px"/>
+
+	<Button
+		android:id="@+id/upload_button"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:layout_marginBottom="2dp"
+		android:layout_marginLeft="2dp"
+		android:layout_marginTop="2dp"
+		android:layout_marginRight="6dp"
+		android:layout_weight="0"
+		android:background="@drawable/upload_button"
+		android:text="@string/upload_button" />
 	<LinearLayout
 	    android:orientation="vertical"
 	    android:layout_width="wrap_content"

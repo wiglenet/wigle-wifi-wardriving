@@ -327,4 +327,5 @@
     <string name="upload_failed">Failed</string>
     <string name="upload_unknown">Unknown</string>
     <string name="title_activity_activate">Scan to activate</string>
+    <string name="unknown_number">\?\?</string>
 </resources>

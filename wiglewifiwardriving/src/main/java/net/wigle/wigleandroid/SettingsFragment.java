@@ -9,9 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
@@ -38,6 +41,11 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.background.ApiDownloader;
+import net.wigle.wigleandroid.background.DownloadHandler;
+
+import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
+
 /**
  * configure settings
  */
@@ -47,6 +55,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private static final int MENU_ERROR_REPORT = 13;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
+    private static final int DEAUTHORIZE_DIALOG=114;
 
     public boolean allowRefresh = false;
 
@@ -129,6 +138,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
                 break;
             }
+            case DEAUTHORIZE_DIALOG: {
+                editor.remove(ListFragment.PREF_AUTHNAME);
+                editor.remove(ListFragment.PREF_TOKEN);
+                editor.apply();
+                this.updateView(view);
+                break;
+            }
             default:
                 MainActivity.warn("Settings unhandled dialogId: " + dialogId);
         }
@@ -203,6 +219,65 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+
+        final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
+        final TextView authUserDisplay = (TextView) view.findViewById(R.id.show_authuser);
+        final TextView authUserLabel = (TextView) view.findViewById(R.id.show_authuser_label);
+        final EditText passEdit = (EditText) view.findViewById(R.id.edit_password);
+        final TextView passEditLabel = (TextView) view.findViewById(R.id.edit_password_label);
+        final CheckBox showPass = (CheckBox) view.findViewById(R.id.showpassword);
+        final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
+        final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
+        final Button authButton = (Button) view.findViewById(R.id.authorize_client);
+        if (!authUser.isEmpty()) {
+            authUserDisplay.setText(authUser);
+            authUserDisplay.setVisibility(View.VISIBLE);
+            authUserLabel.setVisibility(View.VISIBLE);
+            if (!authToken.isEmpty()) {
+                deauthButton.setVisibility(View.VISIBLE);
+                deauthButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        MainActivity.createConfirmation( getActivity(),
+                                getString(R.string.deauthorize_confirm),
+                                MainActivity.SETTINGS_TAB_POS, DEAUTHORIZE_DIALOG );
+                    }
+                });
+                authButton.setVisibility(View.GONE);
+                passEdit.setVisibility(View.GONE);
+                passEditLabel.setVisibility(View.GONE);
+                showPass.setVisibility(View.GONE);
+            }
+        } else {
+            authUserDisplay.setVisibility(View.GONE);
+            authUserLabel.setVisibility(View.GONE);
+            deauthButton.setVisibility(View.GONE);
+            passEdit.setVisibility(View.VISIBLE);
+            passEditLabel.setVisibility(View.VISIBLE);
+            showPass.setVisibility(View.VISIBLE);
+            authButton.setVisibility(View.VISIBLE);
+            final Handler handler = new UserDownloadHandler(view, getActivity().getPackageName(),
+                    getResources(), this);
+            final UserStatsFragment.UserDownloadApiListener apiListener =
+                    new UserStatsFragment.UserDownloadApiListener(handler);
+            authButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
+                            "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                            ApiDownloader.REQUEST_GET,
+                            apiListener);
+                    try {
+
+                        task.startDownload(SettingsFragment.this);
+                    } catch (WiGLEAuthException waex) {
+                        MainActivity.info("User Stats Download Failed due to failed auth");
+                    }
+
+                    //TODO either authorize and update or show error
+                }
+            });
+        }
 
         // anonymous
         final CheckBox beAnonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
@@ -547,6 +622,33 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 break;
         }
         return false;
+    }
+
+    /**
+     * used for authentication - this seems really heavy
+     */
+    private final static class UserDownloadHandler extends DownloadHandler {
+        private SettingsFragment fragment;
+        private UserDownloadHandler(final View view, final String packageName,
+                                    final Resources resources, SettingsFragment settingsFragment) {
+            super(view, null, packageName, resources);
+            fragment = settingsFragment;
+        }
+
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            if (msg.what == MSG_USER_DONE) {
+                if (bundle.containsKey("error")) {
+                    //ALIBI: not doing anything more here, since the toast will alert.
+                    MainActivity.info("Settings auth unsuccessful");
+                } else {
+                    MainActivity.info("Settings auth successful");
+                    fragment.updateView(view);
+                }
+            }
+        }
     }
 
 }

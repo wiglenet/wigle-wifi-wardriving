@@ -24,36 +24,61 @@
     android:text="@string/username"
     />
 <EditText
-        android:id="@+id/edit_username"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text" />
+    android:id="@+id/edit_username"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:inputType="text" />
 
 <TextView
+    android:id="@+id/edit_password_label"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:text="@string/password"
 	/>
 <EditText
-        android:id="@+id/edit_password"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword" />
+    android:id="@+id/edit_password"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:inputType="textPassword" />
+<TextView
+    android:id="@+id/show_authuser_label"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="@string/auth_username"
+	android:visibility="gone" />
+<TextView
+	android:id="@+id/show_authuser"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:inputType="text"
+	android:visibility="gone" />
+<Button
+	android:id="@+id/deauthorize_client"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:text="@string/deauthorize"
+	android:visibility="gone" />
+<Button
+    android:id="@+id/authorize_client"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:text="@string/authorize"
+    android:visibility="visible" />
 
 <CheckBox android:id="@+id/showpassword"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/setting_show_password" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/setting_show_password" />
 
 <CheckBox android:id="@+id/be_anonymous"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/be_anonymous" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/be_anonymous" />
 
 <CheckBox android:id="@+id/donate"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/donate" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/donate" />
 
 <LinearLayout
 	android:layout_width="fill_parent"
@@ -63,39 +88,39 @@
 	/>
 
 <CheckBox android:id="@+id/found_sound"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/found_sound" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/found_sound" />
 
 <CheckBox android:id="@+id/found_new_sound"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/found_new_sound" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/found_new_sound" />
 
 <CheckBox android:id="@+id/edit_showcurrent"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/show_current" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/show_current" />
 
 <CheckBox android:id="@+id/use_metric"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/use_metric" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/use_metric" />
 
 <CheckBox android:id="@+id/circle_size_map"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/circle_size_map" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/circle_size_map" />
 
 <CheckBox android:id="@+id/use_network_location"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/use_network_location" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/use_network_location" />
 
 <CheckBox android:id="@+id/disable_toast"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/disable_toast" />
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/disable_toast" />
 
 <LinearLayout
     android:orientation="horizontal"
@@ -275,8 +300,8 @@
 
 <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"
-		android:text="@string/speech_button" android:layout_weight="1"
-		android:paddingTop="10dip" android:paddingBottom="10dip"/>
+    android:text="@string/speech_button" android:layout_weight="1"
+    android:paddingTop="10dip" android:paddingBottom="10dip"/>
 
 </LinearLayout>
 </ScrollView>

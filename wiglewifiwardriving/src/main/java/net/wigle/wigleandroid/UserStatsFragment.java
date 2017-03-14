@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserStatsFragment extends Fragment {
-    private static final int MSG_USER_DONE = 101;
+    public static final int MSG_USER_DONE = 101;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_STATS = 202;
 

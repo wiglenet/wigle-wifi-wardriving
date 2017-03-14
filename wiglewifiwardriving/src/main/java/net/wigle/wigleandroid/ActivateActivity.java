@@ -16,6 +16,15 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableEntryException;
+import java.security.cert.CertificateException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * fetch wigle authentication tokens by scanning a barcode
@@ -117,10 +126,11 @@ public class ActivateActivity extends Activity {
                                     getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                             final SharedPreferences.Editor editor = prefs.edit();
                             editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
-                            editor.putString(ListFragment.PREF_AUTHNAME, tokens[1]);
-                            editor.putString(ListFragment.PREF_TOKEN, tokens[2]);
+                            //editor.putString(ListFragment.PREF_TOKEN, tokens[2]);
                             //TODO: should we actively unset prefs PREF_PASSWORD here?
                             editor.apply();
+                            TokenAccess.setApiToken(prefs, tokens[1]);
+
                             //DEBUG: Log.i(LOG_TAG, tokens[0]+" : "+tokens[1] + " : "+tokens[2] );
                             finish();
                         } else {

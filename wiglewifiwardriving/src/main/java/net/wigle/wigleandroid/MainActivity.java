@@ -64,7 +64,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import net.wigle.wigleandroid.background.FileUploaderTask;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
@@ -294,9 +293,35 @@ public final class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             setupFragments();
         }
+
+        // rksh 20160202 - api/authuser secure preferences storage
+        checkInitKeystore();
+
         // show the list by default
         selectFragment(state.currentTab);
         info("onCreate setup complete");
+    }
+
+    /**
+     * migration method for viable APIs to switch to encrypted AUTH_TOKENs
+     */
+    private void checkInitKeystore() {
+        final SharedPreferences prefs = getApplicationContext().
+                getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
+                TokenAccess.isApiTokenSet(prefs)) {
+            if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+                // successful migration should remove the password value
+                if (!prefs.getString(ListFragment.PREF_PASSWORD,
+                        "").isEmpty()) {
+                    final Editor editor = prefs.edit();
+                    editor.remove(ListFragment.PREF_PASSWORD);
+                    editor.apply();
+                }
+            } else {
+                MainActivity.info("Not able to upgrade key storage.");
+            }
+        }
     }
 
     private void setupPermissions() {
@@ -940,6 +965,7 @@ public final class MainActivity extends AppCompatActivity {
     public void onStart() {
         MainActivity.info("MAIN: start.");
         super.onStart();
+
     }
 
     @Override
@@ -1404,7 +1430,8 @@ public final class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
+                getSystemService(Context.WIFI_SERVICE);
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor edit = prefs.edit();
 

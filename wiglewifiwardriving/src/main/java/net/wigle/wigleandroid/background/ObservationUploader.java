@@ -19,6 +19,7 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 
@@ -115,8 +116,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private void doRun() throws InterruptedException, WiGLEAuthException {
         final String username = getUsername();
         final String password = getPassword();
-        Status status = validateUserPass(username, password);
+
+        Status status = null;
         final Bundle bundle = new Bundle();
+        if (!validAuth()) {
+            status = validateUserPass(username, password);
+        }
         if ( status == null ) {
             status = doUpload(bundle);
         }
@@ -181,7 +186,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 return Status.BAD_LOGIN;
             }
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
-            final String token = prefs.getString(ListFragment.PREF_TOKEN, null);
+            final String token = TokenAccess.getApiToken(prefs);
             final String encoded = (null != token && null != authname) ?
                     Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"),
                         Base64.NO_WRAP) : null;

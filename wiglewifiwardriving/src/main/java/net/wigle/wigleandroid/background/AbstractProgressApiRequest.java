@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
 import org.json.JSONException;
@@ -48,8 +49,8 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
                                         .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor edit = prefs.edit();
                                 edit.putString(ListFragment.PREF_AUTHNAME, authname);
-                                edit.putString(ListFragment.PREF_TOKEN, token);
                                 edit.apply();
+                                TokenAccess.setApiToken(prefs, token);
                                 // execute ourselves, the pending task
                                 start();
                             } else if (json.has("credential_0")) {

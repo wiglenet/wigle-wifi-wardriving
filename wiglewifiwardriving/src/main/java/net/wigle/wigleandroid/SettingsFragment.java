@@ -645,6 +645,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     MainActivity.info("Settings auth unsuccessful");
                 } else {
                     MainActivity.info("Settings auth successful");
+                    final SharedPreferences prefs = MainActivity.getMainActivity()
+                            .getApplicationContext().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                    final Editor editor = prefs.edit();
+                    editor.remove(ListFragment.PREF_PASSWORD);
+                    editor.apply();
                     fragment.updateView(view);
                 }
             }

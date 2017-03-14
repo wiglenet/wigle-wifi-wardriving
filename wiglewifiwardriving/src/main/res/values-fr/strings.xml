@@ -322,6 +322,6 @@
     <string name="upload_unknown">Inconnu</string>
     <string name="auth_username">Utilisateur Auth</string>
     <string name="deauthorize">Désautoriser (logout)</string>
-    <string name="deauthorize_confirm">Supprimer vos informations d'identification?</string>
+    <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>
     <string name="authorize">Autoriser (login)</string>
 </resources>

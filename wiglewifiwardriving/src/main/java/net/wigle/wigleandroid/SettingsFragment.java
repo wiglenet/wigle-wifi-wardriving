@@ -221,6 +221,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
 
         final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
+        final EditText user = (EditText) view.findViewById(R.id.edit_username);
         final TextView authUserDisplay = (TextView) view.findViewById(R.id.show_authuser);
         final TextView authUserLabel = (TextView) view.findViewById(R.id.show_authuser_label);
         final EditText passEdit = (EditText) view.findViewById(R.id.edit_password);
@@ -247,8 +248,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 passEdit.setVisibility(View.GONE);
                 passEditLabel.setVisibility(View.GONE);
                 showPass.setVisibility(View.GONE);
+                user.setEnabled(false);
+            } else {
+                user.setEnabled(true);
             }
         } else {
+            user.setEnabled(true);
             authUserDisplay.setVisibility(View.GONE);
             authUserLabel.setVisibility(View.GONE);
             deauthButton.setVisibility(View.GONE);
@@ -271,17 +276,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
                         task.startDownload(SettingsFragment.this);
                     } catch (WiGLEAuthException waex) {
-                        MainActivity.info("User Stats Download Failed due to failed auth");
+                        MainActivity.info("User authentication failed");
                     }
-
-                    //TODO either authorize and update or show error
                 }
             });
         }
 
         // anonymous
         final CheckBox beAnonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
-        final EditText user = (EditText) view.findViewById(R.id.edit_username);
         final EditText pass = (EditText) view.findViewById(R.id.edit_password);
         final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
         if ( isAnonymous ) {
@@ -646,10 +648,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 } else {
                     MainActivity.info("Settings auth successful");
                     final SharedPreferences prefs = MainActivity.getMainActivity()
-                            .getApplicationContext().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                            .getApplicationContext()
+                            .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                     final Editor editor = prefs.edit();
                     editor.remove(ListFragment.PREF_PASSWORD);
                     editor.apply();
+                    //TODO: order dependent -verify no risk of race condition here.
                     fragment.updateView(view);
                 }
             }

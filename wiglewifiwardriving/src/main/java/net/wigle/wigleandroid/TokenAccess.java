@@ -43,16 +43,6 @@ public class TokenAccess {
     public static final String ANDROID_KEYSTORE = "AndroidKeyStore";
 
     /**
-     * test presence of a necessary API key
-     * @param prefs
-     * @return true if present, otherwise false
-     */
-    public static boolean isApiTokenSet(SharedPreferences prefs) {
-        if (!prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) return true;
-        return false;
-    }
-
-    /**
      * test presence of a necessary API key, Keystore entry if applicable
      * @param prefs
      * @return true if present, otherwise false
@@ -230,10 +220,10 @@ public class TokenAccess {
      * @return true if successful encryption takes place, else false.
      */
     public static boolean checkMigrateKeystoreVersion(SharedPreferences prefs, Context context) {
-
+        boolean initOnly = false;
         if (prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) {
             MainActivity.info("[TOKEN] No auth token stored - no preference migration possible.");
-            return false;
+            initOnly = true;
         }
 
         if (android.os.Build.VERSION.SDK_INT <
@@ -243,7 +233,7 @@ public class TokenAccess {
             return false;
         } else {
             try {
-                MainActivity.info("[TOKEN] Using Android Keystore; attempting to generate a new key.");
+                MainActivity.info("[TOKEN] Using Android Keystore; check need for new key...");
                 KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
                 keyStore.load(null);
                 KeyPairGenerator kpg = KeyPairGenerator.getInstance(
@@ -251,9 +241,10 @@ public class TokenAccess {
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                        MainActivity.info("Key present and up-to-date M - no action required.");
+                        MainActivity.info("[TOKEN] Key present and up-to-date M - no change.");
                         return false;
                     }
+
                     MainActivity.info("[TOKEN] Initializing SDKv23 Key...");
                     String token = "";
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
@@ -277,13 +268,20 @@ public class TokenAccess {
                     } else {
                         token = prefs.getString(ListFragment.PREF_TOKEN, "");
                         MainActivity.info("[TOKEN] Encrypting token at v1...");
-                        if ((null == token) || token.isEmpty()) return false;
+                        if (token.isEmpty()) {
+                            MainActivity.info("[TOKEN] ...no token, returning after init.");
+                            return false;
+                        }
                     }
-                    if (TokenAccess.setApiToken(prefs, token)) {
-                        MainActivity.info("[TOKEN] ...token set at v1.");
-                        return true;
+                    if (!initOnly) {
+                        if (TokenAccess.setApiToken(prefs, token)) {
+                            MainActivity.info("[TOKEN] ...token set at v1.");
+                            return true;
+                        } else {
+                            MainActivity.error("[TOKEN] Failed token update.");
+                        }
                     } else {
-                        MainActivity.error("[TOKEN] Failed token update.");
+                        MainActivity.error("[TOKEN] v1 Keystore initialized, but no token present.");
                     }
                 } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
@@ -312,19 +310,26 @@ public class TokenAccess {
                     kpg.generateKeyPair();
 
                     String token = prefs.getString(ListFragment.PREF_TOKEN, "");
-                    if (token.isEmpty()) return false;
+                    if (token.isEmpty()) {
+                        MainActivity.info("[TOKEN] ...no token, returning after init.");
+                        return false;
+                    }
                     MainActivity.info("[TOKEN] Encrypting token at v0...");
 
-                    if (TokenAccess.setApiToken(prefs, token)) {
-                        MainActivity.info("[TOKEN] ...token set at v0.");
-                        return true;
+                    if (!initOnly) {
+                        if (TokenAccess.setApiToken(prefs, token)) {
+                            MainActivity.info("[TOKEN] ...token set at v0.");
+                            return true;
+                        } else {
+                            MainActivity.error("[TOKEN] ...Failed token encryption.");
+                        }
                     } else {
-                        MainActivity.error("[TOKEN] ...Failed token encryption.");
+                        MainActivity.error("[TOKEN] v0 Keystore initialized, but no token present.");
                     }
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
                     IOException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
-                MainActivity.error("Upgrade of token storage failed: ", ex);
+                MainActivity.error("Upgrade/init of token storage failed: ", ex);
                 ex.printStackTrace();
                 return false;
             }

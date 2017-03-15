@@ -119,30 +119,24 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
             case ANONYMOUS_DIALOG: {
                 // turn anonymous
-                if (view != null) {
-                    final EditText user = (EditText) view.findViewById(R.id.edit_username);
-                    final EditText pass = (EditText) view.findViewById(R.id.edit_password);
-                    user.setEnabled(false);
-                    pass.setEnabled(false);
-                }
                 editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
                 editor.apply();
 
                 if (view != null) {
+                    this.updateView(view);
+                    //TODO: will updateView handle this?
                     final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
                     be_anonymous.setChecked(true);
-
-                    // might have to remove or show register link
-                    updateRegister(view);
                 }
-
                 break;
             }
             case DEAUTHORIZE_DIALOG: {
                 editor.remove(ListFragment.PREF_AUTHNAME);
                 editor.remove(ListFragment.PREF_TOKEN);
                 editor.apply();
-                this.updateView(view);
+                if (view != null) {
+                    this.updateView(view);
+                }
                 break;
             }
             default:
@@ -284,11 +278,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         // anonymous
         final CheckBox beAnonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
-        final EditText pass = (EditText) view.findViewById(R.id.edit_password);
         final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
         if ( isAnonymous ) {
             user.setEnabled( false );
-            pass.setEnabled( false );
+            passEdit.setEnabled( false );
         }
 
         beAnonymous.setChecked( isAnonymous );
@@ -306,12 +299,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     // confirm
                     MainActivity.createConfirmation( getActivity(), "Upload anonymously?",
                             MainActivity.SETTINGS_TAB_POS, ANONYMOUS_DIALOG );
-                }
-                else {
+                } else {
                     // unset anonymous
-                    user.setEnabled( true );
-                    pass.setEnabled( true );
-
+                    if (!authUser.isEmpty() && !authToken.isEmpty()) {
+                        user.setEnabled(true);
+                        passEdit.setEnabled(true);
+                    }
                     editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, false );
                     editor.apply();
 
@@ -363,16 +356,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             @Override
             public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
                 if ( isChecked ) {
-                    pass.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+                    passEdit.setTransformationMethod(SingleLineTransformationMethod.getInstance());
                 }
                 else {
-                    pass.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    passEdit.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 }
             }
         });
 
-        pass.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
-        pass.addTextChangedListener( new SetWatcher() {
+        passEdit.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
+        passEdit.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
                 credentialsUpdate(ListFragment.PREF_PASSWORD, editor, prefs, s);

@@ -156,6 +156,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         return fos;
     }
 
+    @Deprecated
     private Status doUpload( final String username, final String password, final Bundle bundle )
             throws InterruptedException {
 

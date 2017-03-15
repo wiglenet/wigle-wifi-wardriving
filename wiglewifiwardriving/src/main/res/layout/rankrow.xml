@@ -4,30 +4,33 @@
 	    android:layout_width="fill_parent" android:layout_height="fill_parent">
 
 <LinearLayout android:orientation="horizontal"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:gravity="center">
 
     <LinearLayout android:orientation="horizontal"
                   android:layout_width="wrap_content" android:layout_height="wrap_content"
-                  android:layout_weight="1"
+                  android:layout_weight="0"
                   android:gravity="start">
-            <TextView android:id="@+id/rank" android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textSize="18sp"
-                      android:textColor="#ffff00"/>
-            <TextView android:id="@+id/rankdiff" android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:textSize="16sp"/>
-        </LinearLayout>
+		<TextView android:id="@+id/rank" android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:textSize="18sp"
+				  android:textColor="#ffff00"/>
+		<TextView android:id="@+id/rankdiff" android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:textSize="16sp"/>
+	</LinearLayout>
 
     <TextView android:id="@+id/username" android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_weight="1"
               android:textSize="18sp"
               android:textColor="#4aceff"
-              android:gravity="center"/>
+			  android:paddingLeft="12dp"
+              android:gravity="left"/>
 	<TextView android:id="@+id/month_wifi_gps" android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_weight="1"
+              android:layout_weight="0"
               android:textSize="18sp"
               android:textColor="#00ff00"
 		      android:gravity="end"/>

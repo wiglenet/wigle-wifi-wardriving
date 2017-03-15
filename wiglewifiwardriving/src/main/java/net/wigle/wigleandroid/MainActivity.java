@@ -308,19 +308,16 @@ public final class MainActivity extends AppCompatActivity {
     private void checkInitKeystore() {
         final SharedPreferences prefs = getApplicationContext().
                 getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        if (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty() &&
-                TokenAccess.isApiTokenSet(prefs)) {
-            if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
-                // successful migration should remove the password value
-                if (!prefs.getString(ListFragment.PREF_PASSWORD,
-                        "").isEmpty()) {
-                    final Editor editor = prefs.edit();
-                    editor.remove(ListFragment.PREF_PASSWORD);
-                    editor.apply();
-                }
-            } else {
-                MainActivity.info("Not able to upgrade key storage.");
+        if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+            // successful migration should remove the password value
+            if (!prefs.getString(ListFragment.PREF_PASSWORD,
+                    "").isEmpty()) {
+                final Editor editor = prefs.edit();
+                editor.remove(ListFragment.PREF_PASSWORD);
+                editor.apply();
             }
+        } else {
+            MainActivity.info("Not able to upgrade key storage.");
         }
     }
 
@@ -1816,7 +1813,8 @@ public final class MainActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT).show();
 
             // well turn it of now that we're done
-            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            final WifiManager wifiManager = (WifiManager) getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
             MainActivity.info("turning back off wifi");
             try {
                 wifiManager.setWifiEnabled(false);

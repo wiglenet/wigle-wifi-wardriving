@@ -226,13 +226,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             // Cannot set request property after connection is made
             PreConnectConfigurator preConnectConfigurator = new PreConnectConfigurator() {
-                @Override
-                public void configure(HttpURLConnection connection) {
-                    if (null != encoded && !encoded.isEmpty()) {
-                        connection.setRequestProperty("Authorization", "Basic " + encoded);
+                    @Override
+                    public void configure(HttpURLConnection connection) {
+                    if (!beAnonymous) {
+                        if (null != encoded && !encoded.isEmpty()) {
+                            connection.setRequestProperty("Authorization", "Basic " + encoded);
+                        }
                     }
                 }
-            };
+                          };
 
             final String response = HttpFileUploader.upload(
                     MainActivity.FILE_POST_URL, filename, "file", fis,

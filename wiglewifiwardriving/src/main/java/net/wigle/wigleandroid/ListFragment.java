@@ -594,7 +594,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     public void makeUploadDialog(final MainActivity main) {
         final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String username = beAnonymous? "anonymous":
+                prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
         MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
     }

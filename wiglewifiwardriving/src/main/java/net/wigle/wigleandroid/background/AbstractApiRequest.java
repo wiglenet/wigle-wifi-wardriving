@@ -268,6 +268,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             preConnectConfigurator = new PreConnectConfigurator() {
                 @Override
                 public void configure(HttpURLConnection connection) {
+                    //TODO: for non-upload tasks, how to handle anonymity
                     connection.setRequestProperty("Authorization", "Basic " + encoded);
                 }
             };

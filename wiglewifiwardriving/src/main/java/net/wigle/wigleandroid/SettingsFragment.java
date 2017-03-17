@@ -298,8 +298,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     // turn off until confirmed
                     buttonView.setChecked( false );
                     // confirm
-                    MainActivity.createConfirmation( getActivity(), "Upload anonymously?",
-                            MainActivity.SETTINGS_TAB_POS, ANONYMOUS_DIALOG );
+                    MainActivity.createConfirmation( getActivity(),
+                            getString(R.string.anonymous_confirm), MainActivity.SETTINGS_TAB_POS,
+                            ANONYMOUS_DIALOG );
                 } else {
                     // unset anonymous
                     user.setEnabled(true);

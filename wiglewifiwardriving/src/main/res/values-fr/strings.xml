@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Démarrage</string>
-    <string name="app_name">WiGLE WiFi Wardriving</string>
+    <string name="app_name">WiGLE Wifi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi - Paramètres</string>
     <string name="mapping_app_name">WiGLE WiFi - Plan</string>
@@ -324,4 +324,5 @@
     <string name="deauthorize">Désautoriser (logout)</string>
     <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>
     <string name="authorize">Autoriser (login)</string>
+    <string name="anonymous_confirm">Envoi anonyme?  Supprimera toutes les informations de connexion existantes de votre appareil.</string>
 </resources>

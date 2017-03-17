@@ -308,4 +308,5 @@
     <string name="deauthorize">Deauthorize (logout)</string>
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
+    <string name="anonymous_confirm">Carica i dati in forma anonima? Consente di eliminare ogni informazioni di accesso esistente dal dispositivo.</string>
 </resources>

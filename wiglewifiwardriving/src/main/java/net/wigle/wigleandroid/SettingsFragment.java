@@ -120,13 +120,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             case ANONYMOUS_DIALOG: {
                 // turn anonymous
                 editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
+                editor.remove(ListFragment.PREF_USERNAME);
+                editor.remove(ListFragment.PREF_PASSWORD);
+                editor.remove(ListFragment.PREF_AUTHNAME);
+                editor.remove(ListFragment.PREF_TOKEN);
                 editor.apply();
 
                 if (view != null) {
                     this.updateView(view);
-                    //TODO: will updateView handle this?
-                    final CheckBox be_anonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
-                    be_anonymous.setChecked(true);
                 }
                 break;
             }
@@ -301,10 +302,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                             MainActivity.SETTINGS_TAB_POS, ANONYMOUS_DIALOG );
                 } else {
                     // unset anonymous
-                    if (!authUser.isEmpty() && !authToken.isEmpty()) {
-                        user.setEnabled(true);
-                        passEdit.setEnabled(true);
-                    }
+                    user.setEnabled(true);
+                    passEdit.setEnabled(true);
                     editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, false );
                     editor.apply();
 

@@ -1,9 +1,17 @@
 package net.wigle.wigleandroid;
 
+import android.*;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -21,6 +29,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -41,6 +50,8 @@ public class ActivateActivity extends Activity {
     private SurfaceView cameraView;
     private CameraSource cameraSource;
     private BarcodeDetector barcodeDetector;
+
+    private static final int REQUEST_CAMERA = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +77,10 @@ public class ActivateActivity extends Activity {
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
         cameraView = (SurfaceView)findViewById(R.id.camera_view);
-
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            Log.e(LOG_TAG, "Attempt to initialize camera capture with a pre-SDKv23 client");
+            return;
+        }
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
                         .setBarcodeFormats(Barcode.QR_CODE)
@@ -78,67 +92,75 @@ public class ActivateActivity extends Activity {
             this.finish();
         } else {
             Log.i(LOG_TAG, "Barcode detection available, initializing...");
-            CameraSource.Builder builder =
-                    new CameraSource.Builder(getApplicationContext(), barcodeDetector)
-                    .setFacing(CameraSource.CAMERA_FACING_BACK)
-                    .setRequestedPreviewSize(640, 480).setAutoFocusEnabled(true)
-                    .setRequestedFps(10.0f);
+            if (ContextCompat.checkSelfPermission(this,
+                    android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                this.requestCameraPermission();
+            } else {
+                DisplayMetrics metrics = this.getResources().getDisplayMetrics();
 
-            cameraSource = builder.build();
-            Log.i(LOG_TAG, "Camera Source built");
-            cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
-                @Override
-                public void surfaceCreated(SurfaceHolder holder) {
-                    try {
-                        cameraSource.start(cameraView.getHolder());
-                    } catch (IOException ie) {
-                        Log.e(LOG_TAG, "CAMERA SOURCE"+ ie.getMessage());
-                    } catch (SecurityException se) {
-                        Log.e(LOG_TAG, "CAMERA SOURCE SECURITY ERROR"+ se.getMessage());
-                    }
-                }
+                CameraSource.Builder builder =
+                        new CameraSource.Builder(getApplicationContext(), barcodeDetector)
+                                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                                .setRequestedPreviewSize(metrics.heightPixels, metrics.widthPixels)
+                                .setAutoFocusEnabled(true)
+                                .setRequestedFps(10.0f);
 
-                @Override
-                public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                }
-
-                @Override
-                public void surfaceDestroyed(SurfaceHolder holder) {
-                    cameraSource.stop();
-                }
-            });
-            barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
-                @Override
-                public void release() {
-                    Log.i(LOG_TAG, "CAMERA released");
-                }
-
-                @Override
-                public void receiveDetections(Detector.Detections<Barcode> detections) {
-                    final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-                    if (barcodes.size() > 0) {
-                        Log.i(LOG_TAG, "CAMERA received detections");
-                        Barcode item = barcodes.valueAt(0);
-                        if (item.displayValue.matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
-                            Log.i(LOG_TAG, item.displayValue+" matched.");
-                            String[] tokens = item.displayValue.split(":");
-                            final SharedPreferences prefs = MainActivity.getMainActivity().
-                                    getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                            final SharedPreferences.Editor editor = prefs.edit();
-                            editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
-                            //editor.putString(ListFragment.PREF_TOKEN, tokens[2]);
-                            //TODO: should we actively unset prefs PREF_PASSWORD here?
-                            editor.apply();
-                            TokenAccess.setApiToken(prefs, tokens[1]);
-
-                            //DEBUG: Log.i(LOG_TAG, tokens[0]+" : "+tokens[1] + " : "+tokens[2] );
-                            finish();
-                        } else {
-                            Log.i(LOG_TAG, item.displayValue+" failed to match token pattern");
+                cameraSource = builder.build();
+                Log.i(LOG_TAG, "Camera Source built");
+                cameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
+                    @Override
+                    public void surfaceCreated(SurfaceHolder holder) {
+                        try {
+                            cameraSource.start(cameraView.getHolder());
+                        } catch (IOException ie) {
+                            Log.e(LOG_TAG, "CAMERA SOURCE " + ie.getMessage());
+                        } catch (SecurityException se) {
+                            Log.e(LOG_TAG, "CAMERA SOURCE SECURITY ERROR " + se.getMessage());
+                        } catch (Exception ex) {
+                            Log.e(LOG_TAG, "CAMERA ERROR " + ex.getMessage());
+                            ex.printStackTrace();
                         }
                     }
-                }
-            });
+
+                    @Override
+                    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                    }
+
+                    @Override
+                    public void surfaceDestroyed(SurfaceHolder holder) {
+                        cameraSource.stop();
+                    }
+                });
+                barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
+                    @Override
+                    public void release() {
+                        Log.i(LOG_TAG, "CAMERA released");
+                    }
+
+                    @Override
+                    public void receiveDetections(Detector.Detections<Barcode> detections) {
+                        final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                        if (barcodes.size() > 0) {
+                            Log.i(LOG_TAG, "CAMERA received detections");
+                            Barcode item = barcodes.valueAt(0);
+                            if (item.displayValue.matches("^.*:[a-zA-Z0-9]*:[a-zA-Z0-9]*$")) {
+                                Log.i(LOG_TAG, item.displayValue + " matched.");
+                                String[] tokens = item.displayValue.split(":");
+                                final SharedPreferences prefs = MainActivity.getMainActivity().
+                                        getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                final SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
+                                editor.putString(ListFragment.PREF_AUTHNAME, tokens[1]);
+                                editor.apply();
+                                TokenAccess.setApiToken(prefs, tokens[2]);
+                                finish();
+                            } else {
+                                Log.i(LOG_TAG, item.displayValue + " failed to match token pattern");
+                            }
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -152,6 +174,29 @@ public class ActivateActivity extends Activity {
             barcodeDetector.release();
         }
         Log.i(LOG_TAG, "onDestroy");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(final int requestCode, @NonNull final String permissions[],
+                                           @NonNull final int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CAMERA: {
+                Log.i(LOG_TAG, "location grant response permissions: " + Arrays.toString(permissions)
+                        + " grantResults: " + Arrays.toString(grantResults));
+                launchBarcodeScanning();
+                return;
+            }
+
+            default:
+                Log.w(LOG_TAG, "Unhandled onRequestPermissionsResult code: " + requestCode);
+        }
+    }
+
+    private void requestCameraPermission() {
+        Log.i(LOG_TAG, "CAMERA permission has NOT been granted. Requesting permission.");
+
+        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA},
+                REQUEST_CAMERA);
     }
 
 }

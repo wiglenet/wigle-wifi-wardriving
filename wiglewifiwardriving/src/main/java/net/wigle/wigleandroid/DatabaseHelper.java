@@ -691,7 +691,10 @@ public final class DatabaseHelper extends Thread {
         final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange;
 
         final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
+                && Double.isInfinite(location.getLatitude())
+                && Double.isInfinite(location.getLongitude())
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
+                && Double.isInfinite(location.getAltitude()) && location.getTime() == 0
                 && update.level == 0;
 
         // MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
@@ -746,7 +749,14 @@ public final class DatabaseHelper extends Thread {
                 logTime( start, "db network updated" );
 
 
-                boolean newBest = bestlevel == 0 || update.level > bestlevel;
+                boolean newBest = (bestlevel == 0 || update.level > bestlevel) &&
+                        // https://github.com/wiglenet/wigle-wifi-wardriving/issues/82
+                        // ALIBI: frequent high-accuracy + time = 0
+                        ((location.getTime() != 0L) &&
+                                // ALIBI: frequent high-accuracy + infinite lat/long
+                                !Double.isInfinite(location.getLatitude()) &&
+                                !Double.isInfinite(location.getLongitude()) );
+
                 // MainActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
                 if (newBest) {
                     bestlevel = update.level;

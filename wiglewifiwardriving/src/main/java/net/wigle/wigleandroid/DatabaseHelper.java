@@ -691,17 +691,18 @@ public final class DatabaseHelper extends Thread {
         final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange;
 
         final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
-                && Double.isInfinite(location.getLatitude())
-                && Double.isInfinite(location.getLongitude())
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
-                && Double.isInfinite(location.getAltitude()) && location.getTime() == 0
                 && update.level == 0;
+
+        final boolean junk = Double.isInfinite(location.getLatitude()) ||
+                Double.isInfinite(location.getLongitude()) ||
+                location.getTime() == 0L;
 
         // MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
         //    + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
         //    + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
 
-        if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
+        if ( !blank && !junk && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
             // MainActivity.info("inserting loc: " + network.getSsid() );
             insertLocation.bindString( 1, bssid );
             insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...

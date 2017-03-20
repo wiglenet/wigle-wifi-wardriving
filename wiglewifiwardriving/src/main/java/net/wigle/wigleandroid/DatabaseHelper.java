@@ -694,15 +694,23 @@ public final class DatabaseHelper extends Thread {
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
                 && update.level == 0;
 
-        final boolean junk = Double.isInfinite(location.getLatitude()) ||
+        /*
+        ALIBI: debugging path
+        final boolean likelyJunk = Double.isInfinite(location.getLatitude()) ||
                 Double.isInfinite(location.getLongitude()) ||
                 location.getTime() == 0L;
+
+        if (likelyJunk) {
+            MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
+                        + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
+                        + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
+        } */
 
         // MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
         //    + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
         //    + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
 
-        if ( !blank && !junk && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
+        if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
             // MainActivity.info("inserting loc: " + network.getSsid() );
             insertLocation.bindString( 1, bssid );
             insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...

@@ -155,7 +155,7 @@ public final class MappingFragment extends Fragment {
             public void onMapReady(final GoogleMap googleMap) {
                 if (ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
                         android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                        && ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+                        || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     googleMap.setMyLocationEnabled(true);
                 }

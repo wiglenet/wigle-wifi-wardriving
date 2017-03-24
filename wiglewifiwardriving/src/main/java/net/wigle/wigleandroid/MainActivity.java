@@ -337,7 +337,9 @@ public final class MainActivity extends AppCompatActivity {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied
                 // it. If so, we want to give more explanation about why the permission is needed.
-                String message = mainActivity.getString(R.string.please_allow);
+                // 20170324 rksh: disabled due to
+                // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
+                /*String message = mainActivity.getString(R.string.please_allow);
                 for (int i = 0; i < permissionsNeeded.size(); i++) {
                     if (i > 0) message += ", ";
                     message += permissionsNeeded.get(i);
@@ -349,7 +351,7 @@ public final class MainActivity extends AppCompatActivity {
 
                 // Show our own UI to explain to the user why we need to read the contacts
                 // before actually requesting the permission and showing the default UI
-                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();*/
 
                 MainActivity.info("no permission for " + permissionsNeeded);
 

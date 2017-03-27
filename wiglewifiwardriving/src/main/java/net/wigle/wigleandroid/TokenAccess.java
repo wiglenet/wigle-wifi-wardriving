@@ -278,7 +278,16 @@ public class TokenAccess {
                             MainActivity.info("[TOKEN] ...token set at v1.");
                             return true;
                         } else {
-                            MainActivity.error("[TOKEN] Failed token update.");
+                            /**
+                             * ALIBI: if you can't migrate it, clear it to force re-authentication.
+                             * this isn't optimal, but it beats the alternative.
+                             * This is vital here, since Marshmallow and up can backup/restore
+                             * SharedPreferences, but NOT keystore entries
+                             */
+                            MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
+                            final SharedPreferences.Editor editor = prefs.edit();
+                            editor.remove(ListFragment.PREF_TOKEN);
+                            editor.apply();
                         }
                     } else {
                         MainActivity.error("[TOKEN] v1 Keystore initialized, but no token present.");
@@ -321,7 +330,15 @@ public class TokenAccess {
                             MainActivity.info("[TOKEN] ...token set at v0.");
                             return true;
                         } else {
-                            MainActivity.error("[TOKEN] ...Failed token encryption.");
+                            /**
+                             * ALIBI: if you can't migrate it, clear it to force re-authentication.
+                             * this isn't optimal, but it beats the alternative.
+                             * This may not be necessary in the pre-Marshmallow world.
+                             */
+                            MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
+                            final SharedPreferences.Editor editor = prefs.edit();
+                            editor.remove(ListFragment.PREF_TOKEN);
+                            editor.apply();
                         }
                     } else {
                         MainActivity.error("[TOKEN] v0 Keystore initialized, but no token present.");

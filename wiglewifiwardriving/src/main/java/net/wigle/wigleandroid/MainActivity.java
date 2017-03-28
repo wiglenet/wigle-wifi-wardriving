@@ -333,6 +333,18 @@ public final class MainActivity extends AppCompatActivity {
             }
             addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+            if (pm.isIgnoringBatteryOptimizations(this.getPackageName())) {
+                //intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                MainActivity.info("ignoring battery optimization");
+            } else {
+                MainActivity.info("requesting to ignore battery optimization");
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                intent.setData(Uri.parse("package:" + this.getPackageName()));
+                startActivity(intent);
+            }
+
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied

@@ -79,7 +79,7 @@ public class TokenAccess {
      * @param prefs
      * @return
      */
-    public static boolean clearApiToken(SharedPreferences prefs) {
+    public static void clearApiToken(SharedPreferences prefs) {
         final SharedPreferences.Editor editor = prefs.edit();
         editor.remove(ListFragment.PREF_TOKEN);
         editor.apply();
@@ -278,6 +278,7 @@ public class TokenAccess {
                         keyStore.deleteEntry(KEYSTORE_WIGLE_CREDS_KEY_V0);
                     } else {
                         token = prefs.getString(ListFragment.PREF_TOKEN, "");
+                        //DEBUG: MainActivity.info("[TOKEN] +"+token+"+");
                         MainActivity.info("[TOKEN] Encrypting token at v1...");
                         if (token.isEmpty()) {
                             MainActivity.info("[TOKEN] ...no token, returning after init.");

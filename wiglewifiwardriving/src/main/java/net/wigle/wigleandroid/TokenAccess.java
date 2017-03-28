@@ -75,6 +75,17 @@ public class TokenAccess {
     }
 
     /**
+     * remove the token preference
+     * @param prefs
+     * @return
+     */
+    public static boolean clearApiToken(SharedPreferences prefs) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(ListFragment.PREF_TOKEN);
+        editor.apply();
+    }
+
+    /**
      * Set the appropriate API Token, stored with KeyStore crypto if suitable
      * @param prefs the shared preferences object in which to store the token
      * @param apiToken the token value to store
@@ -285,9 +296,7 @@ public class TokenAccess {
                              * SharedPreferences, but NOT keystore entries
                              */
                             MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
-                            final SharedPreferences.Editor editor = prefs.edit();
-                            editor.remove(ListFragment.PREF_TOKEN);
-                            editor.apply();
+                            clearApiToken(prefs);
                         }
                     } else {
                         MainActivity.error("[TOKEN] v1 Keystore initialized, but no token present.");
@@ -336,9 +345,7 @@ public class TokenAccess {
                              * This may not be necessary in the pre-Marshmallow world.
                              */
                             MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
-                            final SharedPreferences.Editor editor = prefs.edit();
-                            editor.remove(ListFragment.PREF_TOKEN);
-                            editor.apply();
+                            clearApiToken(prefs);
                         }
                     } else {
                         MainActivity.error("[TOKEN] v0 Keystore initialized, but no token present.");

@@ -148,7 +148,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final long now = System.currentTimeMillis();
         lastScanResponseTime = now;
         // final long start = now;
-        final WifiManager wifiManager = (WifiManager) mainActivity.getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         List<ScanResult> results = null;
         try {
             results = wifiManager.getScanResults(); // return can be null!
@@ -744,7 +744,7 @@ public class WifiReceiver extends BroadcastReceiver {
      */
     private boolean doWifiScan() {
         // MainActivity.info("do wifi scan. lastScanTime: " + lastScanResponseTime);
-        final WifiManager wifiManager = (WifiManager) mainActivity.getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         boolean success = false;
 
         if ( mainActivity.isTransferring() ) {

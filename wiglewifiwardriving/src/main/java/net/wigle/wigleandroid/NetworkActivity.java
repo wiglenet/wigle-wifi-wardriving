@@ -321,7 +321,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
     }
 
     private int getExistingSsid( final String ssid ) {
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         final String quotedSsid = "\"" + ssid + "\"";
         int netId = -2;
 
@@ -363,7 +363,7 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
 
     private void connectToNetwork( final String password ) {
         final int preExistingNetId = getExistingSsid( network.getSsid() );
-        final WifiManager wifiManager = (WifiManager) getSystemService( Context.WIFI_SERVICE );
+        final WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService( Context.WIFI_SERVICE );
         int netId = -2;
         if ( preExistingNetId < 0 ) {
             final WifiConfiguration newConfig = new WifiConfiguration();

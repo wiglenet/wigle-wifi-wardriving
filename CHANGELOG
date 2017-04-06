@@ -1,3 +1,17 @@
+* 2.17 (04/02/2017)
+QR code login for WiGLE users
+Marshmallow-and-up overlay issue during permissions
+Marshmallow-and-up map position indicator fix
+Fixed bad position updates in network table
+Encrypted user token storage
+Active authentication and authentication settings
+Layout and color cleanup for stats, rankings, uploads
+Update based on network strength (thanks, cognitiverift!)
+Prevent accidental taps from cancelling upload/download
+Transition to official WiGLE APIv2
+Refactored networking core
+Cleaned up forum post text handling
+
 * 2.16 (09/03/2016)
 Fix new-user startup issues
 

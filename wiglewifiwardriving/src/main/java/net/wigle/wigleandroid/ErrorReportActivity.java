@@ -169,7 +169,7 @@ public class ErrorReportActivity extends ActionBarActivity {
         MainActivity.info( "ErrorReport onCreate" );
         final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
         emailIntent.setType( "plain/text" );
-        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"} );
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "WigleWifi error report" );
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, stack );
         final Intent chooserIntent = Intent.createChooser( emailIntent, "Email WigleWifi error report?" );

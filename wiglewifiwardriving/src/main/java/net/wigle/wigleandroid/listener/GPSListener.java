@@ -127,11 +127,12 @@ public class GPSListener implements Listener, LocationListener {
                 mainActivity.getSystemService(Context.LOCATION_SERVICE);
 
         // see if we have new data
-        if (null == locationManager) {
-            // ALIBI: we have a bug report of an NPE here.
+        try {
+            gpsStatus = locationManager.getGpsStatus(gpsStatus);
+        } catch (NullPointerException npe) {
+            MainActivity.error("NPE trying to call getGPSStatus");
             return;
         }
-        gpsStatus = locationManager.getGpsStatus( gpsStatus );
         final int satCount = getSatCount();
 
         boolean newOK = newLocation != null;

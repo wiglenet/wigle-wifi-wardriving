@@ -98,6 +98,7 @@ public class TokenAccess {
                 android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
             //ALIBI: no crypto available here
             editor.putString(ListFragment.PREF_TOKEN, apiToken);
+            editor.apply();
             return true;
         } else {
             try {
@@ -147,11 +148,12 @@ public class TokenAccess {
                     }
                 } else {
                     // ALIBI: DEBUG should be unreachable.
-                    MainActivity.error("[TOKEN] ERROR: setApiToken for" +
+                    MainActivity.error("[TOKEN] ERROR: setApiToken for APIv" +
                             android.os.Build.VERSION.SDK_INT +
                             ", privateKey Entry NULL. Key: " +
                             keyStr);
                     editor.putString(ListFragment.PREF_TOKEN, apiToken);
+                    editor.apply();
                     return true;
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |

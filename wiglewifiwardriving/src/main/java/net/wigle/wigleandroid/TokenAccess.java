@@ -18,6 +18,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
@@ -146,15 +147,21 @@ public class TokenAccess {
                     }
                 } else {
                     // ALIBI: DEBUG should be unreachable.
-                    MainActivity.error("[TOKEN] ERROR: unreachable condition," +
-                            "privateKey Entry NULL. Key: " +
+                    MainActivity.error("[TOKEN] ERROR: setApiToken for" +
+                            android.os.Build.VERSION.SDK_INT +
+                            ", privateKey Entry NULL. Key: " +
                             keyStr);
+                    editor.putString(ListFragment.PREF_TOKEN, apiToken);
+                    return true;
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
                     IOException | UnrecoverableEntryException | NoSuchPaddingException |
                     InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
                 MainActivity.error("[TOKEN] Failed to set token: ",ex);
                 ex.printStackTrace();
+            } catch (Exception e) {
+                MainActivity.error("[TOKEN] Other error - failed to set token: ",e);
+                e.printStackTrace();
             }
             return false;
         }
@@ -353,9 +360,18 @@ public class TokenAccess {
                     }
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
-                    IOException | NoSuchProviderException | InvalidAlgorithmParameterException ex) {
+                    IOException | NoSuchProviderException | InvalidAlgorithmParameterException |
+                    ProviderException ex) {
                 MainActivity.error("Upgrade/init of token storage failed: ", ex);
                 ex.printStackTrace();
+                return false;
+            } catch (Exception e) {
+                /**
+                 * ALIBI: after production evidence of a ProviderException (runtime), adding belt to
+                 * suspenders
+                 */
+                MainActivity.error("Unexpected error in upgrade/init of token storage failed: ", e);
+                e.printStackTrace();
                 return false;
             }
         }

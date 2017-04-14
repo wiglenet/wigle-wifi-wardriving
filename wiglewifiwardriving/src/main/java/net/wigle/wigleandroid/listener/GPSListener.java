@@ -8,13 +8,16 @@ import net.wigle.wigleandroid.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 public class GPSListener implements Listener, LocationListener {
@@ -106,8 +109,28 @@ public class GPSListener implements Listener, LocationListener {
 
     /** newLocation can be null */
     private void updateLocationData( final Location newLocation ) {
-        final LocationManager locationManager = (LocationManager) mainActivity.getSystemService(Context.LOCATION_SERVICE);
+
+        /**
+         * ALIBI: the location manager call's a non-starter if permission hasn't been granted.
+         */
+        if ( Build.VERSION.SDK_INT >= 23 &&
+                ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
+                        android.Manifest.permission.ACCESS_FINE_LOCATION )
+                        != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        final LocationManager locationManager = (LocationManager)
+                mainActivity.getSystemService(Context.LOCATION_SERVICE);
+
         // see if we have new data
+        if (null == locationManager) {
+            // ALIBI: we have a bug report of an NPE here.
+            return;
+        }
         gpsStatus = locationManager.getGpsStatus( gpsStatus );
         final int satCount = getSatCount();
 
@@ -228,6 +251,7 @@ public class GPSListener implements Listener, LocationListener {
 
         // update the UI
         mainActivity.setLocationUI();
+
     }
 
     public void checkLocationOK() {

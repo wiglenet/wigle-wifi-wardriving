@@ -1163,7 +1163,7 @@ public final class MainActivity extends AppCompatActivity {
             return true;
         }
         return getSharedPreferences(ListFragment.SHARED_PREFS, 0)
-                .getBoolean(ListFragment.PREF_MUTED, false);
+                .getBoolean(ListFragment.PREF_MUTED, true);
     }
 
     public static void sleep(final long sleep) {

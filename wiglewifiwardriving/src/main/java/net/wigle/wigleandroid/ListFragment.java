@@ -289,7 +289,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         item.setIcon( android.R.drawable.ic_menu_gallery );
 
         final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-        boolean muted = prefs.getBoolean(PREF_MUTED, false);
+        boolean muted = prefs.getBoolean(PREF_MUTED, true);
         item = menu.add(0, MENU_MUTE, 0,
                 muted ? getString(R.string.play) : getString(R.string.mute));
         item.setIcon( muted ? android.R.drawable.ic_media_play
@@ -342,7 +342,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-                boolean muted = prefs.getBoolean(PREF_MUTED, false);
+                boolean muted = prefs.getBoolean(PREF_MUTED, true);
                 muted = ! muted;
                 Editor editor = prefs.edit();
                 editor.putBoolean(PREF_MUTED, muted);

@@ -1,3 +1,8 @@
+* 2.18 (04/14/2017)
+Fix ProviderException for token generation on some devices.
+Fix gpsStatus NPE on some devices.
+Default to muted.
+
 * 2.17 (04/02/2017)
 QR code login for WiGLE users
 Marshmallow-and-up overlay issue during permissions

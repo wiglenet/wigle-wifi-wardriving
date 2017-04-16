@@ -198,6 +198,9 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyACUb8m8fx4iZSafmBe4WznRGW74OfSI_U" />
 
+        <!-- https://android-developers.googleblog.com/2017/03/update-your-app-to-take-advantage-of.html -->
+        <meta-data android:name="android.max_aspect" android:value="2.1" />
+
     </application>
 
 </manifest>

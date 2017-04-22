@@ -302,9 +302,12 @@ public class RankStatsFragment extends Fragment {
                 resultList.add(rowBundle);
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
-        }
-        catch (final JSONException ex) {
+        } catch (final JSONException ex) {
+            //TODO: better error for bundle
             MainActivity.error("json error: " + ex, ex);
+        } catch (final Exception e) {
+            //TODO: better error for bundle
+            MainActivity.error("rank error: " + e, e);
         }
 
         final Message message = new Message();

@@ -343,9 +343,11 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                             } else {
                                 throw new WiGLEAuthException("Unable to log in.");
                             }
-                        }
-                        catch (final JSONException ex) {
+                        } catch (final JSONException ex) {
                             MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                            throw new WiGLEAuthException("Unable to log in.");
+                        } catch (final Exception e) {
+                            MainActivity.warn("response exception: " + e + " json: " + json, e);
                             throw new WiGLEAuthException("Unable to log in.");
                         }
                     }

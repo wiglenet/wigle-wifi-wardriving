@@ -268,7 +268,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                             ApiDownloader.REQUEST_GET,
                             apiListener);
                     try {
-
                         task.startDownload(SettingsFragment.this);
                     } catch (WiGLEAuthException waex) {
                         MainActivity.info("User authentication failed");

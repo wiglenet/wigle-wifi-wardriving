@@ -81,11 +81,15 @@ public class ObservationImporter extends AbstractProgressApiRequest {
             } catch (JSONException jex) {
                 MainActivity.error("MyObserved json parse error:", jex);
                 status = Status.EXCEPTION;
-                bundle.putString(BackgroundGuiHandler.ERROR, "ex problem: " + jex);
+                bundle.putString(BackgroundGuiHandler.ERROR, "JSON problem: " + jex);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 status = Status.EXCEPTION;
-                bundle.putString(BackgroundGuiHandler.ERROR, "ex problem: " + e);
+                bundle.putString(BackgroundGuiHandler.ERROR, "Connection problem: " + e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                status = Status.EXCEPTION;
+                bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: " + e + " (from " + e.getCause()+")");
             } finally {
                 listener.requestComplete(null, false);
             }

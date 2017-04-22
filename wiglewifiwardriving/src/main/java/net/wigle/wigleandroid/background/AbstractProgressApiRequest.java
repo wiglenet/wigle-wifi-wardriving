@@ -63,8 +63,11 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
                                 final Bundle bundle = new Bundle();
                                 sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
                             }
-                        }
-                        catch (final JSONException ex) {
+                        } catch (final JSONException ex) {
+                            final Bundle bundle = new Bundle();
+                            sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
+                        } catch (final Exception e) {
+                            MainActivity.error("Failed to log in " + e + " payload: " + json, e);
                             final Bundle bundle = new Bundle();
                             sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
                         }

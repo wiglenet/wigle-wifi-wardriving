@@ -177,9 +177,10 @@ public class UserStatsFragment extends Fragment {
                         }
                     }
                 }
-            }
-            catch (final JSONException ex) {
+            } catch (final JSONException ex) {
                 MainActivity.error("json error: " + ex, ex);
+            } catch (final Exception e) {
+                MainActivity.error("user stats error: " + e, e);
             }
 
             final Message message = new Message();

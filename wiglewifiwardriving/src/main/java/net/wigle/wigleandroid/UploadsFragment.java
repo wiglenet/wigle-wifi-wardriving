@@ -270,9 +270,10 @@ public class UploadsFragment extends Fragment {
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
             bundle.putString(KEY_QUEUE_DEPTH, json.getString(KEY_QUEUE_DEPTH));
-        }
-        catch (final JSONException ex) {
+        } catch (final JSONException ex) {
             MainActivity.error("json error: " + ex, ex);
+        } catch (final Exception e) {
+            MainActivity.error("uploads error: " + e, e);
         }
 
         final Message message = new Message();

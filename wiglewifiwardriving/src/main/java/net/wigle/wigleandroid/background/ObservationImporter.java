@@ -86,6 +86,10 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                 e.printStackTrace();
                 status = Status.EXCEPTION;
                 bundle.putString(BackgroundGuiHandler.ERROR, "ex problem: " + e);
+            } catch (Exception e) {
+                e.printStackTrace();
+                status = Status.EXCEPTION;
+                bundle.putString(BackgroundGuiHandler.ERROR, "ex problem: " + e);
             } finally {
                 listener.requestComplete(null, false);
             }

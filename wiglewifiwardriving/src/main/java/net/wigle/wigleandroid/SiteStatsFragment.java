@@ -142,9 +142,10 @@ public class SiteStatsFragment extends Fragment {
                 if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
                 bundle.putLong(key, json.getLong(jsonKey));
             }
-        }
-        catch (final JSONException ex) {
+        } catch (final JSONException ex) {
             MainActivity.error("json error: " + ex, ex);
+        } catch (final Exception e) {
+            MainActivity.error("Statistics error: " + e, e);
         }
 
         final Message message = new Message();

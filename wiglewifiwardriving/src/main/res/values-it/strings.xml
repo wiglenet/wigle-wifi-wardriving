@@ -64,7 +64,7 @@
     <string name="speech_time">Orario corrente</string>
     <string name="speech_battery">Percentuale livello batteria</string>
     <string name="speech_ssid">SSID della nuova rete WiFi</string>
-    <string name="query_address">Indirizzo (es: Rome, IT):</string>
+    <string name="query_address">Indirizzo (es: Roma, RM, Italia):</string>
     <string name="query_ssid">SSID (es: Linksys) (caratteri jolly SQL: %,_):</string>
     <string name="query_bssid">BSSID (es: 0A:2C:EF:3D:25:1B) (caratteri jolly SQL: %,_):</string>
     <string name="search_button">Cerca nel DB locale</string>

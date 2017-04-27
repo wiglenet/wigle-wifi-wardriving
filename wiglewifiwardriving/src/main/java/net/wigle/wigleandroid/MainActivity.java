@@ -64,7 +64,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
@@ -110,7 +110,7 @@ public final class MainActivity extends AppCompatActivity {
         TTS tts;
         boolean inEmulator;
         PhoneState phoneState;
-        FileUploaderTask fileUploaderTask;
+        ObservationUploader observationUploader;
         NetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
@@ -124,8 +124,6 @@ public final class MainActivity extends AppCompatActivity {
 
     static final Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
-    public static final String FILE_POST_URL = "https://wigle.net/gps/gps/main/confirmfile/";
-    public static final String OBSERVED_URL = "https://wigle.net/gps/gps/main/myobserved/";
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
     // no auth
     public static final String SITE_STATS_URL = "https://api.wigle.net/api/v2/stats/site";
@@ -134,6 +132,9 @@ public final class MainActivity extends AppCompatActivity {
     // api token auth
     public static final String UPLOADS_STATS_URL = "https://api.wigle.net/api/v2/file/transactions";
     public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
+    public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
+    public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
+
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
@@ -215,8 +216,8 @@ public final class MainActivity extends AppCompatActivity {
             // tell those that need it that we have a new context
             state.gpsListener.setMainActivity(this);
             state.wifiReceiver.setMainActivity(this);
-            if (state.fileUploaderTask != null) {
-                state.fileUploaderTask.setContext(this);
+            if (state.observationUploader != null) {
+                state.observationUploader.setContext(this);
             }
         } else {
             info("MAIN: creating new state");
@@ -292,9 +293,32 @@ public final class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             setupFragments();
         }
+
+        // rksh 20160202 - api/authuser secure preferences storage
+        checkInitKeystore();
+
         // show the list by default
         selectFragment(state.currentTab);
         info("onCreate setup complete");
+    }
+
+    /**
+     * migration method for viable APIs to switch to encrypted AUTH_TOKENs
+     */
+    private void checkInitKeystore() {
+        final SharedPreferences prefs = getApplicationContext().
+                getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+            // successful migration should remove the password value
+            if (!prefs.getString(ListFragment.PREF_PASSWORD,
+                    "").isEmpty()) {
+                final Editor editor = prefs.edit();
+                editor.remove(ListFragment.PREF_PASSWORD);
+                editor.apply();
+            }
+        } else {
+            MainActivity.info("Not able to upgrade key storage.");
+        }
     }
 
     private void setupPermissions() {
@@ -313,7 +337,9 @@ public final class MainActivity extends AppCompatActivity {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied
                 // it. If so, we want to give more explanation about why the permission is needed.
-                String message = mainActivity.getString(R.string.please_allow);
+                // 20170324 rksh: disabled due to
+                // https://stackoverflow.com/questions/35453759/android-screen-overlay-detected-message-if-user-is-trying-to-grant-a-permissio
+                /*String message = mainActivity.getString(R.string.please_allow);
                 for (int i = 0; i < permissionsNeeded.size(); i++) {
                     if (i > 0) message += ", ";
                     message += permissionsNeeded.get(i);
@@ -325,7 +351,7 @@ public final class MainActivity extends AppCompatActivity {
 
                 // Show our own UI to explain to the user why we need to read the contacts
                 // before actually requesting the permission and showing the default UI
-                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();
+                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();*/
 
                 MainActivity.info("no permission for " + permissionsNeeded);
 
@@ -938,6 +964,7 @@ public final class MainActivity extends AppCompatActivity {
     public void onStart() {
         MainActivity.info("MAIN: start.");
         super.onStart();
+
     }
 
     @Override
@@ -1136,7 +1163,7 @@ public final class MainActivity extends AppCompatActivity {
             return true;
         }
         return getSharedPreferences(ListFragment.SHARED_PREFS, 0)
-                .getBoolean(ListFragment.PREF_MUTED, false);
+                .getBoolean(ListFragment.PREF_MUTED, true);
     }
 
     public static void sleep(final long sleep) {
@@ -1402,7 +1429,8 @@ public final class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
         }
 
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
+                getSystemService(Context.WIFI_SERVICE);
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor edit = prefs.edit();
 
@@ -1682,7 +1710,7 @@ public final class MainActivity extends AppCompatActivity {
         MainActivity.info("transfer complete");
         // start a scan to get the ball rolling again if this is non-stop mode
         scheduleScan();
-        state.fileUploaderTask = null;
+        state.observationUploader = null;
     }
 
     public void setLocationUI() {
@@ -1737,9 +1765,9 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // interrupt this just in case
-        final FileUploaderTask fileUploaderTask = state.fileUploaderTask;
-        if (fileUploaderTask != null) {
-            fileUploaderTask.setInterrupted();
+        final ObservationUploader observationUploader = state.observationUploader;
+        if (observationUploader != null) {
+            observationUploader.setInterrupted();
         }
 
         if (state.gpsListener != null) {
@@ -1787,7 +1815,8 @@ public final class MainActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT).show();
 
             // well turn it of now that we're done
-            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            final WifiManager wifiManager = (WifiManager) getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
             MainActivity.info("turning back off wifi");
             try {
                 wifiManager.setWifiEnabled(false);

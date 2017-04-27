@@ -32,7 +32,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.MainActivity.State;
+import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -40,10 +42,12 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
 
+import org.json.JSONObject;
+
 import java.text.NumberFormat;
 import java.util.Set;
 
-public final class ListFragment extends Fragment implements TransferListener, DialogListener {
+public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
@@ -285,7 +289,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         item.setIcon( android.R.drawable.ic_menu_gallery );
 
         final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-        boolean muted = prefs.getBoolean(PREF_MUTED, false);
+        boolean muted = prefs.getBoolean(PREF_MUTED, true);
         item = menu.add(0, MENU_MUTE, 0,
                 muted ? getString(R.string.play) : getString(R.string.mute));
         item.setIcon( muted ? android.R.drawable.ic_media_play
@@ -338,7 +342,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-                boolean muted = prefs.getBoolean(PREF_MUTED, false);
+                boolean muted = prefs.getBoolean(PREF_MUTED, true);
                 muted = ! muted;
                 Editor editor = prefs.edit();
                 editor.putBoolean(PREF_MUTED, muted);
@@ -590,7 +594,10 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
     public void makeUploadDialog(final MainActivity main) {
         final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String username = beAnonymous? "anonymous":
+                prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
         MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
     }
@@ -614,18 +621,24 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         final State state = main.getState();
         main.setTransferring();
         // actually need this Activity context, for dialogs
-        state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
-        state.fileUploaderTask.start();
+        state.observationUploader = new ObservationUploader(main,
+                ListFragment.lameStatic.dbHelper, this, false, false, true);
+        try {
+            state.observationUploader.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.warn("Authentication failure on run upload");
+        }
     }
 
     /**
-     * TransferListener interface
+     * ApiListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         final MainActivity main = MainActivity.getMainActivity( this );
         if (main == null) {
-            MainActivity.warn("No main for transferComplete");
+            MainActivity.warn("No main for requestComplete");
         }
         else {
             main.transferComplete();

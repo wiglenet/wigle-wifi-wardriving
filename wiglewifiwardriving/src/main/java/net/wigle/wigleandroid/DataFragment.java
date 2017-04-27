@@ -2,9 +2,11 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
+import net.wigle.wigleandroid.background.ApiListener;
+import net.wigle.wigleandroid.background.ObservationImporter;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
@@ -37,10 +39,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 /**
  * configure settings
  */
-public final class DataFragment extends Fragment implements TransferListener, DialogListener {
+public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
     private static final int MENU_EXIT = 11;
     private static final int MENU_ERROR_REPORT = 13;
@@ -166,8 +172,14 @@ public final class DataFragment extends Fragment implements TransferListener, Di
      * TransferListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         // nothing
+    }
+
+    @Override
+    public void transferComplete() {
+        // also nothing
     }
 
     private void setupCsvButtons( final View view ) {
@@ -281,17 +293,15 @@ public final class DataFragment extends Fragment implements TransferListener, Di
         switch (dialogId) {
             case CSV_RUN_DIALOG: {
                 // actually need this Activity context, for dialogs
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteRunOnly();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, false, true);
+                observationUploader.start();
                 break;
             }
             case CSV_DB_DIALOG: {
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteWholeDb();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, true, false);
+                observationUploader.start();
                 break;
             }
             case KML_RUN_DIALOG: {
@@ -311,21 +321,26 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 break;
             }
             case IMPORT_DIALOG: {
-                final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
-                if ( mainActivity != null ) {
+                final MainActivity mainActivity = MainActivity.getMainActivity(DataFragment.this);
+                if (mainActivity != null) {
                     mainActivity.setTransferring();
                 }
                 // actually need this Activity context, for dialogs
-                HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                        new TransferListener() {
+                final ObservationImporter task = new ObservationImporter(getActivity(),
+                        ListFragment.lameStatic.dbHelper,
+                        new ApiListener() {
                             @Override
-                            public void transferComplete() {
-                                if ( mainActivity != null ) {
+                            public void requestComplete(JSONObject object, boolean cached) {
+                                if (mainActivity != null) {
                                     mainActivity.transferComplete();
                                 }
                             }
                         });
-                task.start();
+                try {
+                    task.startDownload(this);
+                } catch (WiGLEAuthException waex) {
+                    //moot due to bundle handling
+                }
                 break;
             }
             case ZERO_OUT_DIALOG: {

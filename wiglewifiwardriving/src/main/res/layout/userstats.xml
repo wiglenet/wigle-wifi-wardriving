@@ -19,8 +19,7 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:weightSum="1">
+            android:paddingBottom="4dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
@@ -33,25 +32,24 @@
                 android:id="@+id/rank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:text="@string/status_unknown"
-                android:textSize="24sp"
+                android:text="@string/unknown_number"
                 android:textColor="#ffff00"
-                android:layout_weight="0.89" />
+                android:textSize="24sp"
+                android:paddingRight="5dip"/>
 
             <TextView
                 android:id="@+id/prevRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:text="@string/status_unknown"
-                android:textSize="24sp"/>
+                android:text="@string/unknown_number"
+                android:textSize="24sp" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="4dp"
-            android:weightSum="1">
+            android:paddingBottom="4dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
@@ -59,186 +57,243 @@
                 android:textSize="20sp"
                 android:paddingRight="6dp"
                 />
+
             <TextView
                 android:id="@+id/monthRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                android:text="@string/status_unknown"
-                android:textSize="20sp"
+                android:text="@string/unknown_number"
                 android:textColor="#d0d000"
-                android:layout_weight="0.47" />
+                android:textSize="20sp"
+                android:paddingRight="5dip" />
+
             <TextView
                 android:id="@+id/prevMonthRank"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
+                android:text="@string/unknown_number"
+                android:textSize="20sp" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredWiFiGPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="20sp"
-                android:layout_weight="0.35" />
+                android:paddingBottom="2dp"
+                android:textColor="#00ff00"
+                android:paddingRight="4dip"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/discovered_title"
+                android:textSize="20sp"
+                />
         </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredWiFi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip"/>
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/discovered_title"
-            android:textSize="20sp"
-            />
-        <TextView
-            android:id="@+id/discoveredWiFiGPS"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="20sp"
-            android:paddingBottom="2dp"
-            android:textColor="#00ff00"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_title"
+                android:textSize="16sp"
+                />
 
-        <TextView
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/total_title"
-            android:textSize="16sp"
-            />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/discoveredWiFi"
+            <TextView
+                android:id="@+id/totalWiFiLocations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/totallocs_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredCellGPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gendisc_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/totallocs_title"
-            android:textSize="16sp"
-            />
-
-        <TextView
-            android:id="@+id/totalWiFiLocations"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredCell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gentotal_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/eventMonthCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/monthcount_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/gendisc_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/discoveredCellGPS"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/eventPrevMonthCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dp"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prevmonthcount_title"
+                android:textSize="16sp"
+                android:textColor="#909090"/>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/first"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dp"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/firsttransid_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/gentotal_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/discoveredCell"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/last"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lasttransid_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/actual_prevrank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prevrank_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/monthcount_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/eventMonthCount"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prevmonthcount_title"
-            android:textSize="16sp"
-            android:textColor="#909090"/>
-        <TextView
-            android:id="@+id/eventPrevMonthCount"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff"/>
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/firsttransid_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/first"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:paddingBottom="2dp"
-            android:textColor="#4aceff" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/lasttransid_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/last"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:textColor="#4aceff" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prevrank_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/actual_prevrank"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:textColor="#4aceff" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/prevmonthrank_title"
-            android:textSize="16sp"
-            />
-        <TextView
-            android:id="@+id/actual_prevmonthrank"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/status_unknown"
-            android:textSize="16sp"
-            android:textColor="#4aceff" />
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/actual_prevmonthrank"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prevmonthrank_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

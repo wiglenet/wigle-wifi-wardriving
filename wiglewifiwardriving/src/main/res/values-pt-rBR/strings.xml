@@ -266,4 +266,18 @@
     <string name="map_needs_playservice">Mapa precisa do Google Play Services</string>
     <string name="register">Registre-se</string>
     <string name="at">em</string>
+    <string name="activate">ative agora</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
+    <string name="upload_queued">Queued</string>
+    <string name="upload_parsing">Parsing…</string>
+    <string name="upload_trilaterating">Trilaterating…</string>
+    <string name="upload_stats">Final Stats…</string>
+    <string name="upload_success">Completed</string>
+    <string name="upload_failed">Failed</string>
+    <string name="upload_unknown">Unknown</string>
+    <string name="auth_username">Auth User</string>
+    <string name="deauthorize">Deauthorize (logout)</string>
+    <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
+    <string name="authorize">Authorize (login)</string>
+    <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
 </resources>

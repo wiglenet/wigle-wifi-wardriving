@@ -177,9 +177,10 @@ public class NewsFragment extends Fragment {
                 resultList.add(rowBundle);
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
-        }
-        catch (final JSONException ex) {
+        } catch (final JSONException ex) {
             MainActivity.error("json error: " + ex, ex);
+        } catch (final Exception e) {
+            MainActivity.error("news error: " + e, e);
         }
 
         final Message message = new Message();

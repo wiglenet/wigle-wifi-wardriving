@@ -218,7 +218,7 @@ public class RankStatsFragment extends Fragment {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (listAdapter == null) {
             listAdapter = new RankListAdapter(getActivity().getApplicationContext(), R.layout.rankrow);
-        } else if (!listAdapter.isEmpty() && prefs.getString(ListFragment.PREF_TOKEN,"").isEmpty()) {
+        } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
             listAdapter.clear();
         }
 
@@ -274,6 +274,7 @@ public class RankStatsFragment extends Fragment {
                         (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
                 swipeRefreshLayout.setRefreshing(false);
             }
+            //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
         }
     }
 
@@ -301,9 +302,12 @@ public class RankStatsFragment extends Fragment {
                 resultList.add(rowBundle);
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
-        }
-        catch (final JSONException ex) {
+        } catch (final JSONException ex) {
+            //TODO: better error for bundle
             MainActivity.error("json error: " + ex, ex);
+        } catch (final Exception e) {
+            //TODO: better error for bundle
+            MainActivity.error("rank error: " + e, e);
         }
 
         final Message message = new Message();

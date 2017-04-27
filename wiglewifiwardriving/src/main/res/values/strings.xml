@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation" >
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="stats">Starting</string>
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
@@ -319,5 +317,20 @@
     <string name="prevrank_title">User Ranking Last Month</string>
     <string name="prevmonthrank_title">Month Ranking Last Month</string>
     <string name="list_scanning_on">(Scanning turned on)</string>
-
+    <string name="activate">activate now</string>
+    <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
+    <string name="upload_queued">Queued</string>
+    <string name="upload_parsing">Parsing…</string>
+    <string name="upload_trilaterating">Trilaterating…</string>
+    <string name="upload_stats">Final Stats…</string>
+    <string name="upload_success">Completed</string>
+    <string name="upload_failed">Failed</string>
+    <string name="upload_unknown">Unknown</string>
+    <string name="auth_username">Auth User</string>
+    <string name="deauthorize">Deauthorize (logout)</string>
+    <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
+    <string name="authorize">Authorize (login)</string>
+    <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="title_activity_activate">Scan to activate</string>
+    <string name="unknown_number">\?\?</string>
 </resources>

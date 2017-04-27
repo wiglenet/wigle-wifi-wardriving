@@ -8,6 +8,7 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
 import android.app.Dialog;
@@ -73,7 +74,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         setName( name + "-" + getName() );
 
         try {
-            MainActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
+            MainActivity.info( "setting background thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
             Process.setThreadPriority( THREAD_PRIORITY );
 
             subRun();
@@ -141,6 +142,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             dialog.setMessage(getString(Status.WRITING.getMessage()));
             dialog.setIndeterminate(true);
             dialog.setCancelable(true);
+            dialog.setCanceledOnTouchOutside(false);
             return dialog;
         }
 
@@ -192,6 +194,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.setContext(context);
     }
 
+    protected final boolean validAuth() {
+        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        if ( (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
+            return true;
+        }
+        return false;
+
+    }
+
+
     protected final String getUsername() {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
         String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
@@ -213,7 +225,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
     protected final String getToken() {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        String token = prefs.getString(ListFragment.PREF_TOKEN, null);
+        String token = TokenAccess.getApiToken(prefs);
 
         if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
             token = "";

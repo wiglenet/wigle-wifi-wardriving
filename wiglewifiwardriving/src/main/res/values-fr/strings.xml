@@ -311,5 +311,18 @@
     <string name="rank_all_time">Classement de tous les temps</string>
     <string name="rank_month">Classements mensuels</string>
     <string name="all_time_title">WiFi découverts depuis tous les temps</string>
-
+    <string name="activate">Activer maintenant</string>
+    <string name="setting_activate_prompt">visiter https://wigle.net/activate pour votre code utilisateur</string>
+    <string name="upload_queued">En file</string>
+    <string name="upload_parsing">Analyse…</string>
+    <string name="upload_trilaterating">Trilateration…</string>
+    <string name="upload_stats">Stats finales…</string>
+    <string name="upload_success">Succès</string>
+    <string name="upload_failed">Échoué</string>
+    <string name="upload_unknown">Inconnu</string>
+    <string name="auth_username">Utilisateur Auth</string>
+    <string name="deauthorize">Désautoriser (logout)</string>
+    <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>
+    <string name="authorize">Autoriser (login)</string>
+    <string name="anonymous_confirm">Envoi anonyme?  Supprimera toutes les informations de connexion existantes de votre appareil.</string>
 </resources>

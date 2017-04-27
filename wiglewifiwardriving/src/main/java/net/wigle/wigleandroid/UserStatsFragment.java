@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UserStatsFragment extends Fragment {
-    private static final int MSG_USER_DONE = 101;
+    public static final int MSG_USER_DONE = 101;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_STATS = 202;
 
@@ -177,9 +177,10 @@ public class UserStatsFragment extends Fragment {
                         }
                     }
                 }
-            }
-            catch (final JSONException ex) {
+            } catch (final JSONException ex) {
                 MainActivity.error("json error: " + ex, ex);
+            } catch (final Exception e) {
+                MainActivity.error("user stats error: " + e, e);
             }
 
             final Message message = new Message();

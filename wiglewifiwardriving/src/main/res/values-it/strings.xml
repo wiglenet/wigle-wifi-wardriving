@@ -46,8 +46,8 @@
     <string name="battery_kill_text">Uscire a questo livello della batteria</string>
     <string name="reset_wifi_text">Rilevamento blocco sensore WiFi</string>
     <string name="speech_gps">Cambiamenti di stato GPS</string>
-    <string name="mute">Audio Disattivato</string>
-    <string name="play">Audio Attivato</string>
+    <string name="mute">Disattiva audio</string>
+    <string name="play">Attiva audio</string>
     <string name="unknown">Sconosciuto</string>
     <string name="sort_text">Opzioni di ordinamento</string>
     <string name="listdialog_button">OK</string>
@@ -308,5 +308,5 @@
     <string name="deauthorize">Deauthorize (logout)</string>
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
-    <string name="anonymous_confirm">Carica i dati in forma anonima? Consente di eliminare ogni informazioni di accesso esistente dal dispositivo.</string>
+    <string name="anonymous_confirm">Caricare i dati in forma anonima? Consente di eliminare ogni informazioni di accesso esistente dal dispositivo.</string>
 </resources>

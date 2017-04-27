@@ -82,7 +82,7 @@
     <string name="filter_show_wpa">Mostra reti WPA</string>
     <string name="filter_enabled">Filtro abilitato</string>
     <string name="list_waiting_gps">(In attesa del segnale GPS&#8230;)</string>
-    <string name="list_scanning_off">(Scansione disattivata)</string>
+    <string name="list_scanning_off">Disattiva scansione</string>
     <string name="list_short_lat">Lat:</string>
     <string name="list_short_lon">Long:</string>
     <string name="list_short_sats">Sat:</string>
@@ -117,7 +117,7 @@
     <string name="tab_data">Database</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
-    <string name="dash_scan_off">(Scansione disattivata)</string>
+    <string name="dash_scan_off">Disattiva scansione</string>
     <string name="dash_new_wifi">Nuove reti WiFi</string>
     <string name="dash_vis_nets">Reti WiFi visibili:</string>
     <string name="dash_new_upload">Nuove reti (dall\'ultimo caricamento):</string>

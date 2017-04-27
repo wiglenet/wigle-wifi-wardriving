@@ -177,8 +177,8 @@
     <string name="menu_screen_wake">Mantieni lo schermo acceso</string>
     <string name="menu_labels_off">Non mostrare etichette</string>
     <string name="menu_labels_on">Mostra etichette</string>
-    <string name="menu_zoom_in">Aumenta ingrandimento</string>
-    <string name="menu_zoom_out">Diminuisci ingrandimento</string>
+    <string name="menu_zoom_in">Ingrandisci</string>
+    <string name="menu_zoom_out">Riduci</string>
     <string name="menu_turn_off_lockon">Non seguire la posizione corrente</string>
     <string name="menu_turn_on_lockon">Segui la posizione corrente</string>
     <string name="menu_show_old">Mostra quelle viste e le nuove</string>

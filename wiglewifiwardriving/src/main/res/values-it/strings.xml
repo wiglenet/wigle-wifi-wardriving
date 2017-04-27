@@ -69,7 +69,7 @@
     <string name="query_bssid">BSSID (es: 0A:2C:EF:3D:25:1B) (caratteri jolly SQL: %,_):</string>
     <string name="search_button">Cerca nel DB locale</string>
     <string name="reset_button">Pulisci i campi</string>
-    <string name="list_query_clear">Pulisci gli argomenti della ricerca</string>
+    <string name="list_query_clear">Pulisci il campo di ricerca</string>
     <string name="crypto_security">Crittografia</string>
     <string name="crypto_strength">Potenza segnale</string>
     <string name="crypto_password">Password</string>

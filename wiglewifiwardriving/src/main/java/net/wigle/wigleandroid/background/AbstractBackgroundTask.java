@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
@@ -23,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.widget.Toast;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;

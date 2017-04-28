@@ -151,6 +151,7 @@ public class ActivateActivity extends Activity {
                                 final SharedPreferences.Editor editor = prefs.edit();
                                 editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
                                 editor.putString(ListFragment.PREF_AUTHNAME, tokens[1]);
+                                editor.putBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
                                 editor.apply();
                                 TokenAccess.setApiToken(prefs, tokens[2]);
                                 finish();

@@ -438,6 +438,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (view != null) {
             final TextView register = (TextView) view.findViewById(R.id.register);
 
+            //ALIBI: ActivateAcitivity.receiveDetections sets isAnonymous = false
             if ("".equals(username) || isAnonymous) {
                 register.setEnabled(true);
                 register.setVisibility(View.VISIBLE);

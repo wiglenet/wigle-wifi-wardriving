@@ -299,7 +299,7 @@
     <string name="setting_activate_prompt">vai a https://wigle.net/activate per il tuo codice</string>
     <string name="upload_queued">In coda</string>
     <string name="upload_parsing">Analisi…</string>
-    <string name="upload_trilaterating">Trilaterazione ...</string>
+    <string name="upload_trilaterating">Trilaterazione…</string>
     <string name="upload_stats">Trasmetto le statistiche…</string>
     <string name="upload_success">Completato</string>
     <string name="upload_failed">Non a buon fine</string>

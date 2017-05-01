@@ -303,7 +303,7 @@
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Carica</string>
     <string name="queue_depth">File Processing Queue Depth</string>
-    <string name="news_app_name">WiGLE.net Novità</string>
+    <string name="news_app_name">Novità di WiGLE.net</string>
     <string name="tab_news">Novità</string>
     <string name="wifi_gps">WiFi GPS</string>
     <string name="cell_gps">Cell GPS</string>

@@ -1,6 +1,7 @@
 * 2.19 (05/??/2017)
 Fix for activate after anonymous.
 German/Italian translation fixes (thanks kill0rz/Raffaele!)
+Better error feedback system.
 
 * 2.18 (04/14/2017)
 Fix ProviderException for token generation on some devices.

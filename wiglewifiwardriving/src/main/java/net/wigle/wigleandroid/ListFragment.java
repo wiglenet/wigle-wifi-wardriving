@@ -101,6 +101,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
     public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
     public static final String PREF_MAP_TYPE = "mapType";
+    public static final String PREF_BLOWED_UP = "blowedUp";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

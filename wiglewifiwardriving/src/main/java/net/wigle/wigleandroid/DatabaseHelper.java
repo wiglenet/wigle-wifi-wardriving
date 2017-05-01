@@ -1038,6 +1038,12 @@ public final class DatabaseHelper extends Thread {
                 edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
             }
         }
+        else if (maxid > locCount) {
+            final long newMaxid = Math.max(0, locCount - 10000);
+            MainActivity.warn("db marker: " + maxid + " greater than location count: " + locCount
+                    + ", setting to: " + newMaxid);
+            edit.putLong( ListFragment.PREF_DB_MARKER, newMaxid );
+        }
         edit.apply();
     }
 

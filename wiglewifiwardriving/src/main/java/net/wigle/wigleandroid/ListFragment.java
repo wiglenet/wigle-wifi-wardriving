@@ -622,8 +622,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final State state = main.getState();
         main.setTransferring();
         // actually need this Activity context, for dialogs
+        // writeEntireDb and writeRun are both false, so PREF_DB_MARKER is used
         state.observationUploader = new ObservationUploader(main,
-                ListFragment.lameStatic.dbHelper, this, false, false, true);
+                ListFragment.lameStatic.dbHelper, this, false, false, false);
         try {
             state.observationUploader.startDownload(this);
         } catch (WiGLEAuthException waex) {

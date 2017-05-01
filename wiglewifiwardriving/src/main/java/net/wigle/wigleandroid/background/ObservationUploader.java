@@ -81,8 +81,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         if (writeRun && writeEntireDb) {
             throw new IllegalArgumentException("Cannot specify both individual run and entire db");
-        } else if (!writeRun && !writeEntireDb) {
-            throw new IllegalArgumentException("Must specify either individual run and entire db");
         }
         this.writeEntireDb = writeEntireDb;
         this.writeRun = writeRun;

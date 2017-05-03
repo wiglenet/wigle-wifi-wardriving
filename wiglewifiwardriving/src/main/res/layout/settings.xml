@@ -121,6 +121,38 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/disable_toast" />
+<CheckBox android:id="@+id/show_my_discovered"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="@string/show_my_discovered" />
+
+<LinearLayout
+	android:id="@+id/show_my_discovered_since"
+	android:orientation="horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_marginTop="2dip"
+	android:layout_marginBottom="2dip"
+	android:visibility="gone"
+	>
+	<Spinner android:id="@+id/networks_discovered_since_year"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:drawSelectorOnTop="true"
+		android:layout_weight="0"
+		android:prompt="@string/periodstill_text"
+		/>
+	<!-- style="@style/mySpinnerItemStyle" -->
+	<TextView
+		android:id="@+id/show_discovered_since"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:text="@string/show_discovered_since"
+		android:layout_weight="1"
+		android:layout_marginRight="6dip"
+		tools:ignore="RtlHardcoded"
+		/>
+</LinearLayout>
 
 <LinearLayout
     android:orientation="horizontal"
@@ -297,7 +329,6 @@
         tools:ignore="RtlHardcoded"
         />
 </LinearLayout>
-
 <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"

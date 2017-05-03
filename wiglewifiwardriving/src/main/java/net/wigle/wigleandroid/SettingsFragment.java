@@ -2,7 +2,12 @@ package net.wigle.wigleandroid;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -362,6 +367,34 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+
+        final boolean showMyDiscovered = prefs.getBoolean( ListFragment.PREF_SHOW_MY_DISCOVERED, false);
+        final CheckBox showMyNetsOnMap = (CheckBox) view.findViewById(R.id.show_my_discovered);
+        showMyNetsOnMap.setChecked( showMyDiscovered );
+        showMyNetsOnMap.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
+                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_my_discovered_since);
+                if ( isChecked ) {
+                    mainLayout.setVisibility(View.VISIBLE);
+                } else {
+                    mainLayout.setVisibility(View.GONE);
+                }
+                editor.putBoolean(ListFragment.PREF_SHOW_MY_DISCOVERED, isChecked);
+                editor.apply();
+            }
+        });
+
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        List<Long> yearValueBase = new ArrayList<Long>();
+        List<String> yearLabelBase = new ArrayList<String>();
+        for (int i = 2001; i <= thisYear; i++) {
+            yearValueBase.add((long)(i));
+            yearLabelBase.add(Integer.toString(i));
+        }
+        doSpinner( R.id.networks_discovered_since_year, view, ListFragment.PREF_SHOW_DISCOVERED_SINCE,
+                2001L, yearValueBase.toArray(new Long[0]),
+                yearLabelBase.toArray(new String[0]) );
 
         passEdit.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
         passEdit.addTextChangedListener( new SetWatcher() {

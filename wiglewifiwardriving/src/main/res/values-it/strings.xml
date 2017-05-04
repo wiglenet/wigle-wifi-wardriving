@@ -176,13 +176,13 @@
     <string name="menu_screen_sleep">Permetti allo schermo di spegnersi</string>
     <string name="menu_screen_wake">Mantieni lo schermo acceso</string>
     <string name="menu_labels_off">Non mostrare etichette</string>
-    <string name="menu_labels_on">Mostra etichette</string>
+    <string name="menu_labels_on">Attiva etichette</string>
     <string name="menu_zoom_in">Ingrandisci</string>
     <string name="menu_zoom_out">Riduci</string>
     <string name="menu_turn_off_lockon">Non seguire la posizione corrente</string>
     <string name="menu_turn_on_lockon">Segui la posizione corrente</string>
-    <string name="menu_show_old">Mostra quelle viste e le nuove</string>
-    <string name="menu_show_new">Mostra solo nuove</string>
+    <string name="menu_show_old">Attiva tutte quelle trovate</string>
+    <string name="menu_show_new">Nascondi quelle già nel DB</string>
     <string name="menu_copy_network">Copia rete BSSID</string>
     <string name="tts_no_gps_fix">Nessun segnale GPS</string>
     <string name="tts_new_wifi">Nuova rete WiFi</string>

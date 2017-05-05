@@ -127,7 +127,7 @@
     <string name="dash_dist_prev">Distanza percorsa (esecuzione precedente):</string>
     <string name="dash_db_queue">Coda database:</string>
     <string name="dash_db_nets">Reti database:</string>
-    <string name="dash_db_locs">Posizioni db:</string>
+    <string name="dash_db_locs">Posizioni database:</string>
     <string name="dash_no_loc">Posizione non disponibile!</string>
     <string name="dash_short_loc">Pos:</string>
     <string name="km_short">km</string>

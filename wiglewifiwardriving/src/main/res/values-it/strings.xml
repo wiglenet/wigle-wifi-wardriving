@@ -4,7 +4,7 @@
     <string name="app_name">WiGLE WiFi Wardriving</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi - Impostazioni</string>
-    <string name="mapping_app_name">WiGLE WiFi - Lista geografica</string>
+    <string name="mapping_app_name">Lista geografica</string>
     <string name="dashboard_app_name">WiGLE WiFi - Riepilogo</string>
     <string name="error_report_name">WiGLE WiFi - Segnalazioni di errore</string>
     <string name="speech_name">WiGLE WiFi - Impostazioni sintesi vocale</string>
@@ -269,7 +269,7 @@
     <string name="drawer_open">Cassetto Aperto</string>
     <string name="drawer_close">Cassetto Chiuso</string>
     <string name="tab_stats">Statistiche</string>
-    <string name="site_stats_app_name">Statistiche WiGLE.net</string>
+    <string name="site_stats_app_name">Generali</string>
     <string name="netloc_title">Reti WiFi WiGLE.net con localizzazioni</string>
     <string name="loctotal_title">Osservatori Reti WiFi WiGLE.net</string>
     <string name="genloc_title">Torri GSM WiGLE.net con localizzazioni</string>
@@ -280,7 +280,7 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">Nessuno</string>
     <string name="netwepunknown_title">Sconosciuto</string>
-    <string name="user_stats_app_name">Statistiche Utente</string>
+    <string name="user_stats_app_name">Individuali</string>
     <string name="rank_title">Classifica utente:</string>
     <string name="discovered_title">Reti WiFi Scoperte (Nuove per WiGLE)</string>
     <string name="total_title">Totale Reti WiFi Viste</string>

@@ -42,6 +42,7 @@
     <string name="period_text">Time between WiFi scans when slower than 8 km/h or 5 mph</string>
     <string name="periodfast_text">Time between WiFi scans when faster than 8 km/h or 5 mph</string>
     <string name="gps_text">Time between GPS updates</string>
+    <string name="gps_accuracy_text">GPS accuracy level required to record</string>
     <string name="speak_text">Time between audio speech</string>
     <string name="battery_kill_text">Exit at this battery level</string>
     <string name="reset_wifi_text">Decide WiFi is jammed</string>

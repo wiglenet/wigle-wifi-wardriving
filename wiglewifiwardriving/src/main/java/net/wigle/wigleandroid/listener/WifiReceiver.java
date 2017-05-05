@@ -284,7 +284,13 @@ public class WifiReceiver extends BroadcastReceiver {
                     else {
                         // loop for stress-testing
                         // for ( int i = 0; i < 10; i++ ) {
-                        dbHelper.addObservation( network, location, added );
+                        long gpsAccuracyThreshold = prefs.getLong(
+                                ListFragment.PREF_GPS_ACCURACY, MainActivity.DEFAULT_GPS_ACCURACY_THRESHOLD);
+                        final boolean gpsAccurate = (gpsAccuracyThreshold == 0L) || gpsAccuracyThreshold >= location.getAccuracy();
+
+                        if ( gpsAccurate ) {
+                            dbHelper.addObservation(network, location, added);
+                        }
                         // }
                     }
                 } else {
@@ -491,6 +497,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     private Network recordCellInfo(final Location location) {
         TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         Network network = null;
         if ( tele != null ) {
       /*
@@ -588,7 +595,13 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
 
                 if ( location != null ) {
-                    dbHelper.addObservation(network, location, newForRun);
+                    long gpsAccuracyThreshold = prefs.getLong(
+                            ListFragment.PREF_GPS_ACCURACY, MainActivity.DEFAULT_GPS_ACCURACY_THRESHOLD);
+                    final boolean gpsAccurate = (gpsAccuracyThreshold == 0L) || gpsAccuracyThreshold >= location.getAccuracy();
+
+                    if ( gpsAccurate ) {
+                        dbHelper.addObservation(network, location, newForRun);
+                    }
                 }
             }
         }

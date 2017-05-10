@@ -325,6 +325,6 @@
     <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>
     <string name="authorize">Autoriser (login)</string>
     <string name="anonymous_confirm">Envoi anonyme?  Supprimera toutes les informations de connexion existantes de votre appareil.</string>
-    <string name="show_my_discovered">Show Networks I discovered on Map</string>
     <string name="show_discovered_since">Afficher les réseaux découverts depuis</string>
+    <string name="show_discovered">Afficher les réseaux découverts sur la carte</string>
 </resources>

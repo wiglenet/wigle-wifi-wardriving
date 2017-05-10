@@ -268,6 +268,6 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
-    <string name="show_my_discovered">Visa nätverk som jag upptäckte på kartan</string>
     <string name="show_discovered_since">Visa nätverk upptäckt sedan</string>
+    <string name="show_discovered">Visa upptäckta nätverk på kartan</string>
 </resources>

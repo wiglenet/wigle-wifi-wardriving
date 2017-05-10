@@ -333,6 +333,6 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="title_activity_activate">Scan to activate</string>
     <string name="unknown_number">\?\?</string>
-    <string name="show_my_discovered">Show Networks I Discovered on Map</string>
+    <string name="show_discovered">Show Discovered Networks on Map</string>
     <string name="show_discovered_since">Show Networks Discovered Since</string>
 </resources>

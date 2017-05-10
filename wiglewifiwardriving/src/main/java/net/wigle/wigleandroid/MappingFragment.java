@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -14,6 +17,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -21,6 +25,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +50,10 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.TileOverlay;
+import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.android.gms.maps.model.TileProvider;
+import com.google.android.gms.maps.model.UrlTileProvider;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -89,6 +98,11 @@ public final class MappingFragment extends Fragment {
     private static final int MENU_WAKELOCK = 22;
 
     private static final int SSID_FILTER = 102;
+
+    private static final String MAP_TILE_URL_FORMAT =
+            "https://wigle.net/clientTile?zoom=%d&x=%d&y=%d&startTransID=%s&endTransID=%s";
+
+    private static final String HIGH_RES_TILE_TRAILER = "&sizeX=512&sizeY=512";
 
     /** Called when the activity is first created. */
     @Override
@@ -179,6 +193,63 @@ public final class MappingFragment extends Fragment {
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(centerPoint).zoom(zoom).build();
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                if (prefs.getBoolean(ListFragment.PREF_SHOW_DISCOVERED, false)) {
+
+                    TileProvider tileProvider = new UrlTileProvider(256, 256) {
+                        @Override
+                        public URL getTileUrl(int x, int y, int zoom) {
+                            final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
+                            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+
+                            String sinceString = String.format("%d0000-00000", since);
+                            String toString = String.format("%d0000-00000", thisYear+1);
+                            String s = String.format(MAP_TILE_URL_FORMAT,
+                                    zoom, x, y, sinceString, toString);
+
+                            if (Build.VERSION.SDK_INT >= 17) {
+                                //if we can detect it, and if the display density is >= 240dpi, load Hi-Res tiles.
+                                DisplayMetrics metrics = new DisplayMetrics();
+                                MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+                                int dpi = metrics.densityDpi;
+                                if (dpi >= 240) {
+                                    s += HIGH_RES_TILE_TRAILER;
+                                }
+                            }
+                            MainActivity.info("map URL: " + s);
+
+                            if (!checkTileExists(x, y, zoom)) {
+                                return null;
+                            }
+
+                            try {
+                                return new URL(s);
+                            } catch (MalformedURLException e) {
+                                throw new AssertionError(e);
+                            }
+                        }
+
+                        /*
+                         * Check that the tile server supports the requested x, y and zoom.
+                         * Complete this stub according to the tile range you support.
+                         * If you support a limited range of tiles at different zoom levels, then you
+                         * need to define the supported x, y range at each zoom level.
+                         */
+                        private boolean checkTileExists(int x, int y, int zoom) {
+                            int minZoom = 0;
+                            int maxZoom = 18;
+
+                            if ((zoom < minZoom || zoom > maxZoom)) {
+                                return false;
+                            }
+
+                            return true;
+                        }
+                    };
+
+                    TileOverlay tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
+                            .tileProvider(tileProvider).transparency(0.5f));
+                }
             }
         });
         MainActivity.info("done setupMapView.");

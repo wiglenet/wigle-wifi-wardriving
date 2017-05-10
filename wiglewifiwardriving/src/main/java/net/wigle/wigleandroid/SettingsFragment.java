@@ -368,19 +368,23 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
         });
 
-        final boolean showMyDiscovered = prefs.getBoolean( ListFragment.PREF_SHOW_MY_DISCOVERED, false);
-        final CheckBox showMyNetsOnMap = (CheckBox) view.findViewById(R.id.show_my_discovered);
+        final boolean showMyDiscovered = prefs.getBoolean( ListFragment.PREF_SHOW_DISCOVERED, false);
+        if (showMyDiscovered) {
+            LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+            mainLayout.setVisibility(View.VISIBLE);
+        }
+        final CheckBox showMyNetsOnMap = (CheckBox) view.findViewById(R.id.show_discovered);
         showMyNetsOnMap.setChecked( showMyDiscovered );
         showMyNetsOnMap.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_my_discovered_since);
+                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
                 if ( isChecked ) {
                     mainLayout.setVisibility(View.VISIBLE);
                 } else {
                     mainLayout.setVisibility(View.GONE);
                 }
-                editor.putBoolean(ListFragment.PREF_SHOW_MY_DISCOVERED, isChecked);
+                editor.putBoolean(ListFragment.PREF_SHOW_DISCOVERED, isChecked);
                 editor.apply();
             }
         });

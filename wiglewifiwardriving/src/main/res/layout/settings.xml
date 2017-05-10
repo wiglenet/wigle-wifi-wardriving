@@ -121,13 +121,13 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/disable_toast" />
-<CheckBox android:id="@+id/show_my_discovered"
+<CheckBox android:id="@+id/show_discovered"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
-	android:text="@string/show_my_discovered" />
+	android:text="@string/show_discovered" />
 
 <LinearLayout
-	android:id="@+id/show_my_discovered_since"
+	android:id="@+id/show_map_discovered_since"
 	android:orientation="horizontal"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"

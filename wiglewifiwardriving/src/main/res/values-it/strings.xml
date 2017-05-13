@@ -311,4 +311,8 @@
     <string name="anonymous_confirm">Caricare i dati in forma anonima? Consente di eliminare ogni informazioni di accesso esistente dal dispositivo.</string>
     <string name="show_discovered_since">Mostra reti scoperte da</string>
     <string name="show_discovered">Mostra reti scoperte sulla mappa</string>
+    <string name="map_none">Nessuna</string>
+    <string name="map_all">Tutti</string>
+    <string name="map_not_mine">Altri</string>
+    <string name="map_mine">Il mio</string>
 </resources>

@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">Vis netværk opdaget siden</string>
     <string name="show_discovered">Vis opdagede netværk på kort</string>
+    <string name="map_none">Ingen</string>
+    <string name="map_all">Alle</string>
+    <string name="map_not_mine">Andre</string>
+    <string name="map_mine">Mine</string>
 </resources>

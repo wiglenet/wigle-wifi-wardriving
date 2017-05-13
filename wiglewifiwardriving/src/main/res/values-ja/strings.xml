@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">以来発見されたネットワークを表示</string>
     <string name="show_discovered">マップ上に検出されたネットワークを表示する</string>
+    <string name="map_none">なし</string>
+    <string name="map_all">すべて</string>
+    <string name="map_not_mine">その他</string>
+    <string name="map_mine">鉱山</string>
 </resources>

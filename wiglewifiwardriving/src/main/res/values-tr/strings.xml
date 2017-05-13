@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">O zamandan beri Ağları Göster</string>
     <string name="show_discovered">Keşfedilen Ağları Haritada Göster</string>
+    <string name="map_none">Yok</string>
+    <string name="map_all">Herşey</string>
+    <string name="map_not_mine">Diğerleri</string>
+    <string name="map_mine">Mayın</string>
 </resources>

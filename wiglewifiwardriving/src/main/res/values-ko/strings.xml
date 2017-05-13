@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">이후 발견 된 네트워크 표시</string>
     <string name="show_discovered">지도에 발견 된 네트워크 표시</string>
+    <string name="map_none">아무</string>
+    <string name="map_all">모든</string>
+    <string name="map_not_mine">기타</string>
+    <string name="map_mine">광산</string>
 </resources>

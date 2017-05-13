@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">शो के बाद से नेटवर्क का पता चला</string>
     <string name="show_discovered">नक्शे पर खोजा गया नेटवर्क दिखाएं</string>
+    <string name="map_none">कोई नहीं</string>
+    <string name="map_all">सब</string>
+    <string name="map_not_mine">अन्य लोग</string>
+    <string name="map_mine">मेरी</string>
 </resources>

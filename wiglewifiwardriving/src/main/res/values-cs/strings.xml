@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">Zobrazit sítě zjištěné od</string>
     <string name="show_discovered">Zobrazit objevené sítě na mapě</string>
+    <string name="map_none">Žádný</string>
+    <string name="map_all">Všechno</string>
+    <string name="map_not_mine">Ostatní</string>
+    <string name="map_mine">těžit</string>
 </resources>

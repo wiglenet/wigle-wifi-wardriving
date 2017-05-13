@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">Näytä verkkojen havaitseminen</string>
     <string name="show_discovered">Näytä löydetyt verkot kartalla</string>
+    <string name="map_none">Ei mitään</string>
+    <string name="map_all">Kaikki</string>
+    <string name="map_not_mine">toiset</string>
+    <string name="map_mine">Kaivos</string>
 </resources>

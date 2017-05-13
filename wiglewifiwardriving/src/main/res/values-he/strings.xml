@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">הצג רשתות שהתגלו מאז</string>
     <string name="show_discovered">הצג רשתות שהתגלו במפה</string>
+    <string name="map_none">אף אחד</string>
+    <string name="map_all">את כל</string>
+    <string name="map_not_mine">אחרים</string>
+    <string name="map_mine">שלי</string>
 </resources>

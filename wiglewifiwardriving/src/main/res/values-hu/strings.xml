@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">A felfedezett hálózatok megjelenítése</string>
     <string name="show_discovered">A feltárt hálózatok megjelenítése a térképen</string>
+    <string name="map_none">Egyik sem</string>
+    <string name="map_all">Minden</string>
+    <string name="map_not_mine">Egyéb</string>
+    <string name="map_mine">Enyém</string>
 </resources>

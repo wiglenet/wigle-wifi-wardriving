@@ -270,4 +270,8 @@
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
     <string name="show_discovered_since">Toon netwerken ontdekt sinds</string>
     <string name="show_discovered">Toon ontdekte netwerken op kaart</string>
+    <string name="map_none">Geen</string>
+    <string name="map_all">Alle</string>
+    <string name="map_not_mine">anderen</string>
+    <string name="map_mine">De mijne</string>
 </resources>

@@ -327,4 +327,8 @@
     <string name="anonymous_confirm">Envoi anonyme?  Supprimera toutes les informations de connexion existantes de votre appareil.</string>
     <string name="show_discovered_since">Afficher les réseaux découverts depuis</string>
     <string name="show_discovered">Afficher les réseaux découverts sur la carte</string>
+    <string name="map_none">Aucun</string>
+    <string name="map_all">Tout</string>
+    <string name="map_not_mine">Autres</string>
+    <string name="map_mine">Mien</string>
 </resources>

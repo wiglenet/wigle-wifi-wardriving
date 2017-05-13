@@ -104,6 +104,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_BLOWED_UP = "blowedUp";
     public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
     public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
+    public static final String PREF_MAP_NO_TILE = "NONE";
+    public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
+    public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
+    public static final String PREF_MAP_ALL_TILE = "ALL";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

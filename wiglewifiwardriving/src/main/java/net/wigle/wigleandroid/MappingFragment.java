@@ -1,7 +1,13 @@
 package net.wigle.wigleandroid;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -25,6 +31,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,11 +57,13 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 import com.google.android.gms.maps.model.UrlTileProvider;
 
+import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -103,6 +112,8 @@ public final class MappingFragment extends Fragment {
             "https://wigle.net/clientTile?zoom=%d&x=%d&y=%d&startTransID=%s&endTransID=%s";
 
     private static final String HIGH_RES_TILE_TRAILER = "&sizeX=512&sizeY=512";
+    private static final String ONLY_MINE_TILE_TRAILER = "&onlymine=1";
+    private static final String NOT_MINE_TILE_TRAILER = "&notmine=1";
 
     /** Called when the activity is first created. */
     @Override
@@ -194,39 +205,66 @@ public final class MappingFragment extends Fragment {
                         .target(centerPoint).zoom(zoom).build();
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                if (prefs.getBoolean(ListFragment.PREF_SHOW_DISCOVERED, false)) {
+                if (!ListFragment.PREF_MAP_NO_TILE.equals(
+                        prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+                                ListFragment.PREF_MAP_NO_TILE))) {
+                    final int providerTileRes = MainActivity.isHighDefinition()?512:256;
 
-                    TileProvider tileProvider = new UrlTileProvider(256, 256) {
+                    //TODO: figure out how we want to handle settings when not authed/auth fails
+                    //TODO: DRY up token composition vs AbstractApiRequest?
+                    String ifAuthToken = null;
+                    try {
+                        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+                        final String token = TokenAccess.getApiToken(prefs);
+                        final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+                        ifAuthToken = "Basic " + encoded;
+                    } catch (UnsupportedEncodingException ueex) {
+                        MainActivity.error("map tiles unable to encode credentials for mine/others");
+                    }
+                    final String authToken = ifAuthToken;
+
+                    final String userAgent = AbstractApiRequest.getUserAgentString();
+
+
+                    TileProvider tileProvider = new TileProvider() {
                         @Override
-                        public URL getTileUrl(int x, int y, int zoom) {
+                        public Tile getTile(int x, int y, int zoom) {
+                            if (!checkTileExists(x, y, zoom)) {
+                                return null;
+                            }
+
                             final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
                             int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+                            String tileContents = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+                                    ListFragment.PREF_MAP_NO_TILE);
 
                             String sinceString = String.format("%d0000-00000", since);
                             String toString = String.format("%d0000-00000", thisYear+1);
                             String s = String.format(MAP_TILE_URL_FORMAT,
                                     zoom, x, y, sinceString, toString);
 
-                            if (Build.VERSION.SDK_INT >= 17) {
-                                //if we can detect it, and if the display density is >= 240dpi, load Hi-Res tiles.
-                                DisplayMetrics metrics = new DisplayMetrics();
-                                MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-                                int dpi = metrics.densityDpi;
-                                if (dpi >= 240) {
+                            if (MainActivity.isHighDefinition()) {
                                     s += HIGH_RES_TILE_TRAILER;
-                                }
                             }
-                            MainActivity.info("map URL: " + s);
 
-                            if (!checkTileExists(x, y, zoom)) {
-                                return null;
+                            // ALIBI: defaults to "ALL"
+                            if (ListFragment.PREF_MAP_ONLYMINE_TILE.equals(tileContents)) {
+                                s += ONLY_MINE_TILE_TRAILER;
+                            } else if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(tileContents)) {
+                                s += NOT_MINE_TILE_TRAILER;
                             }
+
+                            //DEBUG: MainActivity.info("map URL: " + s);
 
                             try {
-                                return new URL(s);
+                                final byte[] data = downloadData(new URL(s), userAgent, authToken);
+                                if (data != null) {
+                                    return new Tile(providerTileRes, providerTileRes, data);
+                                }
                             } catch (MalformedURLException e) {
                                 throw new AssertionError(e);
                             }
+                            return null;
                         }
 
                         /*
@@ -245,10 +283,44 @@ public final class MappingFragment extends Fragment {
 
                             return true;
                         }
+
+                        private byte[] downloadData(final URL url, final String userAgent, final String authToken) {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            InputStream is = null;
+                            try {
+                                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                                conn.setRequestProperty("Authorization", authToken);
+                                conn.setRequestProperty("User-Agent", userAgent);
+                                is = conn.getInputStream();
+                                byte[] byteChunk = new byte[4096];
+                                int n;
+
+                                while ((n = is.read(byteChunk)) > 0) {
+                                    baos.write(byteChunk, 0, n);
+                                }
+                            } catch (IOException e) {
+                                MainActivity.error("Failed while reading bytes from " +
+                                        url.toExternalForm() + ": "+ e.getMessage());
+                                e.printStackTrace();
+                            } finally {
+                                if (is != null) {
+                                    try {
+                                        is.close();
+                                    } catch (IOException ioex) {
+                                        MainActivity.error("Failed while closing InputStream " +
+                                                url.toExternalForm() + ": "+ ioex.getMessage());
+                                        ioex.printStackTrace();
+                                    }
+                                }
+                            }
+                            return baos.toByteArray();
+                        }
                     };
 
+
+
                     TileOverlay tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
-                            .tileProvider(tileProvider).transparency(0.5f));
+                            .tileProvider(tileProvider).transparency(0.35f));
                 }
             }
         });

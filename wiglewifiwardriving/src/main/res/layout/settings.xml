@@ -121,11 +121,29 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/disable_toast" />
-<CheckBox android:id="@+id/show_discovered"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="@string/show_discovered" />
-
+<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="2dip"
+		android:layout_marginBottom="2dip"
+		>
+	<Spinner android:id="@+id/show_discovered"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:drawSelectorOnTop="true"
+		android:layout_weight="0"
+		/>
+	<TextView
+		android:id="@+id/show_discovered_text"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:text="@string/show_discovered"
+		android:layout_weight="1"
+		android:layout_marginRight="6dip"
+		tools:ignore="RtlHardcoded"
+		/>
+</LinearLayout>
 <LinearLayout
 	android:id="@+id/show_map_discovered_since"
 	android:orientation="horizontal"

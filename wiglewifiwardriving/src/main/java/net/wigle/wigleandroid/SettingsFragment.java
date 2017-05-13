@@ -367,27 +367,23 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+;
 
-        final boolean showMyDiscovered = prefs.getBoolean( ListFragment.PREF_SHOW_DISCOVERED, false);
-        if (showMyDiscovered) {
+        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        final String[] mapModes = new String[]{ListFragment.PREF_MAP_NO_TILE,
+                ListFragment.PREF_MAP_ONLYMINE_TILE, ListFragment.PREF_MAP_NOTMINE_TILE,
+                ListFragment.PREF_MAP_ALL_TILE};
+        final String[] mapModeName = new String[]{ getString(R.string.map_none),
+                getString(R.string.map_mine), getString(R.string.map_not_mine),
+                getString(R.string.map_all)};
+
+        if (!ListFragment.PREF_MAP_NO_TILE.equals(showDiscovered)) {
             LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
             mainLayout.setVisibility(View.VISIBLE);
         }
-        final CheckBox showMyNetsOnMap = (CheckBox) view.findViewById(R.id.show_discovered);
-        showMyNetsOnMap.setChecked( showMyDiscovered );
-        showMyNetsOnMap.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
-                if ( isChecked ) {
-                    mainLayout.setVisibility(View.VISIBLE);
-                } else {
-                    mainLayout.setVisibility(View.GONE);
-                }
-                editor.putBoolean(ListFragment.PREF_SHOW_DISCOVERED, isChecked);
-                editor.apply();
-            }
-        });
+
+        doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
+                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, getContext(), view );
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         List<Long> yearValueBase = new ArrayList<Long>();
@@ -629,6 +625,56 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });
     }
+
+    public static void doMapSpinner( final int spinnerId, final String pref, final String spinDefault, final String[] terms,
+                                      final String[] termNames, final Context context, final View view ) {
+
+        if ( terms.length != termNames.length ) {
+            throw new IllegalArgumentException("lists don't match: " + Arrays.toString(terms)
+                    + " periodName: " + Arrays.toString(termNames));
+        }
+
+        Spinner spinner = (Spinner)view.findViewById(spinnerId);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Editor editor = prefs.edit();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context, android.R.layout.simple_spinner_item);
+
+        final String term = prefs.getString(pref, spinDefault );
+
+        int termIndex = 0;
+        for ( int i = 0; i < terms.length; i++ ) {
+            adapter.add( termNames[i] );
+            if ( term.equals(terms[i]) ) {
+                termIndex = i;
+            }
+        }
+        MainActivity.info("current selection: "+term +": ("+termIndex+")");
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+        spinner.setAdapter( adapter );
+        spinner.setSelection( termIndex );
+        spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+                // set pref
+                final String period = terms[position];
+                MainActivity.info( pref + " setting map data: " + period );
+                editor.putString( pref, period );
+                editor.apply();
+                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+
+                if (ListFragment.PREF_MAP_NO_TILE.equals(period)) {
+                    mainLayout.setVisibility(View.GONE);
+                } else {
+                    mainLayout.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override
+            public void onNothingSelected( final AdapterView<?> arg0 ) {}
+        });
+    }
+
 
     /* Creates the menu items */
     @Override

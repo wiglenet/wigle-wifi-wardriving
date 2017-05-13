@@ -84,11 +84,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         return createConnection(connectURL, setBoundary, preConnectConfigurator, connectionMethod);
     }
 
-    private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
-                                                      final PreConnectConfigurator preConnectConfigurator,
-                                                      final String connectionMethod)
-            throws IOException {
-
+    public static String getUserAgentString() {
         String javaVersion = "unknown";
         try {
             javaVersion =  System.getProperty("java.vendor") + " " +
@@ -100,7 +96,15 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                     System.getProperty("os.version") +
                     " [" + System.getProperty("os.arch") + "]";
         } catch (RuntimeException ignored) { }
-        final String userAgent = "WigleWifi ("+javaVersion+")";
+        return "WigleWifi ("+javaVersion+")";
+    }
+
+    private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
+                                                      final PreConnectConfigurator preConnectConfigurator,
+                                                      final String connectionMethod)
+            throws IOException {
+
+        final String userAgent = AbstractApiRequest.getUserAgentString();
 
         // Open a HTTP connection to the URL
         HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();

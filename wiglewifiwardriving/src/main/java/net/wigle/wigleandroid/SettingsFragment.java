@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -237,6 +235,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
         final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
         final Button authButton = (Button) view.findViewById(R.id.authorize_client);
+
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
             authUserDisplay.setVisibility(View.VISIBLE);
@@ -379,12 +378,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 ;
 
         final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
-        final String[] mapModes = new String[]{ListFragment.PREF_MAP_NO_TILE,
-                ListFragment.PREF_MAP_ONLYMINE_TILE, ListFragment.PREF_MAP_NOTMINE_TILE,
-                ListFragment.PREF_MAP_ALL_TILE};
-        final String[] mapModeName = new String[]{ getString(R.string.map_none),
-                getString(R.string.map_mine), getString(R.string.map_not_mine),
-                getString(R.string.map_all)};
+        final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
+        final String[] mapModes = getMapModes(isAuthenticated);
+        final String[] mapModeName = getMapModeNames(isAuthenticated);
 
         if (!ListFragment.PREF_MAP_NO_TILE.equals(showDiscovered)) {
             LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
@@ -470,6 +466,28 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
+    }
+
+    private String[] getMapModes(final boolean isAuthed) {
+        if (isAuthed) {
+            return new String[]{ListFragment.PREF_MAP_NO_TILE,
+                    ListFragment.PREF_MAP_ONLYMINE_TILE, ListFragment.PREF_MAP_NOTMINE_TILE,
+                    ListFragment.PREF_MAP_ALL_TILE};
+
+        }
+        return new String[]{ListFragment.PREF_MAP_NO_TILE,
+                ListFragment.PREF_MAP_ALL_TILE};
+    }
+
+    private String[] getMapModeNames(final boolean isAuthed) {
+        if (isAuthed) {
+            return new String[]{ getString(R.string.map_none),
+                    getString(R.string.map_mine), getString(R.string.map_not_mine),
+                    getString(R.string.map_all)};
+
+        }
+        return new String[]{ getString(R.string.map_none),
+               getString(R.string.map_all)};
     }
 
     private void updateRegister(final View view) {

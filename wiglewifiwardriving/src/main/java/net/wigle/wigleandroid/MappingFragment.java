@@ -216,8 +216,10 @@ public final class MappingFragment extends Fragment {
                     try {
                         final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
                         final String token = TokenAccess.getApiToken(prefs);
-                        final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
-                        ifAuthToken = "Basic " + encoded;
+                        if ((null != authname) && (null != token)) {
+                            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+                            ifAuthToken = "Basic " + encoded;
+                        }
                     } catch (UnsupportedEncodingException ueex) {
                         MainActivity.error("map tiles unable to encode credentials for mine/others");
                     }
@@ -289,7 +291,9 @@ public final class MappingFragment extends Fragment {
                             InputStream is = null;
                             try {
                                 HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-                                conn.setRequestProperty("Authorization", authToken);
+                                if (null != authToken) {
+                                    conn.setRequestProperty("Authorization", authToken);
+                                }
                                 conn.setRequestProperty("User-Agent", userAgent);
                                 is = conn.getInputStream();
                                 byte[] byteChunk = new byte[4096];

@@ -139,6 +139,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             case DEAUTHORIZE_DIALOG: {
                 editor.remove(ListFragment.PREF_AUTHNAME);
                 editor.remove(ListFragment.PREF_TOKEN);
+                String mapTileMode = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+                        ListFragment.PREF_MAP_NO_TILE);
+                if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
+                        ListFragment.PREF_MAP_ONLYMINE_TILE.equals(mapTileMode)) {
+                    // ALIBI: clear show mine/others on deauthorize
+                    editor.putString(ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+                }
                 editor.apply();
                 if (view != null) {
                     this.updateView(view);
@@ -249,8 +256,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 passEditLabel.setVisibility(View.GONE);
                 showPass.setVisibility(View.GONE);
                 user.setEnabled(false);
+                //TODO: enable onlymine/notmine
             } else {
                 user.setEnabled(true);
+                //TODO: disable onlymine/notmine
             }
         } else {
             user.setEnabled(true);
@@ -604,7 +613,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
                 // set pref
                 final V period = periods[position];
-                MainActivity.info( pref + " setting scan period: " + period );
+                MainActivity.info( pref + " setting period: " + period );
                 if ( period instanceof Long ) {
                     editor.putLong( pref, (Long) period );
                 }

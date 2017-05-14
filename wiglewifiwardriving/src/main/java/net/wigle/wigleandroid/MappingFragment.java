@@ -210,7 +210,6 @@ public final class MappingFragment extends Fragment {
                                 ListFragment.PREF_MAP_NO_TILE))) {
                     final int providerTileRes = MainActivity.isHighDefinition()?512:256;
 
-                    //TODO: figure out how we want to handle settings when not authed/auth fails
                     //TODO: DRY up token composition vs AbstractApiRequest?
                     String ifAuthToken = null;
                     try {

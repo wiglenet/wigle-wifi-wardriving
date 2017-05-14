@@ -255,10 +255,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 passEditLabel.setVisibility(View.GONE);
                 showPass.setVisibility(View.GONE);
                 user.setEnabled(false);
-                //TODO: enable onlymine/notmine
             } else {
                 user.setEnabled(true);
-                //TODO: disable onlymine/notmine
             }
         } else {
             user.setEnabled(true);

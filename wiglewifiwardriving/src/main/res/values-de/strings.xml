@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Ab</string>
-    <string name="app_name">WiGLE Wifi Wardriving</string>
-    <string name="list_app_name">WiGLE Wifi</string>
-    <string name="settings_app_name">WiGLE Wifi - Einstellungen</string>
-    <string name="mapping_app_name">WiGLE Wifi - OpenStreetMap</string>
-    <string name="dashboard_app_name">WiGLE Wifi - Dashboard</string>
-    <string name="error_report_name">WiGLE Wifi - Letzter Fehlerreport</string>
-    <string name="speech_name">WiGLE Wifi - Spracheinstellungen</string>
-    <string name="network_activity_name">WiGLE Wifi - Netzwerk</string>
-    <string name="data_activity_name">WiGLE Wifi - Datenbank</string>
-    <string name="dbresult_activity_name">WiGLE Wifi - Suchergebnis</string>
+    <string name="app_name">WiGLE WiFi Wardriving</string>
+    <string name="list_app_name">WiGLE WiFi</string>
+    <string name="settings_app_name">WiGLE WiFi - Einstellungen</string>
+    <string name="mapping_app_name">WiGLE WiFi - OpenStreetMap</string>
+    <string name="dashboard_app_name">WiGLE WiFi - Dashboard</string>
+    <string name="error_report_name">WiGLE WiFi - Letzter Fehlerreport</string>
+    <string name="speech_name">WiGLE WiFi - Spracheinstellungen</string>
+    <string name="network_activity_name">WiGLE WiFi - Netzwerk</string>
+    <string name="data_activity_name">WiGLE WiFi - Datenbank</string>
+    <string name="dbresult_activity_name">WiGLE WiFi - Suchergebnis</string>
     <string name="upload_button">Hochladen zu\nWiGLE.net</string>
     <string name="username">WiGLE.net Benutzername</string>
     <string name="password">WiGLE.net Passwort</string>
@@ -27,7 +27,7 @@
     <string name="connect_button">Verbinden</string>
     <string name="connect_text">mit Genehmigung der Netzbetreiber</string>
     <string name="csv_run_export_button">CSV Export Lauf</string>
-    <string name="csv_run_export_text">Exportiere aktuellen Lauf in CSV-Datei</string>
+    <string name="csv_run_export_text">Exportiere Lauf in CSV-Datei</string>
     <string name="csv_export_button">CSV Export DB</string>
     <string name="csv_export_text">Exportiere ganze DB in CSV-Datei</string>
     <string name="kml_run_export_button">KML Export Lauf</string>
@@ -96,7 +96,7 @@
     <string name="network_capa">Fähigkeiten:</string>
     <string name="network_channel">Kanal:</string>
     <string name="network_observations">Bemerkungen:</string>
-    <string name="network_querying">(querying&#8230;)</string>
+    <string name="network_querying">(frage ab&#8230;)</string>
     <string name="setting_show_password">Passwort anzeigen</string>
     <string name="setting_db_marker">DB Marker (Uploads ab ...):</string>
     <string name="setting_high_up">Hochgeladen bis ID:</string>
@@ -183,7 +183,7 @@
     <string name="menu_turn_on_lockon">Sperre einschalten</string>
     <string name="menu_show_old">Zeige Lauf &amp; Neu</string>
     <string name="menu_show_new">Zeige nur Neue</string>
-    <string name="menu_copy_network">Kopieren Netzwerk-BSSID</string>
+    <string name="menu_copy_network">Netzwerk-BSSID kopieren</string>
     <string name="tts_no_gps_fix">kein GPS-Signal</string>
     <string name="tts_new_wifi">Neue WLAN</string>
     <string name="tts_new_cell">Neue Zellen</string>
@@ -284,7 +284,7 @@
     <string name="rank_title">Rang:</string>
     <string name="discovered_title">für WiGLE neue WLAN gefunden</string>
     <string name="total_title">WLAN-Netzwerke gefunden</string>
-    <string name="totallocs_title">WLAN-Netzwerke gesehenen</string>
+    <string name="totallocs_title">WLAN-Netzwerke gesehen</string>
     <string name="gendisc_title">gefundene Funkzellen (neu für WiGLE)</string>
     <string name="gentotal_title">gesehene Funkzellen</string>
     <string name="monthcount_title">WLAN gefunden (dieser Monat)</string>

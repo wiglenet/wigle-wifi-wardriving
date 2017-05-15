@@ -2,7 +2,10 @@ package net.wigle.wigleandroid;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -134,6 +137,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             case DEAUTHORIZE_DIALOG: {
                 editor.remove(ListFragment.PREF_AUTHNAME);
                 editor.remove(ListFragment.PREF_TOKEN);
+                String mapTileMode = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+                        ListFragment.PREF_MAP_NO_TILE);
+                if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
+                        ListFragment.PREF_MAP_ONLYMINE_TILE.equals(mapTileMode)) {
+                    // ALIBI: clear show mine/others on deauthorize
+                    editor.putString(ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+                }
                 editor.apply();
                 if (view != null) {
                     this.updateView(view);
@@ -225,6 +235,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
         final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
         final Button authButton = (Button) view.findViewById(R.id.authorize_client);
+
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
             authUserDisplay.setVisibility(View.VISIBLE);
@@ -362,6 +373,31 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+;
+
+        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
+        final String[] mapModes = getMapModes(isAuthenticated);
+        final String[] mapModeName = getMapModeNames(isAuthenticated);
+
+        if (!ListFragment.PREF_MAP_NO_TILE.equals(showDiscovered)) {
+            LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+            mainLayout.setVisibility(View.VISIBLE);
+        }
+
+        doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
+                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, getContext(), view );
+
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        List<Long> yearValueBase = new ArrayList<Long>();
+        List<String> yearLabelBase = new ArrayList<String>();
+        for (int i = 2001; i <= thisYear; i++) {
+            yearValueBase.add((long)(i));
+            yearLabelBase.add(Integer.toString(i));
+        }
+        doSpinner( R.id.networks_discovered_since_year, view, ListFragment.PREF_SHOW_DISCOVERED_SINCE,
+                2001L, yearValueBase.toArray(new Long[0]),
+                yearLabelBase.toArray(new String[0]) );
 
         passEdit.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
         passEdit.addTextChangedListener( new SetWatcher() {
@@ -428,6 +464,28 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName );
+    }
+
+    private String[] getMapModes(final boolean isAuthed) {
+        if (isAuthed) {
+            return new String[]{ListFragment.PREF_MAP_NO_TILE,
+                    ListFragment.PREF_MAP_ONLYMINE_TILE, ListFragment.PREF_MAP_NOTMINE_TILE,
+                    ListFragment.PREF_MAP_ALL_TILE};
+
+        }
+        return new String[]{ListFragment.PREF_MAP_NO_TILE,
+                ListFragment.PREF_MAP_ALL_TILE};
+    }
+
+    private String[] getMapModeNames(final boolean isAuthed) {
+        if (isAuthed) {
+            return new String[]{ getString(R.string.map_none),
+                    getString(R.string.map_mine), getString(R.string.map_not_mine),
+                    getString(R.string.map_all)};
+
+        }
+        return new String[]{ getString(R.string.map_none),
+               getString(R.string.map_all)};
     }
 
     private void updateRegister(final View view) {
@@ -571,7 +629,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
                 // set pref
                 final V period = periods[position];
-                MainActivity.info( pref + " setting scan period: " + period );
+                MainActivity.info( pref + " setting period: " + period );
                 if ( period instanceof Long ) {
                     editor.putLong( pref, (Long) period );
                 }
@@ -592,6 +650,56 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void onNothingSelected( final AdapterView<?> arg0 ) {}
         });
     }
+
+    public static void doMapSpinner( final int spinnerId, final String pref, final String spinDefault, final String[] terms,
+                                      final String[] termNames, final Context context, final View view ) {
+
+        if ( terms.length != termNames.length ) {
+            throw new IllegalArgumentException("lists don't match: " + Arrays.toString(terms)
+                    + " periodName: " + Arrays.toString(termNames));
+        }
+
+        Spinner spinner = (Spinner)view.findViewById(spinnerId);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Editor editor = prefs.edit();
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context, android.R.layout.simple_spinner_item);
+
+        final String term = prefs.getString(pref, spinDefault );
+
+        int termIndex = 0;
+        for ( int i = 0; i < terms.length; i++ ) {
+            adapter.add( termNames[i] );
+            if ( term.equals(terms[i]) ) {
+                termIndex = i;
+            }
+        }
+        MainActivity.info("current selection: "+term +": ("+termIndex+")");
+        adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+        spinner.setAdapter( adapter );
+        spinner.setSelection( termIndex );
+        spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+                // set pref
+                final String period = terms[position];
+                MainActivity.info( pref + " setting map data: " + period );
+                editor.putString( pref, period );
+                editor.apply();
+                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+
+                if (ListFragment.PREF_MAP_NO_TILE.equals(period)) {
+                    mainLayout.setVisibility(View.GONE);
+                } else {
+                    mainLayout.setVisibility(View.VISIBLE);
+                }
+            }
+            @Override
+            public void onNothingSelected( final AdapterView<?> arg0 ) {}
+        });
+    }
+
 
     /* Creates the menu items */
     @Override

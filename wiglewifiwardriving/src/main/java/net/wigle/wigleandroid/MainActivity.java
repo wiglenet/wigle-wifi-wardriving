@@ -44,6 +44,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -673,6 +674,18 @@ public final class MainActivity extends AppCompatActivity {
         if (main != null) {
             main.setLockScreen(lockScreen);
         }
+    }
+
+    public static boolean isHighDefinition() {
+        if (Build.VERSION.SDK_INT >= 17) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+            int dpi = metrics.densityDpi;
+            if (dpi >= 240) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static boolean isScreenLocked(Fragment fragment) {

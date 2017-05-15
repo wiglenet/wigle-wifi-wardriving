@@ -268,4 +268,10 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="show_discovered_since">顯示網絡發現以來</string>
+    <string name="show_discovered">在地圖上顯示發現的網絡</string>
+    <string name="map_none">沒有</string>
+    <string name="map_all">所有</string>
+    <string name="map_not_mine">其他</string>
+    <string name="map_mine">礦</string>
 </resources>

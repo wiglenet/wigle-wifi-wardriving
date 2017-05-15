@@ -333,4 +333,10 @@
     <string name="anonymous_confirm">Caricare come anonimo? In tal caso il tuo login sarà annullato e dimenticato.</string>
     <string name="title_activity_activate">Cattura per attivare</string>
     <string name="unknown_number">\?\?</string>
+    <string name="show_discovered_since">Mostra reti scoperte da</string>
+    <string name="show_discovered">Mostra reti scoperte sulla mappa</string>
+    <string name="map_none">Nessuna</string>
+    <string name="map_all">Tutti</string>
+    <string name="map_not_mine">Altri</string>
+    <string name="map_mine">Il mio</string>
 </resources>

@@ -280,4 +280,10 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="show_discovered_since">Mostrar Redes Descobertas Desde</string>
+    <string name="show_discovered">Mostrar Redes Descobertas no Mapa</string>
+    <string name="map_none">Nenhum</string>
+    <string name="map_all">Todos</string>
+    <string name="map_not_mine">Outras</string>
+    <string name="map_mine">Meu</string>
 </resources>

@@ -333,4 +333,10 @@
     <string name="anonymous_confirm">Anonym hochladen? Der gespeicherte LogIn wird von deinem Telefon gelöscht.</string>
     <string name="title_activity_activate">Scan to activate</string>
     <string name="unknown_number">\?\?</string>
+    <string name="show_discovered_since">Zeige Netzwerke entdeckt seit</string>
+    <string name="show_discovered">Entdeckte Netzwerke auf der Karte anzeigen</string>
+    <string name="map_none">Keiner</string>
+    <string name="map_all">Alle</string>
+    <string name="map_not_mine">Andere</string>
+    <string name="map_mine">Bergwerk</string>
 </resources>

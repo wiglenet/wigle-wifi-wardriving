@@ -271,7 +271,7 @@
     <string name="tab_stats">Statistiche</string>
     <string name="site_stats_app_name">Generali</string>
     <string name="netloc_title">Reti WiFi WiGLE.net con localizzazioni</string>
-    <string name="loctotal_title">Reti WiFi rilevate (compreso ripetuti)</string>
+    <string name="loctotal_title">Reti WiFi rilevate (compreso ripetute)</string>
     <string name="genloc_title">Torri GSM WiGLE.net con localizzazioni</string>
     <string name="userstot_title">Totale Utenti registrati su WiGLE.net</string>
     <string name="transtot_title">File caricati su WiGLE.net</string>

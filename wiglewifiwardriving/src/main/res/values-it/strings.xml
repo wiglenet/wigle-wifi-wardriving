@@ -271,7 +271,7 @@
     <string name="tab_stats">Statistiche</string>
     <string name="site_stats_app_name">Generali</string>
     <string name="netloc_title">Reti WiFi WiGLE.net con localizzazioni</string>
-    <string name="loctotal_title">Osservatori Reti WiFi WiGLE.net</string>
+    <string name="loctotal_title">Reti WiFi rilevate (compreso ripetute)</string>
     <string name="genloc_title">Torri GSM WiGLE.net con localizzazioni</string>
     <string name="userstot_title">Totale Utenti registrati su WiGLE.net</string>
     <string name="transtot_title">File caricati su WiGLE.net</string>
@@ -284,7 +284,7 @@
     <string name="rank_title">Classifica utente:</string>
     <string name="discovered_title">Reti WiFi Scoperte (Nuove per WiGLE)</string>
     <string name="total_title">Totale Reti WiFi Viste</string>
-    <string name="totallocs_title">Totale osservatori WiFi Registrati</string>
+    <string name="totallocs_title">WiFi rilevate (compreso ripetute)</string>
     <string name="gendisc_title">Torri GSM Scoperte (Nuove per WiGLE)</string>
     <string name="gentotal_title">Totale Torri GSM Viste</string>
     <string name="monthcount_title">WiFi Scoperte Questo Mese</string>

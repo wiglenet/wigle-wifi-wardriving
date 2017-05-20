@@ -295,7 +295,7 @@
     <string name="gps_permission">GPS (Localizzazione precisa)</string>
     <string name="cell_permission">GSM (Localizzazione grossolana)</string>
     <string name="allow_storage">Per impostazione predefinita, il database à posizionato sull\'unità esterna, si prega di consentire la scrittura sui supporti/file</string>
-    <string name="restart">Occorre riavviare per l'uso della SD</string>
+    <string name="restart">Occorre riavviare per l\'uso della SD</string>
     <string name="rank_stats_app_name">Graduatorie WiGLE.net</string>
     <string name="total_wifi">WiFi totali</string>
     <string name="total_cell">Celle totali</string>

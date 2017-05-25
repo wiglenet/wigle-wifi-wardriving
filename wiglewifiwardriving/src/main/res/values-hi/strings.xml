@@ -274,6 +274,6 @@
     <string name="map_all">सब</string>
     <string name="map_not_mine">अन्य लोग</string>
     <string name="map_mine">मेरी</string>
-    <string name="status_parsing">पदच्छेद</string>
     <string name="status_downloading">डाउनलोड कर रहा है</string>
+    <string name="status_parsing">पदच्छेद</string>
 </resources>

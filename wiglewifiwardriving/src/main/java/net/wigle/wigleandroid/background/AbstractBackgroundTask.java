@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.ProgressPanel;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
@@ -22,6 +24,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -33,14 +39,14 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     private final AtomicBoolean interrupt = new AtomicBoolean( false );
     private final Object lock = new Object();
     private final String name;
-    private ProgressDialogFragment pd;
+    private ProgressPanel pp;
     private int lastSentPercent = -1;
 
     private static AbstractBackgroundTask latestTask = null;
     static final String PROGRESS_TAG = "background-task-progress";
 
     public AbstractBackgroundTask(final FragmentActivity context, final DatabaseHelper dbHelper, final String name,
-                                  final boolean createDialog) {
+                                  final boolean showProgress) {
         if ( context == null ) {
             throw new IllegalArgumentException( "context is null" );
         }
@@ -55,15 +61,20 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         this.dbHelper = dbHelper;
         this.name = name;
 
-        if (createDialog) createProgressDialog( context );
+        if (showProgress) activateProgressPanel( context );
+        //TODO: make this a placeholder?
+        //pp.setMessage(name);
 
-        this.handler = new BackgroundGuiHandler(context, lock, pd, this);
+        this.handler = new BackgroundGuiHandler(context, lock, pp, this);
         latestTask = this;
     }
 
     @Override
     public final void clearProgressDialog() {
-        pd = null;
+        if (null != pp) {
+            pp.hide();
+        }
+        pp = null;
     }
 
     @Override
@@ -121,67 +132,26 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return handler;
     }
 
-    private void createProgressDialog(final FragmentActivity context) {
-        // make an interruptable progress dialog
-        pd = ProgressDialogFragment.newInstance();
-        pd.show(context.getSupportFragmentManager(), PROGRESS_TAG);
-    }
+    private void activateProgressPanel(final FragmentActivity context) {
+        final LinearLayout progressLayout = (LinearLayout) context.findViewById(R.id.inline_status_bar);
+        final TextView progressLabel = (TextView) context.findViewById(R.id.inline_progress_status);
+        final ProgressBar progressBar = (ProgressBar) context.findViewById(R.id.inline_status_progress);
+        if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
+            pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
+            pp.show();
+            //ALIBI: this will get replaced as soon as the progress is set for the first time
+            progressBar.setIndeterminate(true);
 
-    public static class ProgressDialogFragment extends DialogFragment {
-        public static ProgressDialogFragment newInstance() {
-            return new ProgressDialogFragment ();
-        }
-
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final ProgressDialog dialog = new ProgressDialog(getActivity());
-            dialog.setTitle(getString(Status.WRITING.getTitle()));
-            dialog.setMessage(getString(Status.WRITING.getMessage()));
-            dialog.setIndeterminate(true);
-            dialog.setCancelable(true);
-            dialog.setCanceledOnTouchOutside(false);
-            return dialog;
-        }
-
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            MainActivity.info("Cancelling dialog for task: " + latestTask);
-            if (latestTask != null) {
-                latestTask.setInterrupted();
-            }
-        }
-
-        private ProgressDialog getDialog(final FragmentManager manager) {
-            final ProgressDialogFragment dialog = (ProgressDialogFragment) manager.findFragmentByTag(PROGRESS_TAG);
-            if (dialog != null) {
-                return (ProgressDialog) dialog.getDialog();
-            }
-            MainActivity.info("No progress dialog");
-            return null;
-        }
-
-        public void setMessage(final FragmentManager manager, final String message) {
-            final ProgressDialog dialog = getDialog(manager);
-            if (dialog != null)
-            {
-                dialog.setMessage(message);
-            }
-        }
-
-        /**
-         * Sets the progress of the dialog, we need to make sure we get the right dialog reference here
-         * which is why we obtain the dialog fragment manually from the fragment manager
-         * @param manager fragment manager
-         * @param progress how much progress has been made
-         */
-        public void setProgress(final FragmentManager manager, final int progress)
-        {
-            final ProgressDialog dialog = getDialog(manager);
-            if (dialog != null)
-            {
-                dialog.setProgress(progress);
-            }
+            //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
+            // setting global state to make sure they get set on show
+            Button uploadButton = (Button) context.findViewById(R.id.upload_button);
+            if (null != uploadButton) uploadButton.setEnabled(false);
+            Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
+            if (null != importObservedButton) importObservedButton.setEnabled(false);
+            //TODO: is this the right way to use primitives/MA.state?
+            MainActivity.getMainActivity().setTransferInProgress(true);
+            pp.setMessage(context.getString(R.string.status_working));
+            pp.setIndeterminate();
         }
     }
 

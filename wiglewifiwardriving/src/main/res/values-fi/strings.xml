@@ -257,7 +257,7 @@
     <string name="activate">Aktivoi nyt</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
-    <string name="upload_parsing">Parsing…</string>
+    <string name="upload_parsing">Jäsennys…</string>
     <string name="upload_trilaterating">Trilaterating…</string>
     <string name="upload_stats">Final Stats…</string>
     <string name="upload_success">Completed</string>
@@ -274,4 +274,6 @@
     <string name="map_all">Kaikki</string>
     <string name="map_not_mine">toiset</string>
     <string name="map_mine">Kaivos</string>
+    <string name="status_downloading">lataaminen</string>
+    <string name="status_parsing">Jäsennys</string>
 </resources>

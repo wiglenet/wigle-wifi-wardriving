@@ -274,4 +274,6 @@
     <string name="map_all">Herşey</string>
     <string name="map_not_mine">Diğerleri</string>
     <string name="map_mine">Mayın</string>
+    <string name="status_downloading">İndirilmesi</string>
+    <string name="status_parsing">Ayrıştırma</string>
 </resources>

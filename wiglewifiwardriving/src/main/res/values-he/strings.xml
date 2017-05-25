@@ -274,4 +274,6 @@
     <string name="map_all">את כל</string>
     <string name="map_not_mine">אחרים</string>
     <string name="map_mine">שלי</string>
+    <string name="status_downloading">מוריד</string>
+    <string name="status_parsing">ניתוח</string>
 </resources>

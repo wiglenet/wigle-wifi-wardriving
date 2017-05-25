@@ -4,12 +4,17 @@
 	    android:layout_width="fill_parent" android:layout_height="fill_parent">
 
 <LinearLayout android:orientation="horizontal"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	    android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:paddingTop="1sp">
 	<!-- First row -->
-	<ImageView android:text="wepicon" android:id="@+id/wepicon" android:layout_width="wrap_content"
-	    android:contentDescription="wep icon"
-		android:layout_height="wrap_content" android:paddingLeft="2dp" android:paddingRight="13dp"
-		/>
+    <ImageView
+        android:id="@+id/wepicon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="wep icon"
+        android:paddingLeft="2dp"
+        android:paddingRight="10dp"
+        android:text="wepicon" />
 
 	<TextView android:id="@+id/ssid" android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

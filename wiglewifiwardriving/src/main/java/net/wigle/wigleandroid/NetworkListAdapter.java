@@ -139,6 +139,9 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
                 case Network.CRYPTO_WEP:
                     resource = R.drawable.wep_ico;
                     break;
+                case Network.CRYPTO_WPA2:
+                    resource = R.drawable.wpa2_ico;
+                    break;
                 case Network.CRYPTO_WPA:
                     resource = R.drawable.wpa_ico;
                     break;

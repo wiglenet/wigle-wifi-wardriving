@@ -315,4 +315,6 @@
     <string name="map_all">Alle</string>
     <string name="map_not_mine">andre</string>
     <string name="map_mine">Min</string>
+    <string name="status_downloading">Downloading</string>
+    <string name="status_parsing">Parsing</string>
 </resources>

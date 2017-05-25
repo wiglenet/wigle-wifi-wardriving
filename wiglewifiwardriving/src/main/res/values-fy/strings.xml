@@ -274,4 +274,6 @@
     <string name="map_all">Alle</string>
     <string name="map_not_mine">oaren</string>
     <string name="map_mine">Myn</string>
+    <string name="status_downloading">ynladen</string>
+    <string name="status_parsing">Parsing</string>
 </resources>

@@ -241,6 +241,10 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupImportObservedButton( final View view ) {
         final Button importObservedButton = (Button) view.findViewById( R.id.import_observed_button );
+        //TODO: is this the right way to use primitives/MA.state?
+        if (MainActivity.getMainActivity().getTransferInProgress()) {
+            importObservedButton.setEnabled(false);
+        }
 
         importObservedButton.setOnClickListener( new OnClickListener() {
             @Override

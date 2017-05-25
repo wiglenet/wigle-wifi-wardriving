@@ -274,4 +274,6 @@
     <string name="map_all">Todas</string>
     <string name="map_not_mine">Otros</string>
     <string name="map_mine">Mía</string>
+    <string name="status_downloading">Descargando</string>
+    <string name="status_parsing">Parsing</string>
 </resources>

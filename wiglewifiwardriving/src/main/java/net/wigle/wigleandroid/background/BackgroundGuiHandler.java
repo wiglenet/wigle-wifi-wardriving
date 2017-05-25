@@ -1,13 +1,11 @@
 package net.wigle.wigleandroid.background;
 
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.SettingsFragment;
-import net.wigle.wigleandroid.background.AbstractBackgroundTask.ProgressDialogFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class BackgroundGuiHandler extends Handler {
@@ -26,17 +25,17 @@ public class BackgroundGuiHandler extends Handler {
 
     private FragmentActivity context;
     private final Object lock;
-    private final ProgressDialogFragment pd;
+    private final ProgressPanel pp;
     private final AlertSettable alertSettable;
 
     private String msg_text = "";
 
-    public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressDialogFragment pd,
+    public BackgroundGuiHandler(final FragmentActivity context, final Object lock, final ProgressPanel pp,
                                 final AlertSettable alertSettable) {
 
         this.context = context;
         this.lock = lock;
-        this.pd = pd;
+        this.pp = pp;
         this.alertSettable = alertSettable;
     }
 
@@ -53,16 +52,15 @@ public class BackgroundGuiHandler extends Handler {
                 Toast.makeText(this.context, R.string.status_login_fail
                         , Toast.LENGTH_LONG).show();
             }
-            if (pd == null) {
+            if (pp == null) {
                 // no dialog box, just return
                 return;
             }
 
             if ( msg.what >= WRITING_PERCENT_START ) {
                 final int percentTimesTen = msg.what - WRITING_PERCENT_START;
-                pd.setMessage( context.getSupportFragmentManager(), msg_text + " " + (percentTimesTen/10f) + "%" );
-                // "The progress range is 0..10000."
-                pd.setProgress( context.getSupportFragmentManager(), percentTimesTen * 10 );
+                pp.setMessage( msg_text + " " + (percentTimesTen/10f) + "%" );
+                pp.setProgress( percentTimesTen / 10 );
                 return;
             }
 
@@ -72,29 +70,41 @@ public class BackgroundGuiHandler extends Handler {
             }
             final Status status = Status.values()[ msg.what ];
             if ( Status.UPLOADING.equals( status ) ) {
-                //          pd.setMessage( status.getMessage() );
                 msg_text = context.getString( status.getMessage() );
-                pd.setProgress(context.getSupportFragmentManager(), 0);
+                pp.setProgress(0);
                 return;
-            }
-            if ( Status.WRITING.equals( status ) ) {
+            } else if ( Status.WRITING.equals( status ) ) {
                 msg_text = context.getString( status.getMessage() );
-                pd.setProgress(context.getSupportFragmentManager(), 0);
+                pp.setProgress(0);
+                return;
+            } else if ( Status.DOWNLOADING.equals( status ) ) {
+                msg_text = context.getString( status.getMessage() );
+                //pp.setProgress(0);
+                return;
+            } else if ( Status.PARSING.equals( status ) ) {
+                msg_text = context.getString( status.getMessage() );
+                pp.setProgress(0);
                 return;
             }
 
             // If we got this far then the task is done
 
             // make sure we didn't lose this dialog this somewhere
-            if ( pd != null ) {
+            if ( pp != null ) {
                 try {
-                    MainActivity.info("fragment from pd: " + pd);
-                    pd.dismiss();
+                    MainActivity.info("fragment from pp: " + pp);
+                    Button uploadButton = (Button) context.findViewById(R.id.upload_button);
+                    if (null != uploadButton) uploadButton.setEnabled(true);
+                    Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
+                    if (null != importObservedButton) importObservedButton.setEnabled(true);
+                    //TODO: is this the right way to use primitives/MA.state?
+                    MainActivity.getMainActivity().setTransferInProgress(false);
+                    pp.hide();
                     alertSettable.clearProgressDialog();
                 }
                 catch ( Exception ex ) {
                     // guess it wasn't there anyways
-                    MainActivity.info( "exception dismissing dialog: " + ex );
+                    MainActivity.info( "exception dismissing dialog/hiding progress: " + ex );
                 }
             }
             // Activity context

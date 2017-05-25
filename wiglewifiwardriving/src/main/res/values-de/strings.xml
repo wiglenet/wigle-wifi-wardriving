@@ -339,4 +339,6 @@
     <string name="map_all">Alle</string>
     <string name="map_not_mine">Andere</string>
     <string name="map_mine">Bergwerk</string>
+    <string name="status_downloading">Downloading</string>
+    <string name="status_parsing">analysiere</string>
 </resources>

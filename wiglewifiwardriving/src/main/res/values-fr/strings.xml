@@ -331,4 +331,6 @@
     <string name="map_all">Tout</string>
     <string name="map_not_mine">Autres</string>
     <string name="map_mine">Mien</string>
+    <string name="status_downloading">Téléchargement</string>
+    <string name="status_parsing">Analyse</string>
 </resources>

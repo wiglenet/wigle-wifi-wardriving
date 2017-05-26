@@ -128,58 +128,9 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                     listener.requestComplete(null, false);
                 }
             } else {
-                //TODO: old code, eliminate (pending confirmation with bobzilla)
-                try {
-                    final JSONObject json = new JSONObject(result);
-
-                    if (json.getBoolean("success")) {
-                        Integer total = json.getInt("count");
-                        JSONArray results = json.getJSONArray("results");
-                        if ((null != total) && (total > 0L) && (null != results) &&
-                                (results.length() > 0)) {
-                            status = Status.WRITE_SUCCESS;
-                            for (int i = 0; i < results.length(); i++) {
-                                String netId = results.getString(i);
-                                //DEBUG: MainActivity.info(netId);
-                                final String ssid = "";
-                                final int frequency = 0;
-                                final String capabilities = "";
-                                final int level = 0;
-                                final Network network = new Network(netId, ssid, frequency,
-                                    capabilities, level, NetworkType.WIFI);
-                                final Location location = new Location("wigle");
-                                final boolean newForRun = true;
-                                ListFragment.lameStatic.dbHelper.blockingAddObservation(
-                                    network, location, newForRun);
-
-                                if ((i % 1000) == 0) {
-                                    MainActivity.info("lineCount: " + i + " of " + total);
-                                }
-                                if (total == 0) {
-                                    total = 1;
-                                }
-                                final int percentDone = (i * 1000) / total;
-                                sendPercentTimesTen(percentDone, bundle);
-                            }
-                        }
-                    } else {
-                        MainActivity.error("MyObserved success: false");
-                    }
-                } catch (JSONException jex) {
-                    MainActivity.error("MyObserved json parse error:", jex);
-                    status = Status.EXCEPTION;
-                    bundle.putString(BackgroundGuiHandler.ERROR, "JSON problem: " + jex);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    status = Status.EXCEPTION;
-                    bundle.putString(BackgroundGuiHandler.ERROR, "Connection problem: " + e);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    status = Status.EXCEPTION;
-                    bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: " + e + " (from " + e.getCause()+")");
-                } finally {
-                    listener.requestComplete(null, false);
-                }
+                MainActivity.error("null cachefile in ObservationImporter - should be impossible");
+                status = Status.EXCEPTION;
+                bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: local filename not set");
             }
 
             if (status == null) {

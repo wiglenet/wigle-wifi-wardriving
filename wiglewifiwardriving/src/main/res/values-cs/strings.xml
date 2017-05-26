@@ -274,4 +274,6 @@
     <string name="map_all">Všechno</string>
     <string name="map_not_mine">Ostatní</string>
     <string name="map_mine">těžit</string>
+    <string name="status_downloading">Stahování</string>
+    <string name="status_parsing">Parsování</string>
 </resources>

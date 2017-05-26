@@ -274,4 +274,6 @@
     <string name="map_all">الكل</string>
     <string name="map_not_mine">الآخرين</string>
     <string name="map_mine">الخاص بي</string>
+    <string name="status_downloading">جارى التحميل</string>
+    <string name="status_parsing">توزيع</string>
 </resources>

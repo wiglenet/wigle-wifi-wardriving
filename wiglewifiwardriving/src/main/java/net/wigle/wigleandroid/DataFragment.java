@@ -241,6 +241,9 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupImportObservedButton( final View view ) {
         final Button importObservedButton = (Button) view.findViewById( R.id.import_observed_button );
+        if (MainActivity.getMainActivity().getTransferInProgress()) {
+            importObservedButton.setEnabled(false);
+        }
 
         importObservedButton.setOnClickListener( new OnClickListener() {
             @Override

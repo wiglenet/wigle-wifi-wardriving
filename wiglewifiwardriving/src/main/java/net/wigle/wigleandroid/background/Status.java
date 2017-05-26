@@ -13,7 +13,9 @@ public enum Status {
     BAD_LOGIN( R.string.status_fail, R.string.status_login_fail ),
     UPLOADING( R.string.status_working, R.string.status_uploading ),
     WRITING( R.string.status_working, R.string.status_writing ),
-    EMPTY_FILE( R.string.status_nothing, R.string.status_empty );
+    EMPTY_FILE( R.string.status_nothing, R.string.status_empty ),
+    DOWNLOADING( R.string.status_downloading, R.string.status_downloading ),
+    PARSING( R.string.status_parsing, R.string.status_parsing );
 
     private final int title;
     private final int message;

@@ -98,30 +98,32 @@
 		</LinearLayout>
 	</LinearLayout>
 
-<LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content">
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/status"
-    android:text="@string/list_status_default"
-    android:layout_weight="0"
-    />
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/blank"
-    android:text=""
-    android:layout_weight="5"
-    />
-</LinearLayout>
-
-<LinearLayout
-	android:orientation="horizontal"
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#A07070"
-	/>
-<ListView android:id="@+id/ListView01" android:layout_width="fill_parent" android:layout_height="fill_parent"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/status"
+            android:text="@string/list_status_default"
+            android:layout_weight="0"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/blank"
+            android:text=""
+            android:layout_weight="5"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        android:background="#903030"
+        />
+    <ListView android:id="@+id/ListView01"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"/>
 </LinearLayout>

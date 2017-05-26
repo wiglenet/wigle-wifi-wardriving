@@ -274,4 +274,6 @@
     <string name="map_all">所有</string>
     <string name="map_not_mine">其他</string>
     <string name="map_mine">礦</string>
+    <string name="status_downloading">下載</string>
+    <string name="status_parsing">解析</string>
 </resources>

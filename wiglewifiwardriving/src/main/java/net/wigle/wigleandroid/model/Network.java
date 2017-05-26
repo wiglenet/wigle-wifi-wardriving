@@ -31,6 +31,7 @@ public final class Network implements ClusterItem {
 
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
+    private static final String WPA2_CAP = "[WPA2";
     private static final String WPA_CAP = "[WPA";
     private static final String WEP_CAP = "[WEP";
 
@@ -38,6 +39,7 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_NONE = 0;
     public static final int CRYPTO_WEP = 1;
     public static final int CRYPTO_WPA = 2;
+    public static final int CRYPTO_WPA2 = 3;
 
     private static final Map<Integer,Integer> freqToChan;
     static {
@@ -121,7 +123,9 @@ public final class Network implements ClusterItem {
             this.showCapabilities = null;
         }
 
-        if (this.capabilities.contains(WPA_CAP)) {
+        if (this.capabilities.contains(WPA2_CAP)) {
+            crypto = CRYPTO_WPA2;
+        } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
         }
         else if (this.capabilities.contains(WEP_CAP)) {

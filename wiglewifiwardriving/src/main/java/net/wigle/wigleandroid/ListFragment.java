@@ -108,6 +108,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
     public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
     public static final String PREF_MAP_ALL_TILE = "ALL";
+    public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -599,7 +600,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             public void onClick( final View view ) {
                 final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
                 if (main == null) {return;}
-                makeUploadDialog(main);
+                final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
+                final State state = MainActivity.getStaticState();
+
+                if (userConfirmed) {
+                    uploadFile( state.dbHelper );
+                } else {
+                    makeUploadDialog(main);
+                }
             }
         });
     }
@@ -616,9 +625,19 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void handleDialog(final int dialogId) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences.Editor editor = prefs.edit();
         switch (dialogId) {
             case UPLOAD_DIALOG:
                 final State state = MainActivity.getStaticState();
+                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
+                final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
+
+                if (!userConfirmed && !authUser.isEmpty()) {
+                    //remember the confirmation
+                    editor.putBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER, true);
+                    editor.apply();
+                }
                 uploadFile( state.dbHelper );
                 break;
             default:

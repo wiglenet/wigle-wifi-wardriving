@@ -248,10 +248,34 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         importObservedButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_import_observed), MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
+            MainActivity.createConfirmation(getActivity(),
+                    DataFragment.this.getString(R.string.data_import_observed),
+                    MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
             }
         });
+    }
+
+    private void createAndStartImport() {
+        final MainActivity mainActivity = MainActivity.getMainActivity(DataFragment.this);
+        if (mainActivity != null) {
+            mainActivity.setTransferring();
+        }
+        // actually need this Activity context, for dialogs
+        final ObservationImporter task = new ObservationImporter(getActivity(),
+                ListFragment.lameStatic.dbHelper,
+                new ApiListener() {
+                    @Override
+                    public void requestComplete(JSONObject object, boolean cached) {
+                        if (mainActivity != null) {
+                            mainActivity.transferComplete();
+                        }
+                    }
+                });
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            //moot due to bundle handling
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -324,26 +348,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 break;
             }
             case IMPORT_DIALOG: {
-                final MainActivity mainActivity = MainActivity.getMainActivity(DataFragment.this);
-                if (mainActivity != null) {
-                    mainActivity.setTransferring();
-                }
-                // actually need this Activity context, for dialogs
-                final ObservationImporter task = new ObservationImporter(getActivity(),
-                        ListFragment.lameStatic.dbHelper,
-                        new ApiListener() {
-                            @Override
-                            public void requestComplete(JSONObject object, boolean cached) {
-                                if (mainActivity != null) {
-                                    mainActivity.transferComplete();
-                                }
-                            }
-                        });
-                try {
-                    task.startDownload(this);
-                } catch (WiGLEAuthException waex) {
-                    //moot due to bundle handling
-                }
+                this.createAndStartImport();
                 break;
             }
             case ZERO_OUT_DIALOG: {

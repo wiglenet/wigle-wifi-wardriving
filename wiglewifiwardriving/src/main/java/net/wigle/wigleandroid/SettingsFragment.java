@@ -137,6 +137,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             case DEAUTHORIZE_DIALOG: {
                 editor.remove(ListFragment.PREF_AUTHNAME);
                 editor.remove(ListFragment.PREF_TOKEN);
+                editor.remove(ListFragment.PREF_CONFIRM_UPLOAD_USER);
+
                 String mapTileMode = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
                         ListFragment.PREF_MAP_NO_TILE);
                 if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
@@ -530,6 +532,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         // ALIBI: if the u|p changes, force refetch token
         editor.remove(ListFragment.PREF_AUTHNAME);
         editor.remove(ListFragment.PREF_TOKEN);
+        editor.remove(ListFragment.PREF_CONFIRM_UPLOAD_USER);
         editor.apply();
         this.clearCachefiles();
     }

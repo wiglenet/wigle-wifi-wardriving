@@ -1028,6 +1028,7 @@ public final class DatabaseHelper extends Thread {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final long maxid = prefs.getLong( ListFragment.PREF_DB_MARKER, -1L );
         final Editor edit = prefs.edit();
+        final long oldMaxDb = prefs.getLong( ListFragment.PREF_MAX_DB, locCount );
         edit.putLong( ListFragment.PREF_MAX_DB, locCount );
 
         if ( maxid == -1L ) {
@@ -1038,7 +1039,7 @@ public final class DatabaseHelper extends Thread {
                 edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
             }
         }
-        else if (maxid > locCount) {
+        else if (maxid > locCount || (maxid == 0 && oldMaxDb == 0 && locCount > 10000)) {
             final long newMaxid = Math.max(0, locCount - 10000);
             MainActivity.warn("db marker: " + maxid + " greater than location count: " + locCount
                     + ", setting to: " + newMaxid);

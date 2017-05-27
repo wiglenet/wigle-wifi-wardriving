@@ -102,11 +102,7 @@ public final class MainActivity extends AppCompatActivity {
         DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
         AtomicBoolean finishing;
-
-        //TODO: Audit to combine
         AtomicBoolean transferring;
-        AtomicBoolean largeTransferInProgress;
-
         MediaPlayer soundPop;
         MediaPlayer soundNewPop;
         WifiLock wifiLock;
@@ -265,8 +261,6 @@ public final class MainActivity extends AppCompatActivity {
 
         info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
         info("android release: '" + Build.VERSION.RELEASE);
-
-        state.largeTransferInProgress = new AtomicBoolean(false);
 
         if (state.numberFormat0 == null) {
             state.numberFormat0 = NumberFormat.getNumberInstance(Locale.US);
@@ -515,14 +509,6 @@ public final class MainActivity extends AppCompatActivity {
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             selectFragment(position);
         }
-    }
-
-    public void setTransferInProgress(boolean largeTransferInProgress) {
-        state.largeTransferInProgress.set(largeTransferInProgress);
-    }
-
-    public boolean getTransferInProgress() {
-        return state.largeTransferInProgress.get();
     }
 
     /**

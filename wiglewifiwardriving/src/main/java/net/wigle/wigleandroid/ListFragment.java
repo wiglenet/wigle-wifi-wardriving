@@ -591,7 +591,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupUploadButton( final View view ) {
         final Button button = (Button) view.findViewById( R.id.upload_button );
 
-        if (MainActivity.getMainActivity().getTransferInProgress()) {
+        if (MainActivity.getMainActivity().isTransferring()) {
             button.setEnabled(false);
         }
 

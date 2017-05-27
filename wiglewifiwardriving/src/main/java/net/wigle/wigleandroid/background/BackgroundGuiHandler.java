@@ -97,7 +97,7 @@ public class BackgroundGuiHandler extends Handler {
                     if (null != uploadButton) uploadButton.setEnabled(true);
                     Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
                     if (null != importObservedButton) importObservedButton.setEnabled(true);
-                    MainActivity.getMainActivity().setTransferInProgress(false);
+                    MainActivity.getMainActivity().setTransferring();
                     pp.hide();
                     alertSettable.clearProgressDialog();
                 }

@@ -25,22 +25,44 @@
             android:id="@+id/inline_status_bar"
             android:visibility="gone"
             android:layout_alignParentBottom="true"
-            android:paddingTop="2dp">
-
-            <TextView
-                android:id="@+id/inline_progress_status"
-                android:layout_width="wrap_content"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:paddingLeft="1dp"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textStyle="bold" />
-            <ProgressBar
-                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/inline_status_progress"
-                />
+                android:id="@+id/inline_status_bar_frame">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/inline_status_bar_left"
+                    android:layout_weight="6">
+                    <TextView
+                        android:id="@+id/inline_progress_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:paddingLeft="1dp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textStyle="bold" />
+                    <ProgressBar
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/inline_status_progress"
+                        />
+                </LinearLayout>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/cancel"
+                    android:id="@+id/inline_status_cancel"
+                    android:background="@drawable/cancel_button"
+                    android:padding="2dip"
+                    android:layout_marginLeft="5dip"
+                    android:layout_marginRight="1dip"/>
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
     <!-- The navigation drawer -->

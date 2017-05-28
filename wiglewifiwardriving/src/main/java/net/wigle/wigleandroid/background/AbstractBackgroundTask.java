@@ -1,8 +1,16 @@
 package net.wigle.wigleandroid.background;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Process;
+import android.support.v4.app.FragmentActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
@@ -12,23 +20,9 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Process;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -133,7 +127,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return handler;
     }
 
-    private void updateTransferringState(boolean transferring) {
+    public static void updateTransferringState(final boolean transferring, final FragmentActivity context) {
         Button uploadButton = (Button) context.findViewById(R.id.upload_button);
         if (null != uploadButton) uploadButton.setEnabled(!transferring);
         Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
@@ -158,7 +152,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
                 public void onClick(View v) {
                     latestTask.interrupt();
                     clearProgressDialog();
-                    updateTransferringState(false);
+                    updateTransferringState(false, context);
                 }
             });
             //ALIBI: this will get replaced as soon as the progress is set for the first time
@@ -166,7 +160,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
             //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
             // setting global state to make sure they get set on show
-            updateTransferringState(true);
+            updateTransferringState(true, context);
             pp.setMessage(context.getString(R.string.status_working));
             pp.setIndeterminate();
         }

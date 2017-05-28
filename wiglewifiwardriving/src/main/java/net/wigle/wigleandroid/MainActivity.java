@@ -1556,6 +1556,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void setTransferring() {
+        info("setTransferring");
         state.transferring.set(true);
     }
 

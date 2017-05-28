@@ -93,11 +93,7 @@ public class BackgroundGuiHandler extends Handler {
             if ( pp != null ) {
                 try {
                     MainActivity.info("fragment from pp: " + pp);
-                    Button uploadButton = (Button) context.findViewById(R.id.upload_button);
-                    if (null != uploadButton) uploadButton.setEnabled(true);
-                    Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
-                    if (null != importObservedButton) importObservedButton.setEnabled(true);
-                    MainActivity.getMainActivity().setTransferring();
+                    AbstractBackgroundTask.updateTransferringState(false, context);
                     pp.hide();
                     alertSettable.clearProgressDialog();
                 }

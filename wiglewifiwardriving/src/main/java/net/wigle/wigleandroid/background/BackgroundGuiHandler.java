@@ -97,8 +97,7 @@ public class BackgroundGuiHandler extends Handler {
                     if (null != uploadButton) uploadButton.setEnabled(true);
                     Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
                     if (null != importObservedButton) importObservedButton.setEnabled(true);
-                    //TODO: is this the right way to use primitives/MA.state?
-                    MainActivity.getMainActivity().setTransferInProgress(false);
+                    MainActivity.getMainActivity().setTransferring();
                     pp.hide();
                     alertSettable.clearProgressDialog();
                 }

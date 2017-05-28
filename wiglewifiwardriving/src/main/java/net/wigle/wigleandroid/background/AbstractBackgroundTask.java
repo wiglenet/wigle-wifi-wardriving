@@ -24,6 +24,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -132,24 +133,40 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return handler;
     }
 
+    private void updateTransferringState(boolean transferring) {
+        Button uploadButton = (Button) context.findViewById(R.id.upload_button);
+        if (null != uploadButton) uploadButton.setEnabled(!transferring);
+        Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
+        if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
+        if (transferring) {
+            MainActivity.getMainActivity().setTransferring();
+        } else {
+            MainActivity.getMainActivity().transferComplete();
+        }
+    }
+
     private void activateProgressPanel(final FragmentActivity context) {
         final LinearLayout progressLayout = (LinearLayout) context.findViewById(R.id.inline_status_bar);
         final TextView progressLabel = (TextView) context.findViewById(R.id.inline_progress_status);
         final ProgressBar progressBar = (ProgressBar) context.findViewById(R.id.inline_status_progress);
+        final Button taskCancelButton = (Button) context.findViewById(R.id.inline_status_cancel);
+
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
             pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
             pp.show();
+            taskCancelButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    latestTask.interrupt();
+                    clearProgressDialog();
+                    updateTransferringState(false);
+                }
+            });
             //ALIBI: this will get replaced as soon as the progress is set for the first time
             progressBar.setIndeterminate(true);
 
             //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
             // setting global state to make sure they get set on show
-            Button uploadButton = (Button) context.findViewById(R.id.upload_button);
-            if (null != uploadButton) uploadButton.setEnabled(false);
-            Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
-            if (null != importObservedButton) importObservedButton.setEnabled(false);
-            //TODO: is this the right way to use primitives/MA.state?
-            MainActivity.getMainActivity().setTransferInProgress(true);
+            updateTransferringState(true);
             pp.setMessage(context.getString(R.string.status_working));
             pp.setIndeterminate();
         }

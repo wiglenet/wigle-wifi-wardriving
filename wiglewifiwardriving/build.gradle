@@ -30,6 +30,7 @@ android {
 dependencies {
     compile project(':android-maps-utils')
     compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
     compile 'com.google.android.gms:play-services-maps:10.0.1'
     compile 'com.google.android.gms:play-services-vision:10.0.1'
     compile 'org.slf4j:slf4j-android:1.7.19'

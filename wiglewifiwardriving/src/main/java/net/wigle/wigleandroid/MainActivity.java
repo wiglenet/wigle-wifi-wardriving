@@ -1654,6 +1654,7 @@ public final class MainActivity extends AppCompatActivity {
         if (isScanning) {
             if (listActivity != null) {
                 listActivity.setStatusUI(getString(R.string.list_scanning_on));
+                listActivity.setScanningStatusIndicator(true);
             }
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.updateLastScanResponseTime();
@@ -1667,6 +1668,7 @@ public final class MainActivity extends AppCompatActivity {
         } else {
             if (listActivity != null) {
                 listActivity.setStatusUI(getString(R.string.list_scanning_off));
+                listActivity.setScanningStatusIndicator(false);
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);

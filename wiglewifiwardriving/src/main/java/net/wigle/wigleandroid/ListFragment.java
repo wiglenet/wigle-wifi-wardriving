@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
+import android.graphics.Movie;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -27,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -44,8 +47,14 @@ import net.wigle.wigleandroid.model.QueryArgs;
 
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.Set;
+
+import pl.droidsonroids.gif.GifImageView;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
@@ -226,6 +235,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final TextView tv = (TextView) view.findViewById( R.id.status );
             tv.setText( status );
         }
+    }
+
+    public void setScanningStatusIndicator(boolean scanning) {
+        View view = getView();
+        if (view != null) {
+            final GifImageView scanningImageView = (GifImageView) view.findViewById(R.id.scanning);
+            final ImageView notScanningImageView = (ImageView) view.findViewById(R.id.not_scanning);
+            if (scanning) {
+                scanningImageView.setVisibility(VISIBLE);
+                notScanningImageView.setVisibility(GONE);
+            } else {
+                scanningImageView.setVisibility(GONE);
+                notScanningImageView.setVisibility(VISIBLE);
+
+            }
+        }
+
     }
 
     @Override

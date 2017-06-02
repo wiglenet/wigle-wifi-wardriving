@@ -4,117 +4,143 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        >
+        <TextView
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/stats_run"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            android:textColor="#AAAA00"
+            />
+        <TextView
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/stats_new"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            android:textColor="#AAEE50"
+            android:text="@string/stats"
+            />
+        <TextView
+            android:layout_width="fill_parent" android:layout_height="wrap_content"
+            android:id="@+id/stats_dbnets"
+            android:textSize="16sp"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
 
-<LinearLayout
-    android:orientation="horizontal" android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-<TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content"
-    android:id="@+id/stats_run"
-    android:textSize="16sp"
-    android:layout_weight="1"
-    android:textColor="#AAAA00"
-    />
-<TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content"
-    android:id="@+id/stats_new"
-    android:textSize="16sp"
-    android:layout_weight="1"
-    android:textColor="#AAEE50"
-    android:text="@string/stats"
-    />
-<TextView
-    android:layout_width="fill_parent" android:layout_height="wrap_content"
-    android:id="@+id/stats_dbnets"
-    android:textSize="16sp"
-    android:layout_weight="1"
-    />
-</LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        >
 
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
+        <Button
+            android:id="@+id/upload_button"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="6dp"
+            android:layout_weight="0"
+            android:background="@drawable/upload_button"
+            android:text="@string/upload_button" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="6"
+            >
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/LocationTextView01"
+            android:text="@string/list_waiting_gps"
+            />
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/LocationTextView02"
+            android:text="@string/list_short_lon"
+            />
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/LocationTextView03"
+            android:text="@string/list_short_sats"
+            />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="5"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/LocationTextView04"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/LocationTextView05"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/LocationTextView06"
+                />
+        </LinearLayout>
 
-	<Button
-		android:id="@+id/upload_button"
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		android:layout_marginBottom="2dp"
-		android:layout_marginLeft="2dp"
-		android:layout_marginTop="2dp"
-		android:layout_marginRight="6dp"
-		android:layout_weight="0"
-		android:background="@drawable/upload_button"
-		android:text="@string/upload_button" />
-	<LinearLayout
-	    android:orientation="vertical"
-	    android:layout_width="wrap_content"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="6"
-	    >
-		<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/LocationTextView01"
-		android:text="@string/list_waiting_gps"
-		/>
-		<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/LocationTextView02"
-		android:text="@string/list_short_lon"
-		/>
-		<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:id="@+id/LocationTextView03"
-		android:text="@string/list_short_sats"
-		/>
-	</LinearLayout>
-	<LinearLayout
-	    android:orientation="vertical"
-	    android:layout_width="wrap_content"
-	    android:layout_height="fill_parent"
-	    android:layout_weight="5"
-	    >
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/LocationTextView04"
-			/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/LocationTextView05"
-			/>
-		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:id="@+id/LocationTextView06"
-			/>
-		</LinearLayout>
-	</LinearLayout>
-
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            >
+        <ImageView
+            android:id="@+id/not_scanning"
+            android:paddingTop="1dip"
+            android:paddingRight="1dip"
+            android:paddingBottom="1dip"
+            android:paddingLeft="3dip"
+            android:layout_width="44dip"
+            android:layout_height="44dip"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:visibility="gone"/>
+        <pl.droidsonroids.gif.GifImageView
+            android:id="@+id/scanning"
+            android:paddingTop="1dip"
+            android:paddingRight="1dip"
+            android:paddingBottom="1dip"
+            android:paddingLeft="3dip"
+            android:layout_width="44dip"
+            android:layout_height="44dip"
+            android:src="@drawable/signal_anim"/>
+        </LinearLayout>
+    </LinearLayout>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/status"
-            android:text="@string/list_status_default"
-            android:layout_weight="0"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/blank"
-            android:text=""
-            android:layout_weight="5"
-            />
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/blank"
+			android:text=""
+			android:layout_weight="5"
+			/>
+		<TextView
+			android:paddingTop="3dip"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/status"
+			android:text="@string/list_status_default"
+			android:layout_weight="0"
+			/>
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"

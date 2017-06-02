@@ -20,6 +20,8 @@ import java.util.zip.GZIPInputStream;
 import net.wigle.wigleandroid.MainActivity;
 import android.os.Handler;
 
+import javax.net.ssl.SSLException;
+
 /**
  * Based on   http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html
  * Read more: http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html#ixzz0iqTJF7SV
@@ -138,7 +140,7 @@ final class HttpFileUploader {
             writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
             // close streams
-            MainActivity.info( "File is written" );
+            MainActivity.info( "File written" );
             wbc.close();
             fc.close();
             fileInputStream.close();
@@ -157,8 +159,10 @@ final class HttpFileUploader {
             }
             retval = b.toString();
             // MainActivity.info( "Response: " + retval );
-        }
-        finally {
+        } catch (SSLException ssex) {
+            MainActivity.error("Upload failed. SSL error: ",ssex);
+            return null;
+        } finally {
             if ( conn != null ) {
                 MainActivity.info( "conn disconnect" );
                 conn.disconnect();

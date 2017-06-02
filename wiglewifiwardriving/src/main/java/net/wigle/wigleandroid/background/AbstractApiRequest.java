@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -143,16 +144,21 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         conn.setReadTimeout(8*60*60*1000);
 
         // allow caller to munge
-        if (preConnectConfigurator != null) {
-            preConnectConfigurator.configure(conn);
+        try {
+            if (preConnectConfigurator != null) {
+                preConnectConfigurator.configure(conn);
+            }
+
+            // connect
+            MainActivity.info("about to connect");
+            conn.connect();
+            MainActivity.info("connected");
+
+            return conn;
+        } catch (ConnectException ce) {
+            MainActivity.error("connection failed", ce);
+            return null;
         }
-
-        // connect
-        MainActivity.info( "about to connect" );
-        conn.connect();
-        MainActivity.info( "connected" );
-
-        return conn;
     }
 
     public void setCacheOnly(final boolean cacheOnly) {

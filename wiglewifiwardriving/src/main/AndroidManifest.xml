@@ -35,6 +35,8 @@
     <!-- confine camera activation to Marshmallow and up. -->
     <!-- NB: this functionality exists as early as JellyBean (4.2.2), but not worth the thrash -->
     <uses-permission-sdk-23 android:name="android.permission.CAMERA" />
+    <!-- scan lag due to Marshmallow-and-upBattery Optimization -->
+    <uses-permission-sdk-23 android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <permission
         android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE"

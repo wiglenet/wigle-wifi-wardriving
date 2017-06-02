@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.widget.Button;
 import android.widget.Toast;
 
 public class BackgroundGuiHandler extends Handler {

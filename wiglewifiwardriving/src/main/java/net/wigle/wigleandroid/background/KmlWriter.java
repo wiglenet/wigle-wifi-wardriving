@@ -13,10 +13,8 @@ import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 
 public class KmlWriter extends AbstractBackgroundTask {

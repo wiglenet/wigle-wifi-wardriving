@@ -46,6 +46,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 
+/**
+ * still used for file output streaming; needs to be refactored/renamed -rksh 20170601
+ */
+@Deprecated
 public final class FileUploaderTask extends AbstractBackgroundTask {
     private final TransferListener listener;
     private final boolean justWriteFile;
@@ -60,6 +64,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         int lineCount;
     }
 
+    @Deprecated
     public FileUploaderTask( final FragmentActivity context, final DatabaseHelper dbHelper, final TransferListener listener,
                              final boolean justWriteFile ) {
 
@@ -72,14 +77,17 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         this.justWriteFile = justWriteFile;
     }
 
+    @Deprecated
     public void setWriteWholeDb() {
         this.writeWholeDb = true;
     }
 
+    @Deprecated
     public void setWriteRunOnly() {
         this.writeRunOnly = true;
     }
 
+    @Deprecated
     @Override
     public void subRun() {
         try {
@@ -103,6 +111,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         }
     }
 
+    @Deprecated
     private void doRun() throws InterruptedException {
         final String username = getUsername();
         final String password = getPassword();
@@ -119,6 +128,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         sendBundledMessage( status.ordinal(), bundle );
     }
 
+    @Deprecated
     @SuppressLint("SimpleDateFormat")
     public static OutputStream getOutputStream(final Context context, final Bundle bundle, final Object[] fileFilename)
             throws IOException {
@@ -293,6 +303,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         return status;
     }
 
+    @Deprecated
     public static boolean hasDataConnection(final Context context) {
         final ConnectivityManager connMgr =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -305,6 +316,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         return mobile != null && mobile.isAvailable();
     }
 
+    @Deprecated
     public Status justWriteFile() {
         Status status = null;
         final CountStats countStats = new CountStats();
@@ -346,6 +358,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         return status;
     }
 
+    @Deprecated
     private long writeFile( final OutputStream fos, final Bundle bundle, final CountStats countStats )
             throws IOException, NameNotFoundException, InterruptedException, DBException {
 
@@ -371,6 +384,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         }
     }
 
+    @Deprecated
     @SuppressLint("SimpleDateFormat")
     private long writeFileWithCursor( final OutputStream fos, final Bundle bundle, final CountStats countStats,
                                       final Cursor cursor ) throws IOException, NameNotFoundException, InterruptedException {
@@ -545,6 +559,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         }
     }
 
+    @Deprecated
     private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer,
                                          final CharBuffer charBuffer, final FieldPosition fp, final int number ) {
         stringBuffer.setLength( 0 );
@@ -553,6 +568,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         charBuffer.position( charBuffer.position() + stringBuffer.length() );
     }
 
+    @Deprecated
     private void singleCopyNumberFormat( final NumberFormat numberFormat, final StringBuffer stringBuffer,
                                          final CharBuffer charBuffer, final FieldPosition fp, final double number ) {
         stringBuffer.setLength( 0 );
@@ -561,6 +577,7 @@ public final class FileUploaderTask extends AbstractBackgroundTask {
         charBuffer.position( charBuffer.position() + stringBuffer.length() );
     }
 
+    @Deprecated
     private void singleCopyDateFormat( final DateFormat dateFormat, final StringBuffer stringBuffer,
                                        final CharBuffer charBuffer, final FieldPosition fp, final Date date ) {
         stringBuffer.setLength( 0 );

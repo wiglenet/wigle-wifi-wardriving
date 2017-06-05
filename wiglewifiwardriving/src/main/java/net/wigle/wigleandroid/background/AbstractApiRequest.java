@@ -201,7 +201,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         try {
             fos = MainActivity.createFile(context, cacheFilename);
             // header
-            FileUploaderTask.writeFos(fos, result);
+            ObservationUploader.writeFos(fos, result);
         }
         catch (final IOException ex) {
             MainActivity.error("exception caching result: " + ex, ex);

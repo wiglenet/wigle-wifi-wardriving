@@ -5,6 +5,7 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +14,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class BackgroundGuiHandler extends Handler {
@@ -97,7 +103,7 @@ public class BackgroundGuiHandler extends Handler {
                     alertSettable.clearProgressDialog();
                 }
                 catch ( Exception ex ) {
-                    // guess it wasn't there anyways
+                    // guess it wasn't there anyway
                     MainActivity.info( "exception dismissing dialog/hiding progress: " + ex );
                 }
             }
@@ -110,19 +116,63 @@ public class BackgroundGuiHandler extends Handler {
                     dialog.dismiss();
                 }
                 catch ( Exception ex ) {
-                    // guess it wasn't there anyways
+                    // you can't dismiss what isn't there
                     MainActivity.info( "exception dismissing fm dialog: " + ex );
                 }
             }
 
-            final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
-            try {
-                alertDialog.show(fm, "background-dialog");
-            }
-            catch (IllegalStateException ex) {
-                MainActivity.warn("illegal state in background gui handler: " + ex, ex);
+            if (Status.SUCCESS.equals(status)) {
+                //ALIBI: for now, success gets a long custom toast, other messages get dialogs
+                //TODO: if we decide to use custom toast elsewhere, move this to its own class?
+                LayoutInflater inflater = context.getLayoutInflater();
+                View layout = inflater.inflate(R.layout.wigle_detail_toast,
+                        (ViewGroup) context.findViewById(R.id.custom_toast_container));
+
+                TextView title = (TextView) layout.findViewById(R.id.toast_title_text);
+                title.setText(status.getTitle());
+
+                TextView text = (TextView) layout.findViewById(R.id.toast_message_text);
+                text.setText(composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
+                        msg.peekData().getString( FILEPATH ), msg.peekData().getString( FILENAME ),
+                        status.getMessage() ));
+
+                Toast toast = new Toast(context.getApplicationContext());
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setView(layout);
+                toast.show();
+            } else {
+                final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
+                try {
+                    alertDialog.show(fm, "background-dialog");
+                } catch (IllegalStateException ex) {
+                    MainActivity.warn("illegal state in background gui handler: " + ex, ex);
+                }
             }
         }
+    }
+
+    public static String composeDisplayMessage(Context context, String error, String filepath,
+                                        String filename, final int messageId) {
+        if ( filename != null ) {
+            // just don't show the gz
+            int index = filename.indexOf( ".gz" );
+            if ( index > 0 ) {
+                filename = filename.substring( 0, index );
+            }
+            index = filename.indexOf( ".kml" );
+            if ( index > 0 ) {
+                filename = filename.substring( 0, index );
+            }
+        }
+        if ( filename == null ) {
+            filename = "";
+        } else {
+            filename = "\n\nFile location:\n" + filepath + filename;
+        }
+        error = error == null ? "" : " Error: " + error;
+
+        return context.getString(messageId) + error + filename;
     }
 
     public static class BackgroundAlertDialog extends DialogFragment {
@@ -147,32 +197,9 @@ public class BackgroundGuiHandler extends Handler {
             final int message = bundle.getInt("message");
             final int status = bundle.getInt("status");
 
-            String filename;
-
-            String filepath = bundle.getString( FILEPATH );
-            filepath = filepath == null ? "" : filepath + "\n";
-            filename = bundle.getString( FILENAME );
-            if ( filename != null ) {
-                // just don't show the gz
-                int index = filename.indexOf( ".gz" );
-                if ( index > 0 ) {
-                    filename = filename.substring( 0, index );
-                }
-                index = filename.indexOf( ".kml" );
-                if ( index > 0 ) {
-                    filename = filename.substring( 0, index );
-                }
-            }
-            if ( filename == null ) {
-                filename = "";
-            }
-            else {
-                filename = "\n\nFile location:\n" + filepath + filename;
-            }
-
-            String error = bundle.getString( ERROR );
-            error = error == null ? "" : " Error: " + error;
-            builder.setMessage( activity.getString( message ) + error + filename );
+            builder.setMessage( composeDisplayMessage(activity,  bundle.getString( ERROR ),
+                    bundle.getString( FILEPATH ), bundle.getString( FILENAME ),
+                    message ));
 
             AlertDialog ad = builder.create();
             ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
@@ -180,8 +207,7 @@ public class BackgroundGuiHandler extends Handler {
                 public void onClick( final DialogInterface dialog, final int which ) {
                     try {
                         dialog.dismiss();
-                    }
-                    catch ( Exception ex ) {
+                    } catch ( Exception ex ) {
                         // guess it wasn't there anyways
                         MainActivity.info( "exception dismissing alert dialog: " + ex );
                     }
@@ -191,8 +217,7 @@ public class BackgroundGuiHandler extends Handler {
                         MainActivity.info("dialog: start settings fragment");
                         try {
                             MainActivity.getMainActivity().selectFragment(MainActivity.SETTINGS_TAB_POS);
-                        }
-                        catch (Exception ex) {
+                        } catch (Exception ex) {
                             MainActivity.info("failed to start settings fragment: " + ex, ex);
                         }
                     }
@@ -201,5 +226,4 @@ public class BackgroundGuiHandler extends Handler {
             return ad;
         }
     }
-
 }

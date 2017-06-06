@@ -747,12 +747,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         boolean success = false;
 
-        if ( mainActivity.isTransferring() ) {
-            MainActivity.info( "transferring, not scanning for now" );
-            // reset this
-            lastScanResponseTime = Long.MIN_VALUE;
-        }
-        else if (mainActivity.isScanning()) {
+        if (mainActivity.isScanning()) {
             if ( ! scanInFlight ) {
                 try {
                     success = wifiManager.startScan();
@@ -769,8 +764,7 @@ public class WifiReceiver extends BroadcastReceiver {
             if ( lastScanResponseTime < 0 ) {
                 // use now, since we made a request
                 lastScanResponseTime = now;
-            }
-            else {
+            } else {
                 final long sinceLastScan = now - lastScanResponseTime;
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(

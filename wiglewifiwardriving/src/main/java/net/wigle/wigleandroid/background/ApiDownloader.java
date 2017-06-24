@@ -37,8 +37,7 @@ public class ApiDownloader extends AbstractApiRequest {
         catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             throw waex;
-        }
-        catch (final Exception ex) {
+        } catch (final Exception ex) {
             MainActivity.error("ex: " + ex + " result: " + result, ex);
         }
     }

@@ -33,7 +33,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="6dip"
                 android:background="#ffae17"
-                android:paddingBottom="2dp"
                 />
             <LinearLayout
                 android:orientation="horizontal"
@@ -69,7 +68,9 @@
                     android:background="@drawable/cancel_button"
                     android:padding="2dip"
                     android:layout_marginLeft="5dip"
-                    android:layout_marginRight="1dip"/>
+                    android:layout_marginTop="5dip"/>
+                    android:layout_marginBottom="5dip"/>
+                    android:layout_marginRight="2dip"/>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

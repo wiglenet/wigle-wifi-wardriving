@@ -280,6 +280,7 @@ public final class MainActivity extends AppCompatActivity {
             state.numberFormat8 = NumberFormat.getNumberInstance(Locale.US);
             if (state.numberFormat8 instanceof DecimalFormat) {
                 state.numberFormat8.setMaximumFractionDigits(8);
+                state.numberFormat8.setMinimumFractionDigits(8);
             }
         }
 

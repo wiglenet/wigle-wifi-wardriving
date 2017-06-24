@@ -31,6 +31,13 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
+                android:layout_height="6dip"
+                android:background="#ffae17"
+                android:paddingBottom="2dp"
+                />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/inline_status_bar_frame">
                 <LinearLayout

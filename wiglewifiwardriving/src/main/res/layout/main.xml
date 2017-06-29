@@ -31,6 +31,12 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
+                android:layout_height="6dip"
+                android:background="#ffae17"
+                />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/inline_status_bar_frame">
                 <LinearLayout
@@ -62,7 +68,9 @@
                     android:background="@drawable/cancel_button"
                     android:padding="2dip"
                     android:layout_marginLeft="5dip"
-                    android:layout_marginRight="1dip"/>
+                    android:layout_marginTop="5dip"/>
+                    android:layout_marginBottom="5dip"/>
+                    android:layout_marginRight="2dip"/>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

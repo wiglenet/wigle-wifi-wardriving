@@ -41,14 +41,23 @@ public final class FilterMatcher {
         }
 
         if ( matcher != null ) {
-            matcher.reset(network.getSsid());
-            final boolean invert = prefs.getBoolean( prefix + ListFragment.PREF_MAPF_INVERT, false );
-            final boolean matches = matcher.find();
-            if ( ! matches && ! invert) {
-                return false;
-            }
-            else if ( matches && invert ) {
-                return false;
+            try {
+                final String ssid = network.getSsid();
+                if (null == ssid) {
+
+                }
+                matcher.reset(ssid);
+                final boolean invert = prefs.getBoolean(prefix + ListFragment.PREF_MAPF_INVERT, false);
+                final boolean matches = matcher.find();
+                if (!matches && !invert) {
+                    return false;
+                } else if (matches && invert) {
+                    return false;
+                }
+            } catch (IllegalArgumentException iaex) {
+                MainActivity.warn("Matcher: IllegalArgument: " + network.getSsid() + "pattern: " + matcher.pattern());
+                final boolean invert = prefs.getBoolean(prefix + ListFragment.PREF_MAPF_INVERT, false);
+                return !invert;
             }
         }
 

@@ -183,7 +183,12 @@ public class NetworkActivity extends ActionBarActivity implements DialogListener
         MainActivity.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (mapView != null) {
-            mapView.onSaveInstanceState(outState);
+            try {
+                mapView.onSaveInstanceState(outState);
+            } catch (android.os.BadParcelableException bpe) {
+                MainActivity.error("Exception saving NetworkActivity instance state: ",bpe);
+                //this is really low-severity, since we can restore all state anyway
+            }
         }
     }
 

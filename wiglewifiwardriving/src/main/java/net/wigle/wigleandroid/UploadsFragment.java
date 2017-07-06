@@ -106,6 +106,10 @@ public class UploadsFragment extends Fragment {
         statusMap.put("S", "upload_stats");
         statusMap.put("D", "upload_success");
         statusMap.put("E", "upload_failed");
+        statusMap.put("A", "upload_archive");
+        statusMap.put("C", "upload_catalog");
+        statusMap.put("G", "upload_geoindex");
+
         uploadStatusMap = Collections.unmodifiableMap(statusMap);
     }
     /** Called when the activity is first created. */

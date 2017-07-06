@@ -304,6 +304,9 @@
     <string name="upload_success">Completed</string>
     <string name="upload_failed">Failed</string>
     <string name="upload_unknown">Unknown</string>
+    <string name="upload_archive">Archiving…</string>
+    <string name="upload_catalog">Cataloging…</string>
+    <string name="upload_geoindex">Geocoding…</string>
     <string name="auth_username">Auth User</string>
     <string name="deauthorize">Deauthorize (logout)</string>
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>

@@ -320,6 +320,9 @@
     <string name="upload_success">Succès</string>
     <string name="upload_failed">Échoué</string>
     <string name="upload_unknown">Inconnu</string>
+    <string name="upload_archive">Archivage…</string>
+    <string name="upload_catalog">Catalogage…</string>
+    <string name="upload_geoindex">Codage Géo…</string>
     <string name="auth_username">Utilisateur Auth</string>
     <string name="deauthorize">Désautoriser (logout)</string>
     <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>

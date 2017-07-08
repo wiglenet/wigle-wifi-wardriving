@@ -326,6 +326,9 @@
     <string name="upload_success">fertiggestellt</string>
     <string name="upload_failed">fehlgeschlagen</string>
     <string name="upload_unknown">unbekannt</string>
+    <string name="upload_archive">archiving…</string>
+    <string name="upload_catalog">cataloging…</string>
+    <string name="upload_geoindex">geocoding…</string>
     <string name="auth_username">Benutzerautorisierung</string>
     <string name="deauthorize">de-autorisieren (Logout)</string>
     <string name="deauthorize_confirm">Möchtest du wirklich die LogIn-Informationen löschen?</string>

@@ -82,17 +82,20 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             Process.setThreadPriority( THREAD_PRIORITY );
 
             subRun();
-        }
-        catch ( InterruptedException ex ) {
+        } catch ( InterruptedException ex ) {
             MainActivity.info( name + " interrupted: " + ex );
-        }
-        catch ( final WiGLEAuthException waex) {
-            //DEBUG: MainActivity.info("auth error", waex);
+        } catch ( final WiGLEAuthException waex) {
+            //DEBUG: MainActivity.error("auth error", waex);
             Bundle errorBundle = new Bundle();
             errorBundle.putCharSequence("AUTH_ERROR", waex.getMessage());
             sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
-        }
-        catch ( final Exception ex ) {
+        } catch ( final IOException ioex) {
+            MainActivity.error("connection error", ioex);
+            Bundle errorBundle = new Bundle();
+            errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
+            errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
+            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+        } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         }
     }

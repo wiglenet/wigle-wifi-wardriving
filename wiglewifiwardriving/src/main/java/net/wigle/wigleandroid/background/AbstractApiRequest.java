@@ -231,13 +231,15 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                 ListFragment.SHARED_PREFS, 0);
         final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
         final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+        final String username = prefs.getString(ListFragment.PREF_USERNAME, null);
+        final String password = prefs.getString(ListFragment.PREF_PASSWORD, null);
         MainActivity.info("authname: " + authname);
         if (beAnonymous && requiresLogin) {
             MainActivity.info("anonymous, not running ApiRequest: " + this);
             return;
         }
-        if (authname == null && doBasicLogin) {
-            MainActivity.info("No authname, going to request token");
+        if (authname == null && username != null && password != null && doBasicLogin) {
+            MainActivity.info("No authname but have username, going to request token");
             downloadTokenAndStart(fragment);
         } else {
             start();
@@ -245,7 +247,6 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     protected String getResultString(final BufferedReader reader) throws IOException, InterruptedException {
-        // final Bundle bundle = new Bundle();
         String line;
         final StringBuilder result = new StringBuilder();
         while ( (line = reader.readLine()) != null ) {

@@ -246,16 +246,15 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             importObservedButton.setEnabled(false);
         } else if (MainActivity.getMainActivity().isTransferring()) {
                 importObservedButton.setEnabled(false);
-        } else {
-            importObservedButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(final View buttonView) {
-                    MainActivity.createConfirmation(getActivity(),
-                            DataFragment.this.getString(R.string.data_import_observed),
-                            MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
-                }
-            });
         }
+        importObservedButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View buttonView) {
+                MainActivity.createConfirmation(getActivity(),
+                        DataFragment.this.getString(R.string.data_import_observed),
+                        MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
+            }
+        });
     }
 
     private void createAndStartImport() {

@@ -239,18 +239,23 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupImportObservedButton( final View view ) {
         final Button importObservedButton = (Button) view.findViewById( R.id.import_observed_button );
-        if (MainActivity.getMainActivity().isTransferring()) {
-            importObservedButton.setEnabled(false);
-        }
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
 
-        importObservedButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-            MainActivity.createConfirmation(getActivity(),
-                    DataFragment.this.getString(R.string.data_import_observed),
-                    MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
-            }
-        });
+        if (null == authname) {
+            importObservedButton.setEnabled(false);
+        } else if (MainActivity.getMainActivity().isTransferring()) {
+                importObservedButton.setEnabled(false);
+        } else {
+            importObservedButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(final View buttonView) {
+                    MainActivity.createConfirmation(getActivity(),
+                            DataFragment.this.getString(R.string.data_import_observed),
+                            MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
+                }
+            });
+        }
     }
 
     private void createAndStartImport() {

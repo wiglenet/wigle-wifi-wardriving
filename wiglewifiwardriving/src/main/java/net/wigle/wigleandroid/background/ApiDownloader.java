@@ -6,6 +6,7 @@ import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -33,11 +34,10 @@ public class ApiDownloader extends AbstractApiRequest {
             }
             final JSONObject json = new JSONObject(result);
             listener.requestComplete(json, false);
-        }
-        catch (final WiGLEAuthException waex) {
+        } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             throw waex;
-        } catch (final Exception ex) {
+        } catch (final JSONException ex) {
             MainActivity.error("ex: " + ex + " result: " + result, ex);
         }
     }

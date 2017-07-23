@@ -112,6 +112,7 @@
     <orderEntry type="library" exported="" name="play-services-basement-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.7.19" level="project" />
+    <orderEntry type="library" exported="" name="android-gif-drawable-1.2.7" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.3.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.19" level="project" />

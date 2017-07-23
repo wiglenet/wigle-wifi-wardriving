@@ -1,3 +1,10 @@
+* 2.20 (07/22/2017)
+No modal while uploading.
+Less observation importer memory usage.
+Improved icons and layouts.
+Language fixes (thanks Raffaele74 & kill0rz!)
+Error handling fixes.
+
 * 2.19 (04/30/2017)
 Fix for not using db_marker after restart.
 Fix for activate after anonymous.

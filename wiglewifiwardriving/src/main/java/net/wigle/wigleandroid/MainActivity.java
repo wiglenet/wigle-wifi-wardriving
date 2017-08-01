@@ -157,6 +157,8 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
 
+    public static final String ACTION_END = "net.wigle.wigleandroid.END";
+
     private static MainActivity mainActivity;
     private static ListFragment listActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
@@ -187,6 +189,7 @@ public final class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
+
         // set language
         setLocale(this);
         setContentView(R.layout.main);
@@ -625,27 +628,6 @@ public final class MainActivity extends AppCompatActivity {
         state.fragList[SETTINGS_TAB_POS] = settings;
     }
 
-    private void handleIntent() {
-        // Get the intent that started this activity
-        final Intent intent = getIntent();
-
-        // Figure out what to do based on the intent type
-        MainActivity.info("ShareActivity intent type: " + intent.getAction());
-        switch (intent.getAction()) {
-            case Intent.ACTION_INSERT:
-                MainActivity.getMainActivity().handleScanChange(true);
-                break;
-            case Intent.ACTION_DELETE:
-                MainActivity.getMainActivity().handleScanChange(false);
-                break;
-            case Intent.ACTION_SYNC:
-                MainActivity.getMainActivity().doUpload();
-                break;
-            default:
-                MainActivity.info("Unhandled intent action: " + intent.getAction());
-        }
-    }
-
     @Override
     public boolean onMenuOpened(int featureId, Menu menu) {
         if (featureId == Window.FEATURE_ACTION_BAR && menu != null) {
@@ -992,6 +974,7 @@ public final class MainActivity extends AppCompatActivity {
             intent.putExtra( MainActivity.ERROR_REPORT_DO_EMAIL, true );
             startActivity(intent);
         }
+
         super.onStart();
 
     }

@@ -72,18 +72,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_SYNC" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_INSERT" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_DELETE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".ActivateActivity"
@@ -177,7 +165,11 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
+        <receiver android:name=".listener.TerminationReceiver" >
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.END" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".WigleService"
             android:enabled="true"

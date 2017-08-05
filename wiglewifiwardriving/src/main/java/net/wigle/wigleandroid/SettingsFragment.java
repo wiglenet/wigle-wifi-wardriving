@@ -428,13 +428,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         doScanSpinner( R.id.gps_spinner, ListFragment.GPS_SCAN_PERIOD,
                 MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view );
 
-        MainActivity.prefBackedCheckBox(this, view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
-        MainActivity.prefBackedCheckBox(this, view, R.id.use_metric, ListFragment.PREF_METRIC, false);
-        MainActivity.prefBackedCheckBox(this, view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
-        MainActivity.prefBackedCheckBox(this, view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
-        MainActivity.prefBackedCheckBox(this, view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
-        MainActivity.prefBackedCheckBox(this, view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
-        MainActivity.prefBackedCheckBox(this, view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, ListFragment.PREF_METRIC, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };

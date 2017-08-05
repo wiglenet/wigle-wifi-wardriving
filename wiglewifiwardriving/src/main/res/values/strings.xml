@@ -344,4 +344,5 @@
     <string name="map_mine">Mine</string>
     <string name="status_downloading">Downloading</string>
     <string name="status_parsing">Parsing</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

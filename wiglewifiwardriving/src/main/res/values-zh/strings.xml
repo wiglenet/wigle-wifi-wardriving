@@ -279,4 +279,5 @@
     <string name="map_mine">礦</string>
     <string name="status_downloading">下載</string>
     <string name="status_parsing">解析</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

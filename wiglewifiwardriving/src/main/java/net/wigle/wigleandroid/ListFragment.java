@@ -304,6 +304,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
         item.setIcon(android.R.drawable.ic_menu_search);
+        item.setIcon(android.R.drawable.ic_menu_manage);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
@@ -366,7 +367,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             }
             case MENU_FILTER:
-                onCreateDialog(SSID_FILTER);
+                final Intent intent = new Intent(getActivity(), FilterActivity.class);
+                getActivity().startActivity(intent);
                 return true;
             case MENU_MAP:
                 // call over to finish
@@ -401,9 +403,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onCreateDialog( int which ) {
         DialogFragment dialogFragment = null;
         switch ( which ) {
-            case SSID_FILTER:
-                dialogFragment = MappingFragment.createSsidFilterDialog(FILTER_PREF_PREFIX);
-                break;
             case SORT_DIALOG:
                 dialogFragment = new SortDialog();
                 break;

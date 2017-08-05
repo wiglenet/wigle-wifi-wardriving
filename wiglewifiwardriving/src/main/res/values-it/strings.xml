@@ -341,5 +341,5 @@
     <string name="map_mine">Il mio</string>
     <string name="status_downloading">Download</string>
     <string name="status_parsing">Parsing</string>
-    <string name="filter_app_name">Filter Network List</string>
+    <string name="filter_app_name">Elenco filtri delle reti</string>
 </resources>

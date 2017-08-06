@@ -53,16 +53,16 @@ public class FilterActivity extends ActionBarActivity {
         });
 
         MainActivity.prefBackedCheckBox(this , view, R.id.showinvert,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
         MainActivity.prefBackedCheckBox( this, view, R.id.showopen,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.showwep,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_WEP, true );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WEP, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.showwpa,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_WPA, true );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WPA, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_CELL, true );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_CELL, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
-                MappingFragment.DIALOG_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
     }
 }

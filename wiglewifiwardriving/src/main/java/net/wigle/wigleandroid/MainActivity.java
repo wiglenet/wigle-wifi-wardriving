@@ -3,10 +3,8 @@ package net.wigle.wigleandroid;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -92,7 +90,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.prefs.Preferences;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -802,9 +799,9 @@ public final class MainActivity extends AppCompatActivity {
         return checkbox;
     }
 
-    public static CheckBox prefBackedCheckBox(final Fragment fragment, final View view, final int id,
+    public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
                                               final String pref, final boolean def) {
-        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
         checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {

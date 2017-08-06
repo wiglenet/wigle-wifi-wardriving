@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollview"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:id="@+id/layout_root"
+                  android:orientation="vertical"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:padding="10dp"
+                  android:minWidth="280dip"
+                  >
+        <TextView android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/filter_show_ssid" />
+
+        <EditText
+            android:id="@+id/edit_regex"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textFilter" />
+
+        <CheckBox android:id="@+id/showinvert"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_not_regex" />
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="horizontal"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content">
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:orientation="vertical"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content">
+
+                <CheckBox android:id="@+id/showopen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/filter_show_open"/>
+
+                <CheckBox android:id="@+id/showcell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/filter_show_cell" />
+
+                <CheckBox android:id="@+id/showwep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/filter_show_wep" />
+
+                <CheckBox android:id="@+id/showwpa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/filter_show_wpa" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <CheckBox android:id="@+id/enabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_enabled" />
+    </LinearLayout>
+</ScrollView>

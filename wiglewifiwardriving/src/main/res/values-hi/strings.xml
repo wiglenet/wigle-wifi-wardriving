@@ -279,4 +279,5 @@
     <string name="map_mine">मेरी</string>
     <string name="status_downloading">डाउनलोड कर रहा है</string>
     <string name="status_parsing">पदच्छेद</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

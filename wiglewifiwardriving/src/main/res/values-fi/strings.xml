@@ -279,4 +279,5 @@
     <string name="map_mine">Kaivos</string>
     <string name="status_downloading">lataaminen</string>
     <string name="status_parsing">Jäsennys</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

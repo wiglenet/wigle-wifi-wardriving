@@ -289,4 +289,5 @@
     <string name="map_all">Все</string>
     <string name="map_not_mine">другие</string>
     <string name="map_mine">Мой</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

@@ -279,4 +279,5 @@
     <string name="map_mine">těžit</string>
     <string name="status_downloading">Stahování</string>
     <string name="status_parsing">Parsování</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

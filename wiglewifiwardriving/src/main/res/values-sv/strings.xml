@@ -277,4 +277,5 @@
     <string name="map_all">Allt</string>
     <string name="map_not_mine">Övriga</string>
     <string name="map_mine">Mina</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

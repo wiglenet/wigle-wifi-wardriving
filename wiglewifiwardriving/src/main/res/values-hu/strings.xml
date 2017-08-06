@@ -279,4 +279,5 @@
     <string name="map_mine">Enyém</string>
     <string name="status_downloading">A letöltés</string>
     <string name="status_parsing">Nyelvtani elemzés</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

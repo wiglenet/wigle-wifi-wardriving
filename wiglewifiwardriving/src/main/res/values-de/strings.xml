@@ -344,4 +344,5 @@
     <string name="map_mine">Bergwerk</string>
     <string name="status_downloading">Downloading</string>
     <string name="status_parsing">analysiere</string>
+    <string name="filter_app_name">Filterliste der Netzwerke</string>
 </resources>

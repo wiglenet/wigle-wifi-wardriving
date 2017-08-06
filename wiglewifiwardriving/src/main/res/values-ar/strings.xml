@@ -279,4 +279,5 @@
     <string name="map_mine">الخاص بي</string>
     <string name="status_downloading">جارى التحميل</string>
     <string name="status_parsing">توزيع</string>
+    <string name="filter_app_name">Filter Network List</string>
 </resources>

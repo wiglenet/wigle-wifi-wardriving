@@ -3,6 +3,7 @@ package net.wigle.wigleandroid;
 import java.util.List;
 
 import net.wigle.wigleandroid.background.ApiListener;
+import net.wigle.wigleandroid.background.LegacyObservationImporter;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
@@ -20,6 +21,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -262,21 +264,41 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         if (mainActivity != null) {
             mainActivity.setTransferring();
         }
+
         // actually need this Activity context, for dialogs
-        final ObservationImporter task = new ObservationImporter(getActivity(),
-                ListFragment.lameStatic.dbHelper,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(JSONObject object, boolean cached) {
-                        if (mainActivity != null) {
-                            mainActivity.transferComplete();
+        if (Build.VERSION.SDK_INT >= 11) {
+
+            final ObservationImporter task = new ObservationImporter(getActivity(),
+                    ListFragment.lameStatic.dbHelper,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(JSONObject object, boolean cached) {
+                            if (mainActivity != null) {
+                                mainActivity.transferComplete();
+                            }
                         }
-                    }
-                });
-        try {
-            task.startDownload(this);
-        } catch (WiGLEAuthException waex) {
-            //moot due to bundle handling
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                //moot due to bundle handling
+            }
+        } else {
+            final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
+                    ListFragment.lameStatic.dbHelper,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(JSONObject object, boolean cached) {
+                            if (mainActivity != null) {
+                                mainActivity.transferComplete();
+                            }
+                        }
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                //moot due to bundle handling
+            }
         }
     }
 

@@ -268,15 +268,17 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
-            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
-            // Cannot set request property after connection is made
-            preConnectConfigurator = new PreConnectConfigurator() {
-                @Override
-                public void configure(HttpURLConnection connection) {
-                    //TODO: for non-upload tasks, how to handle anonymity
-                    connection.setRequestProperty("Authorization", "Basic " + encoded);
-                }
-            };
+            if (null != token) {
+                final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+                // Cannot set request property after connection is made
+                preConnectConfigurator = new PreConnectConfigurator() {
+                    @Override
+                    public void configure(HttpURLConnection connection) {
+                        //TODO: for non-upload tasks, how to handle anonymity
+                        connection.setRequestProperty("Authorization", "Basic " + encoded);
+                    }
+                };
+            }
         }
 
         final HttpURLConnection conn = AbstractApiRequest.connect(url, setBoundary,

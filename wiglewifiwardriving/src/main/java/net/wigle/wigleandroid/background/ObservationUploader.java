@@ -182,6 +182,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
+            if (!beAnonymous && null == token) {
+                return Status.BAD_LOGIN;
+            }
             final String encoded = (null != token && null != authname) ?
                     Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"),
                         Base64.NO_WRAP) : null;

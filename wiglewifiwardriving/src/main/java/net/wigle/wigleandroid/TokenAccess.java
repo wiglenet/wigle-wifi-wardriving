@@ -226,8 +226,16 @@ public class TokenAccess {
                 }
             } catch (CertificateException | NoSuchAlgorithmException | IOException |
                     KeyStoreException | UnrecoverableEntryException | NoSuchPaddingException |
-                    InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+                    InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
+                    UnsupportedOperationException ex) {
                 MainActivity.error("[TOKEN] Failed to get API Token: ", ex);
+                /**
+                 * ALIBI: in the event of failure, we'll clear, force a re-auth
+                 */
+                clearApiToken(prefs);
+                final SharedPreferences.Editor editor = prefs.edit();
+                editor.remove(ListFragment.PREF_AUTHNAME);
+                editor.apply();
                 return null;
             }
         }

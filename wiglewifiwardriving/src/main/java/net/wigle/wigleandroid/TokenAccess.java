@@ -48,6 +48,8 @@ public class TokenAccess {
     public static final String ANDROID_KEYSTORE = "AndroidKeyStore";
     public static final String UTF8 = "UTF-8";
     private static final String AES_CIPHER = "AES/GCM/NoPadding";
+    private static final String RSA_OLD_CIPHER = "RSA/ECB/PKCS1Padding";
+    private static final String RSA_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
     /**
      * test presence of a necessary API key, Keystore entry if applicable
@@ -97,6 +99,11 @@ public class TokenAccess {
             NoSuchPaddingException, InvalidKeyException, UnrecoverableEntryException, IllegalBlockSizeException,
             BadPaddingException {
 
+        if (apiToken == null) {
+            MainActivity.error("[TOKEN] ERROR: unreachable condition, apiToken NULL. APIv" + Build.VERSION.SDK_INT);
+            return false;
+        }
+
         final KeyStore keyStore = getKeyStore();
         final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
         Cipher encrypt = Cipher.getInstance(AES_CIPHER);
@@ -128,21 +135,25 @@ public class TokenAccess {
             UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException,
             InvalidAlgorithmParameterException {
 
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return null;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            MainActivity.warn("[TOKEN] getApiTokenVersion2 sdk not M+: " + Build.VERSION.SDK_INT);
+            return null;
+        }
+        else {
+            final KeyStore keyStore = getKeyStore();
+            final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+            final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
 
-        final KeyStore keyStore = getKeyStore();
-        final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
-        final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
+            final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);
+            final byte[] iv = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN_IV, ""), Base64.DEFAULT);
+            final int tagLength = prefs.getInt(ListFragment.PREF_TOKEN_TAG_LENGTH, 128);
 
-        final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);
-        final byte[] iv = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN_IV, ""), Base64.DEFAULT);
-        final int tagLength = prefs.getInt(ListFragment.PREF_TOKEN_TAG_LENGTH, 128);
-
-        decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv) );
-        final byte[] done = decrypt.doFinal(cypherToken);
-        final String token = new String(done, UTF8);
-        MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
-        return token;
+            decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));
+            final byte[] done = decrypt.doFinal(cypherToken);
+            final String token = new String(done, UTF8);
+            MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
+            return token;
+        }
     }
 
     /**
@@ -182,10 +193,10 @@ public class TokenAccess {
                     Cipher c = null;
 
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+                        c = Cipher.getInstance(RSA_CIPHER);
                     } else if (android.os.Build.VERSION.SDK_INT >=
                             android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                        c = Cipher.getInstance(RSA_OLD_CIPHER);
                     }
                     if (null != c) {
                         c.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -276,9 +287,9 @@ public class TokenAccess {
 
                         Cipher c;
                         if (versionThreshold >= android.os.Build.VERSION_CODES.M) {
-                            c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+                            c = Cipher.getInstance(RSA_CIPHER);
                         } else {
-                            c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                            c = Cipher.getInstance(RSA_OLD_CIPHER);
                         }
                         c.init(Cipher.DECRYPT_MODE, privateKey);
                         String key = new String(c.doFinal(cypherText), UTF8);

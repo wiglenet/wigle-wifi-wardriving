@@ -74,6 +74,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_PASSWORD = "password";
     public static final String PREF_AUTHNAME = "authname";
     public static final String PREF_TOKEN = "token";
+    public static final String PREF_TOKEN_IV = "tokenIV";
+    public static final String PREF_TOKEN_TAG_LENGTH = "tokenTagLength";
     public static final String PREF_SHOW_CURRENT = "showCurrent";
     public static final String PREF_BE_ANONYMOUS = "beAnonymous";
     public static final String PREF_DONATE = "donate";

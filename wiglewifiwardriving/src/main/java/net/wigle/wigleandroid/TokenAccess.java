@@ -27,7 +27,10 @@ import java.util.Calendar;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.security.auth.x500.X500Principal;
 
 /**
@@ -41,7 +44,12 @@ public class TokenAccess {
     // identify WiGLE entry in the KeyStore
     public static final String KEYSTORE_WIGLE_CREDS_KEY_V0 = "WiGLEKeyOld";
     public static final String KEYSTORE_WIGLE_CREDS_KEY_V1 = "WiGLEKey";
+    public static final String KEYSTORE_WIGLE_CREDS_KEY_V2 = "WiGLEKeyAES";
     public static final String ANDROID_KEYSTORE = "AndroidKeyStore";
+    public static final String UTF8 = "UTF-8";
+    private static final String AES_CIPHER = "AES/GCM/NoPadding";
+    private static final String RSA_OLD_CIPHER = "RSA/ECB/PKCS1Padding";
+    private static final String RSA_CIPHER = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
 
     /**
      * test presence of a necessary API key, Keystore entry if applicable
@@ -53,11 +61,11 @@ public class TokenAccess {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
 
                 try {
-                    KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-                    keyStore.load(null);
+                    final KeyStore keyStore = getKeyStore();
 
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                        if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                        if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)
+                                || keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
                             //TODO: it would be best to test decrypt here, but makes this heavier
                             return true;
                         }
@@ -86,6 +94,68 @@ public class TokenAccess {
         editor.apply();
     }
 
+    private static boolean setApiTokenVersion2(final SharedPreferences prefs, final String apiToken)
+            throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
+            NoSuchPaddingException, InvalidKeyException, UnrecoverableEntryException, IllegalBlockSizeException,
+            BadPaddingException {
+
+        if (apiToken == null) {
+            MainActivity.error("[TOKEN] ERROR: unreachable condition, apiToken NULL. APIv" + Build.VERSION.SDK_INT);
+            return false;
+        }
+
+        final KeyStore keyStore = getKeyStore();
+        final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+        Cipher encrypt = Cipher.getInstance(AES_CIPHER);
+        encrypt.init(Cipher.ENCRYPT_MODE, key);
+
+        final byte[] input = apiToken.getBytes();
+        final byte[] cypherToken = encrypt.doFinal(input);
+        if (cypherToken == null) {
+            MainActivity.error("[TOKEN] ERROR: unreachable condition, cypherToken NULL. APIv" + Build.VERSION.SDK_INT);
+            return false;
+        }
+        final byte[] iv = encrypt.getIV();
+        // thanks stack overflow, go to hell android security team. number of bits difference.
+        // https://stackoverflow.com/questions/33995233/android-aes-encryption-decryption-using-gcm-mode-in-android
+        // https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3
+        final int tagLength = (cypherToken.length - input.length) * 8;
+
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(ListFragment.PREF_TOKEN, Base64.encodeToString(cypherToken, Base64.DEFAULT));
+        editor.putString(ListFragment.PREF_TOKEN_IV, Base64.encodeToString(iv, Base64.DEFAULT));
+        editor.putInt(ListFragment.PREF_TOKEN_TAG_LENGTH, tagLength);
+        editor.apply();
+        MainActivity.info("[TOKEN] setApiTokenVersion2 set token length: " + apiToken.length());
+        return true;
+    }
+
+    private static String getApiTokenVersion2(SharedPreferences prefs) throws KeyStoreException, IOException,
+            NoSuchAlgorithmException, CertificateException, NoSuchPaddingException, InvalidKeyException,
+            UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException,
+            InvalidAlgorithmParameterException {
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            MainActivity.warn("[TOKEN] getApiTokenVersion2 sdk not M+: " + Build.VERSION.SDK_INT);
+            return null;
+        }
+        else {
+            final KeyStore keyStore = getKeyStore();
+            final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+            final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
+
+            final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);
+            final byte[] iv = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN_IV, ""), Base64.DEFAULT);
+            final int tagLength = prefs.getInt(ListFragment.PREF_TOKEN_TAG_LENGTH, 128);
+
+            decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));
+            final byte[] done = decrypt.doFinal(cypherToken);
+            final String token = new String(done, UTF8);
+            MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
+            return token;
+        }
+    }
+
     /**
      * Set the appropriate API Token, stored with KeyStore crypto if suitable
      * @param prefs the shared preferences object in which to store the token
@@ -102,14 +172,17 @@ public class TokenAccess {
             return true;
         } else {
             try {
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    return setApiTokenVersion2(prefs, apiToken);
+                }
+
                 byte[] cypherToken;
 
                 String keyStr = KEYSTORE_WIGLE_CREDS_KEY_V0;
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     keyStr = KEYSTORE_WIGLE_CREDS_KEY_V1;
                 }
-                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-                keyStore.load(null);
+                final KeyStore keyStore = getKeyStore();
 
                 KeyStore.PrivateKeyEntry privateKeyEntry = (KeyStore.PrivateKeyEntry)
                         keyStore.getEntry(keyStr, null);
@@ -120,10 +193,10 @@ public class TokenAccess {
                     Cipher c = null;
 
                     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+                        c = Cipher.getInstance(RSA_CIPHER);
                     } else if (android.os.Build.VERSION.SDK_INT >=
                             android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                        c = Cipher.getInstance(RSA_OLD_CIPHER);
                     }
                     if (null != c) {
                         c.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -181,8 +254,7 @@ public class TokenAccess {
             return prefs.getString(ListFragment.PREF_TOKEN, "");
         } else {
             try {
-                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-                keyStore.load(null);
+                final KeyStore keyStore = getKeyStore();
 
                 KeyStore.PrivateKeyEntry privateKeyEntry;
 
@@ -201,6 +273,12 @@ public class TokenAccess {
                     return prefs.getString(ListFragment.PREF_TOKEN, "");
                 }
 
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                    return getApiTokenVersion2(prefs);
+                }
+
                 if (null != privateKeyEntry) {
                     String encodedCypherText = prefs.getString(ListFragment.PREF_TOKEN, "");
                     if (!encodedCypherText.isEmpty()) {
@@ -209,12 +287,12 @@ public class TokenAccess {
 
                         Cipher c;
                         if (versionThreshold >= android.os.Build.VERSION_CODES.M) {
-                            c = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+                            c = Cipher.getInstance(RSA_CIPHER);
                         } else {
-                            c = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+                            c = Cipher.getInstance(RSA_OLD_CIPHER);
                         }
                         c.init(Cipher.DECRYPT_MODE, privateKey);
-                        String key = new String(c.doFinal(cypherText), "UTF-8");
+                        String key = new String(c.doFinal(cypherText), UTF8);
                         return key;
                     } else {
                         MainActivity.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
@@ -226,7 +304,8 @@ public class TokenAccess {
                 }
             } catch (CertificateException | NoSuchAlgorithmException | IOException |
                     KeyStoreException | UnrecoverableEntryException | NoSuchPaddingException |
-                    InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
+                    InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
+                    InvalidAlgorithmParameterException ex) {
                 MainActivity.error("[TOKEN] Failed to get API Token: ", ex);
                 return null;
             }
@@ -240,6 +319,52 @@ public class TokenAccess {
      * @return true if successful encryption takes place, else false.
      */
     public static boolean checkMigrateKeystoreVersion(SharedPreferences prefs, Context context) {
+        final boolean firstMigrate = checkMigrateKeystoreVersion1(prefs, context);
+        checkMigrateKeystoreVersion2(prefs, context);
+        return firstMigrate;
+    }
+
+    private static KeyStore getKeyStore() throws KeyStoreException, IOException, NoSuchAlgorithmException,
+            CertificateException {
+        KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
+        // have to call "load" before you do anything
+        keyStore.load(null);
+        return keyStore;
+    }
+
+    private static void checkMigrateKeystoreVersion2(SharedPreferences prefs, Context context) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            try {
+                final KeyStore keyStore = getKeyStore();
+                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    MainActivity.info("[TOKEN] Key present and up-to-date V2 AES - no change.");
+                    return;
+                }
+
+                // get old token
+                final String token = getApiToken(prefs);
+                MainActivity.info("Got old token, length: " + (token == null ? null : token.length()));
+
+                // set up aes key
+                KeyGenerator keyGenerator = KeyGenerator.getInstance(
+                        KeyProperties.KEY_ALGORITHM_AES, ANDROID_KEYSTORE);
+                keyGenerator.init(
+                        new KeyGenParameterSpec.Builder(KEYSTORE_WIGLE_CREDS_KEY_V2,
+                                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                                .build());
+                keyGenerator.generateKey();
+
+                if (token != null && !token.isEmpty()) setApiToken(prefs, token);
+            }
+            catch (Exception ex) {
+                MainActivity.error("Exception migrating to version 2: " + ex, ex);
+            }
+        }
+    }
+
+    private static boolean checkMigrateKeystoreVersion1(SharedPreferences prefs, Context context) {
         boolean initOnly = false;
         if (prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) {
             MainActivity.info("[TOKEN] No auth token stored - no preference migration possible.");
@@ -254,8 +379,7 @@ public class TokenAccess {
         } else {
             try {
                 MainActivity.info("[TOKEN] Using Android Keystore; check need for new key...");
-                KeyStore keyStore = KeyStore.getInstance(ANDROID_KEYSTORE);
-                keyStore.load(null);
+                final KeyStore keyStore = getKeyStore();
                 KeyPairGenerator kpg = KeyPairGenerator.getInstance(
                         KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEYSTORE);
 

@@ -87,10 +87,13 @@ public final class MappingFragment extends Fragment {
     private AtomicBoolean finishing;
     private Location previousLocation;
     private int previousRunNets;
+    private TileOverlay tileOverlay;
 
     private static final String DIALOG_PREFIX = "DialogPrefix";
     public static final String MAP_DIALOG_PREFIX = "";
     public static LocationListener STATIC_LOCATION_LISTENER = null;
+
+    static final int UPDATE_MAP_FILTER = 1;
 
     private static final int DEFAULT_ZOOM = 17;
     public static final LatLng DEFAULT_POINT = new LatLng(41.95d, -87.65d);
@@ -322,7 +325,7 @@ public final class MappingFragment extends Fragment {
 
 
 
-                    TileOverlay tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
+                    tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
                             .tileProvider(tileProvider).transparency(0.35f));
                 }
             }
@@ -499,6 +502,15 @@ public final class MappingFragment extends Fragment {
     @Override
     public void onResume() {
         MainActivity.info( "MAP: onResume" );
+        if (null != mapView) {
+            //refresh tiles on resume
+            mapView.postInvalidate();
+        }
+
+        if (null != tileOverlay) {
+            //DEBUG: MainActivity.info("clearing tile overlay cache");
+            tileOverlay.clearTileCache();
+        }
         super.onResume();
 
         setupTimer();
@@ -695,7 +707,8 @@ public final class MappingFragment extends Fragment {
                 return true;
             }
             case MENU_FILTER: {
-                onCreateDialog( SSID_FILTER );
+                final Intent intent = new Intent(getActivity(), MapFilterActivity.class);
+                getActivity().startActivityForResult(intent, UPDATE_MAP_FILTER);
                 return true;
             }
             case MENU_MAP_TYPE: {
@@ -739,27 +752,6 @@ public final class MappingFragment extends Fragment {
             }
         }
         return false;
-    }
-
-    public void onCreateDialog( int which ) {
-        DialogFragment dialogFragment = null;
-        switch ( which ) {
-            case SSID_FILTER:
-                dialogFragment = createSsidFilterDialog( MAP_DIALOG_PREFIX );
-                break;
-            default:
-                MainActivity.error( "unhandled dialog: " + which );
-        }
-
-        if (dialogFragment != null) {
-            final FragmentManager fm = getActivity().getSupportFragmentManager();
-            try {
-                dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
-            }
-            catch (final IllegalStateException ex) {
-                MainActivity.error("dialog error: " + ex, ex);
-            }
-        }
     }
 
     public static class MapDialogFragment extends DialogFragment {

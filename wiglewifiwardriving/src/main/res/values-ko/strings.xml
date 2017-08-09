@@ -278,4 +278,7 @@
     <string name="map_not_mine">기타</string>
     <string name="map_mine">광산</string>
     <string name="filter_app_name">Filter Network List</string>
+    <string name="mapfilter_app_name">Filter Map</string>
+    <string name="map_data_head">Map Device Data</string>
+    <string name="map_tile_head">Map Overlay Settings</string>
 </resources>

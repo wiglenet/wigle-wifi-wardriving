@@ -280,4 +280,7 @@
     <string name="status_downloading">A letöltés</string>
     <string name="status_parsing">Nyelvtani elemzés</string>
     <string name="filter_app_name">Filter Network List</string>
+    <string name="mapfilter_app_name">Filter Map</string>
+    <string name="map_data_head">Map Device Data</string>
+    <string name="map_tile_head">Map Overlay Settings</string>
 </resources>

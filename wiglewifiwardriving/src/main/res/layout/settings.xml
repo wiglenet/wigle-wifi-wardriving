@@ -121,57 +121,9 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:text="@string/disable_toast" />
-<LinearLayout
-		android:orientation="horizontal"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:layout_marginTop="2dip"
-		android:layout_marginBottom="2dip"
-		>
-	<Spinner android:id="@+id/show_discovered"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		/>
-	<TextView
-		android:id="@+id/show_discovered_text"
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		android:text="@string/show_discovered"
-		android:layout_weight="1"
-		android:layout_marginRight="6dip"
-		tools:ignore="RtlHardcoded"
-		/>
-</LinearLayout>
-<LinearLayout
-	android:id="@+id/show_map_discovered_since"
-	android:orientation="horizontal"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:layout_marginTop="2dip"
-	android:layout_marginBottom="2dip"
-	android:visibility="gone"
-	>
-	<Spinner android:id="@+id/networks_discovered_since_year"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		android:prompt="@string/periodstill_text"
-		/>
-	<!-- style="@style/mySpinnerItemStyle" -->
-	<TextView
-		android:id="@+id/show_discovered_since"
-		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
-		android:text="@string/show_discovered_since"
-		android:layout_weight="1"
-		android:layout_marginRight="6dip"
-		tools:ignore="RtlHardcoded"
-		/>
-</LinearLayout>
-
+<include
+	android:id="@+id/maptileprefs_embed"
+	layout="@layout/map_tile_prefs" />
 <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
@@ -181,20 +133,22 @@
     >
 	<Spinner android:id="@+id/periodstill_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:drawSelectorOnTop="true"
 		android:layout_weight="0"
 		android:prompt="@string/periodstill_text"
+		android:layout_gravity="top"
 		/>
     <!-- style="@style/mySpinnerItemStyle" -->
 	<TextView
 		android:id="@+id/periodstill_text"
 		android:layout_width="wrap_content"
-		android:layout_height="fill_parent"
+		android:layout_height="match_parent"
 		android:text="@string/periodstill_text"
 		android:layout_weight="1"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -207,19 +161,21 @@
     >
 	<Spinner android:id="@+id/period_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:drawSelectorOnTop="true"
 		android:layout_weight="0"
 		android:prompt="@string/period_text"
+		android:layout_gravity="top"
 		/>
 	<TextView
 		android:id="@+id/period_text"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:text="@string/period_text"
 		android:layout_weight="1"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -232,7 +188,7 @@
     >
 	<Spinner android:id="@+id/periodfast_spinner"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:drawSelectorOnTop="true"
 		android:layout_weight="0"
 		android:prompt="@string/periodfast_text"
@@ -240,11 +196,12 @@
 	<TextView
 		android:id="@+id/periodfast_text"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_height="match_parent"
 		android:text="@string/periodfast_text"
 		android:layout_weight="1"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -256,20 +213,21 @@
     android:layout_marginBottom="2dip"
     >
 	<Spinner android:id="@+id/gps_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
+		android:layout_weight="1"
 		android:prompt="@string/gps_text"
 		/>
 	<TextView
 		android:id="@+id/gps_text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
 		android:text="@string/gps_text"
-		android:layout_weight="1"
+		android:layout_weight="2"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -281,20 +239,22 @@
     android:layout_marginBottom="2dip"
     >
 	<Spinner android:id="@+id/language_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
 		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
+		android:layout_weight="1"
 		android:prompt="@string/language_text"
+		android:ellipsize="end"
 		/>
 	<TextView
 		android:id="@+id/language_text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
+		android:layout_width="0dp"
+		android:layout_height="match_parent"
 		android:text="@string/language_text"
-		android:layout_weight="1"
+		android:layout_weight="2"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -306,20 +266,21 @@
     android:layout_marginBottom="2dip"
     >
     <Spinner android:id="@+id/reset_wifi_spinner"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:drawSelectorOnTop="true"
-             android:layout_weight="0"
-             android:prompt="@string/reset_wifi_text"
-        />
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:drawSelectorOnTop="true"
+		android:layout_weight="0"
+		android:prompt="@string/reset_wifi_text"
+		/>
     <TextView
         android:id="@+id/reset_wifi_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
         android:text="@string/reset_wifi_text"
         android:layout_weight="1"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 
@@ -331,20 +292,21 @@
     android:layout_marginBottom="2dip"
     >
     <Spinner android:id="@+id/battery_kill_spinner"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
              android:drawSelectorOnTop="true"
              android:layout_weight="0"
              android:prompt="@string/battery_kill_text"
         />
     <TextView
         android:id="@+id/battery_kill_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
         android:text="@string/battery_kill_text"
         android:layout_weight="1"
         android:layout_marginRight="6dip"
         tools:ignore="RtlHardcoded"
+		android:layout_gravity="left"
         />
 </LinearLayout>
 <Button android:id="@+id/speech_button" android:layout_width="wrap_content"

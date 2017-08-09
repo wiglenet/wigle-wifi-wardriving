@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearlayout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/show_discovered"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:layout_gravity="top"
+            />
+        <TextView
+            android:id="@+id/show_discovered_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/show_discovered"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:gravity="left"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/show_map_discovered_since"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        android:visibility="gone"
+        >
+        <Spinner android:id="@+id/networks_discovered_since_year"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/periodstill_text"
+            android:layout_gravity="top"
+            />
+        <!-- style="@style/mySpinnerItemStyle" -->
+        <TextView
+            android:id="@+id/show_discovered_since"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="@string/show_discovered_since"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:gravity="left"
+            />
+    </LinearLayout>
+</LinearLayout>

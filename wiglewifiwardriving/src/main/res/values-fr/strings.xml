@@ -337,4 +337,7 @@
     <string name="status_downloading">Téléchargement</string>
     <string name="status_parsing">Analyse</string>
     <string name="filter_app_name">Filtrer Liste des Réseaux</string>
+    <string name="mapfilter_app_name">Filter Carte</string>
+    <string name="map_tile_head">Map Overlay Settings</string>
+    <string name="map_data_head">Map Device Data</string>
 </resources>

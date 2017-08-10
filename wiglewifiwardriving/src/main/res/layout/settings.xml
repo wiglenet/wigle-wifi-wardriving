@@ -10,305 +10,326 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-
-<TextView
-	android:id="@+id/register"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textSize="24sp"
-    />
-
-<TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/username"
-    />
-<EditText
-    android:id="@+id/edit_username"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:inputType="text" />
-
-<TextView
-    android:id="@+id/edit_password_label"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="@string/password"
-	/>
-<EditText
-    android:id="@+id/edit_password"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textPassword" />
-<TextView
-    android:id="@+id/show_authuser_label"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="@string/auth_username"
-	android:visibility="gone" />
-<TextView
-	android:id="@+id/show_authuser"
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:inputType="text"
-	android:visibility="gone" />
-<Button
-	android:id="@+id/deauthorize_client"
-	android:layout_width="fill_parent"
-	android:layout_height="fill_parent"
-	android:text="@string/deauthorize"
-	android:visibility="gone" />
-<Button
-    android:id="@+id/authorize_client"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:text="@string/authorize"
-    android:visibility="visible" />
-
-<CheckBox android:id="@+id/showpassword"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/setting_show_password" />
-
-<CheckBox android:id="@+id/be_anonymous"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/be_anonymous" />
-
-<CheckBox android:id="@+id/donate"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/donate" />
-
-<LinearLayout
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#A07070"
-	android:orientation="horizontal"
-	/>
-
-<CheckBox android:id="@+id/found_sound"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/found_sound" />
-
-<CheckBox android:id="@+id/found_new_sound"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/found_new_sound" />
-
-<CheckBox android:id="@+id/edit_showcurrent"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/show_current" />
-
-<CheckBox android:id="@+id/use_metric"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/use_metric" />
-
-<CheckBox android:id="@+id/circle_size_map"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/circle_size_map" />
-
-<CheckBox android:id="@+id/use_network_location"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/use_network_location" />
-
-<CheckBox android:id="@+id/disable_toast"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/disable_toast" />
-<include
-	android:id="@+id/maptileprefs_embed"
-	layout="@layout/map_tile_prefs" />
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-	<Spinner android:id="@+id/periodstill_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		android:prompt="@string/periodstill_text"
-		android:layout_gravity="top"
-		/>
-    <!-- style="@style/mySpinnerItemStyle" -->
-	<TextView
-		android:id="@+id/periodstill_text"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:text="@string/periodstill_text"
-		android:layout_weight="1"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
-
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-	<Spinner android:id="@+id/period_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		android:prompt="@string/period_text"
-		android:layout_gravity="top"
-		/>
-	<TextView
-		android:id="@+id/period_text"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:text="@string/period_text"
-		android:layout_weight="1"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
-
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-	<Spinner android:id="@+id/periodfast_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		android:prompt="@string/periodfast_text"
-		/>
-	<TextView
-		android:id="@+id/periodfast_text"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:text="@string/periodfast_text"
-		android:layout_weight="1"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
-
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-	<Spinner android:id="@+id/gps_spinner"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
-		android:prompt="@string/gps_text"
-		/>
-	<TextView
-		android:id="@+id/gps_text"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:text="@string/gps_text"
-		android:layout_weight="2"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
-
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-	<Spinner android:id="@+id/language_spinner"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="1"
-		android:prompt="@string/language_text"
-		android:ellipsize="end"
-		/>
-	<TextView
-		android:id="@+id/language_text"
-		android:layout_width="0dp"
-		android:layout_height="match_parent"
-		android:text="@string/language_text"
-		android:layout_weight="2"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
-
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="2dip"
-    android:layout_marginBottom="2dip"
-    >
-    <Spinner android:id="@+id/reset_wifi_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:drawSelectorOnTop="true"
-		android:layout_weight="0"
-		android:prompt="@string/reset_wifi_text"
-		/>
     <TextView
-        android:id="@+id/reset_wifi_text"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-        android:text="@string/reset_wifi_text"
-        android:layout_weight="1"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_ident_head"
+        style="?android:attr/listSeparatorTextViewStyle"
         />
-</LinearLayout>
 
-<LinearLayout
+    <TextView
+        android:id="@+id/register"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/username"
+        />
+    <EditText
+        android:id="@+id/edit_username"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text" />
+
+    <TextView
+        android:id="@+id/edit_password_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/password"
+        />
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword" />
+    <TextView
+        android:id="@+id/show_authuser_label"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/auth_username"
+        android:visibility="gone" />
+    <TextView
+        android:id="@+id/show_authuser"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:visibility="gone" />
+    <Button
+        android:id="@+id/deauthorize_client"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/deauthorize"
+        android:visibility="gone" />
+    <Button
+        android:id="@+id/authorize_client"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="@string/authorize"
+        android:visibility="visible" />
+
+    <CheckBox android:id="@+id/showpassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setting_show_password" />
+
+    <CheckBox android:id="@+id/be_anonymous"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/be_anonymous" />
+
+    <CheckBox android:id="@+id/donate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/donate" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_gen_head"
+        style="?android:attr/listSeparatorTextViewStyle"
+        />
+
+    <CheckBox android:id="@+id/found_sound"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/found_sound" />
+
+    <CheckBox android:id="@+id/found_new_sound"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/found_new_sound" />
+
+    <CheckBox android:id="@+id/edit_showcurrent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_current" />
+
+    <CheckBox android:id="@+id/use_metric"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_metric" />
+
+    <CheckBox android:id="@+id/use_network_location"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/use_network_location" />
+
+    <CheckBox android:id="@+id/disable_toast"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/disable_toast" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/battery_kill_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/battery_kill_text"
+            />
+        <TextView
+            android:id="@+id/battery_kill_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/battery_kill_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/language_spinner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="1"
+            android:prompt="@string/language_text"
+            android:ellipsize="end"
+            />
+        <TextView
+            android:id="@+id/language_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/language_text"
+            android:layout_weight="2"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_map_head"
+        style="?android:attr/listSeparatorTextViewStyle"
+        />
+
+    <CheckBox android:id="@+id/circle_size_map"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/circle_size_map" />
+
+    <include
+        android:id="@+id/maptileprefs_embed"
+        layout="@layout/map_tile_prefs" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_scan_head"
+        style="?android:attr/listSeparatorTextViewStyle"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/periodstill_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/periodstill_text"
+            android:layout_gravity="top"
+            />
+        <!-- style="@style/mySpinnerItemStyle" -->
+        <TextView
+            android:id="@+id/periodstill_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/periodstill_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="2dip"
     android:layout_marginBottom="2dip"
     >
-    <Spinner android:id="@+id/battery_kill_spinner"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-             android:drawSelectorOnTop="true"
-             android:layout_weight="0"
-             android:prompt="@string/battery_kill_text"
-        />
-    <TextView
-        android:id="@+id/battery_kill_text"
-		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-        android:text="@string/battery_kill_text"
-        android:layout_weight="1"
-        android:layout_marginRight="6dip"
-        tools:ignore="RtlHardcoded"
-		android:layout_gravity="left"
-        />
-</LinearLayout>
+        <Spinner android:id="@+id/period_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/period_text"
+            android:layout_gravity="top"
+            />
+        <TextView
+            android:id="@+id/period_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/period_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/periodfast_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/periodfast_text"
+            />
+        <TextView
+            android:id="@+id/periodfast_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/periodfast_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/gps_spinner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="1"
+            android:prompt="@string/gps_text"
+            />
+        <TextView
+            android:id="@+id/gps_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/gps_text"
+            android:layout_weight="2"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/reset_wifi_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/reset_wifi_text"
+            />
+        <TextView
+            android:id="@+id/reset_wifi_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/reset_wifi_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
 <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"

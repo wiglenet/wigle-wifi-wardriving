@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -1562,7 +1564,9 @@ public final class MainActivity extends AppCompatActivity {
         if (state.serviceConnection == null) {
             final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
             ComponentName compName;
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                MainActivity.info("startForegroundService");
                 compName = startForegroundService(serviceIntent);
             }
             else {

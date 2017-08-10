@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -19,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
+    public static final String NOTIFICATION_CHANNEL_ID = "wigle_notification_1";
 
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
@@ -143,7 +145,7 @@ public final class WigleService extends Service {
         handleCommand( intent );
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
-        return 1;
+        return Service.START_STICKY;
     }
 
     private void handleCommand( Intent intent ) {
@@ -176,41 +178,81 @@ public final class WigleService extends Service {
                 largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
             }
 
-            final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+            final Uri uri = Uri.EMPTY;
+            final Intent pauseSharedIntent = new Intent(Intent.ACTION_DELETE, uri, this, ShareActivity.class );
+            final PendingIntent pauseIntent = PendingIntent.getActivity( this, 0, pauseSharedIntent, 0 );
+
+            final Intent scanSharedIntent = new Intent(Intent.ACTION_INSERT, uri, this, ShareActivity.class );
+            final PendingIntent scanIntent = PendingIntent.getActivity( this, 0, scanSharedIntent, 0 );
+
+            // final Intent uploadSharedIntent = new Intent(Intent.ACTION_SYNC, uri, this, ShareActivity.class );
+            // final PendingIntent uploadIntent = PendingIntent.getActivity( this, 0, uploadSharedIntent, 0 );
+
+            Notification notification;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent);
+            }
+            else {
+                final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                builder.setContentIntent(contentIntent);
+                builder.setNumber((int) ListFragment.lameStatic.newNets);
+                builder.setTicker(title);
+                builder.setContentTitle(title);
+                builder.setContentText(text);
+                builder.setWhen(when);
+                builder.setLargeIcon(largeIcon);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+                } else {
+                    builder.setSmallIcon(R.drawable.wiglewifi_small);
+                }
+                builder.setOngoing(true);
+                builder.setCategory("SERVICE");
+                builder.setPriority(NotificationCompat.PRIORITY_LOW);
+                builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                builder.addAction(R.drawable.wiglewifi_small_black_white, "Pause", pauseIntent);
+                builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
+                // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
+
+                notification = builder.build();
+            }
+
+            startForegroundCompat( NOTIFICATION_ID, notification );
+        }
+    }
+
+    private Notification getNotification26(final String title, final Context context, final String text,
+                                           final long when, final PendingIntent contentIntent,
+                                           final PendingIntent pauseIntent, final PendingIntent scanIntent) {
+        // new notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    title, NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+
+            // copied from above
+            final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
-            builder.setNumber((int)ListFragment.lameStatic.newNets);
+            builder.setNumber((int) ListFragment.lameStatic.newNets);
             builder.setTicker(title);
             builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
             builder.setLargeIcon(largeIcon);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-            }
-            else {
-                builder.setSmallIcon(R.drawable.wiglewifi_small);
-            }
+            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
-            builder.setPriority(NotificationCompat.PRIORITY_LOW);
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-            final Uri uri = Uri.EMPTY;
-            final Intent pauseSharedIntent = new Intent(Intent.ACTION_DELETE, uri, this, ShareActivity.class );
-            final PendingIntent pauseIntent = PendingIntent.getActivity( this, 0, pauseSharedIntent, 0 );
             builder.addAction(R.drawable.wiglewifi_small_black_white, "Pause", pauseIntent);
-
-            final Intent scanSharedIntent = new Intent(Intent.ACTION_INSERT, uri, this, ShareActivity.class );
-            final PendingIntent scanIntent = PendingIntent.getActivity( this, 0, scanSharedIntent, 0 );
             builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
-
-            // final Intent uploadSharedIntent = new Intent(Intent.ACTION_SYNC, uri, this, ShareActivity.class );
-            // final PendingIntent uploadIntent = PendingIntent.getActivity( this, 0, uploadSharedIntent, 0 );
             // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
 
-            final Notification notification = builder.build();
-            startForegroundCompat( NOTIFICATION_ID, notification );
+            return builder.build();
         }
+        return null;
     }
 
     void invokeMethod(Method method, Object[] args) {

@@ -1561,7 +1561,13 @@ public final class MainActivity extends AppCompatActivity {
         // could be set by nonconfig retain
         if (state.serviceConnection == null) {
             final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
-            final ComponentName compName = startService(serviceIntent);
+            ComponentName compName;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                compName = startForegroundService(serviceIntent);
+            }
+            else {
+                compName = startService(serviceIntent);
+            }
             if (compName == null) {
                 MainActivity.error("startService() failed!");
             } else {

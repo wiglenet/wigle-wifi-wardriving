@@ -577,7 +577,7 @@ public final class MappingFragment extends Fragment {
         item.setIcon( android.R.drawable.ic_menu_mapmode );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+        item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));
         item.setIcon( android.R.drawable.ic_menu_search );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 

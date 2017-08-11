@@ -41,7 +41,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     private final AtomicInteger networkCount = new AtomicInteger();
     private final SharedPreferences prefs;
     private final GoogleMap map;
-    private final Matcher ssidMatcher;
+    private Matcher ssidMatcher;
     private final Set<Network> labeledNetworks = Collections.newSetFromMap(
             new ConcurrentHashMap<Network,Boolean>());
 
@@ -302,6 +302,11 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         if (!isDbResult) {
             addLatestNetworks();
         }
+    }
+
+    public void onResume() {
+        ssidMatcher = FilterMatcher.getFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
+        reCluster();
     }
 
     public void updateNetwork(final Network network) {

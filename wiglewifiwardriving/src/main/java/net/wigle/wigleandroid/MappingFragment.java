@@ -502,6 +502,9 @@ public final class MappingFragment extends Fragment {
     @Override
     public void onResume() {
         MainActivity.info( "MAP: onResume" );
+        if (mapRender != null) {
+            mapRender.onResume();
+        }
         if (null != mapView) {
             //refresh tiles on resume
             mapView.postInvalidate();

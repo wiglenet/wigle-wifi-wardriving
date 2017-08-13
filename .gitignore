@@ -20,3 +20,4 @@ wiglewifiwardriving/build
 local.properties
 .DS_Store
 .settings
+*.db

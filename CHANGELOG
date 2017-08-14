@@ -1,3 +1,10 @@
+* 2.21 (08/13/2017)
+Change crypto to aes, rsa is broken in android-O.
+Enhanced List and Map settings pages.
+Added termination receiver.
+Conform to new android-O notification channels.
+Updated Danish translation (thanks Zarhn!).
+
 * 2.20 (07/22/2017)
 Show WiGLE networks on map (in Settings).
 No modal while uploading.

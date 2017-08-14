@@ -282,7 +282,7 @@
     <string name="filter_app_name">Filtere netværk liste</string>
     <string name="mapfilter_app_name">Filtere kort</string>
     <string name="map_tile_head">Kort overlay instillinger</string>
-    <string name="map_data_head"Kort enheds data</string>
+    <string name="map_data_head">Kort enheds data</string>
     <string name="settings_gen_head">General instillinger</string>
     <string name="settings_ident_head">Idenditets instillinger</string>
     <string name="settings_map_head">Kort Instillinger</string>

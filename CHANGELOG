@@ -1,10 +1,9 @@
-*2.21 ()
-Settings screen organization into sections
-Android O compatability improvements
-Work-around for RSA issues with Nougat/O, transition to AES for token
-Restored Gingerbread-friendly observation import
-Transition of list and map filter from dialog to activity (fixes i18n)
-Application termination via Broadcast intent (net.wigle.wigleandroid.END)
+* 2.21 (08/13/2017)
+Change crypto to aes, rsa is broken in android-O.
+Enhanced List and Map settings pages.
+Added termination receiver.
+Conform to new android-O notification channels.
+Updated Danish translation (thanks Zarhn!).
 
 * 2.20 (07/22/2017)
 Show WiGLE networks on map (in Settings).

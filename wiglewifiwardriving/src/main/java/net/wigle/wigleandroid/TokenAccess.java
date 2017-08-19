@@ -116,7 +116,7 @@ public class TokenAccess {
             return false;
         }
         final byte[] iv = encrypt.getIV();
-        // thanks stack overflow, go to hell android security team. number of bits difference.
+        // thanks stack overflow, grr android security team. number of bits difference.
         // https://stackoverflow.com/questions/33995233/android-aes-encryption-decryption-using-gcm-mode-in-android
         // https://medium.com/@ericfu/securely-storing-secrets-in-an-android-application-501f030ae5a3
         final int tagLength = (cypherToken.length - input.length) * 8;

@@ -272,14 +272,11 @@ public final class MappingFragment extends Fragment {
                         }
 
                         /*
-                         * Check that the tile server supports the requested x, y and zoom.
-                         * Complete this stub according to the tile range you support.
-                         * If you support a limited range of tiles at different zoom levels, then you
-                         * need to define the supported x, y range at each zoom level.
+                         * depends on supported levels on the server
                          */
                         private boolean checkTileExists(int x, int y, int zoom) {
                             int minZoom = 0;
-                            int maxZoom = 18;
+                            int maxZoom = 24;
 
                             if ((zoom < minZoom || zoom > maxZoom)) {
                                 return false;

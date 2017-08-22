@@ -21,18 +21,21 @@ public class ShareActivity extends AppCompatActivity {
 
         // Figure out what to do based on the intent type
         MainActivity.info("ShareActivity intent type: " + intent.getAction());
-        switch (intent.getAction()) {
-            case Intent.ACTION_INSERT:
-                MainActivity.getMainActivity().handleScanChange(true);
-                break;
-            case Intent.ACTION_DELETE:
-                MainActivity.getMainActivity().handleScanChange(false);
-                break;
-            case Intent.ACTION_SYNC:
-                MainActivity.getMainActivity().doUpload();
-                break;
-            default:
-                MainActivity.info("Unhandled intent action: " + intent.getAction());
+        final MainActivity mainActivity = MainActivity.getMainActivity();
+        if (mainActivity != null) {
+            switch (intent.getAction()) {
+                case Intent.ACTION_INSERT:
+                    mainActivity.handleScanChange(true);
+                    break;
+                case Intent.ACTION_DELETE:
+                    mainActivity.handleScanChange(false);
+                    break;
+                case Intent.ACTION_SYNC:
+                    mainActivity.doUpload();
+                    break;
+                default:
+                    MainActivity.info("Unhandled intent action: " + intent.getAction());
+            }
         }
 
         Intent result = new Intent("com.example.RESULT_ACTION");

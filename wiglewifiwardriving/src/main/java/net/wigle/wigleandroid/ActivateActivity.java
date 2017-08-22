@@ -42,7 +42,7 @@ import javax.crypto.NoSuchPaddingException;
 public class ActivateActivity extends Activity {
 
     //intent string
-    public static String barcodeIntent = "net.wigle.wigleandroid://activate";
+    public static final String barcodeIntent = "net.wigle.wigleandroid://activate";
 
     //log tag for activity
     private static final String LOG_TAG = "wigle.activate";
@@ -66,7 +66,7 @@ public class ActivateActivity extends Activity {
         Uri data = getIntent().getData();
         //DEBUG Log.i(LOG_TAG, "intent data: "+data+" matches: "+
         //        ActivateActivity.barcodeIntent.equals(data.toString()));
-        if (ActivateActivity.barcodeIntent.equals(data.toString())) {
+        if (data != null && ActivateActivity.barcodeIntent.equals(data.toString())) {
             launchBarcodeScanning();
         } else {
             Log.e(LOG_TAG, "intent data: "+data+" did not match "+ActivateActivity.barcodeIntent);

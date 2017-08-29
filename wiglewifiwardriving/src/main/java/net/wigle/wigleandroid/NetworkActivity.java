@@ -17,7 +17,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -51,7 +51,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 
 @SuppressWarnings("deprecation")
-public class NetworkActivity extends ActionBarActivity implements DialogListener {
+public class NetworkActivity extends AppCompatActivity implements DialogListener {
     private static final int MENU_EXIT = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;

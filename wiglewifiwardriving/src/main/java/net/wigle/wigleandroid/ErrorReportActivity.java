@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -24,7 +24,7 @@ import android.widget.TextView;
  * @author bobzilla
  *
  */
-public class ErrorReportActivity extends ActionBarActivity {
+public class ErrorReportActivity extends AppCompatActivity {
     private static final int MENU_EXIT = 11;
     private static final int MENU_EMAIL = 12;
     private boolean fromFailure = false;

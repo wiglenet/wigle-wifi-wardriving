@@ -2,7 +2,7 @@ package net.wigle.wigleandroid;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import android.view.View;
 import android.widget.CheckBox;
@@ -14,7 +14,7 @@ import android.widget.EditText;
  */
 
 @SuppressWarnings("deprecation")
-public class FilterActivity extends ActionBarActivity {
+public class FilterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

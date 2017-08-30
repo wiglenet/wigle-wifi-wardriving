@@ -14,7 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -34,7 +34,7 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
 
-public class DBResultActivity extends ActionBarActivity {
+public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
     private static final int MSG_QUERY_DONE = 2;
     private static final int LIMIT = 50;

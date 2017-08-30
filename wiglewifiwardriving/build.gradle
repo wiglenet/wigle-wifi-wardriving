@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 26
     }
 
@@ -29,10 +29,13 @@ android {
 
 dependencies {
     compile project(':android-maps-utils')
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile "com.android.support:support-compat:26.0.1"
+    compile "com.android.support:support-core-utils:26.0.1"
+    compile "com.android.support:support-v4:26.0.1"
+    compile "com.android.support:appcompat-v7:26.0.1"
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    compile 'com.google.android.gms:play-services-maps:10.0.1'
-    compile 'com.google.android.gms:play-services-vision:10.0.1'
+    compile 'com.google.android.gms:play-services-maps:11.0.4'
+    compile 'com.google.android.gms:play-services-vision:11.0.4'
     compile 'org.slf4j:slf4j-android:1.7.19'
     compile files('libs/TTS_library_stub.jar')
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'

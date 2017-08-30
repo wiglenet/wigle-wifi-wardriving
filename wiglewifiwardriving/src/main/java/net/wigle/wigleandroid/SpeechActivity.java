@@ -5,7 +5,7 @@ import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.util.SettingsUtil;
 
-public class SpeechActivity extends ActionBarActivity {
+public class SpeechActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
 
     // used for shutting extraneous activities down on an error

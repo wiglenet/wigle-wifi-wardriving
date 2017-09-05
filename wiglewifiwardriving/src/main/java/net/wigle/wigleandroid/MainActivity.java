@@ -469,7 +469,7 @@ public final class MainActivity extends AppCompatActivity {
                 final TextView text = (TextView) view.findViewById(R.id.drawer_list_text);
                 text.setText(menuTitles[position]);
                 //If that's the Exit button, set the background to red
-                if(menuTitles[position].equals("Exit")) {
+                if(position==9) {
                     view.setBackgroundColor(Color.argb(200,70,0,0));
                 }else{
                     view.setBackgroundColor(0);

@@ -19,6 +19,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -464,8 +465,15 @@ public final class MainActivity extends AppCompatActivity {
                 } else {
                     view = convertView;
                 }
+
                 final TextView text = (TextView) view.findViewById(R.id.drawer_list_text);
                 text.setText(menuTitles[position]);
+                //If that's the Exit button, set the background to red
+                if(menuTitles[position].equals("Exit")) {
+                    view.setBackgroundColor(Color.argb(200,70,0,0));
+                }else{
+                    view.setBackgroundColor(0);
+                }
                 final ImageView image = (ImageView) view.findViewById(R.id.drawer_list_icon);
                 image.setImageResource(menuIcons[position]);
 

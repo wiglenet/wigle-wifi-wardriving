@@ -19,7 +19,6 @@ simple map circle mode if label+clustering off
 
 --- user suggested ---
 map-page type filter on four csv/kml exports
-exit button as different color
 option to stop scanning when not plugged in
 kismet drone support
 some response/info/stat about uploaded files (user stats?)

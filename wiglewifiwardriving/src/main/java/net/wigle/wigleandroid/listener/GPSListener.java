@@ -229,7 +229,7 @@ public class GPSListener implements Listener, LocationListener {
 
             final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final boolean disableToast = prefs.getBoolean( ListFragment.PREF_DISABLE_TOAST, false );
-            if (!disableToast) {
+            if (!disableToast && null != mainActivity && !mainActivity.isFinishing()) {
                 final String announce = location == null ? mainActivity.getString(R.string.lost_location)
                         : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
                 Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();

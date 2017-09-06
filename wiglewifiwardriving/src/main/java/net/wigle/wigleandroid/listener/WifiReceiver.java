@@ -774,7 +774,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     MainActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
                     if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
                         final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
-                        if (!disableToast) {
+                        if (!disableToast &&  null != mainActivity && !mainActivity.isFinishing()) {
                             Toast.makeText( mainActivity,
                                     mainActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
                         }
@@ -822,7 +822,9 @@ public class WifiReceiver extends BroadcastReceiver {
                         && (System.currentTimeMillis() - constructionTime) > 30000L) {
                     final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
                             + mainActivity.getString(R.string.battery_postfix);
-                    Toast.makeText( mainActivity, text, Toast.LENGTH_LONG ).show();
+                    if (null != mainActivity && !mainActivity.isFinishing()) {
+                        Toast.makeText(mainActivity, text, Toast.LENGTH_LONG).show();
+                    }
                     MainActivity.warn("low battery, shutting down");
                     mainActivity.speak( text );
                     MainActivity.sleep(5000L);

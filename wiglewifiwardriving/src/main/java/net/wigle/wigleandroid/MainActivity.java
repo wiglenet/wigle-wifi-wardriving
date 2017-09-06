@@ -405,7 +405,9 @@ public final class MainActivity extends AppCompatActivity {
 
                 if (restart) {
                     // restart the app now that we can talk to the database
-                    Toast.makeText(mainActivity, R.string.restart, Toast.LENGTH_LONG).show();
+                    if (!isFinishing()) {
+                        Toast.makeText(mainActivity, R.string.restart, Toast.LENGTH_LONG).show();
+                    }
 
                     Intent i = getBaseContext().getPackageManager()
                             .getLaunchIntentForPackage(getBaseContext().getPackageName());
@@ -548,7 +550,9 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final NullPointerException | IllegalStateException ex) {
             final String message = "exception in fragment switch: " + ex;
             error(message, ex);
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            if (!isFinishing()) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -767,6 +771,7 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalStateException ex) {
             final String errorMessage = "Exception trying to show dialog: " + ex;
             MainActivity.error(errorMessage, ex);
+            //TODO: in this static context, we can't check isFinishing
             Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
         }
     }
@@ -1468,7 +1473,7 @@ public final class MainActivity extends AppCompatActivity {
         @SuppressWarnings("deprecation")
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
-        if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null) {
+        if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
             Toast.makeText(this, getString(R.string.best_results),
                     Toast.LENGTH_LONG).show();
         }
@@ -1482,7 +1487,9 @@ public final class MainActivity extends AppCompatActivity {
         boolean turnedWifiOn = false;
         if (!wifiManager.isWifiEnabled()) {
             // tell user, cuz this takes a little while
-            Toast.makeText(this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG).show();
+            if (!isFinishing()) {
+                Toast.makeText(this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG).show();
+            }
 
             // save so we can turn it back off when we exit
             edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, true);
@@ -1605,9 +1612,9 @@ public final class MainActivity extends AppCompatActivity {
             // check if there is a gps
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
-            if (locProvider == null) {
+            if (locProvider == null && !isFinishing()) {
                 Toast.makeText(this, getString(R.string.no_gps_device), Toast.LENGTH_LONG).show();
-            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
+            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER) && !isFinishing()) {
                 // gps exists, but isn't on
                 Toast.makeText(this, getString(R.string.turn_on_gps), Toast.LENGTH_LONG).show();
                 final Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -1867,7 +1874,9 @@ public final class MainActivity extends AppCompatActivity {
         // don't call on emulator, it crashes it
         if (wifiWasOff && !state.inEmulator) {
             // tell user, cuz this takes a little while
-            Toast.makeText(this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT).show();
+            if (!isFinishing()) {
+                Toast.makeText(this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT).show();
+            }
 
             // well turn it of now that we're done
             final WifiManager wifiManager = (WifiManager) getApplicationContext()

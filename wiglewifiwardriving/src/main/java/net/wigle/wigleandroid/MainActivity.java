@@ -66,6 +66,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
@@ -92,6 +93,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
@@ -122,6 +125,8 @@ public final class MainActivity extends AppCompatActivity {
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
         private String[] logs = new String[20];
+        Matcher bssidLogExclusions;
+        Matcher bssidDisplayExclusions;
     }
 
     private State state;
@@ -216,6 +221,7 @@ public final class MainActivity extends AppCompatActivity {
         fm.executePendingTransactions();
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (stateFragment != null && stateFragment.getState() != null) {
             info("MAIN: using retained stateFragment state");
             // pry an orientation change, which calls destroy, but we get this from retained fragment
@@ -238,7 +244,6 @@ public final class MainActivity extends AppCompatActivity {
             stateFragment.setState(state);
             fm.beginTransaction().add(stateFragment, STATE_FRAGMENT_TAG).commit();
             // new run, reset
-            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final float prevRun = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
             Editor edit = prefs.edit();
             edit.putFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
@@ -302,6 +307,7 @@ public final class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             setupFragments();
         }
+        setupFilters(prefs);
 
         // rksh 20160202 - api/authuser secure preferences storage
         checkInitKeystore();
@@ -1404,6 +1410,85 @@ public final class MainActivity extends AppCompatActivity {
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
+    }
+
+    /**
+     * Instantiate both both BSSID matchers - inital load
+     * @param prefs
+     */
+    private void setupFilters(final SharedPreferences prefs) {
+        if (null != state) {
+            state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+            state.bssidLogExclusions = generateBssidFilterMatcher(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+            //TODO: port SSID matcher over as well?
+        }
+    }
+
+    /**
+     * Trigger recreation of BSSID address filter from prefs
+     * @param addressKey
+     */
+    public void updateAddressFilter(final String addressKey) {
+        if (null != state) {
+            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            if (ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS.equals(addressKey)) {
+                state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+            } else if (ListFragment.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
+                state.bssidLogExclusions = generateBssidFilterMatcher(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+            }
+        }
+    }
+
+    /**
+     * Accessor for state BSSID matchers
+     * @param addressKey
+     * @return
+     */
+    public Matcher getBssidFilterMatcher(final String addressKey) {
+        if (null != state) {
+            if (ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS.equals(addressKey)) {
+                return state.bssidDisplayExclusions;
+            } else if (ListFragment.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
+                return state.bssidLogExclusions;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Build a BSSID matcher from preferences for the supplied key
+     * @param prefs
+     * @param addressKey
+     * @return
+     */
+    private Matcher generateBssidFilterMatcher( final SharedPreferences prefs,  final String addressKey) {
+        Gson gson = new Gson();
+        Matcher matcher = null;
+        final String f = prefs.getString( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS, "");
+        String[] values = gson.fromJson(prefs.getString(addressKey, "[]"), String[].class);
+        if(values.length>0) {
+            StringBuffer sb = new StringBuffer("^(");
+            boolean first = true;
+            for (String value: values) {
+
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append("|");
+                }
+                sb.append(value);
+                if (value.length() == 17) {
+                    sb.append("$");
+                }
+            }
+            sb.append(")");
+            //TODO: debug
+            MainActivity.info("building regex from: "+sb.toString());
+            Pattern pattern = Pattern.compile( sb.toString(), Pattern.CASE_INSENSITIVE );
+            matcher = pattern.matcher( "" );
+        }
+
+        return matcher;
     }
 
     public boolean inEmulator() {

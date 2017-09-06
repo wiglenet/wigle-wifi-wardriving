@@ -141,6 +141,20 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".MacFilterActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/mac_filter_app_name"
+            android:launchMode="singleTask"
+            android:parentActivityName=".FilterActivity"
+            android:theme="@style/Theme.AppCompat">
+
+            <!-- Parent activity meta-data to support API level 7+ -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".FilterActivity" />
+        </activity>
+        <activity
             android:name=".MapFilterActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"

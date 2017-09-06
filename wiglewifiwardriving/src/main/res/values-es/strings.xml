@@ -287,4 +287,12 @@
     <string name="settings_ident_head">Configuración de Identidad</string>
     <string name="settings_map_head">Configuración del mapa</string>
     <string name="settings_scan_head">Configuración de escaneo</string>
+    <string name="ssid_filter_head">Filtrado de SSID</string>
+    <string name="mac_oui_filter_head">Filtrado MAC / OUI</string>
+    <string name="display_filter_button">Excluir MACs / OUIs de la pantalla...</string>
+    <string name="add_oui_filter_button">Añadir filtro OUI</string>
+    <string name="add_mac_filter_button">Añadir filtro MAC</string>
+    <string name="log_filter_button">Excluir MACs / OUIs del registro…</string>
+    <string name="map_needs_playservice"></string>
+    <string name="mac_filter_app_name">Direcciones de filtro</string>
 </resources>

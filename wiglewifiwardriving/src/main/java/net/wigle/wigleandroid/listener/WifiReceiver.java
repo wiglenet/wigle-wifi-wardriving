@@ -220,7 +220,11 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
                 && ! mainActivity.isMuted();
-        final Matcher ssidMatcher = FilterMatcher.getFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
+
+        //TODO: should we memoize the ssidMatcher in the MainActivity state as well?
+        final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
+        final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS );
+        final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_LOG_ADDRS );
 
         // can be null on shutdown
         if ( results != null ) {
@@ -254,7 +258,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
                 // if we're showing current, or this was just added, put on the list
                 if ( showCurrent || added ) {
-                    if ( FilterMatcher.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
+                    if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
                         if (listAdapter != null) {
                             listAdapter.add( network );
                         }
@@ -280,16 +284,29 @@ public class WifiReceiver extends BroadcastReceiver {
                     // if in fast mode, only add new-for-run stuff to the db queue
                     if ( fastMode && ! added ) {
                         MainActivity.info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
-                    }
-                    else {
+                    } else {
                         // loop for stress-testing
                         // for ( int i = 0; i < 10; i++ ) {
-                        dbHelper.addObservation( network, location, added );
+                        boolean matches = false;
+                        if (bssidDbMatcher != null) {
+                            bssidDbMatcher.reset(network.getBssid());
+                            matches = bssidDbMatcher.find();
+                        }
+                        if (!matches) {
+                            dbHelper.addObservation(network, location, added);
+                        }
                         // }
                     }
                 } else {
                     // no location
-                    dbHelper.pendingObservation( network, added );
+                    boolean matches = false;
+                    if (bssidDbMatcher != null) {
+                        bssidDbMatcher.reset(network.getBssid());
+                        matches = bssidDbMatcher.find();
+                    }
+                    if (!matches) {
+                        dbHelper.pendingObservation( network, added );
+                    }
                 }
             }
         }
@@ -324,7 +341,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final Network cellNetwork = recordCellInfo(location);
         if ( cellNetwork != null ) {
             resultSize++;
-            if ( showCurrent && listAdapter != null && FilterMatcher.isOk( ssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork ) ) {
+            if ( showCurrent && listAdapter != null && FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork ) ) {
                 listAdapter.add(cellNetwork);
             }
             if ( runNetworks.size() > preCellForRun ) {

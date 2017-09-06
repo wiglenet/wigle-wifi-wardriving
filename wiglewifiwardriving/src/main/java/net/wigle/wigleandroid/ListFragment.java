@@ -118,6 +118,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
     public static final String PREF_MAP_ALL_TILE = "ALL";
     public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
+    public static final String PREF_EXCLUDE_DISPLAY_ADDRS = "displayExcludeAddresses";
+    public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

@@ -352,4 +352,12 @@
     <string name="settings_gen_head">General Settings</string>
     <string name="settings_map_head">Map Settings</string>
     <string name="settings_scan_head">Scan Settings</string>
+    <string name="ssid_filter_head">SSID Filtering</string>
+    <string name="mac_oui_filter_head">MAC/OUI Filtering</string>
+    <string name="display_filter_button">Exclude MACs/OUIs from display…</string>
+    <string name="add_oui_filter_button">Add OUI Filter</string>
+    <string name="add_mac_filter_button">Add MAC Filter</string>
+    <string name="log_filter_button">Exclude MACs/OUIs from logging…</string>
+    <string name="mac_filter_app_name">Filter Addresses</string>
+
 </resources>

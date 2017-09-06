@@ -12,6 +12,27 @@
                   android:padding="10dp"
                   android:minWidth="280dip"
                   >
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/mac_oui_filter_head"
+            style="?android:attr/listSeparatorTextViewStyle"
+            />
+        <Button android:id="@+id/display_filter_button" android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:text="@string/display_filter_button" android:layout_weight="1"
+            android:paddingTop="10dip" android:paddingBottom="10dip"/>
+        <Button android:id="@+id/log_filter_button" android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:text="@string/log_filter_button" android:layout_weight="1"
+            android:paddingTop="10dip" android:paddingBottom="10dip"/>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ssid_filter_head"
+            style="?android:attr/listSeparatorTextViewStyle"
+            />
         <TextView android:layout_width="fill_parent"
                   android:layout_height="wrap_content"
                   android:text="@string/filter_show_ssid" />

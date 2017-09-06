@@ -36,9 +36,11 @@ dependencies {
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
     compile 'com.google.android.gms:play-services-maps:11.0.4'
     compile 'com.google.android.gms:play-services-vision:11.0.4'
+    compile 'com.google.code.gson:gson:2.8.1'
     compile 'org.slf4j:slf4j-android:1.7.19'
     compile files('libs/TTS_library_stub.jar')
     compile 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
+    compile 'ru.egslava:MaskedEditText:1.0.5'
 }

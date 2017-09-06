@@ -200,7 +200,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         this.map = map;
         this.isDbResult = isDbResult;
         prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        ssidMatcher = FilterMatcher.getFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
+        ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
         mClusterManager = new ClusterManager<>(context, map);
         networkRenderer = new NetworkRenderer(context, map, mClusterManager);
         mClusterManager.setRenderer(networkRenderer);
@@ -244,7 +244,9 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                 && ! isDbResult;
         if (network.getPosition() != null) {
             if (!showNewDBOnly || network.isNew()) {
-                if (FilterMatcher.isOk(ssidMatcher, prefs, MappingFragment.MAP_DIALOG_PREFIX, network)) {
+                if (FilterMatcher.isOk(ssidMatcher,
+                        null /*ALIBI: we *can* use the filter from the list filter view here ...*/,
+                        prefs, MappingFragment.MAP_DIALOG_PREFIX, network)) {
                     return true;
                 }
             }
@@ -305,7 +307,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     public void onResume() {
-        ssidMatcher = FilterMatcher.getFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
+        ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
         reCluster();
     }
 

@@ -297,4 +297,11 @@
     <string name="settings_ident_head">Identity Settings</string>
     <string name="settings_map_head">Map Settings</string>
     <string name="settings_scan_head">Scan Settings</string>
+    <string name="ssid_filter_head">Фильтрация SSID</string>
+    <string name="mac_oui_filter_head">Фильтрация MAC/OUI</string>
+    <string name="display_filter_button">MAC/OUI с экрана…</string>
+    <string name="add_oui_filter_button">Добавить фильтр OUI</string>
+    <string name="add_mac_filter_button">Добавить фильтр MAC</string>
+    <string name="log_filter_button">Исключить MAC / OUI от регистрации…</string>
+    <string name="mac_filter_app_name">Адреса фильтров</string>
 </resources>

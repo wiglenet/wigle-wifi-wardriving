@@ -352,4 +352,11 @@
     <string name="settings_ident_head">Identitätseinstellungen</string>
     <string name="settings_map_head">Karteneinstellungen</string>
     <string name="settings_scan_head">Scan-Einstellungen</string>
+    <string name="ssid_filter_head">SSID-Filterung</string>
+    <string name="mac_oui_filter_head">MAC / OUI Filterung</string>
+    <string name="display_filter_button">MAC/UOI aus dem Display ausschließen…</string>
+    <string name="add_oui_filter_button">OUI-Filter hinzufügen</string>
+    <string name="add_mac_filter_button">MAC-Filter hinzufügen</string>
+    <string name="log_filter_button">ACs / OUIs aus der Protokollierung ausschließen…</string>
+    <string name="mac_filter_app_name">Filteradressen</string>
 </resources>

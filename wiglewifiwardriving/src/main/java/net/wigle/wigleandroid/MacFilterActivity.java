@@ -87,7 +87,7 @@ public class MacFilterActivity extends AppCompatActivity {
         String formatted = "";
         for (int i = 0; i < rawEntry.length(); i++) {
             if ((i % 2 == 0) && ((i+1) != rawEntry.length())  && (i != 0)) formatted += ":";
-            formatted += rawEntry.charAt(i);
+            formatted += Character.toUpperCase(rawEntry.charAt(i));
         }
         if (!entries.contains(formatted)) {
             MainActivity.info("Adding: " + formatted);

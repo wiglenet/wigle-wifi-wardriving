@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
@@ -43,6 +45,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -116,8 +119,6 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             final int image = NetworkListAdapter.getImage( network );
             final ImageView ico = (ImageView) findViewById( R.id.wepicon );
             ico.setImageResource( image );
-            final ImageView ico2 = (ImageView) findViewById( R.id.wepicon2 );
-            ico2.setImageResource( image );
 
             tv = (TextView) findViewById( R.id.na_signal );
             final int level = network.getLevel();
@@ -141,12 +142,12 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             }
 
             tv = (TextView) findViewById( R.id.na_cap );
-            tv.setText( " " + network.getCapabilities().replace("][", "]\n[") );
+            tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
 
             setupMap( network, savedInstanceState );
             // kick off the query now that we have our map
             setupQuery();
-            setupButton( network );
+            setupButtons( network );
         }
     }
 
@@ -299,30 +300,91 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         rlView.addView( mapView );
     }
 
-    private void setupButton( final Network network ) {
+    private void setupButtons( final Network network ) {
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Button connectButton = (Button) findViewById( R.id.connect_button );
+        final Button hideMacButton = (Button) findViewById( R.id.hide_mac_button );
+        final Button hideOuiButton = (Button) findViewById( R.id.hide_oui_button );
+        final Button disableLogMacButton = (Button) findViewById( R.id.disable_log_mac_button );
+        final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+        final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             connectButton.setEnabled( false );
+            final View connectRowView = (View) findViewById(R.id.connect_row);
+            connectRowView.setVisibility(View.GONE);
+        } else {
+            connectButton.setOnClickListener( new OnClickListener() {
+                @Override
+                public void onClick( final View buttonView ) {
+                    if ( Network.CRYPTO_NONE == network.getCrypto() ) {
+                        MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?",
+                                0, NON_CRYPTO_DIALOG);
+                    }
+                    else {
+                        final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
+                        try {
+                            cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
+                        }
+                        catch (final IllegalStateException ex) {
+                            MainActivity.error("exception showing crypto dialog: " + ex, ex);
+                        }
+                    }
+                }
+            });
         }
 
-        connectButton.setOnClickListener( new OnClickListener() {
+        if (hideAddresses.contains(network.getBssid().toUpperCase())) {
+            hideMacButton.setEnabled(false);
+        }
+
+        if (hideAddresses.contains(network.getBssid().toUpperCase().substring(0,8))) {
+            hideOuiButton.setEnabled(false);
+        }
+
+        if (blockAddresses.contains(network.getBssid().toUpperCase())) {
+            disableLogMacButton.setEnabled(false);
+        }
+
+
+        hideMacButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
-                if ( Network.CRYPTO_NONE == network.getCrypto() ) {
-                    MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?",
-                            0, NON_CRYPTO_DIALOG);
-                }
-                else {
-                    final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
-                    try {
-                        cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
-                    }
-                    catch (final IllegalStateException ex) {
-                        MainActivity.error("exception showing crypto dialog: " + ex, ex);
-                    }
-                }
+                // add a display-exclude row fot MAC
+                MacFilterActivity.addEntry(hideAddresses,
+                        prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                hideMacButton.setEnabled(false);
             }
         });
+
+        hideOuiButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                // add a display-exclude row fot OUI
+                MacFilterActivity.addEntry(hideAddresses,
+                        prefs, network.getBssid().replace(":","").substring(0,6),
+                        ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                hideOuiButton.setEnabled(false);
+            }
+        });
+
+        disableLogMacButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                // add a log-exclude row fot OUI
+                MacFilterActivity.addEntry(blockAddresses,
+                        prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+                //TODO: should this also delete existing records?
+                disableLogMacButton.setEnabled(false);
+            }
+        });
+
+    }
+
+    private ArrayList<String> addressListForPref(final SharedPreferences prefs, final String key) {
+        Gson gson = new Gson();
+        String[] values = gson.fromJson(prefs.getString(key, "[]"), String[].class);
+        return new ArrayList<String>(Arrays.asList(values));
     }
 
     private int getExistingSsid( final String ssid ) {

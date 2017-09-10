@@ -21,36 +21,34 @@
 	    android:id="@+id/ssid"
 	    android:textSize="24sp"
 	    android:textColor="#AAEE50"
-	    android:gravity="center"
+	    android:gravity="left"
 	    android:layout_weight="10"
 	    />
-
-	    <ImageView android:id="@+id/wepicon2" android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:paddingTop="4dp"
-		android:paddingLeft="4dp" android:paddingRight="4dp"
-		android:layout_weight="1"
-		android:contentDescription="@string/crypto"
-		/>
 	</LinearLayout>
 
-    <TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/bssid"
-    android:textSize="20sp"
-    android:textColor="#AAAA00"
-    android:gravity="center"
-    />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/oui"
-        android:textSize="18sp"
-        android:textColor="#808080"
-        android:gravity="center"
-        />
-
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+        android:paddingLeft="4dp"
+        android:paddingStart="4dp"
+		android:id="@+id/bssid"
+		android:textSize="20sp"
+		android:textColor="#AAAA00"
+		android:layout_weight="6"
+		android:gravity="left"
+		/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/oui"
+            android:textSize="18sp"
+            android:textColor="#808080"
+            android:gravity="left"
+            android:layout_weight="5"
+            />
+    </LinearLayout>
     <LinearLayout
     android:orientation="horizontal"
     android:layout_width="fill_parent"
@@ -62,12 +60,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:layout_marginRight="2dip"
+        android:gravity="right"
 		/>
     	<TextView
 		android:id="@+id/na_signal"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:gravity="left"
 		/>
 
 		<TextView
@@ -76,12 +77,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:layout_marginRight="2dip"
+        android:gravity="right"
 		/>
 		<TextView
 		android:id="@+id/na_type"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:gravity="left"
 		/>
 
 		<TextView
@@ -90,12 +94,15 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:layout_marginRight="2dip"
+        android:gravity="right"
 		/>
 		<TextView
 		android:id="@+id/na_firsttime"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:layout_weight="1"
+        android:gravity="left"
 		/>
 
     </LinearLayout>
@@ -133,6 +140,7 @@
 		android:id="@+id/na_chan"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
+        android:layout_marginRight="2dip"
 		/>
 
 		<TextView
@@ -155,23 +163,67 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	/>
-
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="fill_parent" android:layout_height="wrap_content">
+		<Button android:id="@+id/hide_mac_button"
+			android:text="@string/hide_mac"
+			android:layout_weight="4"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:layout_marginLeft="3dip"
+            android:layout_marginRight="2dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="3dip"
+            android:minHeight="0dp"
+            android:background="@drawable/filter_button"/>
+		<Button android:id="@+id/hide_oui_button"
+			android:text="@string/hide_oui"
+			android:layout_weight="4"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="2dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="3dip"
+            android:minHeight="0dp"
+            android:background="@drawable/filter_button" />
+        <Button android:id="@+id/disable_log_mac_button"
+			android:text="@string/block_mac"
+			android:layout_weight="4"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+            android:layout_marginLeft="2dip"
+            android:layout_marginRight="3dip"
+            android:layout_marginTop="5dip"
+            android:layout_marginBottom="3dip"
+            android:minHeight="0dp"
+            android:background="@drawable/filter_button" />
+	</LinearLayout>
     <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<Button android:id="@+id/connect_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/connect_button" android:layout_weight="0"/>
-	<TextView
-		android:id="@+id/connect_text"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/connect_text"
-		android:layout_weight="5"
-		/>
+        android:id="@+id/connect_row"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        >
+		<Button android:id="@+id/connect_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/connect_button"
+            android:layout_weight="0"
+            android:layout_marginLeft="5dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="2dip"
+            android:layout_marginBottom="5dip"
+            android:background="@drawable/connect_button"
+            android:minHeight="0dp"
+            />
+		<TextView
+			android:id="@+id/connect_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/connect_text"
+			android:layout_weight="5"
+			/>
 	</LinearLayout>
 
     <LinearLayout

@@ -45,7 +45,7 @@ public class MacFilterActivity extends AppCompatActivity {
             filterKey = ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS;
         }
 
-        MainActivity.info(filterKey);
+        //DEBUG: MainActivity.info(filterKey);
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
         if(values.length>0) {
@@ -64,7 +64,8 @@ public class MacFilterActivity extends AppCompatActivity {
         final String input = ouiInput.getRawText().toString();
         if (null != input &&  (input.length() == 6)) {
             final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            if (addEntry(listItems, prefs, input, ouiInput)) {
+            if (addEntry(listItems, prefs, input, filterKey)) {
+                ouiInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
             }
         }
@@ -75,15 +76,25 @@ public class MacFilterActivity extends AppCompatActivity {
         final String input = macInput.getRawText();
         if (null != input &&  (input.length() == 12)) {
             final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            if (addEntry(listItems, prefs, input, macInput))  {
+            if (addEntry(listItems, prefs, input, filterKey))  {
+                macInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
             }
 
         }
     }
 
-    private boolean addEntry(ArrayList<String> entries, SharedPreferences prefs, final String rawEntry,
-                                 final MaskedEditText input) {
+    /**
+     * update a JSON Mac+Oui filter list in preferences by key
+     * TODO: should this be moved to a util class?
+     * @param entries list of entries currently in filterKey
+     * @param prefs a preferences instance to edit
+     * @param rawEntry the raw text of the entry
+     * @param filterKey the preferences key
+     * @return true if we've successfully updated preferences, false on existing or fail
+     */
+    public static boolean addEntry(ArrayList<String> entries, SharedPreferences prefs,
+                                   final String rawEntry, final String filterKey) {
         String formatted = "";
         for (int i = 0; i < rawEntry.length(); i++) {
             if ((i % 2 == 0) && ((i+1) != rawEntry.length())  && (i != 0)) formatted += ":";
@@ -97,9 +108,8 @@ public class MacFilterActivity extends AppCompatActivity {
             String serialized = gson.toJson(entries.toArray());
             MainActivity.info(serialized);
             final SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(this.filterKey,serialized);
+            editor.putString(filterKey,serialized);
             editor.apply();
-            input.setText("");
             MainActivity m = MainActivity.getMainActivity();
             if (null != m) {
                 //TODO: should we also update on Suspend/Dispose?

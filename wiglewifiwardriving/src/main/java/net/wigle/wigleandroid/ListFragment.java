@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
-import android.graphics.Movie;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -45,7 +43,6 @@ import net.wigle.wigleandroid.model.QueryArgs;
 
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.Set;
 

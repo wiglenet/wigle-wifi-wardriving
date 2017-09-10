@@ -359,4 +359,7 @@
     <string name="add_mac_filter_button">MAC-Filter hinzufügen</string>
     <string name="log_filter_button">ACs / OUIs aus der Protokollierung ausschließen…</string>
     <string name="mac_filter_app_name">Filteradressen</string>
+    <string name="hide_mac">Hide MAC</string>
+    <string name="hide_oui">Hide OUI</string>
+    <string name="block_mac">Block</string>
 </resources>

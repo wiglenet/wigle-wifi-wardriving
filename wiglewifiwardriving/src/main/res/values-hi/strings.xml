@@ -294,4 +294,7 @@
     <string name="add_mac_filter_button">Add MAC Filter</string>
     <string name="log_filter_button">Exclude MACs/OUIs from logging…</string>
     <string name="mac_filter_app_name">Filter Addresses</string>
+    <string name="hide_mac">Hide MAC</string>
+    <string name="hide_oui">Hide OUI</string>
+    <string name="block_mac">Block</string>
 </resources>

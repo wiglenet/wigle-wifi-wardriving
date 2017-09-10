@@ -356,4 +356,7 @@
     <string name="add_mac_filter_button">Aggiungi filtro MAC</string>
     <string name="log_filter_button">Escludi i MAC / OUI dalla registrazione…</string>
     <string name="mac_filter_app_name">Indirizzi dei filtri</string>
+    <string name="hide_mac">Hide MAC</string>
+    <string name="hide_oui">Hide OUI</string>
+    <string name="block_mac">Block</string>
 </resources>

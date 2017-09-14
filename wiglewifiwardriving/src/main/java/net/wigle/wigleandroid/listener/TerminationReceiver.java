@@ -18,7 +18,11 @@ public class TerminationReceiver extends BroadcastReceiver {
         switch (intent.getAction()) {
             case MainActivity.ACTION_END:
                 MainActivity.info("Received close action");
-                MainActivity.getMainActivity().finish();
+                MainActivity ma = MainActivity.getMainActivity();
+                if (null != ma) {
+                    //ALIBI: multiple terminations in rapid succession can cause NPE
+                    ma.finish();
+                }
                 return;
             default:
                 MainActivity.info("TerminationRec: unhandled intent action: " + intent.getAction());

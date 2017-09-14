@@ -214,7 +214,12 @@ public final class WigleService extends Service {
                 builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
                 // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
 
-                notification = builder.build();
+                try {
+                    //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
+                    notification = builder.build();
+                } catch (NullPointerException npe) {
+                    MainActivity.error("NPE trying to build notification. "+npe.getMessage());
+                }
             }
 
             startForegroundCompat( NOTIFICATION_ID, notification );

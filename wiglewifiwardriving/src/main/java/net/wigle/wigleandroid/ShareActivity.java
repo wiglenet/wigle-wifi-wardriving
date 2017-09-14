@@ -22,7 +22,7 @@ public class ShareActivity extends AppCompatActivity {
         // Figure out what to do based on the intent type
         MainActivity.info("ShareActivity intent type: " + intent.getAction());
         final MainActivity mainActivity = MainActivity.getMainActivity();
-        if (mainActivity != null) {
+        if ((mainActivity != null) && (intent != null)) {
             switch (intent.getAction()) {
                 case Intent.ACTION_INSERT:
                     mainActivity.handleScanChange(true);
@@ -36,6 +36,8 @@ public class ShareActivity extends AppCompatActivity {
                 default:
                     MainActivity.info("Unhandled intent action: " + intent.getAction());
             }
+        } else {
+            MainActivity.error("ShareActivity failure with intent "+intent);
         }
 
         Intent result = new Intent("com.example.RESULT_ACTION");

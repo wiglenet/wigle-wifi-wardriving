@@ -188,7 +188,7 @@ public final class WigleService extends Service {
             // final Intent uploadSharedIntent = new Intent(Intent.ACTION_SYNC, uri, this, ShareActivity.class );
             // final PendingIntent uploadIntent = PendingIntent.getActivity( this, 0, uploadSharedIntent, 0 );
 
-            Notification notification;
+            Notification notification = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent);
             }
@@ -214,10 +214,16 @@ public final class WigleService extends Service {
                 builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
                 // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
 
-                notification = builder.build();
+                try {
+                    //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
+                    notification = builder.build();
+                } catch (NullPointerException npe) {
+                    MainActivity.error("NPE trying to build notification. "+npe.getMessage());
+                }
             }
-
-            startForegroundCompat( NOTIFICATION_ID, notification );
+            if (null != notification) {
+                startForegroundCompat(NOTIFICATION_ID, notification);
+            }
         }
     }
 

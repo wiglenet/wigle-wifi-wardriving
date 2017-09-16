@@ -1,3 +1,9 @@
+* 2.22 (09/15/2017)
+Add bssid/oui filters for UI and DB.
+Avoid "BadTokenException: Unable to add window".
+Highlight exit button (thanks marmat8951!)
+Show WiGLE map tiles when fully zoomed.
+
 * 2.21 (08/13/2017)
 Change crypto to aes, rsa is broken in android-O.
 Enhanced List and Map settings pages.

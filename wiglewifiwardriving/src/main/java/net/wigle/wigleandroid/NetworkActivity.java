@@ -334,15 +334,18 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             });
         }
 
-        if (hideAddresses.contains(network.getBssid().toUpperCase())) {
+        if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
+                (hideAddresses.contains(network.getBssid().toUpperCase())) ) {
             hideMacButton.setEnabled(false);
         }
 
-        if (hideAddresses.contains(network.getBssid().toUpperCase().substring(0,8))) {
+        if ( (null == network.getBssid()) || (network.getBssid().length() < 8) ||
+                (hideAddresses.contains(network.getBssid().toUpperCase().substring(0, 8)))) {
             hideOuiButton.setEnabled(false);
         }
 
-        if (blockAddresses.contains(network.getBssid().toUpperCase())) {
+        if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
+                (blockAddresses.contains(network.getBssid().toUpperCase())) ) {
             disableLogMacButton.setEnabled(false);
         }
 

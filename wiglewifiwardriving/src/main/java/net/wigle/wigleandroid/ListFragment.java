@@ -267,6 +267,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.info( "LIST: resumed.");
         super.onResume();
         getActivity().setTitle(R.string.list_app_name);
+        //ALIBI: default status can confuse users on resume
+        setStatusUI(null);
     }
 
     @Override

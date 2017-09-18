@@ -313,6 +313,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             connectButton.setEnabled( false );
             final View connectRowView = (View) findViewById(R.id.connect_row);
             connectRowView.setVisibility(View.GONE);
+            final View filterRowView = (View) findViewById(R.id.filter_row);
+            filterRowView.setVisibility(View.GONE);
         } else {
             connectButton.setOnClickListener( new OnClickListener() {
                 @Override

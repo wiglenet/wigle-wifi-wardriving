@@ -61,7 +61,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private static final int SORT_DIALOG = 100;
     private static final int UPLOAD_DIALOG = 101;
-    private static final int SSID_FILTER = 102;
 
     public static final float MIN_DISTANCE_ACCURACY = 32f;
 
@@ -233,6 +232,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if ( status != null && view != null ) {
             final TextView tv = (TextView) view.findViewById( R.id.status );
             tv.setText( status );
+        }
+        MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            setScanningStatusIndicator(ma.isScanning());
         }
     }
 
@@ -562,6 +565,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 }
                 else {
                     latText = getString(R.string.list_scanning_off);
+                    setScanningStatusIndicator(false);
                 }
             }
             else {

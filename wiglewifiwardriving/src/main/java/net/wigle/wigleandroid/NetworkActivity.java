@@ -303,9 +303,6 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private void setupButtons( final Network network ) {
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Button connectButton = (Button) findViewById( R.id.connect_button );
-        final Button hideMacButton = (Button) findViewById( R.id.hide_mac_button );
-        final Button hideOuiButton = (Button) findViewById( R.id.hide_oui_button );
-        final Button disableLogMacButton = (Button) findViewById( R.id.disable_log_mac_button );
         final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
         final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
 
@@ -313,7 +310,12 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             connectButton.setEnabled( false );
             final View connectRowView = (View) findViewById(R.id.connect_row);
             connectRowView.setVisibility(View.GONE);
+            final View filterRowView = (View) findViewById(R.id.filter_row);
+            filterRowView.setVisibility(View.GONE);
         } else {
+            final Button hideMacButton = (Button) findViewById( R.id.hide_mac_button );
+            final Button hideOuiButton = (Button) findViewById( R.id.hide_oui_button );
+            final Button disableLogMacButton = (Button) findViewById( R.id.disable_log_mac_button );
             connectButton.setOnClickListener( new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {
@@ -332,53 +334,54 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     }
                 }
             });
-        }
-
-        if (hideAddresses.contains(network.getBssid().toUpperCase())) {
-            hideMacButton.setEnabled(false);
-        }
-
-        if (hideAddresses.contains(network.getBssid().toUpperCase().substring(0,8))) {
-            hideOuiButton.setEnabled(false);
-        }
-
-        if (blockAddresses.contains(network.getBssid().toUpperCase())) {
-            disableLogMacButton.setEnabled(false);
-        }
-
-
-        hideMacButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                // add a display-exclude row fot MAC
-                MacFilterActivity.addEntry(hideAddresses,
-                        prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+            if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
+                    (hideAddresses.contains(network.getBssid().toUpperCase())) ) {
                 hideMacButton.setEnabled(false);
             }
-        });
 
-        hideOuiButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                // add a display-exclude row fot OUI
-                MacFilterActivity.addEntry(hideAddresses,
-                        prefs, network.getBssid().replace(":","").substring(0,6),
-                        ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+            if ( (null == network.getBssid()) || (network.getBssid().length() < 8) ||
+                    (hideAddresses.contains(network.getBssid().toUpperCase().substring(0, 8)))) {
                 hideOuiButton.setEnabled(false);
             }
-        });
 
-        disableLogMacButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                // add a log-exclude row fot OUI
-                MacFilterActivity.addEntry(blockAddresses,
-                        prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_LOG_ADDRS);
-                //TODO: should this also delete existing records?
+            if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
+                    (blockAddresses.contains(network.getBssid().toUpperCase())) ) {
                 disableLogMacButton.setEnabled(false);
             }
-        });
 
+
+            hideMacButton.setOnClickListener( new OnClickListener() {
+                @Override
+                public void onClick( final View buttonView ) {
+                    // add a display-exclude row fot MAC
+                    MacFilterActivity.addEntry(hideAddresses,
+                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                    hideMacButton.setEnabled(false);
+                }
+            });
+
+            hideOuiButton.setOnClickListener( new OnClickListener() {
+                @Override
+                public void onClick( final View buttonView ) {
+                    // add a display-exclude row fot OUI
+                    MacFilterActivity.addEntry(hideAddresses,
+                            prefs, network.getBssid().replace(":","").substring(0,6),
+                            ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                    hideOuiButton.setEnabled(false);
+                }
+            });
+
+            disableLogMacButton.setOnClickListener( new OnClickListener() {
+                @Override
+                public void onClick( final View buttonView ) {
+                    // add a log-exclude row fot OUI
+                    MacFilterActivity.addEntry(blockAddresses,
+                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+                    //TODO: should this also delete existing records?
+                    disableLogMacButton.setEnabled(false);
+                }
+            });
+        }
     }
 
     private ArrayList<String> addressListForPref(final SharedPreferences prefs, final String key) {

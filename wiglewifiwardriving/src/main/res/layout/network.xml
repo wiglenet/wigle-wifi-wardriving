@@ -163,7 +163,8 @@
 	android:layout_height="2dip"
 	android:background="#A07070"
 	/>
-	<LinearLayout android:orientation="horizontal"
+	<LinearLayout android:id="@+id/filter_row"
+        android:orientation="horizontal"
 		android:layout_width="fill_parent" android:layout_height="wrap_content">
 		<Button android:id="@+id/hide_mac_button"
 			android:text="@string/hide_mac"

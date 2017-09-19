@@ -412,9 +412,7 @@ public final class MainActivity extends AppCompatActivity {
 
                 if (restart) {
                     // restart the app now that we can talk to the database
-                    if (!isFinishing()) {
-                        Toast.makeText(mainActivity, R.string.restart, Toast.LENGTH_LONG).show();
-                    }
+                    info("Restarting to pick up storage permission");
 
                     Intent i = getBaseContext().getPackageManager()
                             .getLaunchIntentForPackage(getBaseContext().getPackageName());
@@ -1966,11 +1964,6 @@ public final class MainActivity extends AppCompatActivity {
         final boolean wifiWasOff = prefs.getBoolean(ListFragment.PREF_WIFI_WAS_OFF, false);
         // don't call on emulator, it crashes it
         if (wifiWasOff && !state.inEmulator) {
-            // tell user, cuz this takes a little while
-            if (!isFinishing()) {
-                Toast.makeText(this, getString(R.string.turning_wifi_off), Toast.LENGTH_SHORT).show();
-            }
-
             // well turn it of now that we're done
             final WifiManager wifiManager = (WifiManager) getApplicationContext()
                     .getSystemService(Context.WIFI_SERVICE);

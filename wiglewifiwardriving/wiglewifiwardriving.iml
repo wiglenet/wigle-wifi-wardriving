@@ -136,6 +136,5 @@
     <orderEntry type="library" exported="" name="jackson-core-2.9.0.pr3" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-11.0.4" level="project" />
     <orderEntry type="module" module-name="android-maps-utils" exported="" />
-    <orderEntry type="library" exported="" name="support-annotations-25.2.0" level="project" />
   </component>
 </module>

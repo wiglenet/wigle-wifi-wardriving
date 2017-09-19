@@ -1,3 +1,8 @@
+* 2.23 (09/18/2017)
+Fix scanning status indicator.
+Hide wifi filter for cell networks.
+Handle unexpected bssids in filters.
+
 * 2.22 (09/15/2017)
 Add bssid/oui filters for UI and DB.
 Avoid "BadTokenException: Unable to add window".

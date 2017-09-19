@@ -1,4 +1,4 @@
-* 2.23 (09/18/2017)
+* 2.24 (09/18/2017)
 Fix scanning status indicator.
 Hide wifi filter for cell networks.
 Handle unexpected bssids in filters.

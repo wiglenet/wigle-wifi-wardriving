@@ -37,18 +37,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.OnMapReadyCallback;
+//import com.google.android.gms.maps.model.CameraPosition;
+//import com.google.android.gms.maps.model.CircleOptions;
+//import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
@@ -65,7 +66,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private static final int DEFAULT_ZOOM = 18;
 
     private Network network;
-    private MapView mapView;
+//    private MapView mapView;
     private int observations = 0;
     private boolean isDbResult = false;
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
@@ -155,9 +156,9 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     public void onDestroy() {
         MainActivity.info("NET: onDestroy");
         networkActivity = null;
-        if (mapView != null) {
-            mapView.onDestroy();
-        }
+//        if (mapView != null) {
+//            mapView.onDestroy();
+//        }
         super.onDestroy();
     }
 
@@ -165,41 +166,41 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     public void onResume() {
         MainActivity.info("NET: onResume");
         super.onResume();
-        if (mapView != null) {
-            mapView.onResume();
-        }
+//        if (mapView != null) {
+//            mapView.onResume();
+//        }
     }
 
     @Override
     public void onPause() {
         MainActivity.info("NET: onPause");
         super.onPause();
-        if (mapView != null) {
-            mapView.onPause();
-        }
+//        if (mapView != null) {
+//            mapView.onPause();
+//        }
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         MainActivity.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        if (mapView != null) {
-            try {
-                mapView.onSaveInstanceState(outState);
-            } catch (android.os.BadParcelableException bpe) {
-                MainActivity.error("Exception saving NetworkActivity instance state: ",bpe);
-                //this is really low-severity, since we can restore all state anyway
-            }
-        }
+//        if (mapView != null) {
+//            try {
+//                mapView.onSaveInstanceState(outState);
+//            } catch (android.os.BadParcelableException bpe) {
+//                MainActivity.error("Exception saving NetworkActivity instance state: ",bpe);
+//                //this is really low-severity, since we can restore all state anyway
+//            }
+//        }
     }
 
     @Override
     public void onLowMemory() {
         MainActivity.info("NET: onLowMemory");
         super.onLowMemory();
-        if (mapView != null) {
-            mapView.onLowMemory();
-        }
+//        if (mapView != null) {
+//            mapView.onLowMemory();
+//        }
     }
 
     @SuppressLint("HandlerLeak")
@@ -215,31 +216,31 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
 
-                    mapView.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(final GoogleMap googleMap) {
-                            int count = 0;
-                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
-                                final LatLng latLon = obs.getKey();
-                                final int level = obs.getValue();
-
-                                if (count == 0 && network.getLatLng() == null) {
-                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
-                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-
-                                googleMap.addCircle(new CircleOptions()
-                                        .center(latLon)
-                                        .radius(4)
-                                        .fillColor(NetworkListAdapter.getSignalColor(level, true))
-                                        .strokeWidth(0)
-                                        .zIndex(level));
-                                count++;
-                            }
-                            MainActivity.info("observation count: " + count);
-                        }
-                    });
+//                    mapView.getMapAsync(new OnMapReadyCallback() {
+//                        @Override
+//                        public void onMapReady(final GoogleMap googleMap) {
+//                            int count = 0;
+//                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+//                                final LatLng latLon = obs.getKey();
+//                                final int level = obs.getValue();
+//
+//                                if (count == 0 && network.getLatLng() == null) {
+//                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
+//                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                                }
+//
+//                                googleMap.addCircle(new CircleOptions()
+//                                        .center(latLon)
+//                                        .radius(4)
+//                                        .fillColor(NetworkListAdapter.getSignalColor(level, true))
+//                                        .strokeWidth(0)
+//                                        .zIndex(level));
+//                                count++;
+//                            }
+//                            MainActivity.info("observation count: " + count);
+//                        }
+//                    });
                 }
             }
         };
@@ -268,36 +269,36 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     }
 
     private void setupMap( final Network network, final Bundle savedInstanceState ) {
-        mapView = new MapView( this );
-        try {
-            mapView.onCreate(savedInstanceState);
-        }
-        catch (NullPointerException ex) {
-            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
-        }
-        MapsInitializer.initialize( this );
-
-        if (network.getLatLng() != null) {
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(final GoogleMap googleMap) {
-                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-                    googleMap.addCircle(new CircleOptions()
-                            .center(network.getLatLng())
-                            .radius(5)
-                            .fillColor(Color.argb(128, 240, 240, 240))
-                            .strokeColor(Color.argb(200, 255, 32, 32))
-                            .strokeWidth(3f)
-                            .zIndex(100));
-                }
-            });
-        }
-
-        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
-        rlView.addView( mapView );
+//        mapView = new MapView( this );
+//        try {
+//            mapView.onCreate(savedInstanceState);
+//        }
+//        catch (NullPointerException ex) {
+//            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+//        }
+//        MapsInitializer.initialize( this );
+//
+//        if (network.getLatLng() != null) {
+//            mapView.getMapAsync(new OnMapReadyCallback() {
+//                @Override
+//                public void onMapReady(final GoogleMap googleMap) {
+//                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+//                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//                    googleMap.addCircle(new CircleOptions()
+//                            .center(network.getLatLng())
+//                            .radius(5)
+//                            .fillColor(Color.argb(128, 240, 240, 240))
+//                            .strokeColor(Color.argb(200, 255, 32, 32))
+//                            .strokeWidth(3f)
+//                            .zIndex(100));
+//                }
+//            });
+//        }
+//
+//        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
+//        rlView.addView( mapView );
     }
 
     private void setupButtons( final Network network ) {

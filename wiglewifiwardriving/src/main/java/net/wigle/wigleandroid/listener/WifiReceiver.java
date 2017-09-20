@@ -18,6 +18,7 @@ import net.wigle.wigleandroid.DashboardFragment;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -38,7 +39,6 @@ import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
 
 public class WifiReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;

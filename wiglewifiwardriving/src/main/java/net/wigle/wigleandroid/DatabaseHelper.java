@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.Pair;
@@ -43,7 +44,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 
-import com.google.android.gms.maps.model.LatLng;
 
 /**
  * our database helper, makes a great data meal.

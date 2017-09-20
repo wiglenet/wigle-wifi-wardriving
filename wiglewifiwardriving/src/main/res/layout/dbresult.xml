@@ -20,6 +20,14 @@
 	android:layout_height="2dip"
 	android:background="#A07070"/>
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_map"
+        android:textSize="24sp"
+        android:text="@string/mapless"
+        />
+
 	<RelativeLayout
 		android:id="@+id/db_map_rl"
 		android:layout_width="fill_parent"

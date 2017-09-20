@@ -362,4 +362,5 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="mapless">No Google Maps in this Free and Open-Source Software (FOSS) Version, which has no closed-source libraries</string>
 </resources>

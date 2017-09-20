@@ -65,8 +65,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.ObservationUploader;
@@ -947,14 +945,14 @@ public final class MainActivity extends AppCompatActivity {
             state.wakeLock.acquire();
         }
 
-        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
-        info("GooglePlayServicesAvailable: " + serviceAvailable);
-        if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
-            error("service not available! " + serviceAvailable);
-            final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
-            dialog.show();
-            playServiceShown = true;
-        }
+//        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
+//        info("GooglePlayServicesAvailable: " + serviceAvailable);
+//        if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
+//            error("service not available! " + serviceAvailable);
+//            final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
+//            dialog.show();
+//            playServiceShown = true;
+//        }
     }
 
     @Override

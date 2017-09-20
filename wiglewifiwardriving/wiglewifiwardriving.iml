@@ -104,37 +104,24 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="play-services-vision-11.0.4" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-26.0.1" level="project" />
+    <orderEntry type="library" exported="" name="TTS_library_stub" level="project" />
     <orderEntry type="library" exported="" name="jackson-annotations-2.9.0.pr3" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-26.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-compat-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="gson-2.8.1" level="project" />
     <orderEntry type="library" exported="" name="MaskedEditText-1.0.5" level="project" />
-    <orderEntry type="library" exported="" name="support-vector-drawable-26.0.1" level="project" />
-    <orderEntry type="library" exported="" name="support-core-utils-26.0.1" level="project" />
-    <orderEntry type="library" exported="" name="android-gif-drawable-1.2.7" level="project" />
-    <orderEntry type="library" exported="" name="support-core-ui-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-basement-11.0.4" level="project" />
-    <orderEntry type="library" exported="" name="play-services-base-11.0.4" level="project" />
-    <orderEntry type="library" exported="" name="support-core-utils-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-fragment-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-vision-common-11.0.4" level="project" />
-    <orderEntry type="library" exported="" name="TTS_library_stub" level="project" />
-    <orderEntry type="library" exported="" name="play-services-maps-11.0.4" level="project" />
-    <orderEntry type="library" exported="" name="support-compat-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-26.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-vector-drawable-26.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-core-utils-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.7.19" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-25.2.0" level="project" />
-    <orderEntry type="library" exported="" name="support-compat-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="android-gif-drawable-1.2.7" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-26.0.1" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.19" level="project" />
     <orderEntry type="library" exported="" name="jackson-databind-2.9.0.pr3" level="project" />
-    <orderEntry type="library" exported="" name="support-media-compat-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.9.0.pr3" level="project" />
-    <orderEntry type="library" exported="" name="play-services-tasks-11.0.4" level="project" />
-    <orderEntry type="module" module-name="android-maps-utils" exported="" />
   </component>
 </module>

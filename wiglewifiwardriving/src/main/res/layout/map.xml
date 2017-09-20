@@ -32,7 +32,6 @@
 	</LinearLayout>
 
 	<LinearLayout
-	android:id="@+id/horizontalLine"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
@@ -40,12 +39,12 @@
 	/>
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/no_map"
-        android:textSize="24sp"
-        android:text="@string/mapless"
-        />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_map"
+            android:textSize="24sp"
+            android:text="@string/mapless"
+            />
 
 	<RelativeLayout
 		android:id="@+id/map_rl"

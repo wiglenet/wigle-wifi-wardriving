@@ -5,7 +5,7 @@ import android.content.SharedPreferences.Editor;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
@@ -14,7 +14,9 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class SpeechActivity extends ActionBarActivity {
+import net.wigle.wigleandroid.util.SettingsUtil;
+
+public class SpeechActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
 
     // used for shutting extraneous activities down on an error
@@ -66,7 +68,7 @@ public class SpeechActivity extends ActionBarActivity {
         final Long[] speechPeriods = new Long[]{ 10L,15L,30L,60L,120L,300L,600L,900L,1800L,0L };
         final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
                 "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
-        SettingsFragment.doSpinner((Spinner)findViewById(R.id.speak_spinner), ListFragment.PREF_SPEECH_PERIOD,
+        SettingsUtil.doSpinner((Spinner)findViewById(R.id.speak_spinner), ListFragment.PREF_SPEECH_PERIOD,
                 MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, this);
     }
 

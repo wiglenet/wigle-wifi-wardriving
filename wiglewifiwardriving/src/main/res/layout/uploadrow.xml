@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+<LinearLayout android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+    <TextView android:id="@+id/transid" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:textSize="18sp"
+              android:textColor="#eaba44"
+              android:gravity="start"/>
+    <TextView android:id="@+id/status" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:textColor="#00ff00"
+              android:gravity="center"/>
+
+    <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:gravity="end"
+              android:textColor="#B0B0B0"/>
+</LinearLayout>
+
+<LinearLayout android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<!-- Second row -->
+    <TextView android:id="@+id/file_size" android:layout_width="wrap_content"
+              android:layout_height="wrap_content" android:layout_weight="1"
+              android:gravity="start"
+              style="@android:style/TextAppearance.Small"
+              android:textColor="#B0B0B0"/>
+
+    <TextView android:id="@+id/total_wifi_gps" android:layout_width="wrap_content"
+              android:layout_height="wrap_content" android:layout_weight="1"
+              android:gravity="center"
+              style="@android:style/TextAppearance.Small"
+              android:textColor="#B0B0B0"/>
+
+    <TextView android:id="@+id/total_cell_gps" android:layout_width="wrap_content"
+		      android:layout_height="wrap_content" android:layout_weight="1"
+              android:gravity="end"
+		      style="@android:style/TextAppearance.Small"
+              android:textColor="#B0B0B0"/>
+</LinearLayout>
+
+</LinearLayout>
+

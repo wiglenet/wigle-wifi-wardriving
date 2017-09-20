@@ -12,7 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
@@ -24,7 +24,7 @@ import android.widget.TextView;
  * @author bobzilla
  *
  */
-public class ErrorReportActivity extends ActionBarActivity {
+public class ErrorReportActivity extends AppCompatActivity {
     private static final int MENU_EXIT = 11;
     private static final int MENU_EMAIL = 12;
     private boolean fromFailure = false;
@@ -169,7 +169,7 @@ public class ErrorReportActivity extends ActionBarActivity {
         MainActivity.info( "ErrorReport onCreate" );
         final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
         emailIntent.setType( "plain/text" );
-        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"bobzilla@wigle.net"} );
+        emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "WigleWifi error report" );
         emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, stack );
         final Intent chooserIntent = Intent.createChooser( emailIntent, "Email WigleWifi error report?" );

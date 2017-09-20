@@ -6,12 +6,74 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <!-- The main content view -->
-    <FrameLayout
-        android:id="@+id/tabcontent"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:padding="0dp" />
-
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <FrameLayout
+            android:layout_alignParentTop="true"
+            android:orientation="vertical"
+            android:id="@+id/tabcontent"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+            android:layout_weight="6"
+            android:layout_above="@+id/inline_status_bar"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="#1A1A1A"
+            android:id="@+id/inline_status_bar"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="6dip"
+                android:background="#ffae17"
+                />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/inline_status_bar_frame">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/inline_status_bar_left"
+                    android:layout_weight="6">
+                    <TextView
+                        android:id="@+id/inline_progress_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:paddingLeft="1dp"
+                        android:textColor="?android:attr/textColorPrimary"
+                        android:textStyle="bold" />
+                    <ProgressBar
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/inline_status_progress"
+                        />
+                </LinearLayout>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/cancel"
+                    android:id="@+id/inline_status_cancel"
+                    android:background="@drawable/cancel_button"
+                    android:padding="2dip"
+                    android:layout_marginLeft="5dip"
+                    android:layout_marginTop="5dip"/>
+                    android:layout_marginBottom="5dip"/>
+                    android:layout_marginRight="2dip"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
     <!-- The navigation drawer -->
     <ListView android:id="@+id/left_drawer"
         android:layout_width="240dp"

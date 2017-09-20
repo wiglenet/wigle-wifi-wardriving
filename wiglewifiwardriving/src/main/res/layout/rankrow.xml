@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+<LinearLayout android:orientation="horizontal"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:gravity="center">
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_width="wrap_content" android:layout_height="wrap_content"
+                  android:layout_weight="0"
+                  android:gravity="start">
+		<TextView android:id="@+id/rank" android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:textSize="18sp"
+				  android:textColor="#ffff00"/>
+		<TextView android:id="@+id/rankdiff" android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:textSize="16sp"/>
+	</LinearLayout>
+
+    <TextView android:id="@+id/username" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:textSize="18sp"
+              android:textColor="#4aceff"
+			  android:paddingLeft="12dp"
+              android:gravity="left"/>
+	<TextView android:id="@+id/month_wifi_gps" android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_weight="0"
+              android:textSize="18sp"
+              android:textColor="#00ff00"
+		      android:gravity="end"/>
+</LinearLayout>
+
+<LinearLayout android:orientation="horizontal"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<!-- Second row -->
+    <TextView
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+	<TextView android:id="@+id/total_wifi_gps" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_weight="2"
+        android:gravity="center"
+        style="@android:style/TextAppearance.Small"
+        android:textColor="#B0B0B0"/>
+    <TextView
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+    <TextView android:id="@+id/total_cell_gps" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_weight="2"
+        android:gravity="center"
+		style="@android:style/TextAppearance.Small"
+        android:textColor="#B0B0B0"/>
+    <TextView
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="1"/>
+</LinearLayout>
+
+</LinearLayout>
+

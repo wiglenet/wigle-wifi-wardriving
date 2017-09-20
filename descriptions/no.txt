@@ -5,9 +5,9 @@ Promo (80 characters):
 Wardriving: netstumble, vise trådløse nettverk, laste opp til WiGLE database.
 
 Description (4000 characters):
-WiGLE er en åpen kildekode wardriving app til netstumble, skjerm og kart funnet trådløse nettverk og mobilmaster hvor som helst i verden, lett å laste opp til WiGLE.net database. WiGLE ble startet i 2001 og har nå over 125 millioner WiFi-nettverk kartlagt over hele verden.
+WiGLE er en åpen kildekode wardriving app til netstumble, vis og kartlegg trådløse nettverk og mobilmaster hvor som helst i verden, lett å laste opp til WiGLE.net database. WiGLE ble startet i 2001 og har nå over 125 millioner WiFi-nettverk kartlagt over hele verden.
 
-• Konkurrer på den globale WiGLE leaderboard for de fleste nettverk lokalisert!
+• Konkurrer på den globale WiGLE ledertavlen for flest nettverk lokalisert!
 • Eksporter til CSV-filer på SD-kort (kommadelte verdier)!
 • Eksport til KML-filer på SD-kort (for å importere til Google Maps/Earth)!
 • Lyd og tekst-til-tale-varsling!
@@ -15,17 +15,17 @@ WiGLE er en åpen kildekode wardriving app til netstumble, skjerm og kart funnet
 • Sanntidskart over nettverk funnet (OpenStreetMap)!
 • Kan flytte app til et SD-kort!
 • Lydløs-knappen for å slå av all lyd/tale umiddelbart!
-• Bluetooth GPS støtte gjennom mock steder!
+• Bluetooth GPS støtte gjennom modifisert/falsk plassering!
 • Ingen reklame!
 
 Versjonsmerknader: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-For WiFi og mobilmaster som skal kartlegges, må du vente på at enheten for å fastslå den nåværende plassering, via GPS eller nettverksplassering.
-På kartet: sirklene er WiFi, rutene er celle tårn. Lyse farger er nettverk sett før, lilla de er nye for den lokale databasen.
-Hvis du har problemer med å logge inn, eller har forslag, send oss ​​en e-post til wigle-admin@wigle.net og vi vil gjerne hjelpe ut.
-Trenger "Leser telefontilstand" for å fortelle om en telefonsamtale pågår, for å dempe lyden (lyder og tale).
+For at WiFi og mobilmaster skal kartlegges, må du vente på at enheten fastslår den nåværende plasseringen, via GPS eller nettverksplassering.
+På kartet: sirklene er WiFi, rutene er mobilmaster. Lyse farger er nettverk sett før, lilla de er nye for den lokale databasen.
+Hvis du har problemer med å logge inn, eller har forslag, send oss en e-post til wigle-admin@wigle.net og vi vil gjerne hjelpe.
+Appen trenger "Lese telefontilstand" tilgang for å fortelle om en telefonsamtale pågår, for å dempe lyden (lyder og tale).
 Filene er tilgjengelig for å hjelpe med en menneskelig oversettelse til ikke-engelske språk. Dette var hovedsakelig en mekanisk oversettelse, fordi vi åpenbart ikke kjenner alle disse språkene. Du kan bidra til å forbedre ting ved å gjøre pull-forespørsler på:
 https://github.com/wiglenet/wigle-wifi-wardriving/pulls
 eller sende dem til wigle-admin@wigle.net.
 
-Hold på å snuble!
+Keep on stumbling!

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.Channels;
@@ -29,88 +28,9 @@ final class HttpFileUploader {
     public static final String ENCODING = "UTF-8";
     public static final String LINE_END = "\r\n";
     public static final String TWO_HYPHENS = "--";
-    public static final String BOUNDARY = "*****";
 
     /** don't allow construction */
     private HttpFileUploader(){
-    }
-
-    public static HttpURLConnection connect(String urlString, final boolean setBoundary)
-            throws IOException {
-        return connect(urlString, setBoundary, null);
-    }
-
-    public static HttpURLConnection connect(String urlString, final boolean setBoundary,
-                                            final PreConnectConfigurator preConnectConfigurator) throws IOException {
-        URL connectURL;
-        try{
-            connectURL = new URL( urlString );
-        }
-        catch( Exception ex ) {
-            MainActivity.error( "MALFORMATED URL: " + ex, ex );
-            return null;
-        }
-
-        return createConnection(connectURL, setBoundary, preConnectConfigurator);
-    }
-
-    private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
-                                                      final PreConnectConfigurator preConnectConfigurator)
-            throws IOException {
-
-        String javaVersion = "unknown";
-        try {
-            javaVersion =  System.getProperty("java.vendor") + " " +
-                    System.getProperty("java.version") + ", jvm: " +
-                    System.getProperty("java.vm.vendor") + " " +
-                    System.getProperty("java.vm.name") + " " +
-                    System.getProperty("java.vm.version") + " on " +
-                    System.getProperty("os.name") + " " +
-                    System.getProperty("os.version") +
-                    " [" + System.getProperty("os.arch") + "]";
-        } catch (RuntimeException ignored) { }
-        final String userAgent = "WigleWifi ("+javaVersion+")";
-
-        // Open a HTTP connection to the URL
-        HttpURLConnection conn = (HttpURLConnection) connectURL.openConnection();
-        // Allow Inputs
-        conn.setDoInput(true);
-        // Allow Outputs
-        conn.setDoOutput(true);
-        // Don't use a cached copy.
-        conn.setUseCaches(false);
-        conn.setInstanceFollowRedirects( false );
-
-        // Use a post method.
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Connection", "Keep-Alive");
-        if ( setBoundary ) {
-            conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
-        }
-        else {
-            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-        }
-        conn.setRequestProperty( "Accept-Encoding", "gzip" );
-        conn.setRequestProperty( "User-Agent", userAgent );
-
-        // chunk large stuff
-        conn.setChunkedStreamingMode( 32*1024 );
-        // shouldn't have to do this, but it makes their HttpURLConnectionImpl happy
-        conn.setRequestProperty("Transfer-Encoding", "chunked");
-        // 8 hours
-        conn.setReadTimeout(8*60*60*1000);
-
-        // allow caller to munge
-        if (preConnectConfigurator != null) {
-            preConnectConfigurator.configure(conn);
-        }
-
-        // connect
-        MainActivity.info( "about to connect" );
-        conn.connect();
-        MainActivity.info( "connected" );
-
-        return conn;
     }
 
     /**
@@ -126,6 +46,7 @@ final class HttpFileUploader {
      */
     public static String upload( final String urlString, final String filename, final String fileParamName,
                                  final FileInputStream fileInputStream, final Map<String,String> params,
+                                 final PreConnectConfigurator preConnectConfigurator,
                                  final Handler handler, final long filesize)
                                 throws IOException {
 
@@ -134,7 +55,8 @@ final class HttpFileUploader {
 
         try {
             final boolean setBoundary = true;
-            conn = connect(urlString, setBoundary);
+            conn = AbstractApiRequest.connect(urlString, setBoundary, preConnectConfigurator,
+                    ApiDownloader.REQUEST_POST);
             if (conn == null) {
                 throw new IOException("No connection for: " + urlString);
             }
@@ -163,7 +85,7 @@ final class HttpFileUploader {
 
             StringBuilder header = new StringBuilder( 400 ); // find a better guess. it was 281 for me in the field 2010/05/16 -hck
             for ( Map.Entry<String, String> entry : params.entrySet() ) {
-                header.append( TWO_HYPHENS ).append( BOUNDARY ).append( LINE_END );
+                header.append( TWO_HYPHENS ).append( AbstractApiRequest.BOUNDARY ).append( LINE_END );
                 header.append("Content-Disposition: form-data; name=\"")
                         .append(entry.getKey()).append("\"").append(LINE_END);
                 header.append( LINE_END );
@@ -171,7 +93,7 @@ final class HttpFileUploader {
                 header.append( LINE_END );
             }
 
-            header.append( TWO_HYPHENS + BOUNDARY + LINE_END );
+            header.append( TWO_HYPHENS + AbstractApiRequest.BOUNDARY + LINE_END );
             header.append("Content-Disposition: form-data; name=\"").append(fileParamName)
                     .append("\";filename=\"").append(filename).append("\"").append(LINE_END);
             header.append( "Content-Type: application/octet_stream" + LINE_END );
@@ -195,7 +117,7 @@ final class HttpFileUploader {
             while ( byteswritten < filesize ) {
                 final long bytes = fc.transferTo( byteswritten, chunk, wbc );
                 if ( bytes <= 0 ) {
-                    MainActivity.info( "giving up transfering file. bytes: " + bytes );
+                    MainActivity.info( "giving up transferring file. bytes: " + bytes );
                     break;
                 }
                 byteswritten += bytes;
@@ -212,7 +134,7 @@ final class HttpFileUploader {
             // send multipart form data necesssary after file data...
             header.setLength( 0 ); // clear()
             header.append(LINE_END);
-            header.append(TWO_HYPHENS + BOUNDARY + TWO_HYPHENS + LINE_END);
+            header.append(TWO_HYPHENS + AbstractApiRequest.BOUNDARY + TWO_HYPHENS + LINE_END);
             writeString( wbc, header.toString(), enc, cbuff, bbuff );
 
             // close streams

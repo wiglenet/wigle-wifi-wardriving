@@ -7,14 +7,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-//import com.google.android.gms.maps.model.LatLng;
-//import com.google.maps.android.clustering.ClusterItem;
+import android.annotation.SuppressLint;
+import android.net.wifi.ScanResult;
 
 /**
  * network data. not thread-safe.
  */
 @SuppressLint("UseSparseArrays")
-public final class Network {//implements ClusterItem {
+public final class Network {
     private final String bssid;
     private final String ssid;
     private final int frequency;
@@ -32,6 +32,7 @@ public final class Network {//implements ClusterItem {
 
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
+    private static final String WPA2_CAP = "[WPA2";
     private static final String WPA_CAP = "[WPA";
     private static final String WEP_CAP = "[WEP";
 
@@ -39,6 +40,7 @@ public final class Network {//implements ClusterItem {
     public static final int CRYPTO_NONE = 0;
     public static final int CRYPTO_WEP = 1;
     public static final int CRYPTO_WPA = 2;
+    public static final int CRYPTO_WPA2 = 3;
 
     private static final Map<Integer,Integer> freqToChan;
     static {
@@ -122,7 +124,9 @@ public final class Network {//implements ClusterItem {
             this.showCapabilities = null;
         }
 
-        if (this.capabilities.contains(WPA_CAP)) {
+        if (this.capabilities.contains(WPA2_CAP)) {
+            crypto = CRYPTO_WPA2;
+        } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
         }
         else if (this.capabilities.contains(WEP_CAP)) {
@@ -220,7 +224,17 @@ public final class Network {//implements ClusterItem {
         return geoPoint;
     }
 
-//    @Override
+    public String getOui(final OUI oui) {
+        String retval = "";
+        final String lookup = getBssid().replace(":", "").toUpperCase();
+        if (oui != null && lookup.length() >= 9) {
+            retval = oui.getOui(lookup.substring(0, 9));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
+            if (retval == null) retval = oui.getOui(lookup.substring(0, 6));
+        }
+        return retval == null ? "" : retval;
+    }
+
     public LatLng getPosition() {
         return geoPoint;
     }

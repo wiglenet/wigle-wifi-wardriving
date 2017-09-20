@@ -1,6 +1,88 @@
-* 2.11 (?)
+* 2.24 (09/18/2017)
+Fix scanning status indicator.
+Hide wifi filter for cell networks.
+Handle unexpected bssids in filters.
+
+* 2.22 (09/15/2017)
+Add bssid/oui filters for UI and DB.
+Avoid "BadTokenException: Unable to add window".
+Highlight exit button (thanks marmat8951!)
+Show WiGLE map tiles when fully zoomed.
+
+* 2.21 (08/13/2017)
+Change crypto to aes, rsa is broken in android-O.
+Enhanced List and Map settings pages.
+Added termination receiver.
+Conform to new android-O notification channels.
+Updated Danish translation (thanks Zarhn!).
+
+* 2.20 (07/22/2017)
+Show WiGLE networks on map (in Settings).
+No modal while uploading.
+Less observation importer memory usage.
+Improved icons and layouts.
+Language fixes (thanks Raffaele74 & kill0rz!)
+Error handling fixes.
+
+* 2.19 (04/30/2017)
+Fix for not using db_marker after restart.
+Fix for activate after anonymous.
+German/Italian translation fixes (thanks kill0rz/Raffaele!)
+Better error feedback system.
+
+* 2.18 (04/14/2017)
+Fix ProviderException for token generation on some devices.
+Fix gpsStatus NPE on some devices.
+Default to muted.
+
+* 2.17 (04/02/2017)
+QR code login for WiGLE users
+Marshmallow-and-up overlay issue during permissions
+Marshmallow-and-up map position indicator fix
+Fixed bad position updates in network table
+Encrypted user token storage
+Active authentication and authentication settings
+Layout and color cleanup for stats, rankings, uploads
+Update based on network strength (thanks, cognitiverift!)
+Prevent accidental taps from cancelling upload/download
+Transition to official WiGLE APIv2
+Refactored networking core
+Cleaned up forum post text handling
+
+* 2.16 (09/03/2016)
+Fix new-user startup issues
+
+* 2.15 (09/02/2016)
+Disable GPS when scanning turned off
+Add Pause/Scan buttons to notification
+Force text colors for Nougat
+
+* 2.14 (08/20/2016)
+Oui substring bugfix
+
+* 2.13 (08/19/2016)
+Add manufacturers to network list and instance views
+Workaround rankstats-without-context exception
+Bump appcompat-v7 library to 24.2.0
+
+* 2.12 (08/10/2016)
+Bump support and tools library versions
+Workaround reported ranking exception
+Clean up news items and add links
+Updated German translation (thanks kill0rz!)
+
+* 2.11 (07/30/2016)
+Added monthly/all-time rankings list
+Added list of uploaded files
+Added WiGLE News section
+User stats and Rankings show diff from last month
+Consistently use string WiFi (thanks Aeyoun!)
 Updated Brazilian Portuguese store description (thanks artjacob!)
-Consistently use WiFi (thanks Aeyoun!)
+Updated Norwegian store description (thanks Znerox!)
+Updated French translation (thanks AtomicJo!)
+Updated German translation (thanks mcliquid, kill0rz!)
+Updated Italian translation (thanks bellingeri!)
+Updated Japanese translation (thanks tinbotu!)
 
 * 2.10 (12/12/2015)
 Remove deprecated reference to settings activity

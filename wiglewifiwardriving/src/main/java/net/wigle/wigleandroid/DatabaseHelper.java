@@ -44,7 +44,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 
-//import com.google.android.gms.maps.model.LatLng;
 
 /**
  * our database helper, makes a great data meal.
@@ -56,6 +55,7 @@ public final class DatabaseHelper extends Thread {
     private static final double SMALL_LATLON_CHANGE = 0.0001D;
     private static final double MEDIUM_LATLON_CHANGE = 0.001D;
     private static final double BIG_LATLON_CHANGE = 0.01D;
+    private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi.sqlite";
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -358,7 +358,7 @@ public final class DatabaseHelper extends Thread {
             db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
         }
         else {
-            db = context.openOrCreateDatabase( dbFilename, MAX_PRIORITY, null );
+            db = context.openOrCreateDatabase( dbFilename, Context.MODE_PRIVATE, null );
         }
 
         try {
@@ -536,7 +536,13 @@ public final class DatabaseHelper extends Thread {
     }
 
     public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
-        return addObservation( network, network.getLevel(), location, newForRun );
+        try {
+            return addObservation(network, network.getLevel(), location, newForRun);
+        }
+        catch (final IllegalMonitorStateException ex) {
+            MainActivity.error("exception adding network: " + ex, ex);
+        }
+        return false;
     }
 
     private boolean addObservation( final Network network, final int level, final Location location,
@@ -674,6 +680,7 @@ public final class DatabaseHelper extends Thread {
         final long now = System.currentTimeMillis();
         final double latDiff = Math.abs(lastlat - location.getLatitude());
         final double lonDiff = Math.abs(lastlon - location.getLongitude());
+        final boolean levelChange = bestlevel <= (update.level - LEVEL_CHANGE) ;
         final boolean smallChange = latDiff > SMALL_LATLON_CHANGE || lonDiff > SMALL_LATLON_CHANGE;
         final boolean mediumChange = latDiff > MEDIUM_LATLON_CHANGE || lonDiff > MEDIUM_LATLON_CHANGE;
         final boolean bigChange = latDiff > BIG_LATLON_CHANGE || lonDiff > BIG_LATLON_CHANGE;
@@ -681,11 +688,26 @@ public final class DatabaseHelper extends Thread {
         //    + " lastlat: " + lastlat + " lat: " + location.getLatitude()
         //    + " lastlon: " + lastlon + " lon: " + location.getLongitude() );
         final boolean smallLocDelay = now - lasttime > SMALL_LOC_DELAY;
-        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange);
+        final boolean changeWorthy = mediumChange || (smallLocDelay && smallChange) || levelChange;
 
         final boolean blank = location.getLatitude() == 0 && location.getLongitude() == 0
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
                 && update.level == 0;
+
+        /**
+         * ALIBI: +/-infinite lat/long, 0 timestamp data (even with high accuracy) is gigo
+         */
+        final boolean likelyJunk = Double.isInfinite(location.getLatitude()) ||
+                Double.isInfinite(location.getLongitude()) ||
+                location.getTime() == 0L;
+
+        /*
+        //debugging path
+        if (likelyJunk) {
+            MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
+                        + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
+                        + " smallChange: " + smallChange + " latDiff: " + latDiff + " lonDiff: " + lonDiff);
+        } */
 
         // MainActivity.info(network.getSsid() + " " + bssid + ") blank: " + blank + "isNew: " + isNew + " bigChange: " + bigChange + " fastMode: " + fastMode
         //    + " changeWorthy: " + changeWorthy + " mediumChange: " + mediumChange + " smallLocDelay: " + smallLocDelay
@@ -739,7 +761,10 @@ public final class DatabaseHelper extends Thread {
                 logTime( start, "db network updated" );
 
 
-                boolean newBest = bestlevel == 0 || update.level > bestlevel;
+                boolean newBest = (bestlevel == 0 || update.level > bestlevel) &&
+                        // https://github.com/wiglenet/wigle-wifi-wardriving/issues/82
+                        !likelyJunk;
+
                 // MainActivity.info("META testing network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
                 if (newBest) {
                     bestlevel = update.level;
@@ -1003,6 +1028,7 @@ public final class DatabaseHelper extends Thread {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final long maxid = prefs.getLong( ListFragment.PREF_DB_MARKER, -1L );
         final Editor edit = prefs.edit();
+        final long oldMaxDb = prefs.getLong( ListFragment.PREF_MAX_DB, locCount );
         edit.putLong( ListFragment.PREF_MAX_DB, locCount );
 
         if ( maxid == -1L ) {
@@ -1012,6 +1038,12 @@ public final class DatabaseHelper extends Thread {
                 MainActivity.info( "setting db marker to: " + locCount );
                 edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
             }
+        }
+        else if (maxid > locCount || (maxid == 0 && oldMaxDb == 0 && locCount > 10000)) {
+            final long newMaxid = Math.max(0, locCount - 10000);
+            MainActivity.warn("db marker: " + maxid + " greater than location count: " + locCount
+                    + ", setting to: " + newMaxid);
+            edit.putLong( ListFragment.PREF_DB_MARKER, newMaxid );
         }
         edit.apply();
     }

@@ -175,7 +175,7 @@ public class DashboardFragment extends Fragment {
     final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
 
     String retval;
-    if ( meters > 1000f ) {
+    if ( meters > 3000f ) {
       if ( metric ) {
         retval = numberFormat.format( meters / 1000f ) + " " + context.getString(R.string.km_short);
       }

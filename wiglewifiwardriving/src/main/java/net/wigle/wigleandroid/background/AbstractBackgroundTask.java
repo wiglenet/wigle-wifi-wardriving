@@ -1,24 +1,28 @@
 package net.wigle.wigleandroid.background;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import net.wigle.wigleandroid.DatabaseHelper;
-import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.ProgressPanel;
+import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.TokenAccess;
+import net.wigle.wigleandroid.WiGLEAuthException;
+
+import java.io.IOException;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
@@ -30,14 +34,14 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     private final AtomicBoolean interrupt = new AtomicBoolean( false );
     private final Object lock = new Object();
     private final String name;
-    private ProgressDialogFragment pd;
+    private ProgressPanel pp;
     private int lastSentPercent = -1;
 
     private static AbstractBackgroundTask latestTask = null;
     static final String PROGRESS_TAG = "background-task-progress";
 
     public AbstractBackgroundTask(final FragmentActivity context, final DatabaseHelper dbHelper, final String name,
-                                  final boolean createDialog) {
+                                  final boolean showProgress) {
         if ( context == null ) {
             throw new IllegalArgumentException( "context is null" );
         }
@@ -52,15 +56,20 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         this.dbHelper = dbHelper;
         this.name = name;
 
-        if (createDialog) createProgressDialog( context );
+        if (showProgress) activateProgressPanel( context );
+        //TODO: make this a placeholder?
+        //pp.setMessage(name);
 
-        this.handler = new BackgroundGuiHandler(context, lock, pd, this);
+        this.handler = new BackgroundGuiHandler(context, lock, pp, this);
         latestTask = this;
     }
 
     @Override
     public final void clearProgressDialog() {
-        pd = null;
+        if (null != pp) {
+            pp.hide();
+        }
+        pp = null;
     }
 
     @Override
@@ -69,15 +78,24 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         setName( name + "-" + getName() );
 
         try {
-            MainActivity.info( "setting file export thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
+            MainActivity.info( "setting background thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
             Process.setThreadPriority( THREAD_PRIORITY );
 
             subRun();
-        }
-        catch ( InterruptedException ex ) {
+        } catch ( InterruptedException ex ) {
             MainActivity.info( name + " interrupted: " + ex );
-        }
-        catch ( final Exception ex ) {
+        } catch ( final WiGLEAuthException waex) {
+            //DEBUG: MainActivity.error("auth error", waex);
+            Bundle errorBundle = new Bundle();
+            errorBundle.putCharSequence("AUTH_ERROR", waex.getMessage());
+            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+        } catch ( final IOException ioex) {
+            MainActivity.error("connection error", ioex);
+            Bundle errorBundle = new Bundle();
+            errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
+            errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
+            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+        } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         }
     }
@@ -97,7 +115,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.sendMessage(msg);
     }
 
-    protected abstract void subRun() throws IOException, InterruptedException;
+    protected abstract void subRun() throws IOException, InterruptedException, WiGLEAuthException;
 
     /** interrupt this task */
     public final void setInterrupted() {
@@ -112,66 +130,42 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return handler;
     }
 
-    private void createProgressDialog(final FragmentActivity context) {
-        // make an interruptable progress dialog
-        pd = ProgressDialogFragment.newInstance();
-        pd.show(context.getSupportFragmentManager(), PROGRESS_TAG);
+    public static void updateTransferringState(final boolean transferring, final FragmentActivity context) {
+        Button uploadButton = (Button) context.findViewById(R.id.upload_button);
+        if (null != uploadButton) uploadButton.setEnabled(!transferring);
+        Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
+        if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
+        if (transferring) {
+            MainActivity.getMainActivity().setTransferring();
+        } else {
+            MainActivity.getMainActivity().transferComplete();
+        }
     }
 
-    public static class ProgressDialogFragment extends DialogFragment {
-        public static ProgressDialogFragment newInstance() {
-            return new ProgressDialogFragment ();
-        }
+    private void activateProgressPanel(final FragmentActivity context) {
+        final LinearLayout progressLayout = (LinearLayout) context.findViewById(R.id.inline_status_bar);
+        final TextView progressLabel = (TextView) context.findViewById(R.id.inline_progress_status);
+        final ProgressBar progressBar = (ProgressBar) context.findViewById(R.id.inline_status_progress);
+        final Button taskCancelButton = (Button) context.findViewById(R.id.inline_status_cancel);
 
-        @Override
-        @NonNull
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final ProgressDialog dialog = new ProgressDialog(getActivity());
-            dialog.setTitle(getString(Status.WRITING.getTitle()));
-            dialog.setMessage(getString(Status.WRITING.getMessage()));
-            dialog.setIndeterminate(true);
-            dialog.setCancelable(true);
-            return dialog;
-        }
+        if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
+            pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
+            pp.show();
+            taskCancelButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    latestTask.interrupt();
+                    clearProgressDialog();
+                    updateTransferringState(false, context);
+                }
+            });
+            //ALIBI: this will get replaced as soon as the progress is set for the first time
+            progressBar.setIndeterminate(true);
 
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            MainActivity.info("Cancelling dialog for task: " + latestTask);
-            if (latestTask != null) {
-                latestTask.setInterrupted();
-            }
-        }
-
-        private ProgressDialog getDialog(final FragmentManager manager) {
-            final ProgressDialogFragment dialog = (ProgressDialogFragment) manager.findFragmentByTag(PROGRESS_TAG);
-            if (dialog != null) {
-                return (ProgressDialog) dialog.getDialog();
-            }
-            MainActivity.info("No progress dialog");
-            return null;
-        }
-
-        public void setMessage(final FragmentManager manager, final String message) {
-            final ProgressDialog dialog = getDialog(manager);
-            if (dialog != null)
-            {
-                dialog.setMessage(message);
-            }
-        }
-
-        /**
-         * Sets the progress of the dialog, we need to make sure we get the right dialog reference here
-         * which is why we obtain the dialog fragment manually from the fragment manager
-         * @param manager fragment manager
-         * @param progress how much progress has been made
-         */
-        public void setProgress(final FragmentManager manager, final int progress)
-        {
-            final ProgressDialog dialog = getDialog(manager);
-            if (dialog != null)
-            {
-                dialog.setProgress(progress);
-            }
+            //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
+            // setting global state to make sure they get set on show
+            updateTransferringState(true, context);
+            pp.setMessage(context.getString(R.string.status_working));
+            pp.setIndeterminate();
         }
     }
 
@@ -181,6 +175,16 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         }
         handler.setContext(context);
     }
+
+    protected final boolean validAuth() {
+        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        if ( (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
+            return true;
+        }
+        return false;
+
+    }
+
 
     protected final String getUsername() {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
@@ -203,7 +207,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
     protected final String getToken() {
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        String token = prefs.getString(ListFragment.PREF_TOKEN, null);
+        String token = TokenAccess.getApiToken(prefs);
 
         if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
             token = "";

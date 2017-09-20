@@ -13,10 +13,8 @@ import net.wigle.wigleandroid.DBException;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 
 public class KmlWriter extends AbstractBackgroundTask {
@@ -45,7 +43,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final FileOutputStream fos = MainActivity.createFile(context, filename);
         // header
-        FileUploaderTask.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
                 + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red-dot.png</href></Icon></IconStyle></Style>"
                 + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href></Icon></IconStyle></Style>"
@@ -93,7 +91,7 @@ public class KmlWriter extends AbstractBackgroundTask {
             }
         }
         // footer
-        FileUploaderTask.writeFos( fos, "</Folder>\n</Document></kml>" );
+        ObservationUploader.writeFos( fos, "</Folder>\n</Document></kml>" );
 
         fos.close();
 
@@ -140,15 +138,15 @@ public class KmlWriter extends AbstractBackgroundTask {
             byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
             filterIllegalXml( ssidFiltered );
 
-            FileUploaderTask.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
+            ObservationUploader.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
             fos.write( ssidFiltered );
-            FileUploaderTask.writeFos( fos, "]]></name>\n" );
-            FileUploaderTask.writeFos( fos, "<description><![CDATA[BSSID: <b>" + bssid + "</b><br/>"
+            ObservationUploader.writeFos( fos, "]]></name>\n" );
+            ObservationUploader.writeFos( fos, "<description><![CDATA[BSSID: <b>" + bssid + "</b><br/>"
                     + "Capabilities: <b>" + capabilities + "</b><br/>Frequency: <b>" + frequency + "</b><br/>"
                     + "Timestamp: <b>" + lasttime + "</b><br/>Date: <b>" + date + "</b>]]></description><styleUrl>#" + style + "</styleUrl>\n" );
-            FileUploaderTask.writeFos( fos, "<Point>\n" );
-            FileUploaderTask.writeFos( fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>" );
-            FileUploaderTask.writeFos( fos, "</Point>\n</Placemark>\n" );
+            ObservationUploader.writeFos( fos, "<Point>\n" );
+            ObservationUploader.writeFos( fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>" );
+            ObservationUploader.writeFos( fos, "</Point>\n</Placemark>\n" );
 
             lineCount++;
             if ( (lineCount % 1000) == 0 ) {

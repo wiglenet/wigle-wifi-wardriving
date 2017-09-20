@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.location.Address;
@@ -15,7 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -23,8 +22,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 //import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.GoogleMap;
 //import com.google.android.gms.maps.MapView;
 //import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.model.CameraPosition;
 //import com.google.android.gms.maps.model.LatLng;
 
@@ -34,7 +35,7 @@ import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
 
-public class DBResultActivity extends ActionBarActivity {
+public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
     private static final int MSG_QUERY_DONE = 2;
     private static final int LIMIT = 50;
@@ -42,7 +43,7 @@ public class DBResultActivity extends ActionBarActivity {
     private static final int DEFAULT_ZOOM = 18;
 
     private NetworkListAdapter listAdapter;
-    private Object mapView;
+//    private MapView mapView;
 //    private MapRender mapRender;
     private final List<Network> resultList = new ArrayList<>();
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>();
@@ -96,17 +97,20 @@ public class DBResultActivity extends ActionBarActivity {
 //        mapView.onCreate(savedInstanceState);
 //        MapsInitializer.initialize(this);
 //
-//        if (mapView.getMap() != null) {
-//            mapRender = new MapRender(this, mapView.getMap(), true);
+//        mapView.getMapAsync(new OnMapReadyCallback() {
+//            @Override
+//            public void onMapReady(final GoogleMap googleMap) {
+//                mapRender = new MapRender(DBResultActivity.this, googleMap, true);
 //
-//            if (center != null) {
-//                final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                        .target(center).zoom(DEFAULT_ZOOM).build();
-//                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                if (center != null) {
+//                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                            .target(center).zoom(DEFAULT_ZOOM).build();
+//                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                }
 //            }
-//        }
-
-        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
+//        });
+//
+//        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
 //        rlView.addView( mapView );
     }
 
@@ -129,19 +133,22 @@ public class DBResultActivity extends ActionBarActivity {
                     for ( final Network network : resultList ) {
                         listAdapter.add( network );
                         if ( address == null && first ) {
-                            final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
-                            MainActivity.info( "set center: " + center + " network: " + network.getSsid()
-                                    + " point: " + network.getLatLng());
-//                            if (mapView.getMap() != null) {
-//                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                                        .target(center).zoom(DEFAULT_ZOOM).build();
-//                                mapView.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//                            }
+//                            final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
+//                            MainActivity.info( "set center: " + center + " network: " + network.getSsid()
+//                                    + " point: " + network.getLatLng());
+//                            mapView.getMapAsync(new OnMapReadyCallback() {
+//                                @Override
+//                                public void onMapReady(final GoogleMap googleMap) {
+//                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                            .target(center).zoom(DEFAULT_ZOOM).build();
+//                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                                }
+//                            });
 
                             first = false;
                         }
 
-//                        if (mapView.getMap() != null && network.getLatLng() != null && mapRender != null) {
+//                        if (network.getLatLng() != null && mapRender != null) {
 //                            mapRender.addItem(network);
 //                        }
                     }
@@ -219,10 +226,10 @@ public class DBResultActivity extends ActionBarActivity {
                 }
 
                 handler.sendEmptyMessage( MSG_QUERY_DONE );
-                if ( mapView != null ) {
-                    // force a redraw
+//                if ( mapView != null ) {
+//                    // force a redraw
 //                    mapView.postInvalidate();
-                }
+//                }
             }
         });
 

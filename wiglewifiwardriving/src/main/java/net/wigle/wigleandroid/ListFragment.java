@@ -27,22 +27,31 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.MainActivity.State;
-import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.background.TransferListener;
+import net.wigle.wigleandroid.background.ApiListener;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
+
+import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.Set;
 
-public final class ListFragment extends Fragment implements TransferListener, DialogListener {
+import pl.droidsonroids.gif.GifImageView;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
     private static final int MENU_SCAN = 14;
@@ -52,7 +61,6 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
     private static final int SORT_DIALOG = 100;
     private static final int UPLOAD_DIALOG = 101;
-    private static final int SSID_FILTER = 102;
 
     public static final float MIN_DISTANCE_ACCURACY = 32f;
 
@@ -62,6 +70,8 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String PREF_PASSWORD = "password";
     public static final String PREF_AUTHNAME = "authname";
     public static final String PREF_TOKEN = "token";
+    public static final String PREF_TOKEN_IV = "tokenIV";
+    public static final String PREF_TOKEN_TAG_LENGTH = "tokenTagLength";
     public static final String PREF_SHOW_CURRENT = "showCurrent";
     public static final String PREF_BE_ANONYMOUS = "beAnonymous";
     public static final String PREF_DONATE = "donate";
@@ -96,6 +106,16 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
     public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
     public static final String PREF_MAP_TYPE = "mapType";
+    public static final String PREF_BLOWED_UP = "blowedUp";
+    public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
+    public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
+    public static final String PREF_MAP_NO_TILE = "NONE";
+    public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
+    public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
+    public static final String PREF_MAP_ALL_TILE = "ALL";
+    public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
+    public static final String PREF_EXCLUDE_DISPLAY_ADDRS = "displayExcludeAddresses";
+    public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -120,6 +140,10 @@ public final class ListFragment extends Fragment implements TransferListener, Di
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 
+    // rank stats data
+    public static final String PREF_RANK = "rank";
+    public static final String PREF_MONTH_RANK = "monthRank";
+
     public static final String NETWORK_EXTRA_BSSID = "extraBssid";
     public static final String NETWORK_EXTRA_IS_DB_RESULT = "extraIsDbResult";
 
@@ -141,6 +165,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         public Set<String> runNetworks;
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
+        public OUI oui;
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -208,6 +233,27 @@ public final class ListFragment extends Fragment implements TransferListener, Di
             final TextView tv = (TextView) view.findViewById( R.id.status );
             tv.setText( status );
         }
+        MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            setScanningStatusIndicator(ma.isScanning());
+        }
+    }
+
+    public void setScanningStatusIndicator(boolean scanning) {
+        View view = getView();
+        if (view != null) {
+            final GifImageView scanningImageView = (GifImageView) view.findViewById(R.id.scanning);
+            final ImageView notScanningImageView = (ImageView) view.findViewById(R.id.not_scanning);
+            if (scanning) {
+                scanningImageView.setVisibility(VISIBLE);
+                notScanningImageView.setVisibility(GONE);
+            } else {
+                scanningImageView.setVisibility(GONE);
+                notScanningImageView.setVisibility(VISIBLE);
+
+            }
+        }
+
     }
 
     @Override
@@ -221,6 +267,8 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         MainActivity.info( "LIST: resumed.");
         super.onResume();
         getActivity().setTitle(R.string.list_app_name);
+        //ALIBI: default status can confuse users on resume
+        setStatusUI(null);
     }
 
     @Override
@@ -262,6 +310,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
         item.setIcon(android.R.drawable.ic_menu_search);
+        item.setIcon(android.R.drawable.ic_menu_manage);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
@@ -279,7 +328,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         item.setIcon( android.R.drawable.ic_menu_gallery );
 
         final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-        boolean muted = prefs.getBoolean(PREF_MUTED, false);
+        boolean muted = prefs.getBoolean(PREF_MUTED, true);
         item = menu.add(0, MENU_MUTE, 0,
                 muted ? getString(R.string.play) : getString(R.string.mute));
         item.setIcon( muted ? android.R.drawable.ic_media_play
@@ -312,19 +361,20 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 return true;
             }
             case MENU_SCAN: {
-                boolean scanning = ! (main == null || main.isScanning());
-                final Editor edit = getActivity().getSharedPreferences( SHARED_PREFS, 0 ).edit();
-                edit.putBoolean(PREF_SCAN_RUNNING, scanning);
-                edit.apply();
-                String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
-                item.setTitle( name );
-                item.setIcon((main == null || main.isScanning())
-                        ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play );
-                handleScanChange( getView() );
+                if (main != null) {
+                    final boolean scanning = !main.isScanning();
+                    main.handleScanChange(scanning);
+                    String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
+                    item.setTitle(name);
+                    item.setIcon(scanning ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
+                    handleScanChange(main, getView());
+                }
+
                 return true;
             }
             case MENU_FILTER:
-                onCreateDialog(SSID_FILTER);
+                final Intent intent = new Intent(getActivity(), FilterActivity.class);
+                getActivity().startActivity(intent);
                 return true;
             case MENU_MAP:
                 // call over to finish
@@ -332,7 +382,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-                boolean muted = prefs.getBoolean(PREF_MUTED, false);
+                boolean muted = prefs.getBoolean(PREF_MUTED, true);
                 muted = ! muted;
                 Editor editor = prefs.edit();
                 editor.putBoolean(PREF_MUTED, muted);
@@ -345,24 +395,20 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         return false;
     }
 
-    private void handleScanChange( final View view ) {
-        MainActivity main = MainActivity.getMainActivity(this);
+    private void handleScanChange(final MainActivity main, final View view ) {
         final boolean isScanning = main == null || main.isScanning();
-        MainActivity.info("handleScanChange: isScanning now: " + isScanning );
+        MainActivity.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
-            setStatusUI( view, "Scanning Turned On" );
+            setStatusUI(view, getString(R.string.list_scanning_on));
         }
         else {
-            setStatusUI(view, "Scanning Turned Off");
+            setStatusUI(view, getString(R.string.list_scanning_off));
         }
     }
 
     public void onCreateDialog( int which ) {
         DialogFragment dialogFragment = null;
         switch ( which ) {
-            case SSID_FILTER:
-                dialogFragment = MappingFragment.createSsidFilterDialog(FILTER_PREF_PREFIX);
-                break;
             case SORT_DIALOG:
                 dialogFragment = new SortDialog();
                 break;
@@ -489,8 +535,9 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
     private void setupLocation( final View view ) {
         // set on UI if we already have one
-        setLocationUI( MainActivity.getMainActivity( this ), view );
-        handleScanChange(view);
+        final MainActivity main = MainActivity.getMainActivity(this);
+        setLocationUI(main, view);
+        handleScanChange(main, view);
     }
 
     public void setLocationUI( final MainActivity main ) {
@@ -520,6 +567,7 @@ public final class ListFragment extends Fragment implements TransferListener, Di
                 }
                 else {
                     latText = getString(R.string.list_scanning_off);
+                    setScanningStatusIndicator(false);
                 }
             }
             else {
@@ -572,24 +620,54 @@ public final class ListFragment extends Fragment implements TransferListener, Di
 
     private void setupUploadButton( final View view ) {
         final Button button = (Button) view.findViewById( R.id.upload_button );
+
+        if (MainActivity.getMainActivity().isTransferring()) {
+            button.setEnabled(false);
+        }
+
         button.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View view ) {
                 final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
                 if (main == null) {return;}
-                final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                final String username = prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
-                final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-                MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
+                final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
+                final State state = MainActivity.getStaticState();
+
+                if (userConfirmed) {
+                    uploadFile( state.dbHelper );
+                } else {
+                    makeUploadDialog(main);
+                }
             }
         });
     }
 
+    public void makeUploadDialog(final MainActivity main) {
+        final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final String username = beAnonymous? "anonymous":
+                prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+
+        final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
+        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
+    }
+
     @Override
     public void handleDialog(final int dialogId) {
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences.Editor editor = prefs.edit();
         switch (dialogId) {
             case UPLOAD_DIALOG:
                 final State state = MainActivity.getStaticState();
+                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
+                final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
+
+                if (!userConfirmed && !authUser.isEmpty()) {
+                    //remember the confirmation
+                    editor.putBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER, true);
+                    editor.apply();
+                }
                 uploadFile( state.dbHelper );
                 break;
             default:
@@ -604,18 +682,25 @@ public final class ListFragment extends Fragment implements TransferListener, Di
         final State state = main.getState();
         main.setTransferring();
         // actually need this Activity context, for dialogs
-        state.fileUploaderTask = new FileUploaderTask( getActivity(), dbHelper, this, false );
-        state.fileUploaderTask.start();
+        // writeEntireDb and writeRun are both false, so PREF_DB_MARKER is used
+        state.observationUploader = new ObservationUploader(main,
+                ListFragment.lameStatic.dbHelper, this, false, false, false);
+        try {
+            state.observationUploader.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.warn("Authentication failure on run upload");
+        }
     }
 
     /**
-     * TransferListener interface
+     * ApiListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         final MainActivity main = MainActivity.getMainActivity( this );
         if (main == null) {
-            MainActivity.warn("No main for transferComplete");
+            MainActivity.warn("No main for requestComplete");
         }
         else {
             main.transferComplete();

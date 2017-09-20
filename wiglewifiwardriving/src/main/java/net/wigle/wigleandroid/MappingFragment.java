@@ -1,5 +1,14 @@
 package net.wigle.wigleandroid;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -8,17 +17,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,9 +54,16 @@ import android.widget.Toast;
 //import com.google.android.gms.maps.GoogleMap;
 //import com.google.android.gms.maps.MapView;
 //import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.model.CameraPosition;
 //import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.Tile;
+//import com.google.android.gms.maps.model.TileOverlay;
+//import com.google.android.gms.maps.model.TileOverlayOptions;
+//import com.google.android.gms.maps.model.TileProvider;
+//import com.google.android.gms.maps.model.UrlTileProvider;
 
+import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.LatLng;
@@ -58,21 +79,25 @@ public final class MappingFragment extends Fragment {
         private LatLng oldCenter = null;
         private final int oldZoom = Integer.MIN_VALUE;
     }
+
     private final State state = new State();
 
-    private Object mapView;
+//    private MapView mapView;
 //    private MapRender mapRender;
     private final Handler timer = new Handler();
     private AtomicBoolean finishing;
     private Location previousLocation;
     private int previousRunNets;
+//    private TileOverlay tileOverlay;
 
     private static final String DIALOG_PREFIX = "DialogPrefix";
     public static final String MAP_DIALOG_PREFIX = "";
     public static LocationListener STATIC_LOCATION_LISTENER = null;
 
+    static final int UPDATE_MAP_FILTER = 1;
+
     private static final int DEFAULT_ZOOM = 17;
-    public static final LatLng DEFAULT_POINT = new LatLng( 41.95d, -87.65d );
+    public static final LatLng DEFAULT_POINT = new LatLng(41.95d, -87.65d);
     private static final int MENU_EXIT = 12;
     private static final int MENU_ZOOM_IN = 13;
     private static final int MENU_ZOOM_OUT = 14;
@@ -87,18 +112,25 @@ public final class MappingFragment extends Fragment {
 
     private static final int SSID_FILTER = 102;
 
+    private static final String MAP_TILE_URL_FORMAT =
+            "https://wigle.net/clientTile?zoom=%d&x=%d&y=%d&startTransID=%s&endTransID=%s";
+
+    private static final String HIGH_RES_TILE_TRAILER = "&sizeX=512&sizeY=512";
+    private static final String ONLY_MINE_TILE_TRAILER = "&onlymine=1";
+    private static final String NOT_MINE_TILE_TRAILER = "&notmine=1";
+
     /** Called when the activity is first created. */
     @Override
-    public void onCreate( final Bundle savedInstanceState ) {
+    public void onCreate(final Bundle savedInstanceState) {
         MainActivity.info("MAP: onCreate");
-        super.onCreate( savedInstanceState );
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
-        MainActivity.setLocale( getActivity() );
-        finishing = new AtomicBoolean( false );
+        MainActivity.setLocale(getActivity());
+        finishing = new AtomicBoolean(false);
 
         // media volume
-        getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
+        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         setupQuery();
     }
@@ -108,192 +140,311 @@ public final class MappingFragment extends Fragment {
 //        mapView = new MapView(getActivity());
 //        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
 //        if (serviceAvailable == ConnectionResult.SUCCESS) {
-//            mapView.onCreate(savedInstanceState);
-//        }
-//        else {
-//            Toast.makeText( getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG ).show();
+//            try {
+//                mapView.onCreate(savedInstanceState);
+//            }
+//            catch (final SecurityException ex) {
+//                MainActivity.error("security exception oncreateview map: " + ex, ex);
+//                Toast.makeText(getActivity(), getString(R.string.status_fail), Toast.LENGTH_LONG).show();
+//            }
+//        } else {
+            Toast.makeText(getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG).show();
 //        }
 //        MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
 
-        LatLng oldCenter = null;
-        int oldZoom = Integer.MIN_VALUE;
-        if ( state.oldCenter != null ) {
-            // pry an orientation change, which calls destroy
-            oldCenter = state.oldCenter;
-            oldZoom = state.oldZoom;
-        }
-
-        setupMapView( view, oldCenter, oldZoom );
+//        LatLng oldCenter = null;
+//        int oldZoom = Integer.MIN_VALUE;
+//        if (state.oldCenter != null) {
+//            // pry an orientation change, which calls destroy
+//            oldCenter = state.oldCenter;
+//            oldZoom = state.oldZoom;
+//        }
+//
+//        setupMapView(view, oldCenter, oldZoom);
         return view;
     }
 
-    /**
-     * This call has thrown an npe in the wild
-     * @return the google map from the map view, or null
-     */
-    private Object getMap() {
-//        try {
-//            return mapView.getMap();
-//        }
-//        catch (NullPointerException ex) {
-//            MainActivity.info("npe in mapView.getMap(): " + ex, ex);
-//        }
-        return null;
-    }
-
-    private void setupMapView( final View view, final LatLng oldCenter, final int oldZoom ) {
-        // view
-        final RelativeLayout rlView = (RelativeLayout) view.findViewById( R.id.map_rl );
-
-        if (mapView != null) {
-            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//            mapView.setLayoutParams(params);
-        }
-
-        // conditionally replace the tile source
-        final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-//        rlView.addView( mapView );
-        // guard against not having google play services
-//        if (getMap() != null) {
-//            getMap().setMyLocationEnabled(true);
-//            getMap().setBuildingsEnabled(true);
-//            final boolean showTraffic = prefs.getBoolean( ListFragment.PREF_MAP_TRAFFIC, true );
-//            getMap().setTrafficEnabled(showTraffic);
-//            final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-//            getMap().setMapType(mapType);
-//            mapRender = new MapRender(getActivity(), getMap(), false);
+//    private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
+//        // view
+//        final RelativeLayout rlView = (RelativeLayout) view.findViewById(R.id.map_rl);
 //
-//            // controller
-//            final LatLng centerPoint = getCenter( getActivity(), oldCenter, previousLocation );
-//            float zoom = DEFAULT_ZOOM;
-//            if ( oldZoom >= 0 ) {
-//                zoom = oldZoom;
+//        if (mapView != null) {
+//            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//            mapView.setLayoutParams(params);
+//        }
+//
+//        // conditionally replace the tile source
+//        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+//        rlView.addView(mapView);
+//        // guard against not having google play services
+//        mapView.getMapAsync(new OnMapReadyCallback() {
+//            @Override
+//            public void onMapReady(final GoogleMap googleMap) {
+//                if (ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+//                        || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                    googleMap.setMyLocationEnabled(true);
+//                }
+//
+//                googleMap.setBuildingsEnabled(true);
+//                final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
+//                googleMap.setTrafficEnabled(showTraffic);
+//                final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                googleMap.setMapType(mapType);
+//                mapRender = new MapRender(getActivity(), googleMap, false);
+//
+//                // controller
+//                final LatLng centerPoint = getCenter(getActivity(), oldCenter, previousLocation);
+//                float zoom = DEFAULT_ZOOM;
+//                if (oldZoom >= 0) {
+//                    zoom = oldZoom;
+//                } else {
+//                    zoom = prefs.getFloat(ListFragment.PREF_PREV_ZOOM, zoom);
+//                }
+//
+//                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                        .target(centerPoint).zoom(zoom).build();
+//                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//
+//                if (!ListFragment.PREF_MAP_NO_TILE.equals(
+//                        prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+//                                ListFragment.PREF_MAP_NO_TILE))) {
+//                    final int providerTileRes = MainActivity.isHighDefinition()?512:256;
+//
+//                    //TODO: DRY up token composition vs AbstractApiRequest?
+//                    String ifAuthToken = null;
+//                    try {
+//                        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+//                        final String token = TokenAccess.getApiToken(prefs);
+//                        if ((null != authname) && (null != token)) {
+//                            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+//                            ifAuthToken = "Basic " + encoded;
+//                        }
+//                    } catch (UnsupportedEncodingException ueex) {
+//                        MainActivity.error("map tiles unable to encode credentials for mine/others");
+//                    }
+//                    final String authToken = ifAuthToken;
+//
+//                    final String userAgent = AbstractApiRequest.getUserAgentString();
+//
+//
+//                    TileProvider tileProvider = new TileProvider() {
+//                        @Override
+//                        public Tile getTile(int x, int y, int zoom) {
+//                            if (!checkTileExists(x, y, zoom)) {
+//                                return null;
+//                            }
+//
+//                            final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
+//                            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+//                            String tileContents = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+//                                    ListFragment.PREF_MAP_NO_TILE);
+//
+//                            String sinceString = String.format("%d0000-00000", since);
+//                            String toString = String.format("%d0000-00000", thisYear+1);
+//                            String s = String.format(MAP_TILE_URL_FORMAT,
+//                                    zoom, x, y, sinceString, toString);
+//
+//                            if (MainActivity.isHighDefinition()) {
+//                                    s += HIGH_RES_TILE_TRAILER;
+//                            }
+//
+//                            // ALIBI: defaults to "ALL"
+//                            if (ListFragment.PREF_MAP_ONLYMINE_TILE.equals(tileContents)) {
+//                                s += ONLY_MINE_TILE_TRAILER;
+//                            } else if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(tileContents)) {
+//                                s += NOT_MINE_TILE_TRAILER;
+//                            }
+//
+//                            //DEBUG: MainActivity.info("map URL: " + s);
+//
+//                            try {
+//                                final byte[] data = downloadData(new URL(s), userAgent, authToken);
+//                                if (data != null) {
+//                                    return new Tile(providerTileRes, providerTileRes, data);
+//                                }
+//                            } catch (MalformedURLException e) {
+//                                throw new AssertionError(e);
+//                            }
+//                            return null;
+//                        }
+//
+//                        /*
+//                         * depends on supported levels on the server
+//                         */
+//                        private boolean checkTileExists(int x, int y, int zoom) {
+//                            int minZoom = 0;
+//                            int maxZoom = 24;
+//
+//                            if ((zoom < minZoom || zoom > maxZoom)) {
+//                                return false;
+//                            }
+//
+//                            return true;
+//                        }
+//
+//                        private byte[] downloadData(final URL url, final String userAgent, final String authToken) {
+//                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                            InputStream is = null;
+//                            try {
+//                                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+//                                if (null != authToken) {
+//                                    conn.setRequestProperty("Authorization", authToken);
+//                                }
+//                                conn.setRequestProperty("User-Agent", userAgent);
+//                                is = conn.getInputStream();
+//                                byte[] byteChunk = new byte[4096];
+//                                int n;
+//
+//                                while ((n = is.read(byteChunk)) > 0) {
+//                                    baos.write(byteChunk, 0, n);
+//                                }
+//                            } catch (IOException e) {
+//                                MainActivity.error("Failed while reading bytes from " +
+//                                        url.toExternalForm() + ": "+ e.getMessage());
+//                                e.printStackTrace();
+//                            } finally {
+//                                if (is != null) {
+//                                    try {
+//                                        is.close();
+//                                    } catch (IOException ioex) {
+//                                        MainActivity.error("Failed while closing InputStream " +
+//                                                url.toExternalForm() + ": "+ ioex.getMessage());
+//                                        ioex.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                            return baos.toByteArray();
+//                        }
+//                    };
+//
+//
+//
+//                    tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
+//                            .tileProvider(tileProvider).transparency(0.35f));
+//                }
+//            }
+//        });
+//        MainActivity.info("done setupMapView.");
+//    }
+
+//    public static LatLng getCenter( final Context context, final LatLng priorityCenter,
+//                                    final Location previousLocation ) {
+//
+//        LatLng centerPoint = DEFAULT_POINT;
+//        final Location location = ListFragment.lameStatic.location;
+//        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+//
+//        if ( priorityCenter != null ) {
+//            centerPoint = priorityCenter;
+//        }
+//        else if ( location != null ) {
+//            centerPoint = new LatLng( location.getLatitude(), location.getLongitude() );
+//        }
+//        else if ( previousLocation != null ) {
+//            centerPoint = new LatLng( previousLocation.getLatitude(), previousLocation.getLongitude() );
+//        }
+//        else {
+//            final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
+//            final Location networkLocation = safelyGetLast(context, LocationManager.NETWORK_PROVIDER);
+//
+//            if ( gpsLocation != null ) {
+//                centerPoint = new LatLng( gpsLocation.getLatitude(), gpsLocation.getLongitude()  );
+//            }
+//            else if ( networkLocation != null ) {
+//                centerPoint = new LatLng( networkLocation.getLatitude(), networkLocation.getLongitude()  );
 //            }
 //            else {
-//                zoom = prefs.getFloat( ListFragment.PREF_PREV_ZOOM, zoom );
+//                // ok, try the saved prefs
+//                float lat = prefs.getFloat( ListFragment.PREF_PREV_LAT, Float.MIN_VALUE );
+//                float lon = prefs.getFloat( ListFragment.PREF_PREV_LON, Float.MIN_VALUE );
+//                if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
+//                    centerPoint = new LatLng( lat, lon );
+//                }
 //            }
-//
-//            final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                    .target(centerPoint).zoom(zoom).build();
-//            getMap().moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //        }
-        MainActivity.info("done setupMapView.");
-    }
-
-    public static LatLng getCenter( final Context context, final LatLng priorityCenter,
-                                    final Location previousLocation ) {
-
-        LatLng centerPoint = DEFAULT_POINT;
-        final Location location = ListFragment.lameStatic.location;
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-
-        if ( priorityCenter != null ) {
-            centerPoint = priorityCenter;
-        }
-        else if ( location != null ) {
-            centerPoint = new LatLng( location.getLatitude(), location.getLongitude() );
-        }
-        else if ( previousLocation != null ) {
-            centerPoint = new LatLng( previousLocation.getLatitude(), previousLocation.getLongitude() );
-        }
-        else {
-            final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
-            final Location networkLocation = safelyGetLast(context, LocationManager.NETWORK_PROVIDER);
-
-            if ( gpsLocation != null ) {
-                centerPoint = new LatLng( gpsLocation.getLatitude(), gpsLocation.getLongitude()  );
-            }
-            else if ( networkLocation != null ) {
-                centerPoint = new LatLng( networkLocation.getLatitude(), networkLocation.getLongitude()  );
-            }
-            else {
-                // ok, try the saved prefs
-                float lat = prefs.getFloat( ListFragment.PREF_PREV_LAT, Float.MIN_VALUE );
-                float lon = prefs.getFloat( ListFragment.PREF_PREV_LON, Float.MIN_VALUE );
-                if ( lat != Float.MIN_VALUE && lon != Float.MIN_VALUE ) {
-                    centerPoint = new LatLng( lat, lon );
-                }
-            }
-        }
-
-        return centerPoint;
-    }
-
-    private static Location safelyGetLast( final Context context, final String provider ) {
-        Location retval = null;
-        try {
-            final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            retval = locationManager.getLastKnownLocation( provider );
-        }
-        catch ( final IllegalArgumentException | SecurityException ex ) {
-            MainActivity.info("exception getting last known location: " + ex);
-        }
-        return retval;
-    }
-
-    final Runnable mUpdateTimeTask = new MapRunnable();
-    private class MapRunnable implements Runnable {
-        @Override
-        public void run() {
-            // make sure the app isn't trying to finish
-            if ( ! finishing.get() ) {
-                final Location location = ListFragment.lameStatic.location;
-                if ( location != null ) {
-                    if ( state.locked ) {
-                        if (getMap() != null) {
-                            // MainActivity.info( "mapping center location: " + location );
-                            final LatLng locLatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-//                            final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
-//                            if ( state.firstMove ) {
-//                                getMap().moveCamera(centerUpdate);
-//                                state.firstMove = false;
+//
+//        return centerPoint;
+//    }
+//
+//    private static Location safelyGetLast( final Context context, final String provider ) {
+//        Location retval = null;
+//        try {
+//            final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+//            retval = locationManager.getLastKnownLocation( provider );
+//        }
+//        catch ( final IllegalArgumentException | SecurityException ex ) {
+//            MainActivity.info("exception getting last known location: " + ex);
+//        }
+//        return retval;
+//    }
+//
+//    final Runnable mUpdateTimeTask = new MapRunnable();
+//    private class MapRunnable implements Runnable {
+//        @Override
+//        public void run() {
+//            // make sure the app isn't trying to finish
+//            if ( ! finishing.get() ) {
+//                final Location location = ListFragment.lameStatic.location;
+//                if ( location != null ) {
+//                    if ( state.locked ) {
+//                        mapView.getMapAsync(new OnMapReadyCallback() {
+//                            @Override
+//                            public void onMapReady(final GoogleMap googleMap) {
+//                                // MainActivity.info( "mapping center location: " + location );
+//                                final LatLng locLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+//                                final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
+//                                if (state.firstMove) {
+//                                    googleMap.moveCamera(centerUpdate);
+//                                    state.firstMove = false;
+//                                } else {
+//                                    googleMap.animateCamera(centerUpdate);
+//                                }
 //                            }
-//                            else {
-//                                getMap().animateCamera(centerUpdate);
-//                            }
-                        }
-                    }
-                    else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
-                            || previousLocation.getLongitude() != location.getLongitude()
-                            || previousRunNets != ListFragment.lameStatic.runNets) {
-                        // location or nets have changed, update the view
-                        if (mapView != null) {
+//                        });
+//                    }
+//                    else if ( previousLocation == null || previousLocation.getLatitude() != location.getLatitude()
+//                            || previousLocation.getLongitude() != location.getLongitude()
+//                            || previousRunNets != ListFragment.lameStatic.runNets) {
+//                        // location or nets have changed, update the view
+//                        if (mapView != null) {
 //                            mapView.postInvalidate();
-                        }
-                    }
-                    // set if location isn't null
-                    previousLocation = location;
-                }
+//                        }
+//                    }
+//                    // set if location isn't null
+//                    previousLocation = location;
+//                }
+//
+//                previousRunNets = ListFragment.lameStatic.runNets;
+//
+//                final View view = getView();
+//
+//                if (view != null) {
+//                    TextView tv = (TextView) view.findViewById(R.id.stats_run);
+//                    tv.setText(getString(R.string.run) + ": " + ListFragment.lameStatic.runNets);
+//                    tv = (TextView) view.findViewById(R.id.stats_new);
+//                    tv.setText(getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets);
+//                    tv = (TextView) view.findViewById(R.id.stats_dbnets);
+//                    tv.setText(getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets);
+//                }
+//
+//                final long period = 1000L;
+//                // info("wifitimer: " + period );
+//                timer.postDelayed( this, period );
+//            }
+//            else {
+//                MainActivity.info( "finishing mapping timer" );
+//            }
+//        }
+//    }
 
-                previousRunNets = ListFragment.lameStatic.runNets;
-
-                final View view = getView();
-
-                if (view != null) {
-                    TextView tv = (TextView) view.findViewById(R.id.stats_run);
-                    tv.setText(getString(R.string.run) + ": " + ListFragment.lameStatic.runNets);
-                    tv = (TextView) view.findViewById(R.id.stats_new);
-                    tv.setText(getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets);
-                    tv = (TextView) view.findViewById(R.id.stats_dbnets);
-                    tv.setText(getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets);
-                }
-
-                final long period = 1000L;
-                // info("wifitimer: " + period );
-                timer.postDelayed( this, period );
-            }
-            else {
-                MainActivity.info( "finishing mapping timer" );
-            }
-        }
-    }
-
-    private void setupTimer() {
-        timer.removeCallbacks( mUpdateTimeTask );
-        timer.postDelayed( mUpdateTimeTask, 250 );
-    }
+//    private void setupTimer() {
+//        timer.removeCallbacks( mUpdateTimeTask );
+//        timer.postDelayed( mUpdateTimeTask, 250 );
+//    }
 
     @Override
     public void onDetach() {
@@ -306,16 +457,19 @@ public final class MappingFragment extends Fragment {
         MainActivity.info( "MAP: destroy mapping." );
         finishing.set( true );
 
-//        if (getMap() != null) {
-            // save zoom
-//            final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-//            final Editor edit = prefs.edit();
-//            edit.putFloat( ListFragment.PREF_PREV_ZOOM, getMap().getCameraPosition().zoom );
-//            edit.apply();
+//        mapView.getMapAsync(new OnMapReadyCallback() {
+//            @Override
+//            public void onMapReady(final GoogleMap googleMap) {
+//                // save zoom
+//                final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+//                final Editor edit = prefs.edit();
+//                edit.putFloat( ListFragment.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom );
+//                edit.apply();
 //
-//            // save center
-//            state.oldCenter = getMap().getCameraPosition().target;
-//        }
+//                // save center
+//                state.oldCenter = googleMap.getCameraPosition().target;
+//            }
+//        });
 //        try {
 //            mapView.onDestroy();
 //        }
@@ -346,9 +500,21 @@ public final class MappingFragment extends Fragment {
     @Override
     public void onResume() {
         MainActivity.info( "MAP: onResume" );
+//        if (mapRender != null) {
+//            mapRender.onResume();
+//        }
+//        if (null != mapView) {
+//            //refresh tiles on resume
+//            mapView.postInvalidate();
+//        }
+//
+//        if (null != tileOverlay) {
+//            //DEBUG: MainActivity.info("clearing tile overlay cache");
+//            tileOverlay.clearTileCache();
+//        }
         super.onResume();
 
-        setupTimer();
+//        setupTimer();
         getActivity().setTitle(R.string.mapping_app_name);
 //        mapView.onResume();
     }
@@ -412,7 +578,7 @@ public final class MappingFragment extends Fragment {
         item.setIcon( android.R.drawable.ic_menu_mapmode );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
-        item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
+        item = menu.add(0, MENU_FILTER, 0, getString(R.string.settings_map_head));
         item.setIcon( android.R.drawable.ic_menu_search );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
@@ -455,21 +621,27 @@ public final class MappingFragment extends Fragment {
                 return true;
             }
             case MENU_ZOOM_IN: {
-//                if (getMap() != null) {
-//                    float zoom = getMap().getCameraPosition().zoom;
-//                    zoom++;
-//                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-//                    getMap().animateCamera(zoomUpdate);
-//                }
+//                mapView.getMapAsync(new OnMapReadyCallback() {
+//                    @Override
+//                    public void onMapReady(final GoogleMap googleMap) {
+//                        float zoom = googleMap.getCameraPosition().zoom;
+//                        zoom++;
+//                        final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+//                        googleMap.animateCamera(zoomUpdate);
+//                    }
+//                });
                 return true;
             }
             case MENU_ZOOM_OUT: {
-//                if (getMap() != null) {
-//                    float zoom = getMap().getCameraPosition().zoom;
-//                    zoom--;
-//                    final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
-//                    getMap().animateCamera(zoomUpdate);
-//                }
+//                mapView.getMapAsync(new OnMapReadyCallback() {
+//                    @Override
+//                    public void onMapReady(final GoogleMap googleMap) {
+//                        float zoom = googleMap.getCameraPosition().zoom;
+//                        zoom--;
+//                        final CameraUpdate zoomUpdate = CameraUpdateFactory.zoomTo(zoom);
+//                        googleMap.animateCamera(zoomUpdate);
+//                    }
+//                });
                 return true;
             }
             case MENU_TOGGLE_LOCK: {
@@ -527,43 +699,50 @@ public final class MappingFragment extends Fragment {
 
                 String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
                 item.setTitle( name );
-//                if (getMap() != null) {
-//                    getMap().setTrafficEnabled(showTraffic);
-//                }
+//                mapView.getMapAsync(new OnMapReadyCallback() {
+//                    @Override
+//                    public void onMapReady(final GoogleMap googleMap) {
+//                        googleMap.setTrafficEnabled(showTraffic);
+//                    }
+//                });
                 return true;
             }
             case MENU_FILTER: {
-                onCreateDialog( SSID_FILTER );
+                final Intent intent = new Intent(getActivity(), MapFilterActivity.class);
+                getActivity().startActivityForResult(intent, UPDATE_MAP_FILTER);
                 return true;
             }
             case MENU_MAP_TYPE: {
-//                if (getMap() != null) {
-//                    int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-//                    switch (newMapType) {
-//                        case GoogleMap.MAP_TYPE_NORMAL:
-//                            newMapType = GoogleMap.MAP_TYPE_SATELLITE;
-//                            Toast.makeText( getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT ).show();
-//                            break;
-//                        case GoogleMap.MAP_TYPE_SATELLITE:
-//                            newMapType = GoogleMap.MAP_TYPE_HYBRID;
-//                            Toast.makeText( getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT ).show();
-//                            break;
-//                        case GoogleMap.MAP_TYPE_HYBRID:
-//                            newMapType = GoogleMap.MAP_TYPE_TERRAIN;
-//                            Toast.makeText( getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT ).show();
-//                            break;
-//                        case GoogleMap.MAP_TYPE_TERRAIN:
-//                            newMapType = GoogleMap.MAP_TYPE_NORMAL;
-//                            Toast.makeText( getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT ).show();
-//                            break;
-//                        default:
-//                            MainActivity.error("unhandled mapType: " + newMapType);
+//                mapView.getMapAsync(new OnMapReadyCallback() {
+//                    @Override
+//                    public void onMapReady(final GoogleMap googleMap) {
+//                        int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                        switch (newMapType) {
+//                            case GoogleMap.MAP_TYPE_NORMAL:
+//                                newMapType = GoogleMap.MAP_TYPE_SATELLITE;
+//                                Toast.makeText(getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT).show();
+//                                break;
+//                            case GoogleMap.MAP_TYPE_SATELLITE:
+//                                newMapType = GoogleMap.MAP_TYPE_HYBRID;
+//                                Toast.makeText(getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT).show();
+//                                break;
+//                            case GoogleMap.MAP_TYPE_HYBRID:
+//                                newMapType = GoogleMap.MAP_TYPE_TERRAIN;
+//                                Toast.makeText(getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT).show();
+//                                break;
+//                            case GoogleMap.MAP_TYPE_TERRAIN:
+//                                newMapType = GoogleMap.MAP_TYPE_NORMAL;
+//                                Toast.makeText(getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT).show();
+//                                break;
+//                            default:
+//                                MainActivity.error("unhandled mapType: " + newMapType);
+//                        }
+//                        Editor edit = prefs.edit();
+//                        edit.putInt(ListFragment.PREF_MAP_TYPE, newMapType);
+//                        edit.apply();
+//                        googleMap.setMapType(newMapType);
 //                    }
-//                    Editor edit = prefs.edit();
-//                    edit.putInt( ListFragment.PREF_MAP_TYPE, newMapType );
-//                    edit.apply();
-//                    getMap().setMapType(newMapType);
-//                }
+//                });
             }
             case MENU_WAKELOCK: {
                 boolean screenLocked = ! MainActivity.isScreenLocked( this );
@@ -574,22 +753,6 @@ public final class MappingFragment extends Fragment {
             }
         }
         return false;
-    }
-
-    public void onCreateDialog( int which ) {
-        DialogFragment dialogFragment = null;
-        switch ( which ) {
-            case SSID_FILTER:
-                dialogFragment = createSsidFilterDialog( MAP_DIALOG_PREFIX );
-                break;
-            default:
-                MainActivity.error( "unhandled dialog: " + which );
-        }
-
-        if (dialogFragment != null) {
-            final FragmentManager fm = getActivity().getSupportFragmentManager();
-            dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
-        }
     }
 
     public static class MapDialogFragment extends DialogFragment {
@@ -722,10 +885,10 @@ public final class MappingFragment extends Fragment {
 
             @Override
             public void complete() {
-                if ( mapView != null ) {
-                    // force a redraw
+//                if ( mapView != null ) {
+//                    // force a redraw
 //                    mapView.postInvalidate();
-                }
+//                }
             }
         });
         if (ListFragment.lameStatic.dbHelper != null) {

@@ -2,9 +2,11 @@ package net.wigle.wigleandroid;
 
 import java.util.List;
 
+import net.wigle.wigleandroid.background.ApiListener;
+import net.wigle.wigleandroid.background.LegacyObservationImporter;
+import net.wigle.wigleandroid.background.ObservationImporter;
+import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
-import net.wigle.wigleandroid.background.FileUploaderTask;
-import net.wigle.wigleandroid.background.HttpDownloader;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
@@ -19,6 +21,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -37,10 +40,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
+
 /**
  * configure settings
  */
-public final class DataFragment extends Fragment implements TransferListener, DialogListener {
+public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
     private static final int MENU_EXIT = 11;
     private static final int MENU_ERROR_REPORT = 13;
@@ -166,8 +172,14 @@ public final class DataFragment extends Fragment implements TransferListener, Di
      * TransferListener interface
      */
     @Override
-    public void transferComplete() {
+    public void requestComplete(final JSONObject json, final boolean isCache)
+            throws WiGLEAuthException {
         // nothing
+    }
+
+    @Override
+    public void transferComplete() {
+        // also nothing
     }
 
     private void setupCsvButtons( final View view ) {
@@ -229,14 +241,65 @@ public final class DataFragment extends Fragment implements TransferListener, Di
 
     private void setupImportObservedButton( final View view ) {
         final Button importObservedButton = (Button) view.findViewById( R.id.import_observed_button );
+        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
 
-        importObservedButton.setOnClickListener( new OnClickListener() {
+        if (null == authname) {
+            importObservedButton.setEnabled(false);
+        } else if (MainActivity.getMainActivity().isTransferring()) {
+                importObservedButton.setEnabled(false);
+        }
+        importObservedButton.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick( final View buttonView ) {
-                MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_import_observed), MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
+            public void onClick(final View buttonView) {
+                MainActivity.createConfirmation(getActivity(),
+                        DataFragment.this.getString(R.string.data_import_observed),
+                        MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
             }
         });
+    }
+
+    private void createAndStartImport() {
+        final MainActivity mainActivity = MainActivity.getMainActivity(DataFragment.this);
+        if (mainActivity != null) {
+            mainActivity.setTransferring();
+        }
+
+        // actually need this Activity context, for dialogs
+        if (Build.VERSION.SDK_INT >= 11) {
+
+            final ObservationImporter task = new ObservationImporter(getActivity(),
+                    ListFragment.lameStatic.dbHelper,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(JSONObject object, boolean cached) {
+                            if (mainActivity != null) {
+                                mainActivity.transferComplete();
+                            }
+                        }
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                //moot due to bundle handling
+            }
+        } else {
+            final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
+                    ListFragment.lameStatic.dbHelper,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(JSONObject object, boolean cached) {
+                            if (mainActivity != null) {
+                                mainActivity.transferComplete();
+                            }
+                        }
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                //moot due to bundle handling
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -281,17 +344,15 @@ public final class DataFragment extends Fragment implements TransferListener, Di
         switch (dialogId) {
             case CSV_RUN_DIALOG: {
                 // actually need this Activity context, for dialogs
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteRunOnly();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, false, true);
+                observationUploader.start();
                 break;
             }
             case CSV_DB_DIALOG: {
-                FileUploaderTask fileUploaderTask = new FileUploaderTask( getActivity(),
-                        ListFragment.lameStatic.dbHelper, DataFragment.this, true );
-                fileUploaderTask.setWriteWholeDb();
-                fileUploaderTask.start();
+                ObservationUploader observationUploader = new ObservationUploader(getActivity(),
+                        ListFragment.lameStatic.dbHelper, DataFragment.this, true, true, false);
+                observationUploader.start();
                 break;
             }
             case KML_RUN_DIALOG: {
@@ -311,21 +372,7 @@ public final class DataFragment extends Fragment implements TransferListener, Di
                 break;
             }
             case IMPORT_DIALOG: {
-                final MainActivity mainActivity = MainActivity.getMainActivity( DataFragment.this );
-                if ( mainActivity != null ) {
-                    mainActivity.setTransferring();
-                }
-                // actually need this Activity context, for dialogs
-                HttpDownloader task = new HttpDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                        new TransferListener() {
-                            @Override
-                            public void transferComplete() {
-                                if ( mainActivity != null ) {
-                                    mainActivity.transferComplete();
-                                }
-                            }
-                        });
-                task.start();
+                this.createAndStartImport();
                 break;
             }
             case ZERO_OUT_DIALOG: {

@@ -2,30 +2,32 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, affiche réseau sans fil, télécharger à la base WiGLE.
+Wardriving: netstumble: trouve les réseaux sans fil, et envoie les à la base WiGLE.
 
 Description (4000 characters):
-WiGLE est une source ouverte wardriving application de netstumble, l'affichage et la carte trouvée réseaux sans fil et des tours cellulaires partout dans le monde, facilement télécharger la base de données de WiGLE.net. WiGLE a été lancé en 2001 et a maintenant plus de 125 millions de réseaux WiFi mappés dans le monde entier.
+WiGLE est une application open source de wardriving  netstumble, afficher et cartographier les réseaux wifi sans fil trouvés, ainsi que les tours cellulaires partout dans le monde et de facilement les envoyer à base de données de WiGLE.net. WiGLE a été lancé en 2001 et a maintenant plus de 125 millions de réseaux WiFi mappés dans le monde entier.
 
-• Rivaliser sur le classement mondial WiGLE pour la plupart des réseaux situés!
-• Exportation vers des fichiers CSV sur la carte SD (comma-separated values)!
+• Rivaliser sur le classement mondial WiGLE sur le nombre de réseaux trouvés!
+• Exportation vers des fichiers CSV sur la carte SD (fichiers de données séparés par des virgules)!
 • Export des fichiers KML sur carte SD (à importer dans Google Maps/Earth)!
-• Audio et texte-parole d'alerte!
-• Base de données locale pour suivre les nouveaux réseaux trouvé!
+• Alertes audio et annonces vocales!
+• Base de donnée locale pour suivre les nouveaux réseaux trouvé!
 • Carte des réseaux détectés en temps réel (OpenStreetMap)!
-• Peut se déplacer application sur une carte SD!
+• Application déplaçable sur la carte SD!
 • Bouton "Muet" pour couper tous les sons/parole immédiatement!
-• GPS Bluetooth soutenir par les positions fictives!
-• Aucune annonce!
+• support du GPS Bluetooth en utilisant les positions fictives!
+• Aucune publicité!
 
 Les notes de version: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-Pour une connexion WiFi et des tours cellulaires pour être mappés, vous devez attendre que votre appareil pour déterminer l'emplacement actuel, via GPS ou un emplacement réseau.
-Sur la carte: les cercles sont WiFi, les places sont des tours cellulaires. Les couleurs claires sont des réseaux vus auparavant, les violets sont nouvelles pour la base de données locale.
-Si vous avez des problèmes pour vous connecter, ou des suggestions, envoyez-nous un email à wigle-admin@wigle.net et nous serons heureux de vous aider.
-Besoins »Lit Etat de téléphone" pour dire si un appel téléphonique est en cours, pour couper le son (sons et de la parole).
-Les fichiers sont disponibles pour aider à la traduction humaine de langues autres que l'anglais. Ce fut surtout une traduction mécanique, parce que nous ne savons évidemment pas toutes ces langues. Vous pouvez aider à améliorer les choses en faisant des demandes de tirage au:
-https://github.com/wiglenet/wigle-wifi-wardriving/pulls
-ou de les envoyer à wigle-admin@wigle.net.
+Pour que les émetteurs wifi et les tours cellulaires soient listés, vous devez attendre que votre appareil ait déterminé sa localisation actuelle via le GPS et/ou les tours cellulaires.
 
-Continuez à trébucher!
+
+Sur la carte: les cercles sont WiFi, les carrés sont des tours cellulaires. Les formes claires représentent des réseaux vus auparavant, les violettes représentent ceux qui sont nouveaux pour la base de donnée locale.
+Si vous avez des problèmes pour vous connecter, ou des suggestions, envoyez-nous un email à wigle-admin@wigle.net et nous serons heureux de vous aider.
+L'application a besoin de la permission de connaître l'état de téléphone pour savoir si un appel téléphonique est en cours afin de couper les sons (avertissements et synthèse vocale).
+Vous pouvez nous aider à la traduction en des langues autres que l'anglais a travers des fichiers sur le dépôt du projet. Pour la plupart, il s'agit de traduction automatique quand nous ne connaissons pas la langue en question. Pour envoyer vos propositions, faites soit une pull request sur https://github.com/wiglenet/wigle-wifi-wardriving/pulls
+Les fichiers sont disponibles pour aider à la traduction humaine de langues autres que l'anglais. Ce fut surtout une traduction mécanique, parce que nous ne savons évidemment pas toutes ces langues. Vous pouvez aider à améliorer les choses en faisant des demandes de tirage au:
+ou envoyez les à wigle-admin@wigle.net.
+
+Continuez à Wardriver!

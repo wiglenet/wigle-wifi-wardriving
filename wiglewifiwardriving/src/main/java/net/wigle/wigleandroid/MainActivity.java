@@ -74,6 +74,7 @@ import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -1570,8 +1571,7 @@ public final class MainActivity extends AppCompatActivity {
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
         if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
-            Toast.makeText(this, getString(R.string.best_results),
-                    Toast.LENGTH_LONG).show();
+            WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
         }
 
         final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
@@ -1584,7 +1584,7 @@ public final class MainActivity extends AppCompatActivity {
         if (!wifiManager.isWifiEnabled()) {
             // tell user, cuz this takes a little while
             if (!isFinishing()) {
-                Toast.makeText(this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_wifi));
             }
 
             // save so we can turn it back off when we exit
@@ -1709,10 +1709,11 @@ public final class MainActivity extends AppCompatActivity {
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
             if (locProvider == null && !isFinishing()) {
-                Toast.makeText(this, getString(R.string.no_gps_device), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.no_gps_device), Toast.LENGTH_LONG);
             } else if (!locationManager.isProviderEnabled(GPS_PROVIDER) && !isFinishing()) {
                 // gps exists, but isn't on
-                Toast.makeText(this, getString(R.string.turn_on_gps), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_gps), Toast.LENGTH_LONG);
+
                 final Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 try {
                     startActivity(myIntent);

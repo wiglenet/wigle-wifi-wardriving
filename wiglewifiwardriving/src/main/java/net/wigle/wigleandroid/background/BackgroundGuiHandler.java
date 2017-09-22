@@ -3,6 +3,8 @@ package net.wigle.wigleandroid.background;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.WiGLEToast;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -126,24 +128,10 @@ public class BackgroundGuiHandler extends Handler {
 
             if (Status.SUCCESS.equals(status)) {
                 //ALIBI: for now, success gets a long custom toast, other messages get dialogs
-                //TODO: if we decide to use custom toast elsewhere, move this to its own class?
-                LayoutInflater inflater = context.getLayoutInflater();
-                View layout = inflater.inflate(R.layout.wigle_detail_toast,
-                        (ViewGroup) context.findViewById(R.id.custom_toast_container));
-
-                TextView title = (TextView) layout.findViewById(R.id.toast_title_text);
-                title.setText(status.getTitle());
-
-                TextView text = (TextView) layout.findViewById(R.id.toast_message_text);
-                text.setText(composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
+                WiGLEToast.showOverFragment(context, status.getTitle(),
+                        composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
                         msg.peekData().getString( FILEPATH ), msg.peekData().getString( FILENAME ),
-                        status.getMessage() ));
-
-                Toast toast = new Toast(context.getApplicationContext());
-                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                toast.setDuration(Toast.LENGTH_LONG);
-                toast.setView(layout);
-                toast.show();
+                        status.getMessage()));
             } else {
                 final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
                 try {

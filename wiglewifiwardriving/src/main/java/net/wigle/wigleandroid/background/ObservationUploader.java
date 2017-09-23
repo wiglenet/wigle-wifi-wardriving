@@ -685,15 +685,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         }
 
-        @SuppressWarnings({ "deprecation", "resource" })
-        final FileOutputStream rawFos;
-        if (Build.VERSION.SDK_INT >= 23) {
-            rawFos = hasSD ? new FileOutputStream( file )
+        final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
                     : context.openFileOutput( filename, Context.MODE_PRIVATE );
-        } else {
-            rawFos = hasSD ? new FileOutputStream( file )
-                    : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
-        }
 
         final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
         fileFilename[0] = file;

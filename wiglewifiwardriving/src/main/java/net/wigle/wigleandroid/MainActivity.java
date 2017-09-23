@@ -894,11 +894,7 @@ public final class MainActivity extends AppCompatActivity {
             return new FileOutputStream(file);
         }
 
-        if (Build.VERSION.SDK_INT >= 23) {
             return context.openFileOutput(filename, Context.MODE_PRIVATE);
-        } else {
-            return context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
-        }
     }
 
     @Override
@@ -1124,11 +1120,7 @@ public final class MainActivity extends AppCompatActivity {
                     fos = new FileOutputStream(f);
                 } else {
                     // XXX: should this be using openString instead? baroo?
-                    if (Build.VERSION.SDK_INT >= 23) {
-                        fos = context.openFileOutput(name, Context.MODE_PRIVATE);
-                    } else {
-                        fos = context.openFileOutput(name, Context.MODE_WORLD_READABLE);
-                    }
+                    fos = context.openFileOutput(name, Context.MODE_PRIVATE);
 
                 }
 
@@ -1568,7 +1560,6 @@ public final class MainActivity extends AppCompatActivity {
 
     private void setupWifi() {
         // warn about turning off network notification
-        //@SuppressWarnings("deprecation")
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
         if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {

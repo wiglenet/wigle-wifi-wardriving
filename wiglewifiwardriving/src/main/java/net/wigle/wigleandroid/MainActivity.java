@@ -895,8 +895,7 @@ public final class MainActivity extends AppCompatActivity {
             return new FileOutputStream(file);
         }
 
-        //noinspection deprecation
-        return context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
+            return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -1092,7 +1091,6 @@ public final class MainActivity extends AppCompatActivity {
      * @param name    the file name to write out
      * @return the uri of a file containing resid's resource
      */
-    @SuppressWarnings("deprecation")
     private static Uri resToFile(final Context context, final int resid, final String name) throws IOException {
         // throw it in our bag of fun.
         String openString = name;
@@ -1123,7 +1121,8 @@ public final class MainActivity extends AppCompatActivity {
                     fos = new FileOutputStream(f);
                 } else {
                     // XXX: should this be using openString instead? baroo?
-                    fos = context.openFileOutput(name, Context.MODE_WORLD_READABLE);
+                    fos = context.openFileOutput(name, Context.MODE_PRIVATE);
+
                 }
 
                 final byte[] buff = new byte[1024];
@@ -1562,7 +1561,6 @@ public final class MainActivity extends AppCompatActivity {
 
     private void setupWifi() {
         // warn about turning off network notification
-        @SuppressWarnings("deprecation")
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
         if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {

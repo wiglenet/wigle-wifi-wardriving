@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -684,9 +685,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         }
 
-        @SuppressWarnings({ "deprecation", "resource" })
         final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
-                : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
+                    : context.openFileOutput( filename, Context.MODE_PRIVATE );
 
         final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
         fileFilename[0] = file;

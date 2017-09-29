@@ -1182,6 +1182,8 @@ public final class DatabaseHelper extends Thread {
             }
             MainActivity.info( "creating location table" );
             db.execSQL(LOCATION_CREATE);
+            db.setTransactionSuccessful();
+            //TODO: update list header count
         } catch ( final SQLiteException ex ) {
             MainActivity.error( "sqlite exception: " + ex, ex );
             return 0;

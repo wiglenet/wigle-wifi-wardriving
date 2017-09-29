@@ -361,5 +361,5 @@
     <string name="block_mac">Block</string>
     <string name="clear_db_text">Cancellare tutte le osservazioni locali</string>
     <string name="clear_db_button">cancellare il DB</string>
-    <string name="delete_db_confirm">Sei sicuro di voler cancellare i dati locali? È possibile scaricare nuovamente i dati di rete da WiGLE, ma le informazioni relative alla posizione e all'osservazione verranno perse.</string>
+    <string name="delete_db_confirm">Sei sicuro di voler cancellare i dati locali? È possibile scaricare nuovamente i dati di rete da WiGLE, ma le informazioni relative alla posizione e all\'osservazione verranno perse.</string>
 </resources>

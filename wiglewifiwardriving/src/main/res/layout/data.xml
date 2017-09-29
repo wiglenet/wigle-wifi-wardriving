@@ -250,6 +250,23 @@
         android:layout_weight="5"
         />
 </LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		>
+		<Button android:id="@+id/clear_db"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/clear_db_button" android:layout_weight="0"/>
+		<TextView
+			android:id="@+id/clear_db_text"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/clear_db_text"
+			android:layout_weight="5"
+			/>
+	</LinearLayout>
 
 </LinearLayout>
 </ScrollView>

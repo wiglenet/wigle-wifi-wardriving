@@ -99,6 +99,9 @@ public final class DatabaseHelper extends Thread {
                     + "time long not null"
                     + ")";
 
+    private static final String LOCATION_DELETE = "drop table " + LOCATION_TABLE;
+    private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
+
     private SQLiteDatabase db;
 
     private static final int MAX_QUEUE = 512;
@@ -1156,5 +1159,35 @@ public final class DatabaseHelper extends Thread {
         }
 
         return result;
+    }
+
+    public int clearDatabase() {
+        try {
+            db.beginTransaction();
+            MainActivity.info( "deleting location table" );
+            db.execSQL(LOCATION_DELETE);
+
+            MainActivity.info( "deleting network table" );
+            db.execSQL(NETWORK_DELETE);
+
+            MainActivity.info( "creating network table" );
+            db.execSQL(NETWORK_CREATE);
+            if ( db.getVersion() == 0 ) {
+                // only diff to version 1 is the "type" column in network table
+                db.setVersion(1);
+            }
+            if ( db.getVersion() == 1 ) {
+                // only diff to version 2 is the "bestlevel", "bestlat", "bestlon" columns in network table
+                db.setVersion(2);
+            }
+            MainActivity.info( "creating location table" );
+            db.execSQL(LOCATION_CREATE);
+        } catch ( final SQLiteException ex ) {
+            MainActivity.error( "sqlite exception: " + ex, ex );
+            return 0;
+        } finally {
+            db.endTransaction();
+        }
+        return 1;
     }
 }

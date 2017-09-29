@@ -59,6 +59,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int IMPORT_DIALOG = 125;
     private static final int ZERO_OUT_DIALOG = 126;
     private static final int MAX_OUT_DIALOG = 127;
+    private static final int DELETE_DIALOG = 128;
 
     /** Called when the activity is first created. */
     @Override
@@ -332,6 +333,17 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         MainActivity.DATA_TAB_POS, MAX_OUT_DIALOG);
             }
         } );
+
+        //ALIBI: not technically a marker button, but clearly belongs with them visually/logically
+        final Button deleteDbButton = (Button) view.findViewById(R.id.clear_db);
+        deleteDbButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                MainActivity.createConfirmation( getActivity(), getString(R.string.delete_db_confirm),
+                        MainActivity.DATA_TAB_POS, DELETE_DIALOG);
+            }
+        } );
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -393,6 +405,20 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
                     tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
                 }
+                break;
+            }
+            case DELETE_DIALOG: {
+                //blow away the DB
+                ListFragment.lameStatic.dbHelper.clearDatabase();
+                //update markers
+                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                editor.apply();
+                if (view != null) {
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " " + 0L);
+                }
+//TODO: anything else to update UI?
                 break;
             }
             default:

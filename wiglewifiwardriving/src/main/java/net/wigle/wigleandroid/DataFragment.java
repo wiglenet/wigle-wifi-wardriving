@@ -275,6 +275,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         @Override
                         public void requestComplete(JSONObject object, boolean cached) {
                             if (mainActivity != null) {
+                                try {
+                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                                } catch (DBException dbe) {
+                                    MainActivity.warn("failed DB count update on import-observations", dbe);
+                                }
                                 mainActivity.transferComplete();
                             }
                         }
@@ -285,12 +290,18 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 //moot due to bundle handling
             }
         } else {
+            //TODO: is this dead now?
             final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
                     ListFragment.lameStatic.dbHelper,
                     new ApiListener() {
                         @Override
                         public void requestComplete(JSONObject object, boolean cached) {
                             if (mainActivity != null) {
+                                try {
+                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                                } catch (DBException dbe) {
+                                    MainActivity.warn("failed DB count update on import-observations", dbe);
+                                }
                                 mainActivity.transferComplete();
                             }
                         }
@@ -418,7 +429,12 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
                     tv.setText(getString(R.string.setting_max_id) + " " + 0L);
                 }
-//TODO: anything else to update UI?
+                try {
+                    ListFragment.lameStatic.dbHelper.getNetworkCountFromDB();
+                } catch (DBException dbe) {
+                    MainActivity.warn("Failed to update network count on DB clear: ", dbe);
+                }
+
                 break;
             }
             default:

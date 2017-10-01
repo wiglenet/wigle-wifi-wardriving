@@ -1006,7 +1006,7 @@ public final class DatabaseHelper extends Thread {
         return networkCount.get();
     }
 
-    private void getNetworkCountFromDB() throws DBException {
+    public void getNetworkCountFromDB() throws DBException {
         networkCount.set( getCountFromDB( NETWORK_TABLE ) );
     }
 

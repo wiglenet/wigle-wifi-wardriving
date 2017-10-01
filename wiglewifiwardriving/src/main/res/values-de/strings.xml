@@ -362,4 +362,7 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">leere DB</string>
+    <string name="clear_db_text">Alle lokalen Beobachtungen löschen</string>
+    <string name="delete_db_confirm">ACHTUNG! Sind Sie sicher, dass Sie Ihre lokalen Daten löschen möchten? Sie können Netzwerkdaten von WiGLE neu herunterladen, aber Positions- und Beobachtungsinformationen gehen verloren</string>
 </resources>

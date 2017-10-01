@@ -307,4 +307,7 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
 </resources>

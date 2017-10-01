@@ -297,4 +297,7 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">डेटाबेस खाली करें</string>
+    <string name="clear_db_text">सभी स्थानीय अवलोकनों को हटा दें</string>
+    <string name="delete_db_confirm">क्या आप वाकई अपना स्थानीय डेटा साफ़ करना चाहते हैं? आप WiGLE से नेटवर्क डेटा को फिर से डाउनलोड कर सकते हैं, लेकिन स्थिति और अवलोकन जानकारी खो जाएंगे।</string>
 </resources>

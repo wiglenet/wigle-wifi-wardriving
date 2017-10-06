@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importer mes WiFi observés à partir de WiGLE dans la base locale ?</string>
     <string name="donate_question">Offrir les données à WiGLE ?</string>
     <string name="donate_explain">Permettre à WiGLE à faire une copie anonyme des données, et autoriser WiGLE à octroyer une licence commerciale à d\'autres parties.</string>
-    <string name="no_data_conn">Aucune connexion de données, impossible de se connecter à internet.\nDetails :</string>
     <string name="speech_wifi_restart">Le WiFi redémarre</string>
     <string name="wifi_restart_1">Attention, dernier scan WiFi complété</string>
     <string name="wifi_restart_2">secondes depuis. Redémarrage du WiFi.</string>

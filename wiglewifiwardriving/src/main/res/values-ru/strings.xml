@@ -247,7 +247,6 @@
     <string name="data_import_observed">Импорт моих наблюдений WiFi от WiGLE в локальную базу данных?</string>
     <string name="donate_question">Пожертвовать данные WiGLE?</string>
     <string name="donate_explain">Позвольте WiGLE делать анонимизированную копию данных, которые WiGLE разрешено лицензировать коммерчески для других сторон.</string>
-    <string name="no_data_conn">Никакое информационное соединение, не может соединиться с Интернетом.\nПодробнее:</string>
     <string name="speech_wifi_restart">Перезапуск WiFi</string>
     <string name="wifi_restart_1">Предупреждениу, последнее сканирование WiFi завершалось</string>
     <string name="wifi_restart_2">секунд назад. Перезапуск WiFi.</string>

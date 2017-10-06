@@ -247,7 +247,6 @@
     <string name="data_import_observed">Gevonden netwerken op WiGLE-account lokaal importeren?</string>
     <string name="donate_question">Gegevens doneren aan WiGLE?</string>
     <string name="donate_explain">Hiermee staat u WiGLE toe om uw gegevens anoniem te gebruiken</string>
-    <string name="no_data_conn">Geen gegevensverbinding. Kan niet verbinden met het internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi herstart</string>
     <string name="wifi_restart_1">Waarschuwing, laatste WiFi-scan is</string>
     <string name="wifi_restart_2">seconden geleden voltooid. WiFi herstarten.</string>

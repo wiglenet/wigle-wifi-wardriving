@@ -247,7 +247,6 @@
     <string name="data_import_observed">Fûn netwurken op WiGLE-account lokaal importeren?</string>
     <string name="donate_question">Gegevens doneren oan WiGLE?</string>
     <string name="donate_explain">Hjirmei stiet jo WiGLE ta om jo gegevens anoniem te brûken</string>
-    <string name="no_data_conn">Gjin gegevensferbining. Kin net ferbine mei it ynternet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi herstart</string>
     <string name="wifi_restart_1">Warskôging, lêste WiFi-scan is</string>
     <string name="wifi_restart_2">sekonden lyn dienmakke. WiFi herstarten.</string>

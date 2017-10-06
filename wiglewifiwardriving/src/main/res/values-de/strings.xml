@@ -247,7 +247,6 @@
     <string name="data_import_observed">Import meiner beobachteten WLAN aus WiGLE in die lokale Datenbank?</string>
     <string name="donate_question">Daten an Wigle spenden?</string>
     <string name="donate_explain">WiGLE gestatten eine anonymisierte Kopie der Daten zu erstellen, die von WiGLE anderen Parteien als kommerzielle Lizenz überlassen werden darf.</string>
-    <string name="no_data_conn">Keine Datenverbindung, kann nicht mit dem Internet verbinden.\nDetails:</string>
     <string name="speech_wifi_restart">WLAN startet neu</string>
     <string name="wifi_restart_1">Achtung, neuester WLAN-Scan abgeschlossen vor</string>
     <string name="wifi_restart_2">Sekunden. WLAN-Neustart.</string>

@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importar minhas redes já enviei ao WiGLE no banco de dados local?</string>
     <string name="donate_question">Doar dados ao WiGLE?</string>
     <string name="donate_explain">Permite que o WiGLE faça uma cópia anônima dos dados em que o WiGLE é autorizado a licenciar o uso comercial para terceiros.</string>
-    <string name="no_data_conn">Sem conexão de dados, não é possível acessar a internet. \nDetalhes:</string>
     <string name="speech_wifi_restart">Reinício do WiFi</string>
     <string name="wifi_restart_1">Aviso, o último escaneamento WiFi foi a</string>
     <string name="wifi_restart_2">segundos atrás. Reiniciando o WiFi.</string>

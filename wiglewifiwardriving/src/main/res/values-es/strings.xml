@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importar mis datos desde WiGLE en la base de datos local?</string>
     <string name="donate_question">Donar datos a WiGLE?</string>
     <string name="donate_explain">Permitir a WIGLE hacer una copia anónima de los datos de los cuales WIGLE está autorizado licenciar comercialmente a otras partes.</string>
-    <string name="no_data_conn">No hay conexión de datos, no se puede conectar con el Internet.\nDetails:</string>
     <string name="speech_wifi_restart">reiniciando WiFi</string>
     <string name="wifi_restart_1">Aviso, ultima búsqueda de WiFi completada</string>
     <string name="wifi_restart_2">Segundos. Reiniciando WiFi.</string>

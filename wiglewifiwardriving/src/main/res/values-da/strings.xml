@@ -247,7 +247,6 @@
     <string name="data_import_observed">importere min observeret WiFi fra WiGLE til den lokal database?</string>
     <string name="donate_question">Donaere data til WiGLE?</string>
     <string name="donate_explain">Tillad WiGLE at lave en anonym kopi af indsamlet data, som WiGLE har tilladelse til at licenser kommicelt til 3 part.</string>
-    <string name="no_data_conn">Ingen data forbindelse, Kan ikke forbinde til internettet.\nDetalier:</string>
     <string name="speech_wifi_restart">WiFi genstarter</string>
     <string name="wifi_restart_1">Advarslel, sidste WiFi skanning fuldført</string>
     <string name="wifi_restart_2">Sekunder siden. Genstarter WiFi.</string>

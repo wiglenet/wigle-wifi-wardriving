@@ -247,7 +247,6 @@
     <string name="data_import_observed">Észlelt hálózatok importálása internetről?</string>
     <string name="donate_question">Adományozza az adatot?</string>
     <string name="donate_explain">Engedélyezi a WiGLE-nek, hogy anonim másolatot készítsen az adatokról, melyeket a WiGLE közzétehet és továbbadhat.</string>
-    <string name="no_data_conn">Nem lehet csatlakozni az internethez.\nRészletek:</string>
     <string name="speech_wifi_restart">A WiFi újraindul</string>
     <string name="wifi_restart_1">Figyelem, a legutolsó WiFi letapogatás</string>
     <string name="wifi_restart_2">másodperce történt. Újraindítom a WiFi-t.</string>

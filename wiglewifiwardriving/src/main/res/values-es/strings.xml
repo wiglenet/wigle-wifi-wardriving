@@ -301,4 +301,6 @@
     <string name="clear_db_button">vaciar DB</string>
     <string name="clear_db_text">Eliminar todas las observaciones locales</string>
     <string name="delete_db_confirm">¿Está seguro de que desea borrar los datos locales? Puede volver a descargar los datos de la red desde WiGLE, pero la información de posición y observación se perderá.</string>
+    <string name="no_wigle_conn">Unable to connect to WiGLE. Please check your connection and retry.</string>
+    <string name="no_secure_wigle_conn">Unable to secure connectino with WiGLE. Please check and retry.</string>
 </resources>

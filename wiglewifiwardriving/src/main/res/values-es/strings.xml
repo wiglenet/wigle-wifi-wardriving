@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importar mis datos desde WiGLE en la base de datos local?</string>
     <string name="donate_question">Donar datos a WiGLE?</string>
     <string name="donate_explain">Permitir a WIGLE hacer una copia anónima de los datos de los cuales WIGLE está autorizado licenciar comercialmente a otras partes.</string>
-    <string name="no_data_conn">No hay conexión de datos, no se puede conectar con el Internet.\nDetails:</string>
     <string name="speech_wifi_restart">reiniciando WiFi</string>
     <string name="wifi_restart_1">Aviso, ultima búsqueda de WiFi completada</string>
     <string name="wifi_restart_2">Segundos. Reiniciando WiFi.</string>
@@ -301,4 +300,6 @@
     <string name="clear_db_button">vaciar DB</string>
     <string name="clear_db_text">Eliminar todas las observaciones locales</string>
     <string name="delete_db_confirm">¿Está seguro de que desea borrar los datos locales? Puede volver a descargar los datos de la red desde WiGLE, pero la información de posición y observación se perderá.</string>
+    <string name="no_wigle_conn">No se puede conectar a WiGLE. Compruebe su conexión y vuelva a intentarlo.</string>
+    <string name="no_secure_wigle_conn">No se puede asegurar el connectino con WiGLE. Compruebe y vuelva a intentarlo.</string>
 </resources>

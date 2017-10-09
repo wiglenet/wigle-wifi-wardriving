@@ -247,7 +247,6 @@
     <string name="data_import_observed">Import my observed WiFi from WiGLE into local database?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi restarts</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
@@ -365,4 +364,6 @@
     <string name="clear_db_button">Clear DB</string>
     <string name="clear_db_text">Delete all local observations</string>
     <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">Unable to connect to WiGLE. Please check your connection and retry.</string>
+    <string name="no_secure_wigle_conn">Unable to secure connection with WiGLE. Please check and retry.</string>
 </resources>

@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
@@ -52,7 +51,6 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
 
 /**
  * replacement file upload task
@@ -275,6 +273,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 status = Status.FAIL;
             }
         } catch ( final InterruptedException ex ) {
+            MainActivity.info("ObservationUploader interrupted");
             throw ex;
 
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {

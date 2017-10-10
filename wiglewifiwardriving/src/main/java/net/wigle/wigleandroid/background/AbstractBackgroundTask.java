@@ -153,7 +153,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             pp.show();
             taskCancelButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    latestTask.interrupt();
+                    latestTask.setInterrupted();
                     clearProgressDialog();
                     updateTransferringState(false, context);
                 }

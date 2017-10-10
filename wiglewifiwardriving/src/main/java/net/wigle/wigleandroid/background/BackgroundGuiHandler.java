@@ -26,7 +26,7 @@ import android.widget.Toast;
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
     public static final int AUTHENTICATION_ERROR = 1;
-    public static final int CONNECTION_ERROR = 2;
+    public static final int CONNECTION_ERROR = -1;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
     public static final String FILEPATH = "filepath";

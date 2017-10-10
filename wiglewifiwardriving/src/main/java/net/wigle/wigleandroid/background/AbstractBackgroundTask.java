@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static net.wigle.wigleandroid.background.Status.CONNECTION_ERROR;
+
 public abstract class AbstractBackgroundTask extends Thread implements AlertSettable {
     private static final int THREAD_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
 
@@ -94,7 +96,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             Bundle errorBundle = new Bundle();
             errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
             errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
-            sendBundledMessage(BackgroundGuiHandler.CONNECTION_ERROR, errorBundle);
+            sendBundledMessage(CONNECTION_ERROR.ordinal(), errorBundle);
         } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         }

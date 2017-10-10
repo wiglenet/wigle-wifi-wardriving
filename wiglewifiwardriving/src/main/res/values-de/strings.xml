@@ -366,4 +366,5 @@
     <string name="delete_db_confirm">ACHTUNG! Sind Sie sicher, dass Sie Ihre lokalen Daten löschen möchten? Sie können Netzwerkdaten von WiGLE neu herunterladen, aber Positions- und Beobachtungsinformationen gehen verloren</string>
     <string name="no_wigle_conn">Kann nicht an WiGLE angeschlossen werden. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
     <string name="no_secure_wigle_conn">Portino kann nicht mit WiGLE gesichert werden. Bitte überprüfen und wiederholen.</string>
+    <string name="status_net_error">Network Problem</string>
 </resources>

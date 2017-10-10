@@ -302,4 +302,5 @@
     <string name="delete_db_confirm">¿Está seguro de que desea borrar los datos locales? Puede volver a descargar los datos de la red desde WiGLE, pero la información de posición y observación se perderá.</string>
     <string name="no_wigle_conn">No se puede conectar a WiGLE. Compruebe su conexión y vuelva a intentarlo.</string>
     <string name="no_secure_wigle_conn">No se puede asegurar el connectino con WiGLE. Compruebe y vuelva a intentarlo.</string>
+    <string name="status_net_error">Network Problem</string>
 </resources>

@@ -23,10 +23,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static net.wigle.wigleandroid.background.Status.CONNECTION_ERROR;
+
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
     public static final int AUTHENTICATION_ERROR = 1;
-    public static final int CONNECTION_ERROR = 2;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
     public static final String FILEPATH = "filepath";
@@ -63,7 +64,8 @@ public class BackgroundGuiHandler extends Handler {
                     pp.hide();
                 }
             }
-            if (msg.what == CONNECTION_ERROR) {
+            if (msg.what == CONNECTION_ERROR.ordinal()) {
+                MainActivity.info("CONNECTION ERROR: "+msg);
                 Toast.makeText(this.context, R.string.no_wigle_conn
                         , Toast.LENGTH_LONG).show();
                 if (pp != null) {

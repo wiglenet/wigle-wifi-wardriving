@@ -301,4 +301,5 @@
     <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
     <string name="no_wigle_conn">Kan ikke koble til WiGLE. Vennligst sjekk forbindelsen og prøv igjen.</string>
     <string name="no_secure_wigle_conn">Kan ikke sikre forbindelse med WiGLE. Vennligst sjekk og prøv igjen.</string>
+    <string name="status_net_error">Network Problem</string>
 </resources>

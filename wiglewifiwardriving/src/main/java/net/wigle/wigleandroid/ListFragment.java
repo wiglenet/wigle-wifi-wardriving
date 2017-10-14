@@ -27,7 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,7 +46,7 @@ import org.json.JSONObject;
 import java.text.NumberFormat;
 import java.util.Set;
 
-import pl.droidsonroids.gif.GifImageView;
+import pl.droidsonroids.gif.GifImageButton;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -233,23 +233,46 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final TextView tv = (TextView) view.findViewById( R.id.status );
             tv.setText( status );
         }
-        MainActivity ma = MainActivity.getMainActivity();
+        final MainActivity ma = MainActivity.getMainActivity();
         if (null != ma) {
             setScanningStatusIndicator(ma.isScanning());
+            final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
+            final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
+            scanningImageButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick( final View buttonView ) {
+                    final boolean scanning = !ma.isScanning();
+                    ma.handleScanChange(scanning);
+                    String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
+                    ma.setTitle(name);
+                    handleScanChange(ma, getView());
+                }
+           });
+            notScanningImageButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick( final View buttonView ) {
+                        final boolean scanning = !ma.isScanning();
+                        ma.handleScanChange(scanning);
+                        String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
+                        ma.setTitle(name);
+                        handleScanChange(ma, getView());
+                    }
+            });
         }
+
     }
 
     public void setScanningStatusIndicator(boolean scanning) {
         View view = getView();
         if (view != null) {
-            final GifImageView scanningImageView = (GifImageView) view.findViewById(R.id.scanning);
-            final ImageView notScanningImageView = (ImageView) view.findViewById(R.id.not_scanning);
+            final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
+            final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
             if (scanning) {
-                scanningImageView.setVisibility(VISIBLE);
-                notScanningImageView.setVisibility(GONE);
+                scanningImageButton.setVisibility(VISIBLE);
+                notScanningImageButton.setVisibility(GONE);
             } else {
-                scanningImageView.setVisibility(GONE);
-                notScanningImageView.setVisibility(VISIBLE);
+                scanningImageButton.setVisibility(GONE);
+                notScanningImageButton.setVisibility(VISIBLE);
 
             }
         }

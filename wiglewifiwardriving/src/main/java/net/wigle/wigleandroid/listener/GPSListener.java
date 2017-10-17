@@ -235,7 +235,7 @@ public class GPSListener implements Listener, LocationListener {
                 final String announce = location == null ? mainActivity.getString(R.string.lost_location)
                         : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
                 if (null != mainActivity && ! mainActivity.isFinishing()) {
-                    WiGLEToast.showOverActivity(mainActivity, "", announce);
+                    WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
                 }
             }
 

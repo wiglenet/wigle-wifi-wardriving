@@ -23,6 +23,8 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
+import net.wigle.wigleandroid.util.WiGLEToast;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
@@ -86,8 +88,8 @@ public class ActivateActivity extends Activity {
                         .setBarcodeFormats(Barcode.QR_CODE)
                         .build();
         if (!barcodeDetector.isOperational()) {
-            Toast.makeText(this.getApplicationContext(),
-                    "Barcode detection not available on this device", Toast.LENGTH_LONG);
+            //ALIBI: this *should* be unreachable, but the diversity of android devices and implementation can make this happen
+            WiGLEToast.showOverActivity(this, R.string.error_general, getString(R.string.no_barcode_support_text));
             Log.e(LOG_TAG, "Barcode detection not available on this device.");
             this.finish();
         } else {

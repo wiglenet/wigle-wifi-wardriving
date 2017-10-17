@@ -301,4 +301,7 @@
     <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
     <string name="no_wigle_conn">Kin net ferbine mei WiFi. Kontrolearje jo ferbining en werhelje.</string>
     <string name="no_secure_wigle_conn">Koe de ferbining net feilichje mei WiFi. Kontrolearje asjebleaft en besykje.</string>
+    <string name="error_general">Fersin</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS-stân</string>
 </resources>

@@ -67,6 +67,7 @@ import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 /**
  * show a map!
@@ -144,10 +145,9 @@ public final class MappingFragment extends Fragment {
             }
             catch (final SecurityException ex) {
                 MainActivity.error("security exception oncreateview map: " + ex, ex);
-                Toast.makeText(getActivity(), getString(R.string.status_fail), Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(getActivity(), getString(R.string.map_needs_playservice), Toast.LENGTH_LONG).show();
+            WiGLEToast.showOverFragment(this.getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
         }
         MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
@@ -719,19 +719,19 @@ public final class MappingFragment extends Fragment {
                         switch (newMapType) {
                             case GoogleMap.MAP_TYPE_NORMAL:
                                 newMapType = GoogleMap.MAP_TYPE_SATELLITE;
-                                Toast.makeText(getActivity(), getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT).show();
+                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_SATELLITE:
                                 newMapType = GoogleMap.MAP_TYPE_HYBRID;
-                                Toast.makeText(getActivity(), getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT).show();
+                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_HYBRID:
                                 newMapType = GoogleMap.MAP_TYPE_TERRAIN;
-                                Toast.makeText(getActivity(), getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT).show();
+                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_TERRAIN:
                                 newMapType = GoogleMap.MAP_TYPE_NORMAL;
-                                Toast.makeText(getActivity(), getString(R.string.map_toast_normal), Toast.LENGTH_SHORT).show();
+                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
                                 break;
                             default:
                                 MainActivity.error("unhandled mapType: " + newMapType);

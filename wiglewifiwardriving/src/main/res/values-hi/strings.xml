@@ -301,4 +301,7 @@
     <string name="delete_db_confirm">क्या आप वाकई अपना स्थानीय डेटा साफ़ करना चाहते हैं? आप WiGLE से नेटवर्क डेटा को फिर से डाउनलोड कर सकते हैं, लेकिन स्थिति और अवलोकन जानकारी खो जाएंगे।</string>
     <string name="no_wigle_conn">वाईगल से कनेक्ट करने में असमर्थ कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।</string>
     <string name="no_secure_wigle_conn">वाईगल के साथ कनेक्शन सुरक्षित करने में असमर्थ कृपया चेक करें और पुनः प्रयास करें।</string>
+    <string name="error_general">त्रुटि</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">जीपीएस स्थिति</string>
 </resources>

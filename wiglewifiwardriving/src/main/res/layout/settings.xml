@@ -330,7 +330,33 @@
             />
     </LinearLayout>
 
-<Button android:id="@+id/speech_button" android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/quick_pause_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/quick_pause_text"
+            />
+        <TextView
+            android:id="@+id/quick_pause_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/quick_pause_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"
     android:paddingTop="10dip" android:paddingBottom="10dip"/>

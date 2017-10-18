@@ -304,4 +304,9 @@
     <string name="error_general">Chyba</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">Stav GPS</string>
+    <string name="quick_pause_text">Pozastavit / pokračovat v skenování, když klepnu na indikátor?</string>
+    <string name="quick_pause_decision">Zapamatujte si toto rozhodnutí</string>
+    <string name="quick_pause_unset">Potvrdit</string>
+    <string name="quick_pause">Pauza</string>
+    <string name="quick_pause_do_nothing">Nedělat nic</string>
 </resources>

@@ -61,6 +61,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private static final int SORT_DIALOG = 100;
     private static final int UPLOAD_DIALOG = 101;
+    private static final int QUICK_PAUSE_DIALOG = 102;
 
     public static final float MIN_DISTANCE_ACCURACY = 32f;
 
@@ -81,6 +82,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
     public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
+    public static final String PREF_QUICK_PAUSE = "quickScanPause";
     public static final String GPS_SCAN_PERIOD = "gpsPeriod";
     public static final String PREF_FOUND_SOUND = "foundSound";
     public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
@@ -149,6 +151,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     public static final String ANONYMOUS = "anonymous";
     public static final String WIFI_LOCK_NAME = "wigleWifiLock";
+
+    public static final String QUCIK_SCAN_UNSET = "UNSET";
+    public static final String QUCIK_SCAN_DO_NOTHING = "DO_NOTHING";
+    public static final String QUCIK_SCAN_PAUSE = "PAUSE";
 
     /** cross-activity communication */
     public static class LameStatic {
@@ -238,28 +244,41 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             setScanningStatusIndicator(ma.isScanning());
             final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
+            final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+
             scanningImageButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {
-                    final boolean scanning = !ma.isScanning();
-                    ma.handleScanChange(scanning);
-                    String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
-                    ma.setTitle(name);
-                    handleScanChange(ma, getView());
+                    String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUCIK_SCAN_UNSET);
+                    if (QUCIK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
+                    if (QUCIK_SCAN_PAUSE.equals(quickPausePref)) {
+                        toggleScan();
+                    } else {
+                        makeQuickPausePrefDialog(ma);
+                    }
                 }
            });
             notScanningImageButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick( final View buttonView ) {
-                        final boolean scanning = !ma.isScanning();
-                        ma.handleScanChange(scanning);
-                        String name = getString(R.string.scan) + " " + (scanning ? getString(R.string.off) : getString(R.string.on));
-                        ma.setTitle(name);
-                        handleScanChange(ma, getView());
+                        String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUCIK_SCAN_UNSET);
+                        if (QUCIK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
+                        toggleScan();
                     }
             });
         }
 
+    }
+
+    public void toggleScan() {
+        final MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            final boolean scanning = !ma.isScanning();
+            ma.handleScanChange(scanning);
+            String name = ma.getString(R.string.scan) + " " + (scanning ? ma.getString(R.string.off) : ma.getString(R.string.on));
+            ma.setTitle(name);
+            handleScanChange(ma, getView());
+        }
     }
 
     public void setScanningStatusIndicator(boolean scanning) {
@@ -273,7 +292,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             } else {
                 scanningImageButton.setVisibility(GONE);
                 notScanningImageButton.setVisibility(VISIBLE);
-
             }
         }
 
@@ -678,6 +696,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
     }
 
+    public void makeQuickPausePrefDialog(final MainActivity main) {
+        final String dialogText = getString(R.string.quick_pause_text);
+        final String checkboxText = getString(R.string.quick_pause_decision);
+        MainActivity.createCheckboxConfirmation(ListFragment.this.getActivity(), dialogText, checkboxText,
+                ListFragment.PREF_QUICK_PAUSE, ListFragment.QUCIK_SCAN_PAUSE,
+                ListFragment.QUCIK_SCAN_DO_NOTHING, MainActivity.LIST_TAB_POS, QUICK_PAUSE_DIALOG);
+    }
+
     @Override
     public void handleDialog(final int dialogId) {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -695,6 +721,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 }
                 uploadFile( state.dbHelper );
                 break;
+            case QUICK_PAUSE_DIALOG:
+                MainActivity.info("quick pause callback");
+                toggleScan();
             default:
                 MainActivity.warn("ListFragment unhandled dialogId: " + dialogId);
         }

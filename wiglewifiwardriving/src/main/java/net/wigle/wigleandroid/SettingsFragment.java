@@ -467,6 +467,12 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
+
+        // prefs setting for tap-to-pause scan indicator
+        final String[] pauseOptions = new String[] {ListFragment.QUCIK_SCAN_UNSET, ListFragment.QUCIK_SCAN_PAUSE, ListFragment.QUCIK_SCAN_DO_NOTHING};
+        final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
+        SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
+                ListFragment.QUCIK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
     }
 
     private void updateRegister(final View view) {

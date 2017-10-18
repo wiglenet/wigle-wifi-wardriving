@@ -301,4 +301,7 @@
     <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
     <string name="no_wigle_conn">无法连接到WiGLE。请检查您的连接并重试。</string>
     <string name="no_secure_wigle_conn">无法确保与WiGLE的连接。请检查并重试。</string>
+    <string name="error_general">错误</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS状态</string>
 </resources>

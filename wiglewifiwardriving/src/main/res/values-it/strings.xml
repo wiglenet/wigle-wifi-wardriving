@@ -363,4 +363,7 @@
     <string name="delete_db_confirm">Sei sicuro di voler cancellare i dati locali? È possibile scaricare nuovamente i dati di rete da WiGLE, ma le informazioni relative alla posizione e all\'osservazione verranno perse.</string>
     <string name="no_wigle_conn">Impossibile connettersi a WiGLE. Controllare la connessione e riprovare.</string>
     <string name="no_secure_wigle_conn">Impossibile garantire la connessione con WiGLE. Si prega di controllare e riprovare.</string>
+    <string name="error_general">Errore</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">Stato GPS</string>
 </resources>

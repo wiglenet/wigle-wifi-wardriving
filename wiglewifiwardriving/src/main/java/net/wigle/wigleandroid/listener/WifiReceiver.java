@@ -23,6 +23,8 @@ import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.WiGLEToast;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -792,8 +794,9 @@ public class WifiReceiver extends BroadcastReceiver {
                     if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
                         final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
                         if (!disableToast &&  null != mainActivity && !mainActivity.isFinishing()) {
-                            Toast.makeText( mainActivity,
-                                    mainActivity.getString(R.string.wifi_jammed), Toast.LENGTH_LONG ).show();
+                            if (null != mainActivity && !mainActivity.isFinishing()) {
+                                WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed));
+                            }
                         }
                         scanInFlight = false;
                         try {
@@ -837,15 +840,17 @@ public class WifiReceiver extends BroadcastReceiver {
                 if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
                         && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
                         && (System.currentTimeMillis() - constructionTime) > 30000L) {
-                    final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
+                    if (null != mainActivity) {
+                        final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
                             + mainActivity.getString(R.string.battery_postfix);
-                    if (null != mainActivity && !mainActivity.isFinishing()) {
-                        Toast.makeText(mainActivity, text, Toast.LENGTH_LONG).show();
+                        if (!mainActivity.isFinishing()) {
+                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
+                        }
+                        MainActivity.warn("low battery, shutting down");
+                        mainActivity.speak(text);
+                        MainActivity.sleep(5000L);
+                        mainActivity.finish();
                     }
-                    MainActivity.warn("low battery, shutting down");
-                    mainActivity.speak( text );
-                    MainActivity.sleep(5000L);
-                    mainActivity.finish();
                 }
             }
         }

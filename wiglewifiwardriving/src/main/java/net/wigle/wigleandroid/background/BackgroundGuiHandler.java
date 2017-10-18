@@ -57,15 +57,13 @@ public class BackgroundGuiHandler extends Handler {
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
             if (msg.what == AUTHENTICATION_ERROR) {
-                Toast.makeText(this.context, R.string.status_login_fail
-                        , Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
                 if (pp != null) {
                     pp.hide();
                 }
             }
             if (msg.what == CONNECTION_ERROR) {
-                Toast.makeText(this.context, R.string.no_wigle_conn
-                        , Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.no_wigle_conn));
                 if (pp != null) {
                     pp.hide();
                 }

@@ -10,6 +10,7 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -146,7 +147,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
                 if (fail != null) {
                     // toast!
-                    Toast.makeText(getActivity(), fail, Toast.LENGTH_SHORT).show();
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     ListFragment.lameStatic.queryArgs = queryArgs;
                     // start db result activity

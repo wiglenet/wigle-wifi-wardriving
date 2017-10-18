@@ -364,11 +364,7 @@ public final class MainActivity extends AppCompatActivity {
 
                 if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     message = mainActivity.getString(R.string.allow_storage);
-                }
-
-                // Show our own UI to explain to the user why we need to read the contacts
-                // before actually requesting the permission and showing the default UI
-                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();*/
+                } */
 
                 MainActivity.info("no permission for " + permissionsNeeded);
 
@@ -563,9 +559,6 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final NullPointerException | IllegalStateException ex) {
             final String message = "exception in fragment switch: " + ex;
             error(message, ex);
-            if (!isFinishing()) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            }
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -784,8 +777,6 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalStateException ex) {
             final String errorMessage = "Exception trying to show dialog: " + ex;
             MainActivity.error(errorMessage, ex);
-            //TODO: in this static context, we can't check isFinishing
-            Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
         }
     }
 

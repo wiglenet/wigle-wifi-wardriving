@@ -304,4 +304,9 @@
     <string name="error_general">Fout</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS-status</string>
+    <string name="quick_pause_text">Pauze / hervatten scannen wanneer ik de indicator aanmeld?</string>
+    <string name="quick_pause_decision">Onthoud deze beslissing</string>
+    <string name="quick_pause_unset">Bevestigen</string>
+    <string name="quick_pause">Pauze</string>
+    <string name="quick_pause_do_nothing">Niets doen</string>
 </resources>

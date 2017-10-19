@@ -302,4 +302,9 @@
     <string name="error_general">오류</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS 상태</string>
+    <string name="quick_pause_text">표시기를 두 드릴 때 스캔 일시 중지 / 다시 시작?</string>
+    <string name="quick_pause_decision">이 결정을 기억하십시오.</string>
+    <string name="quick_pause_unset">확인</string>
+    <string name="quick_pause">중지</string>
+    <string name="quick_pause_do_nothing">아무것도하지 마세요</string>
 </resources>

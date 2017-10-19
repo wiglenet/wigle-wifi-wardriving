@@ -366,4 +366,9 @@
     <string name="error_general">Errore</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">Stato GPS</string>
+    <string name="quick_pause_text">Interrompere / riprendere la scansione quando tocco l\'indicatore?</string>
+    <string name="quick_pause_decision">Ricorda questa decisione</string>
+    <string name="quick_pause_unset">Conferma</string>
+    <string name="quick_pause">Pausa</string>
+    <string name="quick_pause_do_nothing">Fare niente</string>
 </resources>

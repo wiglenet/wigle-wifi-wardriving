@@ -304,7 +304,7 @@
     <string name="error_general">Fersin</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS-stân</string>
-    <string name="quick_pause_text">Brekke op 'e pûs / oplibje as ik it lekker tapast?</string>
+    <string name="quick_pause_text">Brekke op \'e pûs / oplibje as ik it lekker tapast?</string>
     <string name="quick_pause_decision">Tink derom dat beslút</string>
     <string name="quick_pause_unset">Befestigje</string>
     <string name="quick_pause">Skoft</string>

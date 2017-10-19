@@ -3,12 +3,10 @@ package net.wigle.wigleandroid;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -32,16 +30,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiDownloader;
@@ -469,10 +463,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
 
         // prefs setting for tap-to-pause scan indicator
-        final String[] pauseOptions = new String[] {ListFragment.QUCIK_SCAN_UNSET, ListFragment.QUCIK_SCAN_PAUSE, ListFragment.QUCIK_SCAN_DO_NOTHING};
+        final String[] pauseOptions = new String[] {ListFragment.QUICK_SCAN_UNSET, ListFragment.QUICK_SCAN_PAUSE, ListFragment.QUICK_SCAN_DO_NOTHING};
         final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
         SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
-                ListFragment.QUCIK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
+                ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
     }
 
     private void updateRegister(final View view) {

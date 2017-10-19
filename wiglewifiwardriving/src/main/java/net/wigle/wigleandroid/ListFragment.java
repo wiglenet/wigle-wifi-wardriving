@@ -152,9 +152,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String ANONYMOUS = "anonymous";
     public static final String WIFI_LOCK_NAME = "wigleWifiLock";
 
-    public static final String QUCIK_SCAN_UNSET = "UNSET";
-    public static final String QUCIK_SCAN_DO_NOTHING = "DO_NOTHING";
-    public static final String QUCIK_SCAN_PAUSE = "PAUSE";
+    public static final String QUICK_SCAN_UNSET = "UNSET";
+    public static final String QUICK_SCAN_DO_NOTHING = "DO_NOTHING";
+    public static final String QUICK_SCAN_PAUSE = "PAUSE";
 
     /** cross-activity communication */
     public static class LameStatic {
@@ -249,9 +249,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             scanningImageButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {
-                    String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUCIK_SCAN_UNSET);
-                    if (QUCIK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
-                    if (QUCIK_SCAN_PAUSE.equals(quickPausePref)) {
+                    String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+                    if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
+                    if (QUICK_SCAN_PAUSE.equals(quickPausePref)) {
                         toggleScan();
                     } else {
                         makeQuickPausePrefDialog(ma);
@@ -261,8 +261,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             notScanningImageButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick( final View buttonView ) {
-                        String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUCIK_SCAN_UNSET);
-                        if (QUCIK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
+                        String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+                        if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
                         toggleScan();
                     }
             });
@@ -700,8 +700,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final String dialogText = getString(R.string.quick_pause_text);
         final String checkboxText = getString(R.string.quick_pause_decision);
         MainActivity.createCheckboxConfirmation(ListFragment.this.getActivity(), dialogText, checkboxText,
-                ListFragment.PREF_QUICK_PAUSE, ListFragment.QUCIK_SCAN_PAUSE,
-                ListFragment.QUCIK_SCAN_DO_NOTHING, MainActivity.LIST_TAB_POS, QUICK_PAUSE_DIALOG);
+                ListFragment.PREF_QUICK_PAUSE, ListFragment.QUICK_SCAN_PAUSE,
+                ListFragment.QUICK_SCAN_DO_NOTHING, MainActivity.LIST_TAB_POS, QUICK_PAUSE_DIALOG);
     }
 
     @Override

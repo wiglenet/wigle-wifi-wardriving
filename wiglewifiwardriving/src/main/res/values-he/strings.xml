@@ -304,4 +304,9 @@
     <string name="error_general">שְׁגִיאָה</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">מצב GPS</string>
+    <string name="quick_pause_text">האם להשהות / לחדש סריקה כשאני מקיש על המחוון?</string>
+    <string name="quick_pause_decision">זכור החלטה זו</string>
+    <string name="quick_pause_unset">לְאַשֵׁר</string>
+    <string name="quick_pause">הַפסָקָה</string>
+    <string name="quick_pause_do_nothing">לעשות כלום</string>
 </resources>

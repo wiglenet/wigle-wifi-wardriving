@@ -302,4 +302,9 @@
     <string name="error_general">エラー</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPSステータス</string>
+    <string name="quick_pause_text">インジケータをタップするとスキャンを一時停止/再開できますか？</string>
+    <string name="quick_pause_decision">この決定を覚えている</string>
+    <string name="quick_pause_unset">確認</string>
+    <string name="quick_pause">一時停止</string>
+    <string name="quick_pause_do_nothing">何もしない</string>
 </resources>

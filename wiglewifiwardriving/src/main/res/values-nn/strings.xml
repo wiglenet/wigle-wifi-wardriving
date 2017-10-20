@@ -345,4 +345,9 @@
     <string name="error_general">Feil</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS-status</string>
+    <string name="quick_pause_text">Pause / Fortsett skanning når jeg trykker på indikatoren?</string>
+    <string name="quick_pause_decision">Husk denne beslutningen</string>
+    <string name="quick_pause_unset">Bekrefte</string>
+    <string name="quick_pause">Pause</string>
+    <string name="quick_pause_do_nothing">Gjør ingenting</string>
 </resources>

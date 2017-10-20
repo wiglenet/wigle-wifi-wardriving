@@ -304,4 +304,10 @@
     <string name="error_general">خطأ</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">حالة غس</string>
+    <string name="quick_pause_text">وقفة / استئناف المسح عند النقر على المؤشر؟</string>
+    <string name="quick_pause_decision">تذكر هذا القرار</string>
+    <string name="quick_pause_unset">تؤكد</string>
+    <string name="quick_pause">وقفة</string>
+    <string name="quick_pause_do_nothing">لا تفعل شيئا</string>
+
 </resources>

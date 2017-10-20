@@ -302,4 +302,9 @@
     <string name="error_general">Fel</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS-status</string>
+    <string name="quick_pause_text">Paus / Återuppta skanning när jag pekar på indikatorn?</string>
+    <string name="quick_pause_decision">Kom ihåg detta beslut</string>
+    <string name="quick_pause_unset">Bekräfta</string>
+    <string name="quick_pause">Paus</string>
+    <string name="quick_pause_do_nothing">Göra ingenting</string>
 </resources>

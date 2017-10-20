@@ -304,4 +304,9 @@
     <string name="error_general">错误</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS状态</string>
+    <string name="quick_pause_text">点击指标时暂停/恢复扫描？</string>
+    <string name="quick_pause_decision">记住这个决定</string>
+    <string name="quick_pause_unset">确认</string>
+    <string name="quick_pause">暂停</string>
+    <string name="quick_pause_do_nothing">没做什么</string>
 </resources>

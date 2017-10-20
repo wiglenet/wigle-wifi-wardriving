@@ -304,4 +304,9 @@
     <string name="error_general">Virhe</string>
     <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
     <string name="gps_status">GPS-tila</string>
+    <string name="quick_pause_text">Keskeytä / jatkaa skannaamista, kun napautan ilmaisinta?</string>
+    <string name="quick_pause_decision">Muista tämä päätös</string>
+    <string name="quick_pause_unset">Vahvistaa</string>
+    <string name="quick_pause">Tauko</string>
+    <string name="quick_pause_do_nothing">Älä tee mitään</string>
 </resources>

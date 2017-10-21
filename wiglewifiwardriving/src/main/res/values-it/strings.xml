@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importare le mie reti osservate da WiGLE nel database locale?</string>
     <string name="donate_question">Dona i dati a WiGLE?</string>
     <string name="donate_explain">Permetti a WiGLE di eseguire una copia anonima dei dati per i quali hai autorizzato WiGLE per la cessione a fini commerciali a terze parti.</string>
-    <string name="no_data_conn">Nessuna connessione dati, impossibile collegarsi a Internet.\nDettagli:</string>
     <string name="speech_wifi_restart">Riavvio WiFi</string>
     <string name="wifi_restart_1">Attenzione, ultima scansione WiFi completata</string>
     <string name="wifi_restart_2">secondi fa. Riavvio WiFi.</string>
@@ -359,4 +358,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_text">Cancellare tutte le osservazioni locali</string>
+    <string name="clear_db_button">cancellare il DB</string>
+    <string name="delete_db_confirm">Sei sicuro di voler cancellare i dati locali? È possibile scaricare nuovamente i dati di rete da WiGLE, ma le informazioni relative alla posizione e all\'osservazione verranno perse.</string>
+    <string name="no_wigle_conn">Impossibile connettersi a WiGLE. Controllare la connessione e riprovare.</string>
+    <string name="no_secure_wigle_conn">Impossibile garantire la connessione con WiGLE. Si prega di controllare e riprovare.</string>
+    <string name="error_general">Errore</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">Stato GPS</string>
+    <string name="quick_pause_text">Interrompere / riprendere la scansione quando tocco l\'indicatore?</string>
+    <string name="quick_pause_decision">Ricorda questa decisione</string>
+    <string name="quick_pause_unset">Conferma</string>
+    <string name="quick_pause">Pausa</string>
+    <string name="quick_pause_do_nothing">Fare niente</string>
 </resources>

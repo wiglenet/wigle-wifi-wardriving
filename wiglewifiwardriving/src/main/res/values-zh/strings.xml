@@ -247,7 +247,6 @@
     <string name="data_import_observed">導入本地數據庫我從 WiGLE觀察 WiFi？</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi restarts</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">无法连接到WiGLE。请检查您的连接并重试。</string>
+    <string name="no_secure_wigle_conn">无法确保与WiGLE的连接。请检查并重试。</string>
+    <string name="error_general">错误</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS状态</string>
+    <string name="quick_pause_text">点击指标时暂停/恢复扫描？</string>
+    <string name="quick_pause_decision">记住这个决定</string>
+    <string name="quick_pause_unset">确认</string>
+    <string name="quick_pause">暂停</string>
+    <string name="quick_pause_do_nothing">没做什么</string>
 </resources>

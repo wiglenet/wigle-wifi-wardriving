@@ -36,6 +36,7 @@ import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
@@ -49,6 +50,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
+
+import javax.net.ssl.SSLException;
 
 /**
  * replacement file upload task
@@ -222,15 +225,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             // Cannot set request property after connection is made
             PreConnectConfigurator preConnectConfigurator = new PreConnectConfigurator() {
-                    @Override
-                    public void configure(HttpURLConnection connection) {
+                @Override
+                public void configure(HttpURLConnection connection) {
                     if (!beAnonymous) {
                         if (null != encoded && !encoded.isEmpty()) {
                             connection.setRequestProperty("Authorization", "Basic " + encoded);
                         }
                     }
                 }
-                          };
+            };
 
             final String response = HttpFileUploader.upload(
                     MainActivity.FILE_POST_URL, filename, "file", fis,
@@ -271,31 +274,19 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 status = Status.FAIL;
             }
         } catch ( final InterruptedException ex ) {
+            MainActivity.info("ObservationUploader interrupted");
             throw ex;
-        } catch ( final FileNotFoundException ex ) {
-            ex.printStackTrace();
-            MainActivity.error( "file problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
-            status = Status.EXCEPTION;
-            bundle.putString( BackgroundGuiHandler.ERROR, "file problem: " + ex );
-        } catch (ConnectException ex) {
-            ex.printStackTrace();
+
+        } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
             MainActivity.error( "connection problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
-            status = Status.EXCEPTION;
-            bundle.putString( BackgroundGuiHandler.ERROR, "connect problem: " + ex );
-            if (! hasDataConnection(context)) {
-                bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_data_conn) + ex);
-            }
-        } catch (UnknownHostException ex) {
             ex.printStackTrace();
-            MainActivity.error( "DNS problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
             status = Status.EXCEPTION;
-            bundle.putString( BackgroundGuiHandler.ERROR, "dns problem: " + ex );
-            if (! hasDataConnection(context)) {
-                bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_data_conn) + ex);
-            }
+            bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
+        } catch (final SSLException ex) {
+            MainActivity.error( "security problem: " + ex, ex );
+            ex.printStackTrace();
+            status = Status.EXCEPTION;
+            bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_secure_wigle_conn) );
         } catch ( final IOException ex ) {
             ex.printStackTrace();
             MainActivity.error( "io problem: " + ex, ex );
@@ -685,15 +676,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         }
 
-        @SuppressWarnings({ "deprecation", "resource" })
-        final FileOutputStream rawFos;
-        if (Build.VERSION.SDK_INT >= 23) {
-            rawFos = hasSD ? new FileOutputStream( file )
+        final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
                     : context.openFileOutput( filename, Context.MODE_PRIVATE );
-        } else {
-            rawFos = hasSD ? new FileOutputStream( file )
-                    : context.openFileOutput( filename, Context.MODE_WORLD_READABLE );
-        }
 
         final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
         fileFilename[0] = file;

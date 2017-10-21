@@ -10,6 +10,7 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -59,6 +60,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int IMPORT_DIALOG = 125;
     private static final int ZERO_OUT_DIALOG = 126;
     private static final int MAX_OUT_DIALOG = 127;
+    private static final int DELETE_DIALOG = 128;
 
     /** Called when the activity is first created. */
     @Override
@@ -145,7 +147,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
                 if (fail != null) {
                     // toast!
-                    Toast.makeText(getActivity(), fail, Toast.LENGTH_SHORT).show();
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     ListFragment.lameStatic.queryArgs = queryArgs;
                     // start db result activity
@@ -274,6 +276,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         @Override
                         public void requestComplete(JSONObject object, boolean cached) {
                             if (mainActivity != null) {
+                                try {
+                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                                } catch (DBException dbe) {
+                                    MainActivity.warn("failed DB count update on import-observations", dbe);
+                                }
                                 mainActivity.transferComplete();
                             }
                         }
@@ -284,12 +291,18 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 //moot due to bundle handling
             }
         } else {
+            //TODO: is this dead now?
             final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
                     ListFragment.lameStatic.dbHelper,
                     new ApiListener() {
                         @Override
                         public void requestComplete(JSONObject object, boolean cached) {
                             if (mainActivity != null) {
+                                try {
+                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                                } catch (DBException dbe) {
+                                    MainActivity.warn("failed DB count update on import-observations", dbe);
+                                }
                                 mainActivity.transferComplete();
                             }
                         }
@@ -332,6 +345,17 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         MainActivity.DATA_TAB_POS, MAX_OUT_DIALOG);
             }
         } );
+
+        //ALIBI: not technically a marker button, but clearly belongs with them visually/logically
+        final Button deleteDbButton = (Button) view.findViewById(R.id.clear_db);
+        deleteDbButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick( final View buttonView ) {
+                MainActivity.createConfirmation( getActivity(), getString(R.string.delete_db_confirm),
+                        MainActivity.DATA_TAB_POS, DELETE_DIALOG);
+            }
+        } );
+
     }
 
     @SuppressLint("SetTextI18n")
@@ -393,6 +417,25 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
                     tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
                 }
+                break;
+            }
+            case DELETE_DIALOG: {
+                //blow away the DB
+                ListFragment.lameStatic.dbHelper.clearDatabase();
+                //update markers
+                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                editor.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                editor.apply();
+                if (view != null) {
+                    final TextView tv = (TextView) view.findViewById(R.id.reset_maxid_text);
+                    tv.setText(getString(R.string.setting_max_id) + " " + 0L);
+                }
+                try {
+                    ListFragment.lameStatic.dbHelper.getNetworkCountFromDB();
+                } catch (DBException dbe) {
+                    MainActivity.warn("Failed to update network count on DB clear: ", dbe);
+                }
+
                 break;
             }
             default:

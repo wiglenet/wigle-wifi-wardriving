@@ -247,7 +247,6 @@
     <string name="data_import_observed">すでに WiGLE へアップロードしたデータをローカルデータベースにインポート</string>
     <string name="donate_question">WiGLE へドネーションしますか?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">インターネットへ接続できません.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi 再起動</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
@@ -295,4 +294,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">WiGLEに接続できません。接続を確認して再試行してください。</string>
+    <string name="no_secure_wigle_conn">WiGLEとの接続を保護できません。確認して再試行してください。</string>
+    <string name="error_general">エラー</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPSステータス</string>
+    <string name="quick_pause_text">インジケータをタップするとスキャンを一時停止/再開できますか？</string>
+    <string name="quick_pause_decision">この決定を覚えている</string>
+    <string name="quick_pause_unset">確認</string>
+    <string name="quick_pause">一時停止</string>
+    <string name="quick_pause_do_nothing">何もしない</string>
 </resources>

@@ -247,7 +247,6 @@
     <string name="data_import_observed">स्थानीय डेटाबेस में मेरे WiGLE से मनाया वाईफ़ाई आयात?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi restarts</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">डेटाबेस खाली करें</string>
+    <string name="clear_db_text">सभी स्थानीय अवलोकनों को हटा दें</string>
+    <string name="delete_db_confirm">क्या आप वाकई अपना स्थानीय डेटा साफ़ करना चाहते हैं? आप WiGLE से नेटवर्क डेटा को फिर से डाउनलोड कर सकते हैं, लेकिन स्थिति और अवलोकन जानकारी खो जाएंगे।</string>
+    <string name="no_wigle_conn">वाईगल से कनेक्ट करने में असमर्थ कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।</string>
+    <string name="no_secure_wigle_conn">वाईगल के साथ कनेक्शन सुरक्षित करने में असमर्थ कृपया चेक करें और पुनः प्रयास करें।</string>
+    <string name="error_general">त्रुटि</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">जीपीएस स्थिति</string>
+    <string name="quick_pause_text">जब मैं सूचक को टैप करता हूँ तो रोकें / फिर से शुरू करें?</string>
+    <string name="quick_pause_decision">इस निर्णय को याद रखें</string>
+    <string name="quick_pause_unset">की पुष्टि करें</string>
+    <string name="quick_pause">ठहराव</string>
+    <string name="quick_pause_do_nothing">कुछ मत करो</string>
 </resources>

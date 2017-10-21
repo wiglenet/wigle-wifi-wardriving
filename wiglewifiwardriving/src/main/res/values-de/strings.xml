@@ -247,7 +247,6 @@
     <string name="data_import_observed">Import meiner beobachteten WLAN aus WiGLE in die lokale Datenbank?</string>
     <string name="donate_question">Daten an Wigle spenden?</string>
     <string name="donate_explain">WiGLE gestatten eine anonymisierte Kopie der Daten zu erstellen, die von WiGLE anderen Parteien als kommerzielle Lizenz überlassen werden darf.</string>
-    <string name="no_data_conn">Keine Datenverbindung, kann nicht mit dem Internet verbinden.\nDetails:</string>
     <string name="speech_wifi_restart">WLAN startet neu</string>
     <string name="wifi_restart_1">Achtung, neuester WLAN-Scan abgeschlossen vor</string>
     <string name="wifi_restart_2">Sekunden. WLAN-Neustart.</string>
@@ -362,4 +361,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">leere DB</string>
+    <string name="clear_db_text">Alle lokalen Beobachtungen löschen</string>
+    <string name="delete_db_confirm">ACHTUNG! Sind Sie sicher, dass Sie Ihre lokalen Daten löschen möchten? Sie können Netzwerkdaten von WiGLE neu herunterladen, aber Positions- und Beobachtungsinformationen gehen verloren</string>
+    <string name="no_wigle_conn">Kann nicht an WiGLE angeschlossen werden. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
+    <string name="no_secure_wigle_conn">Portino kann nicht mit WiGLE gesichert werden. Bitte überprüfen und wiederholen.</string>
+    <string name="error_general">Fehler</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS-Status</string>
+    <string name="quick_pause_text">Anhalten / Fortsetzen, wenn ich auf die Anzeige tippe?</string>
+    <string name="quick_pause_decision">Denk an diese Entscheidung</string>
+    <string name="quick_pause_unset">Bestätigen</string>
+    <string name="quick_pause">Pause</string>
+    <string name="quick_pause_do_nothing">Nichts tun</string>
 </resources>

@@ -247,7 +247,6 @@
     <string name="data_import_observed">importere min observeret WiFi fra WiGLE til den lokal database?</string>
     <string name="donate_question">Donaere data til WiGLE?</string>
     <string name="donate_explain">Tillad WiGLE at lave en anonym kopi af indsamlet data, som WiGLE har tilladelse til at licenser kommicelt til 3 part.</string>
-    <string name="no_data_conn">Ingen data forbindelse, Kan ikke forbinde til internettet.\nDetalier:</string>
     <string name="speech_wifi_restart">WiFi genstarter</string>
     <string name="wifi_restart_1">Advarslel, sidste WiFi skanning fuldført</string>
     <string name="wifi_restart_2">Sekunder siden. Genstarter WiFi.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">Kan ikke oprette forbindelse til WiGLE. Kontroller din forbindelse og prøv igen.</string>
+    <string name="no_secure_wigle_conn">Kan ikke sikre forbindelse med WiGLE. Tjek venligst og prøv igen.</string>
+    <string name="error_general">Fejl</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS Status</string>
+    <string name="quick_pause_text">Pause / Genoptag scanning, når jeg trykker på indikatoren?</string>
+    <string name="quick_pause_decision">Husk denne beslutning</string>
+    <string name="quick_pause_unset">Bekræfte</string>
+    <string name="quick_pause">Pause</string>
+    <string name="quick_pause_do_nothing">Gøre ingenting</string>
 </resources>

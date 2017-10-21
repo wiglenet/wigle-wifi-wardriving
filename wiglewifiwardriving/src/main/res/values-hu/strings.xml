@@ -247,7 +247,6 @@
     <string name="data_import_observed">Észlelt hálózatok importálása internetről?</string>
     <string name="donate_question">Adományozza az adatot?</string>
     <string name="donate_explain">Engedélyezi a WiGLE-nek, hogy anonim másolatot készítsen az adatokról, melyeket a WiGLE közzétehet és továbbadhat.</string>
-    <string name="no_data_conn">Nem lehet csatlakozni az internethez.\nRészletek:</string>
     <string name="speech_wifi_restart">A WiFi újraindul</string>
     <string name="wifi_restart_1">Figyelem, a legutolsó WiFi letapogatás</string>
     <string name="wifi_restart_2">másodperce történt. Újraindítom a WiFi-t.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">Nem sikerült csatlakozni a WiGLE-hez. Ellenőrizze a kapcsolatot, és próbálkozzon újra.</string>
+    <string name="no_secure_wigle_conn">Nem sikerült kapcsolódni a WiGLE kapcsolathoz. Kérjük, ellenőrizze és próbálja újra.</string>
+    <string name="error_general">Hiba</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS állapot</string>
+    <string name="quick_pause_text">Szüneteltetni / folytatni a szkennelést, amikor megérintem a mutatót?</string>
+    <string name="quick_pause_decision">Ne feledje ezt a döntést</string>
+    <string name="quick_pause_unset">Jóváhagy</string>
+    <string name="quick_pause">Szünet</string>
+    <string name="quick_pause_do_nothing">Ne csinálj semmit</string>
 </resources>

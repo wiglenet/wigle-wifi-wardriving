@@ -74,6 +74,7 @@ import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -361,11 +362,7 @@ public final class MainActivity extends AppCompatActivity {
 
                 if (permissionsList.contains(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     message = mainActivity.getString(R.string.allow_storage);
-                }
-
-                // Show our own UI to explain to the user why we need to read the contacts
-                // before actually requesting the permission and showing the default UI
-                Toast.makeText(mainActivity, message, Toast.LENGTH_LONG).show();*/
+                } */
 
                 MainActivity.info("no permission for " + permissionsNeeded);
 
@@ -560,9 +557,6 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final NullPointerException | IllegalStateException ex) {
             final String message = "exception in fragment switch: " + ex;
             error(message, ex);
-            if (!isFinishing()) {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            }
         }
 
         // Highlight the selected item, update the title, and close the drawer
@@ -715,22 +709,74 @@ public final class MainActivity extends AppCompatActivity {
             return frag;
         }
 
+        /**
+         * alternate instantiation with a prefs-back checkbox inline - String prefs only
+         * @param message
+         * @param checkboxLabel
+         * @param tabPos
+         * @param dialogId
+         * @return
+         */
+        public static ConfirmationDialog newInstance(final String message, final String checkboxLabel,
+                                                     final String persistPrefKey,
+                                                     final String persistPrefAgreeValue,
+                                                     final String persistPrefDisagreeValue,
+                                                     final int tabPos,
+                                                     final int dialogId) {
+            final ConfirmationDialog frag = new ConfirmationDialog();
+            Bundle args = new Bundle();
+            args.putString("message", message);
+            args.putInt("tabPos", tabPos);
+            args.putInt("dialogId", dialogId);
+            args.putString("checkboxLabel", checkboxLabel);
+            args.putString("persistPref", persistPrefKey);
+            args.putString("persistPrefAgreeValue", persistPrefAgreeValue);
+            args.putString("persistPrefDisagreeValue", persistPrefDisagreeValue);
+            frag.setArguments(args);
+            return frag;
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Activity activity = getActivity();
             final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setCancelable(true);
-            builder.setTitle("Confirmation");
+            builder.setTitle("Confirmation"); //TODO: literal string
+            final String checkboxLabel = getArguments().containsKey("checkboxLabel") ? getArguments().getString("checkboxLabel"): null;
+            if (null != checkboxLabel) {
+                View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
+                CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+                checkBox.setText(checkboxLabel);
+                builder.setView(checkBoxView);
+            }
+            final String persistPrefKey = getArguments().containsKey("persistPref") ?
+                    getArguments().getString("persistPref"): null;
+            final String persistPrefAgreeValue = getArguments().containsKey("persistPrefAgreeValue") ?
+                    getArguments().getString("persistPrefAgreeValue"): null;
+            final String persistPrefDisagreeValue = getArguments().containsKey("persistPrefDisagreeValue") ?
+                    getArguments().getString("persistPrefDisagreeValue"): null;
+
             builder.setMessage(getArguments().getString("message"));
             final int tabPos = getArguments().getInt("tabPos");
             final int dialogId = getArguments().getInt("dialogId");
+            final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+
             final AlertDialog ad = builder.create();
             // ok
             ad.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(final DialogInterface dialog, final int which) {
                     try {
+                        if (null != persistPrefKey) {
+                            CheckBox checkBox = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.checkbox);
+                            if (checkBox.isChecked()) {
+                                final SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString(persistPrefKey, persistPrefAgreeValue);
+                                editor.apply();
+                            }
+                        }
                         dialog.dismiss();
                         final Activity activity = getActivity();
                         if (activity == null) {
@@ -756,6 +802,14 @@ public final class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(final DialogInterface dialog, final int which) {
                     try {
+                        if (null != persistPrefKey) {
+                            CheckBox checkBox = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.checkbox);
+                            if (checkBox.isChecked()) {
+                                final SharedPreferences.Editor editor = prefs.edit();
+                                editor.putString(persistPrefKey, persistPrefDisagreeValue);
+                                editor.apply();
+                            }
+                        }
                         dialog.dismiss();
                     } catch (Exception ex) {
                         // guess it wasn't there anyways
@@ -781,8 +835,26 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalStateException ex) {
             final String errorMessage = "Exception trying to show dialog: " + ex;
             MainActivity.error(errorMessage, ex);
-            //TODO: in this static context, we can't check isFinishing
-            Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    static void createCheckboxConfirmation(final FragmentActivity activity, final String message,
+                                           final String checkboxLabel, final String persistPrefKey,
+                                           final String persistPrefAgreeValue,
+                                           final String persistPrefDisagreeValue,
+                                   final int tabPos, final int dialogId) {
+        try {
+            final FragmentManager fm = activity.getSupportFragmentManager();
+            final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, checkboxLabel,
+                    persistPrefKey, persistPrefAgreeValue, persistPrefDisagreeValue, tabPos, dialogId);
+            final String tag = tabPos + "-" + dialogId + "-" + activity.getClass().getSimpleName();
+            info("tag: " + tag + " fm: " + fm);
+            dialog.show(fm, tag);
+        } catch (WindowManager.BadTokenException ex) {
+            MainActivity.info("exception showing dialog, view probably changed: " + ex, ex);
+        } catch (final IllegalStateException ex) {
+            final String errorMessage = "Exception trying to show dialog: " + ex;
+            MainActivity.error(errorMessage, ex);
         }
     }
 
@@ -892,8 +964,7 @@ public final class MainActivity extends AppCompatActivity {
             return new FileOutputStream(file);
         }
 
-        //noinspection deprecation
-        return context.openFileOutput(filename, Context.MODE_WORLD_READABLE);
+            return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -1089,7 +1160,6 @@ public final class MainActivity extends AppCompatActivity {
      * @param name    the file name to write out
      * @return the uri of a file containing resid's resource
      */
-    @SuppressWarnings("deprecation")
     private static Uri resToFile(final Context context, final int resid, final String name) throws IOException {
         // throw it in our bag of fun.
         String openString = name;
@@ -1120,7 +1190,7 @@ public final class MainActivity extends AppCompatActivity {
                     fos = new FileOutputStream(f);
                 } else {
                     // XXX: should this be using openString instead? baroo?
-                    fos = context.openFileOutput(name, Context.MODE_WORLD_READABLE);
+                    fos = context.openFileOutput(name, Context.MODE_PRIVATE);
                 }
 
                 final byte[] buff = new byte[1024];
@@ -1559,12 +1629,10 @@ public final class MainActivity extends AppCompatActivity {
 
     private void setupWifi() {
         // warn about turning off network notification
-        @SuppressWarnings("deprecation")
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
         if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
-            Toast.makeText(this, getString(R.string.best_results),
-                    Toast.LENGTH_LONG).show();
+            WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
         }
 
         final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
@@ -1577,7 +1645,7 @@ public final class MainActivity extends AppCompatActivity {
         if (!wifiManager.isWifiEnabled()) {
             // tell user, cuz this takes a little while
             if (!isFinishing()) {
-                Toast.makeText(this, getString(R.string.turn_on_wifi), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_wifi));
             }
 
             // save so we can turn it back off when we exit
@@ -1702,10 +1770,11 @@ public final class MainActivity extends AppCompatActivity {
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
             if (locProvider == null && !isFinishing()) {
-                Toast.makeText(this, getString(R.string.no_gps_device), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.no_gps_device), Toast.LENGTH_LONG);
             } else if (!locationManager.isProviderEnabled(GPS_PROVIDER) && !isFinishing()) {
                 // gps exists, but isn't on
-                Toast.makeText(this, getString(R.string.turn_on_gps), Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_gps), Toast.LENGTH_LONG);
+
                 final Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 try {
                     startActivity(myIntent);

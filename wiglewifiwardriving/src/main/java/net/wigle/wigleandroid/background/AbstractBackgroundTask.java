@@ -94,7 +94,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             Bundle errorBundle = new Bundle();
             errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
             errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
-            sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
+            sendBundledMessage(BackgroundGuiHandler.CONNECTION_ERROR, errorBundle);
         } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
         }
@@ -153,7 +153,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             pp.show();
             taskCancelButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    latestTask.interrupt();
+                    latestTask.setInterrupted();
                     clearProgressDialog();
                     updateTransferringState(false, context);
                 }

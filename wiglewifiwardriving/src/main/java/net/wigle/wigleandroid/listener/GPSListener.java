@@ -5,6 +5,7 @@ import static android.location.LocationManager.NETWORK_PROVIDER;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -233,7 +234,9 @@ public class GPSListener implements Listener, LocationListener {
             if (!disableToast && null != mainActivity && !mainActivity.isFinishing()) {
                 final String announce = location == null ? mainActivity.getString(R.string.lost_location)
                         : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
-                Toast.makeText( mainActivity, announce, Toast.LENGTH_SHORT ).show();
+                if (null != mainActivity && ! mainActivity.isFinishing()) {
+                    WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
+                }
             }
 
             final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );

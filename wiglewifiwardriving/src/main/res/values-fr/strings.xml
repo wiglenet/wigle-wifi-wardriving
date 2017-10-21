@@ -247,7 +247,6 @@
     <string name="data_import_observed">Importer mes WiFi observés à partir de WiGLE dans la base locale ?</string>
     <string name="donate_question">Offrir les données à WiGLE ?</string>
     <string name="donate_explain">Permettre à WiGLE à faire une copie anonyme des données, et autoriser WiGLE à octroyer une licence commerciale à d\'autres parties.</string>
-    <string name="no_data_conn">Aucune connexion de données, impossible de se connecter à internet.\nDetails :</string>
     <string name="speech_wifi_restart">Le WiFi redémarre</string>
     <string name="wifi_restart_1">Attention, dernier scan WiFi complété</string>
     <string name="wifi_restart_2">secondes depuis. Redémarrage du WiFi.</string>
@@ -311,6 +310,12 @@
     <string name="rank_all_time">Classement de tous les temps</string>
     <string name="rank_month">Classements mensuels</string>
     <string name="all_time_title">WiFi découverts depuis tous les temps</string>
+    <string name="month_rank_title">Rang ce mois:</string>
+    <string name="user_centric">Mon classment</string>
+    <string name="not_user_centric">Meilleur classements</string>
+    <string name="prevrank_title">Rang utilisateur mois dernier</string>
+    <string name="prevmonthrank_title">Rang mois denier</string>
+    <string name="list_scanning_on">(Numérisation activée)</string>
     <string name="activate">Activer maintenant</string>
     <string name="setting_activate_prompt">visiter https://wigle.net/activate pour votre code utilisateur</string>
     <string name="upload_queued">En file</string>
@@ -328,6 +333,8 @@
     <string name="deauthorize_confirm">Supprimer vos informations d\'identification?</string>
     <string name="authorize">Autoriser (login)</string>
     <string name="anonymous_confirm">Envoi anonyme?  Supprimera toutes les informations de connexion existantes de votre appareil.</string>
+    <string name="title_activity_activate">Activer</string>
+    <string name="unknown_number">\?\?</string>
     <string name="show_discovered_since">Afficher les réseaux découverts depuis</string>
     <string name="show_discovered">Afficher les réseaux découverts sur la carte</string>
     <string name="map_none">Aucun</string>
@@ -354,4 +361,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">vider DB</string>
+    <string name="clear_db_text">Supprimer toutes les observations locales</string>
+    <string name="delete_db_confirm">Êtes-vous sûr de vouloir effacer vos données locales? Vous pouvez ré-télécharger des données réseau de WiGLE, mais les informations de position et d\'observation seront perdues.</string>
+    <string name="no_wigle_conn">Impossible de se connecter à WiGLE. Vérifiez votre connexion et réessayez.</string>
+    <string name="no_secure_wigle_conn">Impossible de sécuriser la connexion avec WiGLE. Veuillez vérifier et réessayer.</string>
+    <string name="error_general">Erreur</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">État du GPS</string>
+    <string name="quick_pause_text">Pause / Reprendre la numérisation lorsque j\'appuie sur l\'indicateur?</string>
+    <string name="quick_pause_decision">Rappelez cette décision</string>
+    <string name="quick_pause_unset">Confirmer</string>
+    <string name="quick_pause">Pause</string>
+    <string name="quick_pause_do_nothing">Ne fais rien</string>
 </resources>

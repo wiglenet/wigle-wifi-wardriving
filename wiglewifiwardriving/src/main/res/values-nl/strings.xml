@@ -247,7 +247,6 @@
     <string name="data_import_observed">Gevonden netwerken op WiGLE-account lokaal importeren?</string>
     <string name="donate_question">Gegevens doneren aan WiGLE?</string>
     <string name="donate_explain">Hiermee staat u WiGLE toe om uw gegevens anoniem te gebruiken</string>
-    <string name="no_data_conn">Geen gegevensverbinding. Kan niet verbinden met het internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi herstart</string>
     <string name="wifi_restart_1">Waarschuwing, laatste WiFi-scan is</string>
     <string name="wifi_restart_2">seconden geleden voltooid. WiFi herstarten.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">Kan geen verbinding maken met WiGLE. Controleer uw verbinding en probeer het opnieuw.</string>
+    <string name="no_secure_wigle_conn">Kan de verbinding met WiGLE niet beveiligen. Controleer en probeer het opnieuw.</string>
+    <string name="error_general">Fout</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">GPS-status</string>
+    <string name="quick_pause_text">Pauze / hervatten scannen wanneer ik de indicator aanmeld?</string>
+    <string name="quick_pause_decision">Onthoud deze beslissing</string>
+    <string name="quick_pause_unset">Bevestigen</string>
+    <string name="quick_pause">Pauze</string>
+    <string name="quick_pause_do_nothing">Niets doen</string>
 </resources>

@@ -68,6 +68,7 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 /**
  * show a map!

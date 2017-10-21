@@ -247,7 +247,6 @@
     <string name="data_import_observed">ייבוא ​​WiFi נצפתה שלי WiGLE לתוך מסד נתונים מקומי?</string>
     <string name="donate_question">Donate data to WiGLE?</string>
     <string name="donate_explain">Allow WiGLE to make an anonymized copy of data which WiGLE is authorized to license commercially to other parties.</string>
-    <string name="no_data_conn">No data connection, cannot connect to internet.\nDetails:</string>
     <string name="speech_wifi_restart">WiFi restarts</string>
     <string name="wifi_restart_1">Warning, latest WiFi scan completed</string>
     <string name="wifi_restart_2">seconds ago. Restarting WiFi.</string>
@@ -297,4 +296,17 @@
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
     <string name="block_mac">Block</string>
+    <string name="clear_db_button">Clear DB</string>
+    <string name="clear_db_text">Delete all local observations</string>
+    <string name="delete_db_confirm">Are you sure you want to clear your local data? You can re-download network data from WiGLE, but position and observation information will be lost.</string>
+    <string name="no_wigle_conn">לא ניתן להתחבר ל- WiGLE. בדוק את החיבור שלך ונסה שוב.</string>
+    <string name="no_secure_wigle_conn">אין אפשרות לאבטח את החיבור ל- WiGLE. בדוק ונסה שוב.</string>
+    <string name="error_general">שְׁגִיאָה</string>
+    <string name="no_barcode_support_text">Barcode detection not available on this device.</string>
+    <string name="gps_status">מצב GPS</string>
+    <string name="quick_pause_text">האם להשהות / לחדש סריקה כשאני מקיש על המחוון?</string>
+    <string name="quick_pause_decision">זכור החלטה זו</string>
+    <string name="quick_pause_unset">לְאַשֵׁר</string>
+    <string name="quick_pause">הַפסָקָה</string>
+    <string name="quick_pause_do_nothing">לעשות כלום</string>
 </resources>

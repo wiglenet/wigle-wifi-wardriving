@@ -3,6 +3,8 @@ package net.wigle.wigleandroid.background;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.WiGLEToast;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
     public static final int AUTHENTICATION_ERROR = 1;
+    public static final int CONNECTION_ERROR = -1;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
     public static final String FILEPATH = "filepath";
@@ -54,8 +57,13 @@ public class BackgroundGuiHandler extends Handler {
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
             if (msg.what == AUTHENTICATION_ERROR) {
-                Toast.makeText(this.context, R.string.status_login_fail
-                        , Toast.LENGTH_LONG).show();
+                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
+                if (pp != null) {
+                    pp.hide();
+                }
+            }
+            if (msg.what == CONNECTION_ERROR) {
+                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.no_wigle_conn));
                 if (pp != null) {
                     pp.hide();
                 }
@@ -126,24 +134,10 @@ public class BackgroundGuiHandler extends Handler {
 
             if (Status.SUCCESS.equals(status)) {
                 //ALIBI: for now, success gets a long custom toast, other messages get dialogs
-                //TODO: if we decide to use custom toast elsewhere, move this to its own class?
-                LayoutInflater inflater = context.getLayoutInflater();
-                View layout = inflater.inflate(R.layout.wigle_detail_toast,
-                        (ViewGroup) context.findViewById(R.id.custom_toast_container));
-
-                TextView title = (TextView) layout.findViewById(R.id.toast_title_text);
-                title.setText(status.getTitle());
-
-                TextView text = (TextView) layout.findViewById(R.id.toast_message_text);
-                text.setText(composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
+                WiGLEToast.showOverFragment(context, status.getTitle(),
+                        composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
                         msg.peekData().getString( FILEPATH ), msg.peekData().getString( FILENAME ),
-                        status.getMessage() ));
-
-                Toast toast = new Toast(context.getApplicationContext());
-                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                toast.setDuration(Toast.LENGTH_LONG);
-                toast.setView(layout);
-                toast.show();
+                        status.getMessage()));
             } else {
                 final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
                 try {

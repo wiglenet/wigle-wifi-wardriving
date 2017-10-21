@@ -240,7 +240,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             tv.setText( status );
         }
         final MainActivity ma = MainActivity.getMainActivity();
-        if (null != ma) {
+        if (null != ma && view != null) {
             setScanningStatusIndicator(ma.isScanning());
             final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);

@@ -260,7 +260,11 @@ public class TokenAccess {
 
                 // prefer v1 key, fall back to v0 key, nada as applicable
                 int versionThreshold = android.os.Build.VERSION_CODES.M;
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                    return getApiTokenVersion2(prefs);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
                     privateKeyEntry = (KeyStore.PrivateKeyEntry)
                             keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
                 } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
@@ -273,11 +277,6 @@ public class TokenAccess {
                     return prefs.getString(ListFragment.PREF_TOKEN, "");
                 }
 
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
-                    return getApiTokenVersion2(prefs);
-                }
 
                 if (null != privateKeyEntry) {
                     String encodedCypherText = prefs.getString(ListFragment.PREF_TOKEN, "");
@@ -490,6 +489,8 @@ public class TokenAccess {
                     ProviderException ex) {
                 MainActivity.error("Upgrade/init of token storage failed: ", ex);
                 ex.printStackTrace();
+                //TODO: should we clear here?
+                //clearApiToken(prefs);
                 return false;
             } catch (Exception e) {
                 /**

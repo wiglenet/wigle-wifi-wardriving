@@ -260,9 +260,8 @@ public class TokenAccess {
 
                 // prefer v1 key, fall back to v0 key, nada as applicable
                 int versionThreshold = android.os.Build.VERSION_CODES.M;
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
                     return getApiTokenVersion2(prefs);
                 } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
                     privateKeyEntry = (KeyStore.PrivateKeyEntry)

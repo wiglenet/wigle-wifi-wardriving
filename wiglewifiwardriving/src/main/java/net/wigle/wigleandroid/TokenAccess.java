@@ -135,24 +135,29 @@ public class TokenAccess {
             UnrecoverableEntryException, IllegalBlockSizeException, BadPaddingException,
             InvalidAlgorithmParameterException {
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            MainActivity.warn("[TOKEN] getApiTokenVersion2 sdk not M+: " + Build.VERSION.SDK_INT);
+        try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                // GCMParameterSpec not in < 19 - prevent compiler warnings
+                MainActivity.warn("[TOKEN] getApiTokenVersion2 sdk not K+: " + Build.VERSION.SDK_INT);
+                return null;
+            } else {
+                final KeyStore keyStore = getKeyStore();
+                final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+                final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
+
+                final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);
+                final byte[] iv = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN_IV, ""), Base64.DEFAULT);
+                final int tagLength = prefs.getInt(ListFragment.PREF_TOKEN_TAG_LENGTH, 128);
+
+                decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));
+                final byte[] done = decrypt.doFinal(cypherToken);
+                final String token = new String(done, UTF8);
+                MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
+                return token;
+            }
+        } catch (Exception ex) {
+            MainActivity.error("Failed to decrypt token with AES-GCM (v2 cipher): ", ex);
             return null;
-        }
-        else {
-            final KeyStore keyStore = getKeyStore();
-            final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
-            final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
-
-            final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);
-            final byte[] iv = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN_IV, ""), Base64.DEFAULT);
-            final int tagLength = prefs.getInt(ListFragment.PREF_TOKEN_TAG_LENGTH, 128);
-
-            decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));
-            final byte[] done = decrypt.doFinal(cypherToken);
-            final String token = new String(done, UTF8);
-            MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
-            return token;
         }
     }
 
@@ -258,9 +263,12 @@ public class TokenAccess {
 
                 KeyStore.PrivateKeyEntry privateKeyEntry;
 
-                // prefer v1 key, fall back to v0 key, nada as applicable
+                // prefer v2 key -> v1 key -> v0 key, nada as applicable
                 int versionThreshold = android.os.Build.VERSION_CODES.M;
-                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
+                if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
+                    //DEBUG: MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
+                    return getApiTokenVersion2(prefs);
+                } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
                     privateKeyEntry = (KeyStore.PrivateKeyEntry)
                             keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V1, null);
                 } else if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
@@ -273,11 +281,6 @@ public class TokenAccess {
                     return prefs.getString(ListFragment.PREF_TOKEN, "");
                 }
 
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                        && keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    MainActivity.info("Using v2: " + KEYSTORE_WIGLE_CREDS_KEY_V2);
-                    return getApiTokenVersion2(prefs);
-                }
 
                 if (null != privateKeyEntry) {
                     String encodedCypherText = prefs.getString(ListFragment.PREF_TOKEN, "");
@@ -490,6 +493,8 @@ public class TokenAccess {
                     ProviderException ex) {
                 MainActivity.error("Upgrade/init of token storage failed: ", ex);
                 ex.printStackTrace();
+                //TODO: should we clear here?
+                //clearApiToken(prefs);
                 return false;
             } catch (Exception e) {
                 /**

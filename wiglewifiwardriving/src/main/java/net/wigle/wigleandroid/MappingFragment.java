@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,20 +22,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Base64;
-import android.util.DisplayMetrics;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -61,7 +60,6 @@ import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
-import com.google.android.gms.maps.model.UrlTileProvider;
 
 import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.QueryThread;
@@ -89,6 +87,8 @@ public final class MappingFragment extends Fragment {
     private Location previousLocation;
     private int previousRunNets;
     private TileOverlay tileOverlay;
+
+    private Menu menu;
 
     private static final String DIALOG_PREFIX = "DialogPrefix";
     public static final String MAP_DIALOG_PREFIX = "";
@@ -194,6 +194,43 @@ public final class MappingFragment extends Fragment {
                 final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
                 googleMap.setMapType(mapType);
                 mapRender = new MapRender(getActivity(), googleMap, false);
+
+                googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                    @Override
+                    public boolean onMyLocationButtonClick() {
+                        if (!state.locked) {
+
+                            state.locked = true;
+                            MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                            String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                            item.setTitle( name );
+                            MainActivity.info("on my loc received - activating lock");
+                        }
+                        return false;
+                    }
+                });
+
+                googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+                    @Override
+                    public void onCameraMoveStarted(int reason) {
+                        if (reason ==REASON_GESTURE) {
+                            if (state.locked) {
+                                state.locked = false;
+                                MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                                String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                                item.setTitle( name );
+                            }
+
+                            MainActivity.info("Camera moved due to user gesture");
+                        } else if (reason ==REASON_API_ANIMATION) {
+                            MainActivity.info("Camera moved due to user tap");
+                        } else if (reason ==REASON_DEVELOPER_ANIMATION) {
+                            //MainActivity.info("Camera moved due to app directive");
+                        }
+                    }
+
+
+                });
 
                 // controller
                 final LatLng centerPoint = getCenter(getActivity(), oldCenter, previousLocation);
@@ -607,6 +644,7 @@ public final class MappingFragment extends Fragment {
         // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
         super.onCreateOptionsMenu(menu, inflater);
+        this.menu = menu;
     }
 
     /* Handles item selections */

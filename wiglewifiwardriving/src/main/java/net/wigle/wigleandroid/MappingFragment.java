@@ -201,10 +201,12 @@ public final class MappingFragment extends Fragment {
                         if (!state.locked) {
 
                             state.locked = true;
-                            MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
-                            String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-                            item.setTitle( name );
-                            MainActivity.info("on my loc received - activating lock");
+                            if (menu != null) {
+                                MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                                String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                                item.setTitle(name);
+                                MainActivity.info("on-my-location received - activating lock");
+                            }
                         }
                         return false;
                     }
@@ -216,14 +218,15 @@ public final class MappingFragment extends Fragment {
                         if (reason ==REASON_GESTURE) {
                             if (state.locked) {
                                 state.locked = false;
-                                MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
-                                String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-                                item.setTitle( name );
+                                if (menu != null) {
+                                    MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                                    String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                                    item.setTitle(name);
+                                }
                             }
-
-                            MainActivity.info("Camera moved due to user gesture");
                         } else if (reason ==REASON_API_ANIMATION) {
-                            MainActivity.info("Camera moved due to user tap");
+                            //DEBUG: MainActivity.info("Camera moved due to user tap");
+                            //TODO: should we combine this case with REASON_GESTURE?
                         } else if (reason ==REASON_DEVELOPER_ANIMATION) {
                             //MainActivity.info("Camera moved due to app directive");
                         }

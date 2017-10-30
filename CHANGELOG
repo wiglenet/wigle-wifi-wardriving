@@ -1,3 +1,11 @@
+* 2.26 (10/30/2017)
+Scan animation now a button.
+Map lock off on scroll.
+Wrap every "toast" in Android 7.1 workaround.
+Upload interruption fix.
+Secret store Lineage fix.
+Updated German (thanks kill0rz!).
+
 * 2.25 (10/10/2017)
 Added clear DB Button.
 More android 7.1.2 toast workarounds.

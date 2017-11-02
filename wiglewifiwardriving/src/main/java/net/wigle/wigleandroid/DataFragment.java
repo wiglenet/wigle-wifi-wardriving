@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import java.util.List;
 
 import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.LegacyObservationImporter;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
@@ -39,7 +38,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -271,28 +269,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         if (Build.VERSION.SDK_INT >= 11) {
 
             final ObservationImporter task = new ObservationImporter(getActivity(),
-                    ListFragment.lameStatic.dbHelper,
-                    new ApiListener() {
-                        @Override
-                        public void requestComplete(JSONObject object, boolean cached) {
-                            if (mainActivity != null) {
-                                try {
-                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
-                                } catch (DBException dbe) {
-                                    MainActivity.warn("failed DB count update on import-observations", dbe);
-                                }
-                                mainActivity.transferComplete();
-                            }
-                        }
-                    });
-            try {
-                task.startDownload(this);
-            } catch (WiGLEAuthException waex) {
-                //moot due to bundle handling
-            }
-        } else {
-            //TODO: is this dead now?
-            final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
                     ListFragment.lameStatic.dbHelper,
                     new ApiListener() {
                         @Override

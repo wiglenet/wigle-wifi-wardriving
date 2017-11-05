@@ -947,7 +947,7 @@ public final class MainActivity extends AppCompatActivity {
         return MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/";
     }
 
-    public static FileOutputStream createFile(final Context context, final String filename) throws IOException {
+    public static FileOutputStream createFile(final Context context, final String filename, final boolean isCache) throws IOException {
         final String filepath = getSDPath();
         final File path = new File(filepath);
 
@@ -965,9 +965,12 @@ public final class MainActivity extends AppCompatActivity {
             }
 
             return new FileOutputStream(file);
+        } else if (isCache) {
+            File file = File.createTempFile(filename, null, context.getCacheDir());
+            return new FileOutputStream(file);
         }
 
-            return context.openFileOutput(filename, Context.MODE_PRIVATE);
+        return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
     @Override

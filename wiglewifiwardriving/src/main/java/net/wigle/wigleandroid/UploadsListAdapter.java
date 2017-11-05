@@ -123,12 +123,27 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 Intent intent = new Intent(actionIntent);
                 intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE " + transid);
                 try {
-                    File file = new File(localFilePath);
 
                     // content:// url for the file.
-                    Uri fileUri = FileProvider.getUriForFile(fragment.getContext(),
-                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                    ".kmlprovider", file);
+                    Uri fileUri;
+                    if (MainActivity.hasSD()) {
+                        File file = new File(localFilePath);
+                        fileUri = FileProvider.getUriForFile(fragment.getContext(),
+                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                        ".kmlprovider", file);
+                    } else {
+                        File dir = new File(fragment.getContext().getFilesDir(), "app_kml");
+                        File file = new File(dir, transid+".kml");
+                        if (!file.exists()) {
+                            MainActivity.error("file does not exist: " + file.getAbsolutePath());
+                        } else {
+                            MainActivity.info(file.getAbsolutePath());
+                        }
+                        fileUri = FileProvider.getUriForFile(fragment.getContext(),
+                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                        ".kmlprovider", file);
+                    }
+
 
                     // the old, but easier to debug way of getting a file:// url for a file
                     //Uri fileUri = Uri.fromFile(file);

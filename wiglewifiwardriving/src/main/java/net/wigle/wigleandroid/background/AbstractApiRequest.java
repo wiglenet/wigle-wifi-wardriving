@@ -160,10 +160,19 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     public JSONObject getCached() {
-        final File file = new File(MainActivity.getSDPath() + cacheFilename);
-        if (! file.exists() || !file.canRead()) {
-            MainActivity.warn("Cache file doesn't exist or can't be read: " + file);
-            return null;
+        File file = null;
+        if (MainActivity.hasSD()) {
+            file = new File(MainActivity.getSDPath() + cacheFilename);
+            if (!file.exists() || !file.canRead()) {
+                MainActivity.warn("External cache file doesn't exist or can't be read: " + file);
+                return null;
+            }
+        } else {
+            file = new File(context.getCacheDir(), cacheFilename);
+            if (!file.exists() || !file.canRead()) {
+                MainActivity.warn("App-internal cache file doesn't exist or can't be read: " + file);
+                return null;
+            }
         }
         BufferedReader br = null;
         JSONObject json = null;
@@ -199,7 +208,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
         FileOutputStream fos = null;
         try {
-            fos = MainActivity.createFile(context, cacheFilename);
+            fos = MainActivity.createFile(context, cacheFilename, true);
             // header
             ObservationUploader.writeFos(fos, result);
         }

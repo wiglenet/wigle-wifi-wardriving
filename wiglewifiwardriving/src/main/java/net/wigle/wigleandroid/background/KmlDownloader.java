@@ -7,11 +7,6 @@ import android.support.v4.app.FragmentActivity;
 import net.wigle.wigleandroid.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
-import net.wigle.wigleandroid.background.AbstractApiRequest;
-import net.wigle.wigleandroid.background.AbstractProgressApiRequest;
-import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.ObservationUploader;
-import net.wigle.wigleandroid.background.Status;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
+ * A KML-upload grabber intended for sharing/viewing via itents
  * Created by arkasha on 10/27/17.
  */
 
@@ -57,15 +53,25 @@ public class KmlDownloader extends AbstractProgressApiRequest {
         }
     }
 
+    /**
+     * write string data to a file accessible for Intent-based share or view
+     * @param result
+     * @param filename
+     * @throws IOException
+     */
     protected void writeSharefile(final String result, final String filename) throws IOException {
 
         if (MainActivity.hasSD()) {
             if (cacheFilename != null) {
                 //DEBUG: KmlDownloader.printDirContents(new File(MainActivity.getSDPath()));
+                //ALIBI: for external-storage, our existing "cache" method is fine to write the file
                 cacheResult(result);
                 //DEBUG: KmlDownloader.printDirContents(new File(MainActivity.getSDPath()));
             }
         } else {
+            //ALIBI: building a special directory for KML for intents
+            // the app files directory might have been enough here, but helps with provider_paths
+
             //see if KML dir exists
             MainActivity.info("local storage DL...");
 

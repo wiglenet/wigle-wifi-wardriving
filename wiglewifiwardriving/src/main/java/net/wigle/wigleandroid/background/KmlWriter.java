@@ -41,7 +41,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".kml";
 
-        final FileOutputStream fos = MainActivity.createFile(context, filename);
+        final FileOutputStream fos = MainActivity.createFile(context, filename, false);
         // header
         ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"

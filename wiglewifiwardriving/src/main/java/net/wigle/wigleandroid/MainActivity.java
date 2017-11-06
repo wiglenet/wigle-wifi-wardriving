@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -146,6 +144,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
+    public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
 
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
@@ -946,7 +945,7 @@ public final class MainActivity extends AppCompatActivity {
         return MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/";
     }
 
-    public static FileOutputStream createFile(final Context context, final String filename) throws IOException {
+    public static FileOutputStream createFile(final Context context, final String filename, final boolean isCache) throws IOException {
         final String filepath = getSDPath();
         final File path = new File(filepath);
 
@@ -964,9 +963,12 @@ public final class MainActivity extends AppCompatActivity {
             }
 
             return new FileOutputStream(file);
+        } else if (isCache) {
+            File file = File.createTempFile(filename, null, context.getCacheDir());
+            return new FileOutputStream(file);
         }
 
-            return context.openFileOutput(filename, Context.MODE_PRIVATE);
+        return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
     @Override

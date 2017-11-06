@@ -198,7 +198,7 @@
     <string name="status_fail">Fail</string>
     <string name="status_success">Success</string>
     <string name="status_working">Working&#8230;</string>
-    <string name="status_upload_success">Upload Successful</string>
+    <string name="status_upload_success">Transfer Successful</string>
     <string name="status_write_success">Write Successful</string>
     <string name="status_no_user">Username not set, heading to Settings</string>
     <string name="status_no_pass">Password not set and username not \'anonymous\'</string>
@@ -374,4 +374,5 @@
     <string name="quick_pause_unset">Confirm</string>
     <string name="quick_pause">Pause</string>
     <string name="quick_pause_do_nothing">Do nothing</string>
+    <string name="send_to">Share using</string>
 </resources>

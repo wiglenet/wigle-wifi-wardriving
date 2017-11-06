@@ -207,6 +207,15 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <provider
+            android:name=".util.KmlFileProvider"
+            android:authorities="${applicationId}.kmlprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />

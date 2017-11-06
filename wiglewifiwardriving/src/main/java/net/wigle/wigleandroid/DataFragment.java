@@ -286,7 +286,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             try {
                 task.startDownload(this);
             } catch (WiGLEAuthException waex) {
-                //moot due to bundle handling
+                MainActivity.info("failed to authorize user on request");
             }
         }
     }

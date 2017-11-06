@@ -169,10 +169,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             } else {
                 MainActivity.error("Failed to download transid: " + transid);
             }
-        } catch(
-        JSONException jex)
-
-        {
+        } catch(JSONException jex) {
             MainActivity.error("Exception downloading transid: " + transid);
         }
     }

@@ -275,7 +275,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != ma) {
             final boolean scanning = !ma.isScanning();
             ma.handleScanChange(scanning);
-            String name = ma.getString(R.string.scan) + " " + (scanning ? ma.getString(R.string.off) : ma.getString(R.string.on));
             handleScanChange(ma, getView());
         }
     }

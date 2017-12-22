@@ -212,6 +212,11 @@
                 <action android:name="net.wigle.wigleandroid.END" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".listener.UploadReceiver" >
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.UPLOAD" />
+            </intent-filter>
+        </receiver>
         <service
             android:name=".WigleService"
             android:enabled="true"

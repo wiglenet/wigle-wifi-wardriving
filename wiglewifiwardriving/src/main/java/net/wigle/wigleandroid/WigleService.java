@@ -251,7 +251,7 @@ public final class WigleService extends Service {
             builder.setSmallIcon(R.drawable.wiglewifi_small_white);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
-            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             builder.addAction(R.drawable.wiglewifi_small_black_white, "Pause", pauseIntent);
             builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
             // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);

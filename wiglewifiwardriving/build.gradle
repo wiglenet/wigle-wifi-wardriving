@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.2'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
     }
 
     buildTypes {
@@ -29,13 +29,13 @@ android {
 
 dependencies {
     compile project(':android-maps-utils')
-    compile "com.android.support:support-compat:26.1.0"
-    compile "com.android.support:support-core-utils:26.1.0"
-    compile "com.android.support:support-v4:26.1.0"
-    compile "com.android.support:appcompat-v7:26.1.0"
+    compile "com.android.support:support-compat:27.0.2"
+    compile "com.android.support:support-core-utils:27.0.2"
+    compile "com.android.support:support-v4:27.0.2"
+    compile "com.android.support:appcompat-v7:27.0.2"
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    compile 'com.google.android.gms:play-services-maps:11.4.2'
-    compile 'com.google.android.gms:play-services-vision:11.4.2'
+    compile 'com.google.android.gms:play-services-maps:11.8.0'
+    compile 'com.google.android.gms:play-services-vision:11.8.0'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'org.slf4j:slf4j-android:1.7.19'
     compile files('libs/TTS_library_stub.jar')

@@ -93,6 +93,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/intermediate-jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
@@ -104,22 +105,22 @@
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 26 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-license-11.4.2" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-maps-11.8.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-utils-25.2.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-11.4.2" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-base-license-11.4.2" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-basement-11.8.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-base-license-11.8.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-core-ui-25.2.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-maps-11.4.2" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-11.8.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-media-compat-25.2.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-compat-25.2.0" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-maps-license-11.4.2" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-basement-license-11.8.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-annotations:25.2.0@jar" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-basement-license-11.4.2" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-basement-11.4.2" level="project" />
-    <orderEntry type="library" name="com.google.android.gms:play-services-base-11.4.2" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-maps-license-11.8.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-base-11.8.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-v4-25.2.0" level="project" />
     <orderEntry type="library" name="com.android.support:support-fragment-25.2.0" level="project" />
+    <orderEntry type="library" name="com.google.android.gms:play-services-tasks-license-11.8.0" level="project" />
   </component>
 </module>

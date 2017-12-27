@@ -163,6 +163,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
 
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
+    public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;
@@ -2095,4 +2096,22 @@ public final class MainActivity extends AppCompatActivity {
         selectFragment(LIST_TAB_POS);
         listActivity.makeUploadDialog(this);
     }
+
+    /**
+     * pure-background upload method fo intent-based uploads
+     */
+    public void backgroundUploadFile(){
+        MainActivity.info( "background upload file" );
+        if (this == null) { return; }
+        final State state = getState();
+        setTransferring();
+        state.observationUploader = new ObservationUploader(this,
+                ListFragment.lameStatic.dbHelper, null, false, false, false);
+        try {
+            state.observationUploader.startDownload(null);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.warn("Authentication failure on background run upload");
+        }
+    }
+
 }

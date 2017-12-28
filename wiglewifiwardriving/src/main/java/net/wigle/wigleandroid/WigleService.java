@@ -14,8 +14,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
@@ -26,26 +24,8 @@ public final class WigleService extends Service {
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
 
-    // copied from javadoc
-    private static final Class<?>[] mSetForegroundSignature = new Class[] {
-            boolean.class};
-    @SuppressWarnings("rawtypes")
-    private static final Class[] mStartForegroundSignature = new Class[] {
-            int.class, Notification.class};
-    @SuppressWarnings("rawtypes")
-    private static final Class[] mStopForegroundSignature = new Class[] {
-            boolean.class};
-
-    private NotificationManager notificationManager;
-    private Method mSetForeground;
-    private Method mStartForeground;
-    private Method mStopForeground;
-    private final Object[] mSetForegroundArgs = new Object[1];
-    private final Object[] mStartForegroundArgs = new Object[2];
-    private final Object[] mStopForegroundArgs = new Object[1];
-
     private class GuardThread extends Thread {
-        public GuardThread() {
+        GuardThread() {
         }
 
         @Override
@@ -87,24 +67,6 @@ public final class WigleService extends Service {
     @Override
     public void onCreate() {
         MainActivity.info( "service: onCreate" );
-
-        notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        try {
-            mStartForeground = getClass().getMethod("startForeground",
-                    mStartForegroundSignature);
-            mStopForeground = getClass().getMethod("stopForeground",
-                    mStopForegroundSignature);
-        } catch (NoSuchMethodException e) {
-            // Running on an older platform.
-            mStartForeground = mStopForeground = null;
-        }
-        try {
-            mSetForeground = getClass().getMethod("setForeground",
-                    mSetForegroundSignature);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException(
-                    "OS doesn't have Service.startForeground OR Service.setForeground!");
-        }
 
         setupNotification();
 
@@ -153,11 +115,19 @@ public final class WigleService extends Service {
     }
 
     private void shutdownNotification() {
-        stopForegroundCompat( NOTIFICATION_ID );
+        stopForeground(true);
     }
 
     private void setupNotification() {
-        if ( ! done.get() ) {
+        if ( done.get() ) {
+            // make a dummy call to foreground to keep it from crashing with RemoteServiceException
+            // https://developer.android.com/about/versions/oreo/android-8.0-changes.html
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                final Notification.Builder builder = new Notification.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+                startForeground(NOTIFICATION_ID, builder.build());
+            }
+        }
+        else {
             final long when = System.currentTimeMillis();
             final Context context = getApplicationContext();
             final String title = context.getString(R.string.wigle_service);
@@ -222,7 +192,7 @@ public final class WigleService extends Service {
                 }
             }
             if (null != notification) {
-                startForegroundCompat(NOTIFICATION_ID, notification);
+                startForeground(NOTIFICATION_ID, notification);
             }
         }
     }
@@ -260,56 +230,4 @@ public final class WigleService extends Service {
         }
         return null;
     }
-
-    void invokeMethod(Method method, Object[] args) {
-        //noinspection TryWithIdenticalCatches
-        try {
-            method.invoke(this, args);
-        } catch (InvocationTargetException e) {
-            // Should not happen.
-            MainActivity.warn("Unable to invoke method", e);
-        } catch (IllegalAccessException e) {
-            // Should not happen.
-            MainActivity.warn("Unable to invoke method", e);
-        }
-    }
-
-    /**
-     * This is a wrapper around the new startForeground method, using the older
-     * APIs if it is not available.
-     */
-    private void startForegroundCompat(int id, Notification notification) {
-        // If we have the new startForeground API, then use it.
-        if (mStartForeground != null) {
-            mStartForegroundArgs[0] = id;
-            mStartForegroundArgs[1] = notification;
-            invokeMethod(mStartForeground, mStartForegroundArgs);
-            return;
-        }
-
-        // Fall back on the old API.
-        mSetForegroundArgs[0] = Boolean.TRUE;
-        invokeMethod(mSetForeground, mSetForegroundArgs);
-        notificationManager.notify(id, notification);
-    }
-
-    /**
-     * This is a wrapper around the new stopForeground method, using the older
-     * APIs if it is not available.
-     */
-    private void stopForegroundCompat(int id) {
-        // If we have the new stopForeground API, then use it.
-        if (mStopForeground != null) {
-            mStopForegroundArgs[0] = Boolean.TRUE;
-            invokeMethod(mStopForeground, mStopForegroundArgs);
-            return;
-        }
-
-        // Fall back on the old API.  Note to cancel BEFORE changing the
-        // foreground state, since we could be killed at that point.
-        notificationManager.cancel(id);
-        mSetForegroundArgs[0] = Boolean.FALSE;
-        invokeMethod(mSetForeground, mSetForegroundArgs);
-    }
-
 }

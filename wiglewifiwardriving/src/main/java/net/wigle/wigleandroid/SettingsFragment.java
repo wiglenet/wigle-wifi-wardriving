@@ -325,7 +325,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
         final String activateString = getString(R.string.activate);
-        String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
+        String registerBlurb = "<a href='net.wigle.wigleandroid.register://register'>" + registerString +
                 "</a> @WiGLE.net";
 
         // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...

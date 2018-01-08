@@ -129,6 +129,16 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".RegistrationActivity"
+            android:parentActivityName=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="net.wigle.wigleandroid.register" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".FilterActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"

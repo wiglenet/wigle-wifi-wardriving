@@ -145,6 +145,8 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
+    // registration web view
+    public static final String REG_URL = "https://wigle.net/register";
 
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";

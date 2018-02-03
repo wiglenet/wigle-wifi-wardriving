@@ -263,7 +263,9 @@ public final class MappingFragment extends Fragment {
                             ifAuthToken = "Basic " + encoded;
                         }
                     } catch (UnsupportedEncodingException ueex) {
-                        MainActivity.error("map tiles unable to encode credentials for mine/others");
+                        MainActivity.error("map tiles: unable to encode credentials for mine/others", ueex);
+                    } catch (UnsupportedOperationException uoex) {
+                        MainActivity.error("map tiles: unable to access credentials for mine/others", uoex);
                     }
                     final String authToken = ifAuthToken;
 

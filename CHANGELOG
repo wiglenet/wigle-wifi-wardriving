@@ -1,3 +1,10 @@
+* 2.27 (02/24/2017)
+Better registration integration.
+Camera feature optional for devices.
+Fix up app-local storage.
+Fix Lineage crypto credentials in maps.
+Simplify notification service, hopefully reduce Oreo crashes on close.
+
 * 2.26 (10/30/2017)
 Scan animation now a button.
 Map lock off on scroll.

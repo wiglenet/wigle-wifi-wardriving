@@ -3,6 +3,7 @@ Add configurable timeouts for GPS and Network Location
 Split traditional Chinese (TW and HK) from simplified
 
 * 2.27 (02/24/2017)
+Share button on uploads panel.
 Better registration integration.
 Camera feature optional for devices.
 Fix up app-local storage.

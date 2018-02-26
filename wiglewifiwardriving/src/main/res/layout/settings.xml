@@ -337,6 +337,58 @@
         android:layout_marginTop="2dip"
         android:layout_marginBottom="2dip"
         >
+        <Spinner android:id="@+id/gps_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_gps_timeout"
+            />
+        <TextView
+            android:id="@+id/gps_timeout_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_gps_timeout"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/net_loc_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_net_loc_timeout"
+            />
+        <TextView
+            android:id="@+id/net_loc_timeout_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_net_loc_timeout"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
         <Spinner android:id="@+id/quick_pause_spinner"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

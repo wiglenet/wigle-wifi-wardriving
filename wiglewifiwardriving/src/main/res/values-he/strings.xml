@@ -309,4 +309,7 @@
     <string name="quick_pause_unset">לְאַשֵׁר</string>
     <string name="quick_pause">הַפסָקָה</string>
     <string name="quick_pause_do_nothing">לעשות כלום</string>
+    <string name="send_to">Share using</string>
+    <string name="settings_gps_timeout">GPS Timeout</string>
+    <string name="settings_net_loc_timeout">Network Location Timeout</string>
 </resources>

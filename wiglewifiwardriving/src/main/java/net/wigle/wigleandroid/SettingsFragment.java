@@ -40,6 +40,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -461,6 +462,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
+
+        final Long[] timeoutPeriods = new Long[]{GPSListener.GPS_TIMEOUT_DEFAULT, 30000L, GPSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
+        final String[] timeoutName = new String[]{ "15" + sec, "30" + sec,"1" + min,"5" + min,
+                "30" + min,"60" + min};
+        // gps timeout spinner
+        SettingsUtil.doSpinner( R.id.gps_timeout_spinner, view, ListFragment.PREF_GPS_TIMEOUT,
+                GPSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+
+        // net loc timeout spinner
+        SettingsUtil.doSpinner( R.id.net_loc_timeout_spinner, view, ListFragment.PREF_NET_LOC_TIMEOUT,
+                GPSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // prefs setting for tap-to-pause scan indicator
         final String[] pauseOptions = new String[] {ListFragment.QUICK_SCAN_UNSET, ListFragment.QUICK_SCAN_PAUSE, ListFragment.QUICK_SCAN_DO_NOTHING};

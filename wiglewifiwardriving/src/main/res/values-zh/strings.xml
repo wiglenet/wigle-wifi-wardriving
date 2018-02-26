@@ -309,4 +309,7 @@
     <string name="quick_pause_unset">确认</string>
     <string name="quick_pause">暂停</string>
     <string name="quick_pause_do_nothing">没做什么</string>
+    <string name="send_to">分享使用</string>
+    <string name="settings_gps_timeout">GPS超時</string>
+    <string name="settings_net_loc_timeout">網絡位置超時</string>
 </resources>

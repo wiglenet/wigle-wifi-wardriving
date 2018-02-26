@@ -307,4 +307,7 @@
     <string name="quick_pause_unset">확인</string>
     <string name="quick_pause">중지</string>
     <string name="quick_pause_do_nothing">아무것도하지 마세요</string>
+    <string name="send_to">다음을 사용하여 공유</string>
+    <string name="settings_gps_timeout">GPS 타임 아웃</string>
+    <string name="settings_net_loc_timeout">네트워크 위치 제한 시간</string>
 </resources>

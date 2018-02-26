@@ -307,4 +307,7 @@
     <string name="quick_pause_unset">確認</string>
     <string name="quick_pause">一時停止</string>
     <string name="quick_pause_do_nothing">何もしない</string>
+    <string name="send_to">を使用して共有</string>
+    <string name="settings_gps_timeout">GPSタイムアウト</string>
+    <string name="settings_net_loc_timeout">ネットワークロケーションのタイムアウト</string>
 </resources>

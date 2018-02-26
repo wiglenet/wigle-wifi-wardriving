@@ -1,3 +1,7 @@
+* 2.28
+Add configurable timeouts for GPS and Network Location
+Split traditional Chinese (TW and HK) from simplified
+
 * 2.27 (02/24/2017)
 Better registration integration.
 Camera feature optional for devices.

@@ -309,5 +309,7 @@
     <string name="quick_pause_unset">تؤكد</string>
     <string name="quick_pause">وقفة</string>
     <string name="quick_pause_do_nothing">لا تفعل شيئا</string>
-
+    <string name="send_to">مشاركة باستخدام</string>
+    <string name="settings_gps_timeout">غس مهلة</string>
+    <string name="settings_net_loc_timeout">نيتورك لوكاتيون تيموت</string>
 </resources>

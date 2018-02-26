@@ -309,4 +309,7 @@
     <string name="quick_pause_unset">Potvrdit</string>
     <string name="quick_pause">Pauza</string>
     <string name="quick_pause_do_nothing">Nedělat nic</string>
+    <string name="send_to">Share using</string>
+    <string name="settings_gps_timeout">GPS Timeout</string>
+    <string name="settings_net_loc_timeout">Network Location Timeout</string>
 </resources>

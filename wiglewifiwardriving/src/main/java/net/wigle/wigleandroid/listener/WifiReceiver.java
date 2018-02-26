@@ -185,7 +185,9 @@ public class WifiReceiver extends BroadcastReceiver {
         final GPSListener gpsListener = mainActivity.getGPSListener();
         Location location = null;
         if (gpsListener != null) {
-            gpsListener.checkLocationOK();
+            final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
+            final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+            gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
             location = gpsListener.getLocation();
         }
 

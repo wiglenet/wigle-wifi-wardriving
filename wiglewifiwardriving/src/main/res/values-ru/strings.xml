@@ -319,4 +319,7 @@
     <string name="quick_pause_unset">подтвердить</string>
     <string name="quick_pause">Пауза</string>
     <string name="quick_pause_do_nothing">Ничего не делать</string>
+    <string name="send_to">Поделиться с</string>
+    <string name="settings_gps_timeout">Тайм-аут GPS</string>
+    <string name="settings_net_loc_timeout">Тайм-аут сети</string>
 </resources>

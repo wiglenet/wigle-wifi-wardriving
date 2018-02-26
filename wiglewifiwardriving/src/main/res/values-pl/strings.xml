@@ -307,4 +307,7 @@
     <string name="quick_pause_unset">Potwierdzać</string>
     <string name="quick_pause">Pauza</string>
     <string name="quick_pause_do_nothing">Nic nie robić</string>
+    <string name="send_to">Udostępnij za pomocą</string>
+    <string name="settings_gps_timeout">Limit czasu GPS</string>
+    <string name="settings_net_loc_timeout">Limit czasu lokalizacji sieci</string>
 </resources>

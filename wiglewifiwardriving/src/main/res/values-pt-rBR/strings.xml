@@ -319,4 +319,7 @@
     <string name="quick_pause_unset">confirme</string>
     <string name="quick_pause">Pausa</string>
     <string name="quick_pause_do_nothing">Fazer nada</string>
+    <string name="send_to">Compartilhar com</string>
+    <string name="settings_gps_timeout">Tempo limite do GPS</string>
+    <string name="settings_net_loc_timeout">Tempo limite da localização da rede</string>
 </resources>

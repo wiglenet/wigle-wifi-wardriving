@@ -374,4 +374,7 @@
     <string name="quick_pause_unset">Bestätigen</string>
     <string name="quick_pause">Pause</string>
     <string name="quick_pause_do_nothing">Nichts tun</string>
+    <string name="send_to">Senden mit</string>
+    <string name="settings_gps_timeout">GPS-Zeitlimit</string>
+    <string name="settings_net_loc_timeout">Netzwerkstandort-Zeitlimit</string>
 </resources>

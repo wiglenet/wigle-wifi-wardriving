@@ -307,4 +307,7 @@
     <string name="quick_pause_unset">Bekräfta</string>
     <string name="quick_pause">Paus</string>
     <string name="quick_pause_do_nothing">Göra ingenting</string>
+    <string name="send_to">Dela med</string>
+    <string name="settings_gps_timeout">GPS Timeout</string>
+    <string name="settings_net_loc_timeout">Nätverksplats Timeout</string>
 </resources>

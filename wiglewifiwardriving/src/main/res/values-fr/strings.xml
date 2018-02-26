@@ -374,4 +374,7 @@
     <string name="quick_pause_unset">Confirmer</string>
     <string name="quick_pause">Pause</string>
     <string name="quick_pause_do_nothing">Ne fais rien</string>
+    <string name="send_to">Partager en utilisant</string>
+    <string name="settings_gps_timeout">Délai d\'expiration GPS</string>
+    <string name="settings_net_loc_timeout">Délai d\'attente réseau</string>
 </resources>

@@ -309,4 +309,8 @@
     <string name="quick_pause_unset">Onaylamak</string>
     <string name="quick_pause">durma</string>
     <string name="quick_pause_do_nothing">Hiçbir şey yapma</string>
+    <string name="send_to">Kullanarak paylaş</string>
+    <string name="settings_gps_timeout">GPS Zaman Aşımı</string>
+    <string name="settings_net_loc_timeout">Ağ Konum Zaman Aşımı
+</string>
 </resources>

@@ -603,7 +603,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
             if (msg.what == MSG_USER_DONE) {
-                if (bundle.containsKey("error")) {
+                if ((null != bundle) && (bundle.containsKey("error"))) {
                     //ALIBI: not doing anything more here, since the toast will alert.
                     MainActivity.info("Settings auth unsuccessful");
                 } else {

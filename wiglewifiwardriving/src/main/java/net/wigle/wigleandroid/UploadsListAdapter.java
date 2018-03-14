@@ -92,7 +92,27 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     try {
                         task.startDownload(fragment);
                     } catch (WiGLEAuthException waex) {
-                        MainActivity.warn("Authentication error on KML downloadload for transid " +
+                        MainActivity.warn("Authentication error on KML download for transid " +
+                                transid, waex);
+                    }
+                }
+            });
+            ImageButton view = (ImageButton) row.findViewById(R.id.view_upload);
+            view.setVisibility(View.VISIBLE);
+            view.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    MainActivity.info("Viewing transid: " + transid);
+                    final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transid,
+                            new ApiListener() {
+                                @Override
+                                public void requestComplete(final JSONObject json, final boolean isCache) {
+                                    UploadsListAdapter.handleKmlDownload(transid, json, fragment, Intent.ACTION_VIEW);
+                                }
+                            });
+                    try {
+                        task.startDownload(fragment);
+                    } catch (WiGLEAuthException waex) {
+                        MainActivity.warn("Authentication error on KML download for transid " +
                                 transid, waex);
                     }
                 }
@@ -150,11 +170,14 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
 
                     if (Intent.ACTION_SEND.equals(actionIntent)) {
                         //share case, populates arguments to work with email, drive
-                        MainActivity.info("send action called for file URI: "+fileUri.toString());
+                        MainActivity.info("send action called for file URI: " + fileUri.toString());
                         intent.setType("application/vnd.google-earth.kml+xml");
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                    } else if (Intent.ACTION_VIEW.equals(actionIntent)) {
+                        MainActivity.info("view action called for file URI: "+fileUri.toString());
+                        intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
                     } else {
-                        //catch-all, handles "view" case among others.
+                        //catch-all, same as "view" for now.
                         MainActivity.info("view action called for file URI: "+fileUri.toString());
                         intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
                     }

@@ -167,6 +167,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         super.onResume();
         if (mapView != null) {
             mapView.onResume();
+        } else {
+            setupMap( network, null );
         }
     }
 

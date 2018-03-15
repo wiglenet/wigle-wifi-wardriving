@@ -7,26 +7,48 @@
 
     <!-- android:layout_width="wrap_content"
     android:layout_height="wrap_content" -->
-    <ImageButton
-        android:id="@+id/share_upload"
-        android:background="@android:drawable/ic_menu_share"
+    <LinearLayout
+        android:id="@+id/upload_buttons"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="right"
-        android:layout_centerVertical="true"
-        android:layout_height="28dp"
-        android:layout_width="28dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="5dp"
-        android:visibility="gone"
-        />
-
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/view_upload"
+            android:background="@android:drawable/ic_menu_view"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:layout_centerVertical="true"
+            android:layout_height="28dp"
+            android:layout_width="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:id="@+id/share_upload"
+            android:background="@android:drawable/ic_menu_share"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:layout_centerVertical="true"
+            android:layout_height="28dp"
+            android:layout_width="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            />
+    </LinearLayout>
     <RelativeLayout android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/upload_data"
-        android:layout_toLeftOf="@id/share_upload">
+        android:layout_toLeftOf="@id/upload_buttons">
         <LinearLayout android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

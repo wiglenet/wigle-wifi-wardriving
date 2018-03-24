@@ -181,7 +181,7 @@ public class DashboardFragment extends Fragment {
 
     String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
     if (hours > 0) {
-      durString = String.format("%02d", hours) + ":" + durString;
+      durString = String.format("%d", hours) + ":" + durString;
     }
 
     final TextView tv = (TextView) view.findViewById( id );

@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Réseaux depuis le dernier upload :</string>
     <string name="dash_new_cells">Nouvelles tours cellaires :</string>
     <string name="dash_dist_run">Distance de course :</string>
+    <string name="dash_time_run">Durée de course:</string>
     <string name="dash_dist_total">Distance totale :</string>
     <string name="dash_dist_prev">Course précédente :</string>
     <string name="dash_db_queue">File d\'attente BD :</string>

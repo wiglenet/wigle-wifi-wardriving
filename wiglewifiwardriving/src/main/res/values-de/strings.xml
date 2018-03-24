@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Neue WLAN seit letztem Hochladen:</string>
     <string name="dash_new_cells">Neue Funkmasten:</string>
     <string name="dash_dist_run">Strecke seit Start:</string>
+    <string name="dash_time_run">Laufzeit ausführen:</string>
     <string name="dash_dist_total">Gesamtstrecke:.</string>
     <string name="dash_dist_prev">Vorheriger Lauf:</string>
     <string name="dash_db_queue">DB Warteschlange:</string>

@@ -92,6 +92,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     public static final String PREF_DISTANCE_RUN = "distRun";
+    public static final String PREF_STARTTIME_RUN = "timestampRunStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
     public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";

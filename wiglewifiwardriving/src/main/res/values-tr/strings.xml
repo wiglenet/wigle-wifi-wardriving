@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Son yükleme sonrası görünen ağlar:</string>
     <string name="dash_new_cells">Yeni baz istasyonları:</string>
     <string name="dash_dist_run">Geçerli Mesafe:</string>
+    <string name="dash_time_run">Çalıştırma Süresi:</string>
     <string name="dash_dist_total">Toplam Mesafe.:</string>
     <string name="dash_dist_prev">Önceki Mesafe:</string>
     <string name="dash_db_queue">DB Sıralaması:</string>

@@ -251,6 +251,7 @@ public final class MainActivity extends AppCompatActivity {
             final float prevRun = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
             Editor edit = prefs.edit();
             edit.putFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+            edit.putLong(ListFragment.PREF_STARTTIME_RUN, System.currentTimeMillis());
             edit.putFloat(ListFragment.PREF_DISTANCE_PREV_RUN, prevRun);
             edit.apply();
         }

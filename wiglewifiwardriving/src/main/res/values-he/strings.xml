@@ -123,6 +123,7 @@
     <string name="dash_new_upload">הנטס בניו מאז טען:</string>
     <string name="dash_new_cells">תא מגדלי חדש:</string>
     <string name="dash_dist_run">הפעל מרחק:</string>
+    <string name="dash_time_run">משך הפעלה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
     <string name="dash_dist_prev">הקודם הפעלה:</string>
     <string name="dash_db_queue">DB תור:</string>

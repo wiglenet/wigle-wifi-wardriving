@@ -8,6 +8,7 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -124,6 +125,7 @@ public class DashboardFragment extends Fragment {
     tv.setText( getString(R.string.dash_new_cells) + " " + ListFragment.lameStatic.newCells );
 
     updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN, getString(R.string.dash_time_run) );
     updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
     updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
@@ -167,6 +169,25 @@ public class DashboardFragment extends Fragment {
     final String distString = metersToString( numberFormat, getActivity(), dist, false );
     final TextView tv = (TextView) view.findViewById( id );
     tv.setText( title + " " + distString );
+  }
+
+  private void updateTime( final View view, final int id, final String pref, final String title ) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+    long duration =  System.currentTimeMillis() - prefs.getLong( pref, System.currentTimeMillis() );
+
+    //TODO: better to just use TimeUnit?
+    int seconds = (int) (duration / 1000) % 60 ;
+    int minutes = (int) ((duration / (1000*60)) % 60);
+    int hours   = (int) ((duration / (1000*60*60)) % 24);
+
+    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
+    if (hours > 0) {
+      durString = String.format("%02d", hours) + ":" + durString;
+    }
+
+    final TextView tv = (TextView) view.findViewById( id );
+    tv.setText( title + " " + durString );
   }
 
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,

@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nije netwurken sûnt lêste upload:</string>
     <string name="dash_new_cells">Nije stjoermêsten:</string>
     <string name="dash_dist_run">Runôfstân:</string>
+    <string name="dash_time_run">Looptijd:</string>
     <string name="dash_dist_total">Totale ôfstân:.</string>
     <string name="dash_dist_prev">Foarige run:</string>
     <string name="dash_db_queue">DB-wachtrige:</string>

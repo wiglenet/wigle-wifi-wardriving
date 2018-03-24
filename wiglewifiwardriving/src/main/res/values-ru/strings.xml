@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Новые сети с загрузки:</string>
     <string name="dash_new_cells">Новые соты:</string>
     <string name="dash_dist_run">Дистанция пробега:</string>
+    <string name="dash_time_run">Длительность выполнения:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
     <string name="dash_dist_prev">Предыдущий пробег:</string>
     <string name="dash_db_queue">Очередь в БД:</string>

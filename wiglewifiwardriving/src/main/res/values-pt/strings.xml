@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nets New Desde Upload:</string>
     <string name="dash_new_cells">Nova torres de celular:</string>
     <string name="dash_dist_run">Run Distância:</string>
+    <string name="dash_time_run">Duração de corrida:</string>
     <string name="dash_dist_total">Total de Dist.:</string>
     <string name="dash_dist_prev">Anterior Run:</string>
     <string name="dash_db_queue">Fila DB:</string>

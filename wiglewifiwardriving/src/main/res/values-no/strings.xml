@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nye Nets Siden Upload:</string>
     <string name="dash_new_cells">Nye Cell Towers:</string>
     <string name="dash_dist_run">Run Avstand:</string>
+    <string name="dash_time_run">Kjør varighet:</string>
     <string name="dash_dist_total">Total Dist.</string>
     <string name="dash_dist_prev">Forrige Run:</string>
     <string name="dash_db_queue">DB Kø:</string>

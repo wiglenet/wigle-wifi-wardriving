@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nya nät sedan uppladdning:</string>
     <string name="dash_new_cells">Nya mobilmaster:</string>
     <string name="dash_dist_run">Körsträcka:</string>
+    <string name="dash_time_run">Körlängd:</string>
     <string name="dash_dist_total">Total distans:.</string>
     <string name="dash_dist_prev">Föregående runda:</string>
     <string name="dash_db_queue">DB kön:</string>

@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nuevas redes desde ultima subida:</string>
     <string name="dash_new_cells">Nuevas antenas de celular:</string>
     <string name="dash_dist_run">Distancia recorrida:</string>
+    <string name="dash_time_run">Duración recorrida:</string>
     <string name="dash_dist_total">Dist. total:</string>
     <string name="dash_dist_prev">Distancia anterior:</string>
     <string name="dash_db_queue">No subidos:</string>

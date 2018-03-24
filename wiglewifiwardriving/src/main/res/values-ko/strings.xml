@@ -123,6 +123,7 @@
     <string name="dash_new_upload">업로드 이후 새로운 네츠 :</string>
     <string name="dash_new_cells">새로운 셀 타워 :</string>
     <string name="dash_dist_run">거리를 실행합니다 :</string>
+    <string name="dash_time_run">실행 시간:</string>
     <string name="dash_dist_total">Dist 총. :</string>
     <string name="dash_dist_prev">이전이 실행 :</string>
     <string name="dash_db_queue">DB 대기열 :</string>

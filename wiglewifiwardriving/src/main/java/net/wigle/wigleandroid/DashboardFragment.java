@@ -172,7 +172,8 @@ public class DashboardFragment extends Fragment {
   private void updateTime( final View view, final int id, final String pref, final String title ) {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
-    long duration =  System.currentTimeMillis() - prefs.getLong( pref, System.currentTimeMillis() );
+    long millis = System.currentTimeMillis();
+    long duration =  millis - prefs.getLong( pref,  millis);
 
     //TODO: better to just use TimeUnit?
     int seconds = (int) (duration / 1000) % 60 ;

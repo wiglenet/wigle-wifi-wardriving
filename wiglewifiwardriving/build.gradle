@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
@@ -28,19 +28,19 @@ android {
 }
 
 dependencies {
-    compile project(':android-maps-utils')
-    compile "com.android.support:support-compat:27.0.2"
-    compile "com.android.support:support-core-utils:27.0.2"
-    compile "com.android.support:support-v4:27.0.2"
-    compile "com.android.support:appcompat-v7:27.0.2"
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    compile 'com.google.android.gms:play-services-maps:11.8.0'
-    compile 'com.google.android.gms:play-services-vision:11.8.0'
-    compile 'com.google.code.gson:gson:2.8.1'
-    compile 'org.slf4j:slf4j-android:1.7.19'
-    compile files('libs/TTS_library_stub.jar')
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
-    compile 'ru.egslava:MaskedEditText:1.0.5'
+    implementation project(':android-maps-utils')
+    implementation "com.android.support:support-compat:27.1.0"
+    implementation "com.android.support:support-core-utils:27.1.0"
+    implementation "com.android.support:support-v4:27.1.0"
+    implementation "com.android.support:appcompat-v7:27.1.0"
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
+    implementation 'com.google.android.gms:play-services-maps:12.0.0'
+    implementation 'com.google.android.gms:play-services-vision:12.0.0'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'org.slf4j:slf4j-android:1.7.19'
+    implementation files('libs/TTS_library_stub.jar')
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
+    implementation 'ru.egslava:MaskedEditText:1.0.5'
 }

@@ -1111,7 +1111,12 @@ public final class MainActivity extends AppCompatActivity {
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
         if (!"".equals(lang) && !current.equals(lang)) {
-            newLocale = new Locale(lang);
+            if (lang.contains("-")) {
+                String[] parts = lang.split("-");
+                newLocale = new Locale(parts[0], parts[1]);
+            } else {
+                newLocale = new Locale(lang);
+            }
         } else if ("".equals(lang) && ORIG_LOCALE != null && !current.equals(ORIG_LOCALE.getLanguage())) {
             newLocale = ORIG_LOCALE;
         }

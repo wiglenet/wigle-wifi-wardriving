@@ -123,6 +123,7 @@
     <string name="dash_new_upload">上传的新网络：</string>
     <string name="dash_new_cells">新的信号塔：</string>
     <string name="dash_dist_run">运行距离：</string>
+    <string name="dash_time_run">运行时间:</string>
     <string name="dash_dist_total">总共的距离。</string>
     <string name="dash_dist_prev">上一次的运行：</string>
     <string name="dash_db_queue">数据库的队列：</string>

@@ -238,7 +238,9 @@
     <string name="language_ru">ру́сский (러시아어)</string>
     <string name="language_sv">svenska (스웨덴어)</string>
     <string name="language_tr">Türkçe (터키어)</string>
-    <string name="language_zh">繁體中文 (중국어 번체)</string>
+    <string name="language_zh_cn">简体中文（중국어 간체 : Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (중국어 번체 - 대만)</string>
+    <string name="language_zh_hk">繁体中文 香港 (중국어 번체 - 홍콩)</string>
     <string name="language_text">선택된 언어 (다시 시작해야 함)</string>
     <string name="fatal_title">치명적인 DB의 문제</string>
     <string name="fatal_db_warn">보통 장치 또는 SD 카드 문제로 인해!</string>

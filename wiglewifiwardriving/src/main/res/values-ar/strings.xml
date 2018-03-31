@@ -238,7 +238,9 @@
     <string name="language_ru">ру́сский (روسية)</string>
     <string name="language_sv">svenska (سويدية)</string>
     <string name="language_tr">Türkçe (تركية)</string>
-    <string name="language_zh">繁體中文 (الصينية التقليدية)</string>
+    <string name="language_zh_cn">简体中文（الصينية المبسطة: by Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (الصينية التقليدية - تايوان)</string>
+    <string name="language_zh_hk">繁体中文 香港 (الصينية التقليدية - هونغ كونغ)</string>
     <string name="language_text">اللغة المختارة (يتطلب إعادة التشغيل)</string>
     <string name="fatal_title">Fatal DB Problem</string>
     <string name="fatal_db_warn">Usually caused by device or SD card problems!</string>

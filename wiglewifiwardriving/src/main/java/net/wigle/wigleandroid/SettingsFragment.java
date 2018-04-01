@@ -433,7 +433,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
-                "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };
+                "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
                 getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
                 getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
@@ -442,7 +442,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
                 getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
                 getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
-                getString(R.string.language_tr), getString(R.string.language_zh),
+                getString(R.string.language_tr), getString(R.string.language_zh_cn),
+                getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
         SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
 

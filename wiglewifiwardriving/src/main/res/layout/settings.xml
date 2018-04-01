@@ -159,6 +159,7 @@
             android:layout_height="match_parent"
             android:drawSelectorOnTop="true"
             android:layout_weight="1"
+            android:dropDownWidth="wrap_content"
             android:prompt="@string/language_text"
             android:ellipsize="end"
             />

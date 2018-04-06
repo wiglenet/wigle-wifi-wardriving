@@ -192,7 +192,11 @@ public final class WigleService extends Service {
                 }
             }
             if (null != notification) {
-                startForeground(NOTIFICATION_ID, notification);
+                try {
+                    startForeground(NOTIFICATION_ID, notification);
+                } catch (Exception ex) {
+                    MainActivity.error("notification service error: ", ex);
+                }
             }
         }
     }

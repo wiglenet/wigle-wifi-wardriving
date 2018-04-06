@@ -28,7 +28,10 @@ public class RegistrationActivity extends AppCompatActivity {
         WebSettings webSettings = regWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         regWebView.clearCache(true);
-        clearCookies(MainActivity.getMainActivity().getApplicationContext());
+        MainActivity mActivity = MainActivity.getMainActivity();
+        if (mActivity != null) {
+            clearCookies(mActivity.getApplicationContext());
+        }
         regWebView.setWebChromeClient(new WebChromeClient());
         regWebView.getSettings().setUserAgentString(AGENT);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

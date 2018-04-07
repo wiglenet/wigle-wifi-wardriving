@@ -5,7 +5,7 @@ apply plugin: 'signing'
 group = 'com.google.maps.android'
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-maps:12.0.0'
+    implementation 'com.google.android.gms:play-services-maps:12.0.1'
 }
 
 

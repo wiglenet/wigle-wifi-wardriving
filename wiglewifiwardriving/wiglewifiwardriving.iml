@@ -91,7 +91,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaPrecompile" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/lint" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
@@ -105,41 +104,41 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-v4-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: pl.droidsonroids.gif:android-gif-drawable-1.2.7" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-common-12.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:common:1.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-android:1.7.19@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-27.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-annotations:27.1.1@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-27.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-compat-27.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-12.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:viewmodel-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-v4-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-compat-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-license-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-media-compat-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-annotations:27.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-common-license-12.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-common-license-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-license-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable-27.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-media-compat-27.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.19@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-license-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-license-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-27.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-license-12.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-license-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-license-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-maps-license-12.0.1" level="project" />
     <orderEntry type="library" name="Gradle: ru.egslava:MaskedEditText-1.0.5" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-maps-license-12.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-12.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-tasks-license-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-basement-12.0.1" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:/Users/bobzilla/StudioProjects/wigle-wifi-wardriving/wiglewifiwardriving/libs/TTS_library_stub.jar:unspecified@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:runtime-1.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.9.0.pr3@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-12.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-maps-12.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-base-12.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-maps-12.0.1" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.android.gms:play-services-vision-common-12.0.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3@jar" level="project" />
     <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.0" level="project" />
     <orderEntry type="module" module-name="android-maps-utils" />

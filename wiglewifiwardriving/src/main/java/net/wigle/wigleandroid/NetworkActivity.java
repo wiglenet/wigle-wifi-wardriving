@@ -98,9 +98,9 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
         MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
+        final SimpleDateFormat format = NetworkListAdapter.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
             network = MainActivity.getNetworkCache().get(bssid);
-            SimpleDateFormat format = NetworkListAdapter.getConstructionTimeFormater(this);
         }
 
         TextView tv = (TextView) findViewById( R.id.bssid );

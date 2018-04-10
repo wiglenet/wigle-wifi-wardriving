@@ -47,6 +47,13 @@ public final class FilterMatcher {
     public static boolean isOk(final Matcher ssidMatcher, final Matcher bssidMatcher,
                                final SharedPreferences prefs, final String prefix, final Network network ) {
 
+        /**
+         * ALIBI: shouldn't be necessary, but seeing null network reports.
+         */
+        if (network == null) {
+            return false;
+        }
+
         if ( isSsidFilterOn( prefs, prefix ) ) {
             if (ssidMatcher != null) {
                 try {

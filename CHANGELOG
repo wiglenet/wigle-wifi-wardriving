@@ -1,10 +1,11 @@
-* 2.28
+* 2.28 (04/15/2017)
 Add configurable timeouts for GPS and Network Location
 Adding a run timer to the dashboard
 New vector-derived icon set
 Adding a "view" button to the upload panel for direct KML intent integration (Google Earth and other viewers)
 Split traditional Chinese (TW and HK) from simplified
 Language pack synchronization to assist with translation (ongoing)
+Various bug fixes
 
 * 2.27 (02/24/2017)
 Share button on uploads panel.

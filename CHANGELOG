@@ -1,4 +1,7 @@
-* 2.28 (04/15/2017)
+* 2.29 (??/??/2018)
+Better French translation (thanks marmat8951!)
+
+* 2.28 (04/15/2018)
 Add configurable timeouts for GPS and Network Location
 Adding a run timer to the dashboard
 New vector-derived icon set
@@ -7,7 +10,7 @@ Split traditional Chinese (TW and HK) from simplified
 Language pack synchronization to assist with translation (ongoing)
 Various bug fixes
 
-* 2.27 (02/24/2017)
+* 2.27 (02/24/2018)
 Share button on uploads panel.
 Better registration integration.
 Camera feature optional for devices.

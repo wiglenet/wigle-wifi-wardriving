@@ -34,8 +34,8 @@ dependencies {
     implementation "com.android.support:support-v4:27.1.1"
     implementation "com.android.support:appcompat-v7:27.1.1"
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    implementation 'com.google.android.gms:play-services-maps:12.0.1'
-    implementation 'com.google.android.gms:play-services-vision:12.0.1'
+    implementation 'com.google.android.gms:play-services-maps:15.0.0'
+    implementation 'com.google.android.gms:play-services-vision:15.0.0'
     implementation 'com.google.code.gson:gson:2.8.1'
     implementation 'org.slf4j:slf4j-android:1.7.19'
     implementation files('libs/TTS_library_stub.jar')

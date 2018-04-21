@@ -47,7 +47,6 @@ import org.json.JSONObject;
  */
 public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
-    private static final int MENU_EXIT = 11;
     private static final int MENU_ERROR_REPORT = 13;
 
     private static final int CSV_RUN_DIALOG = 120;
@@ -543,10 +542,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
-            case MENU_EXIT:
-                final MainActivity main = MainActivity.getMainActivity();
-                main.finish();
-                return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 startActivity( errorReportIntent );

@@ -103,7 +103,7 @@ public class ErrorReportActivity extends AppCompatActivity {
         // shut down anything we can get a handle to
         final MainActivity mainActivity = MainActivity.getMainActivity();
         if ( mainActivity != null ) {
-            mainActivity.finish();
+            mainActivity.finishSoon();
         }
         if ( NetworkActivity.networkActivity != null ) {
             NetworkActivity.networkActivity.finish();

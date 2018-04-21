@@ -55,7 +55,7 @@ import net.wigle.wigleandroid.model.OUI;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
-    private static final int MENU_EXIT = 11;
+    private static final int MENU_RETURN = 11;
     private static final int MENU_COPY = 12;
     private static final int NON_CRYPTO_DIALOG = 130;
 
@@ -553,7 +553,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         MenuItem item = menu.add(0, MENU_COPY, 0, getString(R.string.menu_copy_network));
         item.setIcon( android.R.drawable.ic_menu_save );
 
-        item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
+        item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
         item.setIcon( android.R.drawable.ic_menu_revert );
 
         return true;
@@ -563,7 +563,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
-            case MENU_EXIT:
+            case MENU_RETURN:
                 // call over to finish
                 finish();
                 return true;

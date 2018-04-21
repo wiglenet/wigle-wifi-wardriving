@@ -215,15 +215,6 @@ public class DashboardFragment extends Fragment {
     return retval;
   }
 
-  // XXX
-//  @Override
-//  public void finish() {
-//    ListActivity.info( "finish dash." );
-//    finishing.set( true );
-//
-//    super.finish();
-//  }
-
   @Override
   public void onDestroy() {
     MainActivity.info( "DASH: onDestroy" );

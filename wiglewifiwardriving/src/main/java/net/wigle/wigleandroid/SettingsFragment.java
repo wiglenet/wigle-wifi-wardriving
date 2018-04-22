@@ -136,11 +136,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 editor.remove(ListFragment.PREF_CONFIRM_UPLOAD_USER);
 
                 String mapTileMode = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-                        ListFragment.PREF_MAP_NO_TILE);
+                        ListFragment.PREF_MAP_ALL_TILE);
                 if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
                         ListFragment.PREF_MAP_ONLYMINE_TILE.equals(mapTileMode)) {
                     // ALIBI: clear show mine/others on deauthorize
-                    editor.putString(ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+                    editor.putString(ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_ALL_TILE);
                 }
                 editor.apply();
                 if (view != null) {
@@ -373,7 +373,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
 ;
 
-        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_ALL_TILE);
         final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
         final String[] mapModes = SettingsUtil.getMapModes(isAuthenticated);
         final String[] mapModeName = SettingsUtil.getMapModeNames(isAuthenticated, this.getContext());
@@ -384,7 +384,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         }
 
         SettingsUtil.doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
-                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, getContext(), view );
+                ListFragment.PREF_MAP_ALL_TILE, mapModes, mapModeName, getContext(), view );
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         List<Long> yearValueBase = new ArrayList<Long>();

@@ -67,7 +67,7 @@ public class MapFilterActivity extends AppCompatActivity {
         final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
 
 
-        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_ALL_TILE);
         final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
         final String[] mapModes = SettingsUtil.getMapModes(isAuthenticated);
         final String[] mapModeName = SettingsUtil.getMapModeNames(isAuthenticated, MapFilterActivity.this);
@@ -78,7 +78,7 @@ public class MapFilterActivity extends AppCompatActivity {
         }
 
         SettingsUtil.doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
-                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, MapFilterActivity.this, view );
+                ListFragment.PREF_MAP_ALL_TILE, mapModes, mapModeName, MapFilterActivity.this, view );
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         List<Long> yearValueBase = new ArrayList<Long>();

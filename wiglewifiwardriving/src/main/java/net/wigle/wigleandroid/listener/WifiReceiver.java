@@ -850,7 +850,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                         MainActivity.warn("low battery, shutting down");
                         mainActivity.speak(text);
-                        mainActivity.finishSoon(4000L);
+                        mainActivity.finishSoon(4000L, false);
                     }
                 }
             }

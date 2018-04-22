@@ -415,12 +415,7 @@ public final class MainActivity extends AppCompatActivity {
                 if (restart) {
                     // restart the app now that we can talk to the database
                     info("Restarting to pick up storage permission");
-
-                    Intent i = getBaseContext().getPackageManager()
-                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    finishSoon();
-                    startActivity(i);
+                    finishSoon(FINISH_TIME_MILLIS, true);
                 }
                 return;
             }
@@ -1994,16 +1989,29 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void finishSoon() {
-        finishSoon(FINISH_TIME_MILLIS);
+        finishSoon(FINISH_TIME_MILLIS, false);
     }
 
-    public void finishSoon(final long finishTimeMillis) {
+    public void finishSoon(final long finishTimeMillis, final boolean restart) {
         MainActivity.info("Will finish in " + finishTimeMillis + "ms");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                final Intent i = getBaseContext().getPackageManager()
+                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
                 MainActivity.info("calling finish now");
                 finish();
+
+                if (restart) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivity(i);
+                        }
+                    }, 10L);
+                }
             }
         }, finishTimeMillis);
     }

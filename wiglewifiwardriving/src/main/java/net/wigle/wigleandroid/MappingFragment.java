@@ -249,7 +249,7 @@ public final class MappingFragment extends Fragment {
 
                 if (!ListFragment.PREF_MAP_NO_TILE.equals(
                         prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-                                ListFragment.PREF_MAP_NO_TILE))) {
+                                ListFragment.PREF_MAP_ALL_TILE))) {
                     final int providerTileRes = MainActivity.isHighDefinition()?512:256;
 
                     //TODO: DRY up token composition vs AbstractApiRequest?
@@ -281,7 +281,7 @@ public final class MappingFragment extends Fragment {
                             final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
                             int thisYear = Calendar.getInstance().get(Calendar.YEAR);
                             String tileContents = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-                                    ListFragment.PREF_MAP_NO_TILE);
+                                    ListFragment.PREF_MAP_ALL_TILE);
 
                             String sinceString = String.format("%d0000-00000", since);
                             String toString = String.format("%d0000-00000", thisYear+1);

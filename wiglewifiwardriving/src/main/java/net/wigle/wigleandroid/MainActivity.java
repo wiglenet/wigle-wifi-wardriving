@@ -29,6 +29,7 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -163,6 +164,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
+    private static final long FINISH_TIME_MILLIS = 500L;
 
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
     public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
@@ -417,7 +419,7 @@ public final class MainActivity extends AppCompatActivity {
                     Intent i = getBaseContext().getPackageManager()
                             .getLaunchIntentForPackage(getBaseContext().getPackageName());
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    finish();
+                    finishSoon();
                     startActivity(i);
                 }
                 return;
@@ -533,7 +535,7 @@ public final class MainActivity extends AppCompatActivity {
      */
     public void selectFragment(int position) {
         if (position == EXIT_TAB_POS) {
-            finish();
+            finishSoon();
             return;
         }
 
@@ -1991,10 +1993,30 @@ public final class MainActivity extends AppCompatActivity {
         return mDrawerToggle.onOptionsItemSelected(item);
     }
 
-    //@Override
+    public void finishSoon() {
+        finishSoon(FINISH_TIME_MILLIS);
+    }
+
+    public void finishSoon(final long finishTimeMillis) {
+        MainActivity.info("Will finish in " + finishTimeMillis + "ms");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                MainActivity.info("calling finish now");
+                finish();
+            }
+        }, finishTimeMillis);
+    }
+
+    /**
+     * Never call this directly! call finishSoon to give the service time to show a notification if needed
+     */
     @Override
     public void finish() {
-        info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+        info("MAIN: finish.");
+        if (state.wifiReceiver != null) {
+            info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+        }
 
         final boolean wasFinishing = state.finishing.getAndSet(true);
         if (wasFinishing) {
@@ -2013,7 +2035,7 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // close the db. not in destroy, because it'll still write after that.
-        state.dbHelper.close();
+        if (state.dbHelper != null) state.dbHelper.close();
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (state.gpsListener != null) {

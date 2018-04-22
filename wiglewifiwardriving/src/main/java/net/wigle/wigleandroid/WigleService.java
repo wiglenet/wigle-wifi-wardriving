@@ -59,6 +59,7 @@ public final class WigleService extends Service {
     @Override
     public boolean onUnbind( final Intent intent ) {
         MainActivity.info( "service: onUnbind. intent: " + intent );
+        oreoSimpleNotification();
         shutdownNotification();
         stopSelf();
         return super.onUnbind( intent );
@@ -79,6 +80,9 @@ public final class WigleService extends Service {
     @Override
     public void onDestroy() {
         MainActivity.info( "service: onDestroy" );
+        // avoid stupid android bug causing:
+        // android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground()
+        oreoSimpleNotification();
         // Make sure our notification is gone.
         shutdownNotification();
         setDone();
@@ -99,12 +103,14 @@ public final class WigleService extends Service {
     public void onStart( Intent intent, int startId ) {
         MainActivity.info( "service: onStart" );
         handleCommand( intent );
+        setupNotification();
     }
 
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
         MainActivity.info( "service: onStartCommand" );
         handleCommand( intent );
+        setupNotification();
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
         return Service.START_STICKY;
@@ -118,14 +124,27 @@ public final class WigleService extends Service {
         stopForeground(true);
     }
 
+    private void oreoSimpleNotification() {
+        // make a dummy call to foreground to keep it from crashing with RemoteServiceException
+        // https://developer.android.com/about/versions/oreo/android-8.0-changes.html
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            MainActivity.info("oreoSimpleNotification");
+            final NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            final String title = getApplicationContext().getString(R.string.wigle_service);
+            final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    title, NotificationManager.IMPORTANCE_LOW);
+            notificationManager.createNotificationChannel(channel);
+
+            final Notification.Builder builder = new Notification.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+            startForeground(NOTIFICATION_ID, builder.build());
+            MainActivity.info("oreoSimpleNotification done");
+        }
+    }
+
     private void setupNotification() {
         if ( done.get() ) {
-            // make a dummy call to foreground to keep it from crashing with RemoteServiceException
-            // https://developer.android.com/about/versions/oreo/android-8.0-changes.html
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                final Notification.Builder builder = new Notification.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
-                startForeground(NOTIFICATION_ID, builder.build());
-            }
+            oreoSimpleNotification();
         }
         else {
             final long when = System.currentTimeMillis();

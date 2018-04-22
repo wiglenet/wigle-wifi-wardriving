@@ -98,7 +98,6 @@ public final class MappingFragment extends Fragment {
 
     private static final int DEFAULT_ZOOM = 17;
     public static final LatLng DEFAULT_POINT = new LatLng(41.95d, -87.65d);
-    private static final int MENU_EXIT = 12;
     private static final int MENU_ZOOM_IN = 13;
     private static final int MENU_ZOOM_OUT = 14;
     private static final int MENU_TOGGLE_LOCK = 15;
@@ -657,11 +656,6 @@ public final class MappingFragment extends Fragment {
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         switch ( item.getItemId() ) {
-            case MENU_EXIT: {
-                final MainActivity main = MainActivity.getMainActivity();
-                main.finish();
-                return true;
-            }
             case MENU_ZOOM_IN: {
                 mapView.getMapAsync(new OnMapReadyCallback() {
                     @Override

@@ -1,5 +1,6 @@
 * 2.29 (??/??/2018)
 Better French translation (thanks marmat8951!)
+Another stab at fixing RemoteServiceException
 
 * 2.28 (04/15/2018)
 Add configurable timeouts for GPS and Network Location

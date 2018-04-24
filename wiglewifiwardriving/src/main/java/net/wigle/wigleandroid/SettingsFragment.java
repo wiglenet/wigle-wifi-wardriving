@@ -431,6 +431,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };

@@ -121,6 +121,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
     public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
+    public static final String PREF_START_AT_BOOT = "startAtBoot";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

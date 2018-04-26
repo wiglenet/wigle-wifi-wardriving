@@ -380,4 +380,5 @@
     <string name="send_to">Share using</string>
     <string name="settings_gps_timeout">GPS Timeout</string>
     <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="start_at_boot">Lunch Wigle at boot</string>
 </resources>

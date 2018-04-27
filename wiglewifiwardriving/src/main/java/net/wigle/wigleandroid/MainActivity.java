@@ -990,6 +990,8 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalArgumentException ex) {
             info("wifiReceiver not registered: " + ex);
         }
+
+        stopService(new Intent(MainActivity.this,WigleService.class));
     }
 
     @Override

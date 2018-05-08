@@ -281,7 +281,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         }
         MapsInitializer.initialize( this );
 
-        if (network.getLatLng() != null) {
+        if ((network != null) && (network.getLatLng() != null)) {
             mapView.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(final GoogleMap googleMap) {

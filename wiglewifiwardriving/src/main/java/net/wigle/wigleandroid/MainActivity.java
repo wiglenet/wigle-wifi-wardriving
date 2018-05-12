@@ -990,6 +990,8 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalArgumentException ex) {
             info("wifiReceiver not registered: " + ex);
         }
+
+        if (state.tts != null) state.tts.shutdown();
     }
 
     @Override
@@ -2109,6 +2111,7 @@ public final class MainActivity extends AppCompatActivity {
         if (state.soundNewPop != null) {
             state.soundNewPop.release();
         }
+        info("MAIN: finish complete.");
 
         super.finish();
     }

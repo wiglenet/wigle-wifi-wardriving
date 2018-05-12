@@ -65,6 +65,26 @@ public final class WigleService extends Service {
         return super.onUnbind( intent );
     }
 
+    /**
+     * This is called if the user force-kills the app
+     */
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        MainActivity.info("service: onTaskRemoved.");
+        if (! done.get()) {
+            final MainActivity mainActivity = MainActivity.getMainActivity();
+            if (mainActivity != null) {
+                mainActivity.finishSoon();
+            }
+            setDone();
+        }
+        oreoSimpleNotification();
+        shutdownNotification();
+        stopSelf();
+        super.onTaskRemoved(rootIntent);
+        MainActivity.info("service: onTaskRemoved complete.");
+    }
+
     @Override
     public void onCreate() {
         MainActivity.info( "service: onCreate" );

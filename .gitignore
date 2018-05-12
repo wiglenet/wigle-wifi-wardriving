@@ -11,6 +11,7 @@
 bin/
 gen/
 build/
+dist/release/
 android-maps-utils/build
 wiglewifiwardriving/build
 .idea

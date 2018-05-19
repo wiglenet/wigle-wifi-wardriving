@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -189,7 +190,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     }
 
     private void updateView(final View view) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final FragmentActivity activity = getActivity();
+        if (activity == null) return;
+        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         // donate

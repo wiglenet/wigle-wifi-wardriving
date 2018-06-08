@@ -168,6 +168,9 @@ public final class MainActivity extends AppCompatActivity {
 
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
     public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
+    public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
+    public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
+
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;

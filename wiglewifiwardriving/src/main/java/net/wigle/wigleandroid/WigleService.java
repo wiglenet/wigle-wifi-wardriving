@@ -187,19 +187,21 @@ public final class WigleService extends Service {
                 largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
             }
 
-            final Uri uri = Uri.EMPTY;
-            final Intent pauseSharedIntent = new Intent(Intent.ACTION_DELETE, uri, this, ShareActivity.class );
-            final PendingIntent pauseIntent = PendingIntent.getActivity( this, 0, pauseSharedIntent, 0 );
+            final Intent pauseSharedIntent = new Intent();
+            pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
+            final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
-            final Intent scanSharedIntent = new Intent(Intent.ACTION_INSERT, uri, this, ShareActivity.class );
-            final PendingIntent scanIntent = PendingIntent.getActivity( this, 0, scanSharedIntent, 0 );
+            final Intent scanSharedIntent = new Intent();
+            scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+            final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
-            // final Intent uploadSharedIntent = new Intent(Intent.ACTION_SYNC, uri, this, ShareActivity.class );
-            // final PendingIntent uploadIntent = PendingIntent.getActivity( this, 0, uploadSharedIntent, 0 );
+            final Intent uploadSharedIntent = new Intent();
+            uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+            final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
             Notification notification = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent);
+                notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
             }
             else {
                 final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -219,9 +221,9 @@ public final class WigleService extends Service {
                 builder.setCategory("SERVICE");
                 builder.setPriority(NotificationCompat.PRIORITY_LOW);
                 builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                builder.addAction(R.drawable.wiglewifi_small_black_white, "Pause", pauseIntent);
-                builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
-                // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
+                builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+                builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+                builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
 
                 try {
                     //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
@@ -242,7 +244,8 @@ public final class WigleService extends Service {
 
     private Notification getNotification26(final String title, final Context context, final String text,
                                            final long when, final PendingIntent contentIntent,
-                                           final PendingIntent pauseIntent, final PendingIntent scanIntent) {
+                                           final PendingIntent pauseIntent, final PendingIntent scanIntent,
+                                           final PendingIntent uploadIntent) {
         // new notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager =
@@ -265,9 +268,9 @@ public final class WigleService extends Service {
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
-            builder.addAction(R.drawable.wiglewifi_small_black_white, "Pause", pauseIntent);
-            builder.addAction(R.drawable.wiglewifi_small_black_white, "Scan", scanIntent);
-            // builder.addAction(R.drawable.wiglewifi_small_black_white, "Upload", uploadIntent);
+            builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+            builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+            builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
 
             return builder.build();
         }

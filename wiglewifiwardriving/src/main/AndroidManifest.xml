@@ -195,31 +195,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".ShareActivity"
-            android:parentActivityName=".MainActivity">
-
-            <!-- Parent activity meta-data to support API level 7+ -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_SYNC" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_INSERT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_DELETE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
         <provider
             android:name=".util.KmlFileProvider"
             android:authorities="${applicationId}.kmlprovider"
@@ -237,6 +212,14 @@
         <receiver android:name=".listener.UploadReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.UPLOAD" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".listener.ScanControlReceiver" >
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.SCAN" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.PAUSE" />
             </intent-filter>
         </receiver>
         <receiver

@@ -105,7 +105,12 @@ public final class Network implements ClusterItem {
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        this.channel = freqToChan.get( frequency );
+        if (this.type.equals(NetworkType.typeForCode("W"))) {
+            this.channel = freqToChan.get(frequency);
+        } else {
+            //TODO: we *can* map this now, but we'd need to determine server-side handling
+            this.channel = null;
+        }
 
         if ( ! NetworkType.WIFI.equals( type ) ) {
             int semicolon = this.capabilities.lastIndexOf(";");

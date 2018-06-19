@@ -1686,7 +1686,7 @@ public final class MainActivity extends AppCompatActivity {
             MainActivity.info("new wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
         }
 

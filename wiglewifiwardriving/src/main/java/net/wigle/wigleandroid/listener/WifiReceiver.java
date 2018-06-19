@@ -61,6 +61,7 @@ import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
+import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -692,9 +693,9 @@ public class WifiReceiver extends BroadcastReceiver {
             // ignore
         } else if ( cellLocation.getClass().getSimpleName().equals("CdmaCellLocation") ) {
             try {
-                final int systemId = (Integer) cellLocation.getClass().getMethod("getSystemId").invoke(cellLocation);
-                final int networkId = (Integer) cellLocation.getClass().getMethod("getNetworkId").invoke(cellLocation);
-                final int baseStationId = (Integer) cellLocation.getClass().getMethod("getBaseStationId").invoke(cellLocation);
+                final int systemId = ((CdmaCellLocation) cellLocation).getSystemId();
+                final int networkId = ((CdmaCellLocation) cellLocation).getNetworkId();
+                final int baseStationId = ((CdmaCellLocation) cellLocation).getBaseStationId();
                 if ( systemId > 0 && networkId >= 0 && baseStationId >= 0 ) {
                     bssid = systemId + "_" + networkId + "_" + baseStationId;
                     type = NetworkType.CDMA;
@@ -1286,9 +1287,12 @@ public class WifiReceiver extends BroadcastReceiver {
         //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
         final String mnc = operatorCode.substring(3, operatorCode.length());
         final String mcc = operatorCode.substring(0, 3);
-        //DEBUG:
-        MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
-        return OPERATOR_MAP.get(mcc).get(mnc).getOperator();
+        //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
+        Map<String, MccMncRecord> country  = OPERATOR_MAP.get(mcc);
+        if (null != country) {
+            return country.get(mnc).getOperator();
+        }
+        return null;
     }
 
     private Map<String,Map<String,MccMncRecord>> initOperatorMap(AssetManager assetManager) {
@@ -1311,10 +1315,8 @@ public class WifiReceiver extends BroadcastReceiver {
             while( mccKeys.hasNext() ){
                 String key = (String)mccKeys.next();
                 JSONObject country = jObject.getJSONObject(key);
-                Map<String, MccMncRecord> mccMap = null;
-                if (map.containsKey(key)) {
-                    mccMap = map.get(key);
-                } else {
+                Map<String, MccMncRecord> mccMap = map.get(key);
+                if (null == mccMap) {
                     mccMap = new HashMap<>();
                     map.put(key, mccMap);
                 }

@@ -1283,11 +1283,11 @@ public class WifiReceiver extends BroadcastReceiver {
      * @return
      */
     private String getOperatorName(final String operatorCode) {
-        //ALIBI: have to work back from end, since MNC is always 3 chars, MCC may be 2 or 3.
-        final int boundary = operatorCode.length() -3;
-        final String mnc = operatorCode.substring(boundary, operatorCode.length());
-        final String mcc = operatorCode.substring(0, boundary);
-        //DEBUG: MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
+        //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
+        final String mnc = operatorCode.substring(3, operatorCode.length());
+        final String mcc = operatorCode.substring(0, 3);
+        //DEBUG:
+        MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
         return OPERATOR_MAP.get(mcc).get(mnc).getOperator();
     }
 

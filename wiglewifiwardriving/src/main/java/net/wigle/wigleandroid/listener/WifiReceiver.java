@@ -2,6 +2,8 @@ package net.wigle.wigleandroid.listener;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
@@ -1290,7 +1292,10 @@ public class WifiReceiver extends BroadcastReceiver {
         //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
         Map<String, MccMncRecord> country  = OPERATOR_MAP.get(mcc);
         if (null != country) {
-            return country.get(mnc).getOperator();
+            MccMncRecord match = country.get(mnc);
+            if (null != match) {
+                return match.getOperator();
+            }
         }
         return null;
     }
@@ -1302,13 +1307,25 @@ public class WifiReceiver extends BroadcastReceiver {
             final InputStream stream = assetManager.open("mcc-mnc-dict.json");
             MainActivity.info("operator stream: " + stream);
 
-            int size = stream.available();
-            byte[] buffer = new byte[size];
+            BufferedInputStream bis = new BufferedInputStream(stream);
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            int result = bis.read();
+            while(result != -1) {
+                buf.write((byte) result);
+                result = bis.read();
+            }
+            json = buf.toString("UTF-8");
 
-            stream.read(buffer);
-            stream.close();
+            if (null != bis) {
+                bis.close();
+            }
+            if (null != buf) {
+                buf.close();
+            }
+            if (null != stream) {
+                stream.close();
+            }
             ObjectMapper mapper = new ObjectMapper();
-            json = new String(buffer, "UTF-8");
             MainActivity.info("operator load complete.");
             JSONObject jObject = new JSONObject(json);
             Iterator<String> mccKeys = jObject.keys();

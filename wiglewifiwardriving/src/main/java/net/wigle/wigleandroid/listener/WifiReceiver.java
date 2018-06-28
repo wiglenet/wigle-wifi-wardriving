@@ -401,9 +401,10 @@ public class WifiReceiver extends BroadcastReceiver {
         // check cell tower info
         final int preCellForRun = runNetworks.size();
         int newCellForRun = 0;
-        final List<Network>cellNetworks = recordCellInfo(location);
+        final Map<String,Network>cellNetworks = recordCellInfo(location);
         if ( cellNetworks != null ) {
-            for (Network cellNetwork: cellNetworks) {
+            for (String key: cellNetworks.keySet()) {
+                final Network cellNetwork = cellNetworks.get(key);
                 if (cellNetwork != null) {
                     resultSize++;
                     if (showCurrent && listAdapter != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork)) {
@@ -546,55 +547,52 @@ public class WifiReceiver extends BroadcastReceiver {
         return NETWORK_TYPE_LEGEND.get(tele.getNetworkType());
     }
 
-    private List<Network> recordCellInfo(final Location location) {
+    private Map<String,Network> recordCellInfo(final Location location) {
         TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
-        List<Network> networks = new ArrayList<Network>();
+        Map<String,Network> networks = new HashMap<>();
         if ( tele != null ) {
             try {
                 CellLocation currentCell = null;
                 //DEBUG:
                 MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
-                //TODO: expand the cases where this does and doesn't work
-                if (TelephonyManager.SIM_STATE_ABSENT == tele.getSimState()) {
-                    MainActivity.info("SIM Absent: ("+getNetworkTypeName()+")");
-                } else {
-                    currentCell = tele.getCellLocation();
-                    if (currentCell != null) {
-                        // if CDMA, we can't lookup carrier name for SSID
-                        if ( currentCell.getClass().getSimpleName().equals("CdmaCellLocation") ) {
-                            Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                            networks.add(currentNetwork);
-                        }
-                    }
+                currentCell = tele.getCellLocation();
+                if (currentCell != null) {
+                    Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
+                    networks.put(currentNetwork.getBssid(),currentNetwork);
                 }
 
                 if (Build.VERSION.SDK_INT >= 17) { // we can survey cells
                     List<CellInfo> infos = tele.getAllCellInfo();
                     if (null != infos) {
                         for (final CellInfo cell : infos) {
-                            if (!"CellInfoCdma".equals(cell.getClass().getSimpleName())) {
-                                //ALIBI: we can't lookup CDMA carrier names from CellInfo -
-                                //TODO: this could still be valuable, disabled right now to avoid dups....?
-                                networks.add(handleSingleCellInfo(cell, tele, location));
+                            Network network = handleSingleCellInfo(cell, tele, location);
+                            if (null != network) {
+                                if (networks.containsKey(network.getBssid())) {
+                                    MainActivity.info("matching network already in map: " + network.getBssid());
+                                    Network n = networks.get(network.getBssid());
+                                    //TODO merge to improve data
+                                } else {
+                                    networks.put(network.getBssid(), network);
+                                }
                             }
                         }
                     }
                 } else {
-                    //ALIBI: falling back on legacy behavior for older phones
-                    if ( (null != currentCell) && (!currentCell.getClass().getSimpleName().equals("CdmaCellLocation")) ) {
-                        Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                        networks.add(currentNetwork);
-                    }
                     //TODO: handle multiple SIMs?
 
-                    //TODO: this could work for older phones, but the above legacy code is fine for now
-                    /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
-                    if (null != list) {
-                        for (final NeighboringCellInfo cell : list) {
-                            networks.add(handleSingleNeighboringCellInfo(cell, tele, location));
-                        }
-                    }*/
                 }
+                //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
+                //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
+
+
+                /*List<NeighboringCellInfo> list = tele.getNeighboringCellInfo();
+                if (null != list) {
+                    for (final NeighboringCellInfo cell : list) {
+                        //networks.put(
+                        handleSingleNeighboringCellInfo(cell, tele, location);
+                        //);
+                    }
+                }*/
             } catch (SecurityException sex) {
                 MainActivity.warn("unable to scan cells due to permission issue: ", sex);
             } catch (NullPointerException ex) {
@@ -689,6 +687,7 @@ public class WifiReceiver extends BroadcastReceiver {
         String bssid = null;
         NetworkType type = null;
         Network network = null;
+        String ssid = null;
 
         //noinspection StatementWithEmptyBody
         if ( cellLocation == null ) {
@@ -702,6 +701,8 @@ public class WifiReceiver extends BroadcastReceiver {
                     bssid = systemId + "_" + networkId + "_" + baseStationId;
                     type = NetworkType.CDMA;
                 }
+                //TODO: not sure if there's anything else we can do here
+                ssid = tele.getNetworkOperatorName();
             } catch ( Exception ex ) {
                 MainActivity.error("CDMA reflection exception: " + ex);
             }
@@ -709,6 +710,8 @@ public class WifiReceiver extends BroadcastReceiver {
             GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
             if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0 ) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
+                ssid = getOperatorName(tele.getNetworkOperator());
+                MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;
             }
         } else {
@@ -716,7 +719,6 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         if ( bssid != null ) {
-            final String ssid = tele.getNetworkOperatorName();
             final String networkType = getNetworkTypeName();
             final String capabilities = networkType + ";" + tele.getNetworkCountryIso();
 
@@ -1287,14 +1289,16 @@ public class WifiReceiver extends BroadcastReceiver {
      */
     private String getOperatorName(final String operatorCode) {
         //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
-        final String mnc = operatorCode.substring(3, operatorCode.length());
-        final String mcc = operatorCode.substring(0, 3);
-        //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
-        Map<String, MccMncRecord> country  = OPERATOR_MAP.get(mcc);
-        if (null != country) {
-            MccMncRecord match = country.get(mnc);
-            if (null != match) {
-                return match.getOperator();
+        if (null != operatorCode && operatorCode.length() >= 5) {
+            final String mnc = operatorCode.substring(3, operatorCode.length());
+            final String mcc = operatorCode.substring(0, 3);
+            //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
+            Map<String, MccMncRecord> country = OPERATOR_MAP.get(mcc);
+            if (null != country) {
+                MccMncRecord match = country.get(mnc);
+                if (null != match) {
+                    return match.getOperator();
+                }
             }
         }
         return null;

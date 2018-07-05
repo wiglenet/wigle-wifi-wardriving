@@ -173,6 +173,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
     public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
 
+    public static final boolean DEBUG_CELL_DATA = false;
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;

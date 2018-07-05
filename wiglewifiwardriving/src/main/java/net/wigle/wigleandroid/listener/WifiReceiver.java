@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -570,7 +569,8 @@ public class WifiReceiver extends BroadcastReceiver {
                                 if (networks.containsKey(network.getBssid())) {
                                     MainActivity.info("matching network already in map: " + network.getBssid());
                                     Network n = networks.get(network.getBssid());
-                                    //TODO merge to improve data
+                                    //TODO merge to improve data instead of replace?
+                                    networks.put(network.getBssid(), network);
                                 } else {
                                     networks.put(network.getBssid(), network);
                                 }
@@ -578,8 +578,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                     }
                 } else {
-                    //TODO: handle multiple SIMs?
-
+                    //TODO: handle multiple SIMs in early revs?
                 }
                 //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
                 //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
@@ -644,6 +643,7 @@ public class WifiReceiver extends BroadcastReceiver {
      * @param location
      * @return
      */
+    @Deprecated
     private Network handleSingleNeighboringCellInfo(final NeighboringCellInfo cellInfo, final TelephonyManager tele, final Location location) {
         //noinspection StatementWithEmptyBody
         if (null == cellInfo) {
@@ -729,6 +729,7 @@ public class WifiReceiver extends BroadcastReceiver {
             }
 
             if ( NetworkType.GSM.equals(type) ) {
+                // never seems to work well in practice
                 strength = gsmDBmMagicDecoderRing( strength );
             }
 
@@ -1056,6 +1057,8 @@ public class WifiReceiver extends BroadcastReceiver {
             res += "\n\tEVDOdBm: " + cellStrengthC.getEvdoDbm();
             res += "\n\tCDMAdBm: " + cellStrengthC.getCdmaDbm();
             MainActivity.info(res);
+            //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
+            //  references http://niviuk.free.fr/cdma_band.php
             return addOrUpdateCell(networkKey, /*TODO: can we improve on this?*/tele.getNetworkOperator(),
                     0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
 
@@ -1115,11 +1118,9 @@ public class WifiReceiver extends BroadcastReceiver {
             res += "\n\tSignal: "+cellStrengthG.getLevel();
             res += "\n\tDBM: " + dBmlevel;
 
-            https://en.wikipedia.org/wiki/Mobile_phone_signal#ASU - GSM: ASU == RSSI
-
             res += "\n\tASUL: "+asulevel;
             MainActivity.info(res);
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24?cellIdentG.getArfcn():0;
+            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentG.getArfcn()!= Integer.MAX_VALUE ?cellIdentG.getArfcn():0;
             return  addOrUpdateCell(networkKey, operator, channel, "GSM",
                     dBmlevel, NetworkType.typeForCode("G"), location);
         }
@@ -1184,7 +1185,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     "\n\tRSSNR:" + cellStrengthL.getRssnr();
             }
             MainActivity.info(res);
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24?cellIdentL.getEarfcn():0;
+            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentL.getEarfcn() != Integer.MAX_VALUE?cellIdentL.getEarfcn():0;
             return addOrUpdateCell(networkKey, operator, channel, "LTE",
                     dBmlevel, NetworkType.typeForCode("L"), location);
         }
@@ -1241,7 +1242,7 @@ public class WifiReceiver extends BroadcastReceiver {
             res += "\n\tASUL: "+asulevel;
             res += "\n\tdBm:"+dBmlevel;
             MainActivity.info(res);
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24?cellIdentW.getUarfcn():0;
+            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentW.getUarfcn() != Integer.MAX_VALUE?cellIdentW.getUarfcn():0;
             return addOrUpdateCell(networkKey, operator, channel, "WCDMA",
                 dBmlevel, NetworkType.typeForCode("D"), location);
         }
@@ -1304,6 +1305,11 @@ public class WifiReceiver extends BroadcastReceiver {
         return null;
     }
 
+    /**
+     * TODO: probably better to do this with a lamestatic map so we can show detail
+     * @param assetManager
+     * @return
+     */
     private Map<String,Map<String,MccMncRecord>> initOperatorMap(AssetManager assetManager) {
         Map<String,Map<String, MccMncRecord>> map = new HashMap<>();
         String json = null;

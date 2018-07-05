@@ -104,6 +104,7 @@ public final class MainActivity extends AppCompatActivity {
     public static class State {
         DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
+        WigleService wigleService;
         AtomicBoolean finishing;
         AtomicBoolean transferring;
         MediaPlayer soundPop;
@@ -164,7 +165,8 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
-    private static final long FINISH_TIME_MILLIS = 200L;
+    private static final long FINISH_TIME_MILLIS = 10L;
+    private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
 
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
     public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
@@ -995,6 +997,8 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         if (state.tts != null) state.tts.shutdown();
+
+        finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 
     @Override
@@ -1745,26 +1749,12 @@ public final class MainActivity extends AppCompatActivity {
     private void setupService() {
         // could be set by nonconfig retain
         if (state.serviceConnection == null) {
-            final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
-            ComponentName compName;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                MainActivity.info("startForegroundService");
-                compName = startForegroundService(serviceIntent);
-            }
-            else {
-                compName = startService(serviceIntent);
-            }
-            if (compName == null) {
-                MainActivity.error("startService() failed!");
-            } else {
-                MainActivity.info("service started ok: " + compName);
-            }
-
             state.serviceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(final ComponentName name, final IBinder iBinder) {
                     MainActivity.info(name + " service connected");
+                    final WigleService.WigleServiceBinder binder = (WigleService.WigleServiceBinder) iBinder;
+                    state.wigleService = binder.getService();
                 }
 
                 @Override
@@ -1773,10 +1763,11 @@ public final class MainActivity extends AppCompatActivity {
                 }
             };
 
-            int flags = 0;
             // have to use the app context to bind to the service, cuz we're in tabs
             // http://code.google.com/p/android/issues/detail?id=2483#c2
-            final boolean bound = getApplicationContext().bindService(serviceIntent, state.serviceConnection, flags);
+            final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
+            final boolean bound = getApplicationContext().bindService(serviceIntent, state.serviceConnection,
+                    Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT);
             MainActivity.info("service bound: " + bound);
         }
     }
@@ -2006,8 +1997,13 @@ public final class MainActivity extends AppCompatActivity {
                         .getLaunchIntentForPackage(getBaseContext().getPackageName());
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                MainActivity.info("calling finish now");
-                finish();
+                if (state.finishing.get()) {
+                    MainActivity.info("finishSoon: finish already called");
+                }
+                else {
+                    MainActivity.info("finishSoon: calling finish now");
+                    finish();
+                }
 
                 if (restart) {
                     new Handler().postDelayed(new Runnable() {

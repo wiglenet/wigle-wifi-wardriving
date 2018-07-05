@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -23,6 +23,8 @@ public final class WigleService extends Service {
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
+    // Binder given to clients
+    private final IBinder wigleServiceBinder = new WigleServiceBinder();
 
     private class GuardThread extends Thread {
         GuardThread() {
@@ -39,6 +41,17 @@ public final class WigleService extends Service {
         }
     }
 
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    class WigleServiceBinder extends Binder {
+        WigleService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return WigleService.this;
+        }
+    }
+
     private void setDone() {
         done.set( true );
         guardThread.interrupt();
@@ -47,7 +60,7 @@ public final class WigleService extends Service {
     @Override
     public IBinder onBind( final Intent intent ) {
         MainActivity.info( "service: onbind. intent: " + intent );
-        return null;
+        return wigleServiceBinder;
     }
 
     @Override
@@ -59,7 +72,6 @@ public final class WigleService extends Service {
     @Override
     public boolean onUnbind( final Intent intent ) {
         MainActivity.info( "service: onUnbind. intent: " + intent );
-        oreoSimpleNotification();
         shutdownNotification();
         stopSelf();
         return super.onUnbind( intent );
@@ -78,7 +90,6 @@ public final class WigleService extends Service {
             }
             setDone();
         }
-        oreoSimpleNotification();
         shutdownNotification();
         stopSelf();
         super.onTaskRemoved(rootIntent);
@@ -100,9 +111,6 @@ public final class WigleService extends Service {
     @Override
     public void onDestroy() {
         MainActivity.info( "service: onDestroy" );
-        // avoid stupid android bug causing:
-        // android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground()
-        oreoSimpleNotification();
         // Make sure our notification is gone.
         shutdownNotification();
         setDone();
@@ -144,29 +152,8 @@ public final class WigleService extends Service {
         stopForeground(true);
     }
 
-    private void oreoSimpleNotification() {
-        // make a dummy call to foreground to keep it from crashing with RemoteServiceException
-        // https://developer.android.com/about/versions/oreo/android-8.0-changes.html
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            MainActivity.info("oreoSimpleNotification");
-            final NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            final String title = getApplicationContext().getString(R.string.wigle_service);
-            final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                    title, NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(channel);
-
-            final Notification.Builder builder = new Notification.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
-            startForeground(NOTIFICATION_ID, builder.build());
-            MainActivity.info("oreoSimpleNotification done");
-        }
-    }
-
     private void setupNotification() {
-        if ( done.get() ) {
-            oreoSimpleNotification();
-        }
-        else {
+        if ( ! done.get() ) {
             final long when = System.currentTimeMillis();
             final Context context = getApplicationContext();
             final String title = context.getString(R.string.wigle_service);
@@ -204,6 +191,7 @@ public final class WigleService extends Service {
                 notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
             }
             else {
+                @SuppressWarnings("deprecation")
                 final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
                 builder.setContentIntent(contentIntent);
                 builder.setNumber((int) ListFragment.lameStatic.newNets);
@@ -250,6 +238,7 @@ public final class WigleService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) return null;
 
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
                     title, NotificationManager.IMPORTANCE_LOW);
@@ -268,8 +257,11 @@ public final class WigleService extends Service {
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            //noinspection deprecation
             builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+            //noinspection deprecation
             builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+            //noinspection deprecation
             builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
 
             return builder.build();

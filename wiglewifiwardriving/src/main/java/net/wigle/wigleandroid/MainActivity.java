@@ -173,6 +173,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
     public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
 
+    public static final boolean DEBUG_CELL_DATA = false;
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;
@@ -1690,7 +1691,7 @@ public final class MainActivity extends AppCompatActivity {
             MainActivity.info("new wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
         }
 

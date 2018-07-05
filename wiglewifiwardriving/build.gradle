@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'de.undercouch.download'
 
 android {
     compileSdkVersion 27
@@ -27,14 +28,19 @@ android {
     }
 }
 
+ext {
+    supportLibraryVersion = '27.1.1'
+    gmsLibraryBaseVersion = '15.0.1'
+}
+
 dependencies {
     implementation project(':android-maps-utils')
-    implementation "com.android.support:support-compat:27.1.1"
-    implementation "com.android.support:support-core-utils:27.1.1"
-    implementation "com.android.support:support-v4:27.1.1"
-    implementation "com.android.support:appcompat-v7:27.1.1"
+    implementation "com.android.support:support-compat:$supportLibraryVersion"
+    implementation "com.android.support:support-core-utils:$supportLibraryVersion"
+    implementation "com.android.support:support-v4:$supportLibraryVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    implementation 'com.google.android.gms:play-services-maps:15.0.1'
+    implementation "com.google.android.gms:play-services-maps:$gmsLibraryBaseVersion"
     implementation 'com.google.android.gms:play-services-vision:15.0.2'
     implementation 'com.google.code.gson:gson:2.8.1'
     implementation 'org.slf4j:slf4j-android:1.7.19'
@@ -43,4 +49,15 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
+}
+
+//this runs every time, which isn't optimal.
+task downloadFile(type: Download) {
+    println "downloading mcc/mnc data"
+    download {
+        src 'https://api.wigle.net/api/v2/cell/mccMnc'
+        dest "$projectDir/src/main/assets/mcc-mnc-dict.json"
+        overwrite true
+        acceptAnyCertificate true /* horrible, but alternative is update trust store <=> letsencrypt */
+    }
 }

@@ -567,7 +567,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             Network network = handleSingleCellInfo(cell, tele, location);
                             if (null != network) {
                                 if (networks.containsKey(network.getBssid())) {
-                                    MainActivity.info("matching network already in map: " + network.getBssid());
+                                    //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
                                     Network n = networks.get(network.getBssid());
                                     //TODO merge to improve data instead of replace?
                                     networks.put(network.getBssid(), network);
@@ -606,7 +606,9 @@ public class WifiReceiver extends BroadcastReceiver {
             MainActivity.info("null cellInfo");
             // ignore
         } else {
-            MainActivity.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
+            if (MainActivity.DEBUG_CELL_DATA) {
+                MainActivity.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
+            }
             switch (cellInfo.getClass().getSimpleName()) {
                 case "CellInfoCdma":
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {

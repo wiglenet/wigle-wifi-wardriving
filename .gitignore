@@ -16,6 +16,8 @@ android-maps-utils/build
 wiglewifiwardriving/build
 .idea
 .gradle
+etc/mccmncsqlite/mcc-mnc-dict.json
+wiglewifiwardriving/src/main/assets/mmcmnc.sqlite
 
 # Local configuration file (sdk path, etc)
 local.properties

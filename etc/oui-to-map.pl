@@ -23,6 +23,7 @@ for my $file (('oui.csv.gz','mam.csv.gz','oui36.csv.gz')) {
         my $key = $cols[$header{'Assignment'}];
         my $val = $cols[$header{'Organization Name'}];
         $val =~ s/"/\\"/g;
+        $val =~ s/\s+$//;
         $output{$key} = $val;
     }
   }

@@ -3,11 +3,9 @@
 use IO::Zlib;
 use Text::CSV_XS qw( csv );
 
-open FILER, "> ../wiglewifiwardriving/src/main/assets/oui.properties";
-binmode FILER, ":utf8";
-
 my $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 1 });
 
+my %output = ();
 for my $file (('oui.csv.gz','mam.csv.gz','oui36.csv.gz')) {
   print "file: $file\n";
   my %header = ();
@@ -25,10 +23,17 @@ for my $file (('oui.csv.gz','mam.csv.gz','oui36.csv.gz')) {
         my $key = $cols[$header{'Assignment'}];
         my $val = $cols[$header{'Organization Name'}];
         $val =~ s/"/\\"/g;
-        print FILER "$key=$val\n";
+        $val =~ s/\s+$//;
+        $output{$key} = $val;
     }
   }
   close $fh;
 }
 
+open FILER, "> ../wiglewifiwardriving/src/main/assets/oui.properties";
+binmode FILER, ":utf8";
+foreach my $key (sort keys %output) {
+  my $val = $output{$key};
+  print FILER "$key=$val\n";
+}
 close FILER;

@@ -92,6 +92,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     public static final String PREF_DISTANCE_RUN = "distRun";
+    public static final String PREF_STARTTIME_RUN = "timestampRunStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
     public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
@@ -118,6 +119,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
     public static final String PREF_EXCLUDE_DISPLAY_ADDRS = "displayExcludeAddresses";
     public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
+    public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
+    public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
+    public static final String PREF_START_AT_BOOT = "startAtBoot";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -275,8 +279,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != ma) {
             final boolean scanning = !ma.isScanning();
             ma.handleScanChange(scanning);
-            String name = ma.getString(R.string.scan) + " " + (scanning ? ma.getString(R.string.off) : ma.getString(R.string.on));
-            ma.setTitle(name);
             handleScanChange(ma, getView());
         }
     }

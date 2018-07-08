@@ -35,7 +35,7 @@
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
 	android:layout_height="2dip"
-	android:background="#A07070"
+	android:background="#903030"
 	/>
 
     <TextView

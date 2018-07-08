@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nije netwurken sûnt lêste upload:</string>
     <string name="dash_new_cells">Nije stjoermêsten:</string>
     <string name="dash_dist_run">Runôfstân:</string>
+    <string name="dash_time_run">Looptijd:</string>
     <string name="dash_dist_total">Totale ôfstân:.</string>
     <string name="dash_dist_prev">Foarige run:</string>
     <string name="dash_db_queue">DB-wachtrige:</string>
@@ -237,7 +238,9 @@
     <string name="language_ru">ру́сский (Russysk)</string>
     <string name="language_sv">svenska (Sweedsk)</string>
     <string name="language_tr">Türkçe (Turksk)</string>
-    <string name="language_zh">繁體中文 (Tradisjoneel Sjinees)</string>
+    <string name="language_zh_cn">简体中文（Verseempeld Sjinees: by Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (Tradisjoneel Sjinees - Taiwan)</string>
+    <string name="language_zh_hk">繁体中文 香港 (Tradisjoneel Sjinees - Hong Kong)</string>
     <string name="language_text">Geselecteerde taal (herstarten fereasket)</string>
     <string name="fatal_title">Fataal DB Probleem</string>
     <string name="fatal_db_warn">Meastal feroarsake troch it apparaat of in SD-kaart probleen!</string>
@@ -309,4 +312,7 @@
     <string name="quick_pause_unset">Befestigje</string>
     <string name="quick_pause">Skoft</string>
     <string name="quick_pause_do_nothing">Neat dwaan</string>
+    <string name="send_to">Share using</string>
+    <string name="settings_gps_timeout">GPS Timeout</string>
+    <string name="settings_net_loc_timeout">Network Location Timeout</string>
 </resources>

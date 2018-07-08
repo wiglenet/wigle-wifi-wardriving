@@ -1,3 +1,33 @@
+* 2.29 (05/12/2018)
+Better French translation (thanks marmat8951!)
+Another stab at fixing RemoteServiceException
+Handle user force-closing properly
+
+* 2.28 (04/15/2018)
+Add configurable timeouts for GPS and Network Location
+Adding a run timer to the dashboard
+New vector-derived icon set
+Adding a "view" button to the upload panel for direct KML intent integration (Google Earth and other viewers)
+Split traditional Chinese (TW and HK) from simplified
+Language pack synchronization to assist with translation (ongoing)
+Various bug fixes
+
+* 2.27 (02/24/2018)
+Share button on uploads panel.
+Better registration integration.
+Camera feature optional for devices.
+Fix up app-local storage.
+Fix Lineage crypto credentials in maps.
+Simplify notification service, hopefully reduce Oreo crashes on close.
+
+* 2.26 (10/30/2017)
+Scan animation now a button.
+Map lock off on scroll.
+Wrap every "toast" in Android 7.1 workaround.
+Upload interruption fix.
+Secret store Lineage fix.
+Updated German (thanks kill0rz!).
+
 * 2.25 (10/10/2017)
 Added clear DB Button.
 More android 7.1.2 toast workarounds.

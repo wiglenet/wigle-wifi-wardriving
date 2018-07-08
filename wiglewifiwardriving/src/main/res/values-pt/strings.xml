@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nets New Desde Upload:</string>
     <string name="dash_new_cells">Nova torres de celular:</string>
     <string name="dash_dist_run">Run Distância:</string>
+    <string name="dash_time_run">Duração de corrida:</string>
     <string name="dash_dist_total">Total de Dist.:</string>
     <string name="dash_dist_prev">Anterior Run:</string>
     <string name="dash_db_queue">Fila DB:</string>
@@ -237,7 +238,9 @@
     <string name="language_ru">ру́сский (russo)</string>
     <string name="language_sv">svenska (sueco)</string>
     <string name="language_tr">Türkçe (turco)</string>
-    <string name="language_zh">繁體中文 (chinês tradicional)</string>
+    <string name="language_zh_cn">简体中文（chinês simplificado: por Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (chinês tradicional - Taiwan)</string>
+    <string name="language_zh_hk">繁体中文 香港 (chinês tradicional - Hong Kong)</string>
     <string name="language_text">Idioma selecionado (requer reinicialização)</string>
     <string name="fatal_title">Problema DB fatal</string>
     <string name="fatal_db_warn">Geralmente causada por dispositivo ou problemas de cartão SD!</string>
@@ -307,4 +310,7 @@
     <string name="quick_pause_unset">confirme</string>
     <string name="quick_pause">Pausa</string>
     <string name="quick_pause_do_nothing">Fazer nada</string>
+    <string name="send_to">Compartilhar com</string>
+    <string name="settings_gps_timeout">Tempo limite do GPS</string>
+    <string name="settings_net_loc_timeout">Tempo limite da localização da rede</string>
 </resources>

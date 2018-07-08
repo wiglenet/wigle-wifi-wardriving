@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
+apply plugin: 'de.undercouch.download'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 14
-        targetSdkVersion 26
+        targetSdkVersion 27
     }
 
     buildTypes {
@@ -27,17 +28,33 @@ android {
     }
 }
 
+ext {
+    supportLibraryVersion = '27.1.1'
+    gmsLibraryBaseVersion = '15.0.1'
+}
+
 dependencies {
-    compile "com.android.support:support-compat:26.0.1"
-    compile "com.android.support:support-core-utils:26.0.1"
-    compile "com.android.support:support-v4:26.0.1"
-    compile "com.android.support:appcompat-v7:26.0.1"
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
-    compile 'com.google.code.gson:gson:2.8.1'
-    compile 'org.slf4j:slf4j-android:1.7.19'
-    compile files('libs/TTS_library_stub.jar')
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
-    compile 'ru.egslava:MaskedEditText:1.0.5'
+    implementation "com.android.support:support-compat:$supportLibraryVersion"
+    implementation "com.android.support:support-core-utils:$supportLibraryVersion"
+    implementation "com.android.support:support-v4:$supportLibraryVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.7'
+    implementation 'com.google.code.gson:gson:2.8.1'
+    implementation 'org.slf4j:slf4j-android:1.7.19'
+    implementation files('libs/TTS_library_stub.jar')
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
+    implementation 'ru.egslava:MaskedEditText:1.0.5'
+}
+
+//this runs every time, which isn't optimal.
+task downloadFile(type: Download) {
+    println "downloading mcc/mnc data"
+    download {
+        src 'https://api.wigle.net/api/v2/cell/mccMnc'
+        dest "$projectDir/src/main/assets/mcc-mnc-dict.json"
+        overwrite true
+        acceptAnyCertificate true /* horrible, but alternative is update trust store <=> letsencrypt */
+    }
 }

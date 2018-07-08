@@ -5,8 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -31,6 +29,7 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -103,6 +102,7 @@ public final class MainActivity extends AppCompatActivity {
     public static class State {
         DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
+        WigleService wigleService;
         AtomicBoolean finishing;
         AtomicBoolean transferring;
         MediaPlayer soundPop;
@@ -144,6 +144,9 @@ public final class MainActivity extends AppCompatActivity {
     public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
+    public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
+    // registration web view
+    public static final String REG_URL = "https://wigle.net/register";
 
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
@@ -160,8 +163,15 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
+    private static final long FINISH_TIME_MILLIS = 10L;
+    private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
 
     public static final String ACTION_END = "net.wigle.wigleandroid.END";
+    public static final String ACTION_UPLOAD = "net.wigle.wigleandroid.UPLOAD";
+    public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
+    public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
+
+    public static final boolean DEBUG_CELL_DATA = false;
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;
@@ -247,6 +257,7 @@ public final class MainActivity extends AppCompatActivity {
             final float prevRun = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
             Editor edit = prefs.edit();
             edit.putFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+            edit.putLong(ListFragment.PREF_STARTTIME_RUN, System.currentTimeMillis());
             edit.putFloat(ListFragment.PREF_DISTANCE_PREV_RUN, prevRun);
             edit.apply();
         }
@@ -408,12 +419,7 @@ public final class MainActivity extends AppCompatActivity {
                 if (restart) {
                     // restart the app now that we can talk to the database
                     info("Restarting to pick up storage permission");
-
-                    Intent i = getBaseContext().getPackageManager()
-                            .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    finish();
-                    startActivity(i);
+                    finishSoon(FINISH_TIME_MILLIS, true);
                 }
                 return;
             }
@@ -528,7 +534,7 @@ public final class MainActivity extends AppCompatActivity {
      */
     public void selectFragment(int position) {
         if (position == EXIT_TAB_POS) {
-            finish();
+            finishSoon();
             return;
         }
 
@@ -944,7 +950,7 @@ public final class MainActivity extends AppCompatActivity {
         return MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/";
     }
 
-    public static FileOutputStream createFile(final Context context, final String filename) throws IOException {
+    public static FileOutputStream createFile(final Context context, final String filename, final boolean isCache) throws IOException {
         final String filepath = getSDPath();
         final File path = new File(filepath);
 
@@ -962,9 +968,12 @@ public final class MainActivity extends AppCompatActivity {
             }
 
             return new FileOutputStream(file);
+        } else if (isCache) {
+            File file = File.createTempFile(filename, null, context.getCacheDir());
+            return new FileOutputStream(file);
         }
 
-            return context.openFileOutput(filename, Context.MODE_PRIVATE);
+        return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -985,6 +994,10 @@ public final class MainActivity extends AppCompatActivity {
         } catch (final IllegalArgumentException ex) {
             info("wifiReceiver not registered: " + ex);
         }
+
+        if (state.tts != null) state.tts.shutdown();
+
+        finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 
     @Override
@@ -1103,7 +1116,15 @@ public final class MainActivity extends AppCompatActivity {
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
         if (!"".equals(lang) && !current.equals(lang)) {
-            newLocale = new Locale(lang);
+            if (lang.contains("-r")) {
+                String[] parts = lang.split("-r");
+                MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
+                newLocale = new Locale(parts[0], parts[1]);
+            } else {
+                MainActivity.info("\tlang: "+lang);
+                newLocale = new Locale(lang);
+
+            }
         } else if ("".equals(lang) && ORIG_LOCALE != null && !current.equals(ORIG_LOCALE.getLanguage())) {
             newLocale = ORIG_LOCALE;
         }
@@ -1667,7 +1688,7 @@ public final class MainActivity extends AppCompatActivity {
             MainActivity.info("new wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
-            state.wifiReceiver = new WifiReceiver(this, state.dbHelper);
+            state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
             state.wifiReceiver.setupWifiTimer(turnedWifiOn);
         }
 
@@ -1726,26 +1747,12 @@ public final class MainActivity extends AppCompatActivity {
     private void setupService() {
         // could be set by nonconfig retain
         if (state.serviceConnection == null) {
-            final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
-            ComponentName compName;
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                MainActivity.info("startForegroundService");
-                compName = startForegroundService(serviceIntent);
-            }
-            else {
-                compName = startService(serviceIntent);
-            }
-            if (compName == null) {
-                MainActivity.error("startService() failed!");
-            } else {
-                MainActivity.info("service started ok: " + compName);
-            }
-
             state.serviceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(final ComponentName name, final IBinder iBinder) {
                     MainActivity.info(name + " service connected");
+                    final WigleService.WigleServiceBinder binder = (WigleService.WigleServiceBinder) iBinder;
+                    state.wigleService = binder.getService();
                 }
 
                 @Override
@@ -1754,10 +1761,11 @@ public final class MainActivity extends AppCompatActivity {
                 }
             };
 
-            int flags = 0;
             // have to use the app context to bind to the service, cuz we're in tabs
             // http://code.google.com/p/android/issues/detail?id=2483#c2
-            final boolean bound = getApplicationContext().bindService(serviceIntent, state.serviceConnection, flags);
+            final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
+            final boolean bound = getApplicationContext().bindService(serviceIntent, state.serviceConnection,
+                    Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT);
             MainActivity.info("service bound: " + bound);
         }
     }
@@ -1974,10 +1982,48 @@ public final class MainActivity extends AppCompatActivity {
         return mDrawerToggle.onOptionsItemSelected(item);
     }
 
-    //@Override
+    public void finishSoon() {
+        finishSoon(FINISH_TIME_MILLIS, false);
+    }
+
+    public void finishSoon(final long finishTimeMillis, final boolean restart) {
+        MainActivity.info("Will finish in " + finishTimeMillis + "ms");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final Intent i = getBaseContext().getPackageManager()
+                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                if (state.finishing.get()) {
+                    MainActivity.info("finishSoon: finish already called");
+                }
+                else {
+                    MainActivity.info("finishSoon: calling finish now");
+                    finish();
+                }
+
+                if (restart) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivity(i);
+                        }
+                    }, 10L);
+                }
+            }
+        }, finishTimeMillis);
+    }
+
+    /**
+     * Never call this directly! call finishSoon to give the service time to show a notification if needed
+     */
     @Override
     public void finish() {
-        info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+        info("MAIN: finish.");
+        if (state.wifiReceiver != null) {
+            info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+        }
 
         final boolean wasFinishing = state.finishing.getAndSet(true);
         if (wasFinishing) {
@@ -1996,7 +2042,7 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // close the db. not in destroy, because it'll still write after that.
-        state.dbHelper.close();
+        if (state.dbHelper != null) state.dbHelper.close();
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (state.gpsListener != null) {
@@ -2062,6 +2108,7 @@ public final class MainActivity extends AppCompatActivity {
         if (state.soundNewPop != null) {
             state.soundNewPop.release();
         }
+        info("MAIN: finish complete.");
 
         super.finish();
     }
@@ -2090,4 +2137,22 @@ public final class MainActivity extends AppCompatActivity {
         selectFragment(LIST_TAB_POS);
         listActivity.makeUploadDialog(this);
     }
+
+    /**
+     * pure-background upload method fo intent-based uploads
+     */
+    public void backgroundUploadFile(){
+        MainActivity.info( "background upload file" );
+        if (this == null) { return; }
+        final State state = getState();
+        setTransferring();
+        state.observationUploader = new ObservationUploader(this,
+                ListFragment.lameStatic.dbHelper, null, false, false, false);
+        try {
+            state.observationUploader.startDownload(null);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.warn("Authentication failure on background run upload");
+        }
+    }
+
 }

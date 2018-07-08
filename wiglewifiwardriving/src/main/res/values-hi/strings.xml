@@ -123,6 +123,7 @@
     <string name="dash_new_upload">अपलोड के बाद से नई जाल:</string>
     <string name="dash_new_cells">नई सेल टावर्स:</string>
     <string name="dash_dist_run">दूरी भागो:</string>
+    <string name="dash_time_run">भागो अवधि:</string>
     <string name="dash_dist_total">जिला कुल.</string>
     <string name="dash_dist_prev">पिछला चलाएँ:</string>
     <string name="dash_db_queue">डीबी कतार:</string>
@@ -237,7 +238,9 @@
     <string name="language_ru">ру́сский (रूसी)</string>
     <string name="language_sv">svenska (स्वीडिश)</string>
     <string name="language_tr">Türkçe (तुर्कीयाई)</string>
-    <string name="language_zh">繁體中文 (पारंपरिक चीनी)</string>
+    <string name="language_zh_cn">简体中文（सरलीकृत चीनी: गीकेयस द्वारा）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (पारंपरिक चीनी - ताइवान)</string>
+    <string name="language_zh_hk">繁体中文 香港 (पारंपरिक चीनी - हॉगकॉग)</string>
     <string name="language_text">चयनित भाषा (की आवश्यकता है को पुनरारंभ करें)</string>
     <string name="fatal_title">घातक DB समस्या</string>
     <string name="fatal_db_warn">आमतौर पर डिवाइस या एसडी कार्ड समस्याओं की वजह से!</string>
@@ -309,4 +312,7 @@
     <string name="quick_pause_unset">की पुष्टि करें</string>
     <string name="quick_pause">ठहराव</string>
     <string name="quick_pause_do_nothing">कुछ मत करो</string>
+    <string name="send_to">शेयर का उपयोग करना</string>
+    <string name="settings_gps_timeout">जीपीएस टाइमआउट</string>
+    <string name="settings_net_loc_timeout">नेटवर्क स्थान टाइमआउट</string>
 </resources>

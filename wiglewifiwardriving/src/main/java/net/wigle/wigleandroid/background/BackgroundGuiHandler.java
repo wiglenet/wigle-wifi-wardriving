@@ -143,7 +143,7 @@ public class BackgroundGuiHandler extends Handler {
                 try {
                     alertDialog.show(fm, "background-dialog");
                 } catch (IllegalStateException ex) {
-                    MainActivity.warn("illegal state in background gui handler: " + ex, ex);
+                    MainActivity.warn("illegal state in background gui handler: ", ex);
                 }
             }
         }

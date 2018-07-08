@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -40,6 +41,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -188,7 +190,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     }
 
     private void updateView(final View view) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final FragmentActivity activity = getActivity();
+        if (activity == null) return;
+        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         // donate
@@ -325,7 +329,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final TextView register = (TextView) view.findViewById(R.id.register);
         final String registerString = getString(R.string.register);
         final String activateString = getString(R.string.activate);
-        String registerBlurb = "<a href='https://wigle.net/register'>" + registerString +
+        String registerBlurb = "<a href='net.wigle.wigleandroid.register://register'>" + registerString +
                 "</a> @WiGLE.net";
 
         // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...
@@ -430,9 +434,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
-                "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh" };
+                "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
                 getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
                 getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
@@ -441,7 +446,8 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
                 getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
                 getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
-                getString(R.string.language_tr), getString(R.string.language_zh),
+                getString(R.string.language_tr), getString(R.string.language_zh_cn),
+                getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
         SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
 
@@ -461,6 +467,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 "2" + min,"5" + min,"10" + min,off };
         SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
+
+        final Long[] timeoutPeriods = new Long[]{GPSListener.GPS_TIMEOUT_DEFAULT, 30000L, GPSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
+        final String[] timeoutName = new String[]{ "15" + sec, "30" + sec,"1" + min,"5" + min,
+                "30" + min,"60" + min};
+        // gps timeout spinner
+        SettingsUtil.doSpinner( R.id.gps_timeout_spinner, view, ListFragment.PREF_GPS_TIMEOUT,
+                GPSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+
+        // net loc timeout spinner
+        SettingsUtil.doSpinner( R.id.net_loc_timeout_spinner, view, ListFragment.PREF_NET_LOC_TIMEOUT,
+                GPSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // prefs setting for tap-to-pause scan indicator
         final String[] pauseOptions = new String[] {ListFragment.QUICK_SCAN_UNSET, ListFragment.QUICK_SCAN_PAUSE, ListFragment.QUICK_SCAN_DO_NOTHING};
@@ -591,7 +608,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
             if (msg.what == MSG_USER_DONE) {
-                if (bundle.containsKey("error")) {
+                if ((null != bundle) && (bundle.containsKey("error"))) {
                     //ALIBI: not doing anything more here, since the toast will alert.
                     MainActivity.info("Settings auth unsuccessful");
                 } else {

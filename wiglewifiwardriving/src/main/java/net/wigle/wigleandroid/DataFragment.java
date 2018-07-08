@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import java.util.List;
 
 import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.LegacyObservationImporter;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.TransferListener;
@@ -39,7 +38,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -49,7 +47,6 @@ import org.json.JSONObject;
  */
 public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
-    private static final int MENU_EXIT = 11;
     private static final int MENU_ERROR_REPORT = 13;
 
     private static final int CSV_RUN_DIALOG = 120;
@@ -288,29 +285,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             try {
                 task.startDownload(this);
             } catch (WiGLEAuthException waex) {
-                //moot due to bundle handling
-            }
-        } else {
-            //TODO: is this dead now?
-            final LegacyObservationImporter task = new LegacyObservationImporter(getActivity(),
-                    ListFragment.lameStatic.dbHelper,
-                    new ApiListener() {
-                        @Override
-                        public void requestComplete(JSONObject object, boolean cached) {
-                            if (mainActivity != null) {
-                                try {
-                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
-                                } catch (DBException dbe) {
-                                    MainActivity.warn("failed DB count update on import-observations", dbe);
-                                }
-                                mainActivity.transferComplete();
-                            }
-                        }
-                    });
-            try {
-                task.startDownload(this);
-            } catch (WiGLEAuthException waex) {
-                //moot due to bundle handling
+                MainActivity.info("failed to authorize user on request");
             }
         }
     }
@@ -567,10 +542,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
-            case MENU_EXIT:
-                final MainActivity main = MainActivity.getMainActivity();
-                main.finish();
-                return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 startActivity( errorReportIntent );

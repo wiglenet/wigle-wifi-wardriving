@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="225"
-    android:versionName="2.25">
+    android:versionCode="229"
+    android:versionName="2.29">
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="26" />
+        android:targetSdkVersion="27" />
 
     <supports-screens
         android:anyDensity="true"
@@ -31,6 +31,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="net.wigle.wigleandroid.permission.MAPS_RECEIVE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- confine camera activation to Marshmallow and up. -->
     <!-- NB: this functionality exists as early as JellyBean (4.2.2), but not worth the thrash -->
@@ -55,7 +56,9 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:allowBackup="true"
@@ -127,6 +130,16 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
+            android:name=".RegistrationActivity"
+            android:parentActivityName=".MainActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="net.wigle.wigleandroid.register" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".FilterActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
@@ -182,34 +195,38 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity
-            android:name=".ShareActivity"
-            android:parentActivityName=".MainActivity">
-
-            <!-- Parent activity meta-data to support API level 7+ -->
+        <provider
+            android:name=".util.KmlFileProvider"
+            android:authorities="${applicationId}.kmlprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_SYNC" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_INSERT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_DELETE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".listener.UploadReceiver" >
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.UPLOAD" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".listener.ScanControlReceiver" >
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.SCAN" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="net.wigle.wigleandroid.PAUSE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".listener.StartWigleAtBootReciever"
+            android:label="StartWigleAtBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <service

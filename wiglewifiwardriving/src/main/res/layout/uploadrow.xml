@@ -1,51 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-<LinearLayout android:orientation="horizontal"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+    <!-- android:layout_width="wrap_content"
+    android:layout_height="wrap_content" -->
+    <LinearLayout
+        android:id="@+id/upload_buttons"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageButton
+            android:id="@+id/view_upload"
+            android:background="@android:drawable/ic_menu_view"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:layout_centerVertical="true"
+            android:layout_height="28dp"
+            android:layout_width="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:id="@+id/share_upload"
+            android:background="@android:drawable/ic_menu_share"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_gravity="right"
+            android:layout_centerVertical="true"
+            android:layout_height="28dp"
+            android:layout_width="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+    <RelativeLayout android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/upload_data"
+        android:layout_toLeftOf="@id/upload_buttons">
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/upload_row_top">
 
-    <TextView android:id="@+id/transid" android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:textSize="18sp"
-              android:textColor="#eaba44"
-              android:gravity="start"/>
-    <TextView android:id="@+id/status" android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:textColor="#00ff00"
-              android:gravity="center"/>
+            <TextView android:id="@+id/transid" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:textSize="18sp"
+                      android:textColor="#eaba44"
+                      android:gravity="start"/>
+            <TextView android:id="@+id/status" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:textColor="#00ff00"
+                      android:gravity="center"/>
 
-    <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:gravity="end"
-              android:textColor="#B0B0B0"/>
-</LinearLayout>
+            <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_weight="1"
+                      android:gravity="end"
+                      android:textColor="#B0B0B0"/>
+        </LinearLayout>
 
-<LinearLayout android:orientation="horizontal"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
-	<!-- Second row -->
-    <TextView android:id="@+id/file_size" android:layout_width="wrap_content"
-              android:layout_height="wrap_content" android:layout_weight="1"
-              android:gravity="start"
-              style="@android:style/TextAppearance.Small"
-              android:textColor="#B0B0B0"/>
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/upload_row_bottom"
+            android:layout_below="@id/upload_row_top">
+            <!-- Second row -->
+            <TextView android:id="@+id/file_size" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:layout_weight="1"
+                      android:gravity="start"
+                      style="@android:style/TextAppearance.Small"
+                      android:textColor="#B0B0B0"/>
 
-    <TextView android:id="@+id/total_wifi_gps" android:layout_width="wrap_content"
-              android:layout_height="wrap_content" android:layout_weight="1"
-              android:gravity="center"
-              style="@android:style/TextAppearance.Small"
-              android:textColor="#B0B0B0"/>
+            <TextView android:id="@+id/total_wifi_gps" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:layout_weight="1"
+                      android:gravity="center"
+                      style="@android:style/TextAppearance.Small"
+                      android:textColor="#B0B0B0"/>
 
-    <TextView android:id="@+id/total_cell_gps" android:layout_width="wrap_content"
-		      android:layout_height="wrap_content" android:layout_weight="1"
-              android:gravity="end"
-		      style="@android:style/TextAppearance.Small"
-              android:textColor="#B0B0B0"/>
-</LinearLayout>
-
-</LinearLayout>
+            <TextView android:id="@+id/total_cell_gps" android:layout_width="wrap_content"
+                      android:layout_height="wrap_content" android:layout_weight="1"
+                      android:gravity="end"
+                      style="@android:style/TextAppearance.Small"
+                      android:textColor="#B0B0B0"/>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>
 

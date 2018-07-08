@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nowe sieci od czasu przesłania:</string>
     <string name="dash_new_cells">Nowe wieże komórkowe:</string>
     <string name="dash_dist_run">Dystans w tym biegu:</string>
+    <string name="dash_time_run">Uruchom Duration:</string>
     <string name="dash_dist_total">Całkowity dystans:</string>
     <string name="dash_dist_prev">Poprzedni bieg:</string>
     <string name="dash_db_queue">Kolejka bazy:</string>
@@ -237,7 +238,9 @@
     <string name="language_ru">ру́сский (rosyjski)</string>
     <string name="language_sv">svenska (szwedzki)</string>
     <string name="language_tr">Türkçe (turecki)</string>
-    <string name="language_zh">繁體中文 (tradycyjne chińskie)</string>
+    <string name="language_zh_cn">简体中文（Chiński uproszczony: autor: Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (tradycyjne chińskie - Tajwan)</string>
+    <string name="language_zh_hk">繁体中文 香港 (tradycyjne chińskie - Hongkong)</string>
     <string name="language_text">Zmień język (wymaga restartu)</string>
     <string name="fatal_title">Poważny błąd bazy</string>
     <string name="fatal_db_warn">Zwykle spowodowane przez problem z urządzeniem lub kartą SD!</string>
@@ -307,4 +310,7 @@
     <string name="quick_pause_unset">Potwierdzać</string>
     <string name="quick_pause">Pauza</string>
     <string name="quick_pause_do_nothing">Nic nie robić</string>
+    <string name="send_to">Udostępnij za pomocą</string>
+    <string name="settings_gps_timeout">Limit czasu GPS</string>
+    <string name="settings_net_loc_timeout">Limit czasu lokalizacji sieci</string>
 </resources>

@@ -279,7 +279,9 @@ public class DBResultActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-//        mapView.onResume();
+//        if (null != mapView) {
+//            mapView.onResume();
+//        }
     }
 
     @Override

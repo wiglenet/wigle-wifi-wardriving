@@ -123,6 +123,7 @@
     <string name="dash_new_upload">Nets Since Upload:</string>
     <string name="dash_new_cells">New Cell Towers:</string>
     <string name="dash_dist_run">Run Distance:</string>
+    <string name="dash_time_run">Run Duration:</string>
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Previous Run:</string>
     <string name="dash_db_queue">DB Queue:</string>
@@ -198,7 +199,7 @@
     <string name="status_fail">Fail</string>
     <string name="status_success">Success</string>
     <string name="status_working">Working&#8230;</string>
-    <string name="status_upload_success">Upload Successful</string>
+    <string name="status_upload_success">Transfer Successful</string>
     <string name="status_write_success">Write Successful</string>
     <string name="status_no_user">Username not set, heading to Settings</string>
     <string name="status_no_pass">Password not set and username not \'anonymous\'</string>
@@ -237,7 +238,9 @@
     <string name="language_ru">ру́сский (Russian)</string>
     <string name="language_sv">svenska (Swedish)</string>
     <string name="language_tr">Türkçe (Turkish)</string>
-    <string name="language_zh">繁體中文 (Traditional Chinese)</string>
+    <string name="language_zh_cn">简体中文（Simplified Chinese: by Geekeyes）</string>
+    <string name="language_zh_tw">繁体中文 台灣 (Traditional Chinese - Taiwan)</string>
+    <string name="language_zh_hk">繁体中文 香港 (Traditional Chinese - Hong Kong)</string>
     <string name="language_text">Selected language (requires restart)</string>
     <string name="fatal_title">Fatal DB Problem</string>
     <string name="fatal_db_warn">Usually caused by device or SD card problems!</string>
@@ -375,4 +378,8 @@
     <string name="quick_pause">Pause</string>
     <string name="quick_pause_do_nothing">Do nothing</string>
     <string name="mapless">No Google Maps in this Free and Open-Source Software (FOSS) Version, which has no closed-source libraries</string>
+    <string name="send_to">Share using</string>
+    <string name="settings_gps_timeout">GPS Timeout</string>
+    <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="start_at_boot">Launch Wigle at boot</string>
 </resources>

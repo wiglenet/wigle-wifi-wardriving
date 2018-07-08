@@ -240,10 +240,10 @@ public final class TTS {
             }
         }
         catch ( final IllegalAccessException ex ) {
-            MainActivity.error( "illegal: " + ex, ex );
+            MainActivity.warn( "illegal: " + ex, ex );
         }
         catch ( final InvocationTargetException ex ) {
-            MainActivity.error( "invocation: " + ex, ex );
+            MainActivity.warn( "invocation: " + ex, ex );
         }
     }
 

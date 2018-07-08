@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,20 +22,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.util.Base64;
-import android.util.DisplayMetrics;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -61,7 +60,6 @@ import android.widget.Toast;
 //import com.google.android.gms.maps.model.TileOverlay;
 //import com.google.android.gms.maps.model.TileOverlayOptions;
 //import com.google.android.gms.maps.model.TileProvider;
-//import com.google.android.gms.maps.model.UrlTileProvider;
 
 import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.QueryThread;
@@ -91,6 +89,8 @@ public final class MappingFragment extends Fragment {
     private int previousRunNets;
 //    private TileOverlay tileOverlay;
 
+    private Menu menu;
+
     private static final String DIALOG_PREFIX = "DialogPrefix";
     public static final String MAP_DIALOG_PREFIX = "";
     public static LocationListener STATIC_LOCATION_LISTENER = null;
@@ -99,7 +99,6 @@ public final class MappingFragment extends Fragment {
 
     private static final int DEFAULT_ZOOM = 17;
     public static final LatLng DEFAULT_POINT = new LatLng(41.95d, -87.65d);
-    private static final int MENU_EXIT = 12;
     private static final int MENU_ZOOM_IN = 13;
     private static final int MENU_ZOOM_OUT = 14;
     private static final int MENU_TOGGLE_LOCK = 15;
@@ -609,6 +608,7 @@ public final class MappingFragment extends Fragment {
         // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
 
         super.onCreateOptionsMenu(menu, inflater);
+        this.menu = menu;
     }
 
     /* Handles item selections */
@@ -616,11 +616,6 @@ public final class MappingFragment extends Fragment {
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         switch ( item.getItemId() ) {
-            case MENU_EXIT: {
-                final MainActivity main = MainActivity.getMainActivity();
-                main.finish();
-                return true;
-            }
             case MENU_ZOOM_IN: {
 //                mapView.getMapAsync(new OnMapReadyCallback() {
 //                    @Override

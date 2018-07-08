@@ -51,7 +51,6 @@ set minimum on distance decimal to 2 on dashboard
 on networkactivity record more observations on that network (site survey)
 rssi on kml export
 upload and/or pause on when connected to this network
-start on boot option
 disable notification bar icon option
 pause at battery level instead of kill
 don't cancel file write/upload when we touch the screen

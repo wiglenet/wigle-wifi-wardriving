@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Base64;
@@ -107,7 +108,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         }
         finally {
             // tell the listener
-            listener.requestComplete(null, false);
+            if (listener != null) {
+                listener.requestComplete(null, false);
+            }
         }
 
     }
@@ -137,18 +140,25 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     @Override
     public void startDownload(final Fragment fragment) throws WiGLEAuthException {
         // download token if needed
-        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(
-                ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
-        final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
-        MainActivity.info("authname: " + authname);
-        if ((!beAnonymous) && (authname == null) && (userName != null) && (userPass != null)) {
-            MainActivity.info("No authname, going to request token");
-            downloadTokenAndStart(fragment);
+        SharedPreferences prefs;
+        if (null != fragment) {
+            prefs = fragment.getActivity().getSharedPreferences(
+                    ListFragment.SHARED_PREFS, 0);
         } else {
-            start();
+            prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
+        }
+        if (prefs != null) {
+            final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+            final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
+            final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
+            MainActivity.info("authname: " + authname);
+            if ((!beAnonymous) && (authname == null) && (userName != null) && (userPass != null)) {
+                MainActivity.info("No authname, going to request token");
+                downloadTokenAndStart(fragment);
+            } else {
+                start();
+            }
         }
     }
 

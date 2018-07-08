@@ -10,6 +10,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -122,6 +123,13 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/disable_toast" />
+
+    <CheckBox
+        android:id="@+id/boot_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_at_boot" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -159,6 +167,7 @@
             android:layout_height="match_parent"
             android:drawSelectorOnTop="true"
             android:layout_weight="1"
+            android:dropDownWidth="wrap_content"
             android:prompt="@string/language_text"
             android:ellipsize="end"
             />
@@ -323,6 +332,58 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/reset_wifi_text"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/gps_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_gps_timeout"
+            />
+        <TextView
+            android:id="@+id/gps_timeout_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_gps_timeout"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/net_loc_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_net_loc_timeout"
+            />
+        <TextView
+            android:id="@+id/net_loc_timeout_text"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_net_loc_timeout"
             android:layout_weight="1"
             android:layout_marginRight="6dip"
             tools:ignore="RtlHardcoded"

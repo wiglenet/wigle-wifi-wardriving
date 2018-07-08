@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -124,6 +123,7 @@ public class DashboardFragment extends Fragment {
     tv.setText( getString(R.string.dash_new_cells) + " " + ListFragment.lameStatic.newCells );
 
     updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN, getString(R.string.dash_time_run) );
     updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
     updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
@@ -169,6 +169,26 @@ public class DashboardFragment extends Fragment {
     tv.setText( title + " " + distString );
   }
 
+  private void updateTime( final View view, final int id, final String pref, final String title ) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+    long millis = System.currentTimeMillis();
+    long duration =  millis - prefs.getLong( pref,  millis);
+
+    //TODO: better to just use TimeUnit?
+    int seconds = (int) (duration / 1000) % 60 ;
+    int minutes = (int) ((duration / (1000*60)) % 60);
+    int hours   = (int) ((duration / (1000*60*60)) % 24);
+
+    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
+    if (hours > 0) {
+      durString = String.format("%d", hours) + ":" + durString;
+    }
+
+    final TextView tv = (TextView) view.findViewById( id );
+    tv.setText( title + " " + durString );
+  }
+
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
       final boolean useShort ) {
     final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -194,15 +214,6 @@ public class DashboardFragment extends Fragment {
     }
     return retval;
   }
-
-  // XXX
-//  @Override
-//  public void finish() {
-//    ListActivity.info( "finish dash." );
-//    finishing.set( true );
-//
-//    super.finish();
-//  }
 
   @Override
   public void onDestroy() {

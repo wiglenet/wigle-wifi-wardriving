@@ -545,7 +545,9 @@ public class WifiReceiver extends BroadcastReceiver {
                 currentCell = tele.getCellLocation();
                 if (currentCell != null) {
                     Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                    networks.put(currentNetwork.getBssid(),currentNetwork);
+                    if (currentNetwork != null) {
+                        networks.put(currentNetwork.getBssid(), currentNetwork);
+                    }
                 }
 
                 if (Build.VERSION.SDK_INT >= 17) { // we can survey cells
@@ -700,11 +702,15 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         } else if ( cellLocation instanceof GsmCellLocation ) {
             GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-            if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0 ) {
+            final String operatorCode = tele.getNetworkOperator();
+            if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 ssid = getOperatorName(tele.getNetworkOperator());
                 MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;
+            }
+            if (operatorCode == null || operatorCode.isEmpty()) {
+                return null;
             }
         } else {
             MainActivity.warn("Unhandled CellLocation type: "+cellLocation.getClass().getSimpleName());
@@ -1054,7 +1060,8 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
             //  references http://niviuk.free.fr/cdma_band.php
-            return addOrUpdateCell(networkKey, /*TODO: can we improve on this?*/tele.getNetworkOperator(),
+            return addOrUpdateCell(networkKey,
+                    /*TODO: can we improve on this?*/ tele.getNetworkOperator(),
                     0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
 
         }
@@ -1093,6 +1100,10 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
             int dBmlevel = cellStrengthG.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "GSM Cell:" +
@@ -1102,11 +1113,11 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
+                        "\n\toperator: " + operator +
+                        "\n\tARFCN: " + fcn;
 
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tARFCN: " + cellIdentG.getArfcn() +
-                            "\n\tBSIC: " + cellIdentG.getBsic();
+                    res += "\n\tBSIC: " + cellIdentG.getBsic();
                 }
 
                 int asulevel = cellStrengthG.getAsuLevel();
@@ -1117,8 +1128,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 res += "\n\tASUL: " + asulevel;
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentG.getArfcn()!= Integer.MAX_VALUE ?cellIdentG.getArfcn():0;
-            return  addOrUpdateCell(networkKey, operator, channel, "GSM",
+            return  addOrUpdateCell(networkKey, operator, fcn, "GSM",
                     dBmlevel, NetworkType.typeForCode("G"), location);
         }
 
@@ -1152,6 +1162,11 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             final String networkKey = mcc+""+mnc+"_"+tacInt+"_"+ciInt;
             int dBmlevel = cellStrengthL.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ?
+                        cellIdentL.getEarfcn():0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "LTE Cell: " +
@@ -1161,11 +1176,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
-
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tEARFCN:" + cellIdentL.getEarfcn();
-                }
+                        "\n\toperator: " + operator +
+                        "\n\tEARFCN:" + fcn;
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
@@ -1184,8 +1196,8 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentL.getEarfcn() != Integer.MAX_VALUE?cellIdentL.getEarfcn():0;
-            return addOrUpdateCell(networkKey, operator, channel, "LTE",
+
+            return addOrUpdateCell(networkKey, operator, fcn, "LTE",
                     dBmlevel, NetworkType.typeForCode("L"), location);
         }
         return null;
@@ -1220,6 +1232,11 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
             int dBmlevel = cellStrengthW.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = (cellIdentW.getUarfcn() != Integer.MAX_VALUE) ?
+                        cellIdentW.getUarfcn():0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "WCDMA Cell:" +
@@ -1228,12 +1245,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
-
-
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tUARFCN:" + cellIdentW.getUarfcn();
-                }
+                        "\n\toperator: " + operator +
+                        "\n\tUARFCN:" + fcn;
 
                 int asulevel = cellStrengthW.getAsuLevel();
 
@@ -1243,15 +1256,15 @@ public class WifiReceiver extends BroadcastReceiver {
                 res += "\n\tdBm:" + dBmlevel;
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentW.getUarfcn() != Integer.MAX_VALUE?cellIdentW.getUarfcn():0;
-            return addOrUpdateCell(networkKey, operator, channel, "WCDMA",
+
+            return addOrUpdateCell(networkKey, operator, fcn, "WCDMA",
                 dBmlevel, NetworkType.typeForCode("D"), location);
         }
         return null;
     }
 
     private Network addOrUpdateCell(final String bssid, final String operator,
-                                    final int channelId, final String networkTypeName,
+                                    final int frequency, final String networkTypeName,
                                     final int strength, final NetworkType type,
                                     final Location location) {
 
@@ -1265,10 +1278,11 @@ public class WifiReceiver extends BroadcastReceiver {
         final String operatorName = getOperatorName(operator);
 
         if ( network == null ) {
-            network = new Network( bssid, operatorName, channelId, capabilities, strength, type );
+            network = new Network( bssid, operatorName, frequency, capabilities, strength, type );
             networkCache.put( network.getBssid(), network );
         } else {
             network.setLevel(strength);
+            network.setFrequency(frequency);
         }
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {

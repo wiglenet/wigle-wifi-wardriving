@@ -25,6 +25,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private SQLiteDatabase db;
 
     private static final String OPERATOR_FOR_MCC_MNC = "SELECT operator FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
+    private static final String RECORD_FOR_MCC_MNC = "SELECT * FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
 
     public MxcDatabaseHelper(Context context) {
         super(context, MXC_DB_NAME, null, MXC_DATABASE_VERSION);
@@ -90,7 +91,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
         try {
             if (openDataBase()) {
-                cursor = db.rawQuery(OPERATOR_FOR_MCC_MNC, new String[]{mcc, mnc});
+                cursor = db.rawQuery(RECORD_FOR_MCC_MNC, new String[]{mcc, mnc});
                 if (cursor.getCount() > 0) {
                     cursor.moveToFirst();
 

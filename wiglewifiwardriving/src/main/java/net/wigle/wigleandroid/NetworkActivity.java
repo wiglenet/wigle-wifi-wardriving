@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,6 +51,7 @@ import com.google.gson.Gson;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
+import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
@@ -135,17 +137,58 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             tv.setText( NetworkListAdapter.getConstructionTime(format, network ) );
 
             tv = (TextView) findViewById( R.id.na_chan );
-            if ( ! NetworkType.WIFI.equals(network.getType()) ) {
-                tv.setText( getString(R.string.na) );
-            }
-            else {
-                Integer chan = network.getChannel();
+            Integer chan = network.getChannel();
+            if ( NetworkType.WIFI.equals(network.getType()) ) {
                 chan = chan != null ? chan : network.getFrequency();
-                tv.setText( " " + Integer.toString(chan) + " " );
+                tv.setText(" " + Integer.toString(chan) + " ");
+            } else if ( NetworkType.CDMA.equals(network.getType()) || chan == null) {
+                tv.setText( getString(R.string.na) );
+            } else {
+                final String[] cellCapabilities = network.getCapabilities().split(";");
+                tv.setText(cellCapabilities[0]+" "+channelCodeTypeForNetworkType(network.getType())+" "+chan);
             }
 
             tv = (TextView) findViewById( R.id.na_cap );
             tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
+
+            if ( ! NetworkType.WIFI.equals(network.getType()) && ! NetworkType.CDMA.equals(network.getType())) {
+
+
+
+                if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
+                    final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
+
+                    MccMncRecord rec = null;
+                    if (operatorCode.length() > 5 && operatorCode.length() < 7) {
+                        final String mnc = operatorCode.substring(3, operatorCode.length());
+                        final String mcc = operatorCode.substring(0, 3);
+
+                        //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
+
+                        rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                        if (rec != null) {
+                            View v = findViewById(R.id.cell_info);
+                            v.setVisibility(View.VISIBLE);
+                            tv = (TextView) findViewById( R.id.na_cell_status );
+                            tv.setText( " "+rec.getStatus() );
+                            tv = (TextView) findViewById( R.id.na_cell_brand );
+                            tv.setText( " "+rec.getBrand());
+                            tv = (TextView) findViewById( R.id.na_cell_bands );
+                            tv.setText( " "+rec.getBands());
+                            if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
+                                v = findViewById(R.id.cell_notes_row);
+                                v.setVisibility(View.VISIBLE);
+                                tv = (TextView) findViewById( R.id.na_cell_notes );
+                                tv.setText( " "+rec.getNotes());
+                            }
+
+                        }
+
+                    }
+                } else {
+                    MainActivity.warn("unable to get operatorCode for "+bssid);
+                }
+            }
 
             setupMap( network, savedInstanceState );
             // kick off the query now that we have our map
@@ -584,5 +627,18 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
         }
         return false;
+    }
+
+    private static final String channelCodeTypeForNetworkType(NetworkType type) {
+        switch (type) {
+            case GSM:
+                return "ARFCN"  ;
+            case LTE:
+                return "EARFCN";
+            case WCDMA:
+                return "UARFCN";
+            default:
+                return null;
+        }
     }
 }

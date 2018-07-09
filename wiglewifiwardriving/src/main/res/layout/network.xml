@@ -129,34 +129,115 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+	android:weightSum="10"
     >
     	<TextView
 		android:id="@+id/na_chan_text"
 		android:text="@string/network_channel"
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
+		android:layout_weight="2"
 		android:layout_height="wrap_content"
 		/>
     	<TextView
 		android:id="@+id/na_chan"
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
+		android:layout_weight="3"
 		android:layout_height="wrap_content"
-        android:layout_marginRight="2dip"
 		/>
 
 		<TextView
 		android:id="@+id/na_observe_text"
 		android:text="@string/network_observations"
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
+		android:layout_weight="3"
+		android:gravity="right"
 		android:layout_height="wrap_content"
 		/>
     	<TextView
 		android:id="@+id/na_observe"
 		android:text="@string/network_querying"
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
+		android:layout_weight="2"
 		android:layout_height="wrap_content"
 		/>
 	</LinearLayout>
-
+	<LinearLayout
+		android:id="@+id/cell_info"
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:visibility="gone"
+        android:layout_marginRight="15dp">
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+            android:weightSum="4"
+			>
+			<TextView
+				android:id="@+id/na_cell_status_lbl"
+				android:text="@string/cell_network_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+				android:layout_height="wrap_content"
+				/>
+			<TextView
+				android:id="@+id/na_cell_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+				android:layout_height="wrap_content"
+				/>
+			<TextView
+				android:id="@+id/na_cell_brand_lbl"
+				android:text="@string/cell_network_brand"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+				android:layout_height="wrap_content"
+				/>
+			<TextView
+				android:id="@+id/na_cell_brand"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+				android:layout_height="wrap_content"
+				/>
+		</LinearLayout>
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			>
+			<TextView
+				android:id="@+id/na_cell_bands_lbl"
+				android:text="@string/cell_network_bands"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+			<TextView
+				android:id="@+id/na_cell_bands"
+                android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+		</LinearLayout>
+		<LinearLayout
+			android:id="@+id/cell_notes_row"
+			android:visibility="gone"
+			android:orientation="horizontal"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			>
+			<TextView
+				android:id="@+id/na_cell_notes_lbl"
+				android:text="@string/cell_network_notes"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+			<TextView
+				android:id="@+id/na_cell_notes"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				/>
+		</LinearLayout>
+	</LinearLayout>
     <LinearLayout
         android:orientation="vertical"
 	android:layout_width="fill_parent"

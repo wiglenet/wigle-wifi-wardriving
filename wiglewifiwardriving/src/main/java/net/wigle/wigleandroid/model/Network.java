@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.model;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -16,18 +17,19 @@ import com.google.maps.android.clustering.ClusterItem;
 public final class Network implements ClusterItem {
     private final String bssid;
     private final String ssid;
-    private final int frequency;
     private final String capabilities;
-    private int level;
-    private final Integer channel;
     private final String showCapabilities;
     private final int crypto;
     private final NetworkType type;
+
+    private int frequency;
+    private int level;
+    private Integer channel;
     private LatLng geoPoint;
     private boolean isNew;
 
     private String detail;
-    private final long constructionTime = System.currentTimeMillis();
+    private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
@@ -107,9 +109,12 @@ public final class Network implements ClusterItem {
         this.type = type;
         if (this.type.equals(NetworkType.typeForCode("W"))) {
             this.channel = freqToChan.get(frequency);
+        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+            //TODO:
+
+            this.channel = frequency;
         } else {
-            //TODO: we *can* map this now, but we'd need to determine server-side handling
-            this.channel = null;
+            channel = null;
         }
 
         if ( ! NetworkType.WIFI.equals( type ) ) {
@@ -178,6 +183,17 @@ public final class Network implements ClusterItem {
 
     public void setLevel( final int level ) {
         this.level = level;
+    }
+
+    // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
+    public void setFrequency( final int frequency) {
+        this.frequency = frequency;
+        if (NetworkType.WIFI.equals(this.type)) {
+            this.channel = freqToChan.get(frequency);
+        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+            this.channel = frequency;
+        }
+        //TODO: ignoring else case
     }
 
     public void setIsNew() {
@@ -258,4 +274,8 @@ public final class Network implements ClusterItem {
         return false;
     }
 
+    /*public static final int lteChannelforEarfcn() {
+        BigDecimal[2] dlUlFrequs =
+        return 0;
+    }*/
 }

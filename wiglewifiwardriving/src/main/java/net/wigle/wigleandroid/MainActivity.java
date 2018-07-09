@@ -325,15 +325,14 @@ public final class MainActivity extends AppCompatActivity {
         }
         setupFilters(prefs);
 
-        if (!state.mxcDbHelper.isPresent()) {
-            try {
-                state.mxcDbHelper.implantMxcDatabase();
-            } catch (IOException ex) {
-                MainActivity.error("unable to implant mcc/mnc db", ex);
-            }
+        //TODO: if we can determine whether DB needs updating, we can avoid copying every time
+        //if (!state.mxcDbHelper.isPresent()) {
+        try {
+            state.mxcDbHelper.implantMxcDatabase();
+        } catch (IOException ex) {
+            MainActivity.error("unable to implant mcc/mnc db", ex);
         }
-        //TODO: need to figure out whether DB needs updating
-
+        //}
 
         // rksh 20160202 - api/authuser secure preferences storage
         checkInitKeystore();

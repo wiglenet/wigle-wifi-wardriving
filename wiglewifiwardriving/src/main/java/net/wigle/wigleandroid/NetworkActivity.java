@@ -151,9 +151,9 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             tv = (TextView) findViewById( R.id.na_cap );
             tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
 
-            if ( ! NetworkType.WIFI.equals(network.getType()) && ! NetworkType.CDMA.equals(network.getType())) {
-
-
+            if ( NetworkType.GSM.equals(network.getType()) ||
+                    NetworkType.LTE.equals(network.getType()) ||
+                    NetworkType.WCDMA.equals(network.getType())) { // cell net types  with advanced data
 
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
@@ -181,9 +181,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                 tv = (TextView) findViewById( R.id.na_cell_notes );
                                 tv.setText( " "+rec.getNotes());
                             }
-
                         }
-
                     }
                 } else {
                     MainActivity.warn("unable to get operatorCode for "+bssid);

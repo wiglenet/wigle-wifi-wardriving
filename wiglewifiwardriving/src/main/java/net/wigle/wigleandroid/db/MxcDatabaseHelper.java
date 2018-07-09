@@ -24,7 +24,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private final Context context;
     private SQLiteDatabase db;
 
+    // query when you just need opname
     private static final String OPERATOR_FOR_MCC_MNC = "SELECT operator FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
+
+    // query for the whole record
     private static final String RECORD_FOR_MCC_MNC = "SELECT * FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
 
     public MxcDatabaseHelper(Context context) {

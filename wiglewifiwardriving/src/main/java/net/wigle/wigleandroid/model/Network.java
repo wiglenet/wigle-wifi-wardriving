@@ -110,8 +110,7 @@ public final class Network implements ClusterItem {
         if (this.type.equals(NetworkType.typeForCode("W"))) {
             this.channel = freqToChan.get(frequency);
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
-            //TODO:
-
+            //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         } else {
             channel = null;
@@ -191,9 +190,9 @@ public final class Network implements ClusterItem {
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = freqToChan.get(frequency);
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+            //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
-        //TODO: ignoring else case
     }
 
     public void setIsNew() {

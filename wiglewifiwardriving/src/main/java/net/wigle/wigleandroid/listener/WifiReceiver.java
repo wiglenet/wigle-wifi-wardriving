@@ -2,10 +2,6 @@ package net.wigle.wigleandroid.listener;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -14,7 +10,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -23,7 +18,7 @@ import java.util.regex.Matcher;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.DashboardFragment;
-import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.LatLng;
@@ -40,7 +35,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.AssetManager;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -67,9 +61,6 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class WifiReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
@@ -127,8 +118,7 @@ public class WifiReceiver extends BroadcastReceiver {
         NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
-    //TODO: Could do gymnastics to init static... ?
-    private Map<String, Map<String,MccMncRecord>> OPERATOR_MAP;
+    private final Map<String, Map<String,String>> OPERATOR_CACHE;
 
     private static final Comparator<Network> signalCompare = new Comparator<Network>() {
         @Override
@@ -171,13 +161,13 @@ public class WifiReceiver extends BroadcastReceiver {
         prevScanPeriod = mainActivity.getLocationSetPeriod();
         ListFragment.lameStatic.runNetworks = runNetworks;
         ssidSpeaker = new SsidSpeaker( mainActivity );
-        OPERATOR_MAP = initOperatorMap(context.getAssets());
         // formats for speech
         timeFormat = new SimpleDateFormat( "h mm aa", Locale.US );
         numberFormat1 = NumberFormat.getNumberInstance( Locale.US );
         if ( numberFormat1 instanceof DecimalFormat ) {
             numberFormat1.setMaximumFractionDigits(1);
         }
+        OPERATOR_CACHE = new HashMap<>();
     }
 
     public void setMainActivity( final MainActivity mainActivity ) {
@@ -557,7 +547,9 @@ public class WifiReceiver extends BroadcastReceiver {
                 currentCell = tele.getCellLocation();
                 if (currentCell != null) {
                     Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
-                    networks.put(currentNetwork.getBssid(),currentNetwork);
+                    if (currentNetwork != null) {
+                        networks.put(currentNetwork.getBssid(), currentNetwork);
+                    }
                 }
 
                 if (Build.VERSION.SDK_INT >= 17) { // we can survey cells
@@ -712,11 +704,15 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         } else if ( cellLocation instanceof GsmCellLocation ) {
             GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
-            if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0 ) {
+            final String operatorCode = tele.getNetworkOperator();
+            if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 ssid = getOperatorName(tele.getNetworkOperator());
                 MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;
+            }
+            if (operatorCode == null || operatorCode.isEmpty()) {
+                return null;
             }
         } else {
             MainActivity.warn("Unhandled CellLocation type: "+cellLocation.getClass().getSimpleName());
@@ -1066,7 +1062,8 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
             //  references http://niviuk.free.fr/cdma_band.php
-            return addOrUpdateCell(networkKey, /*TODO: can we improve on this?*/tele.getNetworkOperator(),
+            return addOrUpdateCell(networkKey,
+                    /*TODO: can we improve on this?*/ tele.getNetworkOperator(),
                     0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
 
         }
@@ -1105,6 +1102,10 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
             int dBmlevel = cellStrengthG.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "GSM Cell:" +
@@ -1114,11 +1115,11 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
+                        "\n\toperator: " + operator +
+                        "\n\tARFCN: " + fcn;
 
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tARFCN: " + cellIdentG.getArfcn() +
-                            "\n\tBSIC: " + cellIdentG.getBsic();
+                    res += "\n\tBSIC: " + cellIdentG.getBsic();
                 }
 
                 int asulevel = cellStrengthG.getAsuLevel();
@@ -1129,8 +1130,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 res += "\n\tASUL: " + asulevel;
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentG.getArfcn()!= Integer.MAX_VALUE ?cellIdentG.getArfcn():0;
-            return  addOrUpdateCell(networkKey, operator, channel, "GSM",
+            return  addOrUpdateCell(networkKey, operator, fcn, "GSM",
                     dBmlevel, NetworkType.typeForCode("G"), location);
         }
 
@@ -1164,6 +1164,11 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             final String networkKey = mcc+""+mnc+"_"+tacInt+"_"+ciInt;
             int dBmlevel = cellStrengthL.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ?
+                        cellIdentL.getEarfcn():0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "LTE Cell: " +
@@ -1173,11 +1178,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
-
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tEARFCN:" + cellIdentL.getEarfcn();
-                }
+                        "\n\toperator: " + operator +
+                        "\n\tEARFCN:" + fcn;
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
@@ -1196,8 +1198,8 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentL.getEarfcn() != Integer.MAX_VALUE?cellIdentL.getEarfcn():0;
-            return addOrUpdateCell(networkKey, operator, channel, "LTE",
+
+            return addOrUpdateCell(networkKey, operator, fcn, "LTE",
                     dBmlevel, NetworkType.typeForCode("L"), location);
         }
         return null;
@@ -1232,6 +1234,11 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
             int dBmlevel = cellStrengthW.getDbm();
+            int fcn = 0;
+            if (android.os.Build.VERSION.SDK_INT >= 24) {
+                fcn = (cellIdentW.getUarfcn() != Integer.MAX_VALUE) ?
+                        cellIdentW.getUarfcn():0;
+            }
 
             if (MainActivity.DEBUG_CELL_DATA) {
                 String res = "WCDMA Cell:" +
@@ -1240,12 +1247,8 @@ public class WifiReceiver extends BroadcastReceiver {
                         "\n\tMCC: " + mcc +
                         "\n\tMNC: " + mnc +
                         "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator;
-
-
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tUARFCN:" + cellIdentW.getUarfcn();
-                }
+                        "\n\toperator: " + operator +
+                        "\n\tUARFCN:" + fcn;
 
                 int asulevel = cellStrengthW.getAsuLevel();
 
@@ -1255,15 +1258,15 @@ public class WifiReceiver extends BroadcastReceiver {
                 res += "\n\tdBm:" + dBmlevel;
                 MainActivity.info(res);
             }
-            final int channel = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentW.getUarfcn() != Integer.MAX_VALUE?cellIdentW.getUarfcn():0;
-            return addOrUpdateCell(networkKey, operator, channel, "WCDMA",
+
+            return addOrUpdateCell(networkKey, operator, fcn, "WCDMA",
                 dBmlevel, NetworkType.typeForCode("D"), location);
         }
         return null;
     }
 
     private Network addOrUpdateCell(final String bssid, final String operator,
-                                    final int channelId, final String networkTypeName,
+                                    final int frequency, final String networkTypeName,
                                     final int strength, final NetworkType type,
                                     final Location location) {
 
@@ -1277,10 +1280,11 @@ public class WifiReceiver extends BroadcastReceiver {
         final String operatorName = getOperatorName(operator);
 
         if ( network == null ) {
-            network = new Network( bssid, operatorName, channelId, capabilities, strength, type );
+            network = new Network( bssid, operatorName, frequency, capabilities, strength, type );
             networkCache.put( network.getBssid(), network );
         } else {
             network.setLevel(strength);
+            network.setFrequency(frequency);
         }
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {
@@ -1304,76 +1308,30 @@ public class WifiReceiver extends BroadcastReceiver {
     private String getOperatorName(final String operatorCode) {
         //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
         if (null != operatorCode && operatorCode.length() >= 5) {
+
+
             final String mnc = operatorCode.substring(3, operatorCode.length());
             final String mcc = operatorCode.substring(0, 3);
             //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
-            Map<String, MccMncRecord> country = OPERATOR_MAP.get(mcc);
-            if (null != country) {
-                MccMncRecord match = country.get(mnc);
-                if (null != match) {
-                    return match.getOperator();
-                }
+
+            Map<String, String> mccMap = OPERATOR_CACHE.get(mcc);;
+            if (null == mccMap) {
+                mccMap = new HashMap<>();
+                OPERATOR_CACHE.put(mcc, mccMap);
+            }
+
+            String operator = mccMap.get(mnc);
+            if (null != operator) {
+                return operator;
+            }
+
+            MainActivity.State s = this.mainActivity.getState();
+            if (null != s) {
+                operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
+                mccMap.put(mnc, operator);
+                return operator;
             }
         }
         return null;
     }
-
-    /**
-     * TODO: probably better to do this with a lamestatic map so we can show detail
-     * @param assetManager
-     * @return
-     */
-    private Map<String,Map<String,MccMncRecord>> initOperatorMap(AssetManager assetManager) {
-        Map<String,Map<String, MccMncRecord>> map = new HashMap<>();
-        String json = null;
-        try {
-            final InputStream stream = assetManager.open("mcc-mnc-dict.json");
-            MainActivity.info("operator stream: " + stream);
-
-            BufferedInputStream bis = new BufferedInputStream(stream);
-            ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            int result = bis.read();
-            while(result != -1) {
-                buf.write((byte) result);
-                result = bis.read();
-            }
-            json = buf.toString("UTF-8");
-
-            if (null != bis) {
-                bis.close();
-            }
-            if (null != buf) {
-                buf.close();
-            }
-            if (null != stream) {
-                stream.close();
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            MainActivity.info("operator load complete.");
-            JSONObject jObject = new JSONObject(json);
-            Iterator<String> mccKeys = jObject.keys();
-            while( mccKeys.hasNext() ){
-                String key = (String)mccKeys.next();
-                JSONObject country = jObject.getJSONObject(key);
-                Map<String, MccMncRecord> mccMap = map.get(key);
-                if (null == mccMap) {
-                    mccMap = new HashMap<>();
-                    map.put(key, mccMap);
-                }
-                Iterator<String> mncKeys = country.keys();
-                while( mncKeys.hasNext() ) {
-                    String mncKey = (String)mncKeys.next();
-                    MccMncRecord record = mapper.readValue(country.getJSONObject(mncKey).toString(), MccMncRecord.class);
-                    mccMap.put(mncKey, record);
-                }
-            }
-        } catch (final IOException ex) {
-            MainActivity.error("exception loading cell operators: " + ex, ex);
-        } catch (final JSONException ex) {
-            MainActivity.error("exception parsing cell operators: " + ex, ex);
-        }
-
-        return map;
-    }
-
 }

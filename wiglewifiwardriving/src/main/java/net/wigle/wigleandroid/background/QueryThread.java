@@ -7,8 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import net.wigle.wigleandroid.DBException;
-import net.wigle.wigleandroid.DatabaseHelper;
+import net.wigle.wigleandroid.db.DBException;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 
 public class QueryThread extends Thread {

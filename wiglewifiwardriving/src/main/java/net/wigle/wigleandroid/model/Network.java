@@ -3,6 +3,7 @@ package net.wigle.wigleandroid.model;
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -17,18 +18,19 @@ import android.net.wifi.ScanResult;
 public final class Network {
     private final String bssid;
     private final String ssid;
-    private final int frequency;
     private final String capabilities;
-    private int level;
-    private final Integer channel;
     private final String showCapabilities;
     private final int crypto;
     private final NetworkType type;
+
+    private int frequency;
+    private int level;
+    private Integer channel;
     private LatLng geoPoint;
     private boolean isNew;
 
     private String detail;
-    private final long constructionTime = System.currentTimeMillis();
+    private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
@@ -108,9 +110,11 @@ public final class Network {
         this.type = type;
         if (this.type.equals(NetworkType.typeForCode("W"))) {
             this.channel = freqToChan.get(frequency);
+        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+            //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
+            this.channel = frequency;
         } else {
-            //TODO: we *can* map this now, but we'd need to determine server-side handling
-            this.channel = null;
+            channel = null;
         }
 
         if ( ! NetworkType.WIFI.equals( type ) ) {
@@ -179,6 +183,17 @@ public final class Network {
 
     public void setLevel( final int level ) {
         this.level = level;
+    }
+
+    // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
+    public void setFrequency( final int frequency) {
+        this.frequency = frequency;
+        if (NetworkType.WIFI.equals(this.type)) {
+            this.channel = freqToChan.get(frequency);
+        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+            //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
+            this.channel = frequency;
+        }
     }
 
     public void setIsNew() {
@@ -258,4 +273,8 @@ public final class Network {
         return false;
     }
 
+    /*public static final int lteChannelforEarfcn() {
+        BigDecimal[2] dlUlFrequs =
+        return 0;
+    }*/
 }

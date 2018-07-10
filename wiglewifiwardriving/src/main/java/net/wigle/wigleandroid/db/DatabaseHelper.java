@@ -1,9 +1,10 @@
 // -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
 // vim:ts=2:sw=2:tw=80:et
 
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.db;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +22,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.wigle.wigleandroid.DataFragment.BackupTask;
+import net.wigle.wigleandroid.ErrorReportActivity;
+import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -208,7 +212,7 @@ public final class DatabaseHelper extends Thread {
 
             final MainActivity mainActivity = MainActivity.getMainActivity();
             final Intent errorReportIntent = new Intent( mainActivity, ErrorReportActivity.class );
-            errorReportIntent.putExtra( MainActivity.ERROR_REPORT_DIALOG, error );
+            errorReportIntent.putExtra( ERROR_REPORT_DIALOG, error );
             mainActivity.startActivity( errorReportIntent );
         }
     }

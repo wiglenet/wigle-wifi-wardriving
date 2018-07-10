@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
+apply plugin: 'groovyx.grooid.groovy-android'
 
 android {
     compileSdkVersion 27
@@ -28,9 +29,23 @@ android {
     }
 }
 
+configurations {
+    driver
+}
+
+dependencies {
+    driver 'org.xerial:sqlite-jdbc:3.23.1'
+}
+
+URLClassLoader loader = GroovyObject.class.classLoader
+configurations.driver.each {File file -> loader.addURL(file.toURI().toURL())}
+
 ext {
     supportLibraryVersion = '27.1.1'
     gmsLibraryBaseVersion = '15.0.1'
+    inputMxcSqlDir = "etc/mccmncsqlite"
+    outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
+    mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"
 }
 
 dependencies {
@@ -51,13 +66,57 @@ dependencies {
     implementation 'ru.egslava:MaskedEditText:1.0.5'
 }
 
-//this runs every time, which isn't optimal.
-task downloadFile(type: Download) {
+import groovy.json.JsonSlurper
+
+//TODO: this runs every time, which isn't optimal. just needs to run before build
+task downloadFile (type: Download) {
     println "downloading mcc/mnc data"
     download {
         src 'https://api.wigle.net/api/v2/cell/mccMnc'
-        dest "$projectDir/src/main/assets/mcc-mnc-dict.json"
+        dest "../$mxcDictionaryFile"
         overwrite true
         acceptAnyCertificate true /* horrible, but alternative is update trust store <=> letsencrypt */
     }
+}
+
+task createMccMncDB (dependsOn: 'downloadFile') {
+    ext.loadScript = { sql, file ->
+        println("Applying " + file)
+        String[] sqlcmds = file.text.split(";")
+        sqlcmds.collect{it.trim()}.findAll{!it.isEmpty() && !it.startsWith("--")}.each{
+            try {
+                sql.execute(it)
+            } catch(java.sql.SQLException e) {
+                System.err << "Invalid SQL statement: " + it
+                e.printStackTrace(System.err)
+                throw new GradleException('Preformulated MCC/MNC Database SQL Failure.')
+            }
+        }
+    }
+
+    delete outputMxcDbFile
+    def sql = groovy.sql.Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
+    new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) {loadScript(sql, it)}
+    def inputFile = new File("$mxcDictionaryFile")
+    def mccMap = new JsonSlurper().parseText(inputFile.text)
+    def insertSql = 'INSERT OR REPLACE INTO wigle_mcc_mnc (mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes) VALUES (?,?,?,?,?,?,?,?,?,?)'
+    def myKeyNames = ['mcc', 'mnc']
+    mccMap.each { mcc, mncMap ->
+        //DEBUG: println "mcc: $mcc"
+        mncMap.each {mnc, value ->
+            //DEBUG: println "\tmnc: $mnc"
+            //DEBUG: println "\t\tvalue: $value"
+            def type = value?.type
+            def countryName = value?.countryName
+            def countryCode = value?.countryCode
+            def brand = value?.brand
+            def operator = value?.operator
+            def status = value?.status
+            def bands = value?.bands
+            def notes = value?.notes
+            def params = [mcc, mnc, type, countryName, countryCode, brand, operator, status, bands, notes]
+            sql.executeInsert insertSql, params, myKeyNames
+        }
+    }
+    sql.close()
 }

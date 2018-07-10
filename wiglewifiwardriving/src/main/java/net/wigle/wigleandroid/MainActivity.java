@@ -69,6 +69,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
@@ -102,6 +104,7 @@ import static android.location.LocationManager.GPS_PROVIDER;
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
     public static class State {
+        public MxcDatabaseHelper mxcDbHelper;
         DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
         WigleService wigleService;
@@ -156,7 +159,7 @@ public final class MainActivity extends AppCompatActivity {
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
-    static final String ERROR_REPORT_DIALOG = "doDialog";
+    public static final String ERROR_REPORT_DIALOG = "doDialog";
 
     public static final long DEFAULT_SPEECH_PERIOD = 60L;
     public static final long DEFAULT_RESET_WIFI_PERIOD = 90000L;
@@ -321,6 +324,15 @@ public final class MainActivity extends AppCompatActivity {
             setupFragments();
         }
         setupFilters(prefs);
+
+        //TODO: if we can determine whether DB needs updating, we can avoid copying every time
+        //if (!state.mxcDbHelper.isPresent()) {
+        try {
+            state.mxcDbHelper.implantMxcDatabase();
+        } catch (IOException ex) {
+            MainActivity.error("unable to implant mcc/mnc db", ex);
+        }
+        //}
 
         // rksh 20160202 - api/authuser secure preferences storage
         checkInitKeystore();
@@ -873,6 +885,10 @@ public final class MainActivity extends AppCompatActivity {
             //state.dbHelper.checkDB();
             state.dbHelper.start();
             ListFragment.lameStatic.dbHelper = state.dbHelper;
+        }
+        if (state.mxcDbHelper == null) {
+            state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext());
+            //state.mxcDbHelper.start();
         }
     }
 

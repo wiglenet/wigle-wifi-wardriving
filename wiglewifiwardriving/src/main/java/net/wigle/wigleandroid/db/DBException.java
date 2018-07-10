@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.db;
 
 /**
  * Make db exceptions checked, so the compiler will help make sure we deal with them

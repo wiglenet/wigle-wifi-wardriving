@@ -1,3 +1,8 @@
+* 2.30 (07/12/2018)
+More expansive cell logging
+Updated OUI manufacturer data
+Another stab at fixing RemoteServiceException Android race condition
+
 * 2.29 (05/12/2018)
 Better French translation (thanks marmat8951!)
 Another stab at fixing RemoteServiceException

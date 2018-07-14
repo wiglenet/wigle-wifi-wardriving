@@ -90,6 +90,8 @@ public class WifiReceiver extends BroadcastReceiver {
     public static final int FIND_TIME_COMPARE = 13;
     public static final int SSID_COMPARE = 14;
 
+    public static final int CELL_MIN_STRENGTH = -113;
+
     private static final Map<Integer, String> NETWORK_TYPE_LEGEND;
     static {
         Map<Integer, String> initMap = new HashMap<>();
@@ -776,7 +778,7 @@ public class WifiReceiver extends BroadcastReceiver {
         int retval;
         if ( strength == 99 ) {
             // unknown
-            retval = -113;
+            retval = CELL_MIN_STRENGTH;
         }
         else {
             //  0        -113 dBm or less
@@ -784,7 +786,7 @@ public class WifiReceiver extends BroadcastReceiver {
             //  2...30   -109... -53 dBm
             //  31        -51 dBm or greater
             //  99 not known or not detectable
-            retval = strength * 2 - 113;
+            retval = strength * 2 + CELL_MIN_STRENGTH;
         }
         //DEBUG: MainActivity.info("strength: " + strength + " dBm: " + retval);
         return retval;
@@ -1278,10 +1280,10 @@ public class WifiReceiver extends BroadcastReceiver {
         final String operatorName = getOperatorName(operator);
 
         if ( network == null ) {
-            network = new Network( bssid, operatorName, frequency, capabilities, strength, type );
+            network = new Network( bssid, operatorName, frequency, capabilities, (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength, type );
             networkCache.put( network.getBssid(), network );
         } else {
-            network.setLevel(strength);
+            network.setLevel( (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength);
             network.setFrequency(frequency);
         }
 

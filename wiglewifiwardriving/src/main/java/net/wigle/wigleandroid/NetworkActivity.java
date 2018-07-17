@@ -291,7 +291,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         };
 
         final String sql = "SELECT level,lat,lon FROM "
-                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "' limit " + obsMap.maxSize();
+                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() +
+                "' ORDER BY _id DESC limit " + obsMap.maxSize();
 
         final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
             @Override

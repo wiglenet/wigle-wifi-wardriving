@@ -92,6 +92,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
+    public static final String PREF_BT_WAS_OFF = "btWasOff";
+    public static final String PREF_SCAN_BT = "scanBluetooth";
     public static final String PREF_DISTANCE_RUN = "distRun";
     public static final String PREF_STARTTIME_RUN = "timestampRunStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
@@ -144,6 +146,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAPF_WEP = "mapfWep";
     public static final String PREF_MAPF_WPA = "mapfWpa";
     public static final String PREF_MAPF_CELL = "mapfCell";
+    public static final String PREF_MAPF_BT = "mapfBt";
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 
@@ -558,6 +561,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         // always set our current list adapter
         state.wifiReceiver.setListAdapter(state.listAdapter);
+        if (null != state.bluetoothReceiver) {
+            state.bluetoothReceiver.setListAdapter(state.listAdapter);
+        }
         final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
         setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }

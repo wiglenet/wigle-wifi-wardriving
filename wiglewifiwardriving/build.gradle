@@ -63,6 +63,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
+    implementation 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
 }
 
 import groovy.json.JsonSlurper

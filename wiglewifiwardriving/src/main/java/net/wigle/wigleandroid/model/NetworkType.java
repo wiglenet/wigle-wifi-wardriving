@@ -8,7 +8,9 @@ public enum NetworkType {
     GSM("G"),
     CDMA("C"),
     LTE("L"),
-    WCDMA("D");
+    WCDMA("D"),
+    BT("B"),
+    NFC("N");
 
     private static final Map<String,NetworkType> types = new HashMap<>();
 

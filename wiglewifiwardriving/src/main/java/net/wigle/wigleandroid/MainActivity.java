@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -72,8 +74,10 @@ import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
+import net.wigle.wigleandroid.listener.BluetoothReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
+import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -115,6 +119,7 @@ public final class MainActivity extends AppCompatActivity {
         WifiLock wifiLock;
         GPSListener gpsListener;
         WifiReceiver wifiReceiver;
+        BluetoothReceiver bluetoothReceiver;
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
@@ -177,6 +182,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
 
     public static final boolean DEBUG_CELL_DATA = false;
+    public static final boolean DEBUG_BLUETOOTH_DATA = false;
 
     private static MainActivity mainActivity;
     private static ListFragment listActivity;
@@ -315,6 +321,8 @@ public final class MainActivity extends AppCompatActivity {
         setupBattery();
         info("setupSound");
         setupSound();
+        info("setupBluetooth");
+        setupBluetooth();
         info("setupWifi");
         setupWifi();
         info("setupLocation"); // must be after setupWifi
@@ -372,6 +380,7 @@ public final class MainActivity extends AppCompatActivity {
                 permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
             }
             addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH);
 
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
@@ -914,6 +923,11 @@ public final class MainActivity extends AppCompatActivity {
 
     public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
                                               final String pref, final boolean def) {
+        return prefBackedCheckBox(activity, view, id, pref, def, null);
+    }
+
+    public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
+                                              final String pref, final boolean def, final PrefCheckboxListener listener) {
         final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
@@ -922,6 +936,9 @@ public final class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                 editor.putBoolean(pref, isChecked);
                 editor.apply();
+                if (null != listener) {
+                    listener.preferenceSet(isChecked);
+                }
             }
         });
 
@@ -1014,6 +1031,20 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         if (state.tts != null) state.tts.shutdown();
+
+        //TODO: redundant with endBluetooth?
+        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        } try {
+            info("unregister bluetoothReceiver");
+            unregisterReceiver( state.bluetoothReceiver );
+        } catch ( final IllegalArgumentException ex ) {
+            info( "bluetoothReceiver not registered: " + ex );
+        }
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.stopScanning();
+        }
 
         finishSoon(DESTROY_FINISH_MILLIS, false);
     }
@@ -1730,6 +1761,82 @@ public final class MainActivity extends AppCompatActivity {
         registerReceiver(state.wifiReceiver, intentFilter);
     }
 
+    public void setupBluetooth() {
+        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+        if (bt == null) {
+            info("No bluetooth adapter");
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final Editor edit = prefs.edit();
+        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, false)) {
+            if (!bt.isEnabled()) {
+                info("Enable bluetooth");
+                // tell user, cuz this takes a little while
+                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_bt), Toast.LENGTH_LONG);
+                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
+                bt.enable();
+            } else {
+                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
+            }
+            edit.commit();
+        }
+        if ( state.bluetoothReceiver == null ) {
+            MainActivity.info( "new bluetoothReceiver");
+            // bluetooth scan listener
+            // this receiver is the main workhorse of bluetooth scanning
+        state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+        }
+
+        info("register bluetooth BroadcastReceiver");
+        final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(state.bluetoothReceiver, intentFilter);
+    }
+
+    public void endBluetooth(SharedPreferences prefs) {
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.stopScanning();
+        }
+
+        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        } try {
+            info("unregister bluetoothReceiver");
+            unregisterReceiver( state.bluetoothReceiver );
+        } catch ( final IllegalArgumentException ex ) {
+            info( "bluetoothReceiver not registered: " + ex );
+        }
+
+        final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
+        // don't call on emulator, it crashes it
+        if ( btWasOff && ! state.inEmulator ) {
+            // tell user, cuz this takes a little while
+
+            WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
+
+            // well turn it off now that we're done
+            MainActivity.info("turning bluetooth back off");
+            try {
+                final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+                if (bt == null) {
+                    info("No bluetooth adapter");
+                } else if (bt.isEnabled()) {
+                    info("Disable bluetooth");
+                    bt.disable();
+                }
+            } catch (Exception ex) {
+                MainActivity.error("exception turning bluetooth back off: " + ex, ex);
+            }
+        }
+    }
+
+    public void bluetoothScan() {
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.bluetoothScan();
+        }
+    }
+
     /**
      * Computes the battery level by registering a receiver to the intent triggered
      * by a battery status/level change.
@@ -2106,6 +2213,8 @@ public final class MainActivity extends AppCompatActivity {
                 MainActivity.error("exception turning wifi back off: " + ex, ex);
             }
         }
+
+        endBluetooth(prefs);
 
         TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if (tele != null && state.phoneState != null) {

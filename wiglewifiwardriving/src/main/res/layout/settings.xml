@@ -206,6 +206,11 @@
         style="?android:attr/listSeparatorTextViewStyle"
         />
 
+    <CheckBox android:id="@+id/bluetooth_ena"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bluetooth_pref_text" />
+
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"

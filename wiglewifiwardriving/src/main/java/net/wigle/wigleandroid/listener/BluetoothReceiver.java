@@ -365,6 +365,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * TODO: DRY this up with the sort in WifiReceiver?
+     * @param prefs
+     */
     private void sort(final SharedPreferences prefs) {
         final int sort = prefs.getInt(ListFragment.PREF_LIST_SORT, SIGNAL_COMPARE);
         Comparator<Network> comparator = signalCompare;
@@ -405,33 +409,33 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
 
-        //TODO:
         final boolean newForRun = runNetworks.add( bssid );
 
         Network network = networkCache.get( bssid );
 
         if ( network == null ) {
-            //TODO: str. filtering
-            MainActivity.info("new BT net: "+bssid);
+            //MainActivity.info("new BT net: "+bssid);
             network = new Network( bssid, ssid, frequency, capabilities, strength, type );
             networkCache.put( bssid, network );
         } else {
             //DEBUG: MainActivity.info("existing BT net");
-            //TODO: network.setLevel( (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength);
-            //freq/channel?
-
+            //TODO: is there any freq/channel info in BT at all??
             //TODO: update capabilities? only if was Misc/Uncategorized, now recognized?
+            //network.setCapabilities(capabilities);
             network.setFrequency(frequency);
         }
 
-        final boolean added = runNetworks.add( network.getBssid() );
-        //if ( added ) {
-            //newWifiForRun++;
-            //if ( ssidSpeak ) {
-            //    ssidSpeaker.add( network.getSsid() );
-            //}
-        //}
-        //somethingAdded |= added;
+        final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
+                && ! mainActivity.isMuted();
+
+        // ALIBI: There are simply a lot of these - not sure this is practical
+        /*if ( newForRun ) {
+            //TODO: not using wifi count, I'd guess? newWifiForRun++;
+            if ( ssidSpeak ) {
+                ssidSpeaker.add( network.getSsid() );
+            }
+        }*/
+        //TODO: somethingAdded |= added;
 
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {
@@ -440,17 +444,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             network.setLatLng( LatLng );
         }
 
-        if ( location != null ) {
-            //TODO: not yet
-            //dbHelper.addObservation(network, location, newForRun);
-        }
-
         final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
         final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS );
+        final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_LOG_ADDRS );
 
         //Update display
         if (listAdapter != null) {
-            if ( showCurrent || added ) {
+            if ( showCurrent || newForRun ) {
                 if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
                     if (NetworkType.BT.equals(network.getType())) {
                         listAdapter.addBluetooth(network);
@@ -464,6 +464,25 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
         }
 
+        //Store to DB
+        boolean matches = false;
+        if (bssidDbMatcher != null) {
+            bssidDbMatcher.reset(network.getBssid());
+            matches = bssidDbMatcher.find();
+        }
+        if ( location != null ) {
+            // w/ location
+            if (!matches) {
+                //TODO: not yet (1/2)
+                //dbHelper.addObservation(network, location, newForRun);
+            }
+        } else {
+            // w/out location
+            if (!matches) {
+                //TODO: not yet (2/2)
+                //dbHelper.pendingObservation( network, newForRun );
+            }
+        }
         return network;
     }
 

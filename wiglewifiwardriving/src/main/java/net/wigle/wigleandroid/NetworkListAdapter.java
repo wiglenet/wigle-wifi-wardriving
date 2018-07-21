@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.graphics.Color;
 import android.provider.Settings;
@@ -182,6 +183,19 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         final ImageView ico = (ImageView) row.findViewById(R.id.wepicon);
         ico.setImageResource(getImage(network));
 
+        final ImageView btico = (ImageView) row.findViewById(R.id.bticon);
+        if (NetworkType.BT.equals(network.getType())) {
+            btico.setVisibility(View.VISIBLE);
+            Integer btImageId = getBtImage(network);
+            if (null == btImageId) {
+                btico.setVisibility(View.GONE);
+            } else {
+                btico.setImageResource(btImageId);
+            }
+        } else {
+            btico.setVisibility(View.GONE);
+        }
+
         TextView tv = (TextView) row.findViewById(R.id.ssid);
         tv.setText(network.getSsid() + " ");
 
@@ -253,6 +267,157 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             resource = R.drawable.bt_ico;
         } else {
             resource = R.drawable.tower_ico;
+        }
+
+        return resource;
+    }
+
+    public static Integer getBtImage(final Network network) {
+        Integer resource;
+        switch (network.getFrequency()) {
+            case BluetoothClass.Device.AUDIO_VIDEO_CAMCORDER:
+                resource = R.drawable.av_camcorder_pro_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_CAR_AUDIO:
+                resource = R.drawable.av_car_f_smile;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_HANDSFREE:
+                resource = R.drawable.av_handsfree_headset_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_HEADPHONES:
+                resource = R.drawable.av_headphone_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_HIFI_AUDIO:
+                resource = R.drawable.av_hifi_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_LOUDSPEAKER:
+                resource = R.drawable.av_speaker_f_detailed;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_MICROPHONE:
+                resource = R.drawable.av_mic_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_PORTABLE_AUDIO:
+                resource = R.drawable.av_boombox_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_SET_TOP_BOX:
+                resource = R.drawable.av_settop_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_UNCATEGORIZED:
+                resource = R.drawable.av_receiver_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VCR:
+                resource = R.drawable.av_vcr_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_CAMERA:
+                resource = R.drawable.av_camcorder_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_CONFERENCING:
+                resource = R.drawable.av_conference;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_DISPLAY_AND_LOUDSPEAKER:
+                resource = R.drawable.av_receiver_f;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_GAMING_TOY:
+                resource = R.drawable.av_toy;
+                break;
+            case BluetoothClass.Device.AUDIO_VIDEO_VIDEO_MONITOR:
+                resource = R.drawable.av_monitor;
+                break;
+            case BluetoothClass.Device.COMPUTER_DESKTOP:
+                resource = R.drawable.comp_desk_f;
+                break;
+            case BluetoothClass.Device.COMPUTER_HANDHELD_PC_PDA:
+                resource = R.drawable.comp_handheld;
+                break;
+            case BluetoothClass.Device.COMPUTER_LAPTOP:
+                resource = R.drawable.comp_laptop;
+                break;
+            case BluetoothClass.Device.COMPUTER_PALM_SIZE_PC_PDA:
+                resource = R.drawable.comp_laptop_sm;
+                break;
+            case BluetoothClass.Device.COMPUTER_SERVER:
+                resource = R.drawable.comp_server_f;
+                break;
+            case BluetoothClass.Device.COMPUTER_UNCATEGORIZED:
+                resource = R.drawable.comp_server_desk_f;
+                break;
+            case BluetoothClass.Device.COMPUTER_WEARABLE:
+                resource = R.drawable.comp_ar_f;
+                break;
+            case BluetoothClass.Device.HEALTH_BLOOD_PRESSURE:
+                resource = R.drawable.med_heart;
+                break;
+            case BluetoothClass.Device.HEALTH_DATA_DISPLAY:
+                resource = R.drawable.med_heart_display_o;
+                break;
+            case BluetoothClass.Device.HEALTH_PULSE_OXIMETER:
+            case BluetoothClass.Device.HEALTH_PULSE_RATE:
+                resource = R.drawable.med_heart;
+                break;
+            case BluetoothClass.Device.HEALTH_GLUCOSE:
+            case BluetoothClass.Device.HEALTH_THERMOMETER:
+            case BluetoothClass.Device.HEALTH_UNCATEGORIZED:
+                resource = R.drawable.med_cross_f;
+                break;
+            case BluetoothClass.Device.HEALTH_WEIGHING:
+                resource = R.drawable.med_scale_f;
+                break;
+            case BluetoothClass.Device.PHONE_CELLULAR:
+                resource = R.drawable.tel_cell;
+                break;
+            case BluetoothClass.Device.PHONE_CORDLESS:
+                resource = R.drawable.tel_cordless_1;
+                break;
+            case BluetoothClass.Device.PHONE_ISDN:
+                resource = R.drawable.tel_isdn;
+                break;
+            case BluetoothClass.Device.PHONE_MODEM_OR_GATEWAY:
+                resource = R.drawable.tel_modem;
+                break;
+            case BluetoothClass.Device.PHONE_SMART:
+                resource = R.drawable.comp_handheld;
+                break;
+            case BluetoothClass.Device.PHONE_UNCATEGORIZED:
+                resource = R.drawable.tel_phone_2;
+                break;
+            case BluetoothClass.Device.TOY_CONTROLLER:
+                resource = R.drawable.toy_controller_f;
+                break;
+            case BluetoothClass.Device.TOY_DOLL_ACTION_FIGURE:
+                resource = R.drawable.av_toy;
+                break;
+            case BluetoothClass.Device.TOY_GAME:
+                resource = R.drawable.av_toy;
+                break;
+            case BluetoothClass.Device.TOY_ROBOT:
+                resource = R.drawable.toy_robot;
+                break;
+            case BluetoothClass.Device.TOY_UNCATEGORIZED:
+                resource = R.drawable.av_toy;
+                break;
+            case BluetoothClass.Device.TOY_VEHICLE:
+                resource = R.drawable.toy_vehicle;
+                break;
+            case BluetoothClass.Device.WEARABLE_GLASSES:
+                resource = R.drawable.wear_glasses_1;
+                break;
+            case BluetoothClass.Device.WEARABLE_HELMET:
+                resource = R.drawable.wear_helmet;
+                break;
+            case BluetoothClass.Device.WEARABLE_JACKET:
+                resource = R.drawable.wear_jacket;
+                break;
+            case BluetoothClass.Device.WEARABLE_PAGER:
+                resource = R.drawable.wear_pager;
+                break;
+            case BluetoothClass.Device.WEARABLE_UNCATEGORIZED:
+                resource = R.drawable.wear_jacket_2;
+                break;
+            case BluetoothClass.Device.WEARABLE_WRIST_WATCH:
+                resource = R.drawable.wear_watch;
+                break;
+            default:
+                resource = null;
         }
 
         return resource;

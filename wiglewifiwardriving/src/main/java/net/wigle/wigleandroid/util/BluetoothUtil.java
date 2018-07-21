@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid.util;
 
+import net.wigle.wigleandroid.MainActivity;
+
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -30,7 +33,7 @@ public class BluetoothUtil {
     }
 
     private final static String TAG=BluetoothUtil.class.getSimpleName();
-    public static BleAdvertisedData parseAdertisedData(byte[] advertisedData) {
+    public static BleAdvertisedData parseAdvertisedData(byte[] advertisedData) {
         List<UUID> uuids = new ArrayList<UUID>();
         String name = null;
         if( advertisedData == null ){
@@ -71,7 +74,11 @@ public class BluetoothUtil {
                     }
                     break;
                 default:
-                    buffer.position(buffer.position() + length - 1);
+                    try {
+                        buffer.position(buffer.position() + length - 1);
+                    } catch (Exception ex) {
+                        MainActivity.error("Error parsing advertised BLE data: ", ex);
+                    }
                     break;
             }
         }

@@ -90,7 +90,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         initMap.put(BluetoothClass.Device.COMPUTER_WEARABLE, "Wearable Computer");
         initMap.put(BluetoothClass.Device.HEALTH_BLOOD_PRESSURE, "Blood Pressure");
         initMap.put(BluetoothClass.Device.HEALTH_DATA_DISPLAY, "Health Display");
-        initMap.put(BluetoothClass.Device.HEALTH_GLUCOSE, "Glucode");
+        initMap.put(BluetoothClass.Device.HEALTH_GLUCOSE, "Glucose");
         initMap.put(BluetoothClass.Device.HEALTH_PULSE_OXIMETER, "PulseOxy");
         initMap.put(BluetoothClass.Device.HEALTH_PULSE_RATE, "Pulse");
         initMap.put(BluetoothClass.Device.HEALTH_THERMOMETER, "Thermometer");
@@ -126,7 +126,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> runNetworks = new HashSet<>();
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
-    private static final int EMPTY_LE_THRESHOLD = 5;
+    private static final int EMPTY_LE_THRESHOLD = 30;
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
@@ -216,14 +216,24 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
                 final BluetoothDevice device = scanResult.getDevice();
-                BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdertisedData(scanRecord.getBytes());
+                BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
+
                 final String bssid = device.getAddress();
-                final String ssid = device.getName();
+
+                final String ssid =
+                        (null ==  scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
+                                ? adData.getName()
+                                :scanRecord.getDeviceName();
+
+                int type = (device.getBluetoothClass().getDeviceClass() == 0 ||
+                            device.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.Major.UNCATEGORIZED)
+                        ?  device.getBluetoothClass().getMajorDeviceClass()
+                        : device.getBluetoothClass().getDeviceClass();
 
                 if (DEBUG_BLUETOOTH_DATA) {
                     MainActivity.info("LE deviceName: " + ssid
                             + "\n\taddress: " + bssid
-                            + "\n\tname: " + device.getName()
+                            + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
                             + "\n\tadName: " + adData.getName()
                             + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())+ "("
                             + device.getBluetoothClass() + ")"
@@ -246,18 +256,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
                 }
 
-                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) + "("
-                    + device.getBluetoothClass().getDeviceClass() + ") [LE]";
+                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) + /*"("
+                        + device.getBluetoothClass().getMajorDeviceClass() + ":"
+                        + device.getBluetoothClass().getDeviceClass() + ") " +*/ " [LE]";
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                final Network network = addOrUpdateBt(bssid, ssid, 0, capabilities,
+                //ALIBI: shamelessly re-using frequency here for device type.
+                final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                         scanResult.getRssi(),
                         NetworkType.BT, location, prefs);
             }
         }
-    }
-
-    public void setMainActivity( final MainActivity mainActivity ) {
-        this.mainActivity = mainActivity;
     }
 
     public void bluetoothScan() {
@@ -280,7 +288,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     scanSettingsBulder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
                     //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
                     //  this is effectively how often we update the display
-                    scanSettingsBulder.setReportDelay(10000);
+                    scanSettingsBulder.setReportDelay(15000);
                     bluetoothLeScanner.startScan(
                             Collections.<ScanFilter>emptyList(), scanSettingsBulder.build(), scanCallback);
 
@@ -314,7 +322,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
 
         //TODO: mirror filtering logic?
-        //TODO: add "show bluetooth" CB to filter
 
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
@@ -323,6 +330,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
             final String bssid = device.getAddress();
             final String ssid = device.getName();
+
+            int type = (device.getBluetoothClass().getDeviceClass() == 0 || device.getBluetoothClass().getDeviceClass() == 7936)?
+                    device.getBluetoothClass().getMajorDeviceClass():device.getBluetoothClass().getDeviceClass();
 
             if (DEBUG_BLUETOOTH_DATA) {
                 String log = "BT deviceName: " + device.getName()
@@ -343,11 +353,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                 MainActivity.info(log);
             }
-                    //+ "\n\tTX power:" + scanRecord.getTxPowerLevel()
-                    //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes()));
 
-            final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) +
-                    " ("+device.getBluetoothClass().getDeviceClass() + ");" + device.getBondState();
+            final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())
+                    /*+ " (" + device.getBluetoothClass().getMajorDeviceClass()
+                    + ":" +device.getBluetoothClass().getDeviceClass() + ")"*/
+                    + ";" + device.getBondState();
             final GPSListener gpsListener = mainActivity.getGPSListener();
 
             final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -358,8 +368,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                 location = gpsListener.getLocation();
             }
-
-            final Network network =  addOrUpdateBt(bssid, ssid, 0, capabilities, rssi, NetworkType.BT, location, prefs);
+            //ALIBI: shamelessly re-using frequency here for device type.
+            final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs);
             sort(prefs);
             listAdapter.notifyDataSetChanged();
         }
@@ -422,7 +432,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //TODO: is there any freq/channel info in BT at all??
             //TODO: update capabilities? only if was Misc/Uncategorized, now recognized?
             //network.setCapabilities(capabilities);
+            network.setLevel(strength);
             network.setFrequency(frequency);
+            if (null != ssid) {
+                network.setSsid(ssid);
+            }
         }
 
         final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )

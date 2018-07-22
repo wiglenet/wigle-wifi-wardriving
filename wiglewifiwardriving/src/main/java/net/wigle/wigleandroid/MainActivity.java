@@ -1785,7 +1785,7 @@ public final class MainActivity extends AppCompatActivity {
             MainActivity.info( "new bluetoothReceiver");
             // bluetooth scan listener
             // this receiver is the main workhorse of bluetooth scanning
-        state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+            state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
         }
 
         info("register bluetooth BroadcastReceiver");

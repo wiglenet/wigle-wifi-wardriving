@@ -126,7 +126,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> runNetworks = new HashSet<>();
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
+
+    // refresh thresholds - probably should either make these configurable, or take BT scans off the WiFiReceiveer clock
     private static final int EMPTY_LE_THRESHOLD = 30;
+    private static final int EMPTY_BT_THRESHOLD = 2;
+
+    // scan state
+    private int btCount = 0;
+    private long lastDiscoveryAt = 0;
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
@@ -274,8 +281,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             return;
         }
 
+        // classic BT scan - basically "Always Be Discovering" times between discovery runs will be MAX(wifi delay) since this is called from wifi receiver
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
+            lastDiscoveryAt = System.currentTimeMillis();
+            //ALIBI: since calls are triggered off of the WiFi Receiver delay, we're just introducing a retirement counter for BT
+            btCount++;
+        } else {
+            if (DEBUG_BLUETOOTH_DATA) {
+                MainActivity.info("skipping bluetooth scan; discover already in progress (last scan started "+(System.currentTimeMillis()-lastDiscoveryAt)+"ms ago)");
+            }
         }
 
         if (Build.VERSION.SDK_INT >= 21) {
@@ -299,9 +314,19 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-        if ( showCurrent && listAdapter != null ) {
+
+        if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
+            btCount = 0;
             listAdapter.clearBluetooth();
         }
+
+        /*
+        Paired device check?
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        for(BluetoothDevice device : pairedDevices) {
+            MainActivity.info("\tpareid device: "+device.getAddress()+" - "+device.getName() + device.getBluetoothClass());
+            //BluetoothClass bluetoothClass = device.getBluetoothClass();
+        }*/
     }
 
     public void stopScanning() {
@@ -326,21 +351,29 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
             int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
 
             final String bssid = device.getAddress();
             final String ssid = device.getName();
 
-            int type = (device.getBluetoothClass().getDeviceClass() == 0 || device.getBluetoothClass().getDeviceClass() == 7936)?
-                    device.getBluetoothClass().getMajorDeviceClass():device.getBluetoothClass().getDeviceClass();
+
+            int type;
+
+            if (btClass == null) {
+                type = (device.getBluetoothClass().getDeviceClass() == 0 || device.getBluetoothClass().getDeviceClass() == 7936) ?
+                        device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
+            } else {
+                type = btClass.getDeviceClass();
+            }
 
             if (DEBUG_BLUETOOTH_DATA) {
                 String log = "BT deviceName: " + device.getName()
                         + "\n\taddress: " + bssid
                         + "\n\tname: " + ssid
                         + "\n\tRSSI dBM: " + rssi
-                        + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())
-                        + "("+device.getBluetoothClass().getDeviceClass()+")"
+                        + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(type)
+                        + "("+type+")"
                         + "\n\tbondState: " + device.getBondState();
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
@@ -354,7 +387,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 MainActivity.info(log);
             }
 
-            final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())
+            final String capabilities = DEVICE_TYPE_LEGEND.get(type)
                     /*+ " (" + device.getBluetoothClass().getMajorDeviceClass()
                     + ":" +device.getBluetoothClass().getDeviceClass() + ")"*/
                     + ";" + device.getBondState();
@@ -368,6 +401,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                 location = gpsListener.getLocation();
             }
+
             //ALIBI: shamelessly re-using frequency here for device type.
             final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs);
             sort(prefs);
@@ -487,14 +521,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if ( location != null ) {
             // w/ location
             if (!matches) {
-                //TODO: not yet (1/2)
-                //dbHelper.addObservation(network, location, newForRun);
+                dbHelper.addObservation(network, location, newForRun);
             }
         } else {
             // w/out location
             if (!matches) {
-                //TODO: not yet (2/2)
-                //dbHelper.pendingObservation( network, newForRun );
+                dbHelper.pendingObservation(network, newForRun);
             }
         }
         return network;

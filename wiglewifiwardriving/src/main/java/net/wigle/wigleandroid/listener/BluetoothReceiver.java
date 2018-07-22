@@ -135,8 +135,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private int btCount = 0;
     private long lastDiscoveryAt = 0;
 
-    private int runBtCount = 0;
-
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
@@ -160,6 +158,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         location = gpsListener.getLocation();
                     }
                     handleLeScanResult(scanResult, location);
+                    final long newBtCount = dbHelper.getNewBtCount();
+                    ListFragment.lameStatic.newBt = newBtCount;
+                    ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
                     listAdapter.notifyDataSetChanged();
                 }
@@ -195,6 +196,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location);
                     }
+                    final long newBtCount = dbHelper.getNewBtCount();
+                    ListFragment.lameStatic.newBt = newBtCount;
+                    ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
                     listAdapter.notifyDataSetChanged();
                 }
@@ -406,6 +410,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
             //ALIBI: shamelessly re-using frequency here for device type.
             final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs);
+
+            final long newBtCount = dbHelper.getNewBtCount();
+            ListFragment.lameStatic.newBt = newBtCount;
+            ListFragment.lameStatic.runBt = runNetworks.size();
+
             sort(prefs);
             listAdapter.notifyDataSetChanged();
         }
@@ -479,7 +488,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 && ! mainActivity.isMuted();
 
         if ( newForRun ) {
-            runBtCount++;
             // ALIBI: There are simply a lot of these - not sure this is practical
             /*if ( ssidSpeak ) {
                 ssidSpeaker.add( network.getSsid() );

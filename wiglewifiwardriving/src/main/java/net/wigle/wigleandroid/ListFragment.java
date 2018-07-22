@@ -168,9 +168,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static class LameStatic {
         public Location location;
         public int runNets;
+        public int runBt;
         public long newNets;
         public long newWifi;
         public long newCells;
+        public long newBt;
         public int currNets;
         public int preQueueSize;
         public long dbNets;

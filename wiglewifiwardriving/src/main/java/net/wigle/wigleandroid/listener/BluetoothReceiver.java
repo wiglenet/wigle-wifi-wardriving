@@ -135,6 +135,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private int btCount = 0;
     private long lastDiscoveryAt = 0;
 
+    private int runBtCount = 0;
+
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
@@ -476,13 +478,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
                 && ! mainActivity.isMuted();
 
-        // ALIBI: There are simply a lot of these - not sure this is practical
-        /*if ( newForRun ) {
-            //TODO: not using wifi count, I'd guess? newWifiForRun++;
-            if ( ssidSpeak ) {
+        if ( newForRun ) {
+            runBtCount++;
+            // ALIBI: There are simply a lot of these - not sure this is practical
+            /*if ( ssidSpeak ) {
                 ssidSpeaker.add( network.getSsid() );
-            }
-        }*/
+            }*/
+        }
         //TODO: somethingAdded |= added;
 
 

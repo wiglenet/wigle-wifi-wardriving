@@ -453,6 +453,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         this.listAdapter = listAdapter;
     }
 
+    public int getRunNetworkCount() {
+        return runNetworks.size();
+    }
 
     private Network addOrUpdateBt(final String bssid, final String ssid,
                                     final int frequency, /*final String networkTypeName*/final String capabilities,

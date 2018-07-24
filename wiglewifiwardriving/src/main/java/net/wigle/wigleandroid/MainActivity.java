@@ -1801,10 +1801,12 @@ public final class MainActivity extends AppCompatActivity {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
-        } try {
+        }
+        try {
             info("unregister bluetoothReceiver");
             unregisterReceiver( state.bluetoothReceiver );
         } catch ( final IllegalArgumentException ex ) {
+            //ALIBI: it's fine to call and fail here.
             info( "bluetoothReceiver not registered: " + ex );
         }
 

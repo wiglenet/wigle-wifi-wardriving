@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -214,7 +215,32 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.info("setupLocation");
         setupLocation(view);
 
+        //TODO: if we want to hide BT when not scanning.
+        //final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+        //if (!prefs.getBoolean(ListFragment.PREF_SCAN_BT, false)) {
+        //    toggleBluetoothStats(false);
+        //}
+
         return view;
+    }
+
+    /**
+     * hide/show bluetooth new total
+     * @param on
+     */
+    public void toggleBluetoothStats(final boolean on) {
+        try {
+            View fragRoot = this.getActivity().findViewById(android.R.id.content);
+            View btView = fragRoot.findViewById(R.id.bt_list_total);
+            if (on) {
+                btView.setVisibility(VISIBLE);
+            } else {
+                btView.setVisibility(GONE);
+            }
+        } catch (Exception ex) {
+            //this shouldn't be a critical failure if the view's not present.
+            MainActivity.warn("Failed to toggle bluetooth new total to "+on);
+        }
     }
 
     /** Called when the activity is first created. */
@@ -233,11 +259,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             return;
         }
         TextView tv = (TextView) view.findViewById( R.id.stats_run );
-        tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
-        tv = (TextView) view.findViewById( R.id.stats_new );
-        tv.setText( getString(R.string.new_word) + ": " + state.dbHelper.getNewNetworkCount() );
+        long netCount = state.wifiReceiver.getRunNetworkCount();
+        final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+
+        if ((null != state.bluetoothReceiver) && prefs.getBoolean(ListFragment.PREF_SCAN_BT, false) ){
+            netCount += state.bluetoothReceiver.getRunNetworkCount();
+        }
+        tv.setText( getString(R.string.run) + ": " + netCount );
+        //tv = (TextView) view.findViewById( R.id.stats_new );
+        //tv.setText( getString( R.string.new_word) +": " );
+        tv = (TextView) view.findViewById( R.id.stats_wifi );
+        tv.setText( ""+state.dbHelper.getNewNetworkCount() );
+        tv = (TextView) view.findViewById( R.id.stats_cell );
+        tv.setText( ""+lameStatic.newCells  );
+        tv = (TextView) view.findViewById( R.id.stats_bt );
+        tv.setText( ""+state.dbHelper.getNewBtCount()  );
         tv = (TextView) view.findViewById( R.id.stats_dbnets );
-        tv.setText(getString(R.string.db) + ": " + state.dbHelper.getNetworkCount());
+        tv.setText(""+state.dbHelper.getNetworkCount());
     }
 
     public void setStatusUI( String status ) {

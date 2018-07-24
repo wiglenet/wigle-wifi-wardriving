@@ -260,9 +260,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         TextView tv = (TextView) view.findViewById( R.id.stats_run );
         long netCount = state.wifiReceiver.getRunNetworkCount();
-        final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-
-        if ((null != state.bluetoothReceiver) && prefs.getBoolean(ListFragment.PREF_SCAN_BT, false) ){
+        if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
         tv.setText( getString(R.string.run) + ": " + netCount );

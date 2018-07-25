@@ -71,7 +71,7 @@
                 android:textSize="15sp"
                 android:layout_weight="1"
                 android:text="@string/stats"
-                android:textColor="#AA5555"
+                android:textColor="#F88"
                 />
         </LinearLayout>
         <LinearLayout

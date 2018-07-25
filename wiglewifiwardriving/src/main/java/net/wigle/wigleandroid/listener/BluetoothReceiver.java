@@ -238,6 +238,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                                 ? adData.getName()
                                 :scanRecord.getDeviceName();
 
+                // This is questionable - of of Major class being known when specific class seems thin
                 int type = (device.getBluetoothClass().getDeviceClass() == 0 ||
                             device.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.Major.UNCATEGORIZED)
                         ?  device.getBluetoothClass().getMajorDeviceClass()
@@ -256,6 +257,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             + "\n\tbytes: " + Arrays.toString(scanRecord.getBytes()));
                 }
                 try {
+                    //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
                     final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
                             scanRecord.getBytes(), System.currentTimeMillis());
                     final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
@@ -270,6 +272,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
                 } catch (Exception ex) {
                     //TODO: so this happens:
+                    MainActivity.warn("failed to parse LeDevice from ScanRecord", ex);
                     //parseScanRecordAsSparseArray explodes on array indices
                 }
 

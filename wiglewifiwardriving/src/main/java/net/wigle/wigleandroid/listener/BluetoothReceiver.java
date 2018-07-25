@@ -255,18 +255,22 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
                             + "\n\tbytes: " + Arrays.toString(scanRecord.getBytes()));
                 }
-
-                final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
-                        scanRecord.getBytes(), System.currentTimeMillis());
-                final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
-                for (int i = 0; i < 200; i++) {
-                    if (!adRecordStore.isRecordPresent(i)) {
-                        continue;
+                try {
+                    final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
+                            scanRecord.getBytes(), System.currentTimeMillis());
+                    final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
+                    for (int i = 0; i < 200; i++) {
+                        if (!adRecordStore.isRecordPresent(i)) {
+                            continue;
+                        }
+                        final AdRecord adRecord = adRecordStore.getRecord(i);
+                        if (DEBUG_BLUETOOTH_DATA) {
+                            MainActivity.info("LE adRecord(" + i + "): " + adRecord);
+                        }
                     }
-                    final AdRecord adRecord = adRecordStore.getRecord(i);
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        MainActivity.info("LE adRecord(" + i + "): " + adRecord);
-                    }
+                } catch (Exception ex) {
+                    //TODO: so this happens:
+                    //parseScanRecordAsSparseArray explodes on array indices
                 }
 
                 final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) + /*"("

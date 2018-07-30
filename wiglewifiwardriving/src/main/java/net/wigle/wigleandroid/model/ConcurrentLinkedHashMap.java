@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @param <K> key
  * @param <V> value
  */
-public final class ConcurrentLinkedHashMap<K,V> {
+public final class ConcurrentLinkedHashMap<K,V> implements Map<K,V> {
     private final ConcurrentHashMap<K,V> map;
     private final LinkedBlockingQueue<K> queue;
     private int count = 0;
@@ -52,8 +54,27 @@ public final class ConcurrentLinkedHashMap<K,V> {
         return previous;
     }
 
-    public V get( K key ) {
+    public void putAll(Map<? extends K,? extends V> map) {
+    }
+
+    public V remove( Object key ) {
+        synchronized( WRITE_LOCK ) {
+            return map.remove(key);
+        }
+    }
+
+    public V get( Object key ) {
         return map.get( key );
+    }
+
+    public void clear() {
+        map.clear();
+    }
+
+    @NonNull
+    @Override
+    public Set<K> keySet() {
+        return null;
     }
 
     /**
@@ -70,6 +91,16 @@ public final class ConcurrentLinkedHashMap<K,V> {
 
     public boolean isEmpty() {
         return map.isEmpty();
+    }
+
+    @Override
+    public boolean containsKey(final Object key) {
+      return map.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(final Object value) {
+        return map.containsValue(value);
     }
 
     public int size() {

@@ -120,35 +120,36 @@ public class WifiReceiver extends BroadcastReceiver {
 
     private final Map<String, Map<String,String>> OPERATOR_CACHE;
 
-    private static final Comparator<Network> signalCompare = new Comparator<Network>() {
+    //TODO: move these to their own thing?
+    public static final Comparator<Network> signalCompare = new Comparator<Network>() {
         @Override
         public int compare( Network a, Network b ) {
             return b.getLevel() - a.getLevel();
         }
     };
 
-    private static final Comparator<Network> channelCompare = new Comparator<Network>() {
+    public static final Comparator<Network> channelCompare = new Comparator<Network>() {
         @Override
         public int compare( Network a, Network b ) {
             return a.getFrequency() - b.getFrequency();
         }
     };
 
-    private static final Comparator<Network> cryptoCompare = new Comparator<Network>() {
+    public static final Comparator<Network> cryptoCompare = new Comparator<Network>() {
         @Override
         public int compare( Network a, Network b ) {
             return b.getCrypto() - a.getCrypto();
         }
     };
 
-    private static final Comparator<Network> findTimeCompare = new Comparator<Network>() {
+    public static final Comparator<Network> findTimeCompare = new Comparator<Network>() {
         @Override
         public int compare( Network a, Network b ) {
             return (int) (b.getConstructionTime() - a.getConstructionTime());
         }
     };
 
-    private static final Comparator<Network> ssidCompare = new Comparator<Network>() {
+    public static final Comparator<Network> ssidCompare = new Comparator<Network>() {
         @Override
         public int compare( Network a, Network b ) {
             return a.getSsid().compareTo( b.getSsid() );
@@ -260,7 +261,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
         if ( showCurrent && listAdapter != null ) {
-            listAdapter.clear();
+            listAdapter.clearWifiAndCell();
         }
 
         final int preQueueSize = dbHelper.getQueueSize();
@@ -312,16 +313,15 @@ public class WifiReceiver extends BroadcastReceiver {
                 if ( showCurrent || added ) {
                     if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
                         if (listAdapter != null) {
-                            listAdapter.add( network );
+                            listAdapter.addWiFi( network );
                         }
                     }
                     // load test
                     // for ( int i = 0; i< 10; i++) {
-                    //  listAdapter.add( network );
+                    //  listAdapter.addWifi( network );
                     // }
 
-                }
-                else if (listAdapter != null){
+                } else if (listAdapter != null) {
                     // not showing current, and not a new thing, go find the network and update the level
                     // this is O(n), ohwell, that's why showCurrent is the default config.
                     for ( int index = 0; index < listAdapter.getCount(); index++ ) {
@@ -397,7 +397,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 if (cellNetwork != null) {
                     resultSize++;
                     if (showCurrent && listAdapter != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork)) {
-                        listAdapter.add(cellNetwork);
+                        listAdapter.addCell(cellNetwork);
                     }
                     if (runNetworks.size() > preCellForRun) {
                         newCellForRun++;
@@ -542,8 +542,7 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( tele != null ) {
             try {
                 CellLocation currentCell = null;
-                //DEBUG:
-                MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
+                //DEBUG: MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
                 currentCell = tele.getCellLocation();
                 if (currentCell != null) {
                     Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
@@ -708,7 +707,7 @@ public class WifiReceiver extends BroadcastReceiver {
             if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 ssid = getOperatorName(tele.getNetworkOperator());
-                MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
+                //DEBUG: MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;
             }
             if (operatorCode == null || operatorCode.isEmpty()) {
@@ -942,6 +941,9 @@ public class WifiReceiver extends BroadcastReceiver {
                     scanInFlight = true;
                 }
             }
+
+            // schedule a bluetooth scan
+            mainActivity.bluetoothScan();
 
             final long now = System.currentTimeMillis();
             if ( lastScanResponseTime < 0 ) {

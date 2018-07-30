@@ -16,7 +16,7 @@ import com.google.maps.android.clustering.ClusterItem;
 @SuppressLint("UseSparseArrays")
 public final class Network implements ClusterItem {
     private final String bssid;
-    private final String ssid;
+    private String ssid;
     private final String capabilities;
     private final String showCapabilities;
     private final int crypto;
@@ -193,6 +193,10 @@ public final class Network implements ClusterItem {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
+    }
+
+    public void setSsid(final String ssid) {
+        this.ssid = ssid;
     }
 
     public void setIsNew() {

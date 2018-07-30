@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -92,6 +93,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
+    public static final String PREF_BT_WAS_OFF = "btWasOff";
+    public static final String PREF_SCAN_BT = "scanBluetooth";
     public static final String PREF_DISTANCE_RUN = "distRun";
     public static final String PREF_STARTTIME_RUN = "timestampRunStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
@@ -144,6 +147,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAPF_WEP = "mapfWep";
     public static final String PREF_MAPF_WPA = "mapfWpa";
     public static final String PREF_MAPF_CELL = "mapfCell";
+    public static final String PREF_MAPF_BT = "mapfBt";
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 
@@ -165,9 +169,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static class LameStatic {
         public Location location;
         public int runNets;
+        public int runBt;
         public long newNets;
         public long newWifi;
         public long newCells;
+        public long newBt;
         public int currNets;
         public int preQueueSize;
         public long dbNets;
@@ -209,7 +215,32 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.info("setupLocation");
         setupLocation(view);
 
+        //TODO: if we want to hide BT when not scanning.
+        //final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+        //if (!prefs.getBoolean(ListFragment.PREF_SCAN_BT, false)) {
+        //    toggleBluetoothStats(false);
+        //}
+
         return view;
+    }
+
+    /**
+     * hide/show bluetooth new total
+     * @param on
+     */
+    public void toggleBluetoothStats(final boolean on) {
+        try {
+            View fragRoot = this.getActivity().findViewById(android.R.id.content);
+            View btView = fragRoot.findViewById(R.id.bt_list_total);
+            if (on) {
+                btView.setVisibility(VISIBLE);
+            } else {
+                btView.setVisibility(GONE);
+            }
+        } catch (Exception ex) {
+            //this shouldn't be a critical failure if the view's not present.
+            MainActivity.warn("Failed to toggle bluetooth new total to "+on);
+        }
     }
 
     /** Called when the activity is first created. */
@@ -228,11 +259,21 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             return;
         }
         TextView tv = (TextView) view.findViewById( R.id.stats_run );
-        tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
-        tv = (TextView) view.findViewById( R.id.stats_new );
-        tv.setText( getString(R.string.new_word) + ": " + state.dbHelper.getNewNetworkCount() );
+        long netCount = state.wifiReceiver.getRunNetworkCount();
+        if (null != state.bluetoothReceiver){
+            netCount += state.bluetoothReceiver.getRunNetworkCount();
+        }
+        tv.setText( getString(R.string.run) + ": " + netCount );
+        //tv = (TextView) view.findViewById( R.id.stats_new );
+        //tv.setText( getString( R.string.new_word) +": " );
+        tv = (TextView) view.findViewById( R.id.stats_wifi );
+        tv.setText( ""+state.dbHelper.getNewNetworkCount() );
+        tv = (TextView) view.findViewById( R.id.stats_cell );
+        tv.setText( ""+lameStatic.newCells  );
+        tv = (TextView) view.findViewById( R.id.stats_bt );
+        tv.setText( ""+state.dbHelper.getNewBtCount()  );
         tv = (TextView) view.findViewById( R.id.stats_dbnets );
-        tv.setText(getString(R.string.db) + ": " + state.dbHelper.getNetworkCount());
+        tv.setText(""+state.dbHelper.getNetworkCount());
     }
 
     public void setStatusUI( String status ) {
@@ -558,6 +599,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         // always set our current list adapter
         state.wifiReceiver.setListAdapter(state.listAdapter);
+        if (null != state.bluetoothReceiver) {
+            state.bluetoothReceiver.setListAdapter(state.listAdapter);
+        }
         final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
         setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }

@@ -385,4 +385,8 @@
     <string name="cell_network_status">Status:</string>
     <string name="cell_network_brand">Brand:</string>
     <string name="cell_network_notes">Notes:</string>
+    <string name="bluetooth_pref_text">Enable Bluetooth Scanning</string>
+    <string name="turning_bt_off">Turning Bluetooth back off</string>
+    <string name="turn_on_bt">Turning on Bluetooth</string>
+    <string name="filter_show_bt">Show Bluetooth</string>
 </resources>

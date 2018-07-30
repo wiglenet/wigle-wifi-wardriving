@@ -42,11 +42,10 @@
 	        android:text="@string/filter_show_cell" /> 
 	           
      	</LinearLayout>
-     
-     	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content">	   	    		    	
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+          android:orientation="vertical"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content">
 	    	
 	    	<CheckBox android:id="@+id/showwep"
 	        android:layout_width="wrap_content"
@@ -56,15 +55,22 @@
 	    	<CheckBox android:id="@+id/showwpa"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="@string/filter_show_wpa" />      
-	    </LinearLayout>    
+	        android:text="@string/filter_show_wpa" />
+
+		</LinearLayout>
+
+
     </LinearLayout>
-    
+    <CheckBox android:id="@+id/showbt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/filter_show_bt" />
+
     <CheckBox android:id="@+id/enabled"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:text="@string/filter_enabled" /> 
-	
+	        android:text="@string/filter_enabled" />
+
 	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="fill_parent"

@@ -74,28 +74,29 @@ public final class FilterMatcher {
             }
 
             if ( NetworkType.WIFI.equals( network.getType() ) ) {
-                switch ( network.getCrypto() ) {
+                switch (network.getCrypto()) {
                     case Network.CRYPTO_NONE:
-                        if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_OPEN, true ) ) {
+                        if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_OPEN, true)) {
                             return false;
                         }
                         break;
                     case Network.CRYPTO_WEP:
-                        if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_WEP, true ) ) {
+                        if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_WEP, true)) {
                             return false;
                         }
                         break;
                     case Network.CRYPTO_WPA:
                     case Network.CRYPTO_WPA2:
-                        if ( ! prefs.getBoolean( prefix + ListFragment.PREF_MAPF_WPA, true ) ) {
+                        if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_WPA, true)) {
                             return false;
                         }
                         break;
                     default:
-                        MainActivity.error( "unhandled crypto: " + network );
+                        MainActivity.error("unhandled crypto: " + network);
                 }
-            }
-            else if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_CELL, true)) {
+            } else if (NetworkType.BT.equals( network.getType() ) && !prefs.getBoolean(prefix + ListFragment.PREF_MAPF_BT, true)) {
+                return false;
+            } else if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_CELL, true)) {
                 return false;
             }
         }

@@ -16,6 +16,16 @@
         android:paddingRight="10dp"
         android:text="wepicon" />
 
+	<ImageView
+		android:id="@+id/bticon"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:contentDescription="wep icon"
+		android:paddingLeft="0dp"
+		android:paddingRight="4dp"
+		android:text="bticon"
+		android:visibility="gone"/>
+
 	<TextView android:id="@+id/ssid" android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 	   android:textColor="#eeeeee"/>

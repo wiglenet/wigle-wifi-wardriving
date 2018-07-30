@@ -42,6 +42,7 @@ import android.widget.TextView;
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -435,6 +436,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling bluetooth change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().setupBluetooth();
+                } else {
+                    MainActivity.getMainActivity().endBluetooth(prefs);
+                }
+            }
+        });
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };

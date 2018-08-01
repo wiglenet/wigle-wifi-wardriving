@@ -138,7 +138,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
-        final GPSListener gpsListener = mainActivity.getGPSListener();
 
 
         if (Build.VERSION.SDK_INT >= 21) {
@@ -148,6 +147,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                 @Override
                 public void onScanResult(int callbackType, ScanResult scanResult) {
+                    final GPSListener gpsListener = mainActivity.getGPSListener();
                     //DEBUG:
                     MainActivity.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
                     Location location = null;
@@ -156,7 +156,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                         location = gpsListener.getLocation();
+                    } else {
+                        MainActivity.warn("Null gpsListener in LE Single Scan Result");
                     }
+
                     handleLeScanResult(scanResult, location);
                     final long newBtCount = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.newBt = newBtCount;
@@ -168,6 +171,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 @Override
                 public void onBatchScanResults(List<ScanResult> results) {
                     //MainActivity.info("LE Batch results: " + results);
+                    final GPSListener gpsListener = mainActivity.getGPSListener();
 
                     Location location = null;
 
@@ -192,7 +196,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                         location = gpsListener.getLocation();
+                    } else {
+                        MainActivity.warn("Null gpsListener in LE Batch Scan Result");
                     }
+
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location);
                     }
@@ -312,13 +319,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 MainActivity.info("bluetoothLeScanner is null");
             }  else {
                 if (scanning.compareAndSet(false, true)) {
-                    final ScanSettings.Builder scanSettingsBulder = new ScanSettings.Builder();
-                    scanSettingsBulder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
+                    final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
+                    scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
                     //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
                     //  this is effectively how often we update the display
-                    scanSettingsBulder.setReportDelay(15000);
+                    scanSettingsBuilder.setReportDelay(15000);
                     bluetoothLeScanner.startScan(
-                            Collections.<ScanFilter>emptyList(), scanSettingsBulder.build(), scanCallback);
+                            Collections.<ScanFilter>emptyList(), scanSettingsBuilder.build(), scanCallback);
 
                 } else {
                     bluetoothLeScanner.flushPendingScanResults(scanCallback);
@@ -413,6 +420,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
                 gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                 location = gpsListener.getLocation();
+            } else {
+                MainActivity.warn("null gpsListener in BTR onReceive");
             }
 
             //ALIBI: shamelessly re-using frequency here for device type.
@@ -471,17 +480,17 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         //final String capabilities = networkTypeName + ";" + operator;
 
-        final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
-        final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
+        final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
+        final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
 
-        final boolean newForRun = runNetworks.add( bssid );
+        final boolean newForRun = runNetworks.add(bssid);
 
-        Network network = networkCache.get( bssid );
+        Network network = networkCache.get(bssid);
 
-        if ( network == null ) {
+        if (network == null) {
             //MainActivity.info("new BT net: "+bssid);
-            network = new Network( bssid, ssid, frequency, capabilities, strength, type );
-            networkCache.put( bssid, network );
+            network = new Network(bssid, ssid, frequency, capabilities, strength, type);
+            networkCache.put(bssid, network);
         } else {
             //DEBUG: MainActivity.info("existing BT net");
             //TODO: is there any freq/channel info in BT at all??
@@ -494,17 +503,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
         }
 
-        final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
-                && ! mainActivity.isMuted();
+        final boolean ssidSpeak = prefs.getBoolean(ListFragment.PREF_SPEAK_SSID, false)
+                && !mainActivity.isMuted();
 
-        if ( newForRun ) {
+        if (newForRun) {
             // ALIBI: There are simply a lot of these - not sure this is practical
             /*if ( ssidSpeak ) {
                 ssidSpeaker.add( network.getSsid() );
             }*/
         }
         //TODO: somethingAdded |= added;
-
 
         if ( location != null && (newForRun || network.getLatLng() == null) ) {
             // set the LatLng for mapping

@@ -215,12 +215,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.info("setupLocation");
         setupLocation(view);
 
-        //TODO: if we want to hide BT when not scanning.
-        //final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-        //if (!prefs.getBoolean(ListFragment.PREF_SCAN_BT, false)) {
-        //    toggleBluetoothStats(false);
-        //}
-
         return view;
     }
 

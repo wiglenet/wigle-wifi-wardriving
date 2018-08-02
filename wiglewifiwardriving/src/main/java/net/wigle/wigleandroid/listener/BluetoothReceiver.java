@@ -238,11 +238,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final BluetoothDevice device = scanResult.getDevice();
                 BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
 
+                final String adDeviceName = (adData != null) ? adData.getName(): null;
+
                 final String bssid = device.getAddress();
 
                 final String ssid =
                         (null ==  scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
-                                ? adData.getName()
+                                ? adDeviceName
                                 :scanRecord.getDeviceName();
 
                 // This is questionable - of of Major class being known when specific class seems thin
@@ -255,7 +257,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     MainActivity.info("LE deviceName: " + ssid
                             + "\n\taddress: " + bssid
                             + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
-                            + "\n\tadName: " + adData.getName()
+                            + "\n\tadName: " + adDeviceName
                             + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())+ "("
                             + device.getBluetoothClass() + ")"
                             + "\n\ttype:" + device.getType()

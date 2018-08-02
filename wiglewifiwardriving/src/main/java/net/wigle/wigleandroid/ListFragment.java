@@ -257,15 +257,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
-        tv.setText( getString(R.string.run) + ": " + netCount );
+        tv.setText( getString(R.string.run) + ": " + counterFormat(netCount) );
         //tv = (TextView) view.findViewById( R.id.stats_new );
-        //tv.setText( getString( R.string.new_word) +": " );
+        //tv.setText( getString( R.string.new_word) +": " +state.dbHelper.getNewNetworkCount());
         tv = (TextView) view.findViewById( R.id.stats_wifi );
-        tv.setText( ""+state.dbHelper.getNewNetworkCount() );
+        tv.setText( ""+counterFormat(state.dbHelper.getNewWifiCount()) );
         tv = (TextView) view.findViewById( R.id.stats_cell );
-        tv.setText( ""+lameStatic.newCells  );
+        tv.setText( ""+counterFormat(lameStatic.newCells)  );
         tv = (TextView) view.findViewById( R.id.stats_bt );
-        tv.setText( ""+state.dbHelper.getNewBtCount()  );
+        tv.setText( ""+counterFormat(state.dbHelper.getNewBtCount())  );
         tv = (TextView) view.findViewById( R.id.stats_dbnets );
         tv.setText(""+state.dbHelper.getNetworkCount());
     }
@@ -802,5 +802,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
+    /**
+     * format the topbar counters
+     * @param input
+     * @return
+     */
+    private String counterFormat(long input) {
+        if (input > 9999999999L) {
+            //any android device on the market today would explode
+            return (input / 1000000000L) + "G";
+        } else if (input >  9999999L) {
+            return (input / 1000000L) + "M";
+        } else if (input > 9999L) {
+            //stay specific until we pass 5 digits
+            return (input / 1000L) + "K";
+        } else {
+            return input+"";
+        }
+    }
 
 }

@@ -259,9 +259,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         tv.setText( getString(R.string.run) + ": " + netCount );
         //tv = (TextView) view.findViewById( R.id.stats_new );
-        //tv.setText( getString( R.string.new_word) +": " );
+        //tv.setText( getString( R.string.new_word) +": " +state.dbHelper.getNewNetworkCount());
         tv = (TextView) view.findViewById( R.id.stats_wifi );
-        tv.setText( ""+state.dbHelper.getNewNetworkCount() );
+        tv.setText( ""+state.dbHelper.getNewWifiCount() );
         tv = (TextView) view.findViewById( R.id.stats_cell );
         tv.setText( ""+lameStatic.newCells  );
         tv = (TextView) view.findViewById( R.id.stats_bt );

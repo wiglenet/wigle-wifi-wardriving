@@ -7,21 +7,29 @@
     android:keepScreenOn="true" >
 
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/newwifi"
-    android:textSize="48sp"
-    android:textColor="#AAEE50"
-    />
-    
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/runnets"
+        android:textSize="42sp"
+        android:textColor="#AAAAAA"
+        />
+
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/runnets"
-    android:textSize="48sp"
-    android:textColor="#AAAA00"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/newwifi"
+        android:textSize="38sp"
+        android:textColor="#AAEE50"
+        />
+
+    <TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/newbt"
+    android:textSize="38sp"
+    android:textColor="#3388AA"
     />
-    
+
     <TextView
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 

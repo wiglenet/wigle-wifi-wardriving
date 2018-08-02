@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
@@ -163,8 +164,10 @@ public final class WigleService extends Service {
             final long dbNets = ListFragment.lameStatic.dbNets;
             String text = context.getString(R.string.list_waiting_gps);
             if ( dbNets > 0 ) {
-                text = context.getString(R.string.run) + ": " + ListFragment.lameStatic.runNets
-                        + "  "+ context.getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets
+                long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
+                long newNets = ListFragment.lameStatic.newNets + ListFragment.lameStatic.newBt;
+                text = context.getString(R.string.run) + ": " + runNets
+                        + "  "+ context.getString(R.string.new_word) + ": " +newNets
                         + "  "+ context.getString(R.string.db) + ": " + dbNets;
             }
             if (! MainActivity.isScanning(context)) {

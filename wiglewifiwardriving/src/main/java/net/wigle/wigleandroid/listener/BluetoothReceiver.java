@@ -31,6 +31,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -269,15 +270,21 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
                             );
                     if ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) {
-                        for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
-                            MainActivity.error(uuid.getUuid().toString());
-                        }
-                    }
-                    if (adData != null) {
-                        final List<java.util.UUID> uuids = adData.getUuids();
-                        if (uuids != null) {
-                            for (java.util.UUID uuid: uuids) {
-                                MainActivity.error("\n\t\tuuid: "+uuid.toString());
+                        if (adData != null) {
+                            final List<java.util.UUID> uuids = adData.getUuids();
+                            if (uuids != null) {
+                                for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
+                                    if (uuids.contains(uuid.getUuid())) {
+                                        MainActivity.info("\n\t\tScan Record adRecord match: "+uuid.toString());
+                                    } else {
+                                        MainActivity.error("\n\t\tScan Record UUID not present in adRecord: "+uuid.toString());
+                                    }
+                                }
+                            }
+                        } else {
+                            MainActivity.error("Scan Record uuids present, but not adData uuids");
+                            for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
+                                MainActivity.info("\n\t\t"+uuid.toString());
                             }
                         }
                     }
@@ -314,6 +321,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * initiate a bluetooth scan, if discovery is not currently in-progress (callbacks via onReceive)
+     */
     public void bluetoothScan() {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -384,10 +394,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * General Bluetooth on-receive callback. Can register a BC or BLE network, although provides no means for distinguishing between them.
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(final Context context, final Intent intent) {
-
-        //TODO: mirror filtering logic?
 
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
@@ -514,11 +527,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             networkCache.put(bssid, network);
         } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
             //detected via standard bluetooth, updated as LE (LE should win)
+            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid());
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
-            int mergedType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
-            networkCache.remove(network);
-            network = new Network(bssid, mergedSsid, mergedType, capabilities, strength, type);
-            networkCache.put(bssid, network);
+            int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+
+            //TODO: We need a way to update the existing network record
+            network.setSsid(mergedSsid);
+            network.setFrequency(mergedDeviceType);
+            network.setType(NetworkType.BLE);
         } else {
             //DEBUG: MainActivity.info("existing BT net");
             //TODO: is there any freq/channel info in BT at all??

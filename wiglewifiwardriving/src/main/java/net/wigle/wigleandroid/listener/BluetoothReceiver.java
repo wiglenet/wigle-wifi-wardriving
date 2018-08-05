@@ -15,6 +15,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.ParcelUuid;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -263,7 +266,21 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             + "\n\ttype:" + device.getType()
                             + "\n\tRSSI:" + scanResult.getRssi()
                             //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
-                            + "\n\tbytes: " + Arrays.toString(scanRecord.getBytes()));
+                            //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
+                            );
+                    if ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) {
+                        for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
+                            MainActivity.error(uuid.getUuid().toString());
+                        }
+                    }
+                    if (adData != null) {
+                        final List<java.util.UUID> uuids = adData.getUuids();
+                        if (uuids != null) {
+                            for (java.util.UUID uuid: uuids) {
+                                MainActivity.error("\n\t\tuuid: "+uuid.toString());
+                            }
+                        }
+                    }
                 }
                 try {
                     //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
@@ -292,7 +309,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 //ALIBI: shamelessly re-using frequency here for device type.
                 final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                         scanResult.getRssi(),
-                        NetworkType.BT, location, prefs);
+                        NetworkType.BLE, location, prefs);
             }
         }
     }
@@ -338,6 +355,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
 
         if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
+            //ALIBI: not super elegant, but this gives devices a longer "decay".
+            // Could try incrementing counter on scan finished instead of successful scan start?
             btCount = 0;
             listAdapter.clearBluetooth();
         }
@@ -383,7 +402,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             int type;
 
             if (btClass == null) {
-                type = (device.getBluetoothClass().getDeviceClass() == 0 || device.getBluetoothClass().getDeviceClass() == 7936) ?
+                type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
                         device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
             } else {
                 type = btClass.getDeviceClass();
@@ -493,6 +512,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //MainActivity.info("new BT net: "+bssid);
             network = new Network(bssid, ssid, frequency, capabilities, strength, type);
             networkCache.put(bssid, network);
+        } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
+            //detected via standard bluetooth, updated as LE (LE should win)
+            String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
+            int mergedType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+            networkCache.remove(network);
+            network = new Network(bssid, mergedSsid, mergedType, capabilities, strength, type);
+            networkCache.put(bssid, network);
         } else {
             //DEBUG: MainActivity.info("existing BT net");
             //TODO: is there any freq/channel info in BT at all??
@@ -503,6 +529,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (null != ssid) {
                 network.setSsid(ssid);
             }
+
         }
 
         final boolean ssidSpeak = prefs.getBoolean(ListFragment.PREF_SPEAK_SSID, false)
@@ -530,9 +557,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (listAdapter != null) {
             if ( showCurrent || newForRun ) {
                 if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
-                    if (NetworkType.BT.equals(network.getType())) {
+                    if (NetworkType.BT.equals(network.getType()) ) {
                         listAdapter.addBluetooth(network);
-                    } else {
+                    } else if (NetworkType.BLE.equals(network.getType())) {
                         listAdapter.addBluetoothLe(network);
                     }
                 }
@@ -560,6 +587,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
         }
         return network;
+    }
+
+    // check standard BT types undefined
+    private boolean isMiscOrUncategorized(final int type) {
+        if (type == 0 || type == 7936) {
+            return true;
+        }
+        return false;
     }
 
 }

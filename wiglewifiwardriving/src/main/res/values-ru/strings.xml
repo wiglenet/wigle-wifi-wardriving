@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">Видимые сети:</string>
     <string name="dash_new_upload">Новые сети с загрузки:</string>
     <string name="dash_new_cells">Новые соты:</string>
+    <string name="dash_new_bt">Новый Bluetooth</string>
     <string name="dash_dist_run">Дистанция пробега:</string>
     <string name="dash_time_run">Длительность выполнения:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
@@ -325,4 +326,13 @@
     <string name="send_to">Поделиться с</string>
     <string name="settings_gps_timeout">Тайм-аут GPS</string>
     <string name="settings_net_loc_timeout">Тайм-аут сети</string>
+    <string name="start_at_boot">Запуск Wigle при загрузке</string>
+    <string name="cell_network_bands">частоты:</string>
+    <string name="cell_network_status">Положение дел:</string>
+    <string name="cell_network_brand">марка:</string>
+    <string name="cell_network_notes">Заметки:</string>
+    <string name="bluetooth_pref_text">Включить Bluetooth-сканирование</string>
+    <string name="turning_bt_off">Отключение Bluetooth</string>
+    <string name="turn_on_bt">Включение Bluetooth</string>
+    <string name="filter_show_bt">Показать Bluetooth</string>
 </resources>

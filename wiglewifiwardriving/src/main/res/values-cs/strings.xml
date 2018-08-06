@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">Viditelných sítí:</string>
     <string name="dash_new_upload">Nových sítí od posledního nahrání:</string>
     <string name="dash_new_cells">Nových BTS:</string>
+    <string name="dash_new_bt">Nové Bluetooth</string>
     <string name="dash_dist_run">Vzdálenost:</string>
     <string name="dash_time_run">Doba trvání:</string>
     <string name="dash_dist_total">Celková vzdálenost:</string>
@@ -380,4 +381,13 @@
     <string name="send_to">Share using</string>
     <string name="settings_gps_timeout">GPS Timeout</string>
     <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="start_at_boot">Spusťte Wigle při startu</string>
+    <string name="cell_network_bands">Frekvence:</string>
+    <string name="cell_network_status">Postavení:</string>
+    <string name="cell_network_brand">Značka:</string>
+    <string name="cell_network_notes">Poznámky:</string>
+    <string name="bluetooth_pref_text">Povolit skenování Bluetooth</string>
+    <string name="turning_bt_off">Vypnutí Bluetooth vypněte</string>
+    <string name="turn_on_bt">Zapnutí funkce Bluetooth</string>
+    <string name="filter_show_bt">Zobrazit Bluetooth</string>
 </resources>

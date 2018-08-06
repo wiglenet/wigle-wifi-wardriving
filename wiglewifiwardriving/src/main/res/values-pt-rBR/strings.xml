@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">Redes Visíveis:</string>
     <string name="dash_new_upload">Redes Novas Não Enviadas:</string>
     <string name="dash_new_cells">Torres de Celulares Novas:</string>
+    <string name="dash_new_bt">Novo Bluetooth</string>
     <string name="dash_dist_run">Distância Percorrida:</string>
     <string name="dash_time_run">Duração de corrida:</string>
     <string name="dash_dist_total">Dist. Total:</string>
@@ -325,4 +326,13 @@
     <string name="send_to">Compartilhar com</string>
     <string name="settings_gps_timeout">Tempo limite do GPS</string>
     <string name="settings_net_loc_timeout">Tempo limite da localização da rede</string>
+    <string name="start_at_boot">Lançar Wigle na inicialização</string>
+    <string name="cell_network_bands">Freqüências:</string>
+    <string name="cell_network_status">Status:</string>
+    <string name="cell_network_brand">Marca:</string>
+    <string name="cell_network_notes">Notas:</string>
+    <string name="bluetooth_pref_text">Ativar a digitalização por Bluetooth</string>
+    <string name="turning_bt_off">Desligar o Bluetooth</string>
+    <string name="turn_on_bt">Ligando o Bluetooth</string>
+    <string name="filter_show_bt">Mostrar Bluetooth</string>
 </resources>

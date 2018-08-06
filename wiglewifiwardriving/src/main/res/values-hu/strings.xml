@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">Látható hálózatok:</string>
     <string name="dash_new_upload">Hálózatok feltöltés óta:</string>
     <string name="dash_new_cells">Új Mobiltornyok:</string>
+    <string name="dash_new_bt">Új Bluetooth</string>
     <string name="dash_dist_run">Futás távolsága:</string>
     <string name="dash_time_run">Futás időtartama:</string>
     <string name="dash_dist_total">Teljes táv.:</string>
@@ -312,7 +313,16 @@
     <string name="quick_pause_unset">Jóváhagy</string>
     <string name="quick_pause">Szünet</string>
     <string name="quick_pause_do_nothing">Ne csinálj semmit</string>
-    <string name="send_to">Share using</string>
-    <string name="settings_gps_timeout">GPS Timeout</string>
-    <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="send_to">Megosztás használatával</string>
+    <string name="settings_gps_timeout">GPS időtúllépés</string>
+    <string name="settings_net_loc_timeout">Hálózati telepítési időtartam</string>
+    <string name="start_at_boot">Indítsa el a Wigle bootoláskor</string>
+    <string name="cell_network_bands">Frekvenciák:</string>
+    <string name="cell_network_status">Állapot:</string>
+    <string name="cell_network_brand">Márka:</string>
+    <string name="cell_network_notes">Megjegyzések:</string>
+    <string name="bluetooth_pref_text">Engedélyezze a Bluetooth szkennelést</string>
+    <string name="turning_bt_off">A Bluetooth kikapcsolása</string>
+    <string name="turn_on_bt">A Bluetooth bekapcsolása</string>
+    <string name="filter_show_bt">Bluetooth megjelenítése</string>
 </resources>

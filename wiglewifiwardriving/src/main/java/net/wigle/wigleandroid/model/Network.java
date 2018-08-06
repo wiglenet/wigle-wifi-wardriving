@@ -20,7 +20,7 @@ public final class Network implements ClusterItem {
     private final String capabilities;
     private final String showCapabilities;
     private final int crypto;
-    private final NetworkType type;
+    private NetworkType type;
 
     private int frequency;
     private int level;
@@ -194,6 +194,8 @@ public final class Network implements ClusterItem {
             this.channel = frequency;
         }
     }
+
+    public void setType(final NetworkType type) { this.type = type; }
 
     public void setSsid(final String ssid) {
         this.ssid = ssid;

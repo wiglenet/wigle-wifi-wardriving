@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">可見籃網：</string>
     <string name="dash_new_upload">由於上傳新籃網：</string>
     <string name="dash_new_cells">新的發射塔：</string>
+    <string name="dash_new_bt">新藍牙</string>
     <string name="dash_dist_run">運行距離：</string>
     <string name="dash_time_run">運行時間:</string>
     <string name="dash_dist_total">共有區。</string>
@@ -380,4 +381,13 @@
     <string name="send_to">分享使用</string>
     <string name="settings_gps_timeout">GPS超時</string>
     <string name="settings_net_loc_timeout">網絡位置超時</string>
+    <string name="start_at_boot">在啟動時啟動Wigle</string>
+    <string name="cell_network_bands">頻率:</string>
+    <string name="cell_network_status">狀態:</string>
+    <string name="cell_network_brand">牌:</string>
+    <string name="cell_network_notes">筆記:</string>
+    <string name="bluetooth_pref_text">啟用藍牙掃描</string>
+    <string name="turning_bt_off">關閉藍牙功能</string>
+    <string name="turn_on_bt">打開藍牙</string>
+    <string name="filter_show_bt">顯示藍牙</string>
 </resources>

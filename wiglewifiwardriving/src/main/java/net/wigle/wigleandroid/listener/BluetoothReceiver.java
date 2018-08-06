@@ -15,6 +15,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.ParcelUuid;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -28,6 +31,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.BluetoothUtil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 
@@ -134,6 +139,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     // scan state
     private int btCount = 0;
     private long lastDiscoveryAt = 0;
+
+    private long adUuidNoScanUuid = 0;
+    private long scanUuidNoAdUuid = 0;
+
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
@@ -236,15 +245,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
                 final BluetoothDevice device = scanResult.getDevice();
-                BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
-
-                final String adDeviceName = (adData != null) ? adData.getName(): null;
+                //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
+                //final String adDeviceName = (adData != null) ? adData.getName(): null;
 
                 final String bssid = device.getAddress();
 
                 final String ssid =
                         (null ==  scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
-                                ? adDeviceName
+                                ? device.getName()
                                 :scanRecord.getDeviceName();
 
                 // This is questionable - of of Major class being known when specific class seems thin
@@ -257,13 +265,42 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     MainActivity.info("LE deviceName: " + ssid
                             + "\n\taddress: " + bssid
                             + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
-                            + "\n\tadName: " + adDeviceName
+                            //+ "\n\tadName: " + adDeviceName
                             + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())+ "("
                             + device.getBluetoothClass() + ")"
                             + "\n\ttype:" + device.getType()
                             + "\n\tRSSI:" + scanResult.getRssi()
                             //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
-                            + "\n\tbytes: " + Arrays.toString(scanRecord.getBytes()));
+                            //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
+                            );
+
+
+                    final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
+                    /*final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
+
+                    if (adCount > 0 || scanCount > 0){
+                        final List<java.util.UUID> adUuids = adData.getUuids();
+                        final List<ParcelUuid> srUuids = scanRecord.getServiceUuids();
+                        if (scanCount > adCount) {
+                            for (ParcelUuid uuid: srUuids) {
+                                if (! adUuids.contains(uuid.getUuid())) {
+                                    MainActivity.error("\n\t\tSR: "+uuid.toString());
+                                }
+                            }
+                            scanUuidNoAdUuid++;
+                        } else if (adCount > scanCount) {
+                            for (UUID uuid: adUuids) {
+                                if (! srUuids.contains(new ParcelUuid(uuid))) {
+                                    MainActivity.error("\n\t\tAD: "+uuid.toString());
+                                }
+                            }
+                            adUuidNoScanUuid++;
+                        } else if (scanCount > 0) {
+                            for (ParcelUuid uuid: srUuids) {
+                                MainActivity.info("\n\t\t==: "+uuid.toString());
+                            }
+                        }
+                    }*/
                 }
                 try {
                     //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
@@ -285,18 +322,21 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //parseScanRecordAsSparseArray explodes on array indices
                 }
 
-                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) + /*"("
+                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) /* + "("
                         + device.getBluetoothClass().getMajorDeviceClass() + ":"
-                        + device.getBluetoothClass().getDeviceClass() + ") " +*/ " [LE]";
+                        + device.getBluetoothClass().getDeviceClass() + ") " +*/;
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 //ALIBI: shamelessly re-using frequency here for device type.
                 final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                         scanResult.getRssi(),
-                        NetworkType.BT, location, prefs);
+                        NetworkType.BLE, location, prefs);
             }
         }
     }
 
+    /**
+     * initiate a bluetooth scan, if discovery is not currently in-progress (callbacks via onReceive)
+     */
     public void bluetoothScan() {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
@@ -338,6 +378,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
 
         if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
+            //ALIBI: not super elegant, but this gives devices a longer "decay".
+            // Could try incrementing counter on scan finished instead of successful scan start?
             btCount = 0;
             listAdapter.clearBluetooth();
         }
@@ -349,6 +391,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             MainActivity.info("\tpareid device: "+device.getAddress()+" - "+device.getName() + device.getBluetoothClass());
             //BluetoothClass bluetoothClass = device.getBluetoothClass();
         }*/
+
+        if (DEBUG_BLUETOOTH_DATA) {
+            if (adUuidNoScanUuid > 0 || scanUuidNoAdUuid > 0) {
+                MainActivity.error("AD but No Scan UUID: "+ adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
+            }
+        }
     }
 
     public void stopScanning() {
@@ -365,10 +413,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * General Bluetooth on-receive callback. Can register a BC or BLE network, although provides no means for distinguishing between them.
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(final Context context, final Intent intent) {
-
-        //TODO: mirror filtering logic?
 
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
@@ -383,7 +434,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             int type;
 
             if (btClass == null) {
-                type = (device.getBluetoothClass().getDeviceClass() == 0 || device.getBluetoothClass().getDeviceClass() == 7936) ?
+                type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
                         device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
             } else {
                 type = btClass.getDeviceClass();
@@ -394,7 +445,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         + "\n\taddress: " + bssid
                         + "\n\tname: " + ssid
                         + "\n\tRSSI dBM: " + rssi
-                        + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(type)
+                        + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
                         + "("+type+")"
                         + "\n\tbondState: " + device.getBondState();
 
@@ -493,6 +544,25 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //MainActivity.info("new BT net: "+bssid);
             network = new Network(bssid, ssid, frequency, capabilities, strength, type);
             networkCache.put(bssid, network);
+        } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
+            //detected via standard bluetooth, updated as LE (LE should win)
+            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid());
+            String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
+            int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+
+            network.setSsid(mergedSsid);
+            network.setFrequency(mergedDeviceType);
+            network.setType(NetworkType.BLE);
+            //TODO: (1/2) We need a way to update the existing network record
+        } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
+            //fill in device type if not present
+            int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+            network.setFrequency(mergedDeviceType);
+
+            //fill in name if not present
+            String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
+            network.setSsid(mergedSsid);
+            //TODO: (2/2) We need a way to update the existing network record
         } else {
             //DEBUG: MainActivity.info("existing BT net");
             //TODO: is there any freq/channel info in BT at all??
@@ -503,6 +573,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (null != ssid) {
                 network.setSsid(ssid);
             }
+
         }
 
         final boolean ssidSpeak = prefs.getBoolean(ListFragment.PREF_SPEAK_SSID, false)
@@ -530,9 +601,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (listAdapter != null) {
             if ( showCurrent || newForRun ) {
                 if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
-                    if (NetworkType.BT.equals(network.getType())) {
+                    if (NetworkType.BT.equals(network.getType()) ) {
                         listAdapter.addBluetooth(network);
-                    } else {
+                    } else if (NetworkType.BLE.equals(network.getType())) {
                         listAdapter.addBluetoothLe(network);
                     }
                 }
@@ -560,6 +631,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
         }
         return network;
+    }
+
+    // check standard BT types undefined
+    private boolean isMiscOrUncategorized(final int type) {
+        if (type == 0 || type == 7936) {
+            return true;
+        }
+        return false;
     }
 
 }

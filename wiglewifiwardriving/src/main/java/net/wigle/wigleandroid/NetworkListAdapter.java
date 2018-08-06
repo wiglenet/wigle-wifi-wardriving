@@ -184,7 +184,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         ico.setImageResource(getImage(network));
 
         final ImageView btico = (ImageView) row.findViewById(R.id.bticon);
-        if (NetworkType.BT.equals(network.getType())) {
+        if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
             btico.setVisibility(View.VISIBLE);
             Integer btImageId = getBtImage(network);
             if (null == btImageId) {
@@ -265,6 +265,8 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             }
         } else if (NetworkType.BT.equals(network.getType())) {
             resource = R.drawable.bt_ico;
+        } else if (NetworkType.BLE.equals(network.getType())) {
+            resource = R.drawable.btle_ico;
         } else {
             resource = R.drawable.tower_ico;
         }

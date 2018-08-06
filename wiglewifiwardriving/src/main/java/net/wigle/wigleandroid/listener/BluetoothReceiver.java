@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 
@@ -138,6 +139,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     // scan state
     private int btCount = 0;
     private long lastDiscoveryAt = 0;
+
+    private long adUuidNoScanUuid = 0;
+    private long scanUuidNoAdUuid = 0;
+
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
@@ -240,15 +245,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             final ScanRecord scanRecord = scanResult.getScanRecord();
             if (scanRecord != null) {
                 final BluetoothDevice device = scanResult.getDevice();
-                BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
-
-                final String adDeviceName = (adData != null) ? adData.getName(): null;
+                //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
+                //final String adDeviceName = (adData != null) ? adData.getName(): null;
 
                 final String bssid = device.getAddress();
 
                 final String ssid =
                         (null ==  scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
-                                ? adDeviceName
+                                ? device.getName()
                                 :scanRecord.getDeviceName();
 
                 // This is questionable - of of Major class being known when specific class seems thin
@@ -261,7 +265,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     MainActivity.info("LE deviceName: " + ssid
                             + "\n\taddress: " + bssid
                             + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
-                            + "\n\tadName: " + adDeviceName
+                            //+ "\n\tadName: " + adDeviceName
                             + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())+ "("
                             + device.getBluetoothClass() + ")"
                             + "\n\ttype:" + device.getType()
@@ -269,25 +273,34 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
                             //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
                             );
-                    if ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) {
-                        if (adData != null) {
-                            final List<java.util.UUID> uuids = adData.getUuids();
-                            if (uuids != null) {
-                                for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
-                                    if (uuids.contains(uuid.getUuid())) {
-                                        MainActivity.info("\n\t\tScan Record adRecord match: "+uuid.toString());
-                                    } else {
-                                        MainActivity.error("\n\t\tScan Record UUID not present in adRecord: "+uuid.toString());
-                                    }
+
+
+                    final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
+                    /*final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
+
+                    if (adCount > 0 || scanCount > 0){
+                        final List<java.util.UUID> adUuids = adData.getUuids();
+                        final List<ParcelUuid> srUuids = scanRecord.getServiceUuids();
+                        if (scanCount > adCount) {
+                            for (ParcelUuid uuid: srUuids) {
+                                if (! adUuids.contains(uuid.getUuid())) {
+                                    MainActivity.error("\n\t\tSR: "+uuid.toString());
                                 }
                             }
-                        } else {
-                            MainActivity.error("Scan Record uuids present, but not adData uuids");
-                            for (ParcelUuid uuid: scanRecord.getServiceUuids()) {
-                                MainActivity.info("\n\t\t"+uuid.toString());
+                            scanUuidNoAdUuid++;
+                        } else if (adCount > scanCount) {
+                            for (UUID uuid: adUuids) {
+                                if (! srUuids.contains(new ParcelUuid(uuid))) {
+                                    MainActivity.error("\n\t\tAD: "+uuid.toString());
+                                }
+                            }
+                            adUuidNoScanUuid++;
+                        } else if (scanCount > 0) {
+                            for (ParcelUuid uuid: srUuids) {
+                                MainActivity.info("\n\t\t==: "+uuid.toString());
                             }
                         }
-                    }
+                    }*/
                 }
                 try {
                     //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
@@ -378,6 +391,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             MainActivity.info("\tpareid device: "+device.getAddress()+" - "+device.getName() + device.getBluetoothClass());
             //BluetoothClass bluetoothClass = device.getBluetoothClass();
         }*/
+
+        if (DEBUG_BLUETOOTH_DATA) {
+            if (adUuidNoScanUuid > 0 || scanUuidNoAdUuid > 0) {
+                MainActivity.error("AD but No Scan UUID: "+ adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
+            }
+        }
     }
 
     public void stopScanning() {
@@ -426,7 +445,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         + "\n\taddress: " + bssid
                         + "\n\tname: " + ssid
                         + "\n\tRSSI dBM: " + rssi
-                        + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(type)
+                        + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
                         + "("+type+")"
                         + "\n\tbondState: " + device.getBondState();
 
@@ -531,10 +550,19 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
 
-            //TODO: We need a way to update the existing network record
             network.setSsid(mergedSsid);
             network.setFrequency(mergedDeviceType);
             network.setType(NetworkType.BLE);
+            //TODO: (1/2) We need a way to update the existing network record
+        } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
+            //fill in device type if not present
+            int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+            network.setFrequency(mergedDeviceType);
+
+            //fill in name if not present
+            String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
+            network.setSsid(mergedSsid);
+            //TODO: (2/2) We need a way to update the existing network record
         } else {
             //DEBUG: MainActivity.info("existing BT net");
             //TODO: is there any freq/channel info in BT at all??

@@ -322,9 +322,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //parseScanRecordAsSparseArray explodes on array indices
                 }
 
-                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) + /*"("
+                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) /* + "("
                         + device.getBluetoothClass().getMajorDeviceClass() + ":"
-                        + device.getBluetoothClass().getDeviceClass() + ") " +*/ " [LE]";
+                        + device.getBluetoothClass().getDeviceClass() + ") " +*/;
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 //ALIBI: shamelessly re-using frequency here for device type.
                 final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,

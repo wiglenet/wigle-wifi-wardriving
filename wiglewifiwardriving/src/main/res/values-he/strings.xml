@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">Visible נטס:</string>
     <string name="dash_new_upload">הנטס בניו מאז טען:</string>
     <string name="dash_new_cells">תא מגדלי חדש:</string>
+    <string name="dash_new_bt">Bluetooth חדש</string>
     <string name="dash_dist_run">הפעל מרחק:</string>
     <string name="dash_time_run">משך הפעלה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
@@ -377,7 +378,16 @@
     <string name="quick_pause_unset">לְאַשֵׁר</string>
     <string name="quick_pause">הַפסָקָה</string>
     <string name="quick_pause_do_nothing">לעשות כלום</string>
-    <string name="send_to">Share using</string>
+    <string name="send_to">שתף באמצעות</string>
     <string name="settings_gps_timeout">GPS Timeout</string>
     <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="start_at_boot">הפעל את Wigle בעת אתחול</string>
+    <string name="cell_network_bands">תדרים:</string>
+    <string name="cell_network_status">סטָטוּס:</string>
+    <string name="cell_network_brand">מותג:</string>
+    <string name="cell_network_notes">הערות:</string>
+    <string name="bluetooth_pref_text">הפעל את סריקת Bluetooth</string>
+    <string name="turning_bt_off">כיבוי Bluetooth</string>
+    <string name="turn_on_bt">הפעלת Bluetooth</string>
+    <string name="filter_show_bt">הצג Bluetooth</string>
 </resources>

@@ -122,6 +122,7 @@
     <string name="dash_vis_nets">可见的网络：</string>
     <string name="dash_new_upload">上传的新网络：</string>
     <string name="dash_new_cells">新的信号塔：</string>
+    <string name="dash_new_bt">新蓝牙</string>
     <string name="dash_dist_run">运行距离：</string>
     <string name="dash_time_run">运行时间:</string>
     <string name="dash_dist_total">总共的距离。</string>
@@ -380,5 +381,14 @@
     <string name="send_to">分享使用</string>
     <string name="settings_gps_timeout">GPS超时</string>
     <string name="settings_net_loc_timeout">网络位置超时</string>
+    <string name="start_at_boot">在启动时启动Wigle</string>
+    <string name="cell_network_bands">频率：</string>
+    <string name="cell_network_status">状态：</string>
+    <string name="cell_network_brand">牌：</string>
+    <string name="cell_network_notes">笔记：</string>
+    <string name="bluetooth_pref_text">启用蓝牙扫描</string>
+    <string name="turning_bt_off">关闭蓝牙功能</string>
+    <string name="turn_on_bt">打开蓝牙</string>
+    <string name="filter_show_bt">显示蓝牙</string>
 </resources>
 

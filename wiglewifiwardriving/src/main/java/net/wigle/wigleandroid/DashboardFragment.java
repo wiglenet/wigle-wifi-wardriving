@@ -105,13 +105,14 @@ public class DashboardFragment extends Fragment {
 
   private void updateUI( final View view ) {
     TextView tv = (TextView) view.findViewById( R.id.runnets );
-    tv.setText( ListFragment.lameStatic.runNets + " " + getString(R.string.run));
+    tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " " + getString(R.string.run));
 
     tv = (TextView) view.findViewById( R.id.newwifi );
     final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    final String newTitle = ListFragment.lameStatic.newWifi >= 10 ? getString(R.string.new_word)
-        : getString(R.string.dash_new_wifi);
-    tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + newTitle );
+    tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
+
+    tv = (TextView) view.findViewById( R.id.newbt );
+    tv.setText( ListFragment.lameStatic.newBt + " " + getString(R.string.dash_new_bt) );
 
     tv = (TextView) view.findViewById( R.id.currnets );
     tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );

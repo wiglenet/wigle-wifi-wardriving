@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
@@ -163,8 +164,10 @@ public final class WigleService extends Service {
             final long dbNets = ListFragment.lameStatic.dbNets;
             String text = context.getString(R.string.list_waiting_gps);
             if ( dbNets > 0 ) {
-                text = context.getString(R.string.run) + ": " + ListFragment.lameStatic.runNets
-                        + "  "+ context.getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets
+                long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
+                long newNets = ListFragment.lameStatic.newNets + ListFragment.lameStatic.newBt;
+                text = context.getString(R.string.run) + ": " + runNets
+                        + "  "+ context.getString(R.string.new_word) + ": " +newNets
                         + "  "+ context.getString(R.string.db) + ": " + dbNets;
             }
             if (! MainActivity.isScanning(context)) {
@@ -189,8 +192,7 @@ public final class WigleService extends Service {
             Notification notification = null;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
-            }
-            else {
+            } else {
                 @SuppressWarnings("deprecation")
                 final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
                 builder.setContentIntent(contentIntent);
@@ -257,6 +259,9 @@ public final class WigleService extends Service {
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            builder.setColorized(true);
+            // WiGLE Blue builder.setColor(6005486);
+            builder.setColor(1973790);
             //noinspection deprecation
             builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
             //noinspection deprecation

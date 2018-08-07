@@ -280,6 +280,8 @@
     <string name="map_all">모든</string>
     <string name="map_not_mine">기타</string>
     <string name="map_mine">광산</string>
+    <string name="status_downloading">다운로드 중</string>
+    <string name="status_parsing">파싱</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_data_head">Map Device Data</string>

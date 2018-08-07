@@ -292,6 +292,8 @@
     <string name="map_all">Todos</string>
     <string name="map_not_mine">Outras</string>
     <string name="map_mine">Meu</string>
+    <string name="status_downloading">Downloading</string>
+    <string name="status_parsing">Análise</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_tile_head">Map Overlay Settings</string>

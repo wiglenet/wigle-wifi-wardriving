@@ -292,6 +292,8 @@
     <string name="map_all">Все</string>
     <string name="map_not_mine">другие</string>
     <string name="map_mine">Мой</string>
+    <string name="status_downloading">загрузка</string>
+    <string name="status_parsing">анализ</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_tile_head">Map Overlay Settings</string>

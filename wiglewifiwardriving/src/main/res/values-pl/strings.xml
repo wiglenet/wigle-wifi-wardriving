@@ -282,6 +282,8 @@
     <string name="map_all">Wszystko</string>
     <string name="map_not_mine">Inni</string>
     <string name="map_mine">Kopalnia</string>
+    <string name="status_downloading">Ściąganie</string>
+    <string name="status_parsing">Analizować</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_tile_head">Map Overlay Settings</string>

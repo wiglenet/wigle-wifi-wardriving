@@ -329,6 +329,9 @@
     <string name="upload_success">Completato</string>
     <string name="upload_failed">Non riuscito</string>
     <string name="upload_unknown">Sconosciuto</string>
+    <string name="upload_archive">Archiviazione…</string>
+    <string name="upload_catalog">Catalogazione…</string>
+    <string name="upload_geoindex">Geocoding…</string>
     <string name="auth_username">Autenticato</string>
     <string name="deauthorize">Uscita (logout)</string>
     <string name="deauthorize_confirm">Sicuro di voler dimenticare le tue credenziali da questo dispositivo?</string>

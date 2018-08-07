@@ -315,15 +315,14 @@
     <string name="quick_pause_do_nothing">Hiçbir şey yapma</string>
     <string name="send_to">Kullanarak paylaş</string>
     <string name="settings_gps_timeout">GPS Zaman Aşımı</string>
-    <string name="settings_net_loc_timeout">Ağ Konum Zaman Aşımı
+    <string name="settings_net_loc_timeout">Ağ Konum Zaman Aşımı</string>
     <string name="start_at_boot">Önyükleme başlatmak Wigle</string>
     <string name="cell_network_bands">frekanslar:</string>
     <string name="cell_network_status">durum:</string>
     <string name="cell_network_brand">Marka:</string>
     <string name="cell_network_notes">Notlar:</string>
     <string name="bluetooth_pref_text">Bluetooth Taramayı Etkinleştir</string>
-    <string name="turning_bt_off">Bluetooth'u kapatma</string>
-    <string name="turn_on_bt">Bluetooth'u açma</string>
-    <string name="filter_show_bt">Bluetooth'u göster</string>
-</string>
+    <string name="turning_bt_off">Bluetooth\'u kapatma</string>
+    <string name="turn_on_bt">Bluetooth\'u açma</string>
+    <string name="filter_show_bt">Bluetooth\'u göster</string>
 </resources>

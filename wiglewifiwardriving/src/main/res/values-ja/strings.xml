@@ -345,6 +345,8 @@
     <string name="map_all">すべて</string>
     <string name="map_not_mine">その他</string>
     <string name="map_mine">鉱山</string>
+    <string name="status_downloading">ダウンロード</string>
+    <string name="status_parsing">解析する</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_data_head">Map Device Data</string>

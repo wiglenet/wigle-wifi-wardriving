@@ -337,7 +337,7 @@
     <string name="deauthorize_confirm">Möchtest du wirklich die LogIn-Informationen löschen?</string>
     <string name="authorize">Autorisieren (Login)</string>
     <string name="anonymous_confirm">Anonym hochladen? Der gespeicherte LogIn wird von deinem Telefon gelöscht.</string>
-    <string name="title_activity_activate">Scan to activate</string>
+    <string name="title_activity_activate">Scannen, um zu aktivieren</string>
     <string name="unknown_number">\?\?</string>
     <string name="show_discovered_since">Zeige Netzwerke entdeckt seit</string>
     <string name="show_discovered">Entdeckte Netzwerke auf der Karte anzeigen</string>

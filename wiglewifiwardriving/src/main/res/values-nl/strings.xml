@@ -274,6 +274,8 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="title_activity_activate">Scannen om te activeren</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">Toon netwerken ontdekt sinds</string>
     <string name="show_discovered">Toon ontdekte netwerken op kaart</string>
     <string name="map_none">Geen</string>

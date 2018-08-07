@@ -274,6 +274,8 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="title_activity_activate">Skannaa aktivoida</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">Näytä verkkojen havaitseminen</string>
     <string name="show_discovered">Näytä löydetyt verkot kartalla</string>
     <string name="map_none">Ei mitään</string>
@@ -325,5 +327,4 @@
     <string name="turning_bt_off">Bluetoothin palauttaminen pois päältä</string>
     <string name="turn_on_bt">Bluetoothin kytkeminen päälle</string>
     <string name="filter_show_bt">Näytä Bluetooth</string>
-
 </resources>

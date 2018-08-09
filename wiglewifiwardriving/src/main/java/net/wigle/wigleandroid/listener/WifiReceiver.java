@@ -357,7 +357,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         matches = bssidDbMatcher.find();
                     }
                     if (!matches) {
-                        dbHelper.pendingObservation( network, added );
+                        dbHelper.pendingObservation( network, added, false, false );
                     }
                 }
             }

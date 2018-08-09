@@ -132,9 +132,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
 
-    // refresh thresholds - probably should either make these configurable, or take BT scans off the WiFiReceiveer clock
+    // refresh thresholds - probably should either make these configurable, or take BT scans off the WiFiReceiver clock
+    // arguably expiration should live per element not-seen in n scans.
     private static final int EMPTY_LE_THRESHOLD = 30;
-    private static final int EMPTY_BT_THRESHOLD = 2;
+    private static final int EMPTY_BT_THRESHOLD = 4;
 
     // scan state
     private int btCount = 0;
@@ -275,8 +276,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             );
 
 
-                    final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
-                    /*final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
+                    /*final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
+                    final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
 
                     if (adCount > 0 || scanCount > 0){
                         final List<java.util.UUID> adUuids = adData.getUuids();
@@ -540,6 +541,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         Network network = networkCache.get(bssid);
 
+        boolean deviceTypeUpdate = false;
+        boolean btTypeUpdate = false;
         if (network == null) {
             //MainActivity.info("new BT net: "+bssid);
             network = new Network(bssid, ssid, frequency, capabilities, strength, type);
@@ -551,13 +554,24 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
 
             network.setSsid(mergedSsid);
+            final int oldDevType = network.getFrequency();
+            if (mergedDeviceType != oldDevType) {
+                deviceTypeUpdate = true;
+            }
+            btTypeUpdate = true;
             network.setFrequency(mergedDeviceType);
+            network.setLevel(strength);
             network.setType(NetworkType.BLE);
             //TODO: (1/2) We need a way to update the existing network record
         } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
             //fill in device type if not present
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
+            final int oldDevType = network.getFrequency();
+            if (mergedDeviceType != oldDevType) {
+                deviceTypeUpdate = true;
+            }
             network.setFrequency(mergedDeviceType);
+            network.setLevel(strength);
 
             //fill in name if not present
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
@@ -622,12 +636,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if ( location != null ) {
             // w/ location
             if (!matches) {
-                dbHelper.addObservation(network, location, newForRun);
+                dbHelper.addObservation(network, location, newForRun, deviceTypeUpdate, btTypeUpdate);
             }
         } else {
             // w/out location
             if (!matches) {
-                dbHelper.pendingObservation(network, newForRun);
+                dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);
             }
         }
         return network;

@@ -73,6 +73,7 @@ public final class DatabaseHelper extends Thread {
     private SQLiteStatement insertLocation;
     private SQLiteStatement updateNetwork;
     private SQLiteStatement updateNetworkMetadata;
+    private SQLiteStatement updateNetworkType;
 
     public static final String NETWORK_TABLE = "network";
     private static final String NETWORK_CREATE =
@@ -146,13 +147,22 @@ public final class DatabaseHelper extends Thread {
         public final int level;
         public final Location location;
         public final boolean newForRun;
+        public final boolean frequencyChanged;
+        public final boolean typeMorphed;
 
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun ) {
+            this(network, level, location, newForRun, false, false);
+        }
+
+        public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
             this.network = network;
             this.level = level;
             this.location = location;
             this.newForRun = newForRun;
+            this.frequencyChanged = frequencyChanged;
+            this.typeMorphed = typeMorphed;
         }
+
     }
 
     /** holder for updates which we'll attempt to interpolate based on timing */
@@ -161,12 +171,19 @@ public final class DatabaseHelper extends Thread {
         public final int level;
         public final boolean newForRun;
         public final long when; // in MS
+        public final boolean frequencyChanged;
+        public final boolean typeMorphed;
 
         public DBPending( final Network network, final int level, final boolean newForRun ) {
+            this(network, level, newForRun, false, false);
+        }
+        public DBPending( final Network network, final int level, final boolean newForRun, boolean frequencyChanged, boolean typeMorphed) {
             this.network = network;
             this.level = level;
             this.newForRun = newForRun;
             this.when = System.currentTimeMillis();
+            this.frequencyChanged = frequencyChanged;
+            this.typeMorphed = typeMorphed;
         }
     }
 
@@ -459,7 +476,7 @@ public final class DatabaseHelper extends Thread {
             }
         }
 
-        // drop index, was never publically released
+        // drop index, was never publicly released
         db.execSQL("DROP INDEX IF EXISTS type");
 
         // compile statements
@@ -474,6 +491,10 @@ public final class DatabaseHelper extends Thread {
 
         updateNetworkMetadata = db.compileStatement( "UPDATE network SET"
                 + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ? WHERE bssid = ?" );
+
+        updateNetworkType = db.compileStatement( "UPDATE network SET"
+                + " type = ? WHERE bssid = ?" );
+
     }
 
     /**
@@ -539,13 +560,24 @@ public final class DatabaseHelper extends Thread {
     public void blockingAddObservation( final Network network, final Location location, final boolean newForRun )
             throws InterruptedException {
 
-        final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun );
+        final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun, false, false );
         queue.put(update);
     }
 
     public boolean addObservation( final Network network, final Location location, final boolean newForRun ) {
         try {
-            return addObservation(network, network.getLevel(), location, newForRun);
+            return addObservation(network, network.getLevel(), location, newForRun, false, false);
+        }
+        catch (final IllegalMonitorStateException ex) {
+            MainActivity.error("exception adding network: " + ex, ex);
+        }
+        return false;
+    }
+
+    public boolean addObservation( final Network network, final Location location, final boolean newForRun,
+                                   final boolean frequencyChanged, final boolean typeMorphed  ) {
+        try {
+            return addObservation(network, network.getLevel(), location, newForRun, frequencyChanged, typeMorphed);
         }
         catch (final IllegalMonitorStateException ex) {
             MainActivity.error("exception adding network: " + ex, ex);
@@ -554,9 +586,9 @@ public final class DatabaseHelper extends Thread {
     }
 
     private boolean addObservation( final Network network, final int level, final Location location,
-                                    final boolean newForRun ) {
+                                    final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
 
-        final DBUpdate update = new DBUpdate( network, level, location, newForRun );
+        final DBUpdate update = new DBUpdate( network, level, location, newForRun, frequencyChanged, typeMorphed );
 
         // data is lost if queue is full!
         boolean added = queue.offer( update );
@@ -567,7 +599,8 @@ public final class DatabaseHelper extends Thread {
                 // go thru the queue, cull out anything not newForRun
                 for ( Iterator<DBUpdate> it = queue.iterator(); it.hasNext(); ) {
                     final DBUpdate val = it.next();
-                    if ( ! val.newForRun ) {
+
+                    if ( ! val.newForRun && !val.typeMorphed && !val.frequencyChanged) {
                         it.remove();
                     }
                 }
@@ -605,6 +638,7 @@ public final class DatabaseHelper extends Thread {
         double bestlon = 0;
         boolean isNew = false;
 
+        // STEP 1: verify location
         // first try cache
         final CachedLocation prevWrittenLocation = previousWrittenLocationsCache.get( bssid );
         if ( prevWrittenLocation != null ) {
@@ -688,6 +722,7 @@ public final class DatabaseHelper extends Thread {
 
         final boolean fastMode = isFastMode();
 
+        //STEP 2: evaluate lat/lon diff
         final long now = System.currentTimeMillis();
         final double latDiff = Math.abs(lastlat - location.getLatitude());
         final double lonDiff = Math.abs(lastlon - location.getLongitude());
@@ -783,7 +818,17 @@ public final class DatabaseHelper extends Thread {
                     bestlon = location.getLongitude();
                 }
 
-                if (smallLocDelay || newBest) {
+                if (update.typeMorphed) {
+                    //ALIBI: currently this trick is only used when a BT networks turns out to be BLE
+                    //  if this should expand, it's important to update the counts here.
+                    updateNetworkType.bindString(1, network.getType().getCode());
+                    updateNetworkType.bindString( 2, bssid );
+                    start = System.currentTimeMillis();
+                    updateNetworkType.execute();
+                    logTime( start, "db network type updated" );
+                }
+
+                if (smallLocDelay || newBest || update.frequencyChanged) {
                     // MainActivity.info("META updating network: " + bssid + " newBest: " + newBest + " updatelevel: " + update.level + " bestlevel: " + bestlevel);
                     updateNetworkMetadata.bindLong( 1, bestlevel );
                     updateNetworkMetadata.bindDouble( 2, bestlat );
@@ -872,10 +917,10 @@ public final class DatabaseHelper extends Thread {
      * @param newForRun was this new for the run?
      * @return was the pending observation enqueued
      */
-    public boolean pendingObservation( final Network network, final boolean newForRun ) {
+    public boolean pendingObservation( final Network network, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed) {
         if ( lastLoc != null ) {
             // modify this to check age at some point on failure. or offer a flush method. or.. something
-            DBPending update = new DBPending( network, network.getLevel(), newForRun );
+            DBPending update = new DBPending( network, network.getLevel(), newForRun, frequencyChanged, typeMorphed);
             boolean added = pending.offer( update );
             if ( ! added ) {
                 if ( System.currentTimeMillis() - prevPendingQueueCullTime > QUEUE_CULL_TIMEOUT ) {
@@ -963,7 +1008,8 @@ public final class DatabaseHelper extends Thread {
                 //        MainActivity.info( "interpolated to ("+lerp_lat+","+lerp_lon+")" );
 
                 // throw it on the queue!
-                if ( addObservation( pend.network, pend.level, lerpLoc, pend.newForRun ) ) {
+                if ( addObservation(pend.network, pend.level, lerpLoc, pend.newForRun,
+                        pend.frequencyChanged, pend.typeMorphed) ) {
                     count++;
                 } else {
                     MainActivity.info( "failed to add "+pend );

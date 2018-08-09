@@ -1790,6 +1790,7 @@ public final class MainActivity extends AppCompatActivity {
 
         info("register bluetooth BroadcastReceiver");
         final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(state.bluetoothReceiver, intentFilter);
     }
 

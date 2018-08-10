@@ -172,6 +172,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_STILL_DEFAULT = 3000L;
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
+    public static final long SCAN_P_DEFAULT = 30000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
@@ -243,6 +244,8 @@ public final class MainActivity extends AppCompatActivity {
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        pieScanningSettings(prefs);
+
         if (stateFragment != null && stateFragment.getState() != null) {
             info("MAIN: using retained stateFragment state");
             // pry an orientation change, which calls destroy, but we get this from retained fragment
@@ -348,6 +351,23 @@ public final class MainActivity extends AppCompatActivity {
         // show the list by default
         selectFragment(state.currentTab);
         info("onCreate setup complete");
+    }
+
+    private void pieScanningSettings(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT == 28) {
+            for (final String key : Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
+                    ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST)) {
+                pieScanSet(prefs, key);
+            }
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private void pieScanSet(final SharedPreferences prefs, final String key) {
+        if (-1 == prefs.getLong(key, -1)) {
+            info("Setting 30 second scan for " + key + " due to broken Android Pie");
+            prefs.edit().putLong(key, SCAN_P_DEFAULT).commit();
+        }
     }
 
     /**

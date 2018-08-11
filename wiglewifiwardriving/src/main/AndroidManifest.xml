@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="232"
-    android:versionName="2.32">
+    android:versionCode="233"
+    android:versionName="2.33">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -54,6 +54,9 @@
         android:required="false" />
     <uses-feature
         android:name="android.hardware.wifi"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.bluetooth"
         android:required="false" />
     <uses-feature
         android:glEsVersion="0x00020000"

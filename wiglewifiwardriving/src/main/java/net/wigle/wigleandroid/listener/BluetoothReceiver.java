@@ -14,13 +14,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Parcel;
-import android.os.ParcelUuid;
-import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -33,11 +29,8 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
-import net.wigle.wigleandroid.util.BluetoothUtil;
 import net.wigle.wigleandroid.util.WiGLEToast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,7 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 
@@ -143,7 +135,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private long lastScanResponseTime = Long.MIN_VALUE;
     private final long constructionTime = System.currentTimeMillis();
 
-    // refresh thresholds - probably should either make these configurable, or take BT scans off the WiFiReceiver clock
+    // refresh thresholds - probably should either make these configurable
     // arguably expiration should live per element not-seen in n scans.
     private static final int EMPTY_LE_THRESHOLD = 30;
     private static final int EMPTY_BT_THRESHOLD = 4;
@@ -538,8 +530,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         return runNetworks.size();
     }
 
-    public void setupBluetoothTimer( final boolean turnedWifiOn ) {
-        MainActivity.info( "create wifi timer" );
+    public void setupBluetoothTimer( final boolean turnedBtOn ) {
+        MainActivity.info( "create Bluetooth timer" );
         if ( bluetoothTimer == null ) {
             bluetoothTimer = new Handler();
             final Runnable mUpdateTimeTask = new Runnable() {
@@ -570,8 +562,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             bluetoothTimer.removeCallbacks( mUpdateTimeTask );
             bluetoothTimer.postDelayed( mUpdateTimeTask, 100 );
 
-            if ( turnedWifiOn ) {
-                MainActivity.info( "not immediately running wifi scan, since it was just turned on"
+            if ( turnedBtOn ) {
+                MainActivity.info( "not immediately running BT scan, since it was just turned on"
                         + " it will block for a few seconds and fail anyway");
             }
             else {
@@ -583,7 +575,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 if ( scanRequestTime <= 0 ) {
                     scanRequestTime = System.currentTimeMillis();
                 }
-                MainActivity.info( "startup finished. wifi scanOK: " + scanOK );
+                MainActivity.info( "startup finished. BT scanOK: " + scanOK );
             }
         }
     }
@@ -611,10 +603,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 // use now, since we made a request
                 lastScanResponseTime = now;
             } else {
-                final long sinceLastScan = now - lastScanResponseTime;
-                final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                final long resetWifiPeriod = prefs.getLong(
-                        ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
                 // are we seeing jams?
             }
         } else {

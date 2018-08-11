@@ -942,9 +942,6 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
             }
 
-            // schedule a bluetooth scan
-            mainActivity.bluetoothScan();
-
             final long now = System.currentTimeMillis();
             if ( lastScanResponseTime < 0 ) {
                 // use now, since we made a request

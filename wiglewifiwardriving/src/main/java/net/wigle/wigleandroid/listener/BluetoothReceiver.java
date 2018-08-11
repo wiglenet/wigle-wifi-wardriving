@@ -14,7 +14,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.Parcel;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
@@ -25,11 +28,13 @@ import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.NetworkListAdapter;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.BluetoothUtil;
+import net.wigle.wigleandroid.util.WiGLEToast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,6 +136,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> runNetworks = new HashSet<>();
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
+
+    private Handler bluetoothTimer;
+    private long scanRequestTime = Long.MIN_VALUE;
+    private boolean scanInFlight = false;
+    private long lastScanResponseTime = Long.MIN_VALUE;
+    private final long constructionTime = System.currentTimeMillis();
 
     // refresh thresholds - probably should either make these configurable, or take BT scans off the WiFiReceiver clock
     // arguably expiration should live per element not-seen in n scans.
@@ -525,6 +536,132 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     public int getRunNetworkCount() {
         return runNetworks.size();
+    }
+
+    public void setupBluetoothTimer( final boolean turnedWifiOn ) {
+        MainActivity.info( "create wifi timer" );
+        if ( bluetoothTimer == null ) {
+            bluetoothTimer = new Handler();
+            final Runnable mUpdateTimeTask = new Runnable() {
+                @Override
+                public void run() {
+                    // make sure the app isn't trying to finish
+                    if ( ! mainActivity.isFinishing() ) {
+                        // info( "timer start scan" );
+                        // schedule a bluetooth scan
+                        doBluetoothScan();
+                        if ( scanRequestTime <= 0 ) {
+                            scanRequestTime = System.currentTimeMillis();
+                        }
+                        long period = getScanPeriod();
+                        // check if set to "continuous"
+                        if ( period == 0L ) {
+                            // set to default here, as a scan will also be requested on the scan result listener
+                            period = MainActivity.SCAN_DEFAULT;
+                        }
+                        // info("bluetoothtimer: " + period );
+                        bluetoothTimer.postDelayed( this, period );
+                    }
+                    else {
+                        MainActivity.info( "finishing timer" );
+                    }
+                }
+            };
+            bluetoothTimer.removeCallbacks( mUpdateTimeTask );
+            bluetoothTimer.postDelayed( mUpdateTimeTask, 100 );
+
+            if ( turnedWifiOn ) {
+                MainActivity.info( "not immediately running wifi scan, since it was just turned on"
+                        + " it will block for a few seconds and fail anyway");
+            }
+            else {
+                MainActivity.info( "start first bluetooth scan");
+                // starts scan, sends event when done
+                final boolean scanOK = doBluetoothScan();
+                mainActivity.bluetoothScan();
+
+                if ( scanRequestTime <= 0 ) {
+                    scanRequestTime = System.currentTimeMillis();
+                }
+                MainActivity.info( "startup finished. wifi scanOK: " + scanOK );
+            }
+        }
+    }
+
+    public boolean doBluetoothScan() {
+        boolean success = false;
+
+        if (mainActivity.isScanning()) {
+            if ( ! scanInFlight ) {
+                try {
+                    //        mainActivity.bluetoothScan()
+                    mainActivity.bluetoothScan();
+                            //bluetoothManager.startScan();
+                }
+                catch (Exception ex) {
+                    MainActivity.warn("exception starting bt scan: " + ex, ex);
+                }
+                if ( success ) {
+                    scanInFlight = true;
+                }
+            }
+
+            final long now = System.currentTimeMillis();
+            if ( lastScanResponseTime < 0 ) {
+                // use now, since we made a request
+                lastScanResponseTime = now;
+            } else {
+                final long sinceLastScan = now - lastScanResponseTime;
+                final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+                final long resetWifiPeriod = prefs.getLong(
+                        ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
+                // are we seeing jams?
+            }
+        } else {
+            // scanning is off. since we're the only timer, update the UI
+            mainActivity.setNetCountUI();
+            mainActivity.setLocationUI();
+            mainActivity.setStatusUI("Scanning Turned Off" );
+            // keep the scan times from getting huge
+            scanRequestTime = System.currentTimeMillis();
+            // reset this
+            lastScanResponseTime = Long.MIN_VALUE;
+        }
+
+        // battery kill
+        if ( ! mainActivity.isTransferring() ) {
+            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            long batteryKill = prefs.getLong(
+                    ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
+
+            if ( mainActivity.getBatteryLevelReceiver() != null ) {
+                final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
+                final int batteryStatus = mainActivity.getBatteryLevelReceiver().getBatteryStatus();
+                // MainActivity.info("batteryStatus: " + batteryStatus);
+                // give some time since starting up to change this configuration
+                if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
+                        && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
+                        && (System.currentTimeMillis() - constructionTime) > 30000L) {
+                    if (null != mainActivity) {
+                        final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
+                                + mainActivity.getString(R.string.battery_postfix);
+                        if (!mainActivity.isFinishing()) {
+                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
+                        }
+                        MainActivity.warn("low battery, shutting down");
+                        mainActivity.speak(text);
+                        mainActivity.finishSoon(4000L, false);
+                    }
+                }
+            }
+        }
+
+        return success;
+    }
+
+    public long getScanPeriod() {
+        //TODO: we should make this configurable through prefs!
+        return 5000;
     }
 
     private Network addOrUpdateBt(final String bssid, final String ssid,

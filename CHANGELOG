@@ -1,3 +1,7 @@
+* 2.32 (08/10/2018)
+Added bluetooth support
+Default Android Pie to 30 sec scans due to it's throttling
+
 * 2.30 - 2.31 (07/15/2018)
 More expansive cell logging
 Updated OUI manufacturer data

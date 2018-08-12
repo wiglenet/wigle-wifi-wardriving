@@ -259,19 +259,24 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                                 ? device.getName()
                                 :scanRecord.getDeviceName();
 
-                // This is questionable - of of Major class being known when specific class seems thin
-                int type = (device.getBluetoothClass().getDeviceClass() == 0 ||
-                            device.getBluetoothClass().getDeviceClass() == BluetoothClass.Device.Major.UNCATEGORIZED)
-                        ?  device.getBluetoothClass().getMajorDeviceClass()
-                        : device.getBluetoothClass().getDeviceClass();
+                // This is questionable - of Major class being known when specific class seems thin
+                final BluetoothClass bluetoothClass = device.getBluetoothClass();
+                int type = BluetoothClass.Device.Major.UNCATEGORIZED;
+                if (bluetoothClass != null) {
+                    final int deviceClass = bluetoothClass.getDeviceClass();
+                    type = (deviceClass == 0 || deviceClass == BluetoothClass.Device.Major.UNCATEGORIZED)
+                            ? bluetoothClass.getMajorDeviceClass()
+                            : deviceClass;
+                }
 
                 if (DEBUG_BLUETOOTH_DATA) {
                     MainActivity.info("LE deviceName: " + ssid
                             + "\n\taddress: " + bssid
                             + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
                             //+ "\n\tadName: " + adDeviceName
-                            + "\n\tclass:" + DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass())+ "("
-                            + device.getBluetoothClass() + ")"
+                            + "\n\tclass:"
+                            + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
+                            + "(" + bluetoothClass + ")"
                             + "\n\ttype:" + device.getType()
                             + "\n\tRSSI:" + scanResult.getRssi()
                             //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
@@ -326,9 +331,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //parseScanRecordAsSparseArray explodes on array indices
                 }
 
-                final String capabilities = DEVICE_TYPE_LEGEND.get(device.getBluetoothClass().getDeviceClass()) /* + "("
-                        + device.getBluetoothClass().getMajorDeviceClass() + ":"
-                        + device.getBluetoothClass().getDeviceClass() + ") " +*/;
+                final String capabilities = DEVICE_TYPE_LEGEND.get(
+                        bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 //ALIBI: shamelessly re-using frequency here for device type.
                 final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,

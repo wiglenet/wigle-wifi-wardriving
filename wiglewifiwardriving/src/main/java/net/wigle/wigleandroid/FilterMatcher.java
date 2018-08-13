@@ -6,8 +6,6 @@ import java.util.regex.PatternSyntaxException;
 
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 
@@ -94,10 +92,11 @@ public final class FilterMatcher {
                     default:
                         MainActivity.error("unhandled crypto: " + network);
                 }
-            } else if ((NetworkType.BT.equals(network.getType()) ||
-                    NetworkType.BLE.equals(network.getType()))
-                    && !prefs.getBoolean(prefix + ListFragment.PREF_MAPF_BT, true)) {
-                return false;
+            } else if (NetworkType.BT.equals(network.getType()) ||
+                    NetworkType.BLE.equals(network.getType())) {
+                if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_BT, true)) {
+                    return false;
+                }
             } else if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_CELL, true)) {
                 return false;
             }

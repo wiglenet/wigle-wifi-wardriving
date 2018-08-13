@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 /**
@@ -29,11 +28,9 @@ public class FilterActivity extends AppCompatActivity {
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.filtersettings);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View view = findViewById(android.R.id.content);
         MainActivity.info("Filter Fragment Selected");

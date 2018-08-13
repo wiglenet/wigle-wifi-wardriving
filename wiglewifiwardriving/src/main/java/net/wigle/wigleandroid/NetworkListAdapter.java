@@ -94,6 +94,11 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         notifyDataSetChanged();
     }
 
+    public void morphBluetoothToLe(Network n) {
+        btNets.remove(n);
+        leNets.add(n);
+    }
+
     public  void clear() {
         networks.clear();
         wifiNets.clear();

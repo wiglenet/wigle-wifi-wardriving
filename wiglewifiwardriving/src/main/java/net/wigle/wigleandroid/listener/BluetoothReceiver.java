@@ -124,7 +124,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
-    private final Map<String,Network> currentBluetoothNetworks = new ConcurrentLinkedHashMap<String, Network>(64);
+    //TODO: unneeded? private final Map<String,Network> currentBluetoothNetworks = new ConcurrentLinkedHashMap<String, Network>(64);
     private final Set<String> runNetworks = new HashSet<>();
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
@@ -137,8 +137,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     // refresh thresholds - probably should either make these configurable
     // arguably expiration should live per element not-seen in n scans.
-    private static final int EMPTY_LE_THRESHOLD = 30;
-    private static final int EMPTY_BT_THRESHOLD = 4;
+    private static final int EMPTY_LE_THRESHOLD = 10;
+    private static final int EMPTY_BT_THRESHOLD = 2;
 
     // scan state
     private int btCount = 0;
@@ -188,19 +188,20 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     Location location = null;
 
-                    boolean forceReset = false;
+                    boolean forceLeListReset = false;
                     if (results.isEmpty()) {
                         empties++;
                         //ALIBI: if it's been too long, we'll force-clear
                         if (EMPTY_LE_THRESHOLD < empties) {
-                            forceReset = true;
+                            forceLeListReset = true;
                             empties = 0;
                         }
                     } else {
-                        forceReset = true;
+                        forceLeListReset = true;
+                        empties = 0;
                     }
 
-                    if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) && forceReset ) {
+                    if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) && forceLeListReset ) {
                         listAdapter.clearBluetoothLe();
                     }
 
@@ -225,14 +226,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                 @Override
                 public void onScanFailed(int errorCode) {
-                    /*if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
-                        listAdapter.clearBluetoothLe();
-                    }*/
                     switch (errorCode) {
                         case SCAN_FAILED_ALREADY_STARTED:
                             MainActivity.info("BluetoothLEScan already started");
                             break;
                         default:
+                            if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
+                                listAdapter.clearBluetoothLe();
+                            }
                             MainActivity.error("Bluetooth scan error: " + errorCode);
                             scanning.set(false);
                     }
@@ -355,8 +356,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (!bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.startDiscovery();
             lastDiscoveryAt = System.currentTimeMillis();
-            //ALIBI: since calls are triggered off of the WiFi Receiver delay, we're just introducing a retirement counter for BT
-            btCount++;
         } else {
             if (DEBUG_BLUETOOTH_DATA) {
                 MainActivity.info("skipping bluetooth scan; discover already in progress (last scan started "+(System.currentTimeMillis()-lastDiscoveryAt)+"ms ago)");
@@ -381,15 +380,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     bluetoothLeScanner.flushPendingScanResults(scanCallback);
                 }
             }
-        }
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-
-        if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
-            //ALIBI: not super elegant, but this gives devices a longer "decay".
-            // Could try incrementing counter on scan finished instead of successful scan start?
-            btCount = 0;
-            listAdapter.clearBluetooth();
         }
 
         /*
@@ -429,6 +419,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, final Intent intent) {
 
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
             final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -437,7 +428,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
             final String bssid = device.getAddress();
             final String ssid = device.getName();
-
 
             int type;
 
@@ -474,7 +464,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     + ";" + device.getBondState();
             final GPSListener gpsListener = mainActivity.getGPSListener();
 
-            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             Location location = null;
             if (gpsListener != null) {
                 final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
@@ -488,12 +477,21 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //ALIBI: shamelessly re-using frequency here for device type.
             final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs);
 
+
+        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+            final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
+            btCount++;
+            if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
+                //ALIBI: not super elegant, but this gives devices a longer "decay".
+                btCount = 0;
+                listAdapter.clearBluetooth();
+            }
             final long newBtCount = dbHelper.getNewBtCount();
             ListFragment.lameStatic.newBt = newBtCount;
             ListFragment.lameStatic.runBt = runNetworks.size();
-
             sort(prefs);
             listAdapter.notifyDataSetChanged();
+
         }
     }
 
@@ -691,7 +689,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             network.setFrequency(mergedDeviceType);
             network.setLevel(strength);
             network.setType(NetworkType.BLE);
-            //TODO: (1/2) We need a way to update the existing network record
         } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
             //fill in device type if not present
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
@@ -705,10 +702,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //fill in name if not present
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             network.setSsid(mergedSsid);
-            //TODO: (2/2) We need a way to update the existing network record
         } else {
             //DEBUG: MainActivity.info("existing BT net");
-            //TODO: is there any freq/channel info in BT at all??
             //TODO: update capabilities? only if was Misc/Uncategorized, now recognized?
             //network.setCapabilities(capabilities);
             network.setLevel(strength);
@@ -742,6 +737,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         //Update display
         if (listAdapter != null) {
+            if (btTypeUpdate) {
+                listAdapter.morphBluetoothToLe(network);
+            }
             if ( showCurrent || newForRun ) {
                 if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
                     if (NetworkType.BT.equals(network.getType()) ) {
@@ -768,6 +766,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 dbHelper.addObservation(network, location, newForRun, deviceTypeUpdate, btTypeUpdate);
             }
         } else {
+            // bob asks "since BT are often indoors, should we be saving regardless of loc?"
             // w/out location
             if (!matches) {
                 dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);

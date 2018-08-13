@@ -6,8 +6,6 @@ import java.util.regex.PatternSyntaxException;
 
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 

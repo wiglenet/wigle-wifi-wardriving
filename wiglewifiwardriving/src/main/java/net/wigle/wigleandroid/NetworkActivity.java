@@ -125,6 +125,19 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             final ImageView ico = (ImageView) findViewById( R.id.wepicon );
             ico.setImageResource( image );
 
+            final ImageView btico = (ImageView) findViewById(R.id.bticon);
+            if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
+                btico.setVisibility(View.VISIBLE);
+                Integer btImageId = NetworkListAdapter.getBtImage(network);
+                if (null == btImageId) {
+                    btico.setVisibility(View.GONE);
+                } else {
+                    btico.setImageResource(btImageId);
+                }
+            } else {
+                btico.setVisibility(View.GONE);
+            }
+
             tv = (TextView) findViewById( R.id.na_signal );
             final int level = network.getLevel();
             tv.setTextColor( NetworkListAdapter.getSignalColor( level ) );

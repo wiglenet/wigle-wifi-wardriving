@@ -324,6 +324,8 @@ public final class MainActivity extends AppCompatActivity {
         setupBattery();
         info("setupSound");
         setupSound();
+        info("setupActivationDialog");
+        setupActivationDialog();
         info("setupBluetooth");
         setupBluetooth();
         info("setupWifi");
@@ -1718,6 +1720,42 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupActivationDialog() {
+        final boolean willActivateBt = canBtBeActivated();
+        final boolean willActivateWifi = canWifiBeActivated();
+        if (willActivateBt || willActivateWifi) {
+
+            String activationMessages = "";
+            if (willActivateBt) {
+                activationMessages += getString(R.string.turn_on_bt);
+            }
+
+            if (willActivateBt && willActivateWifi) {
+                activationMessages += "\n";
+            }
+
+            if (willActivateWifi) {
+                activationMessages += getString(R.string.turn_on_wifi);
+            }
+            // tell user, cuz this takes a little while
+            if (!isFinishing()) {
+                WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
+            }
+        }
+    }
+
+    private boolean canWifiBeActivated() {
+        final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
+                getSystemService(Context.WIFI_SERVICE);
+        if (null == wifiManager) {
+            return false;
+        }
+        if (!wifiManager.isWifiEnabled() && !state.inEmulator) {
+            return true;
+        }
+        return false;
+    }
+
     private void setupWifi() {
         // warn about turning off network notification
         final String notifOn = Settings.Secure.getString(getContentResolver(),
@@ -1734,10 +1772,6 @@ public final class MainActivity extends AppCompatActivity {
         // keep track of for later
         boolean turnedWifiOn = false;
         if (!wifiManager.isWifiEnabled()) {
-            // tell user, cuz this takes a little while
-            if (!isFinishing()) {
-                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_wifi));
-            }
 
             // save so we can turn it back off when we exit
             edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, true);
@@ -1781,6 +1815,18 @@ public final class MainActivity extends AppCompatActivity {
         registerReceiver(state.wifiReceiver, intentFilter);
     }
 
+    private boolean canBtBeActivated() {
+        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+        if (bt == null) {
+            info("No bluetooth adapter");
+            return false;
+        }
+        if (!bt.isEnabled()) {
+            return true;
+        }
+        return false;
+    }
+
     public void setupBluetooth() {
         final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
         if (bt == null) {
@@ -1792,8 +1838,6 @@ public final class MainActivity extends AppCompatActivity {
         if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, false)) {
             if (!bt.isEnabled()) {
                 info("Enable bluetooth");
-                // tell user, cuz this takes a little while
-                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_bt), Toast.LENGTH_LONG);
                 edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
                 bt.enable();
             } else {

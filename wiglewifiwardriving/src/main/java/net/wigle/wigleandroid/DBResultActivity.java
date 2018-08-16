@@ -287,7 +287,9 @@ public class DBResultActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+        if (mapView != null) {
+            mapView.onPause();
+        }
         if (mapRender != null) {
             // save memory
             mapRender.clear();

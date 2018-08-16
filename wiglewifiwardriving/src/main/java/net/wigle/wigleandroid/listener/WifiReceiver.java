@@ -1073,35 +1073,28 @@ public class WifiReceiver extends BroadcastReceiver {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
             CellIdentityGsm cellIdentG = ((CellInfoGsm)(cellInfo)).getCellIdentity();
             CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm)(cellInfo)).getCellSignalStrength();
-            int mcc = 0;
-            int mnc = 0;
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentG.getMncString()):cellIdentG.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentG.getMccString()):cellIdentG.getMcc();
             final int cidInt = cellIdentG.getCid();
             final int lacInt = cellIdentG.getLac();
 
-            if ((Integer.MAX_VALUE == cidInt) || (Integer.MAX_VALUE == lacInt)) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    //DEBUG: MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
-                } else {
-                    //DEBUG: MainActivity.info("Discarding GSM cell with invalid ID");
+            if (!validCellId(cidInt) || (Integer.MAX_VALUE == lacInt) || !validMccMncPair(mcc, mnc)) {
+                if (MainActivity.DEBUG_CELL_DATA) {
+                    if (android.os.Build.VERSION.SDK_INT >= 24) {
+                        MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
+                    } else {
+                        MainActivity.info("Discarding GSM cell with invalid ID");
+                    }
                 }
                 return null;
             }
 
-            String operator = null;
+            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMobileNetworkOperator():mcc+""+mnc;
+            final String networkKey = mcc + "" + mnc + "_" + lacInt + "_" + cidInt;
 
-            if (android.os.Build.VERSION.SDK_INT >= 28) {
-                // mcc = Integer.parseInt(cellIdentG.getMccString());
-                // mnc = Integer.parseInt(cellIdentG.getMncString());
-                // operator = cellIdentG.getMobileNetworkOperator();
-            } else {
-                mcc = cellIdentG.getMcc();
-                mnc = cellIdentG.getMnc();
-                operator = mcc+""+mnc;
-            }
-
-            final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
             int dBmlevel = cellStrengthG.getDbm();
             int fcn = 0;
+
             if (android.os.Build.VERSION.SDK_INT >= 24) {
                 fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
             }
@@ -1141,29 +1134,27 @@ public class WifiReceiver extends BroadcastReceiver {
             CellIdentityLte cellIdentL = cellInfo.getCellIdentity();
             CellSignalStrengthLte cellStrengthL = ((CellInfoLte)(cellInfo)).getCellSignalStrength();
 
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.MAX_VALUE/*TODO: Integer.parseInt(cellIdentL.getMncString())*/:cellIdentL.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.MAX_VALUE/*TODO: Integer.parseInt(cellIdentL.getMccString())*/:cellIdentL.getMcc();
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentL.getMncString()):cellIdentL.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentL.getMccString()):cellIdentL.getMcc();
             final int ciInt = cellIdentL.getCi();
             final int tacInt = cellIdentL.getTac();
 
-            if ((Integer.MAX_VALUE == ciInt) || (Integer.MAX_VALUE == mcc) || (Integer.MAX_VALUE == mnc) || (Integer.MAX_VALUE == tacInt)) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    //DEBUG: MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
-                } else {
-                    //DEBUG: MainActivity.info("Discarding LTE cell with invalid ID");
+            if (!validCellId(ciInt) || (Integer.MAX_VALUE == tacInt) || !validMccMncPair(mcc, mnc)) {
+                if (MainActivity.DEBUG_CELL_DATA) {
+                    if (android.os.Build.VERSION.SDK_INT >= 24) {
+                        MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
+                    } else {
+                        MainActivity.info("Discarding LTE cell with invalid ID");
+                    }
                 }
                 return null;
             }
 
-            String operator = null;
-            if (android.os.Build.VERSION.SDK_INT >= 28) {
-                //TODO: operator = cellIdentL.getMobileNetworkOperator();
-            } else {
-                operator = mcc+""+mnc;
-            }
-            final String networkKey = mcc+""+mnc+"_"+tacInt+"_"+ciInt;
+            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMobileNetworkOperator():mcc+""+mnc;
+            final String networkKey = mcc + "" + mnc + "_" + tacInt + "_" + ciInt;
             int dBmlevel = cellStrengthL.getDbm();
             int fcn = 0;
+
             if (android.os.Build.VERSION.SDK_INT >= 24) {
                 fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ?
                         cellIdentL.getEarfcn():0;
@@ -1211,29 +1202,25 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final int cidInt = cellIdentW.getCid();
             final int lacInt = cellIdentW.getLac();
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.MAX_VALUE/*TODO: Integer.parseInt(cellIdentW.getMncString())*/:cellIdentW.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.MAX_VALUE/*TODO: Integer.parseInt(cellIdentW.getMccString())*/:cellIdentW.getMcc();
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentW.getMncString()):cellIdentW.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentW.getMccString()):cellIdentW.getMcc();
 
-
-            if ((Integer.MAX_VALUE == cidInt) || (Integer.MAX_VALUE == lacInt)) {
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    //DEBUG: MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: "+cellIdentW.getUarfcn());
-                } else {
-                    //DEBUG: MainActivity.info("Discarding WCDMA cell with invalid ID");
+            if (!validCellId(cidInt) || (Integer.MAX_VALUE == lacInt) || !validMccMncPair(mcc, mnc)) {
+                if (MainActivity.DEBUG_CELL_DATA) {
+                    if (android.os.Build.VERSION.SDK_INT >= 24) {
+                        MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: "+cellIdentW.getUarfcn());
+                    } else {
+                        MainActivity.info("Discarding WCDMA cell with invalid ID");
+                    }
                 }
                 return null;
             }
 
-            String operator = null;
-            if (android.os.Build.VERSION.SDK_INT >= 28) {
-                //TODO: operator = cellIdentW.getMobileNetworkOperator();
-            } else {
-                operator = mcc+""+mnc;
-            }
-
-            final String networkKey = mcc+""+mnc+"_"+lacInt+"_"+cidInt;
+            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentW.getMobileNetworkOperator():mcc + "" + mnc;
+            final String networkKey = mcc + "" + mnc + "_" + lacInt + "_" + cidInt;
             int dBmlevel = cellStrengthW.getDbm();
             int fcn = 0;
+
             if (android.os.Build.VERSION.SDK_INT >= 24) {
                 fcn = (cellIdentW.getUarfcn() != Integer.MAX_VALUE) ?
                         cellIdentW.getUarfcn():0;
@@ -1333,4 +1320,38 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         return null;
     }
+
+    private boolean validCellId(final int cellId) {
+        if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean validXac(final int lacOrTac) {
+        //TODO: seeing values of 65535 - value limit, but almost certainly invalid
+        if ((lacOrTac > 0) && (lacOrTac < Integer.MAX_VALUE)) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean validMccMncPair(final String mcc, final String mnc) {
+        try {
+            int mccInt = Integer.parseInt(mcc);
+            int mncInt = Integer.parseInt(mnc);
+            return validMccMncPair(mccInt, mncInt);
+        } catch (Exception ex) {
+
+        }
+        return false;
+    }
+
+    private boolean validMccMncPair(final int mcc, final int mnc) {
+        if ((mcc > 0) && (mcc < Integer.MAX_VALUE) && (mnc > 0) && (mnc < Integer.MAX_VALUE)) {
+            return true;
+        }
+        return false;
+    }
+
 }

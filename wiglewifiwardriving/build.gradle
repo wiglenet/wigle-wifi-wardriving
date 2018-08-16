@@ -3,13 +3,13 @@ apply plugin: 'de.undercouch.download'
 apply plugin: 'groovyx.grooid.groovy-android'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     buildToolsVersion '27.0.3'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
     }
 
     buildTypes {

@@ -1880,9 +1880,8 @@ public final class MainActivity extends AppCompatActivity {
         final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
         // don't call on emulator, it crashes it
         if ( btWasOff && ! state.inEmulator ) {
-            // tell user, cuz this takes a little while
-
-            WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
+            // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?
+            //WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
 
             // well turn it off now that we're done
             MainActivity.info("turning bluetooth back off");

@@ -272,7 +272,9 @@ public class DBResultActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        mapView.onDestroy();
+        if (mapView != null) {
+            mapView.onDestroy();
+        }
         super.onDestroy();
     }
 
@@ -287,7 +289,9 @@ public class DBResultActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+        if (mapView != null) {
+            mapView.onPause();
+        }
         if (mapRender != null) {
             // save memory
             mapRender.clear();
@@ -297,13 +301,17 @@ public class DBResultActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+        if (mapView != null) {
+            mapView.onSaveInstanceState(outState);
+        }
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mapView.onLowMemory();
+        if (mapView != null) {
+            mapView.onLowMemory();
+        }
     }
 
 

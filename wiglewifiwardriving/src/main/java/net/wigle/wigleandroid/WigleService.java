@@ -146,13 +146,14 @@ public final class WigleService extends Service {
 
     private void handleCommand( Intent intent ) {
         MainActivity.info( "service: handleCommand: intent: " + intent );
+        setupNotification();
     }
 
     private void shutdownNotification() {
         stopForeground(true);
     }
 
-    private void setupNotification() {
+    public void setupNotification() {
         if ( ! done.get() ) {
             final long when = System.currentTimeMillis();
             final Context context = getApplicationContext();
@@ -267,15 +268,15 @@ public final class WigleService extends Service {
             builder.setColor(1973790);
 
             //TODO: figure out how to update notification actions on exec, then we can show relevant
-            //if (MainActivity.isScanning(getApplicationContext())) {
+            if (MainActivity.isScanning(getApplicationContext())) {
                 Notification.Action pauseAction = new Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pause", pauseIntent)
                         .build();
                 builder.addAction(pauseAction);
-            //} else {
+            } else {
                 Notification.Action scanAction = new Notification.Action.Builder(android.R.drawable.ic_media_play,"Scan", scanIntent)
                         .build();
                 builder.addAction(scanAction);
-            //}
+            }
             Notification.Action ulAction = new Notification.Action.Builder(android.R.drawable.ic_menu_upload,"Upload", uploadIntent)
                     .build();
             builder.addAction(ulAction);

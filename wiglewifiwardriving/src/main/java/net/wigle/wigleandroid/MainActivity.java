@@ -2040,6 +2040,9 @@ public final class MainActivity extends AppCompatActivity {
                 }
             }
         }
+        if (null != state && null != state.wigleService) {
+            state.wigleService.setupNotification();
+        }
     }
 
     /**

@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
@@ -179,14 +178,17 @@ public final class WigleService extends Service {
 
             final Intent pauseSharedIntent = new Intent();
             pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
+            pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
             final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
             final Intent scanSharedIntent = new Intent();
             scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+            scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
             final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
             final Intent uploadSharedIntent = new Intent();
             uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+            uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
             final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
             Notification notification = null;
@@ -246,6 +248,7 @@ public final class WigleService extends Service {
                     title, NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(channel);
 
+
             // copied from above
             final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
@@ -262,12 +265,20 @@ public final class WigleService extends Service {
             builder.setColorized(true);
             // WiGLE Blue builder.setColor(6005486);
             builder.setColor(1973790);
-            //noinspection deprecation
-            builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
-            //noinspection deprecation
-            builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
-            //noinspection deprecation
-            builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
+
+            //TODO: figure out how to update notification actions on exec, then we can show relevant
+            //if (MainActivity.isScanning(getApplicationContext())) {
+                Notification.Action pauseAction = new Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pause", pauseIntent)
+                        .build();
+                builder.addAction(pauseAction);
+            //} else {
+                Notification.Action scanAction = new Notification.Action.Builder(android.R.drawable.ic_media_play,"Scan", scanIntent)
+                        .build();
+                builder.addAction(scanAction);
+            //}
+            Notification.Action ulAction = new Notification.Action.Builder(android.R.drawable.ic_menu_upload,"Upload", uploadIntent)
+                    .build();
+            builder.addAction(ulAction);
 
             return builder.build();
         }

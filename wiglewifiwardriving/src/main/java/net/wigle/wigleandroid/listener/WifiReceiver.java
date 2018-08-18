@@ -1073,12 +1073,13 @@ public class WifiReceiver extends BroadcastReceiver {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
             CellIdentityGsm cellIdentG = ((CellInfoGsm)(cellInfo)).getCellIdentity();
             CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm)(cellInfo)).getCellSignalStrength();
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentG.getMncString()):cellIdentG.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentG.getMccString()):cellIdentG.getMcc();
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentG.getMncString()):cellIdentG.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentG.getMccString()):cellIdentG.getMcc();
+
             final int cidInt = cellIdentG.getCid();
             final int lacInt = cellIdentG.getLac();
 
-            if (!validCellId(cidInt) || (Integer.MAX_VALUE == lacInt) || !validMccMncPair(mcc, mnc)) {
+            if (!validCellId(cidInt) || !validXac(lacInt) || !validMccMncPair(mcc, mnc)) {
                 if (MainActivity.DEBUG_CELL_DATA) {
                     if (android.os.Build.VERSION.SDK_INT >= 24) {
                         MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
@@ -1134,12 +1135,12 @@ public class WifiReceiver extends BroadcastReceiver {
             CellIdentityLte cellIdentL = cellInfo.getCellIdentity();
             CellSignalStrengthLte cellStrengthL = ((CellInfoLte)(cellInfo)).getCellSignalStrength();
 
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentL.getMncString()):cellIdentL.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentL.getMccString()):cellIdentL.getMcc();
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28 ? safeMxcInt(cellIdentL.getMncString()) : cellIdentL.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28 ? safeMxcInt(cellIdentL.getMccString()) : cellIdentL.getMcc();
             final int ciInt = cellIdentL.getCi();
             final int tacInt = cellIdentL.getTac();
 
-            if (!validCellId(ciInt) || (Integer.MAX_VALUE == tacInt) || !validMccMncPair(mcc, mnc)) {
+            if (!validCellId(ciInt) || !validXac(tacInt) || !validMccMncPair(mcc, mnc)) {
                 if (MainActivity.DEBUG_CELL_DATA) {
                     if (android.os.Build.VERSION.SDK_INT >= 24) {
                         MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
@@ -1202,10 +1203,10 @@ public class WifiReceiver extends BroadcastReceiver {
 
             final int cidInt = cellIdentW.getCid();
             final int lacInt = cellIdentW.getLac();
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentW.getMncString()):cellIdentW.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?Integer.parseInt(cellIdentW.getMccString()):cellIdentW.getMcc();
+            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentW.getMncString()):cellIdentW.getMnc();
+            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentW.getMccString()):cellIdentW.getMcc();
 
-            if (!validCellId(cidInt) || (Integer.MAX_VALUE == lacInt) || !validMccMncPair(mcc, mnc)) {
+            if (!validCellId(cidInt) || !validXac(lacInt) || !validMccMncPair(mcc, mnc)) {
                 if (MainActivity.DEBUG_CELL_DATA) {
                     if (android.os.Build.VERSION.SDK_INT >= 24) {
                         MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: "+cellIdentW.getUarfcn());
@@ -1319,6 +1320,17 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         }
         return null;
+    }
+
+    private int safeMxcInt(final String mxc) {
+        try {
+            if (null != mxc) {
+                return Integer.parseInt(mxc);
+            }
+        } catch (Exception ex) {
+
+        }
+        return Integer.MAX_VALUE;
     }
 
     private boolean validCellId(final int cellId) {

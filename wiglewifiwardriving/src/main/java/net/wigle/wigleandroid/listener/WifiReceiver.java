@@ -21,6 +21,8 @@ import net.wigle.wigleandroid.DashboardFragment;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.GsmOperator;
+import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.NetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -28,6 +30,7 @@ import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.util.WiGLEToast;
 
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -118,8 +121,6 @@ public class WifiReceiver extends BroadcastReceiver {
         NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
-    private final Map<String, Map<String,String>> OPERATOR_CACHE;
-
     //TODO: move these to their own thing?
     public static final Comparator<Network> signalCompare = new Comparator<Network>() {
         @Override
@@ -168,7 +169,6 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( numberFormat1 instanceof DecimalFormat ) {
             numberFormat1.setMaximumFractionDigits(1);
         }
-        OPERATOR_CACHE = new HashMap<>();
     }
 
     public void setMainActivity( final MainActivity mainActivity ) {
@@ -592,6 +592,7 @@ public class WifiReceiver extends BroadcastReceiver {
         return networks;
     }
 
+    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
         if (cellInfo == null) {
             MainActivity.info("null cellInfo");
@@ -600,30 +601,35 @@ public class WifiReceiver extends BroadcastReceiver {
             if (MainActivity.DEBUG_CELL_DATA) {
                 MainActivity.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
             }
-            switch (cellInfo.getClass().getSimpleName()) {
-                case "CellInfoCdma":
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        return handleSingleCdmaInfo(((CellInfoCdma) (cellInfo)), tele , location);
-                    }
-                    break;
-                case "CellInfoGsm":
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        return handleSingleGsmInfo(((CellInfoGsm) (cellInfo)), tele, location);
-                    }
-                    break;
-                case "CellInfoLte":
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-                        return handleSingleLteInfo(((CellInfoLte)(cellInfo)), tele, location);
-                    }
-                    break;
-                case "CellInfoWcdma":
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //WHYYYYYY?
-                        return handleSingleWcdmaInfo((CellInfoWcdma)(cellInfo), tele, location);
-                    }
-                    break;
-                default:
-                    MainActivity.warn("Unknown cell case: "+cellInfo.getClass().getSimpleName());
-                    break;
+            GsmOperator g = null;
+            try {
+                switch (cellInfo.getClass().getSimpleName()) {
+                    case "CellInfoCdma":
+                        return handleSingleCdmaInfo(((CellInfoCdma) (cellInfo)), tele, location);
+                    case "CellInfoGsm":
+                        g = new GsmOperator(((CellInfoGsm) (cellInfo)).getCellIdentity());
+                        CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm) (cellInfo)).getCellSignalStrength();
+                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "GSM",
+                                cellStrengthG.getDbm(), NetworkType.typeForCode("G"), location);
+                    case "CellInfoLte":
+                        g = new GsmOperator(((CellInfoLte) (cellInfo)).getCellIdentity());
+                        CellSignalStrengthLte cellStrengthL = ((CellInfoLte) (cellInfo)).getCellSignalStrength();
+                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "LTE",
+                                cellStrengthL.getDbm(), NetworkType.typeForCode("L"), location);
+                    case "CellInfoWcdma":
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //WHYYYYYY?
+                            g = new GsmOperator(((CellInfoWcdma) (cellInfo)).getCellIdentity());
+                            CellSignalStrengthWcdma cellStrengthW = ((CellInfoWcdma) (cellInfo)).getCellSignalStrength();
+                            return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "WCDMA",
+                                    cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
+                        }
+                        break;
+                    default:
+                        MainActivity.warn("Unknown cell case: " + cellInfo.getClass().getSimpleName());
+                        break;
+                }
+            } catch (GsmOperatorException gsex) {
+                //MainActivity.info("skipping invalid cell data: "+gsex);
             }
         }
         return null;
@@ -706,7 +712,7 @@ public class WifiReceiver extends BroadcastReceiver {
             final String operatorCode = tele.getNetworkOperator();
             if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
-                ssid = getOperatorName(tele.getNetworkOperator());
+                ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
                 //DEBUG: MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;
             }
@@ -1069,189 +1075,6 @@ public class WifiReceiver extends BroadcastReceiver {
         return null;
     }
 
-    private Network handleSingleGsmInfo(final CellInfoGsm cellInfo, final TelephonyManager tele, final Location location) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            CellIdentityGsm cellIdentG = ((CellInfoGsm)(cellInfo)).getCellIdentity();
-            CellSignalStrengthGsm cellStrengthG = ((CellInfoGsm)(cellInfo)).getCellSignalStrength();
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentG.getMncString()):cellIdentG.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentG.getMccString()):cellIdentG.getMcc();
-
-            final int cidInt = cellIdentG.getCid();
-            final int lacInt = cellIdentG.getLac();
-
-            if (!validCellId(cidInt) || !validXac(lacInt) || !validMccMncPair(mcc, mnc)) {
-                if (MainActivity.DEBUG_CELL_DATA) {
-                    if (android.os.Build.VERSION.SDK_INT >= 24) {
-                        MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
-                    } else {
-                        MainActivity.info("Discarding GSM cell with invalid ID");
-                    }
-                }
-                return null;
-            }
-
-            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentG.getMobileNetworkOperator():mcc+""+mnc;
-            final String networkKey = mcc + "" + mnc + "_" + lacInt + "_" + cidInt;
-
-            int dBmlevel = cellStrengthG.getDbm();
-            int fcn = 0;
-
-            if (android.os.Build.VERSION.SDK_INT >= 24) {
-                fcn = cellIdentG.getArfcn() != Integer.MAX_VALUE ? cellIdentG.getArfcn() : 0;
-            }
-
-            if (MainActivity.DEBUG_CELL_DATA) {
-                String res = "GSM Cell:" +
-                        "\n\tCID: " + cidInt +
-                        "\n\tLAC: " + lacInt +
-                        "\n\tPSC: " + cellIdentG.getPsc() +
-                        "\n\tMCC: " + mcc +
-                        "\n\tMNC: " + mnc +
-                        "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator +
-                        "\n\tARFCN: " + fcn;
-
-                if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    res += "\n\tBSIC: " + cellIdentG.getBsic();
-                }
-
-                int asulevel = cellStrengthG.getAsuLevel();
-
-                res += "\n\tSignal: " + cellStrengthG.getLevel();
-                res += "\n\tDBM: " + dBmlevel;
-
-                res += "\n\tASUL: " + asulevel;
-                MainActivity.info(res);
-            }
-            return  addOrUpdateCell(networkKey, operator, fcn, "GSM",
-                    dBmlevel, NetworkType.typeForCode("G"), location);
-        }
-
-        return null;
-    }
-
-    private Network handleSingleLteInfo(final CellInfoLte cellInfo, final TelephonyManager tele, final Location location) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            CellIdentityLte cellIdentL = cellInfo.getCellIdentity();
-            CellSignalStrengthLte cellStrengthL = ((CellInfoLte)(cellInfo)).getCellSignalStrength();
-
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28 ? safeMxcInt(cellIdentL.getMncString()) : cellIdentL.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28 ? safeMxcInt(cellIdentL.getMccString()) : cellIdentL.getMcc();
-            final int ciInt = cellIdentL.getCi();
-            final int tacInt = cellIdentL.getTac();
-
-            if (!validCellId(ciInt) || !validXac(tacInt) || !validMccMncPair(mcc, mnc)) {
-                if (MainActivity.DEBUG_CELL_DATA) {
-                    if (android.os.Build.VERSION.SDK_INT >= 24) {
-                        MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
-                    } else {
-                        MainActivity.info("Discarding LTE cell with invalid ID");
-                    }
-                }
-                return null;
-            }
-
-            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentL.getMobileNetworkOperator():mcc+""+mnc;
-            final String networkKey = mcc + "" + mnc + "_" + tacInt + "_" + ciInt;
-            int dBmlevel = cellStrengthL.getDbm();
-            int fcn = 0;
-
-            if (android.os.Build.VERSION.SDK_INT >= 24) {
-                fcn = cellIdentL.getEarfcn() != Integer.MAX_VALUE ?
-                        cellIdentL.getEarfcn():0;
-            }
-
-            if (MainActivity.DEBUG_CELL_DATA) {
-                String res = "LTE Cell: " +
-                        "\n\tCI: " + ciInt +
-                        "\n\tPCI: " + cellIdentL.getPci() +
-                        "\n\tTAC: " + tacInt +
-                        "\n\tMCC: " + mcc +
-                        "\n\tMNC: " + mnc +
-                        "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator +
-                        "\n\tEARFCN:" + fcn;
-
-                if (Build.VERSION.SDK_INT >= 28) {
-                    //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
-                }
-
-                int asulevel = cellStrengthL.getAsuLevel();
-
-                res += "\n\tlevel:" + cellStrengthL.getLevel();
-                res += "\n\tDBM: " + dBmlevel;
-                res += "\n\tASUL: " + asulevel;
-                if (Build.VERSION.SDK_INT >= 26) {
-                    res += "\n\tRSRP:" + cellStrengthL.getRsrp() +
-                            "\n\tRSRQ:" + cellStrengthL.getRsrq() +
-                            "\n\tCQI:" + cellStrengthL.getCqi() +
-                            "\n\tRSSNR:" + cellStrengthL.getRssnr();
-                }
-                MainActivity.info(res);
-            }
-
-            return addOrUpdateCell(networkKey, operator, fcn, "LTE",
-                    dBmlevel, NetworkType.typeForCode("L"), location);
-        }
-        return null;
-    }
-
-    private Network handleSingleWcdmaInfo(final CellInfoWcdma cellInfo, final TelephonyManager tele, final Location location) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //WHYYYYYY?
-            CellIdentityWcdma cellIdentW = cellInfo.getCellIdentity();
-            CellSignalStrengthWcdma cellStrengthW = ((CellInfoWcdma)(cellInfo)).getCellSignalStrength();
-
-            final int cidInt = cellIdentW.getCid();
-            final int lacInt = cellIdentW.getLac();
-            final int mnc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentW.getMncString()):cellIdentW.getMnc();
-            final int mcc = android.os.Build.VERSION.SDK_INT >= 28?safeMxcInt(cellIdentW.getMccString()):cellIdentW.getMcc();
-
-            if (!validCellId(cidInt) || !validXac(lacInt) || !validMccMncPair(mcc, mnc)) {
-                if (MainActivity.DEBUG_CELL_DATA) {
-                    if (android.os.Build.VERSION.SDK_INT >= 24) {
-                        MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: "+cellIdentW.getUarfcn());
-                    } else {
-                        MainActivity.info("Discarding WCDMA cell with invalid ID");
-                    }
-                }
-                return null;
-            }
-
-            final String operator = android.os.Build.VERSION.SDK_INT >= 28?cellIdentW.getMobileNetworkOperator():mcc + "" + mnc;
-            final String networkKey = mcc + "" + mnc + "_" + lacInt + "_" + cidInt;
-            int dBmlevel = cellStrengthW.getDbm();
-            int fcn = 0;
-
-            if (android.os.Build.VERSION.SDK_INT >= 24) {
-                fcn = (cellIdentW.getUarfcn() != Integer.MAX_VALUE) ?
-                        cellIdentW.getUarfcn():0;
-            }
-
-            if (MainActivity.DEBUG_CELL_DATA) {
-                String res = "WCDMA Cell:" +
-                        "\n\tCI: " + cidInt +
-                        "\n\tLAC: " + lacInt +
-                        "\n\tMCC: " + mcc +
-                        "\n\tMNC: " + mnc +
-                        "\n\tNetwork Key: " + networkKey +
-                        "\n\toperator: " + operator +
-                        "\n\tUARFCN:" + fcn;
-
-                int asulevel = cellStrengthW.getAsuLevel();
-
-                res += "\n\tPSC:" + cellIdentW.getPsc();
-                res += "\n\tlevel:" + cellStrengthW.getLevel();
-                res += "\n\tASUL: " + asulevel;
-                res += "\n\tdBm:" + dBmlevel;
-                MainActivity.info(res);
-            }
-
-            return addOrUpdateCell(networkKey, operator, fcn, "WCDMA",
-                dBmlevel, NetworkType.typeForCode("D"), location);
-        }
-        return null;
-    }
-
     private Network addOrUpdateCell(final String bssid, final String operator,
                                     final int frequency, final String networkTypeName,
                                     final int strength, final NetworkType type,
@@ -1264,7 +1087,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         Network network = networkCache.get( bssid );
 
-        final String operatorName = getOperatorName(operator);
+        final String operatorName = GsmOperator.getOperatorName(operator);
 
         if ( network == null ) {
             network = new Network( bssid, operatorName, frequency, capabilities, (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength, type );
@@ -1285,85 +1108,6 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         //ALIBI: allows us to run in conjunction with current-carrier detection
         return network;
-    }
-
-    /**
-     * Map the 5-6 digit operator code against the database of operator names
-     * @param operatorCode
-     * @return
-     */
-    private String getOperatorName(final String operatorCode) {
-        //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
-        if (null != operatorCode && operatorCode.length() >= 5) {
-
-
-            final String mnc = operatorCode.substring(3, operatorCode.length());
-            final String mcc = operatorCode.substring(0, 3);
-            //DEBUG:  MainActivity.info("Operator MCC: "+mcc+" MNC: "+mnc);
-
-            Map<String, String> mccMap = OPERATOR_CACHE.get(mcc);;
-            if (null == mccMap) {
-                mccMap = new HashMap<>();
-                OPERATOR_CACHE.put(mcc, mccMap);
-            }
-
-            String operator = mccMap.get(mnc);
-            if (null != operator) {
-                return operator;
-            }
-
-            MainActivity.State s = this.mainActivity.getState();
-            if (null != s) {
-                operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
-                mccMap.put(mnc, operator);
-                return operator;
-            }
-        }
-        return null;
-    }
-
-    private int safeMxcInt(final String mxc) {
-        try {
-            if (null != mxc) {
-                return Integer.parseInt(mxc);
-            }
-        } catch (Exception ex) {
-
-        }
-        return Integer.MAX_VALUE;
-    }
-
-    private boolean validCellId(final int cellId) {
-        if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validXac(final int lacOrTac) {
-        //TODO: seeing values of 65535 - value limit, but almost certainly invalid
-        if ((lacOrTac > 0) && (lacOrTac < Integer.MAX_VALUE)) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean validMccMncPair(final String mcc, final String mnc) {
-        try {
-            int mccInt = Integer.parseInt(mcc);
-            int mncInt = Integer.parseInt(mnc);
-            return validMccMncPair(mccInt, mncInt);
-        } catch (Exception ex) {
-
-        }
-        return false;
-    }
-
-    private boolean validMccMncPair(final int mcc, final int mnc) {
-        if ((mcc > 0) && (mcc < Integer.MAX_VALUE) && (mnc > 0) && (mnc < Integer.MAX_VALUE)) {
-            return true;
-        }
-        return false;
     }
 
 }

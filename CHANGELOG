@@ -1,6 +1,8 @@
-* 2.32 - 2.33 (08/10/2018)
+* 2.32 - 2.34 (08/21/2018)
 Added bluetooth support
 Default Android Pie to 30 sec scans due to its throttling
+Please star feature request to fix Pie's throttling: https://issuetracker.google.com/issues/112688545
+Cell tower refactoring, take advantage of new api's
 
 * 2.30 - 2.31 (07/15/2018)
 More expansive cell logging

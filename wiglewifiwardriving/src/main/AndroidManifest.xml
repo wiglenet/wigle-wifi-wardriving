@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="233"
-    android:versionName="2.33">
+    android:versionCode="234"
+    android:versionName="2.34">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -242,6 +242,15 @@
 
         <uses-library
             android:name="com.google.android.maps"
+            android:required="false" />
+
+        <!--
+        sigh, wtf goog
+        https://stackoverflow.com/questions/50782806/android-google-maps-java-lang-noclassdeffounderror-failed-resolution-of-lorg-a
+        https://developers.google.com/maps/documentation/android-sdk/config#specify_requirement_for_apache_http_legacy_library
+        -->
+        <uses-library
+            android:name="org.apache.http.legacy"
             android:required="false" />
 
         <meta-data

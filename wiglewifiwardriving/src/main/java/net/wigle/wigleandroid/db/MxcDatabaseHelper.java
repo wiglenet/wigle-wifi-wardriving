@@ -121,6 +121,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
             if (null != cursor) {
                 cursor.close();
             }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
+            }
         }
         return null;
     }
@@ -151,6 +154,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         }finally {
             if (null != cursor) {
                 cursor.close();
+            }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
             }
         }
         return operator;

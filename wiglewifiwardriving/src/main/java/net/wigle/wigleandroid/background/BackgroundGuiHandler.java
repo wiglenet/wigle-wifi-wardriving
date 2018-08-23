@@ -3,7 +3,7 @@ package net.wigle.wigleandroid.background;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -16,12 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;

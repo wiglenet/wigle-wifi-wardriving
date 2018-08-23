@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid;
+package net.wigle.wigleandroid.ui;
 
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
@@ -11,6 +11,10 @@ import android.widget.TextView;
 
 import com.google.maps.android.MarkerManager;
 
+import net.wigle.wigleandroid.AbstractListAdapter;
+import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
@@ -75,6 +79,20 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         networks.removeAll(wifiNets);
         networks.removeAll(cellNets);
         wifiNets.clear();
+        cellNets.clear();
+        //TODO: these are always followed by adds and then a notify?
+        notifyDataSetChanged();
+    }
+
+    public void clearWifi() {
+        networks.removeAll(wifiNets);
+        wifiNets.clear();
+        //TODO: these are always followed by adds and then a notify?
+        notifyDataSetChanged();
+    }
+
+    public void clearCell() {
+        networks.removeAll(cellNets);
         cellNets.clear();
         //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();

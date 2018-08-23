@@ -14,3 +14,6 @@ CREATE TABLE IF NOT EXISTS "wigle_mcc_mnc" (
 	"notes" TEXT,
 	PRIMARY KEY (mcc, mnc)
 ) WITHOUT ROWID;
+-- so long as we support android SDK < 21, we can't rely on Sqlite >= 3.8.2 (support for "WITHOUT")
+-- https://stackoverflow.com/questions/2421189/version-of-sqlite-used-in-android
+-- https://www.sqlite.org/withoutrowid.html

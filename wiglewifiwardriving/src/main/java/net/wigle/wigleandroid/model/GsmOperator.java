@@ -207,7 +207,7 @@ public class GsmOperator {
     }
 
     /**
-     * Map the 5-6 digit operator code against the database of operator names
+     * Map the 5-6 digit operator PLMN code against the database of operator names
      * @param operatorCode
      * @return
      */

@@ -34,6 +34,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.ui.NetworkListAdapter;
 
 public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;

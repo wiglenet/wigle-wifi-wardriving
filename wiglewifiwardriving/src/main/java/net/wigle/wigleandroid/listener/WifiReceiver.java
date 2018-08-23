@@ -5,8 +5,6 @@ import static android.location.LocationManager.GPS_PROVIDER;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,11 +22,13 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.NetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.NetworkListSorter;
+import net.wigle.wigleandroid.util.CellNetworkLegend;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -43,9 +43,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.telephony.CellIdentityCdma;
-import android.telephony.CellIdentityGsm;
-import android.telephony.CellIdentityLte;
-import android.telephony.CellIdentityWcdma;
 import android.telephony.CellInfo;
 import android.telephony.CellInfoCdma;
 import android.telephony.CellInfoGsm;
@@ -87,75 +84,7 @@ public class WifiReceiver extends BroadcastReceiver {
     private long prevScanPeriod;
     private boolean scanInFlight = false;
 
-    public static final int SIGNAL_COMPARE = 10;
-    public static final int CHANNEL_COMPARE = 11;
-    public static final int CRYPTO_COMPARE = 12;
-    public static final int FIND_TIME_COMPARE = 13;
-    public static final int SSID_COMPARE = 14;
-
     public static final int CELL_MIN_STRENGTH = -113;
-
-    private static final Map<Integer, String> NETWORK_TYPE_LEGEND;
-    static {
-        Map<Integer, String> initMap = new HashMap<>();
-        initMap.put(TelephonyManager.NETWORK_TYPE_1xRTT, "CDMA - 1xRTT");
-        initMap.put(TelephonyManager.NETWORK_TYPE_CDMA, "CDMA"); //CDMA: Either IS95A or IS95B
-        initMap.put(TelephonyManager.NETWORK_TYPE_EDGE, "EDGE");
-        initMap.put(TelephonyManager.NETWORK_TYPE_EHRPD, "eHRPD");
-        initMap.put(TelephonyManager.NETWORK_TYPE_EVDO_0, "CDMA - EvDo rev. 0");
-        initMap.put(TelephonyManager.NETWORK_TYPE_EVDO_A, "CDMA - EvDo rev. A");
-        initMap.put(TelephonyManager.NETWORK_TYPE_EVDO_B, "CDMA - EvDo rev. B");
-        initMap.put(TelephonyManager.NETWORK_TYPE_GPRS, "GPRS");
-        initMap.put(TelephonyManager.NETWORK_TYPE_GSM, "GSM");
-        initMap.put(TelephonyManager.NETWORK_TYPE_HSDPA, "HSDPA");
-        initMap.put(TelephonyManager.NETWORK_TYPE_HSPA, "HSPA");
-        initMap.put(TelephonyManager.NETWORK_TYPE_HSPAP, "HSPA+");
-        initMap.put(TelephonyManager.NETWORK_TYPE_HSUPA, "HSUPA");
-        initMap.put(TelephonyManager.NETWORK_TYPE_IDEN, "iDEN");
-        initMap.put(TelephonyManager.NETWORK_TYPE_IWLAN, "IWLAN");
-        initMap.put(TelephonyManager.NETWORK_TYPE_LTE, "LTE");
-        initMap.put(TelephonyManager.NETWORK_TYPE_TD_SCDMA, "TD_SCDMA");
-        initMap.put(TelephonyManager.NETWORK_TYPE_UMTS, "UMTS");
-        initMap.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, "UNKNOWN");
-
-        NETWORK_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
-    }
-
-    //TODO: move these to their own thing?
-    public static final Comparator<Network> signalCompare = new Comparator<Network>() {
-        @Override
-        public int compare( Network a, Network b ) {
-            return b.getLevel() - a.getLevel();
-        }
-    };
-
-    public static final Comparator<Network> channelCompare = new Comparator<Network>() {
-        @Override
-        public int compare( Network a, Network b ) {
-            return a.getFrequency() - b.getFrequency();
-        }
-    };
-
-    public static final Comparator<Network> cryptoCompare = new Comparator<Network>() {
-        @Override
-        public int compare( Network a, Network b ) {
-            return b.getCrypto() - a.getCrypto();
-        }
-    };
-
-    public static final Comparator<Network> findTimeCompare = new Comparator<Network>() {
-        @Override
-        public int compare( Network a, Network b ) {
-            return (int) (b.getConstructionTime() - a.getConstructionTime());
-        }
-    };
-
-    public static final Comparator<Network> ssidCompare = new Comparator<Network>() {
-        @Override
-        public int compare( Network a, Network b ) {
-            return a.getSsid().compareTo( b.getSsid() );
-        }
-    };
 
     public WifiReceiver( final MainActivity mainActivity, final DatabaseHelper dbHelper, final Context context ) {
         this.mainActivity = mainActivity;
@@ -234,10 +163,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final GPSListener gpsListener = mainActivity.getGPSListener();
         Location location = null;
         if (gpsListener != null) {
-            final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-            final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
-            gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-            location = gpsListener.getLocation();
+            location = gpsListener.checkGetLocation(prefs);
         }
 
         // save the location every minute, for later runs, or viewing map during loss of location.
@@ -368,8 +294,6 @@ public class WifiReceiver extends BroadcastReceiver {
         final long newWifiCount = dbHelper.getNewWifiCount();
         final long newNetDiff = newWifiCount - prevNewNetCount;
         prevNewNetCount = newWifiCount;
-        // check for "New" cell towers
-        final long newCellCount = dbHelper.getNewCellCount();
 
         if ( ! mainActivity.isMuted() ) {
             final boolean playRun = prefs.getBoolean( ListFragment.PREF_FOUND_SOUND, true );
@@ -406,27 +330,12 @@ public class WifiReceiver extends BroadcastReceiver {
             }
         }
 
-        final int sort = prefs.getInt(ListFragment.PREF_LIST_SORT, SIGNAL_COMPARE);
-        Comparator<Network> comparator = signalCompare;
-        switch ( sort ) {
-            case SIGNAL_COMPARE:
-                comparator = signalCompare;
-                break;
-            case CHANNEL_COMPARE:
-                comparator = channelCompare;
-                break;
-            case CRYPTO_COMPARE:
-                comparator = cryptoCompare;
-                break;
-            case FIND_TIME_COMPARE:
-                comparator = findTimeCompare;
-                break;
-            case SSID_COMPARE:
-                comparator = ssidCompare;
-                break;
-        }
+        // check for "New" cell towers
+        final long newCellCount = dbHelper.getNewCellCount();
+
+
         if (listAdapter != null) {
-            listAdapter.sort( comparator );
+            listAdapter.sort(NetworkListSorter.getSort(prefs) );
         }
 
         final long dbNets = dbHelper.getNetworkCount();
@@ -526,14 +435,6 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
             doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
         }
-    }
-
-    public String getNetworkTypeName() {
-        TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
-        if ( tele == null ) {
-            return null;
-        }
-        return NETWORK_TYPE_LEGEND.get(tele.getNetworkType());
     }
 
     private Map<String,Network> recordCellInfo(final Location location) {
@@ -724,7 +625,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         if ( bssid != null ) {
-            final String networkType = getNetworkTypeName();
+            final String networkType = CellNetworkLegend.getNetworkTypeName(tele);
             final String capabilities = networkType + ";" + tele.getNetworkCountryIso();
 
             int strength = 0;

@@ -81,7 +81,8 @@ import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import java.io.File;
 import java.io.FileOutputStream;

@@ -23,16 +23,16 @@ import com.google.android.gms.maps.model.LatLng;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.NetworkListAdapter;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.NetworkListSorter;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,16 +46,6 @@ import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecord;
 import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
-import static net.wigle.wigleandroid.listener.WifiReceiver.CHANNEL_COMPARE;
-import static net.wigle.wigleandroid.listener.WifiReceiver.CRYPTO_COMPARE;
-import static net.wigle.wigleandroid.listener.WifiReceiver.FIND_TIME_COMPARE;
-import static net.wigle.wigleandroid.listener.WifiReceiver.SIGNAL_COMPARE;
-import static net.wigle.wigleandroid.listener.WifiReceiver.SSID_COMPARE;
-import static net.wigle.wigleandroid.listener.WifiReceiver.channelCompare;
-import static net.wigle.wigleandroid.listener.WifiReceiver.cryptoCompare;
-import static net.wigle.wigleandroid.listener.WifiReceiver.findTimeCompare;
-import static net.wigle.wigleandroid.listener.WifiReceiver.signalCompare;
-import static net.wigle.wigleandroid.listener.WifiReceiver.ssidCompare;
 
 /**
  * Created by bobzilla on 12/20/15
@@ -206,10 +196,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
 
                     if (gpsListener != null) {
-                        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-                        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
-                        gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                        location = gpsListener.getLocation();
+                        location = gpsListener.checkGetLocation(prefs);
                     } else {
                         MainActivity.warn("Null gpsListener in LE Batch Scan Result");
                     }
@@ -500,27 +487,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      * @param prefs
      */
     private void sort(final SharedPreferences prefs) {
-        final int sort = prefs.getInt(ListFragment.PREF_LIST_SORT, SIGNAL_COMPARE);
-        Comparator<Network> comparator = signalCompare;
-        switch ( sort ) {
-            case SIGNAL_COMPARE:
-                comparator = signalCompare;
-                break;
-            case CHANNEL_COMPARE:
-                comparator = channelCompare;
-                break;
-            case CRYPTO_COMPARE:
-                comparator = cryptoCompare;
-                break;
-            case FIND_TIME_COMPARE:
-                comparator = findTimeCompare;
-                break;
-            case SSID_COMPARE:
-                comparator = ssidCompare;
-                break;
-        }
         if (listAdapter != null) {
-            listAdapter.sort( comparator );
+            listAdapter.sort(NetworkListSorter.getSort(prefs));
         }
     }
 

@@ -10,7 +10,7 @@ import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.model.QueryArgs;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

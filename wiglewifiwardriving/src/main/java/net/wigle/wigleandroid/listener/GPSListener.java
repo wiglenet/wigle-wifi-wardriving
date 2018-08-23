@@ -5,7 +5,7 @@ import static android.location.LocationManager.NETWORK_PROVIDER;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -338,4 +338,17 @@ public class GPSListener implements Listener, LocationListener {
     public Location getLocation() {
         return location;
     }
+
+    /**
+     * utility method which takes prefs and checks location freshness vs. configured limits
+     * @param prefs SharedPreferences instance containing PREF_GPS_TIMEOUT and PREF_NET_LOC_TIMEOUT values to check
+     * @return the location is valid
+     */
+    public Location checkGetLocation(final SharedPreferences prefs) {
+        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
+        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+        checkLocationOK(gpsTimeout, netLocTimeout);
+        return getLocation();
+    }
+
 }

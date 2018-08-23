@@ -1,4 +1,4 @@
-package net.wigle.wigleandroid.util;
+package net.wigle.wigleandroid.ui;
 
 import android.app.Activity;
 import android.os.Build;

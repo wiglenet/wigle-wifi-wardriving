@@ -10,7 +10,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -42,6 +41,8 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.NetworkListSorter;
 
 import org.json.JSONObject;
 
@@ -521,11 +522,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     getActivity(), android.R.layout.simple_spinner_item);
-            final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
-                    WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+            final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
+                    NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
             final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
                     getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-            int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+            int listSort = prefs.getInt( PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
             int periodIndex = 0;
             for ( int i = 0; i < listSorts.length; i++ ) {
                 adapter.add( listSortName[i] );

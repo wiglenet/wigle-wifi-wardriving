@@ -112,14 +112,17 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     return operator;
                 }
             } else {
-                MainActivity.error("unable to open mcc/mnc database.");
+                MainActivity.error("unable to open mcc/mnc database for record.");
             }
         } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB: ",sqlex);
+            MainActivity.error("Unable to open DB for record: ",sqlex);
 
         }finally {
             if (null != cursor) {
                 cursor.close();
+            }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
             }
         }
         return null;
@@ -143,14 +146,17 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 }
                 return operator;
             } else {
-                MainActivity.error("unable to open mcc/mnc database.");
+                MainActivity.error("unable to open mcc/mnc database for name.");
             }
         } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB: ",sqlex);
+            MainActivity.error("Unable to open DB for name: ",sqlex);
 
         }finally {
             if (null != cursor) {
                 cursor.close();
+            }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
             }
         }
         return operator;

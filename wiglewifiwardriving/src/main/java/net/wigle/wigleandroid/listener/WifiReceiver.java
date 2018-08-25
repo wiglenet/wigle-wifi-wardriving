@@ -36,6 +36,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.SQLException;
 import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -614,7 +615,11 @@ public class WifiReceiver extends BroadcastReceiver {
             if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
+                    try {
+                        ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
+                    } catch (SQLException sex) {
+                        ssid = tele.getNetworkOperatorName();
+                    }
                 } else {
                     ssid = tele.getNetworkOperatorName();
                 }
@@ -992,24 +997,28 @@ public class WifiReceiver extends BroadcastReceiver {
 
         Network network = networkCache.get( bssid );
 
-        final String operatorName = GsmOperator.getOperatorName(operator);
+        try {
+            final String operatorName = GsmOperator.getOperatorName(operator);
 
-        if ( network == null ) {
-            network = new Network( bssid, operatorName, frequency, capabilities, (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength, type );
-            networkCache.put( network.getBssid(), network );
-        } else {
-            network.setLevel( (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength);
-            network.setFrequency(frequency);
-        }
+            if ( network == null ) {
+                network = new Network( bssid, operatorName, frequency, capabilities, (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength, type );
+                networkCache.put( network.getBssid(), network );
+            } else {
+                network.setLevel( (Integer.MAX_VALUE == strength) ? CELL_MIN_STRENGTH : strength);
+                network.setFrequency(frequency);
+            }
 
-        if ( location != null && (newForRun || network.getLatLng() == null) ) {
-            // set the LatLng for mapping
-            final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-            network.setLatLng( LatLng );
-        }
+            if ( location != null && (newForRun || network.getLatLng() == null) ) {
+                // set the LatLng for mapping
+                final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
+                network.setLatLng( LatLng );
+            }
 
-        if ( location != null ) {
-            dbHelper.addObservation(network, location, newForRun);
+            if ( location != null ) {
+                dbHelper.addObservation(network, location, newForRun);
+            }
+        } catch (SQLException sex) {
+            MainActivity.error("Error in add/update:", sex);
         }
         //ALIBI: allows us to run in conjunction with current-carrier detection
         return network;

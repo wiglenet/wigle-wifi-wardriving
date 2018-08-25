@@ -52,8 +52,8 @@ public class OkFileUploader {
                 = new CountingRequestBody(requestBody, new CountingRequestBody.Listener() {
             @Override
             public void onRequestProgress(long bytesWritten, long contentLength) {
-                MainActivity.info("progress: "+bytesWritten +"/"+contentLength);
-                int progress = (int)(bytesWritten / contentLength * 1000f);
+                int progress = (int)((bytesWritten*1000) / contentLength );
+                MainActivity.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
                 if ( handler != null && progress >= 0 ) {
                     handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
                 }

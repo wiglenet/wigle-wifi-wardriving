@@ -33,6 +33,7 @@ public class ErrorReportActivity extends AppCompatActivity {
     private static final int MENU_EMAIL = 12;
     private boolean fromFailure = false;
     private String stack;
+    private String stackFilePath;
 
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -42,9 +43,10 @@ public class ErrorReportActivity extends AppCompatActivity {
         setContentView( R.layout.error );
 
         // get stack from file
-        final String stackFilePath = getLatestStackfilePath();
+        stackFilePath = getLatestStackfilePath();
         if (stackFilePath == null || stackFilePath.isEmpty()) {
-            //TODO:
+            //ALIBI: we have no record of what or why - no reason to hassle user
+            finish();
         }
         stack = getLatestStack(stackFilePath);
 
@@ -225,7 +227,7 @@ public class ErrorReportActivity extends AppCompatActivity {
                 finish();
                 return true;
             case MENU_EMAIL:
-                setupEmail( stack );
+                setupEmail( stack, stackFilePath);
                 return true;
         }
         return false;

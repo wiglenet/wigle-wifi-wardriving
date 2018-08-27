@@ -124,8 +124,6 @@ public class ErrorReportActivity extends AppCompatActivity {
     }
 
     private String getLatestStackfilePath() {
-        StringBuilder builder = new StringBuilder( "No Error Report found" );
-        BufferedReader reader = null;
         try {
             File fileDir = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
             if (!fileDir.canRead() || !fileDir.isDirectory()) {

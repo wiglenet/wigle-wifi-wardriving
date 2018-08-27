@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
@@ -84,7 +85,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         //ALIBI: pre-created during build
     }
 
-    public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) {
+    public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
 
         if (!isPresent()) {
@@ -114,9 +115,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
             } else {
                 MainActivity.error("unable to open mcc/mnc database for record.");
             }
-        } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB for record: ",sqlex);
-
+        } catch (StackOverflowError soe) {
+            MainActivity.error("Database corruption stack overflow: ", soe);
+            throw new SQLiteDatabaseCorruptException("Samsung-specific stack overflow on integrity check.");
         }finally {
             if (null != cursor) {
                 cursor.close();
@@ -128,7 +129,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return null;
     }
 
-    public String networkNameForMccMnc(final String mcc, final String mnc) {
+    public String networkNameForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
         String operator = null;
 
@@ -148,9 +149,9 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
             } else {
                 MainActivity.error("unable to open mcc/mnc database for name.");
             }
-        } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB for name: ",sqlex);
-
+        } catch (StackOverflowError soe) {
+            MainActivity.error("Database corruption stack overflow: ", soe);
+            throw new SQLiteDatabaseCorruptException("Samsung-specific stack overflow on integrity check.");
         }finally {
             if (null != cursor) {
                 cursor.close();

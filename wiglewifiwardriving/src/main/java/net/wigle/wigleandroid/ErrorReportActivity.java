@@ -25,6 +25,10 @@ import android.widget.TextView;
  *
  */
 public class ErrorReportActivity extends AppCompatActivity {
+    // https://developer.android.com/reference/android/os/TransactionTooLargeException
+    // ALIBI: this may still be too big in some cases, but we know we can't be bigger than the max - the size of the other data we package
+    public final static int MAX_STACK_TRANSACTION_SIZE = (1024 * 1024) - 512;
+
     private static final int MENU_EXIT = 11;
     private static final int MENU_EMAIL = 12;
     private boolean fromFailure = false;
@@ -145,6 +149,11 @@ public class ErrorReportActivity extends AppCompatActivity {
                         builder.append( line ).append( "\n" );
                         line = reader.readLine();
                     }
+
+                    if (stack.length() > MAX_STACK_TRANSACTION_SIZE) {
+                        stack = stack.substring(0,MAX_STACK_TRANSACTION_SIZE);
+                    }
+
                 }
             }
         }

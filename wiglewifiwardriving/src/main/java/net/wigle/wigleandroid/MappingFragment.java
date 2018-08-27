@@ -192,6 +192,9 @@ public final class MappingFragment extends Fragment {
                 googleMap.setMapType(mapType);
                 mapRender = new MapRender(getActivity(), googleMap, false);
 
+                // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
+                googleMap.setIndoorEnabled(false);
+
                 googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                     @Override
                     public boolean onMyLocationButtonClick() {

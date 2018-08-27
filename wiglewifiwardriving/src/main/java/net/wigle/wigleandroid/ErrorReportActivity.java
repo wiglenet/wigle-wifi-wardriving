@@ -33,6 +33,7 @@ public class ErrorReportActivity extends AppCompatActivity {
     private static final int MENU_EMAIL = 12;
     private boolean fromFailure = false;
     private String stack;
+    private String stackFilePath;
 
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -42,7 +43,12 @@ public class ErrorReportActivity extends AppCompatActivity {
         setContentView( R.layout.error );
 
         // get stack from file
-        stack = getLatestStack();
+        stackFilePath = getLatestStackfilePath();
+        if (stackFilePath == null || stackFilePath.isEmpty()) {
+            //ALIBI: we have no record of what or why - no reason to hassle user
+            finish();
+        }
+        stack = getLatestStack(stackFilePath);
 
         // set on view
         TextView tv = (TextView) findViewById( R.id.errorreport );
@@ -53,7 +59,7 @@ public class ErrorReportActivity extends AppCompatActivity {
         if ( doEmail ) {
             fromFailure = true;
             // setup email sending
-            setupEmail( stack );
+            setupEmail( stack, stackFilePath );
         }
 
         final String dialogMessage = intent.getStringExtra(MainActivity.ERROR_REPORT_DIALOG );
@@ -117,50 +123,53 @@ public class ErrorReportActivity extends AppCompatActivity {
         }
     }
 
-    private String getLatestStack() {
-        StringBuilder builder = new StringBuilder( "No Error Report found" );
-        BufferedReader reader = null;
+    private String getLatestStackfilePath() {
         try {
-            File fileDir = new File( MainActivity.safeFilePath( Environment.getExternalStorageDirectory() ) + "/wiglewifi/" );
-            if ( ! fileDir.canRead() || ! fileDir.isDirectory() ) {
-                MainActivity.error( "file is not readable or not a directory. fileDir: " + fileDir );
-            }
-            else {
+            File fileDir = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+            if (!fileDir.canRead() || !fileDir.isDirectory()) {
+                MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
+            } else {
                 String[] files = fileDir.list();
-                if ( files == null ) {
-                    MainActivity.error( "no files in dir: " + fileDir );
-                }
-                else {
+                if (files == null) {
+                    MainActivity.error("no files in dir: " + fileDir);
+                } else {
                     String latestFilename = null;
-                    for ( String filename : files ) {
-                        if ( filename.startsWith( MainActivity.ERROR_STACK_FILENAME ) ) {
-                            if ( latestFilename == null || filename.compareTo( latestFilename ) > 0 ) {
+                    for (String filename : files) {
+                        if (filename.startsWith(MainActivity.ERROR_STACK_FILENAME)) {
+                            if (latestFilename == null || filename.compareTo(latestFilename) > 0) {
                                 latestFilename = filename;
                             }
                         }
                     }
-                    MainActivity.info( "latest filename: " + latestFilename );
+                    MainActivity.info("latest filename: " + latestFilename);
 
-                    String filePath = MainActivity.safeFilePath( fileDir ) + "/" + latestFilename;
-                    reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
-                    String line = reader.readLine();
-                    builder.setLength( 0 );
-                    while ( line != null ) {
-                        builder.append( line ).append( "\n" );
-                        line = reader.readLine();
-                    }
-
-                    if (stack.length() > MAX_STACK_TRANSACTION_SIZE) {
-                        stack = stack.substring(0,MAX_STACK_TRANSACTION_SIZE);
-                    }
-
+                    return MainActivity.safeFilePath(fileDir) + "/" + latestFilename;
                 }
             }
+        } catch (Exception ex) {
+            MainActivity.error( "error finding stack file: " + ex, ex );
         }
-        catch ( IOException ex ) {
+        return null;
+    }
+
+    private String getLatestStack(final String filePath) {
+        StringBuilder builder = new StringBuilder( "No Error Report found" );
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
+            String line = reader.readLine();
+            builder.setLength( 0 );
+            while ( line != null ) {
+                builder.append( line ).append( "\n" );
+                line = reader.readLine();
+            }
+
+            if (stack.length() > MAX_STACK_TRANSACTION_SIZE) {
+                return null;
+            }
+        } catch ( IOException ex ) {
             MainActivity.error( "error reading stack file: " + ex, ex );
-        }
-        finally {
+        } finally {
             if (reader != null) {
                 try {
                     reader.close();
@@ -174,13 +183,18 @@ public class ErrorReportActivity extends AppCompatActivity {
         return builder.toString();
     }
 
-    private void setupEmail( String stack ) {
+    private void setupEmail(final String stack, final String stackFile ) {
         MainActivity.info( "ErrorReport onCreate" );
         final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
-        emailIntent.setType( "plain/text" );
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "WigleWifi error report" );
-        emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, stack );
+        emailIntent.setType("text/plain");
+        if (stack == null && stackFile != null && ! stackFile.isEmpty()) {
+            //ALIBI: if we have a stackfile but no stack string, it means the file's large
+            emailIntent.putExtra(Intent.EXTRA_STREAM, stackFile);
+        } else {
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, stack);
+        }
         final Intent chooserIntent = Intent.createChooser( emailIntent, "Email WigleWifi error report?" );
         startActivity( chooserIntent );
     }
@@ -211,7 +225,7 @@ public class ErrorReportActivity extends AppCompatActivity {
                 finish();
                 return true;
             case MENU_EMAIL:
-                setupEmail( stack );
+                setupEmail( stack, stackFilePath);
                 return true;
         }
         return false;

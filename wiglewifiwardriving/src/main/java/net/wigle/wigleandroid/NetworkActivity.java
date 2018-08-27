@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -178,7 +179,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
 
-                        rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                        try {
+                            rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                        } catch (SQLException sqex) {
+                            MainActivity.error("Unable to access Mxc Database: ",sqex);
+                        }
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
                             v.setVisibility(View.VISIBLE);

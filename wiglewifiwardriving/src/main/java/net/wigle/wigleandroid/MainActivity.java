@@ -1724,15 +1724,18 @@ public final class MainActivity extends AppCompatActivity {
     private void setupActivationDialog() {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
-        if (willActivateBt || willActivateWifi) {
+        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, false));
+
+        if ((willActivateBt && useBt) || willActivateWifi) {
 
             String activationMessages = "";
-            if (willActivateBt) {
-                activationMessages += getString(R.string.turn_on_bt);
-            }
 
-            if (willActivateBt && willActivateWifi) {
-                activationMessages += "\n";
+            if (willActivateBt && useBt) {
+                activationMessages += getString(R.string.turn_on_bt);
+                if (willActivateWifi) {
+                    activationMessages += "\n";
+                }
             }
 
             if (willActivateWifi) {

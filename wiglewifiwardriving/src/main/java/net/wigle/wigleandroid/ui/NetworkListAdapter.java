@@ -80,41 +80,37 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         networks.removeAll(cellNets);
         wifiNets.clear();
         cellNets.clear();
-        //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();
     }
 
     public void clearWifi() {
         networks.removeAll(wifiNets);
         wifiNets.clear();
-        //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();
     }
 
     public void clearCell() {
         networks.removeAll(cellNets);
         cellNets.clear();
-        //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();
     }
 
     public void clearBluetooth() {
         networks.removeAll(btNets);
         btNets.clear();
-        //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();
     }
 
     public void clearBluetoothLe() {
         networks.removeAll(leNets);
         leNets.clear();
-        //TODO: these are always followed by adds and then a notify?
         notifyDataSetChanged();
     }
 
     public void morphBluetoothToLe(Network n) {
         btNets.remove(n);
         leNets.add(n);
+        notifyDataSetChanged();
     }
 
     public  void clear() {
@@ -129,19 +125,20 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     public void addWiFi(Network n) {
         networks.add(n);
         wifiNets.add(n);
-        //notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public void addCell(Network n) {
         networks.add(n);
         cellNets.add(n);
-        //notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     public void addBluetooth(Network n) {
         if (!btNets.contains(n)) {
             networks.add(n);
             btNets.add(n);
+            notifyDataSetChanged();
         }
     }
 
@@ -149,6 +146,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         if (!leNets.contains(n)) {
             networks.add(n);
             leNets.add(n);
+            notifyDataSetChanged();
         }
     }
 

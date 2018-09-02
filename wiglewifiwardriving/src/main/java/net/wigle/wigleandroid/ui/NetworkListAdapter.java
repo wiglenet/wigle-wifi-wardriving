@@ -53,6 +53,8 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     //TODO: does these tracking lists need to be synchronized as well?
     private final List<Network> btNets = new ArrayList<>();
     private final List<Network> leNets = new ArrayList<>();
+    private final List<Network> nextBtNets = new ArrayList<>();
+    private final List<Network> nextLeNets = new ArrayList<>();
     private final List<Network> cellNets = new ArrayList<>();
     private final List<Network> wifiNets = new ArrayList<>();
 
@@ -147,6 +149,48 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             networks.add(n);
             leNets.add(n);
             notifyDataSetChanged();
+        }
+    }
+
+    public void enqueueBluetooth(Network n) {
+        if (!btNets.contains(n)) {
+            nextBtNets.add(n);
+        }
+    }
+
+    public void enqueueBluetoothLe(Network n) {
+        if (!leNets.contains(n)) {
+            nextLeNets.add(n);
+        }
+    }
+
+    public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
+
+        if (showCurrent) {
+            if (updateLe) {
+                networks.removeAll(leNets);
+                leNets.retainAll(nextLeNets);
+            }
+            if (updateClassic) {
+                networks.removeAll(btNets);
+                btNets.retainAll(nextBtNets);
+            }
+        }
+        if (updateLe) {
+            leNets.addAll(nextLeNets);
+            networks.addAll(leNets);
+        }
+        if (updateClassic) {
+            btNets.addAll(nextBtNets);
+            networks.addAll(btNets);
+        }
+        notifyDataSetChanged();
+
+        if (updateClassic) {
+            nextBtNets.clear();
+        }
+        if (updateLe) {
+            nextLeNets.clear();
         }
     }
 

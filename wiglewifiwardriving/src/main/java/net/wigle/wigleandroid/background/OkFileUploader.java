@@ -21,9 +21,9 @@ import okhttp3.Response;
 
 /**
  * Alternative upload to HttpFileUploader - use of OkHttp directly gives us several benefits:
- * 1. interruptability
- * 2. configurability
- * 3. ability to get better debugging data and handle gracefully in case of failure.
+ * 1. interruptability (cancel button)
+ * 2. configurability (we can set all sorts of options and failure handling on OkHttp)
+ * 3. ability to get better debugging data and handle gracefully in case of failure. (byzantine failures, SSL problems)
  * Also: "deleted code is debugged code." -orn
  *
  * NOTE: OkHttp is the underlying implementation in HttpUrlConnection beginning in android 4.4, but this is included for compat with android versions below that
@@ -85,6 +85,7 @@ public class OkFileUploader {
                 int progress = (int)((bytesWritten*1000) / contentLength );
                 MainActivity.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
                 if ( handler != null && progress >= 0 ) {
+                    //TODO: we can improve this, but minimal risk dictates reuse of old technique to st
                     handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
                 }
             }

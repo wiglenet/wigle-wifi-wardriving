@@ -163,7 +163,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         MainActivity.warn("Null gpsListener in LE Single Scan Result");
                     }
 
-                    handleLeScanResult(scanResult, location);
+                    handleLeScanResult(scanResult, location, false);
                     final long newBtCount = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.newBt = newBtCount;
                     ListFragment.lameStatic.runBt = runNetworks.size();
@@ -181,13 +181,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     boolean forceLeListReset = false;
                     if (results.isEmpty()) {
                         empties++;
+                        MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
                         //ALIBI: if it's been too long, we'll force-clear
                         if (EMPTY_LE_THRESHOLD < empties) {
                             forceLeListReset = true;
                             empties = 0;
                         }
                     } else {
-                        forceLeListReset = true;
                         empties = 0;
                     }
 
@@ -202,8 +202,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
 
                     for (final ScanResult scanResult : results) {
-                        handleLeScanResult(scanResult, location);
+                        handleLeScanResult(scanResult, location, true);
                     }
+                    listAdapter.batchUpdateBt(prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ), true, false);
                     final long newBtCount = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.newBt = newBtCount;
                     ListFragment.lameStatic.runBt = runNetworks.size();
@@ -221,7 +222,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
                                 listAdapter.clearBluetoothLe();
                             }
-                            MainActivity.error("Bluetooth scan error: " + errorCode);
+                            MainActivity.error("Bluetooth LE scan error: " + errorCode);
                             scanning.set(false);
                     }
                 }
@@ -231,7 +232,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
-    private void handleLeScanResult(final ScanResult scanResult, Location location) {
+    private void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch) {
         if (Build.VERSION.SDK_INT >= 21) {
             //DEBUG: MainActivity.info("LE scanResult: " + scanResult);
             final ScanRecord scanRecord = scanResult.getScanRecord();
@@ -325,7 +326,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 //ALIBI: shamelessly re-using frequency here for device type.
                 final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                         scanResult.getRssi(),
-                        NetworkType.BLE, location, prefs);
+                        NetworkType.BLE, location, prefs, batch);
             }
         }
     }
@@ -462,17 +463,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
 
             //ALIBI: shamelessly re-using frequency here for device type.
-            final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs);
-
+            final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
+            sort(prefs);
+            listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
             final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-            btCount++;
-            if (showCurrent && listAdapter != null && btCount > EMPTY_BT_THRESHOLD) {
-                //ALIBI: not super elegant, but this gives devices a longer "decay".
-                btCount = 0;
-                listAdapter.clearBluetooth();
-            }
+            listAdapter.batchUpdateBt(showCurrent, false, true);
             final long newBtCount = dbHelper.getNewBtCount();
             ListFragment.lameStatic.newBt = newBtCount;
             ListFragment.lameStatic.runBt = runNetworks.size();
@@ -625,7 +622,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private Network addOrUpdateBt(final String bssid, final String ssid,
                                     final int frequency, /*final String networkTypeName*/final String capabilities,
                                     final int strength, final NetworkType type,
-                                    final Location location, SharedPreferences prefs) {
+                                    final Location location, SharedPreferences prefs, final boolean batch) {
 
         //final String capabilities = networkTypeName + ";" + operator;
 
@@ -710,10 +707,18 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
             if ( showCurrent || newForRun ) {
                 if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
-                    if (NetworkType.BT.equals(network.getType()) ) {
-                        listAdapter.addBluetooth(network);
-                    } else if (NetworkType.BLE.equals(network.getType())) {
-                        listAdapter.addBluetoothLe(network);
+                    if (batch) {
+                        if (NetworkType.BT.equals(network.getType())) {
+                            listAdapter.enqueueBluetooth(network);
+                        } else if (NetworkType.BLE.equals(network.getType())) {
+                            listAdapter.enqueueBluetoothLe(network);
+                        }
+                    } else {
+                        if (NetworkType.BT.equals(network.getType())) {
+                            listAdapter.addBluetooth(network);
+                        } else if (NetworkType.BLE.equals(network.getType())) {
+                            listAdapter.addBluetoothLe(network);
+                        }
                     }
                 }
 

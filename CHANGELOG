@@ -1,4 +1,4 @@
-* 2.32 - 2.34 (08/21/2018)
+* 2.32 - 2.35 (09/20/2018)
 Added bluetooth support
 Default Android Pie to 30 sec scans due to its throttling
 Please star feature request to fix Pie's throttling: https://issuetracker.google.com/issues/112688545

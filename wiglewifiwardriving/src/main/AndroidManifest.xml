@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="234"
-    android:versionName="2.34">
+    android:versionCode="235"
+    android:versionName="2.35">
 
     <uses-sdk
         android:minSdkVersion="14"

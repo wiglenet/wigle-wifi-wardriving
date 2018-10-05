@@ -165,7 +165,7 @@ public final class WigleService extends Service {
             String text = context.getString(R.string.list_waiting_gps);
             if ( dbNets > 0 ) {
                 long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
-                long newNets = ListFragment.lameStatic.newNets + ListFragment.lameStatic.newBt;
+                long newNets = ListFragment.lameStatic.newNets;
                 text = context.getString(R.string.run) + ": " + runNets
                         + "  "+ context.getString(R.string.new_word) + ": " +newNets
                         + "  "+ context.getString(R.string.db) + ": " + dbNets;

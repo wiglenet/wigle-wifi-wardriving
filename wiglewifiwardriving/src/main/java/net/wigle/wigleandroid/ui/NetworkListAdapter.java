@@ -211,8 +211,14 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
 
     @Override
     public  long getItemId(int pPosition) {
-        //should i just hash the object?
-        return networks.get(pPosition).getBssid().hashCode();
+        try {
+            //should i just hash the object?
+            return networks.get(pPosition).getBssid().hashCode();
+        }
+        catch (final IndexOutOfBoundsException ex) {
+            MainActivity.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
+        }
+        return 0L;
     }
 
     @Override

@@ -252,9 +252,15 @@ public class WifiReceiver extends BroadcastReceiver {
                     // not showing current, and not a new thing, go find the network and update the level
                     // this is O(n), ohwell, that's why showCurrent is the default config.
                     for ( int index = 0; index < listAdapter.getCount(); index++ ) {
-                        final Network testNet = listAdapter.getItem(index);
-                        if ( testNet.getBssid().equals( network.getBssid() ) ) {
-                            testNet.setLevel( result.level );
+                        try {
+                            final Network testNet = listAdapter.getItem(index);
+                            if ( testNet.getBssid().equals( network.getBssid() ) ) {
+                                testNet.setLevel( result.level );
+                            }
+                        }
+                        catch (final IndexOutOfBoundsException ex) {
+                            // yes, this happened to someone
+                            MainActivity.info("WifiReceiver: index out of bounds: " + index + " ex: " + ex);
                         }
                     }
                 }

@@ -164,7 +164,7 @@ public class ErrorReportActivity extends AppCompatActivity {
                 line = reader.readLine();
             }
 
-            if (stack.length() > MAX_STACK_TRANSACTION_SIZE) {
+            if (stack == null || stack.length() > MAX_STACK_TRANSACTION_SIZE) {
                 return null;
             }
         } catch ( IOException ex ) {

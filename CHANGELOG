@@ -1,3 +1,6 @@
+* 2.37 (10/16/2018)
+Edge case bug fixes
+
 * 2.32 - 2.36 (10/04/2018)
 Added bluetooth support
 Default Android Pie to 30 sec scans due to its throttling

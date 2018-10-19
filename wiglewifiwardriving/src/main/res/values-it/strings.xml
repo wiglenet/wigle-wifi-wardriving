@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nuove reti WiFi</string>
     <string name="dash_vis_nets">Reti WiFi visibili:</string>
     <string name="dash_new_upload">Nuove reti (dall\'ultimo caricamento):</string>
-    <string name="dash_new_cells">Nuove torri GSM:</string>
+    <string name="dash_new_cells">Nuove Cellulare</string>
     <string name="dash_new_bt">Nuovo Bluetooth</string>
     <string name="dash_dist_run">Distanza percorsa (esecuzione corrente):</string>
     <string name="dash_time_run">Esegui la durata:</string>

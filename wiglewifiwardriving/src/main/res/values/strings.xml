@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">New WiFi</string>
     <string name="dash_vis_nets">Visible Nets:</string>
     <string name="dash_new_upload">Nets Since Upload:</string>
-    <string name="dash_new_cells">New Cell Towers:</string>
+    <string name="dash_new_cells">New Cell</string>
     <string name="dash_new_bt">New Bluetooth</string>
     <string name="dash_dist_run">Run Distance:</string>
     <string name="dash_time_run">Run Duration:</string>

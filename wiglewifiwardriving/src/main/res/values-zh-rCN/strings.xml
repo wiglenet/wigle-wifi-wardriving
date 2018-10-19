@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">新的WiFi</string>
     <string name="dash_vis_nets">可见的网络：</string>
     <string name="dash_new_upload">上传的新网络：</string>
-    <string name="dash_new_cells">新的信号塔：</string>
+    <string name="dash_new_cells">新的信号塔</string>
     <string name="dash_new_bt">新蓝牙</string>
     <string name="dash_dist_run">运行距离：</string>
     <string name="dash_time_run">运行时间:</string>

@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">واي فاي جديد</string>
     <string name="dash_vis_nets">شبكات مرئية:</string>
     <string name="dash_new_upload">شبكات جديدة منذ التحميل:</string>
-    <string name="dash_new_cells">أبراج الخلوي الجديدة:</string>
+    <string name="dash_new_cells">جديد الخلو:</string>
     <string name="dash_new_bt">بلوتوث الجديد:</string>
     <string name="dash_dist_run">Run Distance:</string>
     <string name="dash_time_run">Run Duration:</string>

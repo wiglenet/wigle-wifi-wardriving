@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nye WiFi</string>
     <string name="dash_vis_nets">Synlig Net:</string>
     <string name="dash_new_upload">Nye nets siden sidste upload:</string>
-    <string name="dash_new_cells">Ny Cell tårne:</string>
+    <string name="dash_new_cells">Ny Cell</string>
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Kørt Afstand:</string>
     <string name="dash_time_run">Kør varighed:</string>

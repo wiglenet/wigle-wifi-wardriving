@@ -137,30 +137,38 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     }
 
     public void addBluetooth(Network n) {
-        if (!btNets.contains(n)) {
+        if (!btNets.contains(n) && !networks.contains(n)) {
             networks.add(n);
             btNets.add(n);
             notifyDataSetChanged();
+        // } else if (!btNets.contains(n)) {
+        //    MainActivity.info("BT add error - "+ n.getBssid() +" present in nets");
         }
     }
 
     public void addBluetoothLe(Network n) {
-        if (!leNets.contains(n)) {
+        if (!leNets.contains(n) && !networks.contains(n)) {
             networks.add(n);
             leNets.add(n);
             notifyDataSetChanged();
+        // } else if (!btNets.contains(n)) {
+        //    MainActivity.info("BTLE add error - "+ n.getBssid() +" present in nets");
         }
     }
 
     public void enqueueBluetooth(Network n) {
-        if (!btNets.contains(n)) {
+        if (!btNets.contains(n) && !networks.contains(n)) {
             nextBtNets.add(n);
+        // } else if (!btNets.contains(n)) {
+        //    MainActivity.info("BT enqueue error - "+ n.getBssid() +" present in nets");
         }
     }
 
     public void enqueueBluetoothLe(Network n) {
-        if (!leNets.contains(n)) {
+        if (!leNets.contains(n) && !networks.contains(n)) {
             nextLeNets.add(n);
+        // } else if (!btNets.contains(n)) {
+        //    MainActivity.info("BTLE enqueue error - "+ n.getBssid() +" present in nets");
         }
     }
 

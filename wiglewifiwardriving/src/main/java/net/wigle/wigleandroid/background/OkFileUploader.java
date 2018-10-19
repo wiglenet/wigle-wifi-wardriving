@@ -79,13 +79,13 @@ public class OkFileUploader {
 
         // progress-aware requestBody
         CountingRequestBody countingBody
-                = new CountingRequestBody(requestBody, new CountingRequestBody.Listener() {
+                = new CountingRequestBody(requestBody, new CountingRequestBody.UploadProgressListener() {
             @Override
             public void onRequestProgress(long bytesWritten, long contentLength) {
                 int progress = (int)((bytesWritten*1000) / contentLength );
                 MainActivity.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
                 if ( handler != null && progress >= 0 ) {
-                    //TODO: we can improve this, but minimal risk dictates reuse of old technique to st
+                    //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
                     handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
                 }
             }

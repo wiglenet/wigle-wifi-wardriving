@@ -204,7 +204,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location, true);
                     }
-                    listAdapter.batchUpdateBt(prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ), true, false);
+                    if (listAdapter != null) {
+                        listAdapter.batchUpdateBt(prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true),
+                                true, false);
+                    }
                     final long newBtCount = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.newBt = newBtCount;
                     ListFragment.lameStatic.runBt = runNetworks.size();

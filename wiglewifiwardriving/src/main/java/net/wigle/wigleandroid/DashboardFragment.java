@@ -121,7 +121,7 @@ public class DashboardFragment extends Fragment {
     tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
 
     tv = (TextView) view.findViewById( R.id.newcells );
-    tv.setText( getString(R.string.dash_new_cells) + " " + ListFragment.lameStatic.newCells );
+    tv.setText( ListFragment.lameStatic.newCells + " " + getString(R.string.dash_new_cells) );
 
     updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
     updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN, getString(R.string.dash_time_run) );

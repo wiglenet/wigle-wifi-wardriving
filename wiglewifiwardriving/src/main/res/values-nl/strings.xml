@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nieuwe WiFi</string>
     <string name="dash_vis_nets">Zichtbare netwerken:</string>
     <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
-    <string name="dash_new_cells">Nieuwe zendmasten:</string>
+    <string name="dash_new_cells">Nieuwe cellulaire</string>
     <string name="dash_new_bt">Nieuwe Bluetooth</string>
     <string name="dash_dist_run">Runafstand:</string>
     <string name="dash_time_run">Looptijd:</string>

@@ -23,20 +23,29 @@
         />
 
     <TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/newbt"
-    android:textSize="38sp"
-    android:textColor="#3388AA"
-    />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/newbt"
+        android:textSize="38sp"
+        android:textColor="#3388AA"
+        />
 
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/gpsstatus"
-    android:textSize="32sp"
-    android:textColor="#46AA00"
-    />
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/newcells"
+        android:textSize="32sp"
+        android:textColor="#F88"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/gpsstatus"
+        android:textSize="32sp"
+        android:textColor="#46AA00"
+        />
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

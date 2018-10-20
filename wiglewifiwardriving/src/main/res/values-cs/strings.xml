@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nových WiFi</string>
     <string name="dash_vis_nets">Viditelných sítí:</string>
     <string name="dash_new_upload">Nových sítí od posledního nahrání:</string>
-    <string name="dash_new_cells">Nových BTS:</string>
+    <string name="dash_new_cells">Nových BTS</string>
     <string name="dash_new_bt">Nové Bluetooth</string>
     <string name="dash_dist_run">Vzdálenost:</string>
     <string name="dash_time_run">Doba trvání:</string>

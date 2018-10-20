@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nuevas WiFi</string>
     <string name="dash_vis_nets">Redes visibles:</string>
     <string name="dash_new_upload">Nuevas redes desde ultima subida:</string>
-    <string name="dash_new_cells">Nuevas antenas de celular:</string>
+    <string name="dash_new_cells">Nuevas celular</string>
     <string name="dash_new_bt">Nuevo Bluetooth</string>
     <string name="dash_dist_run">Distancia recorrida:</string>
     <string name="dash_time_run">Duración recorrida:</string>

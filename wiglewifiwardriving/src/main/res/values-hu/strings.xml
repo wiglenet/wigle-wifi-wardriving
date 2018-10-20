@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Új WiFi</string>
     <string name="dash_vis_nets">Látható hálózatok:</string>
     <string name="dash_new_upload">Hálózatok feltöltés óta:</string>
-    <string name="dash_new_cells">Új Mobiltornyok:</string>
+    <string name="dash_new_cells">Új Mobiltornyok</string>
     <string name="dash_new_bt">Új Bluetooth</string>
     <string name="dash_dist_run">Futás távolsága:</string>
     <string name="dash_time_run">Futás időtartama:</string>

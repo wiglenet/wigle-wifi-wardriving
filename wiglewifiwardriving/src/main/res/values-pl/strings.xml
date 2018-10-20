@@ -121,7 +121,7 @@
     <string name="dash_new_wifi">Nowe sieci</string>
     <string name="dash_vis_nets">Widoczne sieci:</string>
     <string name="dash_new_upload">Nowe sieci od czasu przesłania:</string>
-    <string name="dash_new_cells">Nowe wieże komórkowe:</string>
+    <string name="dash_new_cells">Nowe wieże komórkowe</string>
     <string name="dash_new_bt">Nowy Bluetooth</string>
     <string name="dash_dist_run">Dystans w tym biegu:</string>
     <string name="dash_time_run">Uruchom Duration:</string>

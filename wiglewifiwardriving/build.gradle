@@ -62,6 +62,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
 }

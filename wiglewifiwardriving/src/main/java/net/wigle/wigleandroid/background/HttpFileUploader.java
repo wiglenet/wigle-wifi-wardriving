@@ -34,7 +34,7 @@ final class HttpFileUploader {
     }
 
     /**
-     * upload utility method.
+     * upload utility method. obviated by {@link net.wigle.wigleandroid.background.OkFileUploader#upload OkFileUploader.upload(...)}
      *
      * @param urlString the url to POST the file to
      * @param filename the filename to use for the post
@@ -44,6 +44,7 @@ final class HttpFileUploader {
      * @param handler if non-null gets empty messages with updates on progress
      * @param filesize guess at filesize for UI callbacks
      */
+    @Deprecated
     public static String upload( final String urlString, final String filename, final String fileParamName,
                                  final FileInputStream fileInputStream, final Map<String,String> params,
                                  final PreConnectConfigurator preConnectConfigurator,
@@ -191,6 +192,7 @@ final class HttpFileUploader {
      * @param cbuff the scratch charbuffer, will be cleared
      * @param bbuff the scratch bytebuffer, will be cleared
      */
+    @Deprecated
     private static void writeString( WritableByteChannel wbc, String str, CharsetEncoder enc, CharBuffer cbuff, ByteBuffer bbuff ) throws IOException {
         // clear existing state
         cbuff.clear();

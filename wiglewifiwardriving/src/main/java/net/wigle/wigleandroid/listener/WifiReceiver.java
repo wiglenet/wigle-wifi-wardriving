@@ -61,6 +61,12 @@ import android.telephony.gsm.GsmCellLocation;
 
 import com.google.android.gms.maps.model.LatLng;
 
+/**
+ * Primary receiver logic for WiFi and Cell nets.
+ * Monolithic - candidate for refactor.
+ * TODO: split Cell into own class
+ * @author bobzilla, arkasha
+ */
 public class WifiReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
@@ -122,6 +128,11 @@ public class WifiReceiver extends BroadcastReceiver {
         lastHaveLocationTime = System.currentTimeMillis();
     }
 
+    /**
+     * the massive core receive handler for WiFi scan callback
+     * @param context
+     * @param intent
+     */
     @SuppressWarnings("ConstantConditions")
     @Override
     public void onReceive( final Context context, final Intent intent ) {
@@ -318,6 +329,7 @@ public class WifiReceiver extends BroadcastReceiver {
             mainActivity.interruptSpeak();
         }
 
+        // TODO: this ties cell collection to WiFi collection - refactor cells onto their own timer
         // check cell tower info
         final int preCellForRun = runNetworks.size();
         int newCellForRun = 0;
@@ -444,6 +456,11 @@ public class WifiReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * trigger for cell collection and logging
+     * @param location
+     * @return
+     */
     private Map<String,Network> recordCellInfo(final Location location) {
         TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
         Map<String,Network> networks = new HashMap<>();
@@ -500,6 +517,14 @@ public class WifiReceiver extends BroadcastReceiver {
         return networks;
     }
 
+    /**
+     * Translate a CellInfo record to Network record / sorts by type and capabilities to correct update methods
+     * (new implementation)
+     * @param cellInfo
+     * @param tele
+     * @param location
+     * @return
+     */
     @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
         if (cellInfo == null) {
@@ -545,6 +570,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * no test environment to implement this, but the handleCellInfo methods should work to complete it.
+     * NeighboringCellInfos never appear in practical testing
      * @param cellInfo
      * @param tele
      * @param location
@@ -591,6 +617,14 @@ public class WifiReceiver extends BroadcastReceiver {
         return null; //TODO:
     }
 
+    /**
+     * Translate and categorize a CellLocation record for update and logging
+     * (old/compat implementation)
+     * @param cellLocation
+     * @param tele
+     * @param location
+     * @return
+     */
     private Network handleSingleCellLocation(final CellLocation cellLocation,
                                              final TelephonyManager tele, final Location location) {
         String bssid = null;
@@ -695,6 +729,7 @@ public class WifiReceiver extends BroadcastReceiver {
      * @param strength
      * @return
      */
+    @Deprecated
     private int gsmDBmMagicDecoderRing( int strength ) {
         int retval;
         if ( strength == 99 ) {
@@ -713,6 +748,13 @@ public class WifiReceiver extends BroadcastReceiver {
         return retval;
     }
 
+    /**
+     * Voice announcement method for scan
+     * @param preQueueSize
+     * @param newWifiCount
+     * @param newCellCount
+     * @param now
+     */
     private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         StringBuilder builder = new StringBuilder();
@@ -811,6 +853,10 @@ public class WifiReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * get the scan period based on preferences and current speed
+     * @return
+     */
     public long getScanPeriod() {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
@@ -833,6 +879,9 @@ public class WifiReceiver extends BroadcastReceiver {
         return prefs.getLong( scanPref, defaultRate );
     }
 
+    /**
+     * Schedule the next WiFi scan
+     */
     public void scheduleScan() {
         wifiTimer.post(new Runnable() {
             @Override
@@ -942,6 +991,13 @@ public class WifiReceiver extends BroadcastReceiver {
         return success;
     }
 
+    /**
+     * CDMA entrypoint to update and logging
+     * @param cellInfo
+     * @param tele
+     * @param location
+     * @return
+     */
     private Network handleSingleCdmaInfo(final CellInfoCdma cellInfo, final TelephonyManager tele, final Location location) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
             CellIdentityCdma cellIdentC = cellInfo.getCellIdentity();
@@ -991,6 +1047,17 @@ public class WifiReceiver extends BroadcastReceiver {
         return null;
     }
 
+    /**
+     * Cell update and logging
+     * @param bssid
+     * @param operator
+     * @param frequency
+     * @param networkTypeName
+     * @param strength
+     * @param type
+     * @param location
+     * @return
+     */
     private Network addOrUpdateCell(final String bssid, final String operator,
                                     final int frequency, final String networkTypeName,
                                     final int strength, final NetworkType type,

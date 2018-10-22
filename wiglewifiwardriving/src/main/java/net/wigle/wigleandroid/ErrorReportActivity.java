@@ -154,6 +154,7 @@ public class ErrorReportActivity extends AppCompatActivity {
 
     private String getLatestStack(final String filePath) {
         StringBuilder builder = new StringBuilder( "No Error Report found" );
+        if (filePath == null) return builder.toString();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
@@ -165,7 +166,7 @@ public class ErrorReportActivity extends AppCompatActivity {
             }
 
             if (stack == null || stack.length() > MAX_STACK_TRANSACTION_SIZE) {
-                return null;
+                return builder.toString();
             }
         } catch ( IOException ex ) {
             MainActivity.error( "error reading stack file: " + ex, ex );

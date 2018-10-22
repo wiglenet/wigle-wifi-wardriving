@@ -168,7 +168,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     ListFragment.lameStatic.newBt = newBtCount;
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
-                    listAdapter.notifyDataSetChanged();
+                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -212,7 +212,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     ListFragment.lameStatic.newBt = newBtCount;
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
-                    listAdapter.notifyDataSetChanged();
+                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -468,16 +468,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //ALIBI: shamelessly re-using frequency here for device type.
             final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
             sort(prefs);
-            listAdapter.notifyDataSetChanged();
+            if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
             final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-            listAdapter.batchUpdateBt(showCurrent, false, true);
+            if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
             final long newBtCount = dbHelper.getNewBtCount();
             ListFragment.lameStatic.newBt = newBtCount;
             ListFragment.lameStatic.runBt = runNetworks.size();
             sort(prefs);
-            listAdapter.notifyDataSetChanged();
+            if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         }
     }

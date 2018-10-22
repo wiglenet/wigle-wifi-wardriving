@@ -62,7 +62,7 @@ public class OkFileUploader {
         // construct multipart body using file reference
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", fileParamName,
+                .addFormDataPart(fileParamName, filename,
                         RequestBody.create(MediaType.parse("application/octet-stream"),
                                 new File(filename)));
 

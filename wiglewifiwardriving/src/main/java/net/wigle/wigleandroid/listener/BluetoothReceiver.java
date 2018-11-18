@@ -396,10 +396,23 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
 
+            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
+
+            if (listAdapter != null && showCurrent) {
+                listAdapter.clearBluetoothLe();
+                listAdapter.clearBluetooth();
+            }
+
+
             if (Build.VERSION.SDK_INT >= 21) {
                 final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-                if (bluetoothLeScanner != null && scanning.compareAndSet(true, false)) {
-                    bluetoothLeScanner.stopScan(scanCallback);
+                if (bluetoothLeScanner != null) {
+                    if (scanning.compareAndSet(true, false)) {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    } else {
+                        MainActivity.error("Scanner present, comp-and-set prevented stop-scan");
+                    }
                 }
             }
         }

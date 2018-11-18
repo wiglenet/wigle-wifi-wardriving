@@ -64,6 +64,30 @@
                     android:textColor="#F88" />
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/bt_list_total"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4">
+                <ImageView
+                    android:id="@+id/bt_icon"
+                    android:src="@drawable/bluetooth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="run bluetooth"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="2dp"
+                    android:text="bt new vs run" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stats_bt"
+                    android:textSize="15sp"
+                    android:layout_weight="1"
+                    android:textColor="#18ffff" />
+            </LinearLayout>
+            <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

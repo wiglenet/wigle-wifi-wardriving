@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.maps.android.MarkerManager;
-
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
@@ -172,6 +170,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         }
     }
 
+    //TODO: almost certainly the source of our duplicate BT nets in non show-current
     public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
 
         if (showCurrent) {

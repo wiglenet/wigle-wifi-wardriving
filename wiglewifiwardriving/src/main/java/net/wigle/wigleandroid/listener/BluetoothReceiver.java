@@ -114,8 +114,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
-    //TODO: unneeded? private final Map<String,Network> currentBluetoothNetworks = new ConcurrentLinkedHashMap<String, Network>(64);
-    private final Set<String> runNetworks = new HashSet<>();
+    //TODO: this is pretty redundant with the central network list,
+    // but they all seem to be getting out of sync, which is annoying AF
+    private final Set<String> unsafeRunNetworks = new HashSet<>();
+    private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
+
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
 
@@ -413,7 +416,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+
             final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (device == null) {
+                // as reported in bug feed
+                MainActivity.error("onReceive with null device - discarding this instance");
+                return;
+            }
             final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
             int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
 
@@ -632,9 +641,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
 
-        final boolean newForRun = runNetworks.add(bssid);
+        final boolean newForRun = runNetworks.add(bssid) && networkCache.containsKey(bssid);
 
         Network network = networkCache.get(bssid);
+
+        if (newForRun && network != null) {
+            MainActivity.warn("runNetworks not working as expected (add -> true, but networkCache already contained)");
+        }
 
         boolean deviceTypeUpdate = false;
         boolean btTypeUpdate = false;

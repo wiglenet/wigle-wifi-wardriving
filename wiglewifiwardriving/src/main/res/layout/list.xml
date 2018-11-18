@@ -66,7 +66,8 @@
                 android:paddingRight="2dp"
                 android:text="cell new vs. run" />
             <TextView
-                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/stats_cell"
                 android:textSize="15sp"
                 android:layout_weight="1"
@@ -91,7 +92,8 @@
                 android:paddingRight="2dp"
                 android:text="bt new vs run" />
             <TextView
-                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/stats_bt"
                 android:textSize="15sp"
                 android:layout_weight="1"
@@ -108,13 +110,14 @@
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="run wifi"
+                android:contentDescription="run DB"
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
                 android:text="database" />
             <TextView
-                android:layout_width="fill_parent" android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/stats_dbnets"
                 android:textSize="15sp"
                 />

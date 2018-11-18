@@ -24,6 +24,7 @@ import android.os.Handler;
  * Based on   http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html
  * Read more: http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html#ixzz0iqTJF7SV
  */
+@Deprecated
 final class HttpFileUploader {
     public static final String ENCODING = "UTF-8";
     public static final String LINE_END = "\r\n";

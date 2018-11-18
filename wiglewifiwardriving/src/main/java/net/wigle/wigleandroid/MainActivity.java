@@ -1881,6 +1881,7 @@ public final class MainActivity extends AppCompatActivity {
         try {
             info("unregister bluetoothReceiver");
             unregisterReceiver( state.bluetoothReceiver );
+            state.bluetoothReceiver = null;
         } catch ( final IllegalArgumentException ex ) {
             //ALIBI: it's fine to call and fail here.
             info( "bluetoothReceiver not registered: " + ex );

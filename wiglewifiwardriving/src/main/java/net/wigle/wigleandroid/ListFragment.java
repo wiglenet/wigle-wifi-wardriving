@@ -36,13 +36,13 @@ import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.NetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 
 import org.json.JSONObject;
 
@@ -54,6 +54,11 @@ import pl.droidsonroids.gif.GifImageButton;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+/**
+ * Main Network List View Fragment Adapter. Manages dynamic update of view apart from list when showing.
+ * TODO: confirm that lameStatic values are being updated correctly, always.
+ * @author: bobzilla, arkasha
+ */
 public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
@@ -258,15 +263,13 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
-        tv.setText( getString(R.string.run) + ": " + counterFormat(netCount) );
-        //tv = (TextView) view.findViewById( R.id.stats_new );
-        //tv.setText( getString( R.string.new_word) +": " +state.dbHelper.getNewNetworkCount());
+        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount) );
         tv = (TextView) view.findViewById( R.id.stats_wifi );
-        tv.setText( ""+counterFormat(state.dbHelper.getNewWifiCount()) );
+        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewWifiCount()) );
         tv = (TextView) view.findViewById( R.id.stats_cell );
-        tv.setText( ""+counterFormat(lameStatic.newCells)  );
+        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells)  );
         tv = (TextView) view.findViewById( R.id.stats_bt );
-        tv.setText( ""+counterFormat(state.dbHelper.getNewBtCount())  );
+        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewBtCount())  );
         tv = (TextView) view.findViewById( R.id.stats_dbnets );
         tv.setText(""+state.dbHelper.getNetworkCount());
     }
@@ -802,24 +805,4 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             main.transferComplete();
         }
     }
-
-    /**
-     * format the topbar counters
-     * @param input
-     * @return
-     */
-    private String counterFormat(long input) {
-        if (input > 9999999999L) {
-            //any android device on the market today would explode
-            return (input / 1000000000L) + "G";
-        } else if (input >  9999999L) {
-            return (input / 1000000L) + "M";
-        } else if (input > 9999L) {
-            //stay specific until we pass 5 digits
-            return (input / 1000L) + "K";
-        } else {
-            return input+"";
-        }
-    }
-
 }

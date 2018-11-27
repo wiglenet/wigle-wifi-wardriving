@@ -654,11 +654,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
 
-        final boolean newForRun = runNetworks.add(bssid) && networkCache.containsKey(bssid);
+        //ALIBI: addressing synchronization issues: if runNetworks syncset did not already contain this bssid
+        //  AND the global ConcurrentLinkedHashMap network cache doesn't contain this key
+        final boolean newForRun = runNetworks.add(bssid) && !networkCache.containsKey(bssid);
 
         Network network = networkCache.get(bssid);
 
         if (newForRun && network != null) {
+            //ALIBI: sanity check used in debugging
             MainActivity.warn("runNetworks not working as expected (add -> true, but networkCache already contained)");
         }
 

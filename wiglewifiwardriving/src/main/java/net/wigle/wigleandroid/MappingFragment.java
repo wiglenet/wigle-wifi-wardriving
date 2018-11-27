@@ -187,9 +187,9 @@ public final class MappingFragment extends Fragment {
                 }
 
                 googleMap.setBuildingsEnabled(true);
-                final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
-                googleMap.setTrafficEnabled(showTraffic);
                 if (null != prefs) {
+                    final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
+                    googleMap.setTrafficEnabled(showTraffic);
                     final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
                     googleMap.setMapType(mapType);
                 } else {

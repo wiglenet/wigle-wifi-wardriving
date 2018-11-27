@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.model;
 
 import android.annotation.TargetApi;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Build;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
@@ -256,8 +257,20 @@ public class GsmOperator {
                 return true;
             }
             MainActivity.State s = MainActivity.getMainActivity().getState();
-            if (null != s) {
-                operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
+            if ((null != s) && (null != s.mxcDbHelper)) {
+                try {
+                    operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
+                } catch (SQLiteDatabaseCorruptException sqldbex) {
+                    // this case seems isolated to LG android 4.4 devices
+                    MainActivity.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
+                    try {
+                        //recopy the MccMnc DB file to see whether we can recover.
+                        s.mxcDbHelper.implantMxcDatabase();
+                        //TODO: too aggressive? operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
+                    } catch (Exception ex) {
+                        MainActivity.warn("Mxc DB recopy failed", ex);
+                    }
+                }
                 if (operator != null) {
                     //DEBUG: MainActivity.info("matched operator L2: "+operator+" ("+mcc+":"+mnc+")");
                     mccMap.put(mnc, operator);

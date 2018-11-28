@@ -668,12 +668,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         boolean deviceTypeUpdate = false;
         boolean btTypeUpdate = false;
         if (network == null) {
-            //MainActivity.info("new BT net: "+bssid);
+            //DEBUG: MainActivity.info("new BT net: "+bssid + "(new: "+newForRun+")");
             network = new Network(bssid, ssid, frequency, capabilities, strength, type);
             networkCache.put(bssid, network);
         } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
-            //detected via standard bluetooth, updated as LE (LE should win)
-            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid());
+            //ALIBI: detected via standard bluetooth, updated as LE (LE should win)
+            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid()+ "(new: "+newForRun+")");
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
 
@@ -688,6 +688,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             network.setType(NetworkType.BLE);
         } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
             //fill in device type if not present
+            //DEBUG: MainActivity.info("had a BLE record, got BC: "+network.getBssid() + "(new: "+newForRun+")");
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
             final int oldDevType = network.getFrequency();
             if (mergedDeviceType != oldDevType) {
@@ -700,7 +701,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             network.setSsid(mergedSsid);
         } else {
-            //DEBUG: MainActivity.info("existing BT net");
+            //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
             //TODO: update capabilities? only if was Misc/Uncategorized, now recognized?
             //network.setCapabilities(capabilities);
             network.setLevel(strength);

@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.model;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -272,7 +271,7 @@ public final class Network implements ClusterItem {
 
     @Override
     public boolean equals(final Object other) {
-        if (other instanceof Network) {
+        if (other != null && other instanceof Network) {
             final Network o = (Network) other;
             return bssid.equals(o.bssid);
         }

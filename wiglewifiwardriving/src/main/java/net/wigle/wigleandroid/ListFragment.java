@@ -40,7 +40,7 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
-import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 
@@ -593,7 +593,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupList( final View view ) {
         State state = MainActivity.getStaticState();
         if (state.listAdapter == null) {
-            state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
         }
         // always set our current list adapter
         state.wifiReceiver.setListAdapter(state.listAdapter);
@@ -605,7 +605,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
 
     public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
-                                         final NetworkListAdapter listAdapter, final boolean isDbResult) {
+                                         final SetNetworkListAdapter listAdapter, final boolean isDbResult) {
 
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

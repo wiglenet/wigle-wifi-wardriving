@@ -34,7 +34,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
-import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 
 public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
@@ -43,7 +43,7 @@ public class DBResultActivity extends AppCompatActivity {
 
     private static final int DEFAULT_ZOOM = 18;
 
-    private NetworkListAdapter listAdapter;
+    private SetNetworkListAdapter listAdapter;
     private MapView mapView;
     private MapRender mapRender;
     private final List<Network> resultList = new ArrayList<>();
@@ -88,7 +88,7 @@ public class DBResultActivity extends AppCompatActivity {
 
     private void setupList() {
         // not set by nonconfig retain
-        listAdapter = new NetworkListAdapter( getApplicationContext(), R.layout.row );
+        listAdapter = new SetNetworkListAdapter( getApplicationContext(), R.layout.row );
         final ListView listView = (ListView) findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }

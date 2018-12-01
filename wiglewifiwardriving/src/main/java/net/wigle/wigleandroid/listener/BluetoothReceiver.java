@@ -23,7 +23,7 @@ import com.google.android.gms.maps.model.LatLng;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -119,7 +119,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> unsafeRunNetworks = new HashSet<>();
     private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
 
-    private NetworkListAdapter listAdapter;
+    private SetNetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
 
     private Handler bluetoothTimer;
@@ -514,7 +514,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
-    public void setListAdapter( final NetworkListAdapter listAdapter ) {
+    public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
         this.listAdapter = listAdapter;
     }
 

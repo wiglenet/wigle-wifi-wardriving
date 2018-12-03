@@ -22,7 +22,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.GsmOperator;
 import net.wigle.wigleandroid.model.GsmOperatorException;
 import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.ui.NetworkListAdapter;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
@@ -70,7 +70,7 @@ import com.google.android.gms.maps.model.LatLng;
 public class WifiReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
-    private NetworkListAdapter listAdapter;
+    private SetNetworkListAdapter listAdapter;
     private final SimpleDateFormat timeFormat;
     private final NumberFormat numberFormat1;
     private final SsidSpeaker ssidSpeaker;
@@ -116,7 +116,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
     }
 
-    public void setListAdapter( final NetworkListAdapter listAdapter ) {
+    public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
         this.listAdapter = listAdapter;
     }
 

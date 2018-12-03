@@ -147,7 +147,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                     return false;
             }
             if (found) {
-                networks.remove(o);
+                return networks.remove(o);
             }
         }
         return false;
@@ -216,15 +216,12 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public boolean removeAll(@NonNull Collection<?> collection) {
-        //DEBUG (1/3): long size = networks.size();
-        final boolean succeeded = networks.removeAll(collection);
-        //DEBUG (2/3): System.out.println("diff: "+(size - networks.size())+ " succeeded: "+succeeded);
-        final boolean btSuccess = btNets.removeAll(collection);
-        final boolean leSuccess = leNets.removeAll(collection);
-        final boolean wifiSuccess = wifiNets.removeAll(collection);
-        final boolean cellSuccess = cellNets.removeAll(collection);
-        //DEBUG (3/3): System.out.println("wifi: "+wifiSuccess + " cell: " + cellSuccess + " BT: " + btSuccess + " LE: "+leSuccess);
-        return succeeded && (btSuccess || leSuccess || wifiSuccess || cellSuccess);
+        boolean succeeded = false;
+        Iterator netIter = collection.iterator();
+        while (netIter.hasNext()) {
+            succeeded |= remove(netIter.next());
+        }
+        return succeeded;
     }
 
     @Override

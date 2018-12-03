@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.maps.android.MarkerManager;
-
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
@@ -24,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * the array adapter for a list of networks.
@@ -50,11 +50,11 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     private final List<Network> unsafeNetworks = new ArrayList<>();
     private final List<Network> networks = Collections.synchronizedList(unsafeNetworks);
 
-    //TODO: does these tracking lists need to be synchronized as well?
-    private final List<Network> btNets = new ArrayList<>();
-    private final List<Network> leNets = new ArrayList<>();
-    private final List<Network> nextBtNets = new ArrayList<>();
-    private final List<Network> nextLeNets = new ArrayList<>();
+    //TODO: do these tracking lists need to be synchronized as well?
+    private final Set<Network> btNets = new HashSet<>();
+    private final Set<Network> leNets = new HashSet<>();
+    private final Set<Network> nextBtNets = new HashSet<>();
+    private final Set<Network> nextLeNets = new HashSet<>();
     private final List<Network> cellNets = new ArrayList<>();
     private final List<Network> wifiNets = new ArrayList<>();
 
@@ -141,8 +141,10 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             networks.add(n);
             btNets.add(n);
             notifyDataSetChanged();
-        // } else if (!btNets.contains(n)) {
+        //} else if (!btNets.contains(n)) {
         //    MainActivity.info("BT add error - "+ n.getBssid() +" present in nets");
+        //} else if (!networks.contains(n)) {
+        //    MainActivity.info("BT add error - "+ n.getBssid() +" present in btnets");
         }
     }
 
@@ -151,15 +153,17 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             networks.add(n);
             leNets.add(n);
             notifyDataSetChanged();
-        // } else if (!btNets.contains(n)) {
+        //} else if (!btNets.contains(n)) {
         //    MainActivity.info("BTLE add error - "+ n.getBssid() +" present in nets");
+        //} else if (networks.contains(n)) {
+        //    MainActivity.info("BTLE add error - "+ n.getBssid() +" present in lenets");
         }
     }
 
     public void enqueueBluetooth(Network n) {
         if (!btNets.contains(n) && !networks.contains(n)) {
             nextBtNets.add(n);
-        // } else if (!btNets.contains(n)) {
+        //} else if (!btNets.contains(n)) {
         //    MainActivity.info("BT enqueue error - "+ n.getBssid() +" present in nets");
         }
     }
@@ -167,11 +171,12 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
     public void enqueueBluetoothLe(Network n) {
         if (!leNets.contains(n) && !networks.contains(n)) {
             nextLeNets.add(n);
-        // } else if (!btNets.contains(n)) {
+        //} else if (!btNets.contains(n)) {
         //    MainActivity.info("BTLE enqueue error - "+ n.getBssid() +" present in nets");
         }
     }
 
+    //TODO: almost certainly the source of our duplicate BT nets in non show-current
     public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
 
         if (showCurrent) {
@@ -186,11 +191,20 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         }
         if (updateLe) {
             leNets.addAll(nextLeNets);
-            networks.addAll(leNets);
+            for (Network leNet: leNets) {
+                if (!networks.contains(leNet)) {
+                    networks.add(leNet);
+                }
+            }
         }
         if (updateClassic) {
             btNets.addAll(nextBtNets);
-            networks.addAll(btNets);
+            for (Network btNet: btNets) {
+                if (!networks.contains(btNet)) {
+                    networks.add(btNet);
+                }
+            }
+            //networks.addAll(btNets);
         }
         notifyDataSetChanged();
 

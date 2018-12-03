@@ -1853,20 +1853,18 @@ public final class MainActivity extends AppCompatActivity {
                 edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
             }
             edit.commit();
+            if ( state.bluetoothReceiver == null ) {
+                MainActivity.info( "new bluetoothReceiver");
+                // bluetooth scan listener
+                // this receiver is the main workhorse of bluetooth scanning
+                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+                state.bluetoothReceiver.setupBluetoothTimer(true);
+            }
+            info("register bluetooth BroadcastReceiver");
+            final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            registerReceiver(state.bluetoothReceiver, intentFilter);
         }
-        if ( state.bluetoothReceiver == null ) {
-            MainActivity.info( "new bluetoothReceiver");
-            // bluetooth scan listener
-            // this receiver is the main workhorse of bluetooth scanning
-            state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
-            state.bluetoothReceiver.setupBluetoothTimer(true);
-
-        }
-
-        info("register bluetooth BroadcastReceiver");
-        final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(state.bluetoothReceiver, intentFilter);
     }
 
     public void endBluetooth(SharedPreferences prefs) {
@@ -1875,12 +1873,15 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
+        if (bluetoothAdapter != null) {
+            if (bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
         }
         try {
             info("unregister bluetoothReceiver");
             unregisterReceiver( state.bluetoothReceiver );
+            state.bluetoothReceiver = null;
         } catch ( final IllegalArgumentException ex ) {
             //ALIBI: it's fine to call and fail here.
             info( "bluetoothReceiver not registered: " + ex );
@@ -1892,7 +1893,7 @@ public final class MainActivity extends AppCompatActivity {
             // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?
             //WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
 
-            // well turn it off now that we're done
+            // turn it off now that we're done
             MainActivity.info("turning bluetooth back off");
             try {
                 final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();

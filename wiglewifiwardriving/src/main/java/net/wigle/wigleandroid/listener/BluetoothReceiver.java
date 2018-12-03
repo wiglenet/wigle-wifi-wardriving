@@ -114,8 +114,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
-    //TODO: unneeded? private final Map<String,Network> currentBluetoothNetworks = new ConcurrentLinkedHashMap<String, Network>(64);
-    private final Set<String> runNetworks = new HashSet<>();
+    //TODO: this is pretty redundant with the central network list,
+    // but they all seem to be getting out of sync, which is annoying AF
+    private final Set<String> unsafeRunNetworks = new HashSet<>();
+    private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
+
     private NetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
 
@@ -393,10 +396,23 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
 
+            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
+
+            if (listAdapter != null && showCurrent) {
+                listAdapter.clearBluetoothLe();
+                listAdapter.clearBluetooth();
+            }
+
+
             if (Build.VERSION.SDK_INT >= 21) {
                 final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-                if (bluetoothLeScanner != null && scanning.compareAndSet(true, false)) {
-                    bluetoothLeScanner.stopScan(scanCallback);
+                if (bluetoothLeScanner != null) {
+                    if (scanning.compareAndSet(true, false)) {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    } else {
+                        MainActivity.error("Scanner present, comp-and-set prevented stop-scan");
+                    }
                 }
             }
         }
@@ -413,7 +429,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+
             final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+            if (device == null) {
+                // as reported in bug feed
+                MainActivity.error("onReceive with null device - discarding this instance");
+                return;
+            }
             final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
             int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
 
@@ -632,19 +654,26 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final ConcurrentLinkedHashMap<String, Network> networkCache = MainActivity.getNetworkCache();
         final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
 
-        final boolean newForRun = runNetworks.add(bssid);
+        //ALIBI: addressing synchronization issues: if runNetworks syncset did not already contain this bssid
+        //  AND the global ConcurrentLinkedHashMap network cache doesn't contain this key
+        final boolean newForRun = runNetworks.add(bssid) && !networkCache.containsKey(bssid);
 
         Network network = networkCache.get(bssid);
+
+        if (newForRun && network != null) {
+            //ALIBI: sanity check used in debugging
+            MainActivity.warn("runNetworks not working as expected (add -> true, but networkCache already contained)");
+        }
 
         boolean deviceTypeUpdate = false;
         boolean btTypeUpdate = false;
         if (network == null) {
-            //MainActivity.info("new BT net: "+bssid);
+            //DEBUG: MainActivity.info("new BT net: "+bssid + "(new: "+newForRun+")");
             network = new Network(bssid, ssid, frequency, capabilities, strength, type);
             networkCache.put(bssid, network);
         } else if (NetworkType.BLE.equals(type) && NetworkType.BT.equals(network.getType())) {
-            //detected via standard bluetooth, updated as LE (LE should win)
-            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid());
+            //ALIBI: detected via standard bluetooth, updated as LE (LE should win)
+            //DEBUG: MainActivity.info("had a BC record, moving to BLE: "+network.getBssid()+ "(new: "+newForRun+")");
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
 
@@ -659,6 +688,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             network.setType(NetworkType.BLE);
         } else if (NetworkType.BT.equals(type) && NetworkType.BLE.equals(network.getType())) {
             //fill in device type if not present
+            //DEBUG: MainActivity.info("had a BLE record, got BC: "+network.getBssid() + "(new: "+newForRun+")");
             int mergedDeviceType = (!isMiscOrUncategorized(network.getFrequency())?network.getFrequency():frequency);
             final int oldDevType = network.getFrequency();
             if (mergedDeviceType != oldDevType) {
@@ -671,7 +701,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             String mergedSsid = (ssid == null || ssid.isEmpty()) ? network.getSsid() : ssid;
             network.setSsid(mergedSsid);
         } else {
-            //DEBUG: MainActivity.info("existing BT net");
+            //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
             //TODO: update capabilities? only if was Misc/Uncategorized, now recognized?
             //network.setCapabilities(capabilities);
             network.setLevel(strength);

@@ -63,6 +63,7 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 
 /**
@@ -186,10 +187,14 @@ public final class MappingFragment extends Fragment {
                 }
 
                 googleMap.setBuildingsEnabled(true);
-                final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
-                googleMap.setTrafficEnabled(showTraffic);
-                final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                googleMap.setMapType(mapType);
+                if (null != prefs) {
+                    final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
+                    googleMap.setTrafficEnabled(showTraffic);
+                    final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                    googleMap.setMapType(mapType);
+                } else {
+                    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                }
                 mapRender = new MapRender(getActivity(), googleMap, false);
 
                 // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
@@ -241,14 +246,17 @@ public final class MappingFragment extends Fragment {
                 if (oldZoom >= 0) {
                     zoom = oldZoom;
                 } else {
-                    zoom = prefs.getFloat(ListFragment.PREF_PREV_ZOOM, zoom);
+                    if (null != prefs) {
+                        zoom = prefs.getFloat(ListFragment.PREF_PREV_ZOOM, zoom);
+                    }
                 }
 
                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(centerPoint).zoom(zoom).build();
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                if (!ListFragment.PREF_MAP_NO_TILE.equals(
+
+                if (null != prefs && !ListFragment.PREF_MAP_NO_TILE.equals(
                         prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
                                 ListFragment.PREF_MAP_NO_TILE))) {
                     final int providerTileRes = MainActivity.isHighDefinition()?512:256;
@@ -465,11 +473,16 @@ public final class MappingFragment extends Fragment {
 
                 if (view != null) {
                     TextView tv = (TextView) view.findViewById(R.id.stats_run);
-                    tv.setText(getString(R.string.run) + ": " + ListFragment.lameStatic.runNets);
-                    tv = (TextView) view.findViewById(R.id.stats_new);
-                    tv.setText(getString(R.string.new_word) + ": " + ListFragment.lameStatic.newNets);
-                    tv = (TextView) view.findViewById(R.id.stats_dbnets);
-                    tv.setText(getString(R.string.db) + ": " + ListFragment.lameStatic.dbNets);
+                    tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(ListFragment.lameStatic.runNets));
+                    tv = (TextView) view.findViewById(R.id.stats_wifi);
+                    tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
+                    tv = (TextView) view.findViewById( R.id.stats_cell );
+                    tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
+                    tv = (TextView) view.findViewById( R.id.stats_bt );
+                    tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
+
+                    tv = (TextView) view.findViewById( R.id.stats_dbnets );
+                    tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
                 }
 
                 final long period = 1000L;
@@ -496,25 +509,29 @@ public final class MappingFragment extends Fragment {
     @Override
     public void onDestroy() {
         MainActivity.info( "MAP: destroy mapping." );
-        finishing.set( true );
+        finishing.set(true);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(final GoogleMap googleMap) {
-                // save zoom
-                final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                final Editor edit = prefs.edit();
-                edit.putFloat( ListFragment.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom );
-                edit.apply();
 
-                // save center
-                state.oldCenter = googleMap.getCameraPosition().target;
+        @Override
+        public void onMapReady(final GoogleMap googleMap) {
+            // save zoom
+            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            if (null != prefs) {
+                final Editor edit = prefs.edit();
+                edit.putFloat(ListFragment.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom);
+                edit.apply();
+            } else {
+                MainActivity.warn("failed saving map state - unable to get preferences.");
+            }
+            // save center
+            state.oldCenter = googleMap.getCameraPosition().target;
             }
         });
+
         try {
             mapView.onDestroy();
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             // seen in the wild
             MainActivity.info("exception in mapView.onDestroy: " + ex, ex);
         }

@@ -55,7 +55,7 @@ import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
-import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.NetworkListUtil;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -102,7 +102,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
         MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
-        final SimpleDateFormat format = SetNetworkListAdapter.getConstructionTimeFormater(this);
+        final SimpleDateFormat format = NetworkListUtil.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
             network = MainActivity.getNetworkCache().get(bssid);
         }
@@ -122,14 +122,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             tv = (TextView) findViewById( R.id.oui );
             tv.setText( ouiString );
 
-            final int image = SetNetworkListAdapter.getImage( network );
+            final int image = NetworkListUtil.getImage( network );
             final ImageView ico = (ImageView) findViewById( R.id.wepicon );
             ico.setImageResource( image );
 
             final ImageView btico = (ImageView) findViewById(R.id.bticon);
             if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
                 btico.setVisibility(View.VISIBLE);
-                Integer btImageId = SetNetworkListAdapter.getBtImage(network);
+                Integer btImageId = NetworkListUtil.getBtImage(network);
                 if (null == btImageId) {
                     btico.setVisibility(View.GONE);
                 } else {
@@ -141,14 +141,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             tv = (TextView) findViewById( R.id.na_signal );
             final int level = network.getLevel();
-            tv.setTextColor( SetNetworkListAdapter.getSignalColor( level ) );
+            tv.setTextColor( NetworkListUtil.getSignalColor( level ) );
             tv.setText( Integer.toString( level ) );
 
             tv = (TextView) findViewById( R.id.na_type );
             tv.setText( network.getType().name() );
 
             tv = (TextView) findViewById( R.id.na_firsttime );
-            tv.setText( SetNetworkListAdapter.getConstructionTime(format, network ) );
+            tv.setText( NetworkListUtil.getConstructionTime(format, network ) );
 
             tv = (TextView) findViewById( R.id.na_chan );
             Integer chan = network.getChannel();
@@ -296,7 +296,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                 googleMap.addCircle(new CircleOptions()
                                         .center(latLon)
                                         .radius(4)
-                                        .fillColor(SetNetworkListAdapter.getSignalColor(level, true))
+                                        .fillColor(NetworkListUtil.getSignalColor(level, true))
                                         .strokeWidth(0)
                                         .zIndex(level));
                                 count++;

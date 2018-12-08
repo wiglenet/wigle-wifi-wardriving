@@ -10,6 +10,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -126,7 +127,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
     @Override
     public boolean remove(Object o) {
         if (o != null && o instanceof Network) {
-            boolean found = false;
+            boolean found;
             switch (((Network) o).getType()) {
                 case BLE:
                     found = leNets.remove(o);
@@ -186,6 +187,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                     }
                     break;
                 default:
+                    MainActivity.error("unhandled addAll case: "+net.getType());
                     break;
             }
         }
@@ -489,4 +491,8 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         }
     }
 
+    @Override
+    public void sort(Comparator comparator) {
+        Collections.sort(networks, comparator);
+    }
 }

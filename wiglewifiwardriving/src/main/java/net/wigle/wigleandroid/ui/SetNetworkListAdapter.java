@@ -138,7 +138,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     }
 
     public void sort(Comparator comparator) {
-        Collections.sort(networks, comparator);
+        networks.sort(comparator);
     }
 
     @Override

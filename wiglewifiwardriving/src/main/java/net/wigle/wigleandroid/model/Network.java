@@ -110,6 +110,15 @@ public final class Network implements ClusterItem {
             this.channel = freqToChan.get(frequency);
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
+            /*if (NetworkType.GSM.equals(type)) {
+
+            } else if (NetworkType.LTE.equals(type)) {
+
+            } else if (NetworkType.WCDMA.equals(type)) {
+
+            } else {
+                channel = 0;
+            }*/
             this.channel = frequency;
         } else {
             channel = null;

@@ -53,4 +53,11 @@
         android:textSize="32sp"
         android:textColor="#909090"
         />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scan_dur"
+        android:textSize="30sp"
+        android:textColor="#909090"
+        />
 </LinearLayout>

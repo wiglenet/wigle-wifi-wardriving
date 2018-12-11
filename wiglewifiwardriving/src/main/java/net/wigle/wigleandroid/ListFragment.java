@@ -103,6 +103,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_SCAN_BT = "scanBluetooth";
     public static final String PREF_DISTANCE_RUN = "distRun";
     public static final String PREF_STARTTIME_RUN = "timestampRunStart";
+    public static final String PREF_CUMULATIVE_SCANTIME_RUN = "millisScannedDuringRun";
+    public static final String PREF_STARTTIME_CURRENT_SCAN = "timestampScanStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
     public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";

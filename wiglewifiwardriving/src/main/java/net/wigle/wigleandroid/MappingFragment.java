@@ -473,7 +473,8 @@ public final class MappingFragment extends Fragment {
 
                 if (view != null) {
                     TextView tv = (TextView) view.findViewById(R.id.stats_run);
-                    tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(ListFragment.lameStatic.runNets));
+                    tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(
+                            ListFragment.lameStatic.runNets+ListFragment.lameStatic.runBt));
                     tv = (TextView) view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
                     tv = (TextView) view.findViewById( R.id.stats_cell );

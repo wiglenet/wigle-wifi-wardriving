@@ -125,6 +125,7 @@
     <string name="dash_new_bt">新しいBluetooth</string>    
     <string name="dash_dist_run">走行距離</string>
     <string name="dash_time_run">実行時間:</string>
+    <string name="dash_time_scanning">スキャン時間:</string>
     <string name="dash_dist_total">トータル走行距離</string>
     <string name="dash_dist_prev">前回の走行距離</string>
     <string name="dash_db_queue">DB queue:</string>

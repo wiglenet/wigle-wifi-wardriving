@@ -124,7 +124,8 @@
     <string name="dash_new_cells">新的發射塔</string>
     <string name="dash_new_bt">新藍牙</string>
     <string name="dash_dist_run">運行距離：</string>
-    <string name="dash_time_run">運行時間:</string>
+    <string name="dash_time_run">運行時間：</string>
+    <string name="dash_time_scanning">掃描持續時間：</string>
     <string name="dash_dist_total">共有區。</string>
     <string name="dash_dist_prev">以前的運行：</string>
     <string name="dash_db_queue">DB的隊列：</string>

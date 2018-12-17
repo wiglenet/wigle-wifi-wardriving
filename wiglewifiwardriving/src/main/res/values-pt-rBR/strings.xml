@@ -125,6 +125,7 @@
     <string name="dash_new_bt">Novo Bluetooth</string>
     <string name="dash_dist_run">Distância Percorrida:</string>
     <string name="dash_time_run">Duração de corrida:</string>
+    <string name="dash_time_scanning">Duração da análise:</string>
     <string name="dash_dist_total">Dist. Total:</string>
     <string name="dash_dist_prev">Sessão Anterior:</string>
     <string name="dash_db_queue">Fila do BD:</string>

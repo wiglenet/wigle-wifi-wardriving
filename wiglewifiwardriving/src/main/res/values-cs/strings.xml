@@ -125,6 +125,7 @@
     <string name="dash_new_bt">Nové Bluetooth</string>
     <string name="dash_dist_run">Vzdálenost:</string>
     <string name="dash_time_run">Doba trvání:</string>
+    <string name="dash_time_scanning">Doba skenování:</string>
     <string name="dash_dist_total">Celková vzdálenost:</string>
     <string name="dash_dist_prev">Minulá vzdálenost:</string>
     <string name="dash_db_queue">Fronta DB:</string>

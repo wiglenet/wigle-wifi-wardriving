@@ -125,6 +125,7 @@
     <string name="dash_new_bt">새로운 블루투스</string>
     <string name="dash_dist_run">거리를 실행합니다 :</string>
     <string name="dash_time_run">실행 시간:</string>
+    <string name="dash_time_scanning">스캔 시간:</string>
     <string name="dash_dist_total">Dist 총. :</string>
     <string name="dash_dist_prev">이전이 실행 :</string>
     <string name="dash_db_queue">DB 대기열 :</string>

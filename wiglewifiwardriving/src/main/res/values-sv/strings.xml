@@ -125,6 +125,7 @@
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Körsträcka:</string>
     <string name="dash_time_run">Körlängd:</string>
+    <string name="dash_time_scanning">Skanna varaktighet:</string>
     <string name="dash_dist_total">Total distans:.</string>
     <string name="dash_dist_prev">Föregående runda:</string>
     <string name="dash_db_queue">DB kön:</string>

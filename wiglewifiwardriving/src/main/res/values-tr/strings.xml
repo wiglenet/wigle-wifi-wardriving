@@ -125,6 +125,7 @@
     <string name="dash_new_bt">Yeni Bluetooth</string>
     <string name="dash_dist_run">Geçerli Mesafe:</string>
     <string name="dash_time_run">Çalıştırma Süresi:</string>
+    <string name="dash_time_scanning">Tarama Süresi:</string>
     <string name="dash_dist_total">Toplam Mesafe.:</string>
     <string name="dash_dist_prev">Önceki Mesafe:</string>
     <string name="dash_db_queue">DB Sıralaması:</string>

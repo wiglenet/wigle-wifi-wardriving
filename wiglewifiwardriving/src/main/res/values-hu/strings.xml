@@ -125,6 +125,7 @@
     <string name="dash_new_bt">Új Bluetooth</string>
     <string name="dash_dist_run">Futás távolsága:</string>
     <string name="dash_time_run">Futás időtartama:</string>
+    <string name="dash_time_scanning">Szkennelés időtartama:</string>
     <string name="dash_dist_total">Teljes táv.:</string>
     <string name="dash_dist_prev">Előző futás:</string>
     <string name="dash_db_queue">Adatbázis várólista:</string>

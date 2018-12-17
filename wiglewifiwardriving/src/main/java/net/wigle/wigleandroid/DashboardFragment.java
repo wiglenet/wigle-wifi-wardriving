@@ -124,7 +124,9 @@ public class DashboardFragment extends Fragment {
     tv.setText( ListFragment.lameStatic.newCells + " " + getString(R.string.dash_new_cells) );
 
     updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
-    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN, getString(R.string.dash_time_run) );
+    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN );
+    updateTimeTare(view, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
+            ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
     updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
     updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
@@ -170,24 +172,32 @@ public class DashboardFragment extends Fragment {
     tv.setText( title + " " + distString );
   }
 
-  private void updateTime( final View view, final int id, final String pref, final String title ) {
+  private void updateTime( final View view, final int id, final String pref) {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
     long millis = System.currentTimeMillis();
     long duration =  millis - prefs.getLong( pref,  millis);
 
-    //TODO: better to just use TimeUnit?
-    int seconds = (int) (duration / 1000) % 60 ;
-    int minutes = (int) ((duration / (1000*60)) % 60);
-    int hours   = (int) ((duration / (1000*60*60)) % 24);
-
-    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
-    if (hours > 0) {
-      durString = String.format("%d", hours) + ":" + durString;
-    }
+    final String durString = timeString(duration);
 
     final TextView tv = (TextView) view.findViewById( id );
-    tv.setText( title + " " + durString );
+    tv.setText( durString );
+  }
+
+  private void updateTimeTare(final View view, final int id, final String prefCumulative,
+                              final String prefCurrent, final boolean isScanning) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+    long cumulative = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+
+    if (isScanning) {
+      cumulative += System.currentTimeMillis() - prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+    }
+
+    final String durString = timeString(cumulative);
+    final TextView tv = (TextView) view.findViewById( id );
+    tv.setText(durString );
+
   }
 
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
@@ -267,6 +277,18 @@ public class DashboardFragment extends Fragment {
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       return false;
+  }
+
+  private String timeString(final long duration) {
+    //TODO: better to just use TimeUnit?
+    int seconds = (int) (duration / 1000) % 60 ;
+    int minutes = (int) ((duration / (1000*60)) % 60);
+    int hours   = (int) ((duration / (1000*60*60)) % 24);
+    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
+    if (hours > 0) {
+      durString = String.format("%d", hours) + ":" + durString;
+    }
+    return " " +durString;
   }
 
 }

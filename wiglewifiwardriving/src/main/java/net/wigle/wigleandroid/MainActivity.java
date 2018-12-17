@@ -273,6 +273,8 @@ public final class MainActivity extends AppCompatActivity {
             Editor edit = prefs.edit();
             edit.putFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
             edit.putLong(ListFragment.PREF_STARTTIME_RUN, System.currentTimeMillis());
+            edit.putLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+            edit.putLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
             edit.putFloat(ListFragment.PREF_DISTANCE_PREV_RUN, prevRun);
             edit.apply();
         }
@@ -2011,7 +2013,18 @@ public final class MainActivity extends AppCompatActivity {
         if (isScanning == oldIsScanning) {
             info("main handleScanChange: no difference, returning");
         }
-        final Editor edit = getSharedPreferences(ListFragment.SHARED_PREFS, 0).edit();
+
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Editor edit = prefs.edit();
+        if (isScanning) {
+            edit.putLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+        } else {
+            final long scanTime = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+            final long lastScanStart = prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+            final long newTare = scanTime + System.currentTimeMillis() - lastScanStart;
+            edit.putLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, newTare);
+        }
+
         edit.putBoolean(ListFragment.PREF_SCAN_RUNNING, isScanning);
         edit.apply();
         internalHandleScanChange(isScanning);

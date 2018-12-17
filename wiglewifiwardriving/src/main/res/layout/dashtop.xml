@@ -46,11 +46,42 @@
         android:textColor="#46AA00"
         />
 
-    <TextView
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/run_dur"
-        android:textSize="32sp"
-        android:textColor="#909090"
-        />
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="30sp"
+            android:textColor="#909090"
+            android:text="@string/dash_time_run"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/run_dur"
+            android:textSize="30sp"
+            android:textColor="#909090"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dash_time_scanning"
+            android:textSize="30sp"
+            android:textColor="#909090"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scan_dur"
+            android:textSize="30sp"
+            android:textColor="#909090"
+            />
+    </LinearLayout>
 </LinearLayout>

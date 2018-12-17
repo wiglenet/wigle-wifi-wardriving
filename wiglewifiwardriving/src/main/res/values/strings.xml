@@ -125,6 +125,7 @@
     <string name="dash_new_bt">New Bluetooth</string>
     <string name="dash_dist_run">Run Distance:</string>
     <string name="dash_time_run">Run Duration:</string>
+    <string name="dash_time_scanning">Scan Duration:</string>
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Previous Run:</string>
     <string name="dash_db_queue">DB Queue:</string>

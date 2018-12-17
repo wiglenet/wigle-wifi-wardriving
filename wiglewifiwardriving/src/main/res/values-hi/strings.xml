@@ -125,6 +125,7 @@
     <string name="dash_new_bt">नया ब्लूटूथ</string>
     <string name="dash_dist_run">दूरी भागो:</string>
     <string name="dash_time_run">भागो अवधि:</string>
+    <string name="dash_time_scanning">स्कैन अवधि:</string>
     <string name="dash_dist_total">जिला कुल.</string>
     <string name="dash_dist_prev">पिछला चलाएँ:</string>
     <string name="dash_db_queue">डीबी कतार:</string>

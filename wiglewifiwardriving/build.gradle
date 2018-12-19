@@ -42,8 +42,8 @@ URLClassLoader loader = GroovyObject.class.classLoader
 configurations.driver.each {File file -> loader.addURL(file.toURI().toURL())}
 
 ext {
-    supportLibraryVersion = '27.1.1'
-    gmsLibraryBaseVersion = '15.0.1'
+    supportLibraryVersion = '28.0.0'
+    gmsLibraryBaseVersion = '16.0.0'
     inputMxcSqlDir = "etc/mccmncsqlite"
     outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
     mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"

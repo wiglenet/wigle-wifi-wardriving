@@ -1095,12 +1095,7 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         MainActivity.info("MAIN: resume.");
-        try {
-            super.onResume();
-        }
-        catch (final IllegalArgumentException ex) {
-            MainActivity.error("exception on resume: " + ex, ex);
-        }
+        super.onResume();
 
         // deal with wake lock
         if (!state.wakeLock.isHeld() && state.screenLocked) {

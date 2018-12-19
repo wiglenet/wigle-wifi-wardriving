@@ -40,6 +40,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -131,7 +132,6 @@ public final class MainActivity extends AppCompatActivity {
         SetNetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab;
-        private final Fragment[] fragList = new Fragment[11];
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -600,10 +600,9 @@ public final class MainActivity extends AppCompatActivity {
                 getString(R.string.site_stats_app_name),
         };
 
-        final Fragment frag = state.fragList[position];
+        final FragmentManager fragmentManager = getSupportFragmentManager();
+        final Fragment frag = fragmentManager.findFragmentById(position);
 
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
         try {
             fragmentManager.beginTransaction()
                     .replace(R.id.tabcontent, frag)
@@ -626,67 +625,82 @@ public final class MainActivity extends AppCompatActivity {
         if (actionBar != null) actionBar.setTitle(title);
     }
 
-
     private void setupFragments() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
         info("Creating ListFragment");
         listActivity = new ListFragment();
         Bundle bundle = new Bundle();
         listActivity.setArguments(bundle);
-        state.fragList[LIST_TAB_POS] = listActivity;
+
+        //state.fragList[LIST_TAB_POS] = listActivity;
+        transaction.add(LIST_TAB_POS, listActivity);
 
         info("Creating MappingFragment");
         final MappingFragment map = new MappingFragment();
         bundle = new Bundle();
         map.setArguments(bundle);
-        state.fragList[MAP_TAB_POS] = map;
+        //state.fragList[MAP_TAB_POS] = map;
+        transaction.add(MAP_TAB_POS, map);
 
         info("Creating DashboardFragment");
         final DashboardFragment dash = new DashboardFragment();
         bundle = new Bundle();
         dash.setArguments(bundle);
-        state.fragList[DASH_TAB_POS] = dash;
+        //state.fragList[DASH_TAB_POS] = dash;
+        transaction.add(DASH_TAB_POS, dash);
 
         info("Creating DataFragment");
         final DataFragment data = new DataFragment();
         bundle = new Bundle();
         data.setArguments(bundle);
-        state.fragList[DATA_TAB_POS] = data;
+        //state.fragList[DATA_TAB_POS] = data;
+        transaction.add(DATA_TAB_POS, data);
 
         info("Creating UserStatsFragment");
         final UserStatsFragment userStats = new UserStatsFragment();
         bundle = new Bundle();
         userStats.setArguments(bundle);
-        state.fragList[USER_STATS_TAB_POS] = userStats;
+        //state.fragList[USER_STATS_TAB_POS] = userStats;
+        transaction.add(USER_STATS_TAB_POS, userStats);
 
         info("Creating SiteStatsFragment");
         final SiteStatsFragment siteStats = new SiteStatsFragment();
         bundle = new Bundle();
         siteStats.setArguments(bundle);
-        state.fragList[SITE_STATS_TAB_POS] = siteStats;
+        //state.fragList[SITE_STATS_TAB_POS] = siteStats;
+        transaction.add(SITE_STATS_TAB_POS, siteStats);
 
         info("Creating NewsFragment");
         final NewsFragment newsStats = new NewsFragment();
         bundle = new Bundle();
         newsStats.setArguments(bundle);
-        state.fragList[NEWS_TAB_POS] = newsStats;
+        //state.fragList[NEWS_TAB_POS] = newsStats;
+        transaction.add(NEWS_TAB_POS, newsStats);
 
         info("Creating RankStatsFragment");
         final RankStatsFragment rankStats = new RankStatsFragment();
         bundle = new Bundle();
         rankStats.setArguments(bundle);
-        state.fragList[RANK_STATS_TAB_POS] = rankStats;
+        //state.fragList[RANK_STATS_TAB_POS] = rankStats;
+        transaction.add(RANK_STATS_TAB_POS, rankStats);
 
         info("Creating UploadsFragment");
         final UploadsFragment uploads = new UploadsFragment();
         bundle = new Bundle();
         uploads.setArguments(bundle);
-        state.fragList[UPLOADS_TAB_POS] = uploads;
+        //state.fragList[UPLOADS_TAB_POS] = uploads;
+        transaction.add(UPLOADS_TAB_POS, uploads);
 
         info("Creating SettingsFragment");
         final SettingsFragment settings = new SettingsFragment();
         bundle = new Bundle();
         settings.setArguments(bundle);
-        state.fragList[SETTINGS_TAB_POS] = settings;
+        //state.fragList[SETTINGS_TAB_POS] = settings;
+        transaction.add(SETTINGS_TAB_POS, settings);
+
+        transaction.commit();
     }
 
     @Override
@@ -838,7 +852,8 @@ public final class MainActivity extends AppCompatActivity {
                         } else if (activity instanceof MainActivity) {
                             final MainActivity mainActivity = (MainActivity) activity;
                             if (mainActivity.getState() != null) {
-                                final Fragment fragment = mainActivity.getState().fragList[tabPos];
+                                FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
+                                final Fragment fragment = fragmentManager.findFragmentById(tabPos);
                                 ((DialogListener) fragment).handleDialog(dialogId);
                             }
                         } else {
@@ -1416,10 +1431,12 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void addNetworkToMap(final Network network) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentById(MAP_TAB_POS);
             if (f != null) {
                 f.addNetwork(network);
             }
@@ -1427,10 +1444,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void updateNetworkOnMap(final Network network) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentById(MAP_TAB_POS);
             if (f != null) {
                 f.updateNetwork(network);
             }
@@ -1438,10 +1456,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void reclusterMap() {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == MAP_TAB_POS) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentById(MAP_TAB_POS);
             if (f != null) {
                 f.reCluster();
             }

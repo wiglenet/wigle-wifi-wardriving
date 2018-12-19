@@ -5,10 +5,6 @@
     android:versionCode="238"
     android:versionName="2.38">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="28" />
-
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"

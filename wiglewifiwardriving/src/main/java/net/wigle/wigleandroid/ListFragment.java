@@ -468,7 +468,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             case MENU_MAP:
                 // call over to finish
-                if (main != null) main.selectFragment(MainActivity.MAP_TAB_POS);
+                if (main != null) main.selectFragment(R.id.nav_map);
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
@@ -743,7 +743,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
 
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
+        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, R.id.nav_list, UPLOAD_DIALOG);
     }
 
     public void makeQuickPausePrefDialog(final MainActivity main) {
@@ -751,7 +751,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final String checkboxText = getString(R.string.quick_pause_decision);
         MainActivity.createCheckboxConfirmation(ListFragment.this.getActivity(), dialogText, checkboxText,
                 ListFragment.PREF_QUICK_PAUSE, ListFragment.QUICK_SCAN_PAUSE,
-                ListFragment.QUICK_SCAN_DO_NOTHING, MainActivity.LIST_TAB_POS, QUICK_PAUSE_DIALOG);
+                ListFragment.QUICK_SCAN_DO_NOTHING, R.id.nav_list, QUICK_PAUSE_DIALOG);
     }
 
     @Override

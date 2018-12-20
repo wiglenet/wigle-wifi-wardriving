@@ -382,7 +382,7 @@
     <string name="send_to">Condividi utilizzando</string>
     <string name="settings_gps_timeout">Timeout GPS</string>
     <string name="settings_net_loc_timeout">Timeout della posizione di rete</string>
-    <string name="start_at_boot">Avvia Wigle all'avvio</string>
+    <string name="start_at_boot">Avvia Wigle all\'avvio</string>
     <string name="cell_network_bands">Frequenze:</string>
     <string name="cell_network_status">Stato:</string>
     <string name="cell_network_brand">Marca:</string>

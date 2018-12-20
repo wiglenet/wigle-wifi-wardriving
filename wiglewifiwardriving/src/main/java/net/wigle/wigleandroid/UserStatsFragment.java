@@ -323,11 +323,11 @@ public class UserStatsFragment extends Fragment {
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
         switch ( item.getItemId() ) {
-            case MENU_SITE_STATS:
-                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
-                return true;
+            //case MENU_SITE_STATS:
+            //    main.selectFragment(R.id.nav_site_stats);
+            //    return true;
             case MENU_RANK_STATS:
-                main.selectFragment(MainActivity.RANK_STATS_TAB_POS);
+                main.selectFragment(R.id.nav_rank);
                 return true;
         }
         return false;

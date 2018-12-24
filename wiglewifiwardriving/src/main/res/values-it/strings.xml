@@ -279,6 +279,7 @@
     <string name="genloc_title">Torri GSM WiGLE.net con localizzazioni</string>
     <string name="userstot_title">Totale Utenti registrati su WiGLE.net</string>
     <string name="transtot_title">File caricati su WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>

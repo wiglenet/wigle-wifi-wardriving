@@ -397,9 +397,9 @@ public class RankStatsFragment extends Fragment {
             case MENU_USER_STATS:
                 main.selectFragment(R.id.nav_stats);
                 return true;
-            //case MENU_SITE_STATS:
-            //    main.selectFragment(R.id.nav_site_stats);
-            //    return true;
+            case MENU_SITE_STATS:
+                main.selectFragment(R.id.nav_site_stats);
+                return true;
             case MENU_RANK_SWAP:
                 monthRanking.set(!monthRanking.get());
                 item.setTitle(getRankSwapString());

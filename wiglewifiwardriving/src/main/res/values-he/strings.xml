@@ -279,6 +279,7 @@
     <string name="genloc_title">WiGLE.net תא מגדלי עם מיקום</string>
     <string name="userstot_title">סה"כ משתמשי WiGLE.net רשומים</string>
     <string name="transtot_title">קבצים שהועלו אל WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>

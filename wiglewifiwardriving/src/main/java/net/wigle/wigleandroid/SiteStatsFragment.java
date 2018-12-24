@@ -39,6 +39,7 @@ public class SiteStatsFragment extends Fragment {
     private static final String KEY_GENLOC = "genloc";
     private static final String KEY_USERSTOT = "userstot";
     private static final String KEY_TRANSTOT = "transtot";
+    private static final String KEY_NETWPA3 = "netwpa3";
     private static final String KEY_NETWPA2 = "netwpa2";
     private static final String KEY_NETWPA = "netwpa";
     private static final String KEY_NETWEP = "netwep";
@@ -48,7 +49,7 @@ public class SiteStatsFragment extends Fragment {
 
     private static final String[] ALL_SITE_KEYS = new String[] {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
-        KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
+        KEY_NETWPA3, KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
 
     private AtomicBoolean finishing;

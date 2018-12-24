@@ -37,14 +37,13 @@
             android:icon="@android:drawable/ic_menu_today"
             android:title="@string/tab_stats"
             />
-        <!--item
+        <item
             android:id="@+id/nav_site_stats"
-            android:icon="@android:drawable/ic_menu_today"
+            android:icon="@android:drawable/ic_menu_info_details"
             android:title="@string/tab_stats"
-            android:color="#0000"
             android:visibility="gone"
-            app:itemIconTint="#FFFFFF"
-            /-->
+            app:showAsAction="never"
+            />
         <item
             android:id="@+id/nav_uploads"
             android:icon="@android:drawable/ic_menu_upload"

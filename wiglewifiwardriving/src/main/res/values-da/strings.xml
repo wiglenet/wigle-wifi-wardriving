@@ -279,6 +279,7 @@
     <string name="genloc_title">WiGLE.net Cell Towers med placering</string>
     <string name="userstot_title">I alt WiGLE.net registrerede brugere</string>
     <string name="transtot_title">Filer uploadet til WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>

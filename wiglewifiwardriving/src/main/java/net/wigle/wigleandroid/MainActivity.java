@@ -107,6 +107,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
+import static android.view.View.GONE;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -513,6 +514,9 @@ public final class MainActivity extends AppCompatActivity {
         navigationView.getMenu().getItem(0).setChecked(true);
         final MenuItem exitItem  = navigationView.getMenu().findItem(R.id.nav_exit);
         exitItem.getIcon().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+        // ALIBI: not enough room on many displays
+        final MenuItem siteStatsItem  = navigationView.getMenu().findItem(R.id.nav_site_stats);
+        siteStatsItem.setVisible(false);
         //navigationView.setItemIconTintList();
         // end drawer setup
     }
@@ -604,8 +608,8 @@ public final class MainActivity extends AppCompatActivity {
                 return UserStatsFragment.class;
             case R.id.nav_rank:
                 return RankStatsFragment.class;
-            //case R.id.nav_site_stats:
-            //    return SiteStatsFragment.class
+            case R.id.nav_site_stats:
+                return SiteStatsFragment.class;
             case R.id.nav_news:
                 return NewsFragment.class;
             case R.id.nav_uploads:

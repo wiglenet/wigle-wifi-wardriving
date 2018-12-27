@@ -49,9 +49,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.BackgroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -63,7 +60,6 @@ import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -107,7 +103,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
-import static android.view.View.GONE;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -512,12 +507,11 @@ public final class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
         navigationView.getMenu().getItem(0).setChecked(true);
-        final MenuItem exitItem  = navigationView.getMenu().findItem(R.id.nav_exit);
-        exitItem.getIcon().setColorFilter(Color.RED, PorterDuff.Mode.SRC_IN);
+
         // ALIBI: not enough room on many displays
         final MenuItem siteStatsItem  = navigationView.getMenu().findItem(R.id.nav_site_stats);
         siteStatsItem.setVisible(false);
-        //navigationView.setItemIconTintList();
+
         // end drawer setup
     }
 
@@ -2130,7 +2124,6 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        info("MAIN: onCreateOptionsMenu.");
         return true;
     }
 

@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:text="@string/userstot_title"
             android:textSize="16sp"
-            android:textFontWeight="400"
+            android:textStyle="bold"
 
             />
         <TextView
@@ -113,7 +113,7 @@
                 android:text="@string/netwpa3_title"
                 android:textSize="16sp"
                 android:textColor="#00AA00"
-                android:textFontWeight="400"
+                android:textStyle="bold"
                 />
             <TextView
                 android:id="@+id/netwpa3"

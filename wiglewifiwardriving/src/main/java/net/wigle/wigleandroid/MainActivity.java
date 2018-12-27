@@ -267,7 +267,7 @@ public final class MainActivity extends AppCompatActivity {
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (state.wakeLock == null) {
-            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wiglewifiwardriving:DoNotDimScreen");
             if (state.wakeLock.isHeld()) {
                 state.wakeLock.release();
             }

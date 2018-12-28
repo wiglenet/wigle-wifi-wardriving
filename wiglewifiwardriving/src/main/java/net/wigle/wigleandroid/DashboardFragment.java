@@ -104,48 +104,57 @@ public class DashboardFragment extends Fragment {
   }
 
   private void updateUI( final View view ) {
-    TextView tv = (TextView) view.findViewById( R.id.runnets );
-    tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " " + getString(R.string.run));
 
-    tv = (TextView) view.findViewById( R.id.newwifi );
-    final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + getString(R.string.dash_new_wifi) );
+        View topBar =  view.findViewById( R.id.dash_status_bar );
+        if (MainActivity.isScanning(getActivity())) {
+            topBar.setVisibility(View.GONE);
+        } else {
+            topBar.setVisibility(View.VISIBLE);
+            TextView dashScanstatus = view.findViewById(R.id.dash_scanstatus);
+            dashScanstatus.setText(getString(R.string.dash_scan_off));
+        }
 
-    tv = (TextView) view.findViewById( R.id.newbt );
-    tv.setText( ListFragment.lameStatic.newBt + " " + getString(R.string.dash_new_bt) );
+        TextView tv = (TextView) view.findViewById( R.id.runnets );
+        tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " " + getString(R.string.run));
 
-    tv = (TextView) view.findViewById( R.id.currnets );
-    tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
+        tv = (TextView) view.findViewById( R.id.newwifi );
+        tv.setText( ListFragment.lameStatic.newWifi + " " );
 
-    tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
-    tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
+        tv = (TextView) view.findViewById( R.id.newbt );
+        tv.setText( ListFragment.lameStatic.newBt + " " );
 
-    tv = (TextView) view.findViewById( R.id.newcells );
-    tv.setText( ListFragment.lameStatic.newCells + " " + getString(R.string.dash_new_cells) );
+        tv = (TextView) view.findViewById( R.id.currnets );
+        tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
 
-    updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
-    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN );
-    updateTimeTare(view, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
-            ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
-    updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
-    updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
+        tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
+        tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
 
-    tv = (TextView) view.findViewById( R.id.queuesize );
-    tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
+        tv = (TextView) view.findViewById( R.id.newcells );
+        tv.setText( ListFragment.lameStatic.newCells + " ");
 
-    tv = (TextView) view.findViewById( R.id.dbNets );
-    tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
+        updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+        updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN );
+        updateTimeTare(view, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
+                ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
+        updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
+        updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
-    tv = (TextView) view.findViewById( R.id.dbLocs );
-    tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
+        tv = (TextView) view.findViewById( R.id.queuesize );
+        tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
 
-    tv = (TextView) view.findViewById( R.id.gpsstatus );
-    Location location = ListFragment.lameStatic.location;
-    String gpsStatus = getString(R.string.dash_no_loc);
-    if ( location != null ) {
-      gpsStatus = location.getProvider();
-    }
-    tv.setText( getString(R.string.dash_short_loc) + " " + gpsStatus );
+        tv = (TextView) view.findViewById( R.id.dbNets );
+        tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
+
+        tv = (TextView) view.findViewById( R.id.dbLocs );
+        tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
+
+        tv = (TextView) view.findViewById( R.id.gpsstatus );
+        Location location = ListFragment.lameStatic.location;
+        String gpsStatus = getString(R.string.dash_no_loc);
+        if ( location != null ) {
+          gpsStatus = location.getProvider();
+        }
+        tv.setText( getString(R.string.dash_short_loc) + " " + gpsStatus );
   }
 
   private long newNetsSinceUpload() {

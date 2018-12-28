@@ -1,3 +1,8 @@
+* 2.39 (12/28/2018)
+List performance and threading fixes
+German fixes (thanks designer2k2!)
+Various bug fixes
+
 * 2.38 (10/29/2018)
 Changing http library
 More edge case bug fixes

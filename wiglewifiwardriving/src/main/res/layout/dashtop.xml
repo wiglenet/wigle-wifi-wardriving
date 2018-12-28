@@ -6,47 +6,108 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
 
-    <TextView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/dash_status_bar"
+
+        android:visibility="gone">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/dash_scanstatus"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="#A0FF0000"
+            android:paddingTop="2dp"
+            android:paddingBottom="4dp"
+            android:gravity="center"
+            />
+    </RelativeLayout>
+    <RelativeLayout
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/runnets"
-        android:textSize="42sp"
+        android:textSize="38sp"
         android:textColor="#AAAAAA"
         />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/gpsstatus"
+            android:textSize="24sp"
+            android:textColor="#46AA00"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/newwifi"
-        android:textSize="38sp"
-        android:textColor="#AAEE50"
-        />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/newbt"
-        android:textSize="38sp"
-        android:textColor="#3388AA"
-        />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/newcells"
-        android:textSize="32sp"
-        android:textColor="#F88"
-        />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/gpsstatus"
-        android:textSize="32sp"
-        android:textColor="#46AA00"
-        />
-
+    </RelativeLayout>
     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newwifi"
+            android:textSize="44sp"
+            android:textColor="#AAEE50"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/dash_new_wifi"
+            android:textSize="21sp"
+            android:layout_gravity="top|left"
+            android:paddingTop="8dp"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newbt"
+            android:textSize="44sp"
+            android:textColor="#3388AA"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/dash_new_bt"
+            android:textSize="21sp"
+            android:layout_gravity="top|left"
+            android:paddingTop="8dp"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/newcells"
+            android:textSize="44sp"
+            android:textColor="#F88"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/dash_new_cells"
+            android:textSize="21sp"
+            android:layout_gravity="top|left"
+            android:paddingTop="8dp"
+            />
+    </LinearLayout>
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -62,10 +123,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/run_dur"
             android:textSize="30sp"
-            android:textColor="#909090"
+            android:textColor="#B0B0B0"
+            android:layout_alignParentRight="true"
             />
-    </LinearLayout>
-    <LinearLayout
+    </RelativeLayout>
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -81,7 +143,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/scan_dur"
             android:textSize="30sp"
-            android:textColor="#909090"
+            android:textColor="#B0B0B0"
+            android:layout_alignParentRight="true"
+
             />
-    </LinearLayout>
+    </RelativeLayout>
 </LinearLayout>

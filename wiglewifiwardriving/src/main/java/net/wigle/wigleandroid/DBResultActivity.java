@@ -132,7 +132,24 @@ public class DBResultActivity extends AppCompatActivity {
                     listAdapter.clear();
                     boolean first = true;
                     for ( final Network network : resultList ) {
-                        listAdapter.add( network );
+                        switch (network.getType()) {
+                            case WIFI:
+                                listAdapter.addWiFi( network );
+                                break;
+                            case CDMA:
+                            case GSM:
+                            case WCDMA:
+                            case LTE:
+                                listAdapter.addCell(network);
+                                break;
+                            case BT:
+                                listAdapter.addBluetooth(network);
+                                break;
+                            case BLE:
+                                listAdapter.addBluetoothLe(network);
+                                break;
+                        }
+
                         if ( address == null && first ) {
                             final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
                             MainActivity.info( "set center: " + center + " network: " + network.getSsid()

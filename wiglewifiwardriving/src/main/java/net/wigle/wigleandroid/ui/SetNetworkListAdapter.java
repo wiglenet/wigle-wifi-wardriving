@@ -70,6 +70,27 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         notifyDataSetChanged();
     }
 
+    @Override
+    public void add(Network network) {
+        switch (network.getType()) {
+            case WIFI:
+                addWiFi( network );
+                break;
+            case CDMA:
+            case GSM:
+            case WCDMA:
+            case LTE:
+                addCell(network);
+                break;
+            case BT:
+                addBluetooth(network);
+                break;
+            case BLE:
+                addBluetoothLe(network);
+                break;
+        }
+    }
+
     public void addWiFi(Network n) {
         networks.addWiFi(n);
         notifyDataSetChanged();

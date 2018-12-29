@@ -334,4 +334,5 @@
     <string name="turning_bt_off">Turning Bluetooth back off</string>
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
 </resources>

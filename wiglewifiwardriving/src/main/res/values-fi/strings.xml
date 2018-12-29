@@ -334,4 +334,5 @@
     <string name="turning_bt_off">Bluetoothin palauttaminen pois päältä</string>
     <string name="turn_on_bt">Bluetoothin kytkeminen päälle</string>
     <string name="filter_show_bt">Näytä Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID-koodin on oltava 12 merkkiä pitkä tai siinä on oltava merkki (%)</string>
 </resources>

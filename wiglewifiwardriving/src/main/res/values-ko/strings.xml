@@ -334,4 +334,5 @@
     <string name="turning_bt_off">Bluetooth 다시 켜기</string>
     <string name="turn_on_bt">블루투스 켜기</string>
     <string name="filter_show_bt">블루투스 표시</string>
+    <string name="error_invalid_bssid">BSSID는 12 자이거나 와일드 카드 (%)를 포함해야합니다.</string>
 </resources>

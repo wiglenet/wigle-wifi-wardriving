@@ -392,4 +392,5 @@
     <string name="turning_bt_off">Bluetoothをオフに戻す</string>
     <string name="turn_on_bt">Bluetoothをオンにする</string>
     <string name="filter_show_bt">Bluetoothを表示する</string>
+    <string name="error_invalid_bssid">BSSIDは12文字の長さであるか、またはワイルドカード（％）を含む必要があります</string>
 </resources>

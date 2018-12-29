@@ -334,4 +334,5 @@
     <string name="turning_bt_off">Bluetooth\'u kapatma</string>
     <string name="turn_on_bt">Bluetooth\'u açma</string>
     <string name="filter_show_bt">Bluetooth\'u göster</string>
+    <string name="error_invalid_bssid">BSSID, 12 karakter uzunluğunda olmalı veya bir joker karakter içermelidir (%)</string>
 </resources>

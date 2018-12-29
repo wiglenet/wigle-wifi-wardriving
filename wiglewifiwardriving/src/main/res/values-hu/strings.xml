@@ -334,4 +334,5 @@
     <string name="turning_bt_off">A Bluetooth kikapcsolása</string>
     <string name="turn_on_bt">A Bluetooth bekapcsolása</string>
     <string name="filter_show_bt">Bluetooth megjelenítése</string>
+    <string name="error_invalid_bssid">A BSSID-nek 12 karakter hosszúnak kell lennie, vagy tartalmaznia kell egy helyettesítő karaktert (%)</string>
 </resources>

@@ -392,4 +392,5 @@
     <string name="turning_bt_off">關閉藍牙功能</string>
     <string name="turn_on_bt">打開藍牙</string>
     <string name="filter_show_bt">顯示藍牙</string>
+    <string name="error_invalid_bssid">BSSID必須長度為12個字符或包含通配符（％）</string>
 </resources>

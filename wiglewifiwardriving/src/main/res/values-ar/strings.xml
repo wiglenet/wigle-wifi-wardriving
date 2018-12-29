@@ -392,4 +392,5 @@
     <string name="turning_bt_off">إيقاف تشغيل البلوتوث</string>
     <string name="turn_on_bt">تشغيل البلوتوث</string>
     <string name="filter_show_bt">عرض البلوتوث</string>
+    <string name="error_invalid_bssid">يجب أن يكون طول BSSID 12 حرفًا أو يحتوي على حرف بدل (٪)</string>
 </resources>

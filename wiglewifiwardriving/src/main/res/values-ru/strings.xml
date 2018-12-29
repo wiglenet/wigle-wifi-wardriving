@@ -346,4 +346,5 @@
     <string name="turning_bt_off">Отключение Bluetooth</string>
     <string name="turn_on_bt">Включение Bluetooth</string>
     <string name="filter_show_bt">Показать Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID должен быть длиной 12 символов или содержать подстановочный знак (%)</string>
 </resources>

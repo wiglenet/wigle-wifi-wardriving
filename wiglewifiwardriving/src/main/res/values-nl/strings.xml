@@ -334,4 +334,5 @@
     <string name="turning_bt_off">Bluetooth uitschakelen</string>
     <string name="turn_on_bt">Bluetooth inschakelen</string>
     <string name="filter_show_bt">Toon Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
 </resources>

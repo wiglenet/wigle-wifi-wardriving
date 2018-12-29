@@ -392,4 +392,5 @@
     <string name="turning_bt_off">Vypnutí Bluetooth vypněte</string>
     <string name="turn_on_bt">Zapnutí funkce Bluetooth</string>
     <string name="filter_show_bt">Zobrazit Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID musí mít délku 12 znaků nebo obsahuje zástupný znak (%)</string>
 </resources>

@@ -115,6 +115,7 @@
     <string name="tab_map">מפה</string>
     <string name="tab_dash">לוח מחוונים</string>
     <string name="tab_data">נתונים</string>
+    <string name="tab_stats">סטטיסטיקות</string>
     <string name="ok">בסדר</string>
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>
@@ -272,7 +273,6 @@
     <string name="at">בְּ-</string>
     <string name="drawer_open">מגירה פתוחה</string>
     <string name="drawer_close">מגירה סגור</string>
-    <string name="tab_stats">סטטיסטיקות משתמש</string>
     <string name="site_stats_app_name">סטטיסטיקה של WiGLE.net</string>
     <string name="netloc_title">רשתות WiFi עם מיקום WiGLE.net</string>
     <string name="loctotal_title">Wi-Fi.net תצפיות רשת WiFi</string>

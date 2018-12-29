@@ -115,6 +115,7 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_dash">Overzicht</string>
     <string name="tab_data">Gegevens</string>
+    <string name="tab_stats">Statistieken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuleren</string>
     <string name="dash_scan_off">Scan is uit</string>

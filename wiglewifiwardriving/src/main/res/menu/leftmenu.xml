@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:checkableBehavior="single">
+    <group>
         <item
             android:id="@+id/nav_list"
             android:icon="@android:drawable/ic_menu_sort_by_size"
@@ -28,22 +28,31 @@
             android:title="@string/tab_news"
             />
         <item
-            android:id="@+id/nav_rank"
-            android:icon="@android:drawable/ic_menu_sort_alphabetically"
-            android:title="@string/tab_rank"
-            />
-        <item
             android:id="@+id/nav_stats"
             android:icon="@android:drawable/ic_menu_today"
-            android:title="@string/tab_stats"
-            />
-        <item
-            android:id="@+id/nav_site_stats"
-            android:icon="@android:drawable/ic_menu_info_details"
-            android:title="@string/tab_stats"
-            android:visibility="gone"
-            app:showAsAction="never"
-            />
+            android:title="@string/tab_stats"/>
+        <group
+            android:id="@+id/stats_group"
+            >
+            <item
+                android:id="@+id/nav_user_stats"
+                android:icon="@android:drawable/ic_menu_myplaces"
+                android:title="@string/user_stats_app_name"
+                android:paddingLeft="4dp"
+                />
+            <item
+                android:id="@+id/nav_rank"
+                android:icon="@android:drawable/ic_menu_sort_alphabetically"
+                android:title="@string/tab_rank"
+                android:paddingLeft="4dp"
+                />
+            <item
+                android:id="@+id/nav_site_stats"
+                android:icon="@android:drawable/ic_menu_info_details"
+                android:title="@string/site_stats_app_name"
+                android:paddingLeft="4dp"
+                />
+        </group>
         <item
             android:id="@+id/nav_uploads"
             android:icon="@android:drawable/ic_menu_upload"

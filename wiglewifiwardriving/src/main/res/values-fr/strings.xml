@@ -115,6 +115,7 @@
     <string name="tab_map">Carte</string>
     <string name="tab_dash">Tableau de bord</string>
     <string name="tab_data">Base de données</string>
+    <string name="tab_stats">Statistiques</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="dash_scan_off">(Numérisation désactivée)</string>
@@ -272,7 +273,6 @@
     <string name="at">à</string>
     <string name="drawer_open">Tiroir ouvert</string>
     <string name="drawer_close">Tiroir fermé</string>
-    <string name="tab_stats">Statistiques</string>
     <string name="site_stats_app_name">Statistiques WiGLE.net</string>
     <string name="netloc_title">WiGLE.net : réseaux WiFi avec localisation</string>
     <string name="loctotal_title">WiGLE.net : observations de réseaux WiFi</string>

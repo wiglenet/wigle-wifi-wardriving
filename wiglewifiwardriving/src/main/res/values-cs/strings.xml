@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Souhrn</string>
     <string name="tab_data">Data</string>
+    <string name="tab_stats">Statistiky</string>
     <string name="ok">OK</string>
     <string name="cancel">Storno</string>
     <string name="dash_scan_off">(Skenování vypnuto)</string>
@@ -272,7 +273,6 @@
     <string name="at">na</string>
     <string name="drawer_open">Zásuvka je otevřená</string>
     <string name="drawer_close">Zásuvka zavřete</string>
-    <string name="tab_stats">Statistiky uživatelů</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
     <string name="netloc_title">WiFi sítě WiGLE.net s umístěním</string>
     <string name="loctotal_title">WiGLE.net WiFi Pozorování sítě</string>

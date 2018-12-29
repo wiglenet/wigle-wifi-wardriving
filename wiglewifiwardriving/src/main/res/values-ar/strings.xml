@@ -115,6 +115,7 @@
     <string name="tab_map">Map</string>
     <string name="tab_dash">Dashboard</string>
     <string name="tab_data">Data</string>
+    <string name="tab_stats">إحصائيات</string>
     <string name="ok">حسنا</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(تم إيقاف تشغيل المسح)</string>
@@ -272,7 +273,6 @@
     <string name="at">في</string>
     <string name="drawer_open">درج مفتوح</string>
     <string name="drawer_close">إغلاق الدرج</string>
-    <string name="tab_stats">إحصائيات المستخدم</string>
     <string name="site_stats_app_name">إحصائيات WiGLE.net</string>
     <string name="netloc_title">WiGLE.net شبكات واي فاي مع الموقع</string>
     <string name="loctotal_title">WiGLE.net واي فاي شبكة الرصد</string>

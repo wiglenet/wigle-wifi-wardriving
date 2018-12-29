@@ -115,6 +115,7 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_dash">Oersjoch</string>
     <string name="tab_data">Gegevens</string>
+    <string name="tab_stats">Statistieken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>
@@ -258,6 +259,8 @@
     <string name="use_wigle_tiles">Gebrûk WiGLE OSM-tegels</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Toast pop-ups uitschakelen</string>
+    <string name="drawer_open">Lade open</string>
+    <string name="drawer_close">Lade gesloten</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>

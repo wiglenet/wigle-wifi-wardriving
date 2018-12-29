@@ -115,6 +115,7 @@
     <string name="tab_map">地図</string>
     <string name="tab_dash">ダッシュボード</string>
     <string name="tab_data">データ</string>
+    <string name="tab_stats">統計</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(スキャン停止中)</string>
@@ -272,7 +273,6 @@
     <string name="at">〜で</string>
     <string name="drawer_open">引き出しを開く</string>
     <string name="drawer_close">引き出しクローズ</string>
-    <string name="tab_stats">ユーザー統計</string>
     <string name="site_stats_app_name">WiGLE.netの統計</string>
     <string name="netloc_title">ロケーションがあるWiGLE.net WiFiネットワーク</string>
     <string name="loctotal_title">WiGLE.net WiFiネットワークの観測</string>

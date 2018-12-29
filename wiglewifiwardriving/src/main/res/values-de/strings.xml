@@ -115,6 +115,7 @@
     <string name="tab_map">Karte</string>
     <string name="tab_dash">Übersicht</string>
     <string name="tab_data">Daten</string>
+    <string name="tab_stats">Statistiken</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="dash_scan_off">(Scan ausgeschaltet)</string>
@@ -272,7 +273,6 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer öffnen</string>
     <string name="drawer_close">Drawer schließen</string>
-    <string name="tab_stats">Statistiken</string>
     <string name="site_stats_app_name">WiGLE.net Statistiken</string>
     <string name="netloc_title">WiGLE.net WLAN-Netzwerke mit Ort</string>
     <string name="loctotal_title">WiGLE.net WLAN-Netzwerk Beobachtungen</string>

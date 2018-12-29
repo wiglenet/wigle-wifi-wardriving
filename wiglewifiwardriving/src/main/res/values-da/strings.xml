@@ -115,6 +115,7 @@
     <string name="tab_map">Kort</string>
     <string name="tab_dash">Instrumentbræt</string>
     <string name="tab_data">Data</string>
+    <string name="tab_stats">Statistik</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuller</string>
     <string name="dash_scan_off">(Scanning er slukket)</string>
@@ -272,7 +273,6 @@
     <string name="at">på</string>
     <string name="drawer_open">Skuffe åben</string>
     <string name="drawer_close">Skuffe tæt</string>
-    <string name="tab_stats">Brugerstatistik</string>
     <string name="site_stats_app_name">WiGLE.net Statistik</string>
     <string name="netloc_title">WiGLE.net WiFi netværk med placering</string>
     <string name="loctotal_title">WiGLE.net WiFi Netværk Observationer</string>

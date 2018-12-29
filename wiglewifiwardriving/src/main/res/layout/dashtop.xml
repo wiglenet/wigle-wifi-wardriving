@@ -30,22 +30,43 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/runnets"
-        android:textSize="38sp"
-        android:textColor="#AAAAAA"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/runnets"
+            android:textSize="38sp"
+            android:textColor="#B0B0B0"
         />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/runcaption"
+            android:textSize="16sp"
+            android:textColor="#AAAAAA"
+            android:layout_toRightOf="@+id/runnets"
+            android:paddingTop="8dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/gpsstatus"
-            android:textSize="24sp"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:textColor="#46AA00"
+            android:layout_toLeftOf="@+id/fixtype"
+            android:layout_alignParentTop="true"
+            android:paddingTop="2dp"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/fixtype"
+            android:tint="#46AA00"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:paddingTop="2dp"
+            android:paddingRight="2dp"
+            android:layout_centerVertical="true"
             />
-
     </RelativeLayout>
     <LinearLayout
         android:layout_width="fill_parent"

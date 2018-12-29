@@ -391,4 +391,5 @@
     <string name="turning_bt_off">כיבוי Bluetooth</string>
     <string name="turn_on_bt">הפעלת Bluetooth</string>
     <string name="filter_show_bt">הצג Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID חייב להכיל 12 תווים או להכיל תו כללי (%)</string>
 </resources>

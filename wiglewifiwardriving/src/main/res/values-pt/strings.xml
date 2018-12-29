@@ -328,4 +328,5 @@
     <string name="turning_bt_off">Desligar o Bluetooth</string>
     <string name="turn_on_bt">Ligando o Bluetooth</string>
     <string name="filter_show_bt">Mostrar Bluetooth</string>
+    <string name="error_invalid_bssid">O BSSID deve ter 12 caracteres ou conter um curinga (%)</string>
 </resources>

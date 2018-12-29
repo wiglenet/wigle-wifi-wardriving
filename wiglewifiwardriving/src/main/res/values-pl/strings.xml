@@ -328,4 +328,5 @@
     <string name="turning_bt_off">Wyłączenie Bluetooth</string>
     <string name="turn_on_bt">Włączanie Bluetooth</string>
     <string name="filter_show_bt">Pokaż Bluetooth</string>
+    <string name="error_invalid_bssid">Identyfikator BSSID może mieć 12 znaków lub zawierać symbol wieloznaczny (%)</string>
 </resources>

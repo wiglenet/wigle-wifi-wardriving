@@ -328,4 +328,5 @@
     <string name="turning_bt_off">Slår tillbaka Bluetooth</string>
     <string name="turn_on_bt">Aktiverar Bluetooth</string>
     <string name="filter_show_bt">Visa Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID måste vara 12 tecken långt eller innehålla ett jokertecken (%)</string>
 </resources>

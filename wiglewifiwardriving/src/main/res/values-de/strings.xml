@@ -391,4 +391,5 @@
     <string name="turning_bt_off">Bluetooth ausschalten</string>
     <string name="turn_on_bt">Bluetooth einschalten</string>
     <string name="filter_show_bt">Bluetooth anzeigen</string>
+    <string name="error_invalid_bssid">BSSID muss 12 Zeichen lang sein oder einen Platzhalter (%) enthalten</string>
 </resources>

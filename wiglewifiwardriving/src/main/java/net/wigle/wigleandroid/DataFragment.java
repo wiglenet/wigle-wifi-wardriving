@@ -128,7 +128,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             case R.id.query_bssid:
                                 field = getString(R.string.bssid);
                                 queryArgs.setBSSID(text);
-                                okValue = true;
+                                if (text.length() > 17 || (text.length() < 17 && !text.contains("%"))) {
+                                    okValue = false;
+                                    fail = getString(R.string.error_invalid_bssid);
+                                } else {
+                                    MainActivity.info("text: "+text);
+                                    okValue = true;
+                                }
                                 break;
                             default:
                                 MainActivity.error("setupButtons: bad id: " + id);

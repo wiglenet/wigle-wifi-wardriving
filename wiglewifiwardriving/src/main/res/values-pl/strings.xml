@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Informacje</string>
     <string name="tab_data">Dane</string>
+    <string name="tab_stats">Statystyka</string>
     <string name="ok">OK</string>
     <string name="cancel">Anuluj</string>
     <string name="dash_scan_off">(Skanowanie wyłączone)</string>

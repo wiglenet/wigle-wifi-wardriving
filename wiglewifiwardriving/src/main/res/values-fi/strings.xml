@@ -115,6 +115,7 @@
     <string name="tab_map">Kartta</string>
     <string name="tab_dash">Kojelauta</string>
     <string name="tab_data">Tiedot</string>
+    <string name="tab_stats">Tilasto</string>
     <string name="ok">OK</string>
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>
@@ -258,6 +259,8 @@
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="drawer_open">Laatikko auki</string>
+    <string name="drawer_close">Laatikko suljettu</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>

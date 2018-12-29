@@ -115,6 +115,7 @@
     <string name="tab_map">Térkép</string>
     <string name="tab_dash">Műszerfal</string>
     <string name="tab_data">Adatbázis</string>
+    <string name="tab_stats">Statisztika</string>
     <string name="ok">OK</string>
     <string name="cancel">Mégse</string>
     <string name="dash_scan_off">(Szkennelés kikapcsolva)</string>
@@ -258,6 +259,8 @@
     <string name="use_wigle_tiles">Használjon WiGLE OSM csempéket</string>
     <string name="wigle_service">WiGLE Wifi Szolgáltatás</string>
     <string name="disable_toast">Felugró értesítések tiltása</string>
+    <string name="drawer_open">Nyitott fiók</string>
+    <string name="drawer_close">Fiók zárva</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>

@@ -19,8 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -87,6 +85,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
+import java.security.acl.Group;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -129,6 +128,7 @@ public final class MainActivity extends AppCompatActivity {
         SetNetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab = R.id.nav_list;
+        int previousTab = R.id.nav_list;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -487,17 +487,37 @@ public final class MainActivity extends AppCompatActivity {
         };
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        NavigationView navigationView = findViewById(R.id.left_drawer);
+        final NavigationView navigationView = findViewById(R.id.left_drawer);
+        navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
-                        menuItem.setChecked(true);
+
+                        menuItem.setCheckable(true);
+                        if (menuItem.getItemId() == R.id.nav_stats) {
+                            menuItem.setChecked(!menuItem.isChecked());
+                        } else {
+                            menuItem.setChecked(true);
+                            MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                            mPreviousMenuItem.setChecked(false);
+                        }
+                        state.previousTab = menuItem.getItemId();
+
                         // close drawer when item is tapped
-                        mDrawerLayout.closeDrawers();
-                        selectFragment(menuItem.getItemId());
+                        if (R.id.nav_stats == menuItem.getItemId()) {
+                            MainActivity.info("Nav stats clicked");
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked() );
+                        } else {
+                            if (R.id.nav_site_stats != menuItem.getItemId() &&
+                                    R.id.nav_user_stats != menuItem.getItemId() &&
+                                    R.id.nav_rank != menuItem.getItemId() )
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
+                            mDrawerLayout.closeDrawers();
+                            selectFragment(menuItem.getItemId());
+                        }
                         return true;
                     }
                 });
@@ -507,10 +527,6 @@ public final class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
         navigationView.getMenu().getItem(0).setChecked(true);
-
-        // ALIBI: not enough room on many displays
-        final MenuItem siteStatsItem  = navigationView.getMenu().findItem(R.id.nav_site_stats);
-        siteStatsItem.setVisible(false);
 
         // end drawer setup
     }
@@ -530,7 +546,7 @@ public final class MainActivity extends AppCompatActivity {
         fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
         fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
         fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
-        fragmentTitles.put(R.id.nav_stats, getString(R.string.user_stats_app_name));
+        fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
         fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
         fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
         fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
@@ -569,6 +585,10 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
+        menu.setGroupVisible(submenuGroupId, visible);
+    }
+
     @Override
     public void setTitle(CharSequence title) {
         final ActionBar actionBar = getSupportActionBar();
@@ -598,7 +618,7 @@ public final class MainActivity extends AppCompatActivity {
                 return DataFragment.class;
             case R.id.nav_map:
                 return MappingFragment.class;
-            case R.id.nav_stats:
+            case R.id.nav_user_stats:
                 return UserStatsFragment.class;
             case R.id.nav_rank:
                 return RankStatsFragment.class;

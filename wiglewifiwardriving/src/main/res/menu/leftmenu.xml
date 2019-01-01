@@ -23,6 +23,11 @@
             android:title="@string/tab_data"
             />
         <item
+            android:id="@+id/nav_search"
+            android:icon="@android:drawable/ic_menu_search"
+            android:title="@string/tab_search"
+            />
+        <item
             android:id="@+id/nav_news"
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="@string/tab_news"

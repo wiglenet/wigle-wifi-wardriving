@@ -12,8 +12,13 @@
 	android:layout_height="2dip"
 	android:background="#A07070"/>
 
-    <ListView android:id="@+id/dblist" android:layout_width="fill_parent" android:layout_height="fill_parent"
-    	android:layout_weight="1"/>
+	<fragment
+        android:name="net.wigle.wigleandroid.NetListFragment"
+        android:id="@+id/net_list"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:layout_weight="1"
+		/>
 
 	<LinearLayout
 	android:layout_width="fill_parent"

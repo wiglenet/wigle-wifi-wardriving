@@ -85,7 +85,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
-import java.security.acl.Group;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -153,7 +152,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
-    // registration web view
+    public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
+    public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
+
+        // registration web view
     public static final String REG_URL = "https://wigle.net/register";
 
     private static final String LOG_TAG = "wigle";
@@ -544,6 +546,7 @@ public final class MainActivity extends AppCompatActivity {
         fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
         fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
         fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
+        fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
         fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
         fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
         fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
@@ -616,6 +619,8 @@ public final class MainActivity extends AppCompatActivity {
                 return DashboardFragment.class;
             case R.id.nav_data:
                 return DataFragment.class;
+            case R.id.nav_search:
+                return SearchFragment.class;
             case R.id.nav_map:
                 return MappingFragment.class;
             case R.id.nav_user_stats:

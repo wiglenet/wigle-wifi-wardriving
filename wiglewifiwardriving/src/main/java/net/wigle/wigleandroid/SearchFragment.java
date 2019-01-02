@@ -99,20 +99,15 @@ public class SearchFragment extends Fragment {
 
                 RadioGroup rbg = view.findViewById(R.id.search_type_group);
                 int searchTypeId = rbg.getCheckedRadioButtonId();
+                final boolean local = (searchTypeId == R.id.radio_search_wigle) ? false: true;
 
-                final String fail = SearchUtil.setupLocalQuery(view, getActivity());
+                final String fail = SearchUtil.setupQuery(view, getActivity(), local);
 
                 if (fail != null) {
                     // toast!
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
-                    // start search activity
-                    if (searchTypeId == R.id.radio_search_wigle) {
-                        ListFragment.lameStatic.queryArgs.setSearchWiGLE(true);
-                    } else {
-                        ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
-                    }
-
+                    ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
                     final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
                     startActivity(settingsIntent);
                 }

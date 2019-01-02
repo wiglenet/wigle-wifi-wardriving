@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,6 +45,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +59,8 @@ public class DBResultActivity extends AppCompatActivity {
     private static final int DEFAULT_ZOOM = 18;
 
     private static final int MSG_SEARCH_DONE = 100;
+    private static final int MSG_SEARCH_FAILED = 400;
+    private static final int MSG_PARSE_FAILED = 500;
 
     private static final String RESULT_LIST_KEY = "results";
 
@@ -66,6 +71,13 @@ public class DBResultActivity extends AppCompatActivity {
     private static final String ENCRYPTION_KEY = "encryption";
     private static final String CHANNEL_KEY = "channel";
 
+    private static final String API_LAT1_PARAM = "latrange1";
+    private static final String API_LAT2_PARAM = "latrange2";
+    private static final String API_LON1_PARAM = "longrange1";
+    private static final String API_LON2_PARAM = "longrange2";
+    private static final String API_BSSID_PARAM = "netid";
+    private static final String API_SSIDLIKE_PARAM = "ssidlike";
+    private static final String API_SSID_PARAM = "ssid";
 
     private static final String[] ALL_NET_KEYS = new String[] {
             TRILAT_KEY, TRILON_KEY, SSID_KEY, NETID_KEY, ENCRYPTION_KEY, CHANNEL_KEY
@@ -101,7 +113,7 @@ public class DBResultActivity extends AppCompatActivity {
         final TextView tv = (TextView) findViewById( R.id.dbstatus );
 
         if ( queryArgs != null ) {
-            tv.setText( getString(R.string.status_working) + "..."); //TODO: throbber/overlay?
+            tv.setText( getString(R.string.status_working)); //TODO: throbber/overlay?
             Address address = queryArgs.getAddress();
             LatLng center = MappingFragment.DEFAULT_POINT;
             if ( address != null ) {
@@ -280,9 +292,9 @@ public class DBResultActivity extends AppCompatActivity {
             }
 
             if (queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_")) {
-                queryParams+="ssidlike="+URLEncoder.encode((queryArgs.getSSID()));
+                queryParams+=API_SSIDLIKE_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
             } else {
-                queryParams+="ssidlike="+URLEncoder.encode((queryArgs.getSSID()));
+                queryParams+=API_SSID_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
             }
         }
 
@@ -291,19 +303,32 @@ public class DBResultActivity extends AppCompatActivity {
                 queryParams+="&";
             }
 
-            if (queryArgs.getBSSID().contains("%") || queryArgs.getBSSID().contains("%")) {
-                String splitBssid[] = queryArgs.getBSSID().split("%|_", 2);
-                queryParams+="netid="+URLEncoder.encode(splitBssid[0]);
-            } else {
-                queryParams+="netid="+URLEncoder.encode((queryArgs.getBSSID()));
-            }
+            queryParams+=API_BSSID_PARAM+"="+(queryArgs.getBSSID());
         }
 
-        //TODO: address
+        final Address address = queryArgs.getAddress();
+        if (address != null) {
+            if (!queryParams.isEmpty()) {
+                queryParams+="&";
+            }
+
+            final double diff = 0.001d;
+            final double lat = address.getLatitude();
+            final double lon = address.getLongitude();
+
+            queryParams+=API_LAT1_PARAM+"="+(lat - diff)+"&";
+            queryParams+=API_LAT2_PARAM+"="+(lat + diff)+"&";
+            queryParams+=API_LON1_PARAM+"="+(lon - diff)+"&";
+            queryParams+=API_LON2_PARAM+"="+(lon + diff);
+        }
 
         final NetsDownloadHandler handler = new NetsDownloadHandler(view,
-                activity.getPackageName(), getResources(), listAdapter, mapView, mapRender, obsMap,
-                (TextView) findViewById(R.id.dbstatus), getString(R.string.status_success), "");
+                activity.getPackageName(), getResources(),
+                listAdapter,
+                mapView,
+                mapRender,
+                obsMap,
+                this);
 
         final ApiDownloader task = new ApiDownloader(activity, ListFragment.lameStatic.dbHelper,
                 "search-cache-"+queryParams+".json", MainActivity.SEARCH_WIFI_URL+"?"+queryParams,
@@ -333,30 +358,38 @@ public class DBResultActivity extends AppCompatActivity {
         }
 
         final Bundle bundle = new Bundle();
+        final Message message = new Message();
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
-            for (int i = 0; i < list.length(); i++) {
-                final JSONObject row = list.getJSONObject(i);
-                final Bundle rowBundle = new Bundle();
-                for  (final String key: ALL_NET_KEYS) {
-                    String value = row.getString(key);
-                    rowBundle.putString(key, value);
+            if (list == null || list.length() == 0) {
+                message.what = MSG_PARSE_FAILED;
+                handler.sendMessage(message);
+                MainActivity.error("empty results");
+            } else {
+                final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
+                for (int i = 0; i < list.length(); i++) {
+                    final JSONObject row = list.getJSONObject(i);
+                    final Bundle rowBundle = new Bundle();
+                    for (final String key : ALL_NET_KEYS) {
+                        String value = row.getString(key);
+                        rowBundle.putString(key, value);
+                    }
+                    resultList.add(rowBundle);
                 }
-                resultList.add(rowBundle);
+                bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
+                message.setData(bundle);
+                message.what = MSG_SEARCH_DONE;
+                handler.sendMessage(message);
             }
-            bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
         } catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
+            message.what = MSG_PARSE_FAILED;
+            handler.sendMessage(message);
+            MainActivity.error("json error parsing:  " + json, ex);
         } catch (final Exception e) {
+            message.what = MSG_SEARCH_FAILED;
+            handler.sendMessage(message);
             MainActivity.error("search error: " + e, e);
         }
-
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_SEARCH_DONE;
-        handler.sendMessage(message);
-
     }
 
     private static void putWithBackoff( TreeMap<Float,String> top, String s, float diff ) {
@@ -441,23 +474,19 @@ public class DBResultActivity extends AppCompatActivity {
         private final MapView mapView;
         private final MapRender mapRender;
         private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap;
-        private final TextView statusView;
-        private final String success;
-        private final String failure;
+        private final Activity activityContext;
 
         private NetsDownloadHandler(final View view, final String packageName,
                                     final Resources resources, final SetNetworkListAdapter resultList,
                                     final MapView mapView, final MapRender mapRender,
                                     final ConcurrentLinkedHashMap<LatLng, Integer> obsMap,
-                                    final TextView statusView, final String success, final String failure) {
+                                    final Activity activityContext) {
             super(view, null, packageName, resources);
             this.resultList = resultList;
             this.mapView = mapView;
             this.mapRender = mapRender;
             this.obsMap = obsMap;
-            this.statusView = statusView;
-            this.success = success;
-            this.failure = failure;
+            this.activityContext = activityContext;
         }
 
         @SuppressLint("SetTextI18n")
@@ -466,10 +495,15 @@ public class DBResultActivity extends AppCompatActivity {
             final Bundle bundle = msg.getData();
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            // MainActivity.info("handleMessage. results: " + results);
+            // DEBUG:
+            MainActivity.info("handleMessage. results: " + results);
+
+            final TextView statusView = activityContext.findViewById(R.id.dbstatus);
+
             if (msg.what == MSG_SEARCH_DONE && results != null /*&& handler != null*/) {
                 resultList.clear();
                 boolean first = true;
+
                 for (final Parcelable result : results) {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
@@ -503,14 +537,28 @@ public class DBResultActivity extends AppCompatActivity {
                     }
                 }
 
+
                 if (statusView != null) {
-                    statusView.setText(success);
+                    statusView.setText(activityContext.getString(R.string.status_success));
                 }
 
                 if (mapView != null) {
                     mapView.postInvalidate();
                 }
 
+            } else if (msg.what == MSG_SEARCH_FAILED) {
+
+                if (statusView != null) {
+                    statusView.setText(activityContext.getString(R.string.search_failed));
+                }
+                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
+                        activityContext.getString(R.string.search_failed), Toast.LENGTH_LONG);
+            } else if (msg.what == MSG_PARSE_FAILED) {
+                if (statusView != null) {
+                    statusView.setText(activityContext.getString(R.string.search_empty));
+                }
+                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
+                        activityContext.getString(R.string.search_empty), Toast.LENGTH_LONG);
             }
         }
     }

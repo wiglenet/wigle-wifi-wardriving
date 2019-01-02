@@ -27,7 +27,7 @@ public class SearchUtil {
         ListFragment.lameStatic.queryArgs = null;
     }
 
-    public static String setupLocalQuery(final View view, final Context context) {
+    public static String setupQuery(final View view, final Context context, final boolean local) {
         final QueryArgs queryArgs = new QueryArgs();
         String fail = null;
         String field = null;
@@ -45,7 +45,7 @@ public class SearchUtil {
                 final String intermediateText = ((MaskedEditText) editText).getRawText();
                 if (null != intermediateText && !intermediateText.isEmpty()) {
                     text = intermediateText.replaceAll("(..)(?!$)", "$1:");
-                    MainActivity.info("text: " + text);
+                    //DEBUG: MainActivity.info("text: " + text);
                 } else {
                     text = "";
                 }
@@ -76,12 +76,39 @@ public class SearchUtil {
                     case R.id.query_bssid:
                         field = context.getString(R.string.bssid);
                         queryArgs.setBSSID(text);
-                        if (text.length() > 17 || (text.length() < 17 && !text.contains("%"))) {
-                            okValue = false;
-                            fail = context.getString(R.string.error_invalid_bssid);
+                        if (local) {
+                            if (text.length() > 17 || (text.length() < 17 && !text.contains("%"))) {
+                                okValue = false;
+                                fail = context.getString(R.string.error_invalid_bssid);
+                            } else {
+                                //DEBUG:
+                                MainActivity.info("text: "+text);
+                                okValue = true;
+                            }
                         } else {
-                            MainActivity.info("text: "+text);
-                            okValue = true;
+                            if (text.contains("%") || text.contains("_")) {
+                                //ALIBI: hack, since online BSSIDs don't allow wildcards
+                                String splitBssid[] = queryArgs.getBSSID().split("%|_", 2);
+                                text = splitBssid[0];
+                            }
+
+                            if (((text.length() == 9) || (text.length() == 12) || (text.length() == 15))
+                                    && (text.charAt(text.length()-1) == ':')) {
+                                //remove trailing ':'s
+                                queryArgs.setBSSID(text.substring(0,text.length()-1));
+                                MainActivity.info("text: "+text);
+                                okValue = true;
+                            } else if (text.length() < 8) {
+                                okValue = false;
+                                fail = context.getString(R.string.error_less_than_oui);
+                            } else if (text.length() == 17) {
+                                MainActivity.info("text: "+text);
+                                okValue = true;
+                            } else {
+                                okValue = false;
+                                fail = context.getString(R.string.error_incomplete_octet);
+                            }
+
                         }
                         break;
                     default:

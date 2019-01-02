@@ -89,7 +89,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick(final View buttonView) {
 
-                final String fail = SearchUtil.setupLocalQuery(view, getActivity());
+                final String fail = SearchUtil.setupQuery(view, getActivity(), true);
                 if (null != ListFragment.lameStatic.queryArgs) {
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
                 }

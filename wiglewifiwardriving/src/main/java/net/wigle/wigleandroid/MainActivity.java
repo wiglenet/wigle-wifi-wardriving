@@ -47,6 +47,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -528,6 +530,23 @@ public final class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        int menuSubColor = 0xE0777777;
+        MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
+        SpannableString spanString = new SpannableString(uStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        uStats.setTitle(spanString);
+
+        MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
+        spanString = new SpannableString(sStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        sStats.setTitle(spanString);
+
+        MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
+        spanString = new SpannableString(rStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        rStats.setTitle(spanString);
+
         navigationView.getMenu().getItem(0).setChecked(true);
 
         // end drawer setup

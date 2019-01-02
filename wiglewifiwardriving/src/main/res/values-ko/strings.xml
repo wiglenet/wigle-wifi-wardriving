@@ -336,4 +336,13 @@
     <string name="turn_on_bt">블루투스 켜기</string>
     <string name="filter_show_bt">블루투스 표시</string>
     <string name="error_invalid_bssid">BSSID는 12 자이거나 와일드 카드 (%)를 포함해야합니다.</string>
+    <string name="error_less_than_oui">BSSID에는 온라인 검색을위한 OUI가 있어야합니다.</string>
+    <string name="error_incomplete_octet">온라인 검색을 위해서는 BSSID 8 진수가 완료되어야합니다 (또는 %).</string>
+    <string name="search_wigle">WiGLE에서 검색</string>
+    <string name="must_login">(로그인해야 함)</string>
+    <string name="search_local">로컬 데이터베이스 검색</string>
+    <string name="search_failed">검색 실패</string>
+    <string name="search_empty">빈 결과</string>
+    <string name="search_query_limit">오늘 최대 검색 수에 도달했습니다. 한도가 내일 다시 설정됩니다.</string>
+
 </resources>

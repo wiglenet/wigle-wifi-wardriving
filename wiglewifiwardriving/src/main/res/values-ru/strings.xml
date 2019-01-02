@@ -348,4 +348,12 @@
     <string name="turn_on_bt">Включение Bluetooth</string>
     <string name="filter_show_bt">Показать Bluetooth</string>
     <string name="error_invalid_bssid">BSSID должен быть длиной 12 символов или содержать подстановочный знак (%)</string>
+    <string name="error_less_than_oui">BSSID должен содержать как минимум OUI для онлайн-поиска</string>
+    <string name="error_incomplete_octet">Октеты BSSID должны быть полными (или%) для онлайн-поиска</string>
+    <string name="search_wigle">Поиск в WiGLE</string>
+    <string name="must_login">(должен войти в систему)</string>
+    <string name="search_local">Поиск в вашей локальной базе данных</string>
+    <string name="search_failed">Поиск не удался</string>
+    <string name="search_empty">Результаты Пусто</string>
+    <string name="search_query_limit">Вы достигли максимального числа поисков сегодня. Ваш лимит будет сброшен завтра.</string>
 </resources>

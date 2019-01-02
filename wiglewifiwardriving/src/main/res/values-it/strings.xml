@@ -393,4 +393,12 @@
     <string name="turn_on_bt">Accensione del Bluetooth</string>
     <string name="filter_show_bt">Mostra Bluetooth</string>
     <string name="error_invalid_bssid">BSSID deve essere lungo 12 caratteri o contenere un carattere jolly (%)</string>
+    <string name="error_less_than_oui">BSSID deve contenere almeno un OUI per la ricerca online</string>
+    <string name="error_incomplete_octet">Gli ottetti BSSID devono essere completi (o%) per la ricerca online</string>
+    <string name="search_wigle">Cerca su WiGLE</string>
+    <string name="must_login">(deve essere registrato)</string>
+    <string name="search_local">Cerca nel tuo database locale</string>
+    <string name="search_failed">Ricerca fallita</string>
+    <string name="search_empty">Risultati vuoti</string>
+    <string name="search_query_limit">Hai raggiunto il numero massimo di ricerche oggi. Il tuo limite verrà ripristinato domani.</string>
 </resources>

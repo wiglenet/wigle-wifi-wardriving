@@ -393,5 +393,13 @@
     <string name="turn_on_bt">打开蓝牙</string>
     <string name="filter_show_bt">显示蓝牙</string>
     <string name="error_invalid_bssid">BSSID必须长度为12个字符或包含通配符（％）</string>
+    <string name="error_less_than_oui">BSSID必须至少包含用于在线搜索的OUI</string>
+    <string name="error_incomplete_octet">BSSID八位字节必须完整（或％）才能进行在线搜索</string>
+    <string name="search_wigle">在WiGLE中搜索</string>
+    <string name="must_login">（必须登录）</string>
+    <string name="search_local">搜索本地数据库</string>
+    <string name="search_failed">搜索失败</string>
+    <string name="search_empty">结果为空</string>
+    <string name="search_query_limit">您今天已达到最大搜索次数。你的限额将在明天重置。</string>
 </resources>
 

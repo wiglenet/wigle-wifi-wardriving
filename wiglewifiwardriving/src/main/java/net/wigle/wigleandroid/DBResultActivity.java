@@ -54,6 +54,7 @@ import org.json.JSONObject;
 public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
     private static final int MSG_QUERY_DONE = 2;
+    private static final int MSG_QUERY_EMPTY = 3;
     private static final int LIMIT = 50;
 
     private static final int DEFAULT_ZOOM = 18;
@@ -78,6 +79,9 @@ public class DBResultActivity extends AppCompatActivity {
     private static final String API_BSSID_PARAM = "netid";
     private static final String API_SSIDLIKE_PARAM = "ssidlike";
     private static final String API_SSID_PARAM = "ssid";
+
+    private static final Double LOCAL_RANGE = 0.1d;
+    private static final Double ONLINE_RANGE = 0.001d; //ALIBI: online DB coverage mandates tighter bounds.
 
     private static final String[] ALL_NET_KEYS = new String[] {
             TRILAT_KEY, TRILON_KEY, SSID_KEY, NETID_KEY, ENCRYPTION_KEY, CHANNEL_KEY
@@ -163,6 +167,7 @@ public class DBResultActivity extends AppCompatActivity {
     @SuppressLint("HandlerLeak")
     private void setupQuery( final QueryArgs queryArgs ) {
         final Address address = queryArgs.getAddress();
+        final AppCompatActivity activity = this;
 
         // what runs on the gui thread
         final Handler handler = new Handler() {
@@ -199,6 +204,11 @@ public class DBResultActivity extends AppCompatActivity {
                         }
                     }
                     resultList.clear();
+                } else if (msg.what == MSG_QUERY_EMPTY) {
+                    tv.setText( getString(R.string.search_empty)  );
+                    listAdapter.clear();
+                    WiGLEToast.showOverActivity(activity, R.string.app_name,
+                            getString(R.string.search_empty), Toast.LENGTH_LONG);
                 }
             }
         };
@@ -216,11 +226,10 @@ public class DBResultActivity extends AppCompatActivity {
             limit = true;
         }
         if ( address != null ) {
-            final double diff = 0.1d;
             final double lat = address.getLatitude();
             final double lon = address.getLongitude();
-            sql += " AND lastlat > '" + (lat - diff) + "' AND lastlat < '" + (lat + diff) + "'";
-            sql += " AND lastlon > '" + (lon - diff) + "' AND lastlon < '" + (lon + diff) + "'";
+            sql += " AND lastlat > '" + (lat - LOCAL_RANGE) + "' AND lastlat < '" + (lat + LOCAL_RANGE) + "'";
+            sql += " AND lastlon > '" + (lon - LOCAL_RANGE) + "' AND lastlon < '" + (lon + LOCAL_RANGE) + "'";
         }
         if ( limit ) {
             sql += " LIMIT " + LIMIT;
@@ -262,19 +271,24 @@ public class DBResultActivity extends AppCompatActivity {
 
             @Override
             public void complete() {
-                for ( final String bssid : top.values() ) {
-                    final Network network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
-                    resultList.add( network );
-                    final LatLng point = network.getLatLng();
-                    if (point != null) {
-                        obsMap.put(point, 0);
-                    }
-                }
+                if (top.values().size() > 0) {
 
-                handler.sendEmptyMessage( MSG_QUERY_DONE );
-                if ( mapView != null ) {
-                    // force a redraw
-                    mapView.postInvalidate();
+                    for (final String bssid : top.values()) {
+                        final Network network = ListFragment.lameStatic.dbHelper.getNetwork(bssid);
+                        resultList.add(network);
+                        final LatLng point = network.getLatLng();
+                        if (point != null) {
+                            obsMap.put(point, 0);
+                        }
+                    }
+
+                    handler.sendEmptyMessage(MSG_QUERY_DONE);
+                    if (mapView != null) {
+                        // force a redraw
+                        mapView.postInvalidate();
+                    }
+                } else {
+                    handler.sendEmptyMessage(MSG_QUERY_EMPTY);
                 }
             }
         });
@@ -312,14 +326,13 @@ public class DBResultActivity extends AppCompatActivity {
                 queryParams+="&";
             }
 
-            final double diff = 0.001d;
             final double lat = address.getLatitude();
             final double lon = address.getLongitude();
 
-            queryParams+=API_LAT1_PARAM+"="+(lat - diff)+"&";
-            queryParams+=API_LAT2_PARAM+"="+(lat + diff)+"&";
-            queryParams+=API_LON1_PARAM+"="+(lon - diff)+"&";
-            queryParams+=API_LON2_PARAM+"="+(lon + diff);
+            queryParams+=API_LAT1_PARAM+"="+(lat - ONLINE_RANGE)+"&";
+            queryParams+=API_LAT2_PARAM+"="+(lat + ONLINE_RANGE)+"&";
+            queryParams+=API_LON1_PARAM+"="+(lon - ONLINE_RANGE)+"&";
+            queryParams+=API_LON2_PARAM+"="+(lon + ONLINE_RANGE);
         }
 
         final NetsDownloadHandler handler = new NetsDownloadHandler(view,

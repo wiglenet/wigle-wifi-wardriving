@@ -338,4 +338,12 @@
     <string name="turn_on_bt">A Bluetooth bekapcsolása</string>
     <string name="filter_show_bt">Bluetooth megjelenítése</string>
     <string name="error_invalid_bssid">A BSSID-nek 12 karakter hosszúnak kell lennie, vagy tartalmaznia kell egy helyettesítő karaktert (%)</string>
+    <string name="error_less_than_oui">A BSSID-nek legalább egy OUI-t kell tartalmaznia az online kereséshez</string>
+    <string name="error_incomplete_octet">A BSSID oktetteknek teljesnek kell lenniük (vagy%) az online kereséshez</string>
+    <string name="search_wigle">Keresés a WiGLE-n</string>
+    <string name="must_login">(be kell jelentkeznie)</string>
+    <string name="search_local">Keresés a helyi adatbázisban</string>
+    <string name="search_failed">A keresés sikertelen</string>
+    <string name="search_empty">Eredmények üresek</string>
+    <string name="search_query_limit">Ma elérte a maximális számú keresést. A határidőt holnap visszaállítja.</string>
 </resources>

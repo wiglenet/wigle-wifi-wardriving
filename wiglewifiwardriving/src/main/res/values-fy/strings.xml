@@ -338,4 +338,13 @@
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
+    <string name="error_less_than_oui">BSSID must contain at least an OUI for online search</string>
+    <string name="error_incomplete_octet">BSSID octets must be complete (or %) for online search</string>
+    <string name="search_wigle">Search WiGLE</string>
+    <string name="must_login">(must be logged in)</string>
+    <string name="search_local">Search Your Local Database</string>
+    <string name="search_failed">Search Failed</string>
+    <string name="search_empty">Results Empty</string>
+    <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
+
 </resources>

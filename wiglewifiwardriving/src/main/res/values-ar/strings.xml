@@ -393,4 +393,13 @@
     <string name="turn_on_bt">تشغيل البلوتوث</string>
     <string name="filter_show_bt">عرض البلوتوث</string>
     <string name="error_invalid_bssid">يجب أن يكون طول BSSID 12 حرفًا أو يحتوي على حرف بدل (٪)</string>
+    <string name="error_less_than_oui">يجب أن يحتوي BSSID على الأقل على OUI للبحث عبر الإنترنت</string>
+    <string name="error_incomplete_octet">يجب أن تكون الثمانيات BSSID مكتملة (أو٪) للبحث عبر الإنترنت</string>
+    <string name="search_wigle">بحث WiGLE</string>
+    <string name="must_login">(يجب تسجيل الدخول)</string>
+    <string name="search_local">ابحث في قاعدة البيانات المحلية الخاصة بك</string>
+    <string name="search_failed">فشل البحث</string>
+    <string name="search_empty">النتائج فارغة</string>
+    <string name="search_query_limit">لقد وصلت إلى الحد الأقصى من عمليات البحث اليوم. ستتم إعادة تعيين الحد الخاص بك غدًا.</string>
+
 </resources>

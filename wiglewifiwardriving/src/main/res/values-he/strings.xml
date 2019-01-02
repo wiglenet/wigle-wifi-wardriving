@@ -393,4 +393,12 @@
     <string name="turn_on_bt">הפעלת Bluetooth</string>
     <string name="filter_show_bt">הצג Bluetooth</string>
     <string name="error_invalid_bssid">BSSID חייב להכיל 12 תווים או להכיל תו כללי (%)</string>
+    <string name="error_less_than_oui">BSSID חייב להכיל לפחות OUI לחיפוש מקוון</string>
+    <string name="error_incomplete_octet">BSSID octets חייב להיות שלם (או%) עבור חיפוש מקוון</string>
+    <string name="search_wigle">חפש ב- WiGLE</string>
+    <string name="must_login">(חייב להיות מחובר)</string>
+    <string name="search_local">חפש את מסד הנתונים המקומי שלך</string>
+    <string name="search_failed">החיפוש נכשל</string>
+    <string name="search_empty">תוצאות ריקות</string>
+    <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
 </resources>

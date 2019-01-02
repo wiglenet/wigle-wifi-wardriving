@@ -371,4 +371,12 @@
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID må være 12 tegn lang eller inneholde et jokertegn (%)</string>
+    <string name="error_less_than_oui">BSSID må inneholde minst en OUI for online søk</string>
+    <string name="error_incomplete_octet">BSSID-oktetter må være komplette (eller%) for online-søk</string>
+    <string name="search_wigle">Søk i WiGLE</string>
+    <string name="must_login">(må være innlogget)</string>
+    <string name="search_local">Søk i din lokale database</string>
+    <string name="search_failed">Søke mislyktes</string>
+    <string name="search_empty">Resultater Tom</string>
+    <string name="search_query_limit">Du har nådd det maksimale antallet søk i dag. Grensen din vil nullstille i morgen.</string>
 </resources>

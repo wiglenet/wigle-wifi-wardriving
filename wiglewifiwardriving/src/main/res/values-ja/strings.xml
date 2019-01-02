@@ -393,4 +393,12 @@
     <string name="turn_on_bt">Bluetoothをオンにする</string>
     <string name="filter_show_bt">Bluetoothを表示する</string>
     <string name="error_invalid_bssid">BSSIDは12文字の長さであるか、またはワイルドカード（％）を含む必要があります</string>
+    <string name="error_less_than_oui">オンライン検索では、BSSIDに少なくともOUIを含める必要があります。</string>
+    <string name="error_incomplete_octet">オンライン検索ではBSSIDオクテットは完全（または％）でなければなりません</string>
+    <string name="search_wigle">WiGLEで検索</string>
+    <string name="must_login">（ログインしている必要があります）</string>
+    <string name="search_local">ローカルデータベースを検索する</string>
+    <string name="search_failed">検索失敗</string>
+    <string name="search_empty">空の結果</string>
+    <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
 </resources>

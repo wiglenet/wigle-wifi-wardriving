@@ -4,5 +4,8 @@
         android:drawable="@drawable/wigle_menu_item_selected"
         android:state_checked= "true" />
     <item
+        android:drawable="@drawable/wigle_menu_item_selected"
+        android:state_selected= "true" />
+    <item
         android:drawable="@drawable/wigle_menu_item" />
 </selector>

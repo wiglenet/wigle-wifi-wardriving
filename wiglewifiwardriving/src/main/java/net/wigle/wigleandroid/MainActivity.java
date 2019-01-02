@@ -129,7 +129,7 @@ public final class MainActivity extends AppCompatActivity {
         SetNetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab = R.id.nav_list;
-        int previousTab = R.id.nav_list;
+        int previousTab = 0;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -505,8 +505,11 @@ public final class MainActivity extends AppCompatActivity {
                             menuItem.setChecked(!menuItem.isChecked());
                         } else {
                             menuItem.setChecked(true);
-                            MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
-                            mPreviousMenuItem.setChecked(false);
+
+                            if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                                MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                                mPreviousMenuItem.setChecked(false);
+                            }
                         }
                         state.previousTab = menuItem.getItemId();
 
@@ -547,8 +550,8 @@ public final class MainActivity extends AppCompatActivity {
         spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
         rStats.setTitle(spanString);
 
+        navigationView.getMenu().getItem(0).setCheckable(true);
         navigationView.getMenu().getItem(0).setChecked(true);
-
         // end drawer setup
     }
 

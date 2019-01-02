@@ -400,5 +400,5 @@
     <string name="search_local">Rechercher dans votre base de données locale</string>
     <string name="search_failed">La recherche a échoué</string>
     <string name="search_empty">Résultats vides</string>
-    <string name="search_query_limit">Vous avez atteint le nombre maximal de recherches aujourd'hui. Votre limite sera réinitialisée demain.</string>
+    <string name="search_query_limit">Vous avez atteint le nombre maximal de recherches aujourd\'hui. Votre limite sera réinitialisée demain.</string>
 </resources>

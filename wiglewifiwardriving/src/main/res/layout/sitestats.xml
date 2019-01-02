@@ -202,8 +202,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/netnowep_title"
                 android:textSize="16sp"
-                android:textColor="#ff0000"/>
-            android:textStyle="bold"
+                android:textColor="#ff0000"
+                android:textStyle="bold"
+                />
             <TextView
                 android:id="@+id/netnowep"
                 android:layout_width="wrap_content"

@@ -520,8 +520,10 @@ public class DBResultActivity extends AppCompatActivity {
                 for (final Parcelable result : results) {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
+                        //TODO: should we move this to a third Network Constructor?
+                        final String encryptionString = row.getString(ENCRYPTION_KEY).toUpperCase();
                         final Network network = new Network(row.getString(NETID_KEY), row.getString(SSID_KEY),
-                                Integer.parseInt(row.getString(CHANNEL_KEY)), "[SEARCH]",
+                                Integer.parseInt(row.getString(CHANNEL_KEY)), "["+encryptionString+" SEARCH]",
                         -113, NetworkType.WIFI);
                         network.setLatLng(new LatLng(Double.parseDouble(row.getString(TRILAT_KEY)),
                                 Double.parseDouble(row.getString(TRILON_KEY))));
@@ -549,7 +551,6 @@ public class DBResultActivity extends AppCompatActivity {
                         }
                     }
                 }
-
 
                 if (statusView != null) {
                     statusView.setText(activityContext.getString(R.string.status_success));

@@ -72,6 +72,9 @@ public class NetworkListUtil {
                 case Network.CRYPTO_WEP:
                     resource = R.drawable.wep_ico;
                     break;
+                case Network.CRYPTO_WPA3:
+                    resource = R.drawable.wpa3_ico;
+                    break;
                 case Network.CRYPTO_WPA2:
                     resource = R.drawable.wpa2_ico;
                     break;

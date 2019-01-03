@@ -524,7 +524,7 @@ public class DBResultActivity extends AppCompatActivity {
                         final String encryptionString = row.getString(ENCRYPTION_KEY).toUpperCase();
                         final Network network = new Network(row.getString(NETID_KEY), row.getString(SSID_KEY),
                                 Integer.parseInt(row.getString(CHANNEL_KEY)), "["+encryptionString+" SEARCH]",
-                        -113, NetworkType.WIFI);
+                        0, NetworkType.WIFI);
                         network.setLatLng(new LatLng(Double.parseDouble(row.getString(TRILAT_KEY)),
                                 Double.parseDouble(row.getString(TRILON_KEY))));
                         if ( first ) {

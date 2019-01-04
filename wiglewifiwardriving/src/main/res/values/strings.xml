@@ -402,4 +402,8 @@
     <string name="search_failed">Search Failed</string>
     <string name="search_empty">Results Empty</string>
     <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
+    <string name="export_m8b_button">Export &#x2791;</string>
+    <string name="export_m8b">Export Geolocation Magic (8) Ball</string>
+    <string name="export_m8b_detail">This will generate a database containing hashes of local observations which can be used as an oracle for determining your approximate location. See \n\n https://github.com/wiglenet/m8b \n\n for details. Default configuration parameters will be used, allowing combination with other artifacts generated in the default configuration.</string>
+    <string name="m8b_failed">Unable to export m8b file.\n</string>
 </resources>

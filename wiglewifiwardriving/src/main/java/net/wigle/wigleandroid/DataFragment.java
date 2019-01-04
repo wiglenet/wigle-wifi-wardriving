@@ -1,11 +1,14 @@
 package net.wigle.wigleandroid;
 
+//import net.wigle.m8b;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.SearchUtil;
@@ -13,18 +16,23 @@ import net.wigle.wigleandroid.util.SearchUtil;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +45,12 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 
 /**
@@ -56,6 +69,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int ZERO_OUT_DIALOG = 126;
     private static final int MAX_OUT_DIALOG = 127;
     private static final int DELETE_DIALOG = 128;
+    private static final int EXPORT_M8B_DIALOG = 129;
+
+    private static final String M8B_SEP = "|";
+    private static final String M8B_SOURCE_FILE_PREFIX = "export";
+    private static final String M8B_SOURCE_FILE_SUFFIX = "m8bs";
 
     /** Called when the activity is first created. */
     @Override
@@ -79,6 +97,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         setupBackupDbButton(view);
         setupImportObservedButton(view);
         setupMarkerButtons(view);
+        setupM8bExport(view);
 
         return view;
     }
@@ -280,6 +299,17 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     }
 
+    public void setupM8bExport( final View view ) {
+        final Button exportM8bButton = (Button) view.findViewById(R.id.export_m8b_button);
+        exportM8bButton.setOnClickListener( new OnClickListener() {
+            @Override
+            public void onClick(final View buttonView) {
+                MainActivity.createConfirmation( getActivity(), getString(R.string.export_m8b_detail),
+                        R.id.nav_data, EXPORT_M8B_DIALOG);
+            }
+        });
+    }
+
     @SuppressLint("SetTextI18n")
     @Override
     public void handleDialog(final int dialogId) {
@@ -358,6 +388,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.warn("Failed to update network count on DB clear: ", dbe);
                 }
 
+                break;
+            }
+            case EXPORT_M8B_DIALOG: {
+                if (!exportM8bFile()) {
+                    MainActivity.warn("Failed to export m8b.");
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
+                            getString(R.string.m8b_failed));
+                }
                 break;
             }
             default:
@@ -497,4 +535,135 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         return false;
     }
 
+    /**
+     * Query DB for pairs, generate source file.
+     * TODO: process intermediate file, share that instead of the source file.
+     * @return boolean successful
+     */
+    private boolean exportM8bFile() {
+        final String sql = "SELECT bssid, bestlat, bestlon FROM " + DatabaseHelper.NETWORK_TABLE
+                + " WHERE bestlat != 0.0 AND bestlon != 0.0 ";
+        //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
+
+        final boolean hasSD = MainActivity.hasSD();
+        // TODO: there's a real case for refusing to export on devices that don't have SD, but we can dig in on this
+
+        // use temp directory to write intermediate file
+        //final File outputDir = getActivity().getApplicationContext().getCacheDir(); // context being the Activity pointer
+
+        File m8bSourceFile = null;
+        OutputStreamWriter writer;
+        //FileWriter writer; - for temp intermediate
+
+        try {
+
+            if ( hasSD ) {
+                final String filepath = MainActivity.safeFilePath(
+                        Environment.getExternalStorageDirectory() ) + "/wiglewifi/m8b/";
+                final File path = new File( filepath );
+                //noinspection ResultOfMethodCallIgnored
+                path.mkdirs();
+                if (!path.exists()) {
+                    MainActivity.info("Got '!exists': " + path);
+                }
+                String openString = filepath + M8B_SOURCE_FILE_PREFIX + "." + M8B_SOURCE_FILE_SUFFIX;
+                //DEBUG: MainActivity.info("Opening file: " + openString);
+                m8bSourceFile = new File( openString );
+
+                //ALIBI: always recreate
+                if (m8bSourceFile.exists()) {
+                    m8bSourceFile.delete();
+                }
+                if (!m8bSourceFile.createNewFile()) {
+                    throw new IOException("Could not create file: " + openString);
+                }
+            }
+
+            final FileOutputStream rawFos = hasSD ? new FileOutputStream( m8bSourceFile )
+                    : getActivity().getApplicationContext().openFileOutput( M8B_SOURCE_FILE_PREFIX + "." + M8B_SOURCE_FILE_SUFFIX, Context.MODE_PRIVATE );
+
+
+
+            //TODO: any reason to version these?
+            //m8bSourceFile = File.createTempFile(M8B_SOURCE_FILE_PREFIX, M8B_SOURCE_FILE_SUFFIX, outputDir);
+            //writer = new FileWriter(m8bSourceFile);
+            writer = new OutputStreamWriter(rawFos);
+        } catch (IOException ioex) {
+            MainActivity.error("Unable to open tempfile: ", ioex);
+            return false;
+        }
+
+        if (writer == null) {
+            MainActivity.error("unable to build writer for cache.");
+            return false;
+        }
+
+        final BufferedWriter buffWriter = new BufferedWriter(writer);
+
+        if (!m8bSourceFile.exists()) {
+            MainActivity.error("file does not exist: " + m8bSourceFile.getAbsolutePath());
+        } else {
+            MainActivity.info(m8bSourceFile.getAbsolutePath());
+        }
+        final Uri fileUri = FileProvider.getUriForFile(getContext(),
+                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                        ".m8bprovider", m8bSourceFile /*TODO: writing temp to export, just for debugging*/);
+
+        // write tempfile
+        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+
+            @Override
+            public boolean handleRow(final Cursor cursor) {
+                final String bssid = cursor.getString(0);
+                final float lat = cursor.getFloat(1);
+                final float lon = cursor.getFloat(2);
+                try {
+                    if (null != buffWriter) {
+                        buffWriter.write(bssid + M8B_SEP + lat + M8B_SEP + lon + "\n");
+                        //DEBUG: MainActivity.info("Line...");
+                        return true;
+                    } else {
+                        MainActivity.error("null writer ");
+                        return false;
+                    }
+                } catch (IOException ioex) {
+                    MainActivity.error("Unable to write line: ", ioex);
+                    return false;
+                }
+
+                //TODO: write to file
+            }
+
+            /**
+             * once the extract file's been written, run the pipeline, setup and enqueue the intent to share
+             */
+            @Override
+            public void complete() {
+                MainActivity.info("m8b source export complete...");
+                if (null != buffWriter) {
+                    try {
+                        buffWriter.close();
+                    } catch (IOException ioex) {
+                        MainActivity.error("Failed to close m8bTemp writer", ioex);
+                    }
+                }
+
+                //TODO: run pipeline on intermediate file, write to output file
+                //m8b.generate(M8B_SOURCE_FILE_PREFIX+"."+M8B_SOURCE_FILE_SUFFIX,
+                //        M8B_SOURCE_FILE_PREFIX+"."+"m8b", 8, false);
+
+                // fire share intent?
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE m8b");
+                intent.setType("application/wigle.m8b");
+
+                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
+            }
+        });
+        ListFragment.lameStatic.dbHelper.addToQueue( request );
+        return true;
+    }
 }

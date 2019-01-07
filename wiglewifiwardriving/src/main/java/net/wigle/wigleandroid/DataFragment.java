@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid;
 
-//import net.wigle.m8b;
+import net.wigle.m8b.M8bProgress;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
@@ -11,12 +11,13 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.MagicEightUtil;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,13 +46,14 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
+import java.nio.channels.FileChannel;
 
 /**
  * configure settings
@@ -71,10 +73,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int DELETE_DIALOG = 128;
     private static final int EXPORT_M8B_DIALOG = 129;
 
+    // constants for Magic (8) Ball export
     private static final String M8B_SEP = "|";
-    private static final String M8B_SOURCE_FILE_PREFIX = "export";
-    private static final String M8B_SOURCE_FILE_SUFFIX = "m8bs";
+    private static final String M8B_FILE_PREFIX = "export";
+    private static final String M8B_SOURCE_EXTENSION = ".m8bs";
+    private static final String M8B_DIR = "/wiglewifi/m8b/";
+    private static final String M8B_EXTENSION = ".m8b";
 
+    ProgressDialog pd = null;
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -535,135 +541,270 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         return false;
     }
 
+
+
     /**
-     * Query DB for pairs, generate source file.
-     * TODO: process intermediate file, share that instead of the source file.
+     * Query DB for pairs, generate intermediate source file, process, fire share intent.
      * @return boolean successful
      */
     private boolean exportM8bFile() {
-        final String sql = "SELECT bssid, bestlat, bestlon FROM " + DatabaseHelper.NETWORK_TABLE
-                + " WHERE bestlat != 0.0 AND bestlon != 0.0 ";
-        //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
+        final long totalDbNets = ListFragment.lameStatic.dbHelper.getNetworkCount();
+        new AsyncMagicEightBallExportTask().execute(
+                (int)(totalDbNets/1000.0d
+                        /*ALIBI: total DB nets in thousands as a "guess" for total size to process*/),
+                0, 0);
+        return true;
+    }
 
-        final boolean hasSD = MainActivity.hasSD();
-        // TODO: there's a real case for refusing to export on devices that don't have SD, but we can dig in on this
+    /**
+     * Asynchronous execution wrapping m8b generation. half-redundant with the async query, half not
+     */
+    class AsyncMagicEightBallExportTask extends AsyncTask<Integer, Integer, String> {
 
-        // use temp directory to write intermediate file
-        //final File outputDir = getActivity().getApplicationContext().getCacheDir(); // context being the Activity pointer
+        @Override
+        protected String doInBackground(Integer... dbKRecords) {
 
-        File m8bSourceFile = null;
-        OutputStreamWriter writer;
-        //FileWriter writer; - for temp intermediate
+            // try and get the actual accurate matching record count. this is slow with large DBs.
+            // TODO: is this worth it?
+            long dbCount = 0;
+            try {
+                dbCount = ListFragment.lameStatic.dbHelper.getNetsWithLocCountFromDB();
+            } catch (DBException dbe) {
+                // fall back to the total number of records.
+            }
 
-        try {
+            // replace our placeholder if we get a proper number
+            final long thousandDbRecords = dbCount == 0 ? dbKRecords[0]: dbCount/1000;
 
-            if ( hasSD ) {
-                final String filepath = MainActivity.safeFilePath(
-                        Environment.getExternalStorageDirectory() ) + "/wiglewifi/m8b/";
-                final File path = new File( filepath );
-                //noinspection ResultOfMethodCallIgnored
-                path.mkdirs();
-                if (!path.exists()) {
-                    MainActivity.info("Got '!exists': " + path);
+            //DEBUG: MainActivity.info("matching values: " + thousandDbRecords);
+
+            // TODO: there's a real case for refusing to export on devices that don't have SD...
+            final boolean hasSD = MainActivity.hasSD();
+
+            File m8bSourceFile;
+            OutputStreamWriter writer;
+
+            try {
+                if ( hasSD ) {
+                    final String filepath = MainActivity.safeFilePath(
+                            Environment.getExternalStorageDirectory() ) + M8B_DIR;
+                    final File path = new File( filepath );
+                    //noinspection ResultOfMethodCallIgnored
+                    path.mkdirs();
+                    if (!path.exists()) {
+                        MainActivity.info("Got '!exists': " + path);
+                    }
+                    String openString = filepath + M8B_FILE_PREFIX +  M8B_SOURCE_EXTENSION;
+                    //DEBUG: MainActivity.info("Opening file: " + openString);
+                    m8bSourceFile = new File( openString );
+
+                } else {
+                    m8bSourceFile = new File(getActivity().getApplication().getFilesDir(),
+                            M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION);
                 }
-                String openString = filepath + M8B_SOURCE_FILE_PREFIX + "." + M8B_SOURCE_FILE_SUFFIX;
-                //DEBUG: MainActivity.info("Opening file: " + openString);
-                m8bSourceFile = new File( openString );
 
-                //ALIBI: always recreate
+                //ALIBI: always start fresh
                 if (m8bSourceFile.exists()) {
                     m8bSourceFile.delete();
                 }
+
                 if (!m8bSourceFile.createNewFile()) {
-                    throw new IOException("Could not create file: " + openString);
+                    throw new IOException("Could not create file: " + m8bSourceFile.getAbsolutePath());
                 }
+
+                final FileOutputStream rawFos = new FileOutputStream( m8bSourceFile );
+
+                writer = new OutputStreamWriter(rawFos);
+                if (writer == null) {
+                    MainActivity.error("unable to build writer for cache.");
+                    return "ERROR";
+                }
+
+            } catch (IOException ioex) {
+                MainActivity.error("Unable to open tempfile: ", ioex);
+                return "ERROR";
             }
 
-            final FileOutputStream rawFos = hasSD ? new FileOutputStream( m8bSourceFile )
-                    : getActivity().getApplicationContext().openFileOutput( M8B_SOURCE_FILE_PREFIX + "." + M8B_SOURCE_FILE_SUFFIX, Context.MODE_PRIVATE );
+            final BufferedWriter buffWriter = new BufferedWriter(writer);
 
+            try {
+                // write header
+                buffWriter.write("bssid" + M8B_SEP + "lat" + M8B_SEP + "lon" + "\n");
+            } catch (IOException ioex) {
+                MainActivity.error("unable to write header");
+                return "ERROR";
+            }
 
+            // write intermediate file
+            // ALIBI: redundant thread, but this gets us queue, progress
+            final QueryThread.Request request = new QueryThread.Request(
+                    ListFragment.lameStatic.dbHelper.LOCATED_NETS_QUERY, new QueryThread.ResultHandler() {
 
-            //TODO: any reason to version these?
-            //m8bSourceFile = File.createTempFile(M8B_SOURCE_FILE_PREFIX, M8B_SOURCE_FILE_SUFFIX, outputDir);
-            //writer = new FileWriter(m8bSourceFile);
-            writer = new OutputStreamWriter(rawFos);
-        } catch (IOException ioex) {
-            MainActivity.error("Unable to open tempfile: ", ioex);
-            return false;
-        }
+                int rows = 0;
 
-        if (writer == null) {
-            MainActivity.error("unable to build writer for cache.");
-            return false;
-        }
+                @Override
+                public boolean handleRow(final Cursor cursor) {
+                    final String bssid = cursor.getString(0);
+                    final float lat = cursor.getFloat(1);
+                    final float lon = cursor.getFloat(2);
+                    try {
+                        if (null != buffWriter) {
+                            buffWriter.write(bssid + M8B_SEP + lat + M8B_SEP + lon + "\n");
 
-        final BufferedWriter buffWriter = new BufferedWriter(writer);
-
-        if (!m8bSourceFile.exists()) {
-            MainActivity.error("file does not exist: " + m8bSourceFile.getAbsolutePath());
-        } else {
-            MainActivity.info(m8bSourceFile.getAbsolutePath());
-        }
-        final Uri fileUri = FileProvider.getUriForFile(getContext(),
-                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                        ".m8bprovider", m8bSourceFile /*TODO: writing temp to export, just for debugging*/);
-
-        // write tempfile
-        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
-
-            @Override
-            public boolean handleRow(final Cursor cursor) {
-                final String bssid = cursor.getString(0);
-                final float lat = cursor.getFloat(1);
-                final float lon = cursor.getFloat(2);
-                try {
-                    if (null != buffWriter) {
-                        buffWriter.write(bssid + M8B_SEP + lat + M8B_SEP + lon + "\n");
-                        //DEBUG: MainActivity.info("Line...");
-                        return true;
-                    } else {
-                        MainActivity.error("null writer ");
+                            rows++;
+                            if (rows % 1000 == 0) {
+                                //DEBUG: MainActivity.info("\tprogress: rows: "+rows+" / "+thousandDbRecords + " = "+ (int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
+                                publishProgress((int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
+                            }
+                            return true;
+                        } else {
+                            MainActivity.error("null writer ");
+                            return false;
+                        }
+                    } catch (IOException ioex) {
+                        MainActivity.error("Unable to write line: ", ioex);
                         return false;
                     }
-                } catch (IOException ioex) {
-                    MainActivity.error("Unable to write line: ", ioex);
-                    return false;
                 }
 
-                //TODO: write to file
-            }
+                /**
+                 * once the intermediate file's written, run the generate pipeline, setup and enqueue the intent to share
+                 */
+                @Override
+                public void complete() {
+                    MainActivity.info("m8b source export complete...");
 
-            /**
-             * once the extract file's been written, run the pipeline, setup and enqueue the intent to share
-             */
-            @Override
-            public void complete() {
-                MainActivity.info("m8b source export complete...");
-                if (null != buffWriter) {
+                    // Tidy up the finished writer
+                    if (null != buffWriter) {
+                        try {
+                            buffWriter.close();
+                        } catch (IOException ioex) {
+                            MainActivity.error("Failed to close m8b temp writer", ioex);
+                        }
+                    }
+
                     try {
-                        buffWriter.close();
-                    } catch (IOException ioex) {
-                        MainActivity.error("Failed to close m8bTemp writer", ioex);
+                        //TODO: DRY up w/ above? difficult to do safely because get*Path for m8bSourceFile may exception out
+                        File m8bSourceFile;
+                        File outputFile;
+
+                        if ( hasSD ) {
+                            String basePath;
+                            basePath = MainActivity.safeFilePath(
+                                    Environment.getExternalStorageDirectory() ) + M8B_DIR;
+                            String openString = basePath + M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION;
+                            //DEBUG: MainActivity.info("Opening file: " + openString);
+                            m8bSourceFile = new File( openString );
+                            if (!m8bSourceFile.exists()) {
+                                MainActivity.info("Got '!exists': " + m8bSourceFile.getCanonicalPath());
+                            }
+                            outputFile = new File(basePath + M8B_FILE_PREFIX + M8B_EXTENSION);
+                        } else {
+                            m8bSourceFile = new File(getActivity().getApplication().getFilesDir(),
+                                    M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION);
+                            outputFile = new File(getActivity().getApplication().getFilesDir(),
+                                    M8B_FILE_PREFIX + M8B_EXTENSION);
+                        }
+
+                        FileReader fr = new FileReader(m8bSourceFile.getCanonicalPath());
+                        BufferedReader lines = new BufferedReader(fr);
+                        lines.readLine(); // ALIBI: skip header
+                        boolean append = false;
+                        FileChannel out = new FileOutputStream(outputFile, append).getChannel();
+
+                        final long genStart = System.currentTimeMillis();
+                        MagicEightUtil.generate(lines, out,
+                                30 /*ALIBI: slicebits high so these can always integrate*/,
+                                false, new M8bProgress() {
+                            @Override
+                            public void handleGenerationProgress(int status) {
+                                publishProgress(100, (int)((status/(double)rows) * 100), 0);
+                            }
+
+                            @Override
+                            public void handleWriteProgress(int status, int linesOut) {
+                                publishProgress(100, 100,
+                                        (int)((status / (double) linesOut) * 100));
+                            }
+                        });
+                        final long duration = System.currentTimeMillis() - genStart;
+
+                        MainActivity.info("completed m8b generation. Generation time: "+((double)duration * 0.001d)+"s");
+                        publishProgress(100, 100, 100); //ALIBI: will close the dialog in case fractions didn't work out.
+
+                        if (null != out) {
+                            try {
+                                out.close();
+                            } catch (Exception ex) {
+                                MainActivity.error("Failed to close output: ",ex);
+                            }
+                        }
+
+                        // fire share intent?
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE.m8b");
+                        intent.setType("application/wigle.m8b");
+
+                        //TODO: verify local-only storage case/m8b_paths.xml
+                        final Uri fileUri = FileProvider.getUriForFile(getContext(),
+                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                        ".m8bprovider", outputFile);
+
+                        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
+                    } catch (Exception ex /*TODO*/) {
+                        MainActivity.error("Failed to synthesize m8b: ",ex);
+                        publishProgress(100, 100, 100);
                     }
                 }
+            });
+            ListFragment.lameStatic.dbHelper.addToQueue( request );
+            return null;
+        }
 
-                //TODO: run pipeline on intermediate file, write to output file
-                //m8b.generate(M8B_SOURCE_FILE_PREFIX+"."+M8B_SOURCE_FILE_SUFFIX,
-                //        M8B_SOURCE_FILE_PREFIX+"."+"m8b", 8, false);
-
-                // fire share intent?
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE m8b");
-                intent.setType("application/wigle.m8b");
-
-                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
+        @Override
+        protected void onPostExecute(String result) {
+            if (null != result) { //launch task will exist with bg thread enqueued with null return
+                MainActivity.error("POST EXECUTE: " + result);
+                if (pd.isShowing()) {
+                    pd.dismiss();
+                }
             }
-        });
-        ListFragment.lameStatic.dbHelper.addToQueue( request );
-        return true;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            //TODO: tri-bar progress indicator instead of single bar?
+            pd = new ProgressDialog(getContext());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setCancelable(false);
+            pd.setMessage(getString(R.string.exporting_m8b_intermediate));
+            pd.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            if (values.length == 3) { // actually 3-stage?
+                if (values[2] > 0) {
+                    if (100 == values[2]) {
+                        if (pd.isShowing()) {
+                            pd.dismiss();
+                        }
+                        return;
+                    }
+                    pd.setMessage(getString(R.string.exporting_m8b_final));
+                    pd.setProgress(values[2]);
+                } else if ( values[1] > 0) {
+                    pd.setMessage(getString(R.string.calculating_m8b));
+                    pd.setProgress(values[1]);
+                } else {
+                    pd.setProgress(values[0]);
+                }
+            } else { // default single progress bar - trust the message already set?
+                pd.setProgress(values[0]);
+            }
+        }
     }
 }

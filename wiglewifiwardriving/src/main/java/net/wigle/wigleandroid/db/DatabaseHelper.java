@@ -107,6 +107,14 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATION_DELETE = "drop table " + LOCATION_TABLE;
     private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
 
+    private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
+    //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
+
+    private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
+    public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
+
+
     private SQLiteDatabase db;
 
     private static final int MAX_QUEUE = 512;
@@ -1121,6 +1129,15 @@ public final class DatabaseHelper extends Thread {
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
         final Cursor cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
+        cursor.moveToFirst();
+        final long count = cursor.getLong( 0 );
+        cursor.close();
+        return count;
+    }
+
+    public long getNetsWithLocCountFromDB() throws DBException {
+        checkDB();
+        final Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
         cursor.moveToFirst();
         final long count = cursor.getLong( 0 );
         cursor.close();

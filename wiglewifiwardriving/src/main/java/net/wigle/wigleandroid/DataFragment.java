@@ -1,6 +1,8 @@
 package net.wigle.wigleandroid;
 
-import net.wigle.m8b.M8bProgress;
+import net.wigle.m8b.geodesy.mgrs;
+import net.wigle.m8b.geodesy.utm;
+import net.wigle.m8b.siphash.SipKey;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
@@ -8,7 +10,6 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
-import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.MagicEightUtil;
@@ -46,14 +47,17 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * configure settings
@@ -74,11 +78,12 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int EXPORT_M8B_DIALOG = 129;
 
     // constants for Magic (8) Ball export
-    private static final String M8B_SEP = "|";
+    //private static final String M8B_SEP = "|";
     private static final String M8B_FILE_PREFIX = "export";
-    private static final String M8B_SOURCE_EXTENSION = ".m8bs";
+    //private static final String M8B_SOURCE_EXTENSION = ".m8bs";
     private static final String M8B_DIR = "/wiglewifi/m8b/";
     private static final String M8B_EXTENSION = ".m8b";
+    private static final int SLICE_BITS = 30;
 
     ProgressDialog pd = null;
     /** Called when the activity is first created. */
@@ -581,90 +586,82 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             // TODO: there's a real case for refusing to export on devices that don't have SD...
             final boolean hasSD = MainActivity.hasSD();
 
-            File m8bSourceFile;
-            OutputStreamWriter writer;
+            File m8bDestFile;
+            final FileChannel out;
 
             try {
                 if ( hasSD ) {
-                    final String filepath = MainActivity.safeFilePath(
+                    final String basePath = MainActivity.safeFilePath(
                             Environment.getExternalStorageDirectory() ) + M8B_DIR;
-                    final File path = new File( filepath );
+                    final File path = new File( basePath );
                     //noinspection ResultOfMethodCallIgnored
                     path.mkdirs();
                     if (!path.exists()) {
                         MainActivity.info("Got '!exists': " + path);
                     }
-                    String openString = filepath + M8B_FILE_PREFIX +  M8B_SOURCE_EXTENSION;
+                    String openString = basePath + M8B_FILE_PREFIX +  M8B_EXTENSION;
                     //DEBUG: MainActivity.info("Opening file: " + openString);
-                    m8bSourceFile = new File( openString );
+                    m8bDestFile = new File( openString );
 
                 } else {
-                    m8bSourceFile = new File(getActivity().getApplication().getFilesDir(),
-                            M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION);
+                    m8bDestFile = new File(getActivity().getApplication().getFilesDir(),
+                            M8B_FILE_PREFIX + M8B_EXTENSION);
                 }
-
                 //ALIBI: always start fresh
-                if (m8bSourceFile.exists()) {
-                    m8bSourceFile.delete();
-                }
-
-                if (!m8bSourceFile.createNewFile()) {
-                    throw new IOException("Could not create file: " + m8bSourceFile.getAbsolutePath());
-                }
-
-                final FileOutputStream rawFos = new FileOutputStream( m8bSourceFile );
-
-                writer = new OutputStreamWriter(rawFos);
-                if (writer == null) {
-                    MainActivity.error("unable to build writer for cache.");
-                    return "ERROR";
-                }
+                boolean append = false;
+                out = new FileOutputStream(m8bDestFile, append).getChannel();
 
             } catch (IOException ioex) {
-                MainActivity.error("Unable to open tempfile: ", ioex);
+                MainActivity.error("Unable to open ouput: ", ioex);
                 return "ERROR";
             }
 
-            final BufferedWriter buffWriter = new BufferedWriter(writer);
+            final File outputFile = m8bDestFile;
 
-            try {
-                // write header
-                buffWriter.write("bssid" + M8B_SEP + "lat" + M8B_SEP + "lon" + "\n");
-            } catch (IOException ioex) {
-                MainActivity.error("unable to write header");
-                return "ERROR";
-            }
+            final SipKey sipkey = new SipKey(new byte[16]);
+            final byte[] macbytes = new byte[6];
+            final Map<Integer,Set<mgrs>> mjg = new TreeMap<Integer,Set<mgrs>>();
+
+            final long genStart = System.currentTimeMillis();
 
             // write intermediate file
             // ALIBI: redundant thread, but this gets us queue, progress
             final QueryThread.Request request = new QueryThread.Request(
                     ListFragment.lameStatic.dbHelper.LOCATED_NETS_QUERY, new QueryThread.ResultHandler() {
 
+                int non_utm=0;
                 int rows = 0;
+                int records = 0;
 
                 @Override
                 public boolean handleRow(final Cursor cursor) {
                     final String bssid = cursor.getString(0);
                     final float lat = cursor.getFloat(1);
                     final float lon = cursor.getFloat(2);
-                    try {
-                        if (null != buffWriter) {
-                            buffWriter.write(bssid + M8B_SEP + lat + M8B_SEP + lon + "\n");
+                    if (!(-80<=lat && lat<=84)) {
+                        non_utm++;
+                    } else {
+                        mgrs m = mgrs.fromUtm(utm.fromLatLon(lat,lon));
 
-                            rows++;
-                            if (rows % 1000 == 0) {
-                                //DEBUG: MainActivity.info("\tprogress: rows: "+rows+" / "+thousandDbRecords + " = "+ (int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
-                                publishProgress((int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
-                            }
-                            return true;
-                        } else {
-                            MainActivity.error("null writer ");
-                            return false;
+                        Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid,macbytes,sipkey,SLICE_BITS);
+
+                        Set<mgrs> locs = mjg.get(kslice2);
+                        if (locs==null){
+                            locs = new HashSet<mgrs>();
+                            mjg.put(kslice2,locs);
                         }
-                    } catch (IOException ioex) {
-                        MainActivity.error("Unable to write line: ", ioex);
-                        return false;
+                        if(locs.add(m)){
+                            records++;
+                        }
                     }
+
+
+                    rows++;
+                    if (rows % 1000 == 0) {
+                        //DEBUG: MainActivity.info("\tprogress: rows: "+rows+" / "+thousandDbRecords + " = "+ (int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
+                        publishProgress((int) ((rows / (double) 1000 / (double) thousandDbRecords) * 100));
+                    }
+                    return true;
                 }
 
                 /**
@@ -675,89 +672,84 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.info("m8b source export complete...");
 
                     // Tidy up the finished writer
-                    if (null != buffWriter) {
+                    if (null != out) {
                         try {
-                            buffWriter.close();
+                            Charset utf8  = Charset.forName("UTF-8");
+
+                            ByteBuffer bb = ByteBuffer.allocate(4096).order(ByteOrder.LITTLE_ENDIAN); // screw you, java
+
+                            // write header
+                            bb.put("MJG\n".getBytes(utf8)); // magic number
+                            bb.put("2\n".getBytes(utf8)); // version
+                            bb.put("SIP-2-4\n".getBytes(utf8)); // hash
+                            bb.put(String.format("%x\n",SLICE_BITS).getBytes(utf8)); // slice bits (hex)
+                            bb.put("MGRS-1000\n".getBytes(utf8)); // coords
+                            bb.put("4\n".getBytes(utf8)); // id size in bytes (hex)
+                            bb.put("9\n".getBytes(utf8)); // coords size in bytes (hex)
+                            bb.put(String.format("%x\n",records).getBytes(utf8)); // record count (hex)
+
+                            int recordsize = 4+9;
+
+                            bb.flip();
+                            while (bb.hasRemaining()){
+                                out.write(bb);
+                            }
+
+                            // back to fill mode
+                            bb.clear();
+                            byte[] mstr = new byte[9];
+                            int outElements = 0;
+                            for ( Map.Entry<Integer,Set<mgrs>> me : mjg.entrySet()) {
+                                int key = me.getKey().intValue();
+                                for ( mgrs m : me.getValue() ) {
+                                    if (bb.remaining() < recordsize ) {
+                                        bb.flip();
+                                        while (bb.hasRemaining()){
+                                            out.write(bb);
+                                        }
+                                        bb.clear();
+                                    }
+                                    m.populateBytes(mstr);
+                                    bb.putInt(key).put(mstr);
+                                }
+                                outElements++;
+                                if (outElements % 100 == 0) {
+                                    publishProgress(100, (int)(outElements / (double)mjg.size() * 100));
+                                }
+                            }
+
+                            bb.flip();
+                            while (bb.hasRemaining()) {
+                                out.write(bb);
+                            }
+
+                            bb.clear();
+                            out.close();
+
                         } catch (IOException ioex) {
-                            MainActivity.error("Failed to close m8b temp writer", ioex);
+                            MainActivity.error("Failed to close m8b writer", ioex);
                         }
                     }
 
-                    try {
-                        //TODO: DRY up w/ above? difficult to do safely because get*Path for m8bSourceFile may exception out
-                        File m8bSourceFile;
-                        File outputFile;
+                    final long duration = System.currentTimeMillis() - genStart;
+                    MainActivity.info("completed m8b generation. Generation time: "+((double)duration * 0.001d)+"s");
 
-                        if ( hasSD ) {
-                            String basePath;
-                            basePath = MainActivity.safeFilePath(
-                                    Environment.getExternalStorageDirectory() ) + M8B_DIR;
-                            String openString = basePath + M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION;
-                            //DEBUG: MainActivity.info("Opening file: " + openString);
-                            m8bSourceFile = new File( openString );
-                            if (!m8bSourceFile.exists()) {
-                                MainActivity.info("Got '!exists': " + m8bSourceFile.getCanonicalPath());
-                            }
-                            outputFile = new File(basePath + M8B_FILE_PREFIX + M8B_EXTENSION);
-                        } else {
-                            m8bSourceFile = new File(getActivity().getApplication().getFilesDir(),
-                                    M8B_FILE_PREFIX + M8B_SOURCE_EXTENSION);
-                            outputFile = new File(getActivity().getApplication().getFilesDir(),
-                                    M8B_FILE_PREFIX + M8B_EXTENSION);
-                        }
+                    publishProgress(100, 100); //ALIBI: will close the dialog in case fractions didn't work out.
 
-                        FileReader fr = new FileReader(m8bSourceFile.getCanonicalPath());
-                        BufferedReader lines = new BufferedReader(fr);
-                        lines.readLine(); // ALIBI: skip header
-                        boolean append = false;
-                        FileChannel out = new FileOutputStream(outputFile, append).getChannel();
+                    // fire share intent?
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE.m8b");
+                    intent.setType("application/wigle.m8b");
 
-                        final long genStart = System.currentTimeMillis();
-                        MagicEightUtil.generate(lines, out,
-                                30 /*ALIBI: slicebits high so these can always integrate*/,
-                                false, new M8bProgress() {
-                            @Override
-                            public void handleGenerationProgress(int status) {
-                                publishProgress(100, (int)((status/(double)rows) * 100), 0);
-                            }
-
-                            @Override
-                            public void handleWriteProgress(int status, int linesOut) {
-                                publishProgress(100, 100,
-                                        (int)((status / (double) linesOut) * 100));
-                            }
-                        });
-                        final long duration = System.currentTimeMillis() - genStart;
-
-                        MainActivity.info("completed m8b generation. Generation time: "+((double)duration * 0.001d)+"s");
-                        publishProgress(100, 100, 100); //ALIBI: will close the dialog in case fractions didn't work out.
-
-                        if (null != out) {
-                            try {
-                                out.close();
-                            } catch (Exception ex) {
-                                MainActivity.error("Failed to close output: ",ex);
-                            }
-                        }
-
-                        // fire share intent?
-                        Intent intent = new Intent(Intent.ACTION_SEND);
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE.m8b");
-                        intent.setType("application/wigle.m8b");
-
-                        //TODO: verify local-only storage case/m8b_paths.xml
-                        final Uri fileUri = FileProvider.getUriForFile(getContext(),
-                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                        ".m8bprovider", outputFile);
+                    //TODO: verify local-only storage case/m8b_paths.xml
+                    final Uri fileUri = FileProvider.getUriForFile(getContext(),
+                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                    ".m8bprovider", outputFile);
 
                         intent.putExtra(Intent.EXTRA_STREAM, fileUri);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
-                    } catch (Exception ex /*TODO*/) {
-                        MainActivity.error("Failed to synthesize m8b: ",ex);
-                        publishProgress(100, 100, 100);
-                    }
                 }
             });
             ListFragment.lameStatic.dbHelper.addToQueue( request );
@@ -780,29 +772,31 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             pd = new ProgressDialog(getContext());
             pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             pd.setCancelable(false);
-            pd.setMessage(getString(R.string.exporting_m8b_intermediate));
+            pd.setMessage(getString(R.string.m8b_sizing));
+            pd.setIndeterminate(true);
             pd.show();
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            if (values.length == 3) { // actually 3-stage?
-                if (values[2] > 0) {
-                    if (100 == values[2]) {
+            if (values.length == 2) { // actually 2-stage?
+                if (values[1] > 0) {
+                    if (100 == values[1]) {
                         if (pd.isShowing()) {
                             pd.dismiss();
                         }
                         return;
                     }
                     pd.setMessage(getString(R.string.exporting_m8b_final));
-                    pd.setProgress(values[2]);
-                } else if ( values[1] > 0) {
-                    pd.setMessage(getString(R.string.calculating_m8b));
                     pd.setProgress(values[1]);
                 } else {
+                    pd.setIndeterminate(false);
+                    pd.setMessage(getString(R.string.calculating_m8b));
                     pd.setProgress(values[0]);
                 }
             } else { // default single progress bar - trust the message already set?
+                pd.setIndeterminate(false);
+                pd.setMessage(getString(R.string.calculating_m8b));
                 pd.setProgress(values[0]);
             }
         }

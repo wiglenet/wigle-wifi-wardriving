@@ -184,7 +184,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     boolean forceLeListReset = false;
                     if (results.isEmpty()) {
                         empties++;
-                        MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
+                        //DEBUG: MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
                         //ALIBI: if it's been too long, we'll force-clear
                         if (EMPTY_LE_THRESHOLD < empties) {
                             forceLeListReset = true;

@@ -252,7 +252,12 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public Network get(int i) {
-        return networks.get(i);
+        try {
+            return networks.get(i);
+        } catch (IndexOutOfBoundsException iobex) {
+            MainActivity.error("failed SBNL.get - index out of bound (likely structure changed)");
+            return null;
+        }
     }
 
     @Override

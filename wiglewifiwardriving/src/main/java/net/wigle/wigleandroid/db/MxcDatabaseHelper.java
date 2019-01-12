@@ -108,7 +108,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
 
         // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT == 19) {
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
             return null;
         }
 
@@ -158,7 +158,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         String operator = null;
 
         // ALIBI: old, incompatible DB implementation
-        if (android.os.Build.VERSION.SDK_INT == 19) {
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
             return null;
         }
 

@@ -20,6 +20,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -36,10 +37,12 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -49,21 +52,14 @@ import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -98,8 +94,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,8 +128,7 @@ public final class MainActivity extends AppCompatActivity {
         ObservationUploader observationUploader;
         SetNetworkListAdapter listAdapter;
         String previousStatus;
-        int currentTab;
-        private final Fragment[] fragList = new Fragment[11];
+        int currentTab = R.id.nav_list;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -183,6 +180,8 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
     public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
 
+    public static final String FRAGMENT_TAG_PREFIX = "VisibleFragment-";
+
     public static final boolean DEBUG_CELL_DATA = false;
     public static final boolean DEBUG_BLUETOOTH_DATA = false;
 
@@ -192,23 +191,10 @@ public final class MainActivity extends AppCompatActivity {
     private boolean playServiceShown = false;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
-
-    public static final int LIST_TAB_POS = 0;
-    public static final int MAP_TAB_POS = 1;
-    public static final int DASH_TAB_POS = 2;
-    public static final int DATA_TAB_POS = 3;
-    public static final int NEWS_TAB_POS = 4;
-    public static final int RANK_STATS_TAB_POS = 5;
-    public static final int USER_STATS_TAB_POS = 6;
-    public static final int UPLOADS_TAB_POS = 7;
-    public static final int SETTINGS_TAB_POS = 8;
-    public static final int EXIT_TAB_POS = 9;
-    public static final int SITE_STATS_TAB_POS = 10;
 
 
     @SuppressWarnings("deprecation")
@@ -281,7 +267,7 @@ public final class MainActivity extends AppCompatActivity {
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (state.wakeLock == null) {
-            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wiglewifiwardriving:DoNotDimScreen");
             if (state.wakeLock.isHeld()) {
                 state.wakeLock.release();
             }
@@ -478,65 +464,6 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void setupMenuDrawer() {
-        // set up drawer menu
-        final String[] menuTitles = new String[]{
-                getString(R.string.tab_list),
-                getString(R.string.tab_map),
-                getString(R.string.tab_dash),
-                getString(R.string.tab_data),
-                getString(R.string.tab_news),
-                getString(R.string.tab_rank),
-                getString(R.string.tab_stats),
-                getString(R.string.tab_uploads),
-                getString(R.string.menu_settings),
-                getString(R.string.menu_exit),
-        };
-        final int[] menuIcons = new int[]{
-                android.R.drawable.ic_menu_sort_by_size,
-                android.R.drawable.ic_menu_mapmode,
-                android.R.drawable.ic_menu_directions,
-                android.R.drawable.ic_menu_save,
-                android.R.drawable.ic_menu_agenda,
-                android.R.drawable.ic_menu_sort_alphabetically,
-                android.R.drawable.ic_menu_today,
-                android.R.drawable.ic_menu_upload,
-                android.R.drawable.ic_menu_preferences,
-                android.R.drawable.ic_delete,
-        };
-
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, R.id.drawer_list_text, menuTitles) {
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                final LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                View view;
-                if (convertView == null) {
-                    view = inflater.inflate(R.layout.drawer_list_item, parent, false);
-                } else {
-                    view = convertView;
-                }
-
-                final TextView text = (TextView) view.findViewById(R.id.drawer_list_text);
-                text.setText(menuTitles[position]);
-                //If that's the Exit button, set the background to red
-                if(position == EXIT_TAB_POS) {
-                    view.setBackgroundColor(Color.argb(200,70,0,0));
-                }else{
-                    view.setBackgroundColor(0);
-                }
-                final ImageView image = (ImageView) view.findViewById(R.id.drawer_list_icon);
-                image.setImageResource(menuIcons[position]);
-
-                return view;
-            }
-        });
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -558,66 +485,88 @@ public final class MainActivity extends AppCompatActivity {
                 if (actionBar != null) actionBar.setTitle("Menu");
             }
         };
-
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        NavigationView navigationView = findViewById(R.id.left_drawer);
 
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+                        selectFragment(menuItem.getItemId());
+                        return true;
+                    }
+                });
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
-        // end drawer setup
-    }
+        navigationView.getMenu().getItem(0).setChecked(true);
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectFragment(position);
-        }
+        // ALIBI: not enough room on many displays
+        final MenuItem siteStatsItem  = navigationView.getMenu().findItem(R.id.nav_site_stats);
+        siteStatsItem.setVisible(false);
+
+        // end drawer setup
     }
 
     /**
      * Swaps fragments in the main content view
      */
-    public void selectFragment(int position) {
-        if (position == EXIT_TAB_POS) {
+    public void selectFragment(final int itemId) {
+        if (itemId == R.id.nav_exit) {
             finishSoon();
             return;
         }
 
-        final String[] fragmentTitles = new String[]{
-                getString(R.string.list_app_name),
-                getString(R.string.mapping_app_name),
-                getString(R.string.dashboard_app_name),
-                getString(R.string.data_activity_name),
-                getString(R.string.news_app_name),
-                getString(R.string.rank_stats_app_name),
-                getString(R.string.user_stats_app_name),
-                getString(R.string.uploads_app_name),
-                getString(R.string.settings_app_name),
-                getString(R.string.menu_exit),
-                getString(R.string.site_stats_app_name),
-        };
+        final Map<Integer, String> fragmentTitles = new HashMap<>();
+        fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
+        fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
+        fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
+        fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
+        fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
+        fragmentTitles.put(R.id.nav_stats, getString(R.string.user_stats_app_name));
+        fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
+        fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
+        fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
+        //fragmentTitles.put(R.id.nav_, getString(R.string.site_stats_app_name));
 
-        final Fragment frag = state.fragList[position];
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
         try {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.tabcontent, frag)
-                    .commit();
-        } catch (final NullPointerException | IllegalStateException ex) {
-            final String message = "exception in fragment switch: " + ex;
-            error(message, ex);
-        }
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final Fragment frag = (Fragment) classForFragmentNavId(itemId).newInstance();
+            Bundle bundle = new Bundle();
+            frag.setArguments(bundle);
 
-        // Highlight the selected item, update the title, and close the drawer
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
-        state.currentTab = position;
-        setTitle(fragmentTitles[position]);
+
+            //fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+itemId);
+
+            if (null == frag) {
+                final String maybeName = getResources().getResourceName(itemId);
+                MainActivity.error("null fragment for: " + String.format("0x%08X", itemId) + " (" + maybeName + ")");
+            }
+
+            try {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX+itemId)
+                        .commit();
+            } catch (final NullPointerException | IllegalStateException ex) {
+                final String message = "exception in fragment switch: " + ex;
+                error(message, ex);
+            }
+
+            // Highlight the selected item, update the title, and close the drawer
+            state.currentTab = itemId;
+            setTitle(fragmentTitles.get(itemId));
+        } catch (IllegalAccessException ex) {
+            MainActivity.error("Unable to get fragment for id: "+itemId, ex);
+        } catch (InstantiationException ex) {
+            MainActivity.error("Unable to make fragment for id: "+itemId, ex);
+        }
     }
 
     @Override
@@ -626,67 +575,44 @@ public final class MainActivity extends AppCompatActivity {
         if (actionBar != null) actionBar.setTitle(title);
     }
 
-
     private void setupFragments() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
         info("Creating ListFragment");
         listActivity = new ListFragment();
         Bundle bundle = new Bundle();
         listActivity.setArguments(bundle);
-        state.fragList[LIST_TAB_POS] = listActivity;
 
-        info("Creating MappingFragment");
-        final MappingFragment map = new MappingFragment();
-        bundle = new Bundle();
-        map.setArguments(bundle);
-        state.fragList[MAP_TAB_POS] = map;
+        transaction.add(R.id.tabcontent, listActivity, FRAGMENT_TAG_PREFIX+R.id.nav_list);
+        transaction.commit();
+    }
 
-        info("Creating DashboardFragment");
-        final DashboardFragment dash = new DashboardFragment();
-        bundle = new Bundle();
-        dash.setArguments(bundle);
-        state.fragList[DASH_TAB_POS] = dash;
-
-        info("Creating DataFragment");
-        final DataFragment data = new DataFragment();
-        bundle = new Bundle();
-        data.setArguments(bundle);
-        state.fragList[DATA_TAB_POS] = data;
-
-        info("Creating UserStatsFragment");
-        final UserStatsFragment userStats = new UserStatsFragment();
-        bundle = new Bundle();
-        userStats.setArguments(bundle);
-        state.fragList[USER_STATS_TAB_POS] = userStats;
-
-        info("Creating SiteStatsFragment");
-        final SiteStatsFragment siteStats = new SiteStatsFragment();
-        bundle = new Bundle();
-        siteStats.setArguments(bundle);
-        state.fragList[SITE_STATS_TAB_POS] = siteStats;
-
-        info("Creating NewsFragment");
-        final NewsFragment newsStats = new NewsFragment();
-        bundle = new Bundle();
-        newsStats.setArguments(bundle);
-        state.fragList[NEWS_TAB_POS] = newsStats;
-
-        info("Creating RankStatsFragment");
-        final RankStatsFragment rankStats = new RankStatsFragment();
-        bundle = new Bundle();
-        rankStats.setArguments(bundle);
-        state.fragList[RANK_STATS_TAB_POS] = rankStats;
-
-        info("Creating UploadsFragment");
-        final UploadsFragment uploads = new UploadsFragment();
-        bundle = new Bundle();
-        uploads.setArguments(bundle);
-        state.fragList[UPLOADS_TAB_POS] = uploads;
-
-        info("Creating SettingsFragment");
-        final SettingsFragment settings = new SettingsFragment();
-        bundle = new Bundle();
-        settings.setArguments(bundle);
-        state.fragList[SETTINGS_TAB_POS] = settings;
+    private static Class classForFragmentNavId(final int navId) {
+        switch(navId) {
+            case R.id.nav_list:
+                return ListFragment.class;
+            case R.id.nav_dash:
+                return DashboardFragment.class;
+            case R.id.nav_data:
+                return DataFragment.class;
+            case R.id.nav_map:
+                return MappingFragment.class;
+            case R.id.nav_stats:
+                return UserStatsFragment.class;
+            case R.id.nav_rank:
+                return RankStatsFragment.class;
+            case R.id.nav_site_stats:
+                return SiteStatsFragment.class;
+            case R.id.nav_news:
+                return NewsFragment.class;
+            case R.id.nav_uploads:
+                return UploadsFragment.class;
+            case R.id.nav_settings:
+                return SettingsFragment.class;
+            default:
+                return ListFragment.class;
+        }
     }
 
     @Override
@@ -838,8 +764,16 @@ public final class MainActivity extends AppCompatActivity {
                         } else if (activity instanceof MainActivity) {
                             final MainActivity mainActivity = (MainActivity) activity;
                             if (mainActivity.getState() != null) {
-                                final Fragment fragment = mainActivity.getState().fragList[tabPos];
-                                ((DialogListener) fragment).handleDialog(dialogId);
+                                final String maybeName = getResources().getResourceName(tabPos);
+                                //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
+                                final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+tabPos);
+                                if (fragment == null) {
+                                    MainActivity.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                    //TODO: might behoove us to show an error here
+                                } else {
+                                    ((DialogListener) fragment).handleDialog(dialogId);
+                                }
                             }
                         } else {
                             ((DialogListener) activity).handleDialog(dialogId);
@@ -1416,10 +1350,12 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void addNetworkToMap(final Network network) {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.addNetwork(network);
             }
@@ -1427,10 +1363,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void updateNetworkOnMap(final Network network) {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.updateNetwork(network);
             }
@@ -1438,10 +1375,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void reclusterMap() {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.reCluster();
             }
@@ -2186,7 +2124,6 @@ public final class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        info("MAIN: onCreateOptionsMenu.");
         return true;
     }
 
@@ -2334,7 +2271,7 @@ public final class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             MainActivity.info("onKeyDown: not quitting app on back");
-            selectFragment(0);
+            selectFragment(R.id.nav_list);
             return true;
         }
         // we may want this, but devices with menu button don't get the 3 dots, so we'd have to force on the 3 dots
@@ -2351,7 +2288,7 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void doUpload() {
-        selectFragment(LIST_TAB_POS);
+        selectFragment(R.id.nav_list);
         listActivity.makeUploadDialog(this);
     }
 

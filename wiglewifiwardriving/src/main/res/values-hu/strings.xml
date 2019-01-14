@@ -258,6 +258,12 @@
     <string name="use_wigle_tiles">Használjon WiGLE OSM csempéket</string>
     <string name="wigle_service">WiGLE Wifi Szolgáltatás</string>
     <string name="disable_toast">Felugró értesítések tiltása</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">aktiváld most</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>

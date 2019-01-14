@@ -218,7 +218,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     MainActivity.createConfirmation( getActivity(),
                             getString(R.string.donate_question) + "\n\n"
                                     + getString(R.string.donate_explain),
-                            MainActivity.SETTINGS_TAB_POS, DONATE_DIALOG);
+                            R.id.nav_settings, DONATE_DIALOG);
                 }
                 else {
                     editor.putBoolean( ListFragment.PREF_DONATE, false);
@@ -249,7 +249,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     public void onClick(View view) {
                         MainActivity.createConfirmation( getActivity(),
                                 getString(R.string.deauthorize_confirm),
-                                MainActivity.SETTINGS_TAB_POS, DEAUTHORIZE_DIALOG );
+                                R.id.nav_settings, DEAUTHORIZE_DIALOG );
                     }
                 });
                 authButton.setVisibility(View.GONE);
@@ -311,7 +311,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     buttonView.setChecked( false );
                     // confirm
                     MainActivity.createConfirmation( getActivity(),
-                            getString(R.string.anonymous_confirm), MainActivity.SETTINGS_TAB_POS,
+                            getString(R.string.anonymous_confirm), R.id.nav_settings,
                             ANONYMOUS_DIALOG );
                 } else {
                     // unset anonymous
@@ -594,7 +594,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         switch ( item.getItemId() ) {
             case MENU_RETURN:
                 final MainActivity mainActivity = MainActivity.getMainActivity(this);
-                if (mainActivity != null) mainActivity.selectFragment(MainActivity.LIST_TAB_POS);
+                if (mainActivity != null) mainActivity.selectFragment(R.id.nav_list);
                 return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );

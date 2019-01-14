@@ -279,6 +279,7 @@
     <string name="genloc_title">WiGLE.net : tours cellulaires avec localisation</string>
     <string name="userstot_title">Total d\'utilisateurs enregistrés sur WiGLE.net</string>
     <string name="transtot_title">Fichiers uploadés vers WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>

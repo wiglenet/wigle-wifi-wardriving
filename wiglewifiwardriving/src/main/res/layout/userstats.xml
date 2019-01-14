@@ -77,7 +77,9 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            >
             <TextView
                 android:id="@+id/discoveredWiFiGPS"
                 android:layout_width="wrap_content"
@@ -94,10 +96,17 @@
                 android:textSize="20sp"
                 />
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp">
             <TextView
                 android:id="@+id/discoveredWiFi"
                 android:layout_width="wrap_content"

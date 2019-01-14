@@ -351,10 +351,10 @@ public class UploadsFragment extends Fragment {
         final MainActivity main = MainActivity.getMainActivity();
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                main.selectFragment(R.id.nav_uploads);
                 return true;
             case MENU_SITE_STATS:
-                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                main.selectFragment(R.id.nav_uploads);
                 return true;
         }
         return false;

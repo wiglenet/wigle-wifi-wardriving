@@ -279,6 +279,7 @@
     <string name="genloc_title">WiGLE.net vysílače s polohou</string>
     <string name="userstot_title">Celkový počet registrovaných uživatelů WiGLE.net</string>
     <string name="transtot_title">Soubory byly odeslány do WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>

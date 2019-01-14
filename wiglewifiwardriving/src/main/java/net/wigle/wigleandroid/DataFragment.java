@@ -196,7 +196,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_export_csv), MainActivity.DATA_TAB_POS, CSV_RUN_DIALOG);
+                        DataFragment.this.getString(R.string.data_export_csv), R.id.nav_data, CSV_RUN_DIALOG);
             }
         });
 
@@ -205,7 +205,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_export_csv_db), MainActivity.DATA_TAB_POS, CSV_DB_DIALOG);
+                        DataFragment.this.getString(R.string.data_export_csv_db), R.id.nav_data, CSV_DB_DIALOG);
             }
         });
     }
@@ -216,7 +216,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_export_kml_run), MainActivity.DATA_TAB_POS, KML_RUN_DIALOG);
+                        DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
             }
         });
 
@@ -225,7 +225,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_export_kml_db), MainActivity.DATA_TAB_POS, KML_DB_DIALOG);
+                        DataFragment.this.getString(R.string.data_export_kml_db), R.id.nav_data, KML_DB_DIALOG);
             }
         });
     }
@@ -240,7 +240,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(),
-                        DataFragment.this.getString(R.string.data_backup_db), MainActivity.DATA_TAB_POS, BACKUP_DIALOG);
+                        DataFragment.this.getString(R.string.data_backup_db), R.id.nav_data, BACKUP_DIALOG);
             }
         });
     }
@@ -260,7 +260,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             public void onClick(final View buttonView) {
                 MainActivity.createConfirmation(getActivity(),
                         DataFragment.this.getString(R.string.data_import_observed),
-                        MainActivity.DATA_TAB_POS, IMPORT_DIALOG);
+                        R.id.nav_data, IMPORT_DIALOG);
             }
         });
     }
@@ -310,7 +310,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(), getString(R.string.setting_zero_out),
-                        MainActivity.DATA_TAB_POS, ZERO_OUT_DIALOG);
+                        R.id.nav_data, ZERO_OUT_DIALOG);
             }
         });
 
@@ -324,7 +324,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(), getString(R.string.setting_max_out),
-                        MainActivity.DATA_TAB_POS, MAX_OUT_DIALOG);
+                        R.id.nav_data, MAX_OUT_DIALOG);
             }
         } );
 
@@ -334,7 +334,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             @Override
             public void onClick( final View buttonView ) {
                 MainActivity.createConfirmation( getActivity(), getString(R.string.delete_db_confirm),
-                        MainActivity.DATA_TAB_POS, DELETE_DIALOG);
+                        R.id.nav_data, DELETE_DIALOG);
             }
         } );
 

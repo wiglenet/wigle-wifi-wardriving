@@ -273,7 +273,6 @@
     <string name="at">na</string>
     <string name="drawer_open">Panel je otevřený</string>
     <string name="drawer_close">Panel je zavřený</string>
-    <string name="tab_stats">Statistiky uživatelů</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
     <string name="netloc_title">WiFi sítě WiGLE.net s umístěním</string>
     <string name="loctotal_title">WiGLE.net zpozorované WiFi sítě</string>

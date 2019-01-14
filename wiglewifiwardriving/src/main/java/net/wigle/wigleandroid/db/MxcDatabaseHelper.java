@@ -107,6 +107,11 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
 
+        // ALIBI: old, incompatible DB implementation
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
+            return null;
+        }
+
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
             return null;
@@ -151,6 +156,11 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     public String networkNameForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
         String operator = null;
+
+        // ALIBI: old, incompatible DB implementation
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
+            return null;
+        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");

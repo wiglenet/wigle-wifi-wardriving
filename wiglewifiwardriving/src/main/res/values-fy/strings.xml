@@ -115,6 +115,7 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_dash">Oersjoch</string>
     <string name="tab_data">Gegevens</string>
+    <string name="tab_stats">Statistieken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>
@@ -258,6 +259,8 @@
     <string name="use_wigle_tiles">Gebrûk WiGLE OSM-tegels</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Toast pop-ups uitschakelen</string>
+    <string name="drawer_open">Lade open</string>
+    <string name="drawer_close">Lade gesloten</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
@@ -335,4 +338,13 @@
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
+    <string name="error_less_than_oui">BSSID must contain at least an OUI for online search</string>
+    <string name="error_incomplete_octet">BSSID octets must be complete (or %) for online search</string>
+    <string name="search_wigle">Search WiGLE</string>
+    <string name="must_login">(must be logged in)</string>
+    <string name="search_local">Search Your Local Database</string>
+    <string name="search_failed">Search Failed</string>
+    <string name="search_empty">Results Empty</string>
+    <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
+
 </resources>

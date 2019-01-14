@@ -18,7 +18,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/netloc_title"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             />
         <TextView
@@ -26,7 +26,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:paddingBottom="4dp"
             />
 
@@ -34,7 +34,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/loctotal_title"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             />
         <TextView
@@ -42,7 +42,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:paddingBottom="4dp"
             />
 
@@ -50,7 +50,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/genloc_title"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             />
         <TextView
@@ -58,7 +58,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:paddingBottom="4dp"
             />
 
@@ -66,7 +66,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/userstot_title"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
 
             />
@@ -75,7 +75,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:paddingBottom="2dp"
             />
 
@@ -83,7 +83,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/transtot_title"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
 
             />
@@ -92,7 +92,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:paddingBottom="4dp"
             />
 
@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netwpa3_title"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="#00AA00"
                 android:textStyle="bold"
                 />
@@ -120,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingBottom="2dp"
                 android:paddingLeft="4dp"
                 />
@@ -134,7 +134,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netwpa2_title"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="#00ff00"
                 android:textStyle="bold"
                 />
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingBottom="2dp"
                 android:paddingLeft="4dp"
                 />
@@ -157,7 +157,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netwpa_title"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="#ffff00"
                 android:textStyle="bold"
                 />
@@ -166,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingBottom="2dp"
                 android:paddingLeft="4dp"
                 />
@@ -179,7 +179,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netwep_title"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="#ffad00"
                 android:textStyle="bold"
                 />
@@ -188,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingBottom="2dp"
                 android:paddingLeft="4dp"
                 />
@@ -201,15 +201,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netnowep_title"
-                android:textSize="16sp"
-                android:textColor="#ff0000"/>
-            android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#ff0000"
+                android:textStyle="bold"
+                />
             <TextView
                 android:id="@+id/netnowep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingBottom="2dp"
                 android:paddingLeft="4dp"
                 />
@@ -222,7 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/netwepunknown_title"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 />
             <TextView
@@ -230,7 +231,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:paddingLeft="4dp"
                 />
         </LinearLayout>

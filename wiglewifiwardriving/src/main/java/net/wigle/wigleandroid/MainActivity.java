@@ -19,8 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -49,6 +47,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -129,6 +129,7 @@ public final class MainActivity extends AppCompatActivity {
         SetNetworkListAdapter listAdapter;
         String previousStatus;
         int currentTab = R.id.nav_list;
+        int previousTab = 0;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -153,7 +154,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
-    // registration web view
+    public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
+    public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
+
+        // registration web view
     public static final String REG_URL = "https://wigle.net/register";
 
     private static final String LOG_TAG = "wigle";
@@ -487,17 +491,40 @@ public final class MainActivity extends AppCompatActivity {
         };
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        NavigationView navigationView = findViewById(R.id.left_drawer);
+        final NavigationView navigationView = findViewById(R.id.left_drawer);
+        navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
 
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         // set item as selected to persist highlight
-                        menuItem.setChecked(true);
+
+                        menuItem.setCheckable(true);
+                        if (menuItem.getItemId() == R.id.nav_stats) {
+                            menuItem.setChecked(!menuItem.isChecked());
+                        } else {
+                            menuItem.setChecked(true);
+
+                            if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                                MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                                mPreviousMenuItem.setChecked(false);
+                            }
+                        }
+                        state.previousTab = menuItem.getItemId();
+
                         // close drawer when item is tapped
-                        mDrawerLayout.closeDrawers();
-                        selectFragment(menuItem.getItemId());
+                        if (R.id.nav_stats == menuItem.getItemId()) {
+                            MainActivity.info("Nav stats clicked");
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked() );
+                        } else {
+                            if (R.id.nav_site_stats != menuItem.getItemId() &&
+                                    R.id.nav_user_stats != menuItem.getItemId() &&
+                                    R.id.nav_rank != menuItem.getItemId() )
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
+                            mDrawerLayout.closeDrawers();
+                            selectFragment(menuItem.getItemId());
+                        }
                         return true;
                     }
                 });
@@ -506,12 +533,25 @@ public final class MainActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
+
+        int menuSubColor = 0xE0777777;
+        MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
+        SpannableString spanString = new SpannableString(uStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        uStats.setTitle(spanString);
+
+        MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
+        spanString = new SpannableString(sStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        sStats.setTitle(spanString);
+
+        MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
+        spanString = new SpannableString(rStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        rStats.setTitle(spanString);
+
+        navigationView.getMenu().getItem(0).setCheckable(true);
         navigationView.getMenu().getItem(0).setChecked(true);
-
-        // ALIBI: not enough room on many displays
-        final MenuItem siteStatsItem  = navigationView.getMenu().findItem(R.id.nav_site_stats);
-        siteStatsItem.setVisible(false);
-
         // end drawer setup
     }
 
@@ -528,9 +568,10 @@ public final class MainActivity extends AppCompatActivity {
         fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
         fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
         fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
+        fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
         fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
         fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
-        fragmentTitles.put(R.id.nav_stats, getString(R.string.user_stats_app_name));
+        fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
         fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
         fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
         fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
@@ -569,6 +610,10 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
+        menu.setGroupVisible(submenuGroupId, visible);
+    }
+
     @Override
     public void setTitle(CharSequence title) {
         final ActionBar actionBar = getSupportActionBar();
@@ -596,9 +641,11 @@ public final class MainActivity extends AppCompatActivity {
                 return DashboardFragment.class;
             case R.id.nav_data:
                 return DataFragment.class;
+            case R.id.nav_search:
+                return SearchFragment.class;
             case R.id.nav_map:
                 return MappingFragment.class;
-            case R.id.nav_stats:
+            case R.id.nav_user_stats:
                 return UserStatsFragment.class;
             case R.id.nav_rank:
                 return RankStatsFragment.class;

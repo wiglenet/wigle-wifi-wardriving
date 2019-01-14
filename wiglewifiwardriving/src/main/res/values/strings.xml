@@ -115,6 +115,8 @@
     <string name="tab_map">Map</string>
     <string name="tab_dash">Dashboard</string>
     <string name="tab_data">Database</string>
+    <string name="tab_stats">Statistics</string>
+    <string name="tab_search">Search</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(Scanning Turned Off)</string>
@@ -272,7 +274,6 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
-    <string name="tab_stats">User Statistics</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
     <string name="netloc_title">WiGLE.net WiFi Networks with Location</string>
     <string name="loctotal_title">WiGLE.net WiFi Network Observations</string>
@@ -393,4 +394,12 @@
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID must be 12 characters long or contain a wildcard (%)</string>
+    <string name="error_less_than_oui">BSSID must contain at least an OUI for online search</string>
+    <string name="error_incomplete_octet">BSSID octets must be complete (or %) for online search</string>
+    <string name="search_wigle">Search WiGLE</string>
+    <string name="must_login">(must be logged in)</string>
+    <string name="search_local">Search Your Local Database</string>
+    <string name="search_failed">Search Failed</string>
+    <string name="search_empty">Results Empty</string>
+    <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
 </resources>

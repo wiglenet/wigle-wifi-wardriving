@@ -115,6 +115,7 @@
     <string name="tab_map">Harita</string>
     <string name="tab_dash">Pano</string>
     <string name="tab_data">Veri</string>
+    <string name="tab_stats">Istatistik</string>
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
     <string name="dash_scan_off">(Tarama Kapalı)</string>
@@ -335,4 +336,12 @@
     <string name="turn_on_bt">Bluetooth\'u açma</string>
     <string name="filter_show_bt">Bluetooth\'u göster</string>
     <string name="error_invalid_bssid">BSSID, 12 karakter uzunluğunda olmalı veya bir joker karakter içermelidir (%)</string>
+    <string name="error_less_than_oui">BSSID, çevrimiçi arama için en az bir OUI içermelidir</string>
+    <string name="error_incomplete_octet">Çevrimiçi arama için BSSID sekizli sayısı tam (veya%)</string>
+    <string name="search_wigle">WiGLE\'de ara</string>
+    <string name="must_login">(oturum açmış olmalısınız)</string>
+    <string name="search_local">Yerel Veritabanınızı Arayın</string>
+    <string name="search_failed">Arama Başarısız Oldu</string>
+    <string name="search_empty">Boş Sonuçlar</string>
+    <string name="search_query_limit">Bugün maksimum arama sayısına ulaştınız. Sınırın yarın sıfırlanacak.</string>
 </resources>

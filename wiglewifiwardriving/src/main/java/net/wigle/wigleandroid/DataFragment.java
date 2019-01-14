@@ -1,7 +1,5 @@
 package net.wigle.wigleandroid;
 
-import java.util.List;
-
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
@@ -9,8 +7,8 @@ import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.model.Pair;
-import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.SearchUtil;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -18,8 +16,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -37,10 +33,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONObject;
+
+import java.util.List;
 
 
 /**
@@ -91,69 +88,15 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View buttonView) {
-                final QueryArgs queryArgs = new QueryArgs();
-                String fail = null;
-                String field = null;
-                boolean okValue = false;
 
-                for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid}) {
-                    if (fail != null) {
-                        break;
-                    }
-
-                    final EditText editText = (EditText) view.findViewById(id);
-                    final String text = editText.getText().toString().trim();
-                    if ("".equals(text)) {
-                        continue;
-                    }
-
-                    try {
-                        switch (id) {
-                            case R.id.query_address:
-                                field = getString(R.string.address);
-                                Geocoder gc = new Geocoder(getActivity());
-                                List<Address> addresses = gc.getFromLocationName(text, 1);
-                                if (addresses.size() < 1) {
-                                    fail = getString(R.string.no_address_found);
-                                    break;
-                                }
-                                queryArgs.setAddress(addresses.get(0));
-                                okValue = true;
-                                break;
-                            case R.id.query_ssid:
-                                field = getString(R.string.ssid);
-                                queryArgs.setSSID(text);
-                                okValue = true;
-                                break;
-                            case R.id.query_bssid:
-                                field = getString(R.string.bssid);
-                                queryArgs.setBSSID(text);
-                                if (text.length() > 17 || (text.length() < 17 && !text.contains("%"))) {
-                                    okValue = false;
-                                    fail = getString(R.string.error_invalid_bssid);
-                                } else {
-                                    MainActivity.info("text: "+text);
-                                    okValue = true;
-                                }
-                                break;
-                            default:
-                                MainActivity.error("setupButtons: bad id: " + id);
-                        }
-                    } catch (Exception ex) {
-                        fail = getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage();
-                        break;
-                    }
+                final String fail = SearchUtil.setupQuery(view, getActivity(), true);
+                if (null != ListFragment.lameStatic.queryArgs) {
+                    ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
                 }
-
-                if (fail == null && !okValue) {
-                    fail = "No query fields specified";
-                }
-
                 if (fail != null) {
                     // toast!
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
-                    ListFragment.lameStatic.queryArgs = queryArgs;
                     // start db result activity
                     final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
                     startActivity(settingsIntent);
@@ -165,10 +108,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         button.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final View buttonView) {
-                for (final int id : new int[]{R.id.query_address, R.id.query_ssid}) {
-                    final EditText editText = (EditText) view.findViewById(id);
-                    editText.setText("");
-                }
+                SearchUtil.clearWiFiBtFields(view);
             }
         });
 

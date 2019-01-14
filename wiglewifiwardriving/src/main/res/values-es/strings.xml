@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Resumen</string>
     <string name="tab_data">Datos</string>
+    <string name="tab_stats">Estadística</string>
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Exploración apagada)</string>
@@ -306,6 +307,8 @@
     <string name="add_mac_filter_button">Añadir filtro MAC</string>
     <string name="log_filter_button">Excluir MACs / OUIs del registro…</string>
     <string name="map_needs_playservice"></string>
+    <string name="drawer_open">Cajón abierto</string>
+    <string name="drawer_close">Cajón cerrado</string>
     <string name="mac_filter_app_name">Direcciones de filtro</string>
     <string name="hide_mac">Hide MAC</string>
     <string name="hide_oui">Hide OUI</string>
@@ -336,4 +339,12 @@
     <string name="turn_on_bt">Encendido de Bluetooth</string>
     <string name="filter_show_bt">Mostrar Bluetooth</string>
     <string name="error_invalid_bssid">BSSID debe tener 12 caracteres o contener un comodín (%)</string>
+    <string name="error_less_than_oui">BSSID debe contener al menos un OUI para búsqueda en línea</string>
+    <string name="error_incomplete_octet">Los octetos BSSID deben estar completos (o%) para la búsqueda en línea</string>
+    <string name="search_wigle">Buscar en WiGLE</string>
+    <string name="must_login">(debe estar conectado)</string>
+    <string name="search_local">Busca tu base de datos local</string>
+    <string name="search_failed">Búsqueda fallida</string>
+    <string name="search_empty">Resultados vacíos</string>
+    <string name="search_query_limit">Has alcanzado el número máximo de búsquedas en la actualidad. Tu límite se restablecerá mañana.</string>
 </resources>

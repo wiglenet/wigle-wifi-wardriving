@@ -115,6 +115,7 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_dash">Overzicht</string>
     <string name="tab_data">Gegevens</string>
+    <string name="tab_stats">Statistieken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuleren</string>
     <string name="dash_scan_off">Scan is uit</string>
@@ -335,4 +336,12 @@
     <string name="turn_on_bt">Bluetooth inschakelen</string>
     <string name="filter_show_bt">Toon Bluetooth</string>
     <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
+    <string name="error_less_than_oui">BSSID moet ten minste een OUI bevatten voor online zoeken</string>
+    <string name="error_incomplete_octet">BSSID-octetten moeten compleet zijn (of%) voor online zoeken</string>
+    <string name="search_wigle">Zoeken op WiGLE</string>
+    <string name="must_login">(moet ingelogd zijn)</string>
+    <string name="search_local">Doorzoek uw lokale database</string>
+    <string name="search_failed">Zoeken mislukt</string>
+    <string name="search_empty">Resultaten leeg</string>
+    <string name="search_query_limit">U heeft vandaag het maximale aantal zoekopdrachten bereikt. Je limiet wordt morgen opnieuw ingesteld.</string>
 </resources>

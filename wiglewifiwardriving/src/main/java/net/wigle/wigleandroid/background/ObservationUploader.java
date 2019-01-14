@@ -13,7 +13,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Base64;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -25,13 +24,11 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;

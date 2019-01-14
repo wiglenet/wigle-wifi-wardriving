@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Informacje</string>
     <string name="tab_data">Dane</string>
+    <string name="tab_stats">Statystyka</string>
     <string name="ok">OK</string>
     <string name="cancel">Anuluj</string>
     <string name="dash_scan_off">(Skanowanie wyłączone)</string>
@@ -335,4 +336,12 @@
     <string name="turn_on_bt">Włączanie Bluetooth</string>
     <string name="filter_show_bt">Pokaż Bluetooth</string>
     <string name="error_invalid_bssid">Identyfikator BSSID może mieć 12 znaków lub zawierać symbol wieloznaczny (%)</string>
+    <string name="error_less_than_oui">BSSID musi zawierać co najmniej OUI dla wyszukiwania online</string>
+    <string name="error_incomplete_octet">Osetki BSSID muszą być kompletne (lub%) do wyszukiwania online</string>
+    <string name="search_wigle">Szukaj w WiGLE</string>
+    <string name="must_login">(musi być zalogowany)</string>
+    <string name="search_local">Przeszukaj lokalną bazę danych</string>
+    <string name="search_failed">Wyszukiwanie nie powiodło się</string>
+    <string name="search_empty">Wyniki Empty</string>
+    <string name="search_query_limit">Masz już maksymalną liczbę wyszukiwań. Twój limit zostanie zresetowany jutro.</string>
 </resources>

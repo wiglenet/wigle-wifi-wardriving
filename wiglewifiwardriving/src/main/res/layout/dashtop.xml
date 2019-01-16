@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newwifi"
             android:textSize="44sp"
-            android:textColor="#AAEE50"
+            style="@style/WiFiColor"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newbt"
             android:textSize="44sp"
-            android:textColor="#3388AA"
+            style="@style/BtDarkColor"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newcells"
             android:textSize="44sp"
-            android:textColor="#F88"
+            style="@style/CellColor"
             />
         <TextView
             android:layout_width="wrap_content"

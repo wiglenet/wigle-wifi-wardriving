@@ -37,7 +37,7 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/stats_wifi"
                     android:textSize="15sp"
-                    android:textColor="#AAEE50" />
+                    style="@style/WiFiColor" />
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -61,7 +61,7 @@
                     android:textSize="15sp"
                     android:layout_weight="1"
                     android:text="@string/stats"
-                    android:textColor="#F88" />
+                    style="@style/CellColor" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/bt_list_total"
@@ -85,7 +85,7 @@
                     android:id="@+id/stats_bt"
                     android:textSize="15sp"
                     android:layout_weight="1"
-                    android:textColor="#18ffff" />
+                    style="@style/BtColor" />
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -113,7 +113,7 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="2dip"
-        android:background="#903030" />
+        style="@style/DividerColor" />
     <RelativeLayout
         android:id="@+id/map_rl"
         android:orientation="vertical"

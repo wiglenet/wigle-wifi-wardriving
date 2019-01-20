@@ -1991,6 +1991,7 @@ public final class MainActivity extends AppCompatActivity {
         final boolean oldIsScanning = isScanning();
         if (isScanning == oldIsScanning) {
             info("main handleScanChange: no difference, returning");
+            return;
         }
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);

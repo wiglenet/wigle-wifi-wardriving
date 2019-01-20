@@ -190,7 +190,6 @@ public final class MainActivity extends AppCompatActivity {
     public static final boolean DEBUG_BLUETOOTH_DATA = false;
 
     private static MainActivity mainActivity;
-    private static ListFragment listActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
     private boolean playServiceShown = false;
 
@@ -625,11 +624,11 @@ public final class MainActivity extends AppCompatActivity {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
         info("Creating ListFragment");
-        listActivity = new ListFragment();
+        ListFragment listFragment = new ListFragment();
         Bundle bundle = new Bundle();
-        listActivity.setArguments(bundle);
+        listFragment.setArguments(bundle);
 
-        transaction.add(R.id.tabcontent, listActivity, FRAGMENT_TAG_PREFIX+R.id.nav_list);
+        transaction.add(R.id.tabcontent, listFragment, FRAGMENT_TAG_PREFIX+R.id.nav_list);
         transaction.commit();
     }
 
@@ -2010,12 +2009,27 @@ public final class MainActivity extends AppCompatActivity {
         internalHandleScanChange(isScanning);
     }
 
+    private ListFragment getListFragmentIfCurrent() {
+        try {
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment f = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_list);
+            if (null != f) {
+                return (ListFragment) f;
+            }
+        } catch (Exception ex) {
+            MainActivity.error("Unable to get listfragment: ",ex);
+        }
+        return null;
+    }
+
     private void internalHandleScanChange(final boolean isScanning) {
         info("main internalHandleScanChange: isScanning now: " + isScanning);
+        ListFragment listFragment = getListFragmentIfCurrent();
+
         if (isScanning) {
-            if (listActivity != null) {
-                listActivity.setStatusUI(getString(R.string.list_scanning_on));
-                listActivity.setScanningStatusIndicator(true);
+            if (listFragment != null) {
+                listFragment.setStatusUI(getString(R.string.list_scanning_on));
+                listFragment.setScanningStatusIndicator(true);
             }
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.updateLastScanResponseTime();
@@ -2027,9 +2041,9 @@ public final class MainActivity extends AppCompatActivity {
                 state.wifiLock.acquire();
             }
         } else {
-            if (listActivity != null) {
-                listActivity.setStatusUI(getString(R.string.list_scanning_off));
-                listActivity.setScanningStatusIndicator(false);
+            if (listFragment != null) {
+                listFragment.setStatusUI(getString(R.string.list_scanning_off));
+                listFragment.setScanningStatusIndicator(false);
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
@@ -2143,15 +2157,17 @@ public final class MainActivity extends AppCompatActivity {
 
     public void setLocationUI() {
         // tell list about new location
-        if (listActivity != null) {
-            listActivity.setLocationUI(this);
+        ListFragment listFragment = getListFragmentIfCurrent();
+        if (listFragment != null) {
+            listFragment.setLocationUI(this);
         }
     }
 
     public void setNetCountUI() {
         // tell list
-        if (listActivity != null) {
-            listActivity.setNetCountUI(getState());
+        ListFragment listFragment = getListFragmentIfCurrent();
+        if (listFragment != null) {
+            listFragment.setNetCountUI(getState());
         }
     }
 
@@ -2162,9 +2178,11 @@ public final class MainActivity extends AppCompatActivity {
         if (status != null) {
             // keep around a previous, for orientation changes
             state.previousStatus = status;
-            if (listActivity != null) {
+            ListFragment listFragment = getListFragmentIfCurrent();
+
+            if (listFragment != null) {
                 // tell list
-                listActivity.setStatusUI(status);
+                listFragment.setStatusUI(status);
             }
         }
     }
@@ -2336,7 +2354,8 @@ public final class MainActivity extends AppCompatActivity {
 
     public void doUpload() {
         selectFragment(R.id.nav_list);
-        listActivity.makeUploadDialog(this);
+        ListFragment listFragment = getListFragmentIfCurrent();
+        listFragment.makeUploadDialog(this);
     }
 
     /**

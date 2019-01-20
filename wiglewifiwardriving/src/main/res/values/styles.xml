@@ -39,4 +39,8 @@
     <style name="StatRankColor" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#ffff00</item>
     </style>
+    <style name="invertedText">
+        <item name="android:textColor">#303030</item>
+        <item name="android:background">#B0B0B0</item>
+    </style>
 </resources>

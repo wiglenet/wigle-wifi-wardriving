@@ -165,7 +165,7 @@ public class DashboardFragment extends Fragment {
         ImageView iv = (ImageView) view.findViewById(R.id.fixtype);
         if (location == null) {
             tv.setTextColor(Color.RED);
-            iv.setImageResource(android.R.drawable.ic_delete);
+            iv.setImageResource(R.drawable.gpsnone);
             iv.setVisibility(View.VISIBLE);
             iv.setColorFilter(Color.argb(255, 255, 0, 0));
         } else {

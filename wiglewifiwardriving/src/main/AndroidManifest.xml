@@ -81,12 +81,10 @@
         <activity
             android:name=".ActivateActivity"
             android:label="@string/title_activity_activate"
-            android:parentActivityName=".MainActivity">
-            android:label="@string/activate"
-            android:theme="@style/Theme.AppCompat"
-            android:exported="false"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.wigle.wigleandroid.MainActivity" />

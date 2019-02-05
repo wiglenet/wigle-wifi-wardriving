@@ -265,7 +265,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         } catch ( final IOException ex ) {
             ex.printStackTrace();
             MainActivity.error( "io problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {

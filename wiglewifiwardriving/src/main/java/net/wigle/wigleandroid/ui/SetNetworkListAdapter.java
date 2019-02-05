@@ -182,6 +182,10 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             MainActivity.info("index out of bounds: " + position + " ex: " + ex);
             return row;
         }
+
+        if (null == network) {
+            return row;
+        }
         // info( "listing net: " + network.getBssid() );
 
         final ImageView ico = (ImageView) row.findViewById(R.id.wepicon);

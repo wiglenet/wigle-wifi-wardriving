@@ -67,6 +67,9 @@ public class NetworkListUtil {
 
     public static int getImage(final Network network) {
         int resource;
+        if (null == network) {
+            return R.drawable.no_ico;
+        }
         if (network.getType().equals(NetworkType.WIFI)) {
             switch (network.getCrypto()) {
                 case Network.CRYPTO_WEP:

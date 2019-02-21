@@ -113,8 +113,9 @@
     <string name="nonstop">Nonstop</string>
     <string name="tab_list">Lista</string>
     <string name="tab_map">Karta</string>
-    <string name="tab_dash">Dashboard</string>
+    <string name="tab_dash">Instrumentbräda</string>
     <string name="tab_data">Data</string>
+    <string name="tab_stats">Statistik</string>
     <string name="ok">OK</string>
     <string name="cancel">Avbryt</string>
     <string name="dash_scan_off">(Scanning avstängd)</string>
@@ -258,6 +259,12 @@
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">activate now</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -329,4 +336,12 @@
     <string name="turn_on_bt">Aktiverar Bluetooth</string>
     <string name="filter_show_bt">Visa Bluetooth</string>
     <string name="error_invalid_bssid">BSSID måste vara 12 tecken långt eller innehålla ett jokertecken (%)</string>
+    <string name="error_less_than_oui">BSSID måste innehålla minst ett OUI för online-sökning</string>
+    <string name="error_incomplete_octet">BSSID-oktetter måste vara kompletta (eller%) för online-sökning</string>
+    <string name="search_wigle">Sök i WiGLE</string>
+    <string name="must_login">(måste vara inloggad)</string>
+    <string name="search_local">Sök i din lokala databas</string>
+    <string name="search_failed">Sök misslyckades</string>
+    <string name="search_empty">Resultat tom</string>
+    <string name="search_query_limit">Du har nått det maximala antalet sökningar idag. Din gräns återställs i morgon.</string>
 </resources>

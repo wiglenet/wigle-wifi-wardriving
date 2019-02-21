@@ -115,6 +115,7 @@
     <string name="tab_map">מפה</string>
     <string name="tab_dash">לוח מחוונים</string>
     <string name="tab_data">נתונים</string>
+    <string name="tab_stats">סטטיסטיקות</string>
     <string name="ok">בסדר</string>
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>
@@ -272,13 +273,13 @@
     <string name="at">בְּ-</string>
     <string name="drawer_open">מגירה פתוחה</string>
     <string name="drawer_close">מגירה סגור</string>
-    <string name="tab_stats">סטטיסטיקות משתמש</string>
     <string name="site_stats_app_name">סטטיסטיקה של WiGLE.net</string>
     <string name="netloc_title">רשתות WiFi עם מיקום WiGLE.net</string>
     <string name="loctotal_title">Wi-Fi.net תצפיות רשת WiFi</string>
     <string name="genloc_title">WiGLE.net תא מגדלי עם מיקום</string>
     <string name="userstot_title">סה"כ משתמשי WiGLE.net רשומים</string>
     <string name="transtot_title">קבצים שהועלו אל WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">הפעלת Bluetooth</string>
     <string name="filter_show_bt">הצג Bluetooth</string>
     <string name="error_invalid_bssid">BSSID חייב להכיל 12 תווים או להכיל תו כללי (%)</string>
+    <string name="error_less_than_oui">BSSID חייב להכיל לפחות OUI לחיפוש מקוון</string>
+    <string name="error_incomplete_octet">BSSID octets חייב להיות שלם (או%) עבור חיפוש מקוון</string>
+    <string name="search_wigle">חפש ב- WiGLE</string>
+    <string name="must_login">(חייב להיות מחובר)</string>
+    <string name="search_local">חפש את מסד הנתונים המקומי שלך</string>
+    <string name="search_failed">החיפוש נכשל</string>
+    <string name="search_empty">תוצאות ריקות</string>
+    <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
 </resources>

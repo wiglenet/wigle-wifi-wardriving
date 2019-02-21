@@ -7,6 +7,16 @@ public class QueryArgs {
     private String ssid;
     private String bssid;
 
+    public void setSearchWiGLE(boolean searchWiGLE) {
+        this.searchWiGLE = searchWiGLE;
+    }
+
+    public boolean searchWiGLE() {
+        return searchWiGLE;
+    }
+
+    private boolean searchWiGLE = false;
+
     public Address getAddress() {
         return address;
     }

@@ -207,7 +207,7 @@ public class BackgroundGuiHandler extends Handler {
                             || status == Status.BAD_LOGIN.ordinal()) {
                         MainActivity.info("dialog: start settings fragment");
                         try {
-                            MainActivity.getMainActivity().selectFragment(MainActivity.SETTINGS_TAB_POS);
+                            MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
                         } catch (Exception ex) {
                             MainActivity.info("failed to start settings fragment: " + ex, ex);
                         }

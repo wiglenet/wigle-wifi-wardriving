@@ -115,6 +115,7 @@
     <string name="tab_map">Kort</string>
     <string name="tab_dash">Instrumentbræt</string>
     <string name="tab_data">Data</string>
+    <string name="tab_stats">Statistik</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuller</string>
     <string name="dash_scan_off">(Scanning er slukket)</string>
@@ -272,13 +273,13 @@
     <string name="at">på</string>
     <string name="drawer_open">Skuffe åben</string>
     <string name="drawer_close">Skuffe tæt</string>
-    <string name="tab_stats">Brugerstatistik</string>
     <string name="site_stats_app_name">WiGLE.net Statistik</string>
     <string name="netloc_title">WiGLE.net WiFi netværk med placering</string>
     <string name="loctotal_title">WiGLE.net WiFi Netværk Observationer</string>
     <string name="genloc_title">WiGLE.net Cell Towers med placering</string>
     <string name="userstot_title">I alt WiGLE.net registrerede brugere</string>
     <string name="transtot_title">Filer uploadet til WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">Aktiverer Bluetooth</string>
     <string name="filter_show_bt">Vis Bluetooth</string>
     <string name="error_invalid_bssid">BSSID skal være 12 tegn lang eller indeholde et wildcard (%)</string>
+    <string name="error_less_than_oui">BSSID skal indeholde mindst en OUI til online søgning</string>
+    <string name="error_incomplete_octet">BSSID-oktetter skal være komplette (eller%) til online søgning</string>
+    <string name="search_wigle">Søg på WiGLE</string>
+    <string name="must_login">(skal være logget ind)</string>
+    <string name="search_local">Søg i din lokale database</string>
+    <string name="search_failed">Søgningen mislykkedes</string>
+    <string name="search_empty">Resultater tom</string>
+    <string name="search_query_limit">Du har nået det maksimale antal søgninger i dag. Din grænse vil blive nulstillet i morgen.</string>
 </resources>

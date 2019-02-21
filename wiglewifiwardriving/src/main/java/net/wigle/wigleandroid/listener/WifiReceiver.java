@@ -265,8 +265,10 @@ public class WifiReceiver extends BroadcastReceiver {
                     for ( int index = 0; index < listAdapter.getCount(); index++ ) {
                         try {
                             final Network testNet = listAdapter.getItem(index);
-                            if ( testNet.getBssid().equals( network.getBssid() ) ) {
-                                testNet.setLevel( result.level );
+                            if (null != testNet) {
+                                if ( testNet.getBssid().equals( network.getBssid() ) ) {
+                                    testNet.setLevel( result.level );
+                                }
                             }
                         }
                         catch (final IndexOutOfBoundsException ex) {

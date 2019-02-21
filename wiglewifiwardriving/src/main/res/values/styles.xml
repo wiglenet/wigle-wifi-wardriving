@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="NavigationDrawerStyle">
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="WiFiColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#AAEE50</item>
+    </style>
+    <style name="CellColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#F88</item>
+    </style>
+    <style name="BtColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#18ffff</item>
+    </style>
+    <style name="BtDarkColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#3388AA</item>
+    </style>
+    <style name="DividerColor">
+        <item name="android:background">#903030</item>
+    </style>
+    <style name="UploadColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#eaba44</item>
+    </style>
+    <style name="KeyStatColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#00ff00</item>
+    </style>
+    <style name="StatColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#B0B0B0</item>
+    </style>
+    <style name="SmallStats" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#B0B0B0</item>
+    </style>
+    <style name="UserNameColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#4aceff</item>
+    </style>
+    <style name="StatWiFiColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#00ff00</item>
+    </style>
+    <style name="StatRankColor" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#ffff00</item>
+    </style>
+    <style name="invertedText">
+        <item name="android:textColor">#303030</item>
+        <item name="android:background">#B0B0B0</item>
+    </style>
+</resources>

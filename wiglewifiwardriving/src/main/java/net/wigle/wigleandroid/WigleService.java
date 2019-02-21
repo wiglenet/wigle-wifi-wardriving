@@ -180,50 +180,55 @@ public final class WigleService extends Service {
             final Intent pauseSharedIntent = new Intent();
             pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
             pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
-            final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
 
-            final Intent scanSharedIntent = new Intent();
-            scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
-            scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
-            final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
-
-            final Intent uploadSharedIntent = new Intent();
-            uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
-            uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
-            final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
-
+            MainActivity ma = MainActivity.getMainActivity();
             Notification notification = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
-            } else {
-                @SuppressWarnings("deprecation")
-                final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                builder.setContentIntent(contentIntent);
-                builder.setNumber((int) ListFragment.lameStatic.newNets);
-                builder.setTicker(title);
-                builder.setContentTitle(title);
-                builder.setContentText(text);
-                builder.setWhen(when);
-                builder.setLargeIcon(largeIcon);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-                } else {
-                    builder.setSmallIcon(R.drawable.wiglewifi_small);
-                }
-                builder.setOngoing(true);
-                builder.setCategory("SERVICE");
-                builder.setPriority(NotificationCompat.PRIORITY_LOW);
-                builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
-                builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
-                builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
 
-                try {
-                    //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
-                    notification = builder.build();
-                } catch (NullPointerException npe) {
-                    MainActivity.error("NPE trying to build notification. "+npe.getMessage());
+            if (null != ma) {
+                final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                final Intent scanSharedIntent = new Intent();
+                scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+                scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
+                final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
+
+                final Intent uploadSharedIntent = new Intent();
+                uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+                uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
+                final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                } else {
+                    @SuppressWarnings("deprecation")
+                    final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                    builder.setContentIntent(contentIntent);
+                    builder.setNumber((int) ListFragment.lameStatic.newNets);
+                    builder.setTicker(title);
+                    builder.setContentTitle(title);
+                    builder.setContentText(text);
+                    builder.setWhen(when);
+                    builder.setLargeIcon(largeIcon);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+                    } else {
+                        builder.setSmallIcon(R.drawable.wiglewifi_small);
+                    }
+                    builder.setOngoing(true);
+                    builder.setCategory("SERVICE");
+                    builder.setPriority(NotificationCompat.PRIORITY_LOW);
+                    builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                    builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+                    builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+                    builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
+
+                    try {
+                        //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
+                        notification = builder.build();
+                    } catch (NullPointerException npe) {
+                        MainActivity.error("NPE trying to build notification. "+npe.getMessage());
+                    }
                 }
+
             }
             if (null != notification) {
                 try {
@@ -231,6 +236,8 @@ public final class WigleService extends Service {
                 } catch (Exception ex) {
                     MainActivity.error("notification service error: ", ex);
                 }
+            } else {
+                MainActivity.info("null notification - skipping startForeground");
             }
         }
     }

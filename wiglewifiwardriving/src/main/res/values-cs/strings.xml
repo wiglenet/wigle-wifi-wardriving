@@ -1,4 +1,4 @@
-;<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Zapínání</string>
     <string name="app_name">WiGLE Wifi Wardriving</string>
@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Souhrn</string>
     <string name="tab_data">Databáze</string>
+    <string name="tab_stats">Statistiky</string>
     <string name="ok">OK</string>
     <string name="cancel">Storno</string>
     <string name="dash_scan_off">(Skenování vypnuto)</string>
@@ -272,13 +273,13 @@
     <string name="at">na</string>
     <string name="drawer_open">Panel je otevřený</string>
     <string name="drawer_close">Panel je zavřený</string>
-    <string name="tab_stats">Statistiky uživatelů</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
     <string name="netloc_title">WiFi sítě WiGLE.net s umístěním</string>
     <string name="loctotal_title">WiGLE.net zpozorované WiFi sítě</string>
     <string name="genloc_title">WiGLE.net vysílače s polohou</string>
     <string name="userstot_title">Celkový počet registrovaných uživatelů WiGLE.net</string>
     <string name="transtot_title">Soubory byly odeslány do WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">Zapínání Bluetooth</string>
     <string name="filter_show_bt">Zobrazit Bluetooth</string>
     <string name="error_invalid_bssid">BSSID musí mít délku 12 znaků nebo obsahuje zástupný znak (%)</string>
+    <string name="error_less_than_oui">BSSID musí obsahovat alespoň OUI pro on-line vyhledávání</string>
+    <string name="error_incomplete_octet">Oktety BSSID musí být kompletní (nebo%) pro vyhledávání online</string>
+    <string name="search_wigle">Hledat WiGLE</string>
+    <string name="must_login">(musí být přihlášeno)</string>
+    <string name="search_local">Vyhledejte místní databázi</string>
+    <string name="search_failed">Hledání se nezdařilo</string>
+    <string name="search_empty">Výsledky prázdné</string>
+    <string name="search_query_limit">Do dnešního dne jste dosáhli maximálního počtu vyhledávání. Váš limit se zítra vynuluje.</string>
 </resources>

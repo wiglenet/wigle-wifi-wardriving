@@ -39,6 +39,7 @@ public class SiteStatsFragment extends Fragment {
     private static final String KEY_GENLOC = "genloc";
     private static final String KEY_USERSTOT = "userstot";
     private static final String KEY_TRANSTOT = "transtot";
+    private static final String KEY_NETWPA3 = "netwpa3";
     private static final String KEY_NETWPA2 = "netwpa2";
     private static final String KEY_NETWPA = "netwpa";
     private static final String KEY_NETWEP = "netwep";
@@ -48,7 +49,7 @@ public class SiteStatsFragment extends Fragment {
 
     private static final String[] ALL_SITE_KEYS = new String[] {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
-        KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
+        KEY_NETWPA3, KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
 
     private AtomicBoolean finishing;
@@ -219,10 +220,10 @@ public class SiteStatsFragment extends Fragment {
         final MainActivity main = MainActivity.getMainActivity();
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                main.selectFragment(R.id.nav_user_stats);
                 return true;
             case MENU_RANK_STATS:
-                main.selectFragment(MainActivity.RANK_STATS_TAB_POS);
+                main.selectFragment(R.id.nav_rank);
                 return true;
         }
         return false;

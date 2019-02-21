@@ -53,6 +53,7 @@ dependencies {
     implementation project(':android-maps-utils')
     implementation "com.android.support:support-compat:$supportLibraryVersion"
     implementation "com.android.support:support-core-utils:$supportLibraryVersion"
+    implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     // note: may be cause of libhwui crash - see https://github.com/koral--/android-gif-drawable/releases/tag/v1.2.16

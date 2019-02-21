@@ -115,6 +115,7 @@
     <string name="tab_map">Karte</string>
     <string name="tab_dash">Übersicht</string>
     <string name="tab_data">Daten</string>
+    <string name="tab_stats">Statistiken</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="dash_scan_off">(Scan ausgeschaltet)</string>
@@ -272,13 +273,13 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer öffnen</string>
     <string name="drawer_close">Drawer schließen</string>
-    <string name="tab_stats">Statistiken</string>
     <string name="site_stats_app_name">WiGLE.net Statistiken</string>
     <string name="netloc_title">WiGLE.net WLAN-Netzwerke mit Ort</string>
     <string name="loctotal_title">WiGLE.net WLAN-Netzwerk Beobachtungen</string>
     <string name="genloc_title">WiGLE.net Funktmasten mit Ort</string>
     <string name="userstot_title">registrierte WiGLE.net-Nutzer</string>
     <string name="transtot_title">Dateien zu WiGLE.net hochgeladen</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">Bluetooth einschalten</string>
     <string name="filter_show_bt">Bluetooth anzeigen</string>
     <string name="error_invalid_bssid">BSSID muss 12 Zeichen lang sein oder einen Platzhalter (%) enthalten</string>
+    <string name="error_less_than_oui">BSSID muss mindestens eine OUI für die Online-Suche enthalten</string>
+    <string name="error_incomplete_octet">BSSID-Oktette müssen für die Online-Suche vollständig (oder%) sein</string>
+    <string name="search_wigle">Suchen Sie nach WiGLE</string>
+    <string name="must_login">(muss eingeloggt sein)</string>
+    <string name="search_local">Suchen Sie in Ihrer lokalen Datenbank</string>
+    <string name="search_failed">Suche fehlgeschlagen</string>
+    <string name="search_empty">Ergebnisse leer</string>
+    <string name="search_query_limit">Sie haben heute die maximale Anzahl an Suchen erreicht. Ihr Limit wird morgen zurückgesetzt.</string>
 </resources>

@@ -115,6 +115,7 @@
     <string name="tab_map">नक्शा</string>
     <string name="tab_dash">डैशबोर्ड</string>
     <string name="tab_data">डेटा</string>
+    <string name="tab_stats">आंकड़े</string>
     <string name="ok">ठीक है</string>
     <string name="cancel">रद्द करें</string>
     <string name="dash_scan_off">(स्कैनिंग बंद कर दिया)</string>
@@ -258,6 +259,12 @@
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">अब सक्रिय करें</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -329,4 +336,12 @@
     <string name="turn_on_bt">ब्लूटूथ चालू करना</string>
     <string name="filter_show_bt">ब्लूटूथ दिखाएं</string>
     <string name="error_invalid_bssid">BSSID 12 वर्णों का होना चाहिए या इसमें वाइल्डकार्ड (%) होना चाहिए</string>
+    <string name="error_less_than_oui">ऑनलाइन खोज के लिए BSSID में कम से कम OUI होना चाहिए</string>
+    <string name="error_incomplete_octet">ऑनलाइन खोज के लिए BSSID ऑक्टेट पूर्ण (या%) होना चाहिए</string>
+    <string name="search_wigle">WiGLE पर खोजें</string>
+    <string name="must_login">(लॉग इन होना चाहिए)</string>
+    <string name="search_local">अपने स्थानीय डेटाबेस खोजें</string>
+    <string name="search_failed">खोज विफल</string>
+    <string name="search_empty">परिणाम खाली</string>
+    <string name="search_query_limit">आप आज अधिकतम खोज पर पहुँच गए हैं। आपकी सीमा कल रीसेट हो जाएगी।</string>
 </resources>

@@ -139,6 +139,7 @@
             android:textSize="30sp"
             android:text="@string/dash_time_run"
             android:textColor="#303030"
+            android:paddingLeft="3dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -147,6 +148,7 @@
             android:textSize="30sp"
             android:layout_alignParentRight="true"
             android:textColor="#303030"
+            android:paddingRight="3dp"
             />
     </RelativeLayout>
     <RelativeLayout
@@ -159,6 +161,7 @@
             android:textSize="30sp"
             android:text="@string/dash_time_scanning"
             android:textColor="#B0B0B0"
+            android:paddingLeft="3dp"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -166,6 +169,7 @@
             android:id="@+id/scan_dur"
             android:textSize="30sp"
             android:textColor="#B0B0B0"
+            android:paddingRight="3dp"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
 </LinearLayout>

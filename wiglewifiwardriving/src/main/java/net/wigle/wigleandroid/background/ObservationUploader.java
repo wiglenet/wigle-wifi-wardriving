@@ -22,6 +22,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.CsvUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -446,6 +447,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 if ( id > maxId ) {
                     maxId = id;
                 }
+
                 final String bssid = cursor.getString(1);
                 final long netStart = System.currentTimeMillis();
                 final Network network = dbHelper.getNetwork( bssid );
@@ -457,48 +459,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 }
 
                 countStats.lineCount++;
-                String ssid = network.getSsid();
-                if (ssid.contains(COMMA)) {
-                    // comma isn't a legal ssid character, but just in case
-                    ssid = ssid.replaceAll( COMMA, "_" );
-                }
                 // ListActivity.debug("writing network: " + ssid );
 
-                // reset the buffers
-                charBuffer.clear();
-                byteBuffer.clear();
-                // fill in the line
+                // build in the line
                 try {
-                    charBuffer.append( network.getBssid() );
-                    charBuffer.append( COMMA );
-                    // ssid can be unicode
-                    charBuffer.append( ssid );
-                    charBuffer.append( COMMA );
-                    charBuffer.append( network.getCapabilities() );
-                    charBuffer.append( COMMA );
-                    date.setTime( cursor.getLong(7) );
-                    singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
-                    charBuffer.append( COMMA );
-                    Integer channel = network.getChannel();
-                    if ( channel == null ) {
-                        channel = network.getFrequency();
-                    }
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
-                    charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
-                    charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
-                    charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
-                    charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
-                    charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
-                    charBuffer.append( COMMA );
-                    charBuffer.append( network.getType().name() );
-                    charBuffer.append( NEWLINE );
-                }
-                catch ( BufferOverflowException ex ) {
+                    CsvUtil.writeLine(cursor, network, date, charBuffer, byteBuffer, stringBuffer,
+                            fp, dateFormat, numberFormat);
+                } catch ( BufferOverflowException ex ) {
                     MainActivity.info("buffer overflow: " + ex, ex );
                     // double the buffer
                     charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
@@ -568,58 +535,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
 
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final int number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final double number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param dateFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param date
-     */
-    private void singleCopyDateFormat(final DateFormat dateFormat, final StringBuffer stringBuffer,
-                                      final CharBuffer charBuffer, final FieldPosition fp,
-                                      final Date date ) {
-        stringBuffer.setLength( 0 );
-        dateFormat.format( date, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
 
     @SuppressLint("SimpleDateFormat")
     public static OutputStream getOutputStream(final Context context, final Bundle bundle,

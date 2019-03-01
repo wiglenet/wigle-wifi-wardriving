@@ -52,6 +52,10 @@ public class SiteStatsFragment extends Fragment {
         KEY_NETWPA3, KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
 
+    private ScrollView scrollView;
+    private View landscape;
+    private View portrait;
+
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
 
@@ -79,11 +83,26 @@ public class SiteStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
         MainActivity.info("SITESTATS: onCreateView. orientation: " + orientation);
-        final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
+        scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
+        landscape = inflater.inflate(R.layout.sitestatslandscape, container, false);
+        portrait = inflater.inflate(R.layout.sitestatsportrait, container, false);
+        switchView();
 
-        downloadLatestSiteStats(scrollView);
         return scrollView;
+    }
 
+    private void switchView() {
+        if (scrollView != null) {
+            final int orientation = getResources().getConfiguration().orientation;
+            View component = portrait;
+            if (orientation == 2) {
+                component = landscape;
+            }
+            scrollView.removeAllViews();
+            scrollView.addView(component);
+            downloadLatestSiteStats(scrollView);
+
+        }
     }
 
     private final static class SiteDownloadHandler extends DownloadHandler {
@@ -191,8 +210,10 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
         MainActivity.info("SITESTATS: config changed");
+        switchView();
         super.onConfigurationChanged( newConfig );
     }
+
 
     /* Creates the menu items */
     @Override

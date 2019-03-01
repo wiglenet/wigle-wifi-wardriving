@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mainlayout"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:weightSum="5">
+
+    <LinearLayout
+        android:id="@+id/topboxlayout"
+        android:orientation="horizontal"
+        android:layout_weight="3"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:keepScreenOn="true"
+        android:paddingRight="10dp">
+        <include layout="@layout/sitestatstop"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/bottomboxlayout"
+        android:orientation="horizontal"
+        android:layout_weight="2"
+        android:layout_height="fill_parent"
+        android:layout_width="0dp"
+        android:keepScreenOn="true" >
+        <include layout="@layout/sitestatsbottom"/>
+    </LinearLayout>
+</LinearLayout>

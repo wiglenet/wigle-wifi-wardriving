@@ -49,12 +49,12 @@ public class CsvUtil {
         //  this implementation standardizes w/ kismet
         if (ssid.contains(COMMA)) {
             // comma isn't a legal ssid character, but just in case
-            //ssid = ssid.replaceAll( COMMA, "\\\\054" );
-            ssid = ssid.replaceAll( COMMA, "_" );
+            ssid = ssid.replaceAll( COMMA, "\\\\054" );
+            //ssid = ssid.replaceAll( COMMA, "_" );
         }
-        //if (ssid.contains(DOUBLE_QUOTE)) {
-        //    ssid = ssid.replace(DOUBLE_QUOTE, "\\042");
-        //}
+        if (ssid.contains(DOUBLE_QUOTE)) {
+            ssid = ssid.replace(DOUBLE_QUOTE, "\\042");
+        }
 
         charBuffer.clear();
         byteBuffer.clear();

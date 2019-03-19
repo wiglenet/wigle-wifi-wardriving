@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="239"
-    android:versionName="2.39">
+    android:versionCode="242"
+    android:versionName="2.42">
 
     <supports-screens
         android:anyDensity="true"
@@ -81,12 +81,10 @@
         <activity
             android:name=".ActivateActivity"
             android:label="@string/title_activity_activate"
-            android:parentActivityName=".MainActivity">
-            android:label="@string/activate"
-            android:theme="@style/Theme.AppCompat"
-            android:exported="false"
             android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
+            <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.wigle.wigleandroid.MainActivity" />
@@ -205,6 +203,15 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"/>
+        </provider>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.m8bprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/m8b_paths" />
         </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>

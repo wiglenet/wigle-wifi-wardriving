@@ -115,6 +115,7 @@
     <string name="tab_map">地图</string>
     <string name="tab_dash">仪表盘</string>
     <string name="tab_data">数据库</string>
+    <string name="tab_stats">统计</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（扫描关闭的网络）</string>
@@ -272,13 +273,13 @@
     <string name="at">在</string>
     <string name="drawer_open">抽屉打开</string>
     <string name="drawer_close">抽屉关闭</string>
-    <string name="tab_stats">用户统计</string>
     <string name="site_stats_app_name">WiGLE.net统计</string>
     <string name="netloc_title">带有位置的WiGLE.net WiFi网络</string>
     <string name="loctotal_title">WiGLE.net WiFi网络观测</string>
     <string name="genloc_title">带有位置的WiGLE.net小区塔</string>
     <string name="userstot_title">WiGLE.net注册用户总数</string>
     <string name="transtot_title">已上传到WiGLE.net的文件</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,5 +393,13 @@
     <string name="turn_on_bt">打开蓝牙</string>
     <string name="filter_show_bt">显示蓝牙</string>
     <string name="error_invalid_bssid">BSSID必须长度为12个字符或包含通配符（％）</string>
+    <string name="error_less_than_oui">BSSID必须至少包含用于在线搜索的OUI</string>
+    <string name="error_incomplete_octet">BSSID八位字节必须完整（或％）才能进行在线搜索</string>
+    <string name="search_wigle">在WiGLE中搜索</string>
+    <string name="must_login">（必须登录）</string>
+    <string name="search_local">搜索本地数据库</string>
+    <string name="search_failed">搜索失败</string>
+    <string name="search_empty">结果为空</string>
+    <string name="search_query_limit">您今天已达到最大搜索次数。你的限额将在明天重置。</string>
 </resources>
 

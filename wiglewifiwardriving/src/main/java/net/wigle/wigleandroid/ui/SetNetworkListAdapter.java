@@ -145,9 +145,10 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     public  long getItemId(int pPosition) {
         try {
             //should i just hash the object?
-            return networks.get(pPosition).getBssid().hashCode();
-        }
-        catch (final IndexOutOfBoundsException ex) {
+            if (null != networks.get(pPosition)) {
+                return networks.get(pPosition).getBssid().hashCode();
+            }
+        } catch (final IndexOutOfBoundsException ex) {
             MainActivity.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
         }
         return 0L;
@@ -179,6 +180,10 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         } catch (final IndexOutOfBoundsException ex) {
             // yes, this happened to someone
             MainActivity.info("index out of bounds: " + position + " ex: " + ex);
+            return row;
+        }
+
+        if (null == network) {
             return row;
         }
         // info( "listing net: " + network.getBssid() );

@@ -115,6 +115,7 @@
     <string name="tab_map">Lista geografica</string>
     <string name="tab_dash">Riepilogo</string>
     <string name="tab_data">Database</string>
+    <string name="tab_stats">Statistiche</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
     <string name="dash_scan_off">Scansione disattivata</string>
@@ -272,13 +273,13 @@
     <string name="at">presso</string>
     <string name="drawer_open">Cassetto Aperto</string>
     <string name="drawer_close">Cassetto Chiuso</string>
-    <string name="tab_stats">Statistiche</string>
     <string name="site_stats_app_name">Generali</string>
     <string name="netloc_title">Reti WiFi WiGLE.net con localizzazioni</string>
     <string name="loctotal_title">Reti WiFi rilevate (compreso ripetute)</string>
     <string name="genloc_title">Torri GSM WiGLE.net con localizzazioni</string>
     <string name="userstot_title">Totale Utenti registrati su WiGLE.net</string>
     <string name="transtot_title">File caricati su WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">Accensione del Bluetooth</string>
     <string name="filter_show_bt">Mostra Bluetooth</string>
     <string name="error_invalid_bssid">BSSID deve essere lungo 12 caratteri o contenere un carattere jolly (%)</string>
+    <string name="error_less_than_oui">BSSID deve contenere almeno un OUI per la ricerca online</string>
+    <string name="error_incomplete_octet">Gli ottetti BSSID devono essere completi (o%) per la ricerca online</string>
+    <string name="search_wigle">Cerca su WiGLE</string>
+    <string name="must_login">(deve essere registrato)</string>
+    <string name="search_local">Cerca nel tuo database locale</string>
+    <string name="search_failed">Ricerca fallita</string>
+    <string name="search_empty">Risultati vuoti</string>
+    <string name="search_query_limit">Hai raggiunto il numero massimo di ricerche oggi. Il tuo limite verrà ripristinato domani.</string>
 </resources>

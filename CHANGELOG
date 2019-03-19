@@ -1,3 +1,10 @@
+* 2.40 - 2.42 (02/28/2019)
+Server-side network search
+Magic (8) Ball Export: https://github.com/wiglenet/m8b
+Updated Czech translation: Thanks Czechball!
+Menu fragments the "right" way
+Various bug and UI fixes
+
 * 2.39 (12/28/2018)
 List performance and threading fixes
 German fixes (thanks designer2k2!)

@@ -115,6 +115,7 @@
     <string name="tab_map">Mapa</string>
     <string name="tab_dash">Informacje</string>
     <string name="tab_data">Dane</string>
+    <string name="tab_stats">Statystyka</string>
     <string name="ok">OK</string>
     <string name="cancel">Anuluj</string>
     <string name="dash_scan_off">(Skanowanie wyłączone)</string>
@@ -258,6 +259,12 @@
     <string name="use_wigle_tiles">Użyj kafelek WiGLE OSM</string>
     <string name="wigle_service">Usługa WiGLE Wifi</string>
     <string name="disable_toast">Wtłącz dymki toast</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">Zainstaluj teraz</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -329,4 +336,12 @@
     <string name="turn_on_bt">Włączanie Bluetooth</string>
     <string name="filter_show_bt">Pokaż Bluetooth</string>
     <string name="error_invalid_bssid">Identyfikator BSSID może mieć 12 znaków lub zawierać symbol wieloznaczny (%)</string>
+    <string name="error_less_than_oui">BSSID musi zawierać co najmniej OUI dla wyszukiwania online</string>
+    <string name="error_incomplete_octet">Osetki BSSID muszą być kompletne (lub%) do wyszukiwania online</string>
+    <string name="search_wigle">Szukaj w WiGLE</string>
+    <string name="must_login">(musi być zalogowany)</string>
+    <string name="search_local">Przeszukaj lokalną bazę danych</string>
+    <string name="search_failed">Wyszukiwanie nie powiodło się</string>
+    <string name="search_empty">Wyniki Empty</string>
+    <string name="search_query_limit">Masz już maksymalną liczbę wyszukiwań. Twój limit zostanie zresetowany jutro.</string>
 </resources>

@@ -85,6 +85,7 @@ public final class FilterMatcher {
                         break;
                     case Network.CRYPTO_WPA:
                     case Network.CRYPTO_WPA2:
+                    case Network.CRYPTO_WPA3:
                         if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_WPA, true)) {
                             return false;
                         }

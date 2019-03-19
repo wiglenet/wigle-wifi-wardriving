@@ -115,6 +115,7 @@
     <string name="tab_map">地図</string>
     <string name="tab_dash">ダッシュボード</string>
     <string name="tab_data">データ</string>
+    <string name="tab_stats">統計</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(スキャン停止中)</string>
@@ -272,13 +273,13 @@
     <string name="at">〜で</string>
     <string name="drawer_open">引き出しを開く</string>
     <string name="drawer_close">引き出しクローズ</string>
-    <string name="tab_stats">ユーザー統計</string>
     <string name="site_stats_app_name">WiGLE.netの統計</string>
     <string name="netloc_title">ロケーションがあるWiGLE.net WiFiネットワーク</string>
     <string name="loctotal_title">WiGLE.net WiFiネットワークの観測</string>
     <string name="genloc_title">ロケーションのあるWiGLE.netセルタワー</string>
     <string name="userstot_title">合計WiGLE.net登録ユーザ</string>
     <string name="transtot_title">WiGLE.netにアップロードされたファイル</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -392,4 +393,12 @@
     <string name="turn_on_bt">Bluetoothをオンにする</string>
     <string name="filter_show_bt">Bluetoothを表示する</string>
     <string name="error_invalid_bssid">BSSIDは12文字の長さであるか、またはワイルドカード（％）を含む必要があります</string>
+    <string name="error_less_than_oui">オンライン検索では、BSSIDに少なくともOUIを含める必要があります。</string>
+    <string name="error_incomplete_octet">オンライン検索ではBSSIDオクテットは完全（または％）でなければなりません</string>
+    <string name="search_wigle">WiGLEで検索</string>
+    <string name="must_login">（ログインしている必要があります）</string>
+    <string name="search_local">ローカルデータベースを検索する</string>
+    <string name="search_failed">検索失敗</string>
+    <string name="search_empty">空の結果</string>
+    <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
 </resources>

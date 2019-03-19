@@ -52,20 +52,20 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#46AA00"
-            android:layout_toLeftOf="@+id/fixtype"
             android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/fixtype"
             android:paddingTop="2dp"
             />
+
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/fixtype"
             android:tint="#46AA00"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:paddingTop="2dp"
+            android:paddingTop="8dp"
             android:paddingRight="2dp"
-            android:layout_centerVertical="true"
             />
     </RelativeLayout>
     <LinearLayout
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newwifi"
             android:textSize="44sp"
-            android:textColor="#AAEE50"
+            style="@style/WiFiColor"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newbt"
             android:textSize="44sp"
-            android:textColor="#3388AA"
+            style="@style/BtDarkColor"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -117,7 +117,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/newcells"
             android:textSize="44sp"
-            android:textColor="#F88"
+            style="@style/CellColor"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -131,21 +131,22 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        style="@style/invertedText">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="30sp"
-            android:textColor="#909090"
             android:text="@string/dash_time_run"
+            android:textColor="#303030"
             />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/run_dur"
             android:textSize="30sp"
-            android:textColor="#B0B0B0"
             android:layout_alignParentRight="true"
+            android:textColor="#303030"
             />
     </RelativeLayout>
     <RelativeLayout
@@ -155,9 +156,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/dash_time_scanning"
             android:textSize="30sp"
-            android:textColor="#909090"
+            android:text="@string/dash_time_scanning"
+            android:textColor="#B0B0B0"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -165,8 +166,6 @@
             android:id="@+id/scan_dur"
             android:textSize="30sp"
             android:textColor="#B0B0B0"
-            android:layout_alignParentRight="true"
-
-            />
+            android:layout_alignParentRight="true" />
     </RelativeLayout>
 </LinearLayout>

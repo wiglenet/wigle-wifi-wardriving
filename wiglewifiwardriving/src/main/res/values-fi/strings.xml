@@ -115,6 +115,7 @@
     <string name="tab_map">Kartta</string>
     <string name="tab_dash">Kojelauta</string>
     <string name="tab_data">Tiedot</string>
+    <string name="tab_stats">Tilasto</string>
     <string name="ok">OK</string>
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>
@@ -258,6 +259,14 @@
     <string name="use_wigle_tiles">Use WiGLE OSM tiles</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Disable toast pop-ups</string>
+    <string name="drawer_open">Laatikko auki</string>
+    <string name="drawer_close">Laatikko suljettu</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">Aktivoi nyt</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -329,4 +338,13 @@
     <string name="turn_on_bt">Bluetoothin kytkeminen päälle</string>
     <string name="filter_show_bt">Näytä Bluetooth</string>
     <string name="error_invalid_bssid">BSSID-koodin on oltava 12 merkkiä pitkä tai siinä on oltava merkki (%)</string>
+    <string name="error_less_than_oui">BSSID: n on sisällettävä vähintään OUI online-haulle</string>
+    <string name="error_incomplete_octet">BSSID-oktettien on oltava täydellisiä (tai%) online-haulle</string>
+    <string name="search_wigle">Hae WiGLE-sivustosta</string>
+    <string name="must_login">(täytyy olla kirjautunut sisään)</string>
+    <string name="search_local">Hae paikallisesta tietokannasta</string>
+    <string name="search_failed">Haku epäonnistui</string>
+    <string name="search_empty">Tulokset tyhjä</string>
+    <string name="search_query_limit">Olet saavuttanut suurimman määrän hakuja tänään. Rajasi palautetaan huomenna.</string>
+
 </resources>

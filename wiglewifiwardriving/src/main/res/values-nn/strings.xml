@@ -115,6 +115,7 @@
     <string name="tab_map">Map</string>
     <string name="tab_dash">Dashboard</string>
     <string name="tab_data">Database</string>
+    <string name="tab_stats">Statistics</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(Scanning Turned Off)</string>
@@ -272,13 +273,13 @@
     <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
-    <string name="tab_stats">Statistics</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
     <string name="netloc_title">WiGLE.net Wifi Networks with Location</string>
     <string name="loctotal_title">WiGLE.net Wifi Network Observations</string>
     <string name="genloc_title">WiGLE.net Cell Towers with Location</string>
     <string name="userstot_title">Total WiGLE.net Registered Users</string>
     <string name="transtot_title">Files Uploaded to WiGLE.net</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -370,4 +371,12 @@
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID må være 12 tegn lang eller inneholde et jokertegn (%)</string>
+    <string name="error_less_than_oui">BSSID må inneholde minst en OUI for online søk</string>
+    <string name="error_incomplete_octet">BSSID-oktetter må være komplette (eller%) for online-søk</string>
+    <string name="search_wigle">Søk i WiGLE</string>
+    <string name="must_login">(må være innlogget)</string>
+    <string name="search_local">Søk i din lokale database</string>
+    <string name="search_failed">Søke mislyktes</string>
+    <string name="search_empty">Resultater Tom</string>
+    <string name="search_query_limit">Du har nådd det maksimale antallet søk i dag. Grensen din vil nullstille i morgen.</string>
 </resources>

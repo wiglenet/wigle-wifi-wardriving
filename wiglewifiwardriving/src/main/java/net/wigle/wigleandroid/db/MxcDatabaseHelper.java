@@ -199,11 +199,15 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
         final String mxcPath = DATABASE_PATH + MXC_DB_NAME;
 
-        if (null == db || !db.isOpen()) {
-            db = SQLiteDatabase.openDatabase(mxcPath, null,
-                    SQLiteDatabase.OPEN_READONLY);
+        try {
+            if (null == db || !db.isOpen()) {
+                db = SQLiteDatabase.openDatabase(mxcPath, null,
+                        SQLiteDatabase.OPEN_READONLY);
+            }
+            return db.isOpen();
+        } catch (Exception ex) { // SAMSUNG devices RTE here
+            return false;
         }
-        return db.isOpen();
     }
 
     /** This method close database connection and released occupied memory **/

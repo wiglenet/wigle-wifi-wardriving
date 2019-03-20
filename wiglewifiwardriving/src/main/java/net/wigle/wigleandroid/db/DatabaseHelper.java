@@ -1119,20 +1119,32 @@ public final class DatabaseHelper extends Thread {
 
     private long getCountFromDB( final String table ) throws DBException {
         checkDB();
-        final Cursor cursor = db.rawQuery( "select count(*) FROM " + table, null );
-        cursor.moveToFirst();
-        final long count = cursor.getLong( 0 );
-        cursor.close();
-        return count;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("select count(*) FROM " + table, null);
+            cursor.moveToFirst();
+            final long count = cursor.getLong(0);
+            return count;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
-        final Cursor cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
-        cursor.moveToFirst();
-        final long count = cursor.getLong( 0 );
-        cursor.close();
-        return count;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
+            cursor.moveToFirst();
+            final long count = cursor.getLong( 0 );
+            return count;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public long getNetsWithLocCountFromDB() throws DBException {
@@ -1148,10 +1160,11 @@ public final class DatabaseHelper extends Thread {
         // check cache
         Network retval = MainActivity.getNetworkCache().get( bssid );
         if ( retval == null ) {
+            Cursor cursor = null;
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };
-                final Cursor cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon FROM "
+                cursor = db.rawQuery("select ssid,frequency,capabilities,type,lastlat,lastlon,bestlat,bestlon FROM "
                         + NETWORK_TABLE
                         + " WHERE bssid = ?", args);
                 if ( cursor.getCount() > 0 ) {
@@ -1174,10 +1187,12 @@ public final class DatabaseHelper extends Thread {
                     }
                     MainActivity.getNetworkCache().put( bssid, retval );
                 }
-                cursor.close();
-            }
-            catch (DBException ex ) {
+            } catch (DBException ex ) {
                 deathDialog( "getNetwork", ex );
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
         }
         return retval;

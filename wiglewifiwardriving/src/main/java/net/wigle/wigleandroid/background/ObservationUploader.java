@@ -365,10 +365,11 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         //noinspection TryFinallyCanBeTryWithResources
         try {
             return writeFileWithCursor( fos, bundle, countStats, cursor );
-        }
-        finally {
+        } finally {
             fos.close();
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 

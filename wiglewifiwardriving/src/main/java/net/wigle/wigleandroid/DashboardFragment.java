@@ -2,10 +2,10 @@ package net.wigle.wigleandroid;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -156,11 +156,10 @@ public class DashboardFragment extends Fragment {
 
         tv = (TextView) view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
-        String gpsStatus = getString(R.string.dash_no_loc);
-        if ( location != null ) {
-          gpsStatus = location.getProvider();
-        }
+
         tv.setText( getString(R.string.dash_short_loc) + " ");
+
+        TextView fixMeta = view.findViewById(R.id.fixmeta);
 
         ImageView iv = (ImageView) view.findViewById(R.id.fixtype);
         if (location == null) {
@@ -168,24 +167,40 @@ public class DashboardFragment extends Fragment {
             iv.setImageResource(R.drawable.gpsnone);
             iv.setVisibility(View.VISIBLE);
             iv.setColorFilter(Color.argb(255, 255, 0, 0));
+            fixMeta.setVisibility(View.INVISIBLE);
         } else {
-            if (location.getProvider().equals("gps")) {
+            if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+
+                String satString = null;
+                if (MainActivity.getMainActivity() != null && MainActivity.getMainActivity().getGPSListener() != null) {
+                    satString = "("+MainActivity.getMainActivity().getGPSListener().getSatCount()+")";
+                }
+                if (satString == null) {
+                    fixMeta.setVisibility(View.INVISIBLE);
+                } else {
+                    fixMeta.setTextColor(Color.GREEN);
+                    fixMeta.setVisibility(View.VISIBLE);
+                    fixMeta.setText(satString);
+                }
                 tv.setTextColor(Color.GREEN);
                 iv.setImageResource(R.drawable.gps);
                 iv.setColorFilter(Color.GREEN);
                 iv.setVisibility(View.VISIBLE);
-            } else if (location.getProvider().equals("network")) {
+            } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
+                fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.YELLOW);
                 iv.setImageResource(R.drawable.wifi);
                 iv.setVisibility(View.VISIBLE);
                 iv.setColorFilter(Color.YELLOW);
-            } else if (location.getProvider().equals("passive")) {
+            } else if (location.getProvider().equals(LocationManager.PASSIVE_PROVIDER)) {
+                fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.parseColor("#FFA500"));
                 iv.setImageResource(R.drawable.cell);
                 iv.setVisibility(View.VISIBLE);
                 iv.setColorFilter(Color.parseColor("#FFA500"));
             } else {
                 //ALIBI: fall back on string version
+                fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.parseColor("#AAA"));
                 iv.setVisibility(View.GONE);
                 tv.setText( getString(R.string.dash_short_loc) + " "+location.getProvider());

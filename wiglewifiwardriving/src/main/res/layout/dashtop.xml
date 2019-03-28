@@ -49,23 +49,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/gpsstatus"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#46AA00"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/fixtype"
             android:paddingTop="2dp"
             />
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fixtype"
             android:tint="#46AA00"
-            android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@+id/fixmeta"
             android:paddingTop="8dp"
-            android:paddingRight="2dp"
+            android:paddingRight="4dp"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fixmeta"
+            android:textSize="20sp"
+            android:textColor="#46AA00"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:paddingTop="2dp"
+            android:visibility="invisible"
+            android:paddingRight="4dp"
             />
     </RelativeLayout>
     <LinearLayout
@@ -148,7 +159,7 @@
             android:textSize="30sp"
             android:layout_alignParentRight="true"
             android:textColor="#303030"
-            android:paddingRight="3dp"
+            android:paddingRight="4dp"
             />
     </RelativeLayout>
     <RelativeLayout
@@ -169,7 +180,7 @@
             android:id="@+id/scan_dur"
             android:textSize="30sp"
             android:textColor="#B0B0B0"
-            android:paddingRight="3dp"
+            android:paddingRight="4dp"
             android:layout_alignParentRight="true" />
     </RelativeLayout>
 </LinearLayout>

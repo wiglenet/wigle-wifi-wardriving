@@ -242,28 +242,26 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         }
 
         // actually need this Activity context, for dialogs
-        if (Build.VERSION.SDK_INT >= 11) {
 
-            final ObservationImporter task = new ObservationImporter(getActivity(),
-                    ListFragment.lameStatic.dbHelper,
-                    new ApiListener() {
-                        @Override
-                        public void requestComplete(JSONObject object, boolean cached) {
-                            if (mainActivity != null) {
-                                try {
-                                    mainActivity.getState().dbHelper.getNetworkCountFromDB();
-                                } catch (DBException dbe) {
-                                    MainActivity.warn("failed DB count update on import-observations", dbe);
-                                }
-                                mainActivity.transferComplete();
+        final ObservationImporter task = new ObservationImporter(getActivity(),
+                ListFragment.lameStatic.dbHelper,
+                new ApiListener() {
+                    @Override
+                    public void requestComplete(JSONObject object, boolean cached) {
+                        if (mainActivity != null) {
+                            try {
+                                mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                            } catch (DBException dbe) {
+                                MainActivity.warn("failed DB count update on import-observations", dbe);
                             }
+                            mainActivity.transferComplete();
                         }
-                    });
-            try {
-                task.startDownload(this);
-            } catch (WiGLEAuthException waex) {
-                MainActivity.info("failed to authorize user on request");
-            }
+                    }
+                });
+        try {
+            task.startDownload(this);
+        } catch (WiGLEAuthException waex) {
+            MainActivity.info("failed to authorize user on request");
         }
     }
 
@@ -450,6 +448,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         @Override
         protected void onPostExecute( Integer result ) {
             mainActivity.transferComplete();
+
+            MainActivity.info("DB backup postExe");
 
             final View view = fragment.getView();
             if (view != null) {

@@ -1209,14 +1209,14 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         MainActivity.info( "networkIterator" );
         final String[] args = new String[]{};
-        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network", args );
+        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network", args );
     }
 
     public Cursor getSingleNetwork( final String bssid ) throws DBException {
         checkDB();
         final String[] args = new String[]{bssid};
         return db.rawQuery(
-                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon FROM network WHERE bssid = ?", args );
+                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE bssid = ?", args );
     }
 
 

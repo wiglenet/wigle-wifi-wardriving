@@ -4,13 +4,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.NetworkType;
+
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,6 +22,9 @@ import android.support.v4.app.FragmentActivity;
 
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
+    private static final String NO_SSID = "(no SSID)";
+
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK);
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper ) {
         this( context, dbHelper, null);
@@ -44,10 +51,21 @@ public class KmlWriter extends AbstractBackgroundTask {
         // header
         ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
-                + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red-dot.png</href></Icon></IconStyle></Style>"
-                + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href></Icon></IconStyle></Style>"
-                + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"blue\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/blue.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"pink\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"ltblue\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/ltblue.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"zeroConfidence\"><IconStyle><Icon><href>https://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon></IconStyle></Style>"
                 + "<Folder><name>Wifi Networks</name>\n" );
+
+        // confidence styles from online generator; not applicable here because we don't have qos?
+        /*+ "<Style id=\"highConfidence\"><IconStyle id=\"highConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"mediumConfidence\"> <IconStyle id=\"medConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"lowConfidence\"> <IconStyle id=\"lowConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"zeroConfidence\"> <IconStyle id=\"zeroConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"*/
+
 
         // body
         Cursor cursor = null;
@@ -115,7 +133,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 throw new InterruptedException( "we were interrupted" );
             }
 
-            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon
+            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,typecode
             final String bssid = cursor.getString(0);
             final String ssid = cursor.getString(1);
             final int frequency = cursor.getInt(2);
@@ -123,26 +141,61 @@ public class KmlWriter extends AbstractBackgroundTask {
             final long lasttime = cursor.getLong(4);
             final double lastlat = cursor.getDouble(5);
             final double lastlon = cursor.getDouble(6);
-            final String date = dateFormat.format( new Date( lasttime ) );
+            final int bestlevel = cursor.getInt(7);
+            final String typecode = cursor.getString( 8);
+            final String date = sdf.format(new Date(lasttime));
+
+            NetworkType type = NetworkType.typeForCode(typecode);
 
             String style = "green";
-            if (capabilities.contains("WEP")) {
-                style = "yellow";
+
+            if (type == null) {
+                style = "zeroConfidence";
+            } else if (NetworkType.WIFI.equals(type)) {
+                if (capabilities.contains("WEP")) {
+                    style = "yellow";
+                }
+                if (capabilities.contains("WPA")) {
+                    style = "red";
+                }
+            } else if (NetworkType.BLE.equals(type)) {
+                style = "ltblue";
+            } else if (NetworkType.BT.equals(type)) {
+                style = "blue";
+
+            } else if (NetworkType.CDMA.equals(type) || NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type)) {
+                style = "pink";
+            } else {
+                style = "zeroConfidence";
             }
-            if (capabilities.contains("WPA")) {
-                style = "red";
+
+            //Regardless of reported quality, this freaks out
+            if (lasttime == 0L) {
+                style = "zeroConfidence";
             }
 
             // not unicode. ha ha for them!
             byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
             filterIllegalXml( ssidFiltered );
+            if (ssidFiltered.length == 0) {
+                ssidFiltered = NO_SSID.getBytes( MainActivity.ENCODING);
+            }
+
+            final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
 
             ObservationUploader.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
             fos.write( ssidFiltered );
             ObservationUploader.writeFos( fos, "]]></name>\n" );
-            ObservationUploader.writeFos( fos, "<description><![CDATA[BSSID: <b>" + bssid + "</b><br/>"
-                    + "Capabilities: <b>" + capabilities + "</b><br/>Frequency: <b>" + frequency + "</b><br/>"
-                    + "Timestamp: <b>" + lasttime + "</b><br/>Date: <b>" + date + "</b>]]></description><styleUrl>#" + style + "</styleUrl>\n" );
+            ObservationUploader.writeFos( fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                    + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
+                    + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
+                    + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
+                    + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
+                    + "Signal: " + bestlevel + "\n"
+                    + "Type: " + type.name() + "\n"          // TODO: add to server side
+                    + encStatus
+                    + "]]>"
+                    +"</description><styleUrl>#" + style + "</styleUrl>\n" );
             ObservationUploader.writeFos( fos, "<Point>\n" );
             ObservationUploader.writeFos( fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>" );
             ObservationUploader.writeFos( fos, "</Point>\n</Placemark>\n" );
@@ -161,6 +214,20 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
 
         return true;
+    }
+
+    private String encryptionStringForCapabilities(final String capabilities) {
+        if (capabilities.contains("WPA3")) {
+            return "WPA3";
+        } else if (capabilities.contains("WPA2")) {
+            return "WPA2";
+        } else if (capabilities.contains("WPA")) {
+            return "WPA";
+        } else if (capabilities.contains("WEP")) {
+            return "WEP";
+        } else {
+            return "Unknown";
+        }
     }
 
     private void filterIllegalXml( byte[] data ) {

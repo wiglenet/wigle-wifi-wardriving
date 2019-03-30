@@ -1,7 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 public class StateFragment extends Fragment {
     //data object we want to retain

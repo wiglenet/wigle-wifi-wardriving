@@ -1,8 +1,7 @@
-package android.support.v4.app;
+package androidx.fragment.app;
 
 import android.os.Bundle;
 import android.os.Parcel;
-import android.support.v4.app.Fragment;
 
 /**
  * Created by arkasha on 7/3/17.

@@ -2,7 +2,7 @@ package net.wigle.wigleandroid.ui;
 
 import android.app.Activity;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;

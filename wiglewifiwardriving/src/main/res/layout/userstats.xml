@@ -147,6 +147,48 @@
                 android:textSize="16sp"
                 />
         </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredBtGPS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btdisc_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/discoveredBt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/status_unknown"
+                android:textSize="16sp"
+                android:paddingBottom="2dip"
+                android:textColor="#4aceff"
+                android:paddingRight="3dip" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bttotal_title"
+                android:textSize="16sp"
+                />
+        </LinearLayout>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
@@ -187,6 +229,7 @@
                 android:textSize="16sp"
                 />
         </LinearLayout>
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"

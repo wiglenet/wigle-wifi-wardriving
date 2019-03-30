@@ -70,6 +70,8 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_DISCOVERED = "discoveredWiFiGPS";
     private static final String KEY_TOTAL = "discoveredWiFi";
     private static final String KEY_TOTAL_LOCS = "totalWiFiLocations";
+    private static final String KEY_BT_DISC = "discoveredBtGPS";
+    private static final String KEY_BT_TOTAL = "discoveredBt";
     private static final String KEY_GEN_DISC = "discoveredCellGPS";
     private static final String KEY_GEN_TOTAL = "discoveredCell";
     private static final String KEY_MONTH_COUNT = "eventMonthCount";
@@ -85,7 +87,8 @@ public class UserStatsFragment extends Fragment {
 
     private static final String[] ALL_USER_KEYS = new String[] {
             KEY_RANK, KEY_PREV_RANK, KEY_MONTH_RANK, KEY_PREV_MONTH_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS,
-            KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
+            KEY_BT_DISC, KEY_BT_TOTAL, KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS,
+            KEY_LAST_TRANS,
         };
 
     private AtomicBoolean finishing;

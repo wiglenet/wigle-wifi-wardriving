@@ -74,9 +74,9 @@ public final class RankListAdapter extends AbstractListAdapter<RankUser> {
         tv.setText(numberFormat.format(
                 monthRanking ? rankUser.getMonthWifiGps() : rankUser.getTotalWifiGps()));
 
-        tv = (TextView) row.findViewById( R.id.total_wifi_gps );
-        tv.setText(getContext().getString(R.string.total_wifi) + ": "
-                + numberFormat.format(rankUser.getTotalWifiGps()));
+        tv = (TextView) row.findViewById( R.id.total_bt_gps );
+        tv.setText(getContext().getString(R.string.total_bt) + ": "
+                + numberFormat.format(rankUser.getTotalBtGps()));
 
         tv = (TextView) row.findViewById( R.id.total_cell_gps );
         tv.setText(getContext().getString(R.string.total_cell) + ": "

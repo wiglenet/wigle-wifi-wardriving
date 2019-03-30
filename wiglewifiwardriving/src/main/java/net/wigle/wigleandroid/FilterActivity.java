@@ -3,7 +3,7 @@ package net.wigle.wigleandroid;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +28,7 @@ public class FilterActivity extends AppCompatActivity {
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.filtersettings);
 
-        final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }

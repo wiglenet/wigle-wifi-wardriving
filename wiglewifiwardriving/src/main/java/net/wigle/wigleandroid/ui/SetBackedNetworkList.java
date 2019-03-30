@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid.ui;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.Network;

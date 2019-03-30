@@ -205,7 +205,7 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.m8bprovider"
             android:exported="false"
             android:grantUriPermissions="true">

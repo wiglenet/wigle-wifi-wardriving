@@ -1,6 +1,8 @@
+import groovy.sql.Sql
+
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
-apply plugin: 'groovyx.grooid.groovy-android'
+apply plugin: 'groovyx.android'
 
 android {
     compileSdkVersion 28

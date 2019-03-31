@@ -63,6 +63,10 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         tv.setText(getContext().getString(R.string.wifi_gps) + ": "
                 + numberFormat.format(upload.getTotalWifiGps()));
 
+        tv = (TextView) row.findViewById(R.id.total_bt_gps);
+        tv.setText(getContext().getString(R.string.bt_gps) + ": "
+                + numberFormat.format(upload.getTotalBtGps()));
+
         tv = (TextView) row.findViewById(R.id.total_cell_gps);
         tv.setText(getContext().getString(R.string.cell_gps) + ": "
                 + numberFormat.format(upload.getTotalCellGps()));

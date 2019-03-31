@@ -42,6 +42,22 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:text="@string/btloc_title"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/btloc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/status_unknown"
+        android:textSize="22sp"
+        android:paddingBottom="4dp"
+        />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:text="@string/genloc_title"
         android:textSize="20sp"
         android:textStyle="bold"

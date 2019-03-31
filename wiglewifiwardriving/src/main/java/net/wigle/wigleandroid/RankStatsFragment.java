@@ -74,6 +74,7 @@ public class RankStatsFragment extends Fragment {
      */
     private static final String KEY_MONTH_WIFI_GPS = "eventMonthCount";
     private static final String KEY_TOTAL_WIFI_GPS = "discoveredWiFiGPS";
+    private static final String KEY_TOTAL_BT_GPS = "discoveredBtGPS";
     private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";
     private static final String KEY_RANK = "rank";
     private static final String KEY_USERNAME = "userName";
@@ -84,7 +85,8 @@ public class RankStatsFragment extends Fragment {
     private static final int ROW_COUNT = 100;
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK, KEY_PREV_MONTH_RANK,
+            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK,
+            KEY_PREV_MONTH_RANK,
         };
 
     private AtomicBoolean finishing;
@@ -263,7 +265,8 @@ public class RankStatsFragment extends Fragment {
                         final long rankDiff = row.getLong(rankDiffKey) - row.getLong(KEY_RANK);
                         final RankUser rankUser = new RankUser(row.getLong(KEY_RANK), rankDiff,
                                 row.getString(KEY_USERNAME), row.getLong(KEY_MONTH_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_CELL_GPS));
+                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_BT_GPS),
+                                row.getLong(KEY_TOTAL_CELL_GPS));
                         rankListAdapter.add(rankUser);
                     }
                 }

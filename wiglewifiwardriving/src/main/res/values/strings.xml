@@ -409,4 +409,9 @@
     <string name="m8b_sizing">Determining oracle inputs</string>
     <string name="exporting_m8b_final">Writing oracle file</string>
     <string name="calculating_m8b">Calculating oracle</string>
+    <string name="bt_gps">BT GPS</string>
+    <string name="btloc_title">WiGLE.net Bluetooth Devices with Location</string>
+    <string name="btdisc_title">Discovered Bluetooth Devices (New to WiGLE)</string>
+    <string name="bttotal_title">Total Bluetooth Devices Seen</string>
+    <string name="total_bt">Total Bluetooth</string>
 </resources>

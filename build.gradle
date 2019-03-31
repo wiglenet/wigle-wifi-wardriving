@@ -15,7 +15,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath 'de.undercouch:gradle-download-task:3.4.3'
-        classpath "org.codehaus.groovy:gradle-groovy-android-plugin:0.3.6"
+        classpath 'org.codehaus.groovy:groovy-android-gradle-plugin:2.0.1'
     }
 }
 

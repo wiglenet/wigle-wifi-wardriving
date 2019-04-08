@@ -341,7 +341,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             }
             case KML_RUN_DIALOG: {
                 KmlWriter kmlWriter = new KmlWriter( getActivity(), ListFragment.lameStatic.dbHelper,
-                        ListFragment.lameStatic.runNetworks );
+                        ListFragment.lameStatic.runNetworks, ListFragment.lameStatic.runBtNetworks );
                 kmlWriter.start();
                 break;
             }

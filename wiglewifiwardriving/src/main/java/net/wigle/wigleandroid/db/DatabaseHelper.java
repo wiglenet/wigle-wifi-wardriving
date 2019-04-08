@@ -138,6 +138,23 @@ public final class DatabaseHelper extends Thread {
     private final DeathHandler deathHandler;
     private final SharedPreferences prefs;
 
+    public enum NetworkFilter {
+        WIFI("type = 'W'"),
+        BT("type IN ('B','E')"),
+        CELL("type IN ('G','C','L','D')");
+
+        final String filter;
+
+        NetworkFilter(final String filter) {
+            this.filter = filter;
+        }
+
+        public String getFilter() {
+            return this.filter;
+        }
+    }
+
+
     /** used in private addObservation */
     private final ConcurrentLinkedHashMap<String,CachedLocation> previousWrittenLocationsCache =
             new ConcurrentLinkedHashMap<>(64);
@@ -1212,11 +1229,25 @@ public final class DatabaseHelper extends Thread {
         return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network", args );
     }
 
+    public Cursor networkIterator(final NetworkFilter filter) throws DBException {
+        checkDB();
+        MainActivity.info( "networkIterator (filtered)" );
+        final String[] args = new String[]{};
+        return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE "+filter.getFilter(), args );
+    }
+
     public Cursor getSingleNetwork( final String bssid ) throws DBException {
         checkDB();
         final String[] args = new String[]{bssid};
         return db.rawQuery(
                 "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE bssid = ?", args );
+    }
+
+    public Cursor getSingleNetwork( final String bssid, final NetworkFilter filter ) throws DBException {
+        checkDB();
+        final String[] args = new String[]{bssid};
+        return db.rawQuery(
+                "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE bssid = ? AND "+ filter.getFilter(), args );
     }
 
 

@@ -191,6 +191,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public long dbLocs;
         public DatabaseHelper dbHelper;
         public Set<String> runNetworks;
+        public Set<String> runBtNetworks;
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;

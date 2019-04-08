@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.listener;
 
+import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -134,7 +135,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private static final int EMPTY_BT_THRESHOLD = 2;
 
     // scan state
-    private int btCount = 0;
     private long lastDiscoveryAt = 0;
 
     private long adUuidNoScanUuid = 0;
@@ -144,7 +144,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
-
+        ListFragment.lameStatic.runBtNetworks = runNetworks;
 
         if (Build.VERSION.SDK_INT >= 21) {
             scanCallback = new ScanCallback() {

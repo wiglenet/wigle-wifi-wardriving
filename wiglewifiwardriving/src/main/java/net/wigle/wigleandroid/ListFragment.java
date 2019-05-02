@@ -32,6 +32,9 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.internal.NavigationMenuItemView;
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
@@ -397,16 +400,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
         item.setIcon( android.R.drawable.ic_menu_mapmode );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon(android.R.drawable.ic_menu_search);
         item.setIcon(android.R.drawable.ic_menu_manage);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
         item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         MainActivity main = MainActivity.getMainActivity(this);
         final String scan = (main == null || main.isScanning()) ? getString(R.string.off) : getString(R.string.on);
@@ -468,7 +470,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 getActivity().startActivity(intent);
                 return true;
             case MENU_MAP:
-                // call over to finish
+                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
+                MenuItem mapMenuItem = navigationView.getMenu().findItem(R.id.nav_map);
+                mapMenuItem.setCheckable(true);
+                navigationView.setCheckedItem(R.id.nav_map);
                 if (main != null) main.selectFragment(R.id.nav_map);
                 return true;
             case MENU_MUTE:

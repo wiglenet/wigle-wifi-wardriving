@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
@@ -240,12 +242,22 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(R.id.nav_user_stats);
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
+                MenuItem userStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_user_stats);
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
+                userStatsMenuItem.setCheckable(true);
+                userStatsMenuItem.setChecked(true);
+                if (main != null) main.selectFragment(R.id.nav_user_stats);
                 return true;
             case MENU_RANK_STATS:
-                main.selectFragment(R.id.nav_rank);
+                MenuItem rankStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_rank);
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
+                rankStatsMenuItem.setCheckable(true);
+                rankStatsMenuItem.setChecked(true);
+                if (main != null) main.selectFragment(R.id.nav_rank);
                 return true;
         }
         return false;

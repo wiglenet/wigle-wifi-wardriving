@@ -22,6 +22,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
@@ -351,12 +353,23 @@ public class UploadsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(R.id.nav_uploads);
+                MenuItem userStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_user_stats);
+                userStatsMenuItem.setCheckable(true);
+                navigationView.setCheckedItem(R.id.nav_user_stats);
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
+                userStatsMenuItem.setChecked(true);
+                if (main != null) main.selectFragment(R.id.nav_user_stats);
                 return true;
             case MENU_SITE_STATS:
-                main.selectFragment(R.id.nav_uploads);
+                MenuItem siteStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_site_stats);
+                siteStatsMenuItem.setCheckable(true);
+                navigationView.setCheckedItem(R.id.nav_site_stats);
+                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
+                siteStatsMenuItem.setChecked(true);
+                if (main != null) main.selectFragment(R.id.nav_site_stats);
                 return true;
         }
         return false;

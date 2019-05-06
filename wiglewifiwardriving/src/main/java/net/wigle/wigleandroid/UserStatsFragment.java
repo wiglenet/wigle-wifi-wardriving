@@ -19,9 +19,12 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -325,12 +328,13 @@ public class UserStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_SITE_STATS:
-                main.selectFragment(R.id.nav_site_stats);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
             case MENU_RANK_STATS:
-                main.selectFragment(R.id.nav_rank);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_rank);
                 return true;
         }
         return false;

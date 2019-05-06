@@ -22,10 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.Upload;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -351,12 +354,13 @@ public class UploadsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(R.id.nav_uploads);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
                 return true;
             case MENU_SITE_STATS:
-                main.selectFragment(R.id.nav_uploads);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
         }
         return false;

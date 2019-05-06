@@ -28,6 +28,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -402,18 +403,10 @@ public class RankStatsFragment extends Fragment {
 
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                MenuItem userStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_user_stats);
-                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
-                userStatsMenuItem.setCheckable(true);
-                userStatsMenuItem.setChecked(true);
-                if (main != null)  main.selectFragment(R.id.nav_user_stats);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
                 return true;
             case MENU_SITE_STATS:
-                MenuItem siteStatsMenuItem = navigationView.getMenu().findItem(R.id.nav_site_stats);
-                navigationView.getMenu().setGroupVisible(R.id.stats_group, true);
-                siteStatsMenuItem.setCheckable(true);
-                siteStatsMenuItem.setChecked(true);
-                if (main != null) main.selectFragment(R.id.nav_site_stats);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
             case MENU_RANK_SWAP:
                 monthRanking.set(!monthRanking.get());

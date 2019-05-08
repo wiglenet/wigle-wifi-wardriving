@@ -76,7 +76,6 @@ public class WifiReceiver extends BroadcastReceiver {
     private final SsidSpeaker ssidSpeaker;
 
     private Handler wifiTimer;
-    private Location prevGpsLocation;
     private long scanRequestTime = Long.MIN_VALUE;
     private long lastScanResponseTime = Long.MIN_VALUE;
     private long lastWifiUnjamTime = 0;
@@ -416,37 +415,6 @@ public class WifiReceiver extends BroadcastReceiver {
         mainActivity.setStatusUI( status );
         // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
         scanRequestTime = nonstopScanRequestTime;
-
-        // do lerp if need be
-        if ( location == null ) {
-            if ( prevGpsLocation != null ) {
-                dbHelper.lastLocation( prevGpsLocation );
-                // MainActivity.info("set last location for lerping");
-            }
-        }
-        else {
-            dbHelper.recoverLocations( location );
-        }
-
-        // do distance calcs
-        if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
-                && location.getAccuracy() <= ListFragment.MIN_DISTANCE_ACCURACY ) {
-            if ( prevGpsLocation != null ) {
-                float dist = location.distanceTo( prevGpsLocation );
-                // info( "dist: " + dist );
-                if ( dist > 0f ) {
-                    final Editor edit = prefs.edit();
-                    edit.putFloat( ListFragment.PREF_DISTANCE_RUN,
-                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );
-                    edit.putFloat( ListFragment.PREF_DISTANCE_TOTAL,
-                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
-                    edit.apply();
-                }
-            }
-
-            // set for next time
-            prevGpsLocation = location;
-        }
 
         if ( somethingAdded && ssidSpeak ) {
             ssidSpeaker.speak();

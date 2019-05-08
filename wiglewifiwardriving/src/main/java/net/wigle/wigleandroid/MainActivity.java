@@ -108,7 +108,7 @@ public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
-        DatabaseHelper dbHelper;
+        public DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
         WigleService wigleService;
         AtomicBoolean finishing;
@@ -2086,7 +2086,7 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // create a new listener to try and get around the gps stopping bug
-        state.gpsListener = new GPSListener(this);
+        state.gpsListener = new GPSListener(this, state.dbHelper);
         state.gpsListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
         try {
             locationManager.addGpsStatusListener(state.gpsListener);

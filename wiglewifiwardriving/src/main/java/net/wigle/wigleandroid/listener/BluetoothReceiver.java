@@ -444,7 +444,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
             int type;
 
-            if (btClass == null) {
+            if (btClass == null && device != null) {
                 type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
                         device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
             } else {
@@ -510,7 +510,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      */
     private void sort(final SharedPreferences prefs) {
         if (listAdapter != null) {
-            listAdapter.sort(NetworkListSorter.getSort(prefs));
+            try {
+                listAdapter.sort(NetworkListSorter.getSort(prefs));
+            } catch (IllegalArgumentException ex) {
+                MainActivity.error("sort failed: ",ex);
+            }
         }
     }
 

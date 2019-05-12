@@ -936,10 +936,11 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                         scanInFlight = false;
                         try {
-                            wifiManager.setWifiEnabled(false);
-                            wifiManager.setWifiEnabled(true);
-                        }
-                        catch (SecurityException ex) {
+                            if (wifiManager != null) {
+                                wifiManager.setWifiEnabled(false);
+                                wifiManager.setWifiEnabled(true);
+                            }
+                        } catch (SecurityException ex) {
                             MainActivity.info("exception resetting wifi: " + ex, ex);
                         }
                         lastWifiUnjamTime = now;

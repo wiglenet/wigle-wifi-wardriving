@@ -6,16 +6,18 @@ package net.wigle.wigleandroid.model;
 public final class Upload {
     private final String transid;
     private final long totalWifiGps;
+    private final long totalBtGps;
     private final long totalCellGps;
     private final int percentDone;
     private final String status;
     private final long fileSize;
 
-    public Upload(final String transid, final long totalWifiGps, final long totalCellGps,
+    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps,
                   final int percentDone, final String status, final long fileSize) {
 
         this.transid = transid;
         this.totalWifiGps = totalWifiGps;
+        this.totalBtGps = totalBtGps;
         this.totalCellGps = totalCellGps;
         this.percentDone = percentDone;
         this.status = status;
@@ -28,6 +30,10 @@ public final class Upload {
 
     public long getTotalWifiGps() {
         return totalWifiGps;
+    }
+
+    public long getTotalBtGps() {
+        return totalBtGps;
     }
 
     public long getTotalCellGps() {

@@ -5,7 +5,8 @@ import static android.location.LocationManager.NETWORK_PROVIDER;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,16 +18,20 @@ import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.widget.Toast;
+import android.provider.ContactsContract;
+
+import androidx.core.content.ContextCompat;
 
 public class GPSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
+    public static final float LERP_THRESHOLD_METERS = 1.0f;
 
     private MainActivity mainActivity;
+    private final DatabaseHelper dbHelper;
     private Location location;
     private Location networkLocation;
     private GpsStatus gpsStatus;
@@ -37,9 +42,11 @@ public class GPSListener implements Listener, LocationListener {
     private float previousSpeed = 0f;
     private LocationListener mapLocationListener;
     private int prevStatus = 0;
+    private Location prevGpsLocation;
 
-    public GPSListener( MainActivity mainActivity) {
+    public GPSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
+        this.dbHelper = dbHelper;
     }
 
     public void setMapListener( LocationListener mapLocationListener ) {
@@ -207,6 +214,43 @@ public class GPSListener implements Listener, LocationListener {
             }
         }
 
+        if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
+                && location.getAccuracy() <= ListFragment.MIN_DISTANCE_ACCURACY ) {
+            if ( prevGpsLocation != null ) {
+                float dist = location.distanceTo( prevGpsLocation );
+                //MainActivity.info( "dist: " + dist );
+                if ( dist > 0f ) {
+                    final Editor edit = prefs.edit();
+                    edit.putFloat( ListFragment.PREF_DISTANCE_RUN,
+                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );
+                    edit.putFloat( ListFragment.PREF_DISTANCE_TOTAL,
+                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
+                    edit.apply();
+                }
+                if ( dist > LERP_THRESHOLD_METERS) {
+                    if (null != dbHelper) {
+                        if (!location.equals(prevGpsLocation)) {
+                            dbHelper.recoverLocations(location);
+                            //MainActivity.info("lerping...");
+                        }
+                    }
+                }
+            }
+
+            // set for next time
+            prevGpsLocation = location;
+        }
+
+        // do lerp if need be
+        if ( location == null ) {
+            if ( prevGpsLocation != null ) {
+                if (null != dbHelper) {
+                    dbHelper.lastLocation(prevGpsLocation);
+                    MainActivity.info("set last location for lerping");
+                }
+            }
+        }
+
         // for maps. so lame!
         ListFragment.lameStatic.location = location;
         boolean scanScheduled = false;
@@ -339,4 +383,17 @@ public class GPSListener implements Listener, LocationListener {
     public Location getLocation() {
         return location;
     }
+
+    /**
+     * utility method which takes prefs and checks location freshness vs. configured limits
+     * @param prefs SharedPreferences instance containing PREF_GPS_TIMEOUT and PREF_NET_LOC_TIMEOUT values to check
+     * @return the location is valid
+     */
+    public Location checkGetLocation(final SharedPreferences prefs) {
+        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
+        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+        checkLocationOK(gpsTimeout, netLocTimeout);
+        return getLocation();
+    }
+
 }

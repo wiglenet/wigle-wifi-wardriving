@@ -9,9 +9,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.fragment.app.Fragment;
+import androidx.core.view.MenuItemCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,10 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.Upload;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,6 +82,7 @@ public class UploadsFragment extends Fragment {
     private static final String RESULT_LIST_KEY = "results";
 
     private static final String KEY_TOTAL_WIFI_GPS = "discoveredGps";
+    private static final String KEY_TOTAL_BT_GPS = "btDiscoveredGps";
     private static final String KEY_TOTAL_CELL_GPS = "genDiscoveredGps";
     private static final String KEY_QUEUE_DEPTH = "processingQueueDepth";
     private static final String KEY_TRANSID = "transid";
@@ -89,7 +93,7 @@ public class UploadsFragment extends Fragment {
     private static final int ROW_COUNT = 100;
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE,
+            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE,
         };
 
     private AtomicBoolean finishing;
@@ -237,6 +241,7 @@ public class UploadsFragment extends Fragment {
                     if (result instanceof Bundle) {
                         final Bundle row = (Bundle) result;
                         final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
+                                row.getLong(KEY_TOTAL_BT_GPS),
                                 row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
                                 row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE));
                         uploadsListAdapter.add(upload);
@@ -349,12 +354,13 @@ public class UploadsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
                 return true;
             case MENU_SITE_STATS:
-                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
         }
         return false;

@@ -4,54 +4,130 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="21">
+        <TextView
+            android:id="@+id/stats_run"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_weight="4"
+            android:textColor="#AAAAAA"
+            android:text="@string/run" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+			    android:layout_weight="4">
+                <ImageView
+                    android:id="@+id/wifi_ico"
+                    android:src="@drawable/wifi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="run wifi"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="2dp"
+                    android:text="wifi new vs run" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stats_wifi"
+                    android:textSize="15sp"
+                    style="@style/WiFiColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4">
+                <ImageView
+                    android:id="@+id/cell_ico"
+                    android:src="@drawable/cell"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="run cell"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="2dp"
+                    android:text="cell new vs. run" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stats_cell"
+                    android:textSize="15sp"
+                    android:layout_weight="1"
+                    android:text="@string/stats"
+                    style="@style/CellColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/bt_list_total"
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4">
+                <ImageView
+                    android:id="@+id/bt_icon"
+                    android:src="@drawable/bluetooth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="run bluetooth"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="2dp"
+                    android:text="bt new vs run" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stats_bt"
+                    android:textSize="15sp"
+                    android:layout_weight="1"
+                    style="@style/BtColor" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5">
+                <ImageView
+                    android:id="@+id/db_icon"
+                    android:src="@drawable/database"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="run DB"
+                    android:paddingTop="3dp"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="2dp"
+                    android:text="database" />
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stats_dbnets"
+                    android:textSize="15sp" />
+            </LinearLayout>
+    </LinearLayout>
+
 
     <LinearLayout
-    android:orientation="horizontal" android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-	<TextView
-	    android:layout_width="fill_parent" android:layout_height="wrap_content"
-	    android:id="@+id/stats_run"
-	    android:textSize="16sp"
-	    android:layout_weight="1"
-	    android:textColor="#AAAA00"
-	    />
-	<TextView
-	    android:layout_width="fill_parent" android:layout_height="wrap_content"
-	    android:id="@+id/stats_new"
-	    android:textSize="16sp"
-	    android:layout_weight="1"
-	    android:textColor="#AAEE50"
-	    />
-	<TextView
-	    android:layout_width="fill_parent" android:layout_height="wrap_content"
-	    android:id="@+id/stats_dbnets"
-	    android:textSize="16sp"
-	    android:layout_weight="1"
-	    />
-	</LinearLayout>
-
-	<LinearLayout
-	android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#903030"
-	/>
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="2dip"
+        style="@style/DividerColor" />
+    <RelativeLayout
+        android:id="@+id/map_rl"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
     <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/no_map"
-            android:textSize="24sp"
-            android:text="@string/mapless"
-            />
-
-	<RelativeLayout
-		android:id="@+id/map_rl"
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-  />
-
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_map"
+        android:textSize="24sp"
+        android:text="@string/mapless"
+        />
 
 </LinearLayout>

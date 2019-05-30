@@ -6,28 +6,36 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.NetworkType;
+
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
+    private final Set<String> btNetworks;
+    private static final String NO_SSID = "(no SSID)";
+
+    private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK);
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper ) {
-        this( context, dbHelper, null);
+        this( context, dbHelper, null, null);
     }
 
-    public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper, final Set<String> networks ) {
+    public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper, final Set<String> networks, final Set<String> btNetworks) {
         super(context, dbHelper, "KmlWriter", true);
 
         // make a safe local copy
         this.networks = (networks == null) ? null : new HashSet<>(networks);
+        this.btNetworks = (btNetworks == null) ? null : new HashSet<String>(btNetworks);
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -44,29 +52,89 @@ public class KmlWriter extends AbstractBackgroundTask {
         // header
         ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
-                + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red-dot.png</href></Icon></IconStyle></Style>"
-                + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href></Icon></IconStyle></Style>"
-                + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"green\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/green.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"blue\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/blue.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"pink\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/pink.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"ltblue\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/lightblue.png</href></Icon></IconStyle></Style>"
+                + "<Style id=\"zeroConfidence\"><IconStyle><Icon><href>https://maps.google.com/mapfiles/kml/pal2/icon18.png</href></Icon></IconStyle></Style>"
                 + "<Folder><name>Wifi Networks</name>\n" );
+
+        // confidence styles from online generator; not applicable here because we don't have qos?
+        /*+ "<Style id=\"highConfidence\"><IconStyle id=\"highConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/grn-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"mediumConfidence\"> <IconStyle id=\"medConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"lowConfidence\"> <IconStyle id=\"lowConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/red-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"
+        + "<Style id=\"zeroConfidence\"> <IconStyle id=\"zeroConfidenceStyle\"> <scale>1.0</scale><heading>0.0</heading><Icon><href>http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png</href><refreshInterval>0.0</refreshInterval><viewRefreshTime>0.0</viewRefreshTime><viewBoundScale>0.0</viewBoundScale></Icon></IconStyle></Style>"*/
+
 
         // body
         Cursor cursor = null;
         Status status = null;
         try {
             if ( this.networks == null ) {
-                cursor = dbHelper.networkIterator();
-                writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle );
-            }
-            else {
-                int count = 0;
+                cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.WIFI);
+                long wifiCount = writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle);
+                cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.CELL);
+                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                long cellCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount, dbHelper.getNetworkCount(), bundle);
+                cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
+                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
+                MainActivity.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
+            } else {
+                long count = 0;
+                long btFailCount = 0L;
+                long wifiFailCount = 0L;
+                Set<String> cellSet = new HashSet<>();
+                final int totalNets = networks.size() + btNetworks.size();
                 for ( String network : networks ) {
+                    // DEBUG: MainActivity.info( "network: " + network );
+                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.WIFI );
+
+                    final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
+                    // ALIBI: assume this was a cell net, if it didn't match for WiFi - avoid full second iteration
+                    if (0L == found) {
+                        //DEBUG: MainActivity.info("Didn't find network "+network+"; adding to cells.");
+                        cellSet.add(network);
+                        wifiFailCount++;
+                    }
+                    cursor.close();
+                    cursor = null;
+                    if (found > 0) {
+                        count++;
+                    }
+                }
+                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                //ALIBI: cell networks are still mixed into the lamestatic list of WiFi for now. this can get more efficient when we partition them.
+                for ( String network : cellSet ) {
                     // MainActivity.info( "network: " + network );
-                    cursor = dbHelper.getSingleNetwork( network );
-                    writeKmlFromCursor( fos, cursor, dateFormat, count, networks.size(), bundle );
+                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.CELL);
+
+                    final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
+                    cursor.close();
+                    cursor = null;
+                    if (found > 0) {
+                        count++;
+                    } else {
+                        MainActivity.warn("unfound cell: ["+network+"]");
+                    }
+                }
+                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                for ( String network : btNetworks ) {
+                    // MainActivity.info( "network: " + network );
+                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.BT );
+
+                    final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
+                    if (0L == found) {
+                        btFailCount++;
+                        MainActivity.error("unfound BT network: ["+network+"]");
+                    }
                     cursor.close();
                     cursor = null;
                     count++;
                 }
+                MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount+" from total count: "+totalNets+" (non-bt-networks: "+ networks.size()+" btnets:"+btNetworks.size()+")");
             }
             status = Status.WRITE_SUCCESS;
         }
@@ -105,17 +173,17 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
     }
 
-    private boolean writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat,
-                                        long startCount, long totalCount, final Bundle bundle ) throws IOException, InterruptedException {
+    private long writeKmlFromCursor( final OutputStream fos, final Cursor cursor, final SimpleDateFormat dateFormat,
+                                        long startCount, long totalCount, final Bundle bundle) throws IOException, InterruptedException {
 
-        int lineCount = 0;
+        long lineCount = 0;
 
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
             if ( wasInterrupted() ) {
                 throw new InterruptedException( "we were interrupted" );
             }
 
-            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon
+            // bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,typecode
             final String bssid = cursor.getString(0);
             final String ssid = cursor.getString(1);
             final int frequency = cursor.getInt(2);
@@ -123,29 +191,105 @@ public class KmlWriter extends AbstractBackgroundTask {
             final long lasttime = cursor.getLong(4);
             final double lastlat = cursor.getDouble(5);
             final double lastlon = cursor.getDouble(6);
-            final String date = dateFormat.format( new Date( lasttime ) );
+            final int bestlevel = cursor.getInt(7);
+            final String typecode = cursor.getString( 8);
+            final String date = sdf.format(new Date(lasttime));
+
+            final NetworkType type = NetworkType.typeForCode(typecode);
 
             String style = "green";
-            if (capabilities.contains("WEP")) {
-                style = "yellow";
+
+            if (type == null) {
+                style = "zeroConfidence";
+            } else if (NetworkType.WIFI.equals(type)) {
+                if (capabilities.contains("WEP")) {
+                    style = "yellow";
+                }
+                if (capabilities.contains("WPA")) {
+                    style = "red";
+                }
+            } else if (NetworkType.BLE.equals(type)) {
+                style = "ltblue";
+            } else if (NetworkType.BT.equals(type)) {
+                style = "blue";
+
+            } else if (NetworkType.CDMA.equals(type) || NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type)) {
+                style = "pink";
+            } else {
+                style = "zeroConfidence";
             }
-            if (capabilities.contains("WPA")) {
-                style = "red";
+
+            //Regardless of reported quality, this freaks out
+            if (lasttime == 0L) {
+                style = "zeroConfidence";
             }
 
             // not unicode. ha ha for them!
             byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
             filterIllegalXml( ssidFiltered );
+            if (ssidFiltered.length == 0) {
+                ssidFiltered = NO_SSID.getBytes( MainActivity.ENCODING);
+            }
 
-            ObservationUploader.writeFos( fos, "<Placemark>\n<name><![CDATA[" );
-            fos.write( ssidFiltered );
-            ObservationUploader.writeFos( fos, "]]></name>\n" );
-            ObservationUploader.writeFos( fos, "<description><![CDATA[BSSID: <b>" + bssid + "</b><br/>"
-                    + "Capabilities: <b>" + capabilities + "</b><br/>Frequency: <b>" + frequency + "</b><br/>"
-                    + "Timestamp: <b>" + lasttime + "</b><br/>Date: <b>" + date + "</b>]]></description><styleUrl>#" + style + "</styleUrl>\n" );
-            ObservationUploader.writeFos( fos, "<Point>\n" );
-            ObservationUploader.writeFos( fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>" );
-            ObservationUploader.writeFos( fos, "</Point>\n</Placemark>\n" );
+
+            if (type.equals(NetworkType.WIFI)) {
+
+                final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
+
+                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(ssidFiltered);
+                ObservationUploader.writeFos(fos, "]]></name>\n");
+                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                        + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
+                        + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
+                        + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
+                        + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
+                        + "Signal: " + bestlevel + "\n"
+                        + "Type: " + type.name() + "\n"
+                        + encStatus
+                        + "]]>"
+                        + "</description><styleUrl>#" + style + "</styleUrl>\n");
+                ObservationUploader.writeFos(fos, "<Point>\n");
+                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+
+            } else if (type.equals(NetworkType.CDMA) || type.equals(NetworkType.LTE) ||
+                    type.equals(NetworkType.GSM) || type.equals(NetworkType.WCDMA)) {
+                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(ssidFiltered);
+                ObservationUploader.writeFos(fos, "]]></name>\n");
+                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                        + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
+                        + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
+                        + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
+                        + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
+                        + "Signal: " + bestlevel + "\n"
+                        + "Type: " + type.name()
+                        + "]]>"
+                        + "</description><styleUrl>#" + style + "</styleUrl>\n");
+                ObservationUploader.writeFos(fos, "<Point>\n");
+                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+
+            } else if (type.equals(NetworkType.BT) || type.equals(NetworkType.BLE)) {
+                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(ssidFiltered);
+                ObservationUploader.writeFos(fos, "]]></name>\n");
+                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                        + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
+                        + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
+                        + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
+                        + "Time: " + date + "\n"                 // NOTE: server side contains server timezone
+                        + "Signal: " + bestlevel + "\n"
+                        + "Type: " + type.name()
+                        + "]]>"
+                        + "</description><styleUrl>#" + style + "</styleUrl>\n");
+                ObservationUploader.writeFos(fos, "<Point>\n");
+                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+            } else {
+                MainActivity.warn("unknown network type "+type+"for network: "+bssid);
+            }
 
             lineCount++;
             if ( (lineCount % 1000) == 0 ) {
@@ -160,7 +304,21 @@ public class KmlWriter extends AbstractBackgroundTask {
             sendPercentTimesTen( percentDone, bundle );
         }
 
-        return true;
+        return lineCount;
+    }
+
+    private String encryptionStringForCapabilities(final String capabilities) {
+        if (capabilities.contains("WPA3")) {
+            return "WPA3";
+        } else if (capabilities.contains("WPA2")) {
+            return "WPA2";
+        } else if (capabilities.contains("WPA")) {
+            return "WPA";
+        } else if (capabilities.contains("WEP")) {
+            return "WEP";
+        } else {
+            return "Unknown";
+        }
     }
 
     private void filterIllegalXml( byte[] data ) {

@@ -12,9 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.util.Base64;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -26,13 +25,11 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.UnknownHostException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -196,9 +193,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
-            final String encoded = (null != token && null != authname) ?
-                    Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"),
-                        Base64.NO_WRAP) : null;
 
             // don't upload empty files
             if ( countStats.lineCount == 0 && ! "ark-mobile".equals(userName) &&
@@ -210,46 +204,18 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             // show on the UI
             sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
 
-            long filesize = file != null ? file.length() : 0L;
-            if ( filesize <= 0 ) {
-                // find out how big the gzip'd file became
-                final FileInputStream fin = context.openFileInput(filename);
-                filesize = fin.available();
-                fin.close();
-                MainActivity.info("filesize: " + filesize);
-            }
-            if ( filesize <= 0 ) {
-                filesize = countStats.byteCount; // as an upper bound
-            }
-
             // send file
             final boolean hasSD = MainActivity.hasSD();
-            @SuppressWarnings("ConstantConditions")
-            final FileInputStream fis = hasSD ? new FileInputStream( file )
-                    : context.openFileInput( filename );
+
+            final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
+
             MainActivity.info("authname: " + authname);
 
             if (beAnonymous) {
                 MainActivity.info("anonymous upload");
             }
 
-            // Cannot set request property after connection is made
-            PreConnectConfigurator preConnectConfigurator = new PreConnectConfigurator() {
-                @Override
-                public void configure(HttpURLConnection connection) {
-                    if (!beAnonymous) {
-                        if (null != encoded && !encoded.isEmpty()) {
-                            connection.setRequestProperty("Authorization", "Basic " + encoded);
-                        }
-                    }
-                }
-            };
-
-            final String response = HttpFileUploader.upload(
-                    MainActivity.FILE_POST_URL, filename, "file", fis,
-                    params, preConnectConfigurator, getHandler(), filesize );
-
-            // as upload() is currently written: response can never be null. leave checks inplace anyhow. -uhtu
+            final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath, "file", params, authname, token, getHandler());
 
             if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
                 if ( response != null && response.indexOf("donate=Y") > 0 ) {
@@ -300,7 +266,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         } catch ( final IOException ex ) {
             ex.printStackTrace();
             MainActivity.error( "io problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {
@@ -401,10 +366,11 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         //noinspection TryFinallyCanBeTryWithResources
         try {
             return writeFileWithCursor( fos, bundle, countStats, cursor );
-        }
-        finally {
+        } finally {
             fos.close();
-            cursor.close();
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 

@@ -8,8 +8,8 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +19,12 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +73,8 @@ public class UserStatsFragment extends Fragment {
     private static final String KEY_DISCOVERED = "discoveredWiFiGPS";
     private static final String KEY_TOTAL = "discoveredWiFi";
     private static final String KEY_TOTAL_LOCS = "totalWiFiLocations";
+    private static final String KEY_BT_DISC = "discoveredBtGPS";
+    private static final String KEY_BT_TOTAL = "discoveredBt";
     private static final String KEY_GEN_DISC = "discoveredCellGPS";
     private static final String KEY_GEN_TOTAL = "discoveredCell";
     private static final String KEY_MONTH_COUNT = "eventMonthCount";
@@ -85,7 +90,8 @@ public class UserStatsFragment extends Fragment {
 
     private static final String[] ALL_USER_KEYS = new String[] {
             KEY_RANK, KEY_PREV_RANK, KEY_MONTH_RANK, KEY_PREV_MONTH_RANK, KEY_DISCOVERED, KEY_TOTAL, KEY_TOTAL_LOCS,
-            KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS, KEY_LAST_TRANS,
+            KEY_BT_DISC, KEY_BT_TOTAL, KEY_GEN_DISC, KEY_GEN_TOTAL, KEY_MONTH_COUNT, KEY_PREV_MONTH, KEY_FIRST_TRANS,
+            KEY_LAST_TRANS,
         };
 
     private AtomicBoolean finishing;
@@ -322,12 +328,13 @@ public class UserStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_SITE_STATS:
-                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
             case MENU_RANK_STATS:
-                main.selectFragment(MainActivity.RANK_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_rank);
                 return true;
         }
         return false;

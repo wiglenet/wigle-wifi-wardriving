@@ -143,6 +143,10 @@ public class TokenAccess {
             } else {
                 final KeyStore keyStore = getKeyStore();
                 final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+                if (null == key ) {
+                    MainActivity.warn("Null key in getApiTokenVersion2");
+                    return null;
+                }
                 final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
 
                 final byte[] cypherToken = Base64.decode(prefs.getString(ListFragment.PREF_TOKEN, ""), Base64.DEFAULT);

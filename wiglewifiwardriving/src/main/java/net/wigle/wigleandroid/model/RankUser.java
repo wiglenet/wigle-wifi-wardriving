@@ -9,15 +9,17 @@ public final class RankUser {
     private final String username;
     private final long monthWifiGps;
     private final long totalWifiGps;
+    private final long totalBtGps;
     private final long totalCellGps;
 
     public RankUser(final long rank, final long rankDiff, final String username, final long monthWifiGps,
-                    final long totalWifiGps, final long totalCellGps) {
+                    final long totalWifiGps, final long totalBtGps, final long totalCellGps) {
         this.rank = rank;
         this.rankDiff = rankDiff;
         this.username = username;
         this.monthWifiGps = monthWifiGps;
         this.totalWifiGps = totalWifiGps;
+        this.totalBtGps = totalBtGps;
         this.totalCellGps = totalCellGps;
     }
 
@@ -39,6 +41,10 @@ public final class RankUser {
 
     public long getTotalWifiGps() {
         return totalWifiGps;
+    }
+
+    public long getTotalBtGps() {
+        return totalBtGps;
     }
 
     public long getTotalCellGps() {

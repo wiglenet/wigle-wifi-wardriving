@@ -115,15 +115,18 @@
     <string name="tab_map">Kaart</string>
     <string name="tab_dash">Oersjoch</string>
     <string name="tab_data">Gegevens</string>
+    <string name="tab_stats">Statistieken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>
     <string name="dash_new_wifi">Nije WiFi</string>
     <string name="dash_vis_nets">Sichtbere netwurken:</string>
     <string name="dash_new_upload">Nije netwurken sûnt lêste upload:</string>
-    <string name="dash_new_cells">Nije stjoermêsten:</string>
+    <string name="dash_new_cells">Nije stjoermêsten</string>
+    <string name="dash_new_bt">Nije Bluetooth</string>
     <string name="dash_dist_run">Runôfstân:</string>
     <string name="dash_time_run">Looptijd:</string>
+    <string name="dash_time_scanning">Scanduur:</string>
     <string name="dash_dist_total">Totale ôfstân:.</string>
     <string name="dash_dist_prev">Foarige run:</string>
     <string name="dash_db_queue">DB-wachtrige:</string>
@@ -256,6 +259,14 @@
     <string name="use_wigle_tiles">Gebrûk WiGLE OSM-tegels</string>
     <string name="wigle_service">WiGLE Wifi Service</string>
     <string name="disable_toast">Toast pop-ups uitschakelen</string>
+    <string name="drawer_open">Lade open</string>
+    <string name="drawer_close">Lade gesloten</string>
+    <string name="netwpa3_title">WPA3</string>
+    <string name="netwpa2_title">WPA2</string>
+    <string name="netwpa_title">WPA</string>
+    <string name="netwep_title">WEP</string>
+    <string name="netnowep_title">None</string>
+    <string name="netwepunknown_title">Unknown</string>
     <string name="activate">no aktivearje</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -273,6 +284,8 @@
     <string name="deauthorize_confirm">Are you sure you want to remove your credentials from this device?</string>
     <string name="authorize">Authorize (login)</string>
     <string name="anonymous_confirm">Upload anonymously? This will remove any existing login info from your device.</string>
+    <string name="title_activity_activate">Scan to Activate</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">Show Networks Ontdekt Sûnt</string>
     <string name="show_discovered">Show Ontdekt Netwurken op Map</string>
     <string name="map_none">Gjin</string>
@@ -315,4 +328,23 @@
     <string name="send_to">Share using</string>
     <string name="settings_gps_timeout">GPS Timeout</string>
     <string name="settings_net_loc_timeout">Network Location Timeout</string>
+    <string name="start_at_boot">Launch Wigle at boot</string>
+    <string name="cell_network_bands">Frequencies:</string>
+    <string name="cell_network_status">Status:</string>
+    <string name="cell_network_brand">Brand:</string>
+    <string name="cell_network_notes">Notes:</string>
+    <string name="bluetooth_pref_text">Enable Bluetooth Scanning</string>
+    <string name="turning_bt_off">Turning Bluetooth back off</string>
+    <string name="turn_on_bt">Turning on Bluetooth</string>
+    <string name="filter_show_bt">Show Bluetooth</string>
+    <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
+    <string name="error_less_than_oui">BSSID must contain at least an OUI for online search</string>
+    <string name="error_incomplete_octet">BSSID octets must be complete (or %) for online search</string>
+    <string name="search_wigle">Search WiGLE</string>
+    <string name="must_login">(must be logged in)</string>
+    <string name="search_local">Search Your Local Database</string>
+    <string name="search_failed">Search Failed</string>
+    <string name="search_empty">Results Empty</string>
+    <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
+
 </resources>

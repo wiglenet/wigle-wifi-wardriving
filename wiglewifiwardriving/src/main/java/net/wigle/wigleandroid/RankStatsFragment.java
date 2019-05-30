@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.core.view.MenuItemCompat;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,10 +22,13 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -74,6 +77,7 @@ public class RankStatsFragment extends Fragment {
      */
     private static final String KEY_MONTH_WIFI_GPS = "eventMonthCount";
     private static final String KEY_TOTAL_WIFI_GPS = "discoveredWiFiGPS";
+    private static final String KEY_TOTAL_BT_GPS = "discoveredBtGPS";
     private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";
     private static final String KEY_RANK = "rank";
     private static final String KEY_USERNAME = "userName";
@@ -84,7 +88,8 @@ public class RankStatsFragment extends Fragment {
     private static final int ROW_COUNT = 100;
 
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK, KEY_PREV_MONTH_RANK,
+            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK,
+            KEY_PREV_MONTH_RANK,
         };
 
     private AtomicBoolean finishing;
@@ -263,7 +268,8 @@ public class RankStatsFragment extends Fragment {
                         final long rankDiff = row.getLong(rankDiffKey) - row.getLong(KEY_RANK);
                         final RankUser rankUser = new RankUser(row.getLong(KEY_RANK), rankDiff,
                                 row.getString(KEY_USERNAME), row.getLong(KEY_MONTH_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_CELL_GPS));
+                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_BT_GPS),
+                                row.getLong(KEY_TOTAL_CELL_GPS));
                         rankListAdapter.add(rankUser);
                     }
                 }
@@ -393,12 +399,14 @@ public class RankStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
+
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
                 return true;
             case MENU_SITE_STATS:
-                main.selectFragment(MainActivity.SITE_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                 return true;
             case MENU_RANK_SWAP:
                 monthRanking.set(!monthRanking.get());

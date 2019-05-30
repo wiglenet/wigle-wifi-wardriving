@@ -1,12 +1,15 @@
 package net.wigle.wigleandroid.db;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 
+import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.MccMncRecord;
 
@@ -20,9 +23,11 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private static final String MXC_DB_NAME = "mmcmnc.sqlite";
     private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
     private static final int MXC_DATABASE_VERSION = 1;
+    private static final int MAX_INSTALL_TRIES = 5;
 
     private final Context context;
     private SQLiteDatabase db;
+    private SharedPreferences prefs;
 
     // query when you just need opname
     private static final String OPERATOR_FOR_MCC_MNC = "SELECT operator FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
@@ -33,6 +38,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     public MxcDatabaseHelper(Context context) {
         super(context, MXC_DB_NAME, null, MXC_DATABASE_VERSION);
         this.context = context;
+        prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
     }
 
     public boolean isPresent() {
@@ -48,29 +54,43 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         MainActivity.info("installing mmc/mnc database...");
         InputStream assetInputData = null;
 
+        final SharedPreferences.Editor edit = prefs.edit();
+        edit.putBoolean(ListFragment.PREF_MXC_INSTALL_PENDING, true);
+        edit.apply();
+
+        Integer installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
+
         try {
-            assetInputData = context.getAssets().open(MXC_DB_NAME);
-            final String outputFilePath = DATABASE_PATH + MXC_DB_NAME;
-                    //context.getDatabasePath(MXC_DB_NAME).getAbsolutePath();
-            MainActivity.info("/data/data/" + context.getPackageName() + "/databases/" + MXC_DB_NAME +" vs "+outputFilePath);
-            final File outputFile = new File(outputFilePath);
+            if (installCount < MAX_INSTALL_TRIES) {
+                assetInputData = context.getAssets().open(MXC_DB_NAME);
+                final String outputFilePath = DATABASE_PATH + MXC_DB_NAME;
+                //context.getDatabasePath(MXC_DB_NAME).getAbsolutePath();
+                MainActivity.info("/data/data/" + context.getPackageName() + "/databases/" + MXC_DB_NAME + " vs " + outputFilePath);
+                final File outputFile = new File(outputFilePath);
 
-            OutputStream mxcOutput = new FileOutputStream(outputFile);
+                OutputStream mxcOutput = new FileOutputStream(outputFile);
 
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = assetInputData.read(buffer))>0){
-                mxcOutput.write(buffer, 0, length);
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = assetInputData.read(buffer)) > 0) {
+                    mxcOutput.write(buffer, 0, length);
+                }
+
+                mxcOutput.flush();
+                mxcOutput.close();
+            } else {
+                MainActivity.error("stopped trying to implant Mxc DB: reached max tries.");
             }
-
-            mxcOutput.flush();
-            mxcOutput.close();
         } catch (IOException ioe) {
             throw ioe;
         } finally {
             if (null != assetInputData) {
                 assetInputData.close();
             }
+            final SharedPreferences.Editor editDone = prefs.edit();
+            editDone.putInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, installCount+1);
+            editDone.putBoolean(ListFragment.PREF_MXC_INSTALL_PENDING, false);
+            editDone.apply();
         }
     }
 
@@ -84,8 +104,13 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         //ALIBI: pre-created during build
     }
 
-    public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) {
+    public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
+
+        // ALIBI: old, incompatible DB implementation
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
+            return null;
+        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
@@ -112,22 +137,30 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                     return operator;
                 }
             } else {
-                MainActivity.error("unable to open mcc/mnc database.");
+                MainActivity.error("unable to open mcc/mnc database for record.");
             }
-        } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB: ",sqlex);
-
+        } catch (StackOverflowError soe) {
+            MainActivity.error("Database corruption stack overflow: ", soe);
+            throw new SQLiteDatabaseCorruptException("Samsung-specific stack overflow on integrity check.");
         }finally {
             if (null != cursor) {
                 cursor.close();
+            }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
             }
         }
         return null;
     }
 
-    public String networkNameForMccMnc(final String mcc, final String mnc) {
+    public String networkNameForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
         String operator = null;
+
+        // ALIBI: old, incompatible DB implementation
+        if (android.os.Build.VERSION.SDK_INT <= 19) {
+            return null;
+        }
 
         if (!isPresent()) {
             //DEBUG: MainActivity.error("No Mxc DB");
@@ -143,14 +176,17 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 }
                 return operator;
             } else {
-                MainActivity.error("unable to open mcc/mnc database.");
+                MainActivity.error("unable to open mcc/mnc database for name.");
             }
-        } catch (SQLException sqlex) {
-            MainActivity.error("Unable to open DB: ",sqlex);
-
+        } catch (StackOverflowError soe) {
+            MainActivity.error("Database corruption stack overflow: ", soe);
+            throw new SQLiteDatabaseCorruptException("Samsung-specific stack overflow on integrity check.");
         }finally {
             if (null != cursor) {
                 cursor.close();
+            }
+            if ((null != db) && (db.isOpen())) {
+                db.close();
             }
         }
         return operator;
@@ -163,11 +199,15 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
         final String mxcPath = DATABASE_PATH + MXC_DB_NAME;
 
-        if (null == db || !db.isOpen()) {
-            db = SQLiteDatabase.openDatabase(mxcPath, null,
-                    SQLiteDatabase.OPEN_READONLY);
+        try {
+            if (null == db || !db.isOpen()) {
+                db = SQLiteDatabase.openDatabase(mxcPath, null,
+                        SQLiteDatabase.OPEN_READONLY);
+            }
+            return db.isOpen();
+        } catch (Exception ex) { // SAMSUNG devices RTE here
+            return false;
         }
-        return db.isOpen();
     }
 
     /** This method close database connection and released occupied memory **/

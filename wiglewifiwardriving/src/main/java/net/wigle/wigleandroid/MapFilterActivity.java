@@ -1,15 +1,13 @@
 package net.wigle.wigleandroid;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+import androidx.core.app.NavUtils;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import net.wigle.wigleandroid.util.SettingsUtil;
 
@@ -32,7 +30,7 @@ public class MapFilterActivity extends AppCompatActivity {
         setContentView(R.layout.mapfilter);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+            final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
             if (actionBar != null) {
                 actionBar.setDisplayHomeAsUpEnabled(true);
             }
@@ -101,6 +99,8 @@ public class MapFilterActivity extends AppCompatActivity {
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_WPA, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_CELL, true );
+        MainActivity.prefBackedCheckBox( this, view, R.id.showbt,
+                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BT, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
     }

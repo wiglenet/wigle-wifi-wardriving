@@ -3,17 +3,20 @@ package net.wigle.wigleandroid;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -104,45 +107,107 @@ public class DashboardFragment extends Fragment {
   }
 
   private void updateUI( final View view ) {
-    TextView tv = (TextView) view.findViewById( R.id.runnets );
-    tv.setText( ListFragment.lameStatic.runNets + " " + getString(R.string.run));
 
-    tv = (TextView) view.findViewById( R.id.newwifi );
-    final String scanning = MainActivity.isScanning(getActivity()) ? "" : getString(R.string.dash_scan_off) + "\n";
-    final String newTitle = ListFragment.lameStatic.newWifi >= 10 ? getString(R.string.new_word)
-        : getString(R.string.dash_new_wifi);
-    tv.setText( scanning + ListFragment.lameStatic.newWifi + " " + newTitle );
+        View topBar =  view.findViewById( R.id.dash_status_bar );
+        if (MainActivity.isScanning(getActivity())) {
+            topBar.setVisibility(View.GONE);
+        } else {
+            topBar.setVisibility(View.VISIBLE);
+            TextView dashScanstatus = view.findViewById(R.id.dash_scanstatus);
+            dashScanstatus.setText(getString(R.string.dash_scan_off));
+        }
 
-    tv = (TextView) view.findViewById( R.id.currnets );
-    tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
+        TextView tv = (TextView) view.findViewById( R.id.runnets );
+        tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " ");
 
-    tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
-    tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
+        tv = (TextView) view.findViewById( R.id.runcaption );
+        tv.setText( (getString(R.string.run)));
 
-    tv = (TextView) view.findViewById( R.id.newcells );
-    tv.setText( getString(R.string.dash_new_cells) + " " + ListFragment.lameStatic.newCells );
+        tv = (TextView) view.findViewById( R.id.newwifi );
+        tv.setText( ListFragment.lameStatic.newWifi + " " );
 
-    updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
-    updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN, getString(R.string.dash_time_run) );
-    updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
-    updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
+        tv = (TextView) view.findViewById( R.id.newbt );
+        tv.setText( ListFragment.lameStatic.newBt + " " );
 
-    tv = (TextView) view.findViewById( R.id.queuesize );
-    tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
+        tv = (TextView) view.findViewById( R.id.currnets );
+        tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
 
-    tv = (TextView) view.findViewById( R.id.dbNets );
-    tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
+        tv = (TextView) view.findViewById( R.id.newNetsSinceUpload );
+        tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload() );
 
-    tv = (TextView) view.findViewById( R.id.dbLocs );
-    tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
+        tv = (TextView) view.findViewById( R.id.newcells );
+        tv.setText( ListFragment.lameStatic.newCells + " ");
 
-    tv = (TextView) view.findViewById( R.id.gpsstatus );
-    Location location = ListFragment.lameStatic.location;
-    String gpsStatus = getString(R.string.dash_no_loc);
-    if ( location != null ) {
-      gpsStatus = location.getProvider();
-    }
-    tv.setText( getString(R.string.dash_short_loc) + " " + gpsStatus );
+        updateDist( view, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run) );
+        updateTime(view, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN );
+        updateTimeTare(view, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
+                ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
+        updateDist( view, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total) );
+        updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
+
+        tv = (TextView) view.findViewById( R.id.queuesize );
+        tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
+
+        tv = (TextView) view.findViewById( R.id.dbNets );
+        tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
+
+        tv = (TextView) view.findViewById( R.id.dbLocs );
+        tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
+
+        tv = (TextView) view.findViewById( R.id.gpsstatus );
+        Location location = ListFragment.lameStatic.location;
+
+        tv.setText( getString(R.string.dash_short_loc) + " ");
+
+        TextView fixMeta = view.findViewById(R.id.fixmeta);
+
+        ImageView iv = (ImageView) view.findViewById(R.id.fixtype);
+        if (location == null) {
+            tv.setTextColor(Color.RED);
+            iv.setImageResource(R.drawable.gpsnone);
+            iv.setVisibility(View.VISIBLE);
+            iv.setColorFilter(Color.argb(255, 255, 0, 0));
+            fixMeta.setVisibility(View.INVISIBLE);
+        } else {
+            if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+
+                String satString = null;
+                if (MainActivity.getMainActivity() != null && MainActivity.getMainActivity().getGPSListener() != null) {
+                    satString = "("+MainActivity.getMainActivity().getGPSListener().getSatCount()+")";
+                }
+                if (satString == null) {
+                    fixMeta.setVisibility(View.INVISIBLE);
+                } else {
+                    fixMeta.setTextColor(Color.GREEN);
+                    fixMeta.setVisibility(View.VISIBLE);
+                    fixMeta.setText(satString);
+                }
+                tv.setTextColor(Color.GREEN);
+                iv.setImageResource(R.drawable.gps);
+                iv.setColorFilter(Color.GREEN);
+                iv.setVisibility(View.VISIBLE);
+            } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
+                fixMeta.setVisibility(View.INVISIBLE);
+                tv.setTextColor(Color.YELLOW);
+                iv.setImageResource(R.drawable.wifi);
+                iv.setVisibility(View.VISIBLE);
+                iv.setColorFilter(Color.YELLOW);
+            } else if (location.getProvider().equals(LocationManager.PASSIVE_PROVIDER)) {
+                fixMeta.setVisibility(View.INVISIBLE);
+                tv.setTextColor(Color.parseColor("#FFA500"));
+                iv.setImageResource(R.drawable.cell);
+                iv.setVisibility(View.VISIBLE);
+                iv.setColorFilter(Color.parseColor("#FFA500"));
+            } else {
+                //ALIBI: fall back on string version
+                fixMeta.setVisibility(View.INVISIBLE);
+                tv.setTextColor(Color.parseColor("#AAA"));
+                iv.setVisibility(View.GONE);
+                tv.setText( getString(R.string.dash_short_loc) + " "+location.getProvider());
+                iv.setColorFilter(Color.parseColor("#AAA"));
+            }
+        }
+
   }
 
   private long newNetsSinceUpload() {
@@ -169,24 +234,32 @@ public class DashboardFragment extends Fragment {
     tv.setText( title + " " + distString );
   }
 
-  private void updateTime( final View view, final int id, final String pref, final String title ) {
+  private void updateTime( final View view, final int id, final String pref) {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
     long millis = System.currentTimeMillis();
     long duration =  millis - prefs.getLong( pref,  millis);
 
-    //TODO: better to just use TimeUnit?
-    int seconds = (int) (duration / 1000) % 60 ;
-    int minutes = (int) ((duration / (1000*60)) % 60);
-    int hours   = (int) ((duration / (1000*60*60)) % 24);
-
-    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
-    if (hours > 0) {
-      durString = String.format("%d", hours) + ":" + durString;
-    }
+    final String durString = timeString(duration);
 
     final TextView tv = (TextView) view.findViewById( id );
-    tv.setText( title + " " + durString );
+    tv.setText( durString );
+  }
+
+  private void updateTimeTare(final View view, final int id, final String prefCumulative,
+                              final String prefCurrent, final boolean isScanning) {
+    final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+    long cumulative = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+
+    if (isScanning) {
+      cumulative += System.currentTimeMillis() - prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+    }
+
+    final String durString = timeString(cumulative);
+    final TextView tv = (TextView) view.findViewById( id );
+    tv.setText(durString );
+
   }
 
   public static String metersToString(final NumberFormat numberFormat, final Context context, final float meters,
@@ -266,6 +339,18 @@ public class DashboardFragment extends Fragment {
   @Override
   public boolean onOptionsItemSelected( final MenuItem item ) {
       return false;
+  }
+
+  private String timeString(final long duration) {
+    //TODO: better to just use TimeUnit?
+    int seconds = (int) (duration / 1000) % 60 ;
+    int minutes = (int) ((duration / (1000*60)) % 60);
+    int hours   = (int) ((duration / (1000*60*60)) % 24);
+    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
+    if (hours > 0) {
+      durString = String.format("%d", hours) + ":" + durString;
+    }
+    return " " +durString;
   }
 
 }

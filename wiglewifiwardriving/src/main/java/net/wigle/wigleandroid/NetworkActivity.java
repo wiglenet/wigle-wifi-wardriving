@@ -7,20 +7,20 @@ import java.util.Map;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Color;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -56,6 +56,7 @@ import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
+import net.wigle.wigleandroid.ui.NetworkListUtil;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -72,7 +73,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 //    private MapView mapView;
     private int observations = 0;
     private boolean isDbResult = false;
-//    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
+    private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
 
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
@@ -102,7 +103,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
         MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
-        final SimpleDateFormat format = NetworkListAdapter.getConstructionTimeFormater(this);
+        final SimpleDateFormat format = NetworkListUtil.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
             network = MainActivity.getNetworkCache().get(bssid);
         }
@@ -122,20 +123,33 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             tv = (TextView) findViewById( R.id.oui );
             tv.setText( ouiString );
 
-            final int image = NetworkListAdapter.getImage( network );
+            final int image = NetworkListUtil.getImage( network );
             final ImageView ico = (ImageView) findViewById( R.id.wepicon );
             ico.setImageResource( image );
 
+            final ImageView btico = (ImageView) findViewById(R.id.bticon);
+            if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
+                btico.setVisibility(View.VISIBLE);
+                Integer btImageId = NetworkListUtil.getBtImage(network);
+                if (null == btImageId) {
+                    btico.setVisibility(View.GONE);
+                } else {
+                    btico.setImageResource(btImageId);
+                }
+            } else {
+                btico.setVisibility(View.GONE);
+            }
+
             tv = (TextView) findViewById( R.id.na_signal );
             final int level = network.getLevel();
-            tv.setTextColor( NetworkListAdapter.getSignalColor( level ) );
+            tv.setTextColor( NetworkListUtil.getSignalColor( level ) );
             tv.setText( Integer.toString( level ) );
 
             tv = (TextView) findViewById( R.id.na_type );
             tv.setText( network.getType().name() );
 
             tv = (TextView) findViewById( R.id.na_firsttime );
-            tv.setText( NetworkListAdapter.getConstructionTime(format, network ) );
+            tv.setText( NetworkListUtil.getConstructionTime(format, network ) );
 
             tv = (TextView) findViewById( R.id.na_chan );
             Integer chan = network.getChannel();
@@ -166,7 +180,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
 
-                        rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                        try {
+                            rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                        } catch (SQLException sqex) {
+                            MainActivity.error("Unable to access Mxc Database: ",sqex);
+                        }
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
                             v.setVisibility(View.VISIBLE);
@@ -279,7 +297,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 //                                googleMap.addCircle(new CircleOptions()
 //                                        .center(latLon)
 //                                        .radius(4)
-//                                        .fillColor(NetworkListAdapter.getSignalColor(level, true))
+//                                        .fillColor(NetworkListUtil.getSignalColor(level, true))
 //                                        .strokeWidth(0)
 //                                        .zIndex(level));
 //                                count++;
@@ -292,13 +310,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         };
 
         final String sql = "SELECT level,lat,lon FROM "
-                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() + "' limit " + 512;
+                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() +
+                "' ORDER BY _id DESC limit " + obsMap.maxSize();
 
         final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 observations++;
-//                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
+                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
                 if ( ( observations % 10 ) == 0 ) {
                     // change things on the gui thread
                     handler.sendEmptyMessage( MSG_OBS_UPDATE );
@@ -324,7 +343,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 //        }
 //        MapsInitializer.initialize( this );
 //
-//        if (network.getLatLng() != null) {
+//        if ((network != null) && (network.getLatLng() != null)) {
 //            mapView.getMapAsync(new OnMapReadyCallback() {
 //                @Override
 //                public void onMapReady(final GoogleMap googleMap) {

@@ -16,8 +16,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -42,6 +42,7 @@ import android.widget.TextView;
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -217,7 +218,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     MainActivity.createConfirmation( getActivity(),
                             getString(R.string.donate_question) + "\n\n"
                                     + getString(R.string.donate_explain),
-                            MainActivity.SETTINGS_TAB_POS, DONATE_DIALOG);
+                            R.id.nav_settings, DONATE_DIALOG);
                 }
                 else {
                     editor.putBoolean( ListFragment.PREF_DONATE, false);
@@ -248,7 +249,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     public void onClick(View view) {
                         MainActivity.createConfirmation( getActivity(),
                                 getString(R.string.deauthorize_confirm),
-                                MainActivity.SETTINGS_TAB_POS, DEAUTHORIZE_DIALOG );
+                                R.id.nav_settings, DEAUTHORIZE_DIALOG );
                     }
                 });
                 authButton.setVisibility(View.GONE);
@@ -310,7 +311,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     buttonView.setChecked( false );
                     // confirm
                     MainActivity.createConfirmation( getActivity(),
-                            getString(R.string.anonymous_confirm), MainActivity.SETTINGS_TAB_POS,
+                            getString(R.string.anonymous_confirm), R.id.nav_settings,
                             ANONYMOUS_DIALOG );
                 } else {
                     // unset anonymous
@@ -435,6 +436,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling bluetooth change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().setupBluetooth();
+                } else {
+                    MainActivity.getMainActivity().endBluetooth(prefs);
+                }
+            }
+        });
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
@@ -582,7 +594,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         switch ( item.getItemId() ) {
             case MENU_RETURN:
                 final MainActivity mainActivity = MainActivity.getMainActivity(this);
-                if (mainActivity != null) mainActivity.selectFragment(MainActivity.LIST_TAB_POS);
+                if (mainActivity != null) mainActivity.selectFragment(R.id.nav_list);
                 return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );

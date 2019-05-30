@@ -6,8 +6,8 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,9 +17,12 @@ import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,9 +39,11 @@ public class SiteStatsFragment extends Fragment {
 
     private static final String KEY_NETLOC = "netloc";
     private static final String KEY_LOCTOTAL = "loctotal";
+    private static final String KEY_BTLOC = "btloc";
     private static final String KEY_GENLOC = "genloc";
     private static final String KEY_USERSTOT = "userstot";
     private static final String KEY_TRANSTOT = "transtot";
+    private static final String KEY_NETWPA3 = "netwpa3";
     private static final String KEY_NETWPA2 = "netwpa2";
     private static final String KEY_NETWPA = "netwpa";
     private static final String KEY_NETWEP = "netwep";
@@ -47,9 +52,13 @@ public class SiteStatsFragment extends Fragment {
 
 
     private static final String[] ALL_SITE_KEYS = new String[] {
-        KEY_NETLOC, KEY_LOCTOTAL, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
-        KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
+        KEY_NETLOC, KEY_LOCTOTAL, KEY_BTLOC, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
+        KEY_NETWPA3, KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
         };
+
+    private ScrollView scrollView;
+    private View landscape;
+    private View portrait;
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
@@ -78,11 +87,26 @@ public class SiteStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
         MainActivity.info("SITESTATS: onCreateView. orientation: " + orientation);
-        final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
+        scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
+        landscape = inflater.inflate(R.layout.sitestatslandscape, container, false);
+        portrait = inflater.inflate(R.layout.sitestatsportrait, container, false);
+        switchView();
 
-        downloadLatestSiteStats(scrollView);
         return scrollView;
+    }
 
+    private void switchView() {
+        if (scrollView != null) {
+            final int orientation = getResources().getConfiguration().orientation;
+            View component = portrait;
+            if (orientation == 2) {
+                component = landscape;
+            }
+            scrollView.removeAllViews();
+            scrollView.addView(component);
+            downloadLatestSiteStats(scrollView);
+
+        }
     }
 
     private final static class SiteDownloadHandler extends DownloadHandler {
@@ -190,8 +214,10 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
         MainActivity.info("SITESTATS: config changed");
+        switchView();
         super.onConfigurationChanged( newConfig );
     }
+
 
     /* Creates the menu items */
     @Override
@@ -217,12 +243,13 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
-                main.selectFragment(MainActivity.USER_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
                 return true;
             case MENU_RANK_STATS:
-                main.selectFragment(MainActivity.RANK_STATS_TAB_POS);
+                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_rank);
                 return true;
         }
         return false;

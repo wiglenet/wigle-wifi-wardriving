@@ -1,9 +1,5 @@
 package net.wigle.wigleandroid.model;
 
-import android.annotation.SuppressLint;
-import android.net.wifi.ScanResult;
-
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -17,11 +13,11 @@ import android.net.wifi.ScanResult;
 @SuppressLint("UseSparseArrays")
 public final class Network {
     private final String bssid;
-    private final String ssid;
+    private String ssid;
     private final String capabilities;
     private final String showCapabilities;
     private final int crypto;
-    private final NetworkType type;
+    private NetworkType type;
 
     private int frequency;
     private int level;
@@ -34,6 +30,7 @@ public final class Network {
 
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
+    private static final String WPA3_CAP = "[WPA3";
     private static final String WPA2_CAP = "[WPA2";
     private static final String WPA_CAP = "[WPA";
     private static final String WEP_CAP = "[WEP";
@@ -43,6 +40,7 @@ public final class Network {
     public static final int CRYPTO_WEP = 1;
     public static final int CRYPTO_WPA = 2;
     public static final int CRYPTO_WPA2 = 3;
+    public static final int CRYPTO_WPA3 = 4;
 
     private static final Map<Integer,Integer> freqToChan;
     static {
@@ -112,6 +110,15 @@ public final class Network {
             this.channel = freqToChan.get(frequency);
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
+            /*if (NetworkType.GSM.equals(type)) {
+
+            } else if (NetworkType.LTE.equals(type)) {
+
+            } else if (NetworkType.WCDMA.equals(type)) {
+
+            } else {
+                channel = 0;
+            }*/
             this.channel = frequency;
         } else {
             channel = null;
@@ -133,7 +140,9 @@ public final class Network {
             this.showCapabilities = null;
         }
 
-        if (this.capabilities.contains(WPA2_CAP)) {
+        if (this.capabilities.contains(WPA3_CAP)) {
+            crypto = CRYPTO_WPA3;
+        } else if (this.capabilities.contains(WPA2_CAP)) {
             crypto = CRYPTO_WPA2;
         } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
@@ -194,6 +203,12 @@ public final class Network {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
+    }
+
+    public void setType(final NetworkType type) { this.type = type; }
+
+    public void setSsid(final String ssid) {
+        this.ssid = ssid;
     }
 
     public void setIsNew() {
@@ -266,7 +281,7 @@ public final class Network {
 
     @Override
     public boolean equals(final Object other) {
-        if (other instanceof Network) {
+        if (other != null && other instanceof Network) {
             final Network o = (Network) other;
             return bssid.equals(o.bssid);
         }

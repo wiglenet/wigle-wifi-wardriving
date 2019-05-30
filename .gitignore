@@ -15,6 +15,7 @@ dist/release/
 android-maps-utils/build
 wiglewifiwardriving/build
 .idea
+*.iml
 .gradle
 etc/mccmncsqlite/mcc-mnc-dict.json
 wiglewifiwardriving/src/main/assets/mmcmnc.sqlite

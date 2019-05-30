@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.FileProvider;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -62,6 +62,10 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         tv = (TextView) row.findViewById(R.id.total_wifi_gps);
         tv.setText(getContext().getString(R.string.wifi_gps) + ": "
                 + numberFormat.format(upload.getTotalWifiGps()));
+
+        tv = (TextView) row.findViewById(R.id.total_bt_gps);
+        tv.setText(getContext().getString(R.string.bt_gps) + ": "
+                + numberFormat.format(upload.getTotalBtGps()));
 
         tv = (TextView) row.findViewById(R.id.total_cell_gps);
         tv.setText(getContext().getString(R.string.cell_gps) + ": "

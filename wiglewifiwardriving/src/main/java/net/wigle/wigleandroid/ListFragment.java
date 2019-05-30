@@ -11,11 +11,11 @@ import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.core.view.MenuItemCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,15 +32,20 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.internal.NavigationMenuItemView;
+import com.google.android.material.navigation.NavigationView;
+
 import net.wigle.wigleandroid.MainActivity.State;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.NetworkListSorter;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 
 import org.json.JSONObject;
 
@@ -52,6 +57,11 @@ import pl.droidsonroids.gif.GifImageButton;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+/**
+ * Main Network List View Fragment Adapter. Manages dynamic update of view apart from list when showing.
+ * TODO: confirm that lameStatic values are being updated correctly, always.
+ * @author: bobzilla, arkasha
+ */
 public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
     private static final int MENU_SORT = 13;
@@ -92,8 +102,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
     public static final String PREF_MUTED = "muted";
     public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
+    public static final String PREF_BT_WAS_OFF = "btWasOff";
+    public static final String PREF_SCAN_BT = "scanBluetooth";
     public static final String PREF_DISTANCE_RUN = "distRun";
     public static final String PREF_STARTTIME_RUN = "timestampRunStart";
+    public static final String PREF_CUMULATIVE_SCANTIME_RUN = "millisScannedDuringRun";
+    public static final String PREF_STARTTIME_CURRENT_SCAN = "timestampScanStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
     public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
     public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
@@ -144,6 +158,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAPF_WEP = "mapfWep";
     public static final String PREF_MAPF_WPA = "mapfWpa";
     public static final String PREF_MAPF_CELL = "mapfCell";
+    public static final String PREF_MAPF_BT = "mapfBt";
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 
@@ -161,19 +176,25 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String QUICK_SCAN_DO_NOTHING = "DO_NOTHING";
     public static final String QUICK_SCAN_PAUSE = "PAUSE";
 
+    public static final String PREF_MXC_INSTALL_PENDING = "INSTALLING_MXC";
+    public static final String PREF_MXC_REINSTALL_ATTEMPTED = "TRIED_INSTALLING_MXC";
+
     /** cross-activity communication */
     public static class LameStatic {
         public Location location;
         public int runNets;
+        public int runBt;
         public long newNets;
         public long newWifi;
         public long newCells;
+        public long newBt;
         public int currNets;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
         public DatabaseHelper dbHelper;
         public Set<String> runNetworks;
+        public Set<String> runBtNetworks;
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
@@ -212,6 +233,25 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         return view;
     }
 
+    /**
+     * hide/show bluetooth new total
+     * @param on
+     */
+    public void toggleBluetoothStats(final boolean on) {
+        try {
+            View fragRoot = this.getActivity().findViewById(android.R.id.content);
+            View btView = fragRoot.findViewById(R.id.bt_list_total);
+            if (on) {
+                btView.setVisibility(VISIBLE);
+            } else {
+                btView.setVisibility(GONE);
+            }
+        } catch (Exception ex) {
+            //this shouldn't be a critical failure if the view's not present.
+            MainActivity.warn("Failed to toggle bluetooth new total to "+on);
+        }
+    }
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
@@ -228,11 +268,19 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             return;
         }
         TextView tv = (TextView) view.findViewById( R.id.stats_run );
-        tv.setText( getString(R.string.run) + ": " + state.wifiReceiver.getRunNetworkCount() );
-        tv = (TextView) view.findViewById( R.id.stats_new );
-        tv.setText( getString(R.string.new_word) + ": " + state.dbHelper.getNewNetworkCount() );
+        long netCount = state.wifiReceiver.getRunNetworkCount();
+        if (null != state.bluetoothReceiver){
+            netCount += state.bluetoothReceiver.getRunNetworkCount();
+        }
+        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount) );
+        tv = (TextView) view.findViewById( R.id.stats_wifi );
+        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewWifiCount()) );
+        tv = (TextView) view.findViewById( R.id.stats_cell );
+        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells)  );
+        tv = (TextView) view.findViewById( R.id.stats_bt );
+        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewBtCount())  );
         tv = (TextView) view.findViewById( R.id.stats_dbnets );
-        tv.setText(getString(R.string.db) + ": " + state.dbHelper.getNetworkCount());
+        tv.setText(""+state.dbHelper.getNetworkCount());
     }
 
     public void setStatusUI( String status ) {
@@ -352,16 +400,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
         item.setIcon( android.R.drawable.ic_menu_mapmode );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_FILTER, 0, getString(R.string.menu_ssid_filter));
-        item.setIcon(android.R.drawable.ic_menu_search);
         item.setIcon(android.R.drawable.ic_menu_manage);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SORT, 0, getString(R.string.menu_sort));
         item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         MainActivity main = MainActivity.getMainActivity(this);
         final String scan = (main == null || main.isScanning()) ? getString(R.string.off) : getString(R.string.on);
@@ -423,8 +470,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 getActivity().startActivity(intent);
                 return true;
             case MENU_MAP:
-                // call over to finish
-                if (main != null) main.selectFragment(MainActivity.MAP_TAB_POS);
+                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
+                MenuItem mapMenuItem = navigationView.getMenu().findItem(R.id.nav_map);
+                mapMenuItem.setCheckable(true);
+                navigationView.setCheckedItem(R.id.nav_map);
+                if (main != null) main.selectFragment(R.id.nav_map);
                 return true;
             case MENU_MUTE:
                 final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
@@ -486,11 +536,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
                     getActivity(), android.R.layout.simple_spinner_item);
-            final int[] listSorts = new int[]{ WifiReceiver.CHANNEL_COMPARE, WifiReceiver.CRYPTO_COMPARE,
-                    WifiReceiver.FIND_TIME_COMPARE, WifiReceiver.SIGNAL_COMPARE, WifiReceiver.SSID_COMPARE };
+            final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
+                    NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
             final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
                     getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-            int listSort = prefs.getInt( PREF_LIST_SORT, WifiReceiver.SIGNAL_COMPARE );
+            int listSort = prefs.getInt( PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
             int periodIndex = 0;
             for ( int i = 0; i < listSorts.length; i++ ) {
                 adapter.add( listSortName[i] );
@@ -554,16 +604,19 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupList( final View view ) {
         State state = MainActivity.getStaticState();
         if (state.listAdapter == null) {
-            state.listAdapter = new NetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
         }
         // always set our current list adapter
         state.wifiReceiver.setListAdapter(state.listAdapter);
+        if (null != state.bluetoothReceiver) {
+            state.bluetoothReceiver.setListAdapter(state.listAdapter);
+        }
         final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
         setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }
 
     public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
-                                         final NetworkListAdapter listAdapter, final boolean isDbResult) {
+                                         final SetNetworkListAdapter listAdapter, final boolean isDbResult) {
 
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -696,7 +749,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
 
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, MainActivity.LIST_TAB_POS, UPLOAD_DIALOG);
+        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, R.id.nav_list, UPLOAD_DIALOG);
     }
 
     public void makeQuickPausePrefDialog(final MainActivity main) {
@@ -704,7 +757,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final String checkboxText = getString(R.string.quick_pause_decision);
         MainActivity.createCheckboxConfirmation(ListFragment.this.getActivity(), dialogText, checkboxText,
                 ListFragment.PREF_QUICK_PAUSE, ListFragment.QUICK_SCAN_PAUSE,
-                ListFragment.QUICK_SCAN_DO_NOTHING, MainActivity.LIST_TAB_POS, QUICK_PAUSE_DIALOG);
+                ListFragment.QUICK_SCAN_DO_NOTHING, R.id.nav_list, QUICK_PAUSE_DIALOG);
     }
 
     @Override
@@ -763,6 +816,4 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             main.transferComplete();
         }
     }
-
-
 }

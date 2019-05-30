@@ -3,7 +3,7 @@ package net.wigle.wigleandroid;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
 
@@ -60,7 +60,7 @@ public class MacFilterActivity extends AppCompatActivity {
     }
 
     public void addOui(View v) {
-        final MaskedEditText ouiInput = findViewById(R.id.oui_input);
+        final MaskedEditText ouiInput = (MaskedEditText) findViewById(R.id.oui_input);
         final String input = ouiInput.getRawText().toString();
         if (null != input &&  (input.length() == 6)) {
             final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -72,7 +72,7 @@ public class MacFilterActivity extends AppCompatActivity {
     }
 
     public void addMac(View v) {
-        final MaskedEditText macInput = findViewById(R.id.mac_address_input);
+        final MaskedEditText macInput = (MaskedEditText) findViewById(R.id.mac_address_input);
         final String input = macInput.getRawText();
         if (null != input &&  (input.length() == 12)) {
             final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);

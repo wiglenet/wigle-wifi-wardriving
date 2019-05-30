@@ -3,7 +3,7 @@ package net.wigle.wigleandroid.background;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,16 +12,10 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
@@ -213,7 +207,7 @@ public class BackgroundGuiHandler extends Handler {
                             || status == Status.BAD_LOGIN.ordinal()) {
                         MainActivity.info("dialog: start settings fragment");
                         try {
-                            MainActivity.getMainActivity().selectFragment(MainActivity.SETTINGS_TAB_POS);
+                            MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
                         } catch (Exception ex) {
                             MainActivity.info("failed to start settings fragment: " + ex, ex);
                         }

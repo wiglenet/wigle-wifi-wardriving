@@ -115,6 +115,7 @@
     <string name="tab_map">地図</string>
     <string name="tab_dash">ダッシュボード</string>
     <string name="tab_data">データ</string>
+    <string name="tab_stats">統計</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(スキャン停止中)</string>
@@ -122,8 +123,10 @@
     <string name="dash_vis_nets">現在見えている WiFi</string>
     <string name="dash_new_upload">アップロード以降に発見した WiFi</string>
     <string name="dash_new_cells">新しく発見した基地局</string>
+    <string name="dash_new_bt">新しいBluetooth</string>    
     <string name="dash_dist_run">走行距離</string>
     <string name="dash_time_run">実行時間:</string>
+    <string name="dash_time_scanning">スキャン時間:</string>
     <string name="dash_dist_total">トータル走行距離</string>
     <string name="dash_dist_prev">前回の走行距離</string>
     <string name="dash_db_queue">DB queue:</string>
@@ -270,13 +273,13 @@
     <string name="at">〜で</string>
     <string name="drawer_open">引き出しを開く</string>
     <string name="drawer_close">引き出しクローズ</string>
-    <string name="tab_stats">ユーザー統計</string>
     <string name="site_stats_app_name">WiGLE.netの統計</string>
     <string name="netloc_title">ロケーションがあるWiGLE.net WiFiネットワーク</string>
     <string name="loctotal_title">WiGLE.net WiFiネットワークの観測</string>
     <string name="genloc_title">ロケーションのあるWiGLE.netセルタワー</string>
     <string name="userstot_title">合計WiGLE.net登録ユーザ</string>
     <string name="transtot_title">WiGLE.netにアップロードされたファイル</string>
+    <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
@@ -344,6 +347,8 @@
     <string name="map_all">すべて</string>
     <string name="map_not_mine">その他</string>
     <string name="map_mine">鉱山</string>
+    <string name="status_downloading">ダウンロード</string>
+    <string name="status_parsing">解析する</string>
     <string name="filter_app_name">Filter Network List</string>
     <string name="mapfilter_app_name">Filter Map</string>
     <string name="map_data_head">Map Device Data</string>
@@ -378,4 +383,22 @@
     <string name="send_to">を使用して共有</string>
     <string name="settings_gps_timeout">GPSタイムアウト</string>
     <string name="settings_net_loc_timeout">ネットワークロケーションのタイムアウト</string>
+    <string name="start_at_boot">ブート時にウィグルを起動する</string>
+    <string name="cell_network_bands">周波数:</string>
+    <string name="cell_network_status">状態:</string>
+    <string name="cell_network_brand">ブランド:</string>
+    <string name="cell_network_notes">ノート:</string>
+    <string name="bluetooth_pref_text">Bluetoothスキャンを有効にする</string>
+    <string name="turning_bt_off">Bluetoothをオフに戻す</string>
+    <string name="turn_on_bt">Bluetoothをオンにする</string>
+    <string name="filter_show_bt">Bluetoothを表示する</string>
+    <string name="error_invalid_bssid">BSSIDは12文字の長さであるか、またはワイルドカード（％）を含む必要があります</string>
+    <string name="error_less_than_oui">オンライン検索では、BSSIDに少なくともOUIを含める必要があります。</string>
+    <string name="error_incomplete_octet">オンライン検索ではBSSIDオクテットは完全（または％）でなければなりません</string>
+    <string name="search_wigle">WiGLEで検索</string>
+    <string name="must_login">（ログインしている必要があります）</string>
+    <string name="search_local">ローカルデータベースを検索する</string>
+    <string name="search_failed">検索失敗</string>
+    <string name="search_empty">空の結果</string>
+    <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
 </resources>

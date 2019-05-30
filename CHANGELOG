@@ -1,3 +1,41 @@
+* 2.43 (05/26/2019)
+Bluetooth on by default.
+Bluetooth stats everywhere.
+KML export improvements.
+Safe mcc mnc handling.
+Adding number of satellites to dash fix.
+Fixing GPS threading and LERP.
+
+* 2.40 - 2.42 (02/28/2019)
+Server-side network search
+Magic (8) Ball Export: https://github.com/wiglenet/m8b
+Updated Czech translation: Thanks Czechball!
+Menu fragments the "right" way
+Various bug and UI fixes
+
+* 2.39 (12/28/2018)
+List performance and threading fixes
+German fixes (thanks designer2k2!)
+Various bug fixes
+
+* 2.38 (10/29/2018)
+Changing http library
+More edge case bug fixes
+
+* 2.37 (10/16/2018)
+Edge case bug fixes
+
+* 2.32 - 2.36 (10/04/2018)
+Added bluetooth support
+Default Android Pie to 30 sec scans due to its throttling
+Please star feature request to fix Pie's throttling: https://issuetracker.google.com/issues/112688545
+Cell tower refactoring, take advantage of new api's
+
+* 2.30 - 2.31 (07/15/2018)
+More expansive cell logging
+Updated OUI manufacturer data
+Another stab at fixing RemoteServiceException Android race condition
+
 * 2.29 (05/12/2018)
 Better French translation (thanks marmat8951!)
 Another stab at fixing RemoteServiceException

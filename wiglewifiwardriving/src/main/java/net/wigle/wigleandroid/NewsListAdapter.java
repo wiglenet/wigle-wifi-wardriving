@@ -41,13 +41,15 @@ public final class NewsListAdapter extends AbstractListAdapter<NewsItem> {
         }
 
         TextView tv = (TextView) row.findViewById( R.id.subject );
-        tv.setText(newsItem.getSubject());
+        tv.setText(Html.fromHtml("<a href=\""+newsItem.getLink()+"\">"+newsItem.getSubject()+"</a>"));
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         tv = (TextView) row.findViewById( R.id.poster_date );
         tv.setText(newsItem.getPoster() + " - " + newsItem.getDateTime());
 
         tv = (TextView) row.findViewById( R.id.post );
         tv.setText(newsItem.getPost());
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         tv = (TextView) row.findViewById( R.id.link );
         tv.setText(Html.fromHtml("<a href=\""+newsItem.getLink()+"\">"+newsItem.getLink()+"</a>"));

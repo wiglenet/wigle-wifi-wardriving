@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,7 +19,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -33,35 +34,32 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import com.google.android.material.navigation.NavigationView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -70,12 +68,15 @@ import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
+import net.wigle.wigleandroid.listener.BluetoothReceiver;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
+import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.util.WiGLEToast;
+import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -91,8 +92,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -103,7 +106,7 @@ public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
-        DatabaseHelper dbHelper;
+        public DatabaseHelper dbHelper;
         ServiceConnection serviceConnection;
         WigleService wigleService;
         AtomicBoolean finishing;
@@ -113,6 +116,7 @@ public final class MainActivity extends AppCompatActivity {
         WifiLock wifiLock;
         GPSListener gpsListener;
         WifiReceiver wifiReceiver;
+        BluetoothReceiver bluetoothReceiver;
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
@@ -120,10 +124,10 @@ public final class MainActivity extends AppCompatActivity {
         boolean inEmulator;
         PhoneState phoneState;
         ObservationUploader observationUploader;
-        NetworkListAdapter listAdapter;
+        SetNetworkListAdapter listAdapter;
         String previousStatus;
-        int currentTab;
-        private final Fragment[] fragList = new Fragment[11];
+        int currentTab = R.id.nav_list;
+        int previousTab = 0;
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
@@ -148,7 +152,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
-    // registration web view
+    public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
+    public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
+
+        // registration web view
     public static final String REG_URL = "https://wigle.net/register";
 
     private static final String LOG_TAG = "wigle";
@@ -165,6 +172,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_STILL_DEFAULT = 3000L;
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
+    public static final long SCAN_P_DEFAULT = 30000L;
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
@@ -174,31 +182,20 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ACTION_PAUSE = "net.wigle.wigleandroid.PAUSE";
     public static final String ACTION_SCAN = "net.wigle.wigleandroid.SCAN";
 
+    public static final String FRAGMENT_TAG_PREFIX = "VisibleFragment-";
+
     public static final boolean DEBUG_CELL_DATA = false;
+    public static final boolean DEBUG_BLUETOOTH_DATA = false;
 
     private static MainActivity mainActivity;
-    private static ListFragment listActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
     private boolean playServiceShown = false;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
-
-    public static final int LIST_TAB_POS = 0;
-    public static final int MAP_TAB_POS = 1;
-    public static final int DASH_TAB_POS = 2;
-    public static final int DATA_TAB_POS = 3;
-    public static final int NEWS_TAB_POS = 4;
-    public static final int RANK_STATS_TAB_POS = 5;
-    public static final int USER_STATS_TAB_POS = 6;
-    public static final int UPLOADS_TAB_POS = 7;
-    public static final int SETTINGS_TAB_POS = 8;
-    public static final int EXIT_TAB_POS = 9;
-    public static final int SITE_STATS_TAB_POS = 10;
 
 
     @SuppressWarnings("deprecation")
@@ -235,6 +232,8 @@ public final class MainActivity extends AppCompatActivity {
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        pieScanningSettings(prefs);
+
         if (stateFragment != null && stateFragment.getState() != null) {
             info("MAIN: using retained stateFragment state");
             // pry an orientation change, which calls destroy, but we get this from retained fragment
@@ -261,13 +260,15 @@ public final class MainActivity extends AppCompatActivity {
             Editor edit = prefs.edit();
             edit.putFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
             edit.putLong(ListFragment.PREF_STARTTIME_RUN, System.currentTimeMillis());
+            edit.putLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+            edit.putLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
             edit.putFloat(ListFragment.PREF_DISTANCE_PREV_RUN, prevRun);
             edit.apply();
         }
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (state.wakeLock == null) {
-            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+            state.wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wiglewifiwardriving:DoNotDimScreen");
             if (state.wakeLock.isHeld()) {
                 state.wakeLock.release();
             }
@@ -313,6 +314,10 @@ public final class MainActivity extends AppCompatActivity {
         setupBattery();
         info("setupSound");
         setupSound();
+        info("setupActivationDialog");
+        setupActivationDialog();
+        info("setupBluetooth");
+        setupBluetooth();
         info("setupWifi");
         setupWifi();
         info("setupLocation"); // must be after setupWifi
@@ -338,6 +343,23 @@ public final class MainActivity extends AppCompatActivity {
         // show the list by default
         selectFragment(state.currentTab);
         info("onCreate setup complete");
+    }
+
+    private void pieScanningSettings(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT == 28) {
+            for (final String key : Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
+                    ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST)) {
+                pieScanSet(prefs, key);
+            }
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private void pieScanSet(final SharedPreferences prefs, final String key) {
+        if (-1 == prefs.getLong(key, -1)) {
+            info("Setting 30 second scan for " + key + " due to broken Android Pie");
+            prefs.edit().putLong(key, SCAN_P_DEFAULT).commit();
+        }
     }
 
     /**
@@ -370,6 +392,7 @@ public final class MainActivity extends AppCompatActivity {
                 permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
             }
             addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH);
 
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
@@ -442,65 +465,6 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void setupMenuDrawer() {
-        // set up drawer menu
-        final String[] menuTitles = new String[]{
-                getString(R.string.tab_list),
-                getString(R.string.tab_map),
-                getString(R.string.tab_dash),
-                getString(R.string.tab_data),
-                getString(R.string.tab_news),
-                getString(R.string.tab_rank),
-                getString(R.string.tab_stats),
-                getString(R.string.tab_uploads),
-                getString(R.string.menu_settings),
-                getString(R.string.menu_exit),
-        };
-        final int[] menuIcons = new int[]{
-                android.R.drawable.ic_menu_sort_by_size,
-                android.R.drawable.ic_menu_mapmode,
-                android.R.drawable.ic_menu_directions,
-                android.R.drawable.ic_menu_save,
-                android.R.drawable.ic_menu_agenda,
-                android.R.drawable.ic_menu_sort_alphabetically,
-                android.R.drawable.ic_menu_today,
-                android.R.drawable.ic_menu_upload,
-                android.R.drawable.ic_menu_preferences,
-                android.R.drawable.ic_delete,
-        };
-
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        // Set the adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                R.layout.drawer_list_item, R.id.drawer_list_text, menuTitles) {
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                final LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-                View view;
-                if (convertView == null) {
-                    view = inflater.inflate(R.layout.drawer_list_item, parent, false);
-                } else {
-                    view = convertView;
-                }
-
-                final TextView text = (TextView) view.findViewById(R.id.drawer_list_text);
-                text.setText(menuTitles[position]);
-                //If that's the Exit button, set the background to red
-                if(position == EXIT_TAB_POS) {
-                    view.setBackgroundColor(Color.argb(200,70,0,0));
-                }else{
-                    view.setBackgroundColor(0);
-                }
-                final ImageView image = (ImageView) view.findViewById(R.id.drawer_list_icon);
-                image.setImageResource(menuIcons[position]);
-
-                return view;
-            }
-        });
-        // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -522,66 +486,129 @@ public final class MainActivity extends AppCompatActivity {
                 if (actionBar != null) actionBar.setTitle("Menu");
             }
         };
-
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        final NavigationView navigationView = findViewById(R.id.left_drawer);
+        navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
 
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+
+                        menuItem.setCheckable(true);
+                        if (menuItem.getItemId() == R.id.nav_stats) {
+                            menuItem.setChecked(!menuItem.isChecked());
+                        } else {
+                            menuItem.setChecked(true);
+
+                            if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                                MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                                mPreviousMenuItem.setChecked(false);
+                            }
+                        }
+                        state.previousTab = menuItem.getItemId();
+
+                        // close drawer when item is tapped
+                        if (R.id.nav_stats == menuItem.getItemId()) {
+                            MainActivity.info("Nav stats clicked");
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked() );
+                        } else {
+                            if (R.id.nav_site_stats != menuItem.getItemId() &&
+                                    R.id.nav_user_stats != menuItem.getItemId() &&
+                                    R.id.nav_rank != menuItem.getItemId() )
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
+                            mDrawerLayout.closeDrawers();
+                            selectFragment(menuItem.getItemId());
+                        }
+                        return true;
+                    }
+                });
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
         }
-        // end drawer setup
-    }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            selectFragment(position);
-        }
+        int menuSubColor = 0xE0777777;
+        MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
+        SpannableString spanString = new SpannableString("    "+uStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        uStats.setTitle(spanString);
+
+        MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
+        spanString = new SpannableString("    "+sStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        sStats.setTitle(spanString);
+
+        MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
+        spanString = new SpannableString("    "+rStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        rStats.setTitle(spanString);
+
+        navigationView.getMenu().getItem(0).setCheckable(true);
+        navigationView.getMenu().getItem(0).setChecked(true);
+        // end drawer setup
     }
 
     /**
      * Swaps fragments in the main content view
      */
-    public void selectFragment(int position) {
-        if (position == EXIT_TAB_POS) {
+    public void selectFragment(final int itemId) {
+        if (itemId == R.id.nav_exit) {
             finishSoon();
             return;
         }
 
-        final String[] fragmentTitles = new String[]{
-                getString(R.string.list_app_name),
-                getString(R.string.mapping_app_name),
-                getString(R.string.dashboard_app_name),
-                getString(R.string.data_activity_name),
-                getString(R.string.news_app_name),
-                getString(R.string.rank_stats_app_name),
-                getString(R.string.user_stats_app_name),
-                getString(R.string.uploads_app_name),
-                getString(R.string.settings_app_name),
-                getString(R.string.menu_exit),
-                getString(R.string.site_stats_app_name),
-        };
+        final Map<Integer, String> fragmentTitles = new HashMap<>();
+        fragmentTitles.put(R.id.nav_list, getString(R.string.mapping_app_name));
+        fragmentTitles.put(R.id.nav_dash, getString(R.string.dashboard_app_name));
+        fragmentTitles.put(R.id.nav_data, getString(R.string.data_activity_name));
+        fragmentTitles.put(R.id.nav_search, getString(R.string.tab_search));
+        fragmentTitles.put(R.id.nav_news, getString(R.string.news_app_name));
+        fragmentTitles.put(R.id.nav_rank, getString(R.string.rank_stats_app_name));
+        fragmentTitles.put(R.id.nav_stats, getString(R.string.tab_stats));
+        fragmentTitles.put(R.id.nav_uploads, getString(R.string.uploads_app_name));
+        fragmentTitles.put(R.id.nav_settings, getString(R.string.settings_app_name));
+        fragmentTitles.put(R.id.nav_exit, getString(R.string.menu_exit));
+        //fragmentTitles.put(R.id.nav_, getString(R.string.site_stats_app_name));
 
-        final Fragment frag = state.fragList[position];
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
         try {
-            fragmentManager.beginTransaction()
-                    .replace(R.id.tabcontent, frag)
-                    .commit();
-        } catch (final NullPointerException | IllegalStateException ex) {
-            final String message = "exception in fragment switch: " + ex;
-            error(message, ex);
-        }
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            final Fragment frag = (Fragment) classForFragmentNavId(itemId).newInstance();
+            Bundle bundle = new Bundle();
+            frag.setArguments(bundle);
 
-        // Highlight the selected item, update the title, and close the drawer
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerList);
-        state.currentTab = position;
-        setTitle(fragmentTitles[position]);
+
+            //fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+itemId);
+
+            if (null == frag) {
+                final String maybeName = getResources().getResourceName(itemId);
+                MainActivity.error("null fragment for: " + String.format("0x%08X", itemId) + " (" + maybeName + ")");
+            }
+
+            try {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX+itemId)
+                        .commit();
+            } catch (final NullPointerException | IllegalStateException ex) {
+                final String message = "exception in fragment switch: " + ex;
+                error(message, ex);
+            }
+
+            // Highlight the selected item, update the title, and close the drawer
+            state.currentTab = itemId;
+            setTitle(fragmentTitles.get(itemId));
+        } catch (IllegalAccessException ex) {
+            MainActivity.error("Unable to get fragment for id: "+itemId, ex);
+        } catch (InstantiationException ex) {
+            MainActivity.error("Unable to make fragment for id: "+itemId, ex);
+        }
+    }
+
+    private void showSubmenu(final Menu menu, final int submenuGroupId, final boolean visible) {
+        menu.setGroupVisible(submenuGroupId, visible);
     }
 
     @Override
@@ -590,67 +617,46 @@ public final class MainActivity extends AppCompatActivity {
         if (actionBar != null) actionBar.setTitle(title);
     }
 
-
     private void setupFragments() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
         info("Creating ListFragment");
-        listActivity = new ListFragment();
+        ListFragment listFragment = new ListFragment();
         Bundle bundle = new Bundle();
-        listActivity.setArguments(bundle);
-        state.fragList[LIST_TAB_POS] = listActivity;
+        listFragment.setArguments(bundle);
 
-        info("Creating MappingFragment");
-        final MappingFragment map = new MappingFragment();
-        bundle = new Bundle();
-        map.setArguments(bundle);
-        state.fragList[MAP_TAB_POS] = map;
+        transaction.add(R.id.tabcontent, listFragment, FRAGMENT_TAG_PREFIX+R.id.nav_list);
+        transaction.commit();
+    }
 
-        info("Creating DashboardFragment");
-        final DashboardFragment dash = new DashboardFragment();
-        bundle = new Bundle();
-        dash.setArguments(bundle);
-        state.fragList[DASH_TAB_POS] = dash;
-
-        info("Creating DataFragment");
-        final DataFragment data = new DataFragment();
-        bundle = new Bundle();
-        data.setArguments(bundle);
-        state.fragList[DATA_TAB_POS] = data;
-
-        info("Creating UserStatsFragment");
-        final UserStatsFragment userStats = new UserStatsFragment();
-        bundle = new Bundle();
-        userStats.setArguments(bundle);
-        state.fragList[USER_STATS_TAB_POS] = userStats;
-
-        info("Creating SiteStatsFragment");
-        final SiteStatsFragment siteStats = new SiteStatsFragment();
-        bundle = new Bundle();
-        siteStats.setArguments(bundle);
-        state.fragList[SITE_STATS_TAB_POS] = siteStats;
-
-        info("Creating NewsFragment");
-        final NewsFragment newsStats = new NewsFragment();
-        bundle = new Bundle();
-        newsStats.setArguments(bundle);
-        state.fragList[NEWS_TAB_POS] = newsStats;
-
-        info("Creating RankStatsFragment");
-        final RankStatsFragment rankStats = new RankStatsFragment();
-        bundle = new Bundle();
-        rankStats.setArguments(bundle);
-        state.fragList[RANK_STATS_TAB_POS] = rankStats;
-
-        info("Creating UploadsFragment");
-        final UploadsFragment uploads = new UploadsFragment();
-        bundle = new Bundle();
-        uploads.setArguments(bundle);
-        state.fragList[UPLOADS_TAB_POS] = uploads;
-
-        info("Creating SettingsFragment");
-        final SettingsFragment settings = new SettingsFragment();
-        bundle = new Bundle();
-        settings.setArguments(bundle);
-        state.fragList[SETTINGS_TAB_POS] = settings;
+    private static Class classForFragmentNavId(final int navId) {
+        switch(navId) {
+            case R.id.nav_list:
+                return ListFragment.class;
+            case R.id.nav_dash:
+                return DashboardFragment.class;
+            case R.id.nav_data:
+                return DataFragment.class;
+            case R.id.nav_search:
+                return SearchFragment.class;
+            case R.id.nav_map:
+                return MappingFragment.class;
+            case R.id.nav_user_stats:
+                return UserStatsFragment.class;
+            case R.id.nav_rank:
+                return RankStatsFragment.class;
+            case R.id.nav_site_stats:
+                return SiteStatsFragment.class;
+            case R.id.nav_news:
+                return NewsFragment.class;
+            case R.id.nav_uploads:
+                return UploadsFragment.class;
+            case R.id.nav_settings:
+                return SettingsFragment.class;
+            default:
+                return ListFragment.class;
+        }
     }
 
     @Override
@@ -802,8 +808,16 @@ public final class MainActivity extends AppCompatActivity {
                         } else if (activity instanceof MainActivity) {
                             final MainActivity mainActivity = (MainActivity) activity;
                             if (mainActivity.getState() != null) {
-                                final Fragment fragment = mainActivity.getState().fragList[tabPos];
-                                ((DialogListener) fragment).handleDialog(dialogId);
+                                final String maybeName = getResources().getResourceName(tabPos);
+                                //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
+                                final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+tabPos);
+                                if (fragment == null) {
+                                    MainActivity.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                    //TODO: might behoove us to show an error here
+                                } else {
+                                    ((DialogListener) fragment).handleDialog(dialogId);
+                                }
                             }
                         } else {
                             ((DialogListener) activity).handleDialog(dialogId);
@@ -912,6 +926,11 @@ public final class MainActivity extends AppCompatActivity {
 
     public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
                                               final String pref, final boolean def) {
+        return prefBackedCheckBox(activity, view, id, pref, def, null);
+    }
+
+    public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
+                                              final String pref, final boolean def, final PrefCheckboxListener listener) {
         final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
@@ -920,6 +939,9 @@ public final class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
                 editor.putBoolean(pref, isChecked);
                 editor.apply();
+                if (null != listener) {
+                    listener.preferenceSet(isChecked);
+                }
             }
         });
 
@@ -1012,6 +1034,20 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         if (state.tts != null) state.tts.shutdown();
+
+        //TODO: redundant with endBluetooth?
+        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+            bluetoothAdapter.cancelDiscovery();
+        } try {
+            info("unregister bluetoothReceiver");
+            unregisterReceiver( state.bluetoothReceiver );
+        } catch ( final IllegalArgumentException ex ) {
+            info( "bluetoothReceiver not registered: " + ex );
+        }
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.stopScanning();
+        }
 
         finishSoon(DESTROY_FINISH_MILLIS, false);
     }
@@ -1357,10 +1393,12 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void addNetworkToMap(final Network network) {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.addNetwork(network);
             }
@@ -1368,10 +1406,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void updateNetworkOnMap(final Network network) {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.updateNetwork(network);
             }
@@ -1379,10 +1418,11 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static void reclusterMap() {
-        if (getStaticState().currentTab == MAP_TAB_POS) {
+        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
+        if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final State state = mainActivity.getState();
-            final MappingFragment f = (MappingFragment) state.fragList[MAP_TAB_POS];
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.reCluster();
             }
@@ -1664,6 +1704,45 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setupActivationDialog() {
+        final boolean willActivateBt = canBtBeActivated();
+        final boolean willActivateWifi = canWifiBeActivated();
+        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true));
+
+        if ((willActivateBt && useBt) || willActivateWifi) {
+
+            String activationMessages = "";
+
+            if (willActivateBt && useBt) {
+                activationMessages += getString(R.string.turn_on_bt);
+                if (willActivateWifi) {
+                    activationMessages += "\n";
+                }
+            }
+
+            if (willActivateWifi) {
+                activationMessages += getString(R.string.turn_on_wifi);
+            }
+            // tell user, cuz this takes a little while
+            if (!isFinishing()) {
+                WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
+            }
+        }
+    }
+
+    private boolean canWifiBeActivated() {
+        final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
+                getSystemService(Context.WIFI_SERVICE);
+        if (null == wifiManager) {
+            return false;
+        }
+        if (!wifiManager.isWifiEnabled() && !state.inEmulator) {
+            return true;
+        }
+        return false;
+    }
+
     private void setupWifi() {
         // warn about turning off network notification
         final String notifOn = Settings.Secure.getString(getContentResolver(),
@@ -1680,10 +1759,6 @@ public final class MainActivity extends AppCompatActivity {
         // keep track of for later
         boolean turnedWifiOn = false;
         if (!wifiManager.isWifiEnabled()) {
-            // tell user, cuz this takes a little while
-            if (!isFinishing()) {
-                WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_wifi));
-            }
 
             // save so we can turn it back off when we exit
             edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, true);
@@ -1725,6 +1800,97 @@ public final class MainActivity extends AppCompatActivity {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(state.wifiReceiver, intentFilter);
+    }
+
+    private boolean canBtBeActivated() {
+        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+        if (bt == null) {
+            info("No bluetooth adapter");
+            return false;
+        }
+        if (!bt.isEnabled()) {
+            return true;
+        }
+        return false;
+    }
+
+    public void setupBluetooth() {
+        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+        if (bt == null) {
+            info("No bluetooth adapter");
+            return;
+        }
+        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final Editor edit = prefs.edit();
+        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
+            if (!bt.isEnabled()) {
+                info("Enable bluetooth");
+                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
+                bt.enable();
+            } else {
+                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
+            }
+            edit.commit();
+            if ( state.bluetoothReceiver == null ) {
+                MainActivity.info( "new bluetoothReceiver");
+                // bluetooth scan listener
+                // this receiver is the main workhorse of bluetooth scanning
+                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+                state.bluetoothReceiver.setupBluetoothTimer(true);
+            }
+            info("register bluetooth BroadcastReceiver");
+            final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            registerReceiver(state.bluetoothReceiver, intentFilter);
+        }
+    }
+
+    public void endBluetooth(SharedPreferences prefs) {
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.stopScanning();
+        }
+
+        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter != null) {
+            if (bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
+        }
+        try {
+            info("unregister bluetoothReceiver");
+            unregisterReceiver( state.bluetoothReceiver );
+            state.bluetoothReceiver = null;
+        } catch ( final IllegalArgumentException ex ) {
+            //ALIBI: it's fine to call and fail here.
+            info( "bluetoothReceiver not registered: " + ex );
+        }
+
+        final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
+        // don't call on emulator, it crashes it
+        if ( btWasOff && ! state.inEmulator ) {
+            // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?
+            //WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
+
+            // turn it off now that we're done
+            MainActivity.info("turning bluetooth back off");
+            try {
+                final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+                if (bt == null) {
+                    info("No bluetooth adapter");
+                } else if (bt.isEnabled()) {
+                    info("Disable bluetooth");
+                    bt.disable();
+                }
+            } catch (Exception ex) {
+                MainActivity.error("exception turning bluetooth back off: " + ex, ex);
+            }
+        }
+    }
+
+    public void bluetoothScan() {
+        if (state.bluetoothReceiver != null) {
+            state.bluetoothReceiver.bluetoothScan();
+        }
     }
 
     /**
@@ -1822,19 +1988,46 @@ public final class MainActivity extends AppCompatActivity {
         final boolean oldIsScanning = isScanning();
         if (isScanning == oldIsScanning) {
             info("main handleScanChange: no difference, returning");
+            return;
         }
-        final Editor edit = getSharedPreferences(ListFragment.SHARED_PREFS, 0).edit();
+
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Editor edit = prefs.edit();
+        if (isScanning) {
+            edit.putLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+        } else {
+            final long scanTime = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+            final long lastScanStart = prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+            final long newTare = scanTime + System.currentTimeMillis() - lastScanStart;
+            edit.putLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, newTare);
+        }
+
         edit.putBoolean(ListFragment.PREF_SCAN_RUNNING, isScanning);
         edit.apply();
         internalHandleScanChange(isScanning);
     }
 
+    private ListFragment getListFragmentIfCurrent() {
+        try {
+            final FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment f = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_list);
+            if (null != f) {
+                return (ListFragment) f;
+            }
+        } catch (Exception ex) {
+            MainActivity.error("Unable to get listfragment: ",ex);
+        }
+        return null;
+    }
+
     private void internalHandleScanChange(final boolean isScanning) {
         info("main internalHandleScanChange: isScanning now: " + isScanning);
+        ListFragment listFragment = getListFragmentIfCurrent();
+
         if (isScanning) {
-            if (listActivity != null) {
-                listActivity.setStatusUI(getString(R.string.list_scanning_on));
-                listActivity.setScanningStatusIndicator(true);
+            if (listFragment != null) {
+                listFragment.setStatusUI(getString(R.string.list_scanning_on));
+                listFragment.setScanningStatusIndicator(true);
             }
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.updateLastScanResponseTime();
@@ -1846,9 +2039,9 @@ public final class MainActivity extends AppCompatActivity {
                 state.wifiLock.acquire();
             }
         } else {
-            if (listActivity != null) {
-                listActivity.setStatusUI(getString(R.string.list_scanning_off));
-                listActivity.setScanningStatusIndicator(false);
+            if (listFragment != null) {
+                listFragment.setStatusUI(getString(R.string.list_scanning_off));
+                listFragment.setScanningStatusIndicator(false);
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
@@ -1861,6 +2054,9 @@ public final class MainActivity extends AppCompatActivity {
                     MainActivity.info("exception releasing wifilock: " + ex);
                 }
             }
+        }
+        if (null != state && null != state.wigleService) {
+            state.wigleService.setupNotification();
         }
     }
 
@@ -1887,7 +2083,7 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         // create a new listener to try and get around the gps stopping bug
-        state.gpsListener = new GPSListener(this);
+        state.gpsListener = new GPSListener(this, state.dbHelper);
         state.gpsListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
         try {
             locationManager.addGpsStatusListener(state.gpsListener);
@@ -1959,15 +2155,17 @@ public final class MainActivity extends AppCompatActivity {
 
     public void setLocationUI() {
         // tell list about new location
-        if (listActivity != null) {
-            listActivity.setLocationUI(this);
+        ListFragment listFragment = getListFragmentIfCurrent();
+        if (listFragment != null) {
+            listFragment.setLocationUI(this);
         }
     }
 
     public void setNetCountUI() {
         // tell list
-        if (listActivity != null) {
-            listActivity.setNetCountUI(getState());
+        ListFragment listFragment = getListFragmentIfCurrent();
+        if (listFragment != null) {
+            listFragment.setNetCountUI(getState());
         }
     }
 
@@ -1978,16 +2176,17 @@ public final class MainActivity extends AppCompatActivity {
         if (status != null) {
             // keep around a previous, for orientation changes
             state.previousStatus = status;
-            if (listActivity != null) {
+            ListFragment listFragment = getListFragmentIfCurrent();
+
+            if (listFragment != null) {
                 // tell list
-                listActivity.setStatusUI(status);
+                listFragment.setStatusUI(status);
             }
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        info("MAIN: onCreateOptionsMenu.");
         return true;
     }
 
@@ -2104,6 +2303,8 @@ public final class MainActivity extends AppCompatActivity {
             }
         }
 
+        endBluetooth(prefs);
+
         TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if (tele != null && state.phoneState != null) {
             tele.listen(state.phoneState, PhoneStateListener.LISTEN_NONE);
@@ -2133,7 +2334,7 @@ public final class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             MainActivity.info("onKeyDown: not quitting app on back");
-            selectFragment(0);
+            selectFragment(R.id.nav_list);
             return true;
         }
         // we may want this, but devices with menu button don't get the 3 dots, so we'd have to force on the 3 dots
@@ -2150,8 +2351,9 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void doUpload() {
-        selectFragment(LIST_TAB_POS);
-        listActivity.makeUploadDialog(this);
+        selectFragment(R.id.nav_list);
+        ListFragment listFragment = getListFragmentIfCurrent();
+        listFragment.makeUploadDialog(this);
     }
 
     /**

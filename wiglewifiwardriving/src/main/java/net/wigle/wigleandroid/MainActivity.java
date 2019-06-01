@@ -19,6 +19,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.location.GnssStatus;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -2094,6 +2095,32 @@ public final class MainActivity extends AppCompatActivity {
             info("Security exception adding status listener: " + ex, ex);
         }
 
+        if (Build.VERSION.SDK_INT >= 24) {
+            try {
+                locationManager.registerGnssStatusCallback(new GnssStatus.Callback() {
+                    @Override
+                    public void onStarted() {
+                    }
+
+                    @Override
+                    public void onStopped() {
+                    }
+
+                    @Override
+                    public void onFirstFix(int ttffMillis) {
+                    }
+
+                    @Override
+                    public void onSatelliteStatusChanged(GnssStatus status) {
+                        state.gpsListener.onGnssStatusChanged(status);
+                    }
+                });
+            }
+            catch (final Exception ex) {
+                error("Error registering for gnss: " + ex, ex);
+            }
+        }
+
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final boolean useNetworkLoc = prefs.getBoolean(ListFragment.PREF_USE_NETWORK_LOC, false);
 
@@ -2124,6 +2151,15 @@ public final class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public static <A> String join(final String delimiter, final Iterable<A> iterable) {
+        final StringBuilder sb = new StringBuilder();
+        for (final A i : iterable) {
+            if (sb.length() > 0) sb.append(delimiter);
+            sb.append(i.toString());
+        }
+        return sb.toString();
     }
 
     public long getLocationSetPeriod() {

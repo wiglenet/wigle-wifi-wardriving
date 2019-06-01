@@ -2154,8 +2154,13 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static <A> String join(final String delimiter, final Iterable<A> iterable) {
+        if (delimiter == null || iterable == null) {
+            throw new IllegalArgumentException("join argument is null. delimiter: " + delimiter
+                    + " iterable: " + iterable);
+        }
         final StringBuilder sb = new StringBuilder();
         for (final A i : iterable) {
+            if (i == null) continue;
             if (sb.length() > 0) sb.append(delimiter);
             sb.append(i.toString());
         }

@@ -420,7 +420,7 @@ public class GPSListener implements Listener, LocationListener {
                 con = "Galileo";
                 break;
         }
-        if (Build.VERSION.SDK_INT > 28 && constellationType == GnssStatus.CONSTELLATION_IRNSS) {
+        if (Build.VERSION.SDK_INT > 28 && constellationType == 7 /*GnssStatus.CONSTELLATION_IRNSS*/) {
             con = "IRNSS";
         }
         return con;

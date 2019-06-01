@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.listener.GPSListener;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -160,6 +162,8 @@ public class DashboardFragment extends Fragment {
         tv.setText( getString(R.string.dash_short_loc) + " ");
 
         TextView fixMeta = view.findViewById(R.id.fixmeta);
+        TextView conType = view.findViewById(R.id.contype);
+        TextView conCount = view.findViewById(R.id.concount);
 
         ImageView iv = (ImageView) view.findViewById(R.id.fixtype);
         if (location == null) {
@@ -168,12 +172,19 @@ public class DashboardFragment extends Fragment {
             iv.setVisibility(View.VISIBLE);
             iv.setColorFilter(Color.argb(255, 255, 0, 0));
             fixMeta.setVisibility(View.INVISIBLE);
+            conType.setVisibility(View.INVISIBLE);
+            conCount.setVisibility(View.INVISIBLE);
         } else {
             if (location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
 
                 String satString = null;
+                String conKeyString = null;
+                String conValString = null;
                 if (MainActivity.getMainActivity() != null && MainActivity.getMainActivity().getGPSListener() != null) {
-                    satString = "("+MainActivity.getMainActivity().getGPSListener().getSatCount()+")";
+                    final GPSListener listener = MainActivity.getMainActivity().getGPSListener();
+                    satString = "("+listener.getSatCount()+")";
+                    conKeyString = MainActivity.join("\n", listener.getConstellations().keySet());
+                    conValString = MainActivity.join("\n", listener.getConstellations().values());
                 }
                 if (satString == null) {
                     fixMeta.setVisibility(View.INVISIBLE);
@@ -186,6 +197,18 @@ public class DashboardFragment extends Fragment {
                 iv.setImageResource(R.drawable.gps);
                 iv.setColorFilter(Color.GREEN);
                 iv.setVisibility(View.VISIBLE);
+
+                if (conKeyString == null) {
+                    conType.setVisibility(View.INVISIBLE);
+                    conCount.setVisibility(View.INVISIBLE);
+                } else {
+                    conType.setVisibility(View.VISIBLE);
+                    conType.setText(conKeyString);
+
+                    conCount.setVisibility(View.VISIBLE);
+                    conCount.setText(conValString);
+                }
+
             } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
                 fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.YELLOW);

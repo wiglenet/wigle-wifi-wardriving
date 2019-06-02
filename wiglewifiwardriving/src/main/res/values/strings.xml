@@ -414,4 +414,5 @@
     <string name="btdisc_title">Discovered Bluetooth Devices (New to WiGLE)</string>
     <string name="bttotal_title">Total Bluetooth Devices Seen</string>
     <string name="total_bt">Total Bluetooth</string>
+    <string name="menu_debug">Debug</string>
 </resources>

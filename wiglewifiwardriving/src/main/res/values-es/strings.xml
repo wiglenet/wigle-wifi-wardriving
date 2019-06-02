@@ -347,4 +347,5 @@
     <string name="search_failed">Búsqueda fallida</string>
     <string name="search_empty">Resultados vacíos</string>
     <string name="search_query_limit">Has alcanzado el número máximo de búsquedas en la actualidad. Tu límite se restablecerá mañana.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

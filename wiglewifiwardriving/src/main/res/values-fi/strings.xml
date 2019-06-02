@@ -346,5 +346,5 @@
     <string name="search_failed">Haku epäonnistui</string>
     <string name="search_empty">Tulokset tyhjä</string>
     <string name="search_query_limit">Olet saavuttanut suurimman määrän hakuja tänään. Rajasi palautetaan huomenna.</string>
-
+    <string name="menu_debug">Debug</string>
 </resources>

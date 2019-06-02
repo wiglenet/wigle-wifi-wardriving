@@ -401,4 +401,5 @@
     <string name="search_failed">החיפוש נכשל</string>
     <string name="search_empty">תוצאות ריקות</string>
     <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

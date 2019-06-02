@@ -104,7 +104,7 @@ public class SettingsUtil {
             public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
                 // set pref
                 final V period = periods[position];
-                MainActivity.info( pref + " setting period: " + period );
+                // MainActivity.info( pref + " setting period: " + period );
                 if ( period instanceof Long ) {
                     editor.putLong( pref, (Long) period );
                 }

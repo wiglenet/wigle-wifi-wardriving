@@ -344,4 +344,5 @@
     <string name="search_failed">Arama Başarısız Oldu</string>
     <string name="search_empty">Boş Sonuçlar</string>
     <string name="search_query_limit">Bugün maksimum arama sayısına ulaştınız. Sınırın yarın sıfırlanacak.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

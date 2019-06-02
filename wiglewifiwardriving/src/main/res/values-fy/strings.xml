@@ -346,5 +346,5 @@
     <string name="search_failed">Search Failed</string>
     <string name="search_empty">Results Empty</string>
     <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
-
+    <string name="menu_debug">Debug</string>
 </resources>

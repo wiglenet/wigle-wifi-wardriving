@@ -19,16 +19,11 @@ import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import androidx.core.content.ContextCompat;
@@ -36,7 +31,8 @@ import androidx.core.content.ContextCompat;
 public class GPSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
-    public static final float LERP_THRESHOLD_METERS = 1.0f;
+    public static final float LERP_MIN_THRESHOLD_METERS = 1.0f;
+    public static final float LERP_MAX_THRESHOLD_METERS = 200f;
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
@@ -240,12 +236,14 @@ public class GPSListener implements Listener, LocationListener {
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
                     edit.apply();
                 }
-                if ( dist > LERP_THRESHOLD_METERS) {
-                    if (null != dbHelper) {
-                        if (!location.equals(prevGpsLocation)) {
-                            dbHelper.recoverLocations(location);
-                            //MainActivity.info("lerping...");
-                        }
+                if ( dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
+                    if (dist > LERP_MAX_THRESHOLD_METERS) {
+                        MainActivity.warn("Diff is too large, not lerping. " + dist + " meters");
+                        dbHelper.clearPendingObservations();
+                    }
+                    else if (!location.equals(prevGpsLocation)) {
+                        MainActivity.info("lerping for " + dist + " meters");
+                        dbHelper.recoverLocations(location);
                     }
                 }
             }

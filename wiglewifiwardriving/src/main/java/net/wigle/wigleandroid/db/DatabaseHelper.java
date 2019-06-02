@@ -985,6 +985,11 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    public void clearPendingObservations() {
+        MainActivity.info("clearing pending observations");
+        pending.clear();
+    }
+
     /**
      *  walk any pending observations, lerp from last to recover to fill in their location details, add to the real queue.
      *

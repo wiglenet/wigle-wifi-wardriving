@@ -344,4 +344,5 @@
     <string name="search_failed">Wyszukiwanie nie powiodło się</string>
     <string name="search_empty">Wyniki Empty</string>
     <string name="search_query_limit">Masz już maksymalną liczbę wyszukiwań. Twój limit zostanie zresetowany jutro.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

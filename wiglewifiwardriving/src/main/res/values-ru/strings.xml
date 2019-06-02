@@ -356,4 +356,5 @@
     <string name="search_failed">Поиск не удался</string>
     <string name="search_empty">Результаты Пусто</string>
     <string name="search_query_limit">Вы достигли максимального числа поисков сегодня. Ваш лимит будет сброшен завтра.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

@@ -401,4 +401,5 @@
     <string name="search_failed">La recherche a échoué</string>
     <string name="search_empty">Résultats vides</string>
     <string name="search_query_limit">Vous avez atteint le nombre maximal de recherches aujourd\'hui. Votre limite sera réinitialisée demain.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

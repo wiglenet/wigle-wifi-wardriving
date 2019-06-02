@@ -401,4 +401,5 @@
     <string name="search_failed">Hledání se nezdařilo</string>
     <string name="search_empty">Výsledky prázdné</string>
     <string name="search_query_limit">Do dnešního dne jste dosáhli maximálního počtu vyhledávání. Váš limit se zítra vynuluje.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

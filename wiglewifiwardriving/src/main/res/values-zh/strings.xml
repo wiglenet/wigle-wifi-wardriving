@@ -401,5 +401,5 @@
     <string name="search_failed">搜索失败</string>
     <string name="search_empty">结果为空</string>
     <string name="search_query_limit">您今天已达到最大搜索次数。你的限额将在明天重置。</string>
+    <string name="menu_debug">Debug</string>
 </resources>
-

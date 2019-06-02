@@ -346,4 +346,5 @@
     <string name="search_failed">A keresés sikertelen</string>
     <string name="search_empty">Eredmények üresek</string>
     <string name="search_query_limit">Ma elérte a maximális számú keresést. A határidőt holnap visszaállítja.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

@@ -52,8 +52,9 @@ import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
  */
 public final class SettingsFragment extends Fragment implements DialogListener {
 
-    private static final int MENU_RETURN = 12;
     private static final int MENU_ERROR_REPORT = 13;
+    private static final int MENU_DEBUG = 14
+;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
@@ -80,6 +81,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         // set language
         MainActivity.setLocale(getActivity());
+        setHasOptionsMenu(true);
     }
 
     @SuppressLint("SetTextI18n")
@@ -581,25 +583,27 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     /* Creates the menu items */
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-        MenuItem item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
+        MenuItem item = menu.add(0, MENU_DEBUG, 0, getString(R.string.menu_debug));
+        item.setIcon( android.R.drawable.ic_media_previous );
+
+        item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
         item.setIcon( android.R.drawable.ic_menu_report_image );
 
-        item = menu.add(0, MENU_RETURN, 0, getString(R.string.menu_return));
-        item.setIcon( android.R.drawable.ic_media_previous );
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     /* Handles item selections */
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         switch ( item.getItemId() ) {
-            case MENU_RETURN:
-                final MainActivity mainActivity = MainActivity.getMainActivity(this);
-                if (mainActivity != null) mainActivity.selectFragment(R.id.nav_list);
+            case MENU_DEBUG:
+                final Intent debugIntent = new Intent( getActivity(), DebugActivity.class );
+                this.startActivity( debugIntent );
                 return true;
             case MENU_ERROR_REPORT:
                 final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
                 this.startActivity( errorReportIntent );
-                break;
+                return true;
         }
         return false;
     }

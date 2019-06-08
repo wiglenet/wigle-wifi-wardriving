@@ -165,6 +165,7 @@ public final class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
+    private static final int ACTION_WIFI_CODE = 2;
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
@@ -350,10 +351,24 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void pieScanningSettings(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT < 28) return;
+
+        final List<String> keys = Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
+                ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST);
         if (Build.VERSION.SDK_INT == 28) {
-            for (final String key : Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
-                    ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST)) {
+            for (final String key : keys) {
                 pieScanSet(prefs, key);
+            }
+        }
+        else if (Build.VERSION.SDK_INT == 29) {
+            // see if all configs are at the P
+            for (final String key : keys) {
+                if (prefs.getLong(key, -1) != SCAN_P_DEFAULT) {
+                    return;
+                }
+            }
+            for (final String key : keys) {
+                qScanSet(prefs, key);
             }
         }
     }
@@ -363,6 +378,14 @@ public final class MainActivity extends AppCompatActivity {
         if (-1 == prefs.getLong(key, -1)) {
             info("Setting 30 second scan for " + key + " due to broken Android Pie");
             prefs.edit().putLong(key, SCAN_P_DEFAULT).commit();
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private void qScanSet(final SharedPreferences prefs, final String key) {
+        if (SCAN_P_DEFAULT == prefs.getLong(key, -1)) {
+            info("Removing 30 second scan for " + key + " due to less broken Android Q");
+            prefs.edit().remove(key).commit();
         }
     }
 
@@ -1782,20 +1805,24 @@ public final class MainActivity extends AppCompatActivity {
 
         // keep track of for later
         boolean turnedWifiOn = false;
-        if (!wifiManager.isWifiEnabled()) {
-
-            // save so we can turn it back off when we exit
-            edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, true);
-
-            // just turn it on, but not in emulator cuz it crashes it
-            if (!state.inEmulator) {
-                MainActivity.info("turning on wifi");
-                wifiManager.setWifiEnabled(true);
-                MainActivity.info("wifi on");
-                turnedWifiOn = true;
+        if (wifiManager != null && !wifiManager.isWifiEnabled()) {
+            turnedWifiOn = true;
+            // switch this to androidx call when it becomes available
+            if (Build.VERSION.SDK_INT >= 29) {
+                final Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+                startActivityForResult(panelIntent, ACTION_WIFI_CODE);
             }
-        } else {
-            edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, false);
+            else {
+                // open wifi setting pages after a few seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
+                                getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }
+                }, 3000);
+            }
         }
         edit.apply();
 
@@ -1810,11 +1837,25 @@ public final class MainActivity extends AppCompatActivity {
         // register wifi receiver
         setupWifiReceiverIntent();
 
-        if (state.wifiLock == null) {
+        if (state.wifiLock == null && wifiManager != null) {
             MainActivity.info("lock wifi radio on");
-            // lock the radio on
+            // lock the radio on (only works in 28 (P) and lower)
             state.wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, ListFragment.WIFI_LOCK_NAME);
             state.wifiLock.acquire();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == ACTION_WIFI_CODE) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                info("wifi turned on");
+            }
+            else {
+                info("wifi NOT turned on");
+            }
         }
     }
 
@@ -2353,20 +2394,6 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean wifiWasOff = prefs.getBoolean(ListFragment.PREF_WIFI_WAS_OFF, false);
-        // don't call on emulator, it crashes it
-        if (wifiWasOff && !state.inEmulator) {
-            // well turn it of now that we're done
-            final WifiManager wifiManager = (WifiManager) getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
-            MainActivity.info("turning back off wifi");
-            try {
-                wifiManager.setWifiEnabled(false);
-            } catch (Exception ex) {
-                MainActivity.error("exception turning wifi back off: " + ex, ex);
-            }
-        }
-
         endBluetooth(prefs);
 
         TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);

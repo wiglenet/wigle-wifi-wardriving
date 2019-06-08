@@ -158,7 +158,7 @@
     <string name="ssid">SSID</string>
     <string name="bssid">BSSID</string>
     <string name="best_results">For best results, unset "Network notification" in "Wireless &amp; networks"-&gt;"WiFi settings"</string>
-    <string name="turn_on_wifi">Turning on WiFi</string>
+    <string name="turn_on_wifi">Please turn on WiFi</string>
     <string name="no_gps_device">No GPS detected in device!</string>
     <string name="turn_on_gps">Please turn on GPS</string>
     <string name="address">Address</string>

@@ -1827,13 +1827,17 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private boolean canBtBeActivated() {
-        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
-        if (bt == null) {
-            info("No bluetooth adapter");
-            return false;
-        }
-        if (!bt.isEnabled()) {
-            return true;
+        try {
+            final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+            if (bt == null) {
+                info("No bluetooth adapter");
+                return false;
+            }
+            if (!bt.isEnabled()) {
+                return true;
+            }
+        } catch (java.lang.SecurityException sex) {
+            MainActivity.warn("bt activation security exception");
         }
         return false;
     }

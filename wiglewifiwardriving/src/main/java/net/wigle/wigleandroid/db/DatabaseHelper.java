@@ -1171,11 +1171,17 @@ public final class DatabaseHelper extends Thread {
 
     public long getNetsWithLocCountFromDB() throws DBException {
         checkDB();
-        final Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
-        cursor.moveToFirst();
-        final long count = cursor.getLong( 0 );
-        cursor.close();
-        return count;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
+            cursor.moveToFirst();
+            final long count = cursor.getLong( 0 );
+            return count;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public Network getNetwork( final String bssid ) {

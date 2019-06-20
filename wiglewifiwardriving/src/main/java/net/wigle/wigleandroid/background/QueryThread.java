@@ -57,20 +57,20 @@ public class QueryThread extends Thread {
     @Override
     public void run() {
         while ( ! done.get() ) {
+            Cursor cursor = null;
             try {
                 final Request request = queue.take();
                 // if(true) throw new DBException("meh", new SQLiteException("meat puppets"));
                 if ( request != null ) {
                     final SQLiteDatabase db = dbHelper.getDB();
                     if ( db != null ) {
-                        final Cursor cursor = db.rawQuery( request.sql, null );
+                        cursor = db.rawQuery( request.sql, null );
                         while ( cursor.moveToNext() ) {
                             if (!request.handler.handleRow( cursor )) {
                                 break;
                             }
                         }
                         request.handler.complete();
-                        cursor.close();
                     }
                 }
             }
@@ -82,6 +82,10 @@ public class QueryThread extends Thread {
             }
             catch ( DBException ex ) {
                 dbHelper.deathDialog("query thread", ex);
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
             }
         }
     }

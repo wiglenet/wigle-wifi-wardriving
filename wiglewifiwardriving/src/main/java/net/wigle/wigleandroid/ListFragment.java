@@ -623,11 +623,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, final long id) {
                 final Network network = (Network) parent.getItemAtPosition(position);
-                MainActivity.getNetworkCache().put(network.getBssid(), network);
-                final Intent intent = new Intent(activity, NetworkActivity.class);
-                intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());
-                intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
-                activity.startActivity(intent);
+                if (network != null) {
+                    MainActivity.getNetworkCache().put(network.getBssid(), network);
+                    final Intent intent = new Intent(activity, NetworkActivity.class);
+                    intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());
+                    intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
+                    activity.startActivity(intent);
+                } else {
+                    MainActivity.error("Null network onItemClick - ignoring");
+                }
             }
         });
     }

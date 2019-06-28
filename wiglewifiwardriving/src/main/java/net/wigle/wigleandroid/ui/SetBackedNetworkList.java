@@ -498,6 +498,12 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public void sort(Comparator comparator) {
-        Collections.sort(networks, comparator);
+        try {
+            Collections.sort(networks, comparator);
+        } catch (IllegalArgumentException iaex) {
+            MainActivity.warn("SBNL.sort: IllegalArgumentException", iaex);
+            iaex.printStackTrace();
+            //ALIBI: missing a sort isn't a critical error, since this list gets updated continually
+        }
     }
 }

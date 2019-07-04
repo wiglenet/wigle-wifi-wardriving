@@ -1,3 +1,9 @@
+* 2.44 (07/04/2019)
+Add GNSS info to dashboard.
+Italian language fix (thx Mpegforever).
+Update dependencies and prepare for Q.
+Various bug fixes.
+
 * 2.43 (05/26/2019)
 Bluetooth on by default.
 Bluetooth stats everywhere.

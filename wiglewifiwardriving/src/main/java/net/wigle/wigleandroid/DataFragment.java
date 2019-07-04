@@ -63,8 +63,6 @@ import java.util.TreeMap;
  */
 public final class DataFragment extends Fragment implements ApiListener, TransferListener, DialogListener {
 
-    private static final int MENU_ERROR_REPORT = 13;
-
     private static final int CSV_RUN_DIALOG = 120;
     private static final int CSV_DB_DIALOG = 121;
     private static final int KML_RUN_DIALOG = 122;
@@ -89,7 +87,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public void onCreate( final Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
-        setHasOptionsMenu(true);
         // set language
         MainActivity.setLocale( getActivity() );
 
@@ -517,35 +514,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         super.onResume();
         getActivity().setTitle(R.string.data_activity_name);
     }
-
-    /* Creates the menu items */
-    @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-        // MenuItem item = menu.add( 0, MENU_SETTINGS, 0, getString(R.string.menu_settings) );
-        // item.setIcon( android.R.drawable.ic_menu_preferences );
-
-        MenuItem item = menu.add( 0, MENU_ERROR_REPORT, 0, getString(R.string.menu_error_report) );
-        item.setIcon( android.R.drawable.ic_menu_report_image );
-
-        // item = menu.add( 0, MENU_EXIT, 0, getString(R.string.menu_exit) );
-        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    /* Handles item selections */
-    @Override
-    public boolean onOptionsItemSelected( final MenuItem item ) {
-        switch ( item.getItemId() ) {
-            case MENU_ERROR_REPORT:
-                final Intent errorReportIntent = new Intent( getActivity(), ErrorReportActivity.class );
-                startActivity( errorReportIntent );
-                break;
-        }
-        return false;
-    }
-
-
 
     /**
      * Query DB for pairs, generate intermediate source file, process, fire share intent.

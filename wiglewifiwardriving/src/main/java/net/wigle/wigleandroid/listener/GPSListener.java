@@ -12,29 +12,34 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 import androidx.core.content.ContextCompat;
 
 public class GPSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
-    public static final float LERP_THRESHOLD_METERS = 1.0f;
+    public static final float LERP_MIN_THRESHOLD_METERS = 1.0f;
+    public static final float LERP_MAX_THRESHOLD_METERS = 200f;
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private Location location;
     private Location networkLocation;
     private GpsStatus gpsStatus;
+    private GnssStatus gnssStatus;
     // set these times to avoid NPE in locationOK() seen by <DooMMasteR>
     private Long lastLocationTime = 0L;
     private Long lastNetworkLocationTime = 0L;
@@ -114,6 +119,10 @@ public class GPSListener implements Listener, LocationListener {
         if ( mapLocationListener != null ) {
             mapLocationListener.onStatusChanged( provider, status, extras );
         }
+    }
+
+    public void onGnssStatusChanged(GnssStatus gnssStatus) {
+        this.gnssStatus = gnssStatus;
     }
 
     /** newLocation can be null */
@@ -227,12 +236,14 @@ public class GPSListener implements Listener, LocationListener {
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
                     edit.apply();
                 }
-                if ( dist > LERP_THRESHOLD_METERS) {
-                    if (null != dbHelper) {
-                        if (!location.equals(prevGpsLocation)) {
-                            dbHelper.recoverLocations(location);
-                            //MainActivity.info("lerping...");
-                        }
+                if ( dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
+                    if (dist > LERP_MAX_THRESHOLD_METERS) {
+                        MainActivity.warn("Diff is too large, not lerping. " + dist + " meters");
+                        dbHelper.clearPendingObservations();
+                    }
+                    else if (!location.equals(prevGpsLocation)) {
+                        MainActivity.info("lerping for " + dist + " meters");
+                        dbHelper.recoverLocations(location);
                     }
                 }
             }
@@ -358,14 +369,59 @@ public class GPSListener implements Listener, LocationListener {
 
     public int getSatCount() {
         int satCount = 0;
-        if ( gpsStatus != null ) {
+        if (gnssStatus != null && Build.VERSION.SDK_INT >= 24) {
+            for ( int i = 0; i < gnssStatus.getSatelliteCount(); i++ ) {
+                if ( gnssStatus.usedInFix(i) ) satCount++;
+            }
+        }
+        else if ( gpsStatus != null ) {
             for ( GpsSatellite sat : gpsStatus.getSatellites() ) {
-                if ( sat.usedInFix() ) {
-                    satCount++;
-                }
+                if ( sat.usedInFix() ) satCount++;
             }
         }
         return satCount;
+    }
+
+    public Map<String, Integer> getConstellations() {
+        final Map<String, Integer> cons = new TreeMap<>();
+        if (gnssStatus != null && Build.VERSION.SDK_INT >= 24) {
+            for ( int i = 0; i < gnssStatus.getSatelliteCount(); i++ ) {
+                if ( gnssStatus.usedInFix(i) ) {
+                    final String key = constellationToString(gnssStatus.getConstellationType(i));
+                    int old = cons.getOrDefault(key, 0);
+                    cons.put(key, old + 1);
+                }
+            }
+        }
+        return Collections.unmodifiableMap(cons);
+    }
+
+    private String constellationToString(final int constellationType) {
+        String con = "?";
+        switch(constellationType) {
+            case GnssStatus.CONSTELLATION_GPS:
+                con = "GPS";
+                break;
+            case GnssStatus.CONSTELLATION_SBAS:
+                con = "SBAS";
+                break;
+            case GnssStatus.CONSTELLATION_GLONASS:
+                con = "Glonass";
+                break;
+            case GnssStatus.CONSTELLATION_QZSS:
+                con = "QZSS";
+                break;
+            case GnssStatus.CONSTELLATION_BEIDOU:
+                con = "Beidou";
+                break;
+            case GnssStatus.CONSTELLATION_GALILEO:
+                con = "Galileo";
+                break;
+        }
+        if (Build.VERSION.SDK_INT > 28 && constellationType == 7 /*GnssStatus.CONSTELLATION_IRNSS*/) {
+            con = "IRNSS";
+        }
+        return con;
     }
 
     public void saveLocation() {

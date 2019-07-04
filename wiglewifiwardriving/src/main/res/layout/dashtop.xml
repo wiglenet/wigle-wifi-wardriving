@@ -25,162 +25,243 @@
             android:gravity="center"
             />
     </RelativeLayout>
+
+    <!-- outer 2-sided horizontal -->
     <RelativeLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView
+        <!-- left side vertical -->
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/runnets"
-            android:textSize="38sp"
-            android:textColor="#B0B0B0"
-        />
-        <TextView
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/runrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentTop="true">
+
+                <TextView
+                    android:id="@+id/runnets"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#B0B0B0"
+                    android:textSize="38sp"
+                    />
+
+                <TextView
+                    android:id="@+id/runcaption"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/runnets"
+                    android:paddingTop="8dp"
+                    android:textColor="#AAAAAA"
+                    android:textSize="16sp"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/wifirow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/runrow">
+
+                <TextView
+                    android:id="@+id/newwifi"
+                    style="@style/WiFiColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="44sp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_toRightOf="@+id/newwifi"
+                    android:paddingTop="8dp"
+                    android:text="@string/dash_new_wifi"
+                    android:textSize="21sp"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/btrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/wifirow">
+
+                <TextView
+                    android:id="@+id/newbt"
+                    style="@style/BtDarkColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="44sp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_toRightOf="@+id/newbt"
+                    android:paddingTop="8dp"
+                    android:text="@string/dash_new_bt"
+                    android:textSize="21sp"
+                    />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/cellrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:orientation="horizontal"
+                android:layout_below="@id/btrow">
+
+                <TextView
+                    android:id="@+id/newcells"
+                    style="@style/CellColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="44sp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|left"
+                    android:layout_toRightOf="@+id/newcells"
+                    android:paddingTop="8dp"
+                    android:text="@string/dash_new_cells"
+                    android:textSize="21sp"
+                    />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <!-- right side vertical (satellite info) -->
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/runcaption"
-            android:textSize="16sp"
-            android:textColor="#AAAAAA"
-            android:layout_toRightOf="@+id/runnets"
-            android:paddingTop="8dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/gpsstatus"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#46AA00"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/fixtype"
-            android:paddingTop="2dp"
-            />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fixtype"
-            android:tint="#46AA00"
-            android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/fixmeta"
-            android:paddingTop="8dp"
-            android:paddingRight="4dp"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/fixmeta"
-            android:textSize="20sp"
-            android:textColor="#46AA00"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:paddingTop="2dp"
-            android:visibility="invisible"
-            android:paddingRight="4dp"
-            />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/gpsstatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/fixtype"
+                android:paddingTop="2dp"
+                android:textColor="#46AA00"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                />
+
+            <ImageView
+                android:id="@+id/fixtype"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/fixmeta"
+                android:paddingRight="4dp"
+                android:paddingTop="8dp"
+                android:tint="#46AA00"
+                />
+
+            <TextView
+                android:id="@+id/fixmeta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:textColor="#46AA00"
+                android:textSize="20sp"
+                android:visibility="invisible"
+                />
+
+            <TextView
+                android:id="@+id/contype"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/fixmeta"
+                android:layout_toLeftOf="@+id/concount"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:textColor="#46AA00"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="invisible"
+                />
+
+            <TextView
+                android:id="@+id/concount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/fixmeta"
+                android:paddingRight="4dp"
+                android:paddingTop="2dp"
+                android:textColor="#46AA00"
+                android:textSize="16sp"
+                android:visibility="invisible"
+                />
+        </RelativeLayout>
     </RelativeLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/newwifi"
-            android:textSize="44sp"
-            style="@style/WiFiColor"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/dash_new_wifi"
-            android:textSize="21sp"
-            android:layout_gravity="top|left"
-            android:paddingTop="8dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/newbt"
-            android:textSize="44sp"
-            style="@style/BtDarkColor"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/dash_new_bt"
-            android:textSize="21sp"
-            android:layout_gravity="top|left"
-            android:paddingTop="8dp"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/newcells"
-            android:textSize="44sp"
-            style="@style/CellColor"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/dash_new_cells"
-            android:textSize="21sp"
-            android:layout_gravity="top|left"
-            android:paddingTop="8dp"
-            />
-    </LinearLayout>
+
     <RelativeLayout
-        android:layout_width="fill_parent"
+        style="@style/invertedText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        style="@style/invertedText">
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"
+            android:paddingLeft="3dp"
             android:text="@string/dash_time_run"
             android:textColor="#303030"
-            android:paddingLeft="3dp"
+            android:textSize="30sp"
             />
+
         <TextView
+            android:id="@+id/run_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/run_dur"
-            android:textSize="30sp"
             android:layout_alignParentRight="true"
-            android:textColor="#303030"
             android:paddingRight="4dp"
+            android:textColor="#303030"
+            android:textSize="30sp"
             />
     </RelativeLayout>
+
     <RelativeLayout
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="30sp"
+            android:paddingLeft="3dp"
             android:text="@string/dash_time_scanning"
             android:textColor="#B0B0B0"
-            android:paddingLeft="3dp"
+            android:textSize="30sp"
             />
+
         <TextView
+            android:id="@+id/scan_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/scan_dur"
-            android:textSize="30sp"
-            android:textColor="#B0B0B0"
+            android:layout_alignParentRight="true"
             android:paddingRight="4dp"
-            android:layout_alignParentRight="true" />
+            android:textColor="#B0B0B0"
+            android:textSize="30sp"/>
     </RelativeLayout>
 </LinearLayout>

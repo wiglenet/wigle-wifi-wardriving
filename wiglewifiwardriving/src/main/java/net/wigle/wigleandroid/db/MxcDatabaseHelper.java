@@ -60,6 +60,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
         Integer installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
 
+        OutputStream mxcOutput = null;
         try {
             if (installCount < MAX_INSTALL_TRIES) {
                 assetInputData = context.getAssets().open(MXC_DB_NAME);
@@ -68,16 +69,13 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 MainActivity.info("/data/data/" + context.getPackageName() + "/databases/" + MXC_DB_NAME + " vs " + outputFilePath);
                 final File outputFile = new File(outputFilePath);
 
-                OutputStream mxcOutput = new FileOutputStream(outputFile);
+                mxcOutput = new FileOutputStream(outputFile);
 
                 byte[] buffer = new byte[1024];
                 int length;
                 while ((length = assetInputData.read(buffer)) > 0) {
                     mxcOutput.write(buffer, 0, length);
                 }
-
-                mxcOutput.flush();
-                mxcOutput.close();
             } else {
                 MainActivity.error("stopped trying to implant Mxc DB: reached max tries.");
             }
@@ -86,6 +84,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         } finally {
             if (null != assetInputData) {
                 assetInputData.close();
+            }
+            if (null != mxcOutput) {
+                mxcOutput.flush();
+                mxcOutput.close();
             }
             final SharedPreferences.Editor editDone = prefs.edit();
             editDone.putInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, installCount+1);
@@ -210,7 +212,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    /** This method close database connection and released occupied memory **/
+    /** This method closes the database connection and released occupied memory **/
     @Override
     public synchronized void close() {
         if (db != null)

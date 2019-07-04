@@ -401,4 +401,5 @@
     <string name="search_failed">Søgningen mislykkedes</string>
     <string name="search_empty">Resultater tom</string>
     <string name="search_query_limit">Du har nået det maksimale antal søgninger i dag. Din grænse vil blive nulstillet i morgen.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

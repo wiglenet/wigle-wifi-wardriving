@@ -359,7 +359,7 @@
     <string name="settings_scan_head">Scan Settings</string>
     <string name="ssid_filter_head">Filtro SSID</string>
     <string name="mac_oui_filter_head">Filtro MAC / OUI</string>
-    <string name="display_filter_button">scludi i MAC / OUI da visualizzare…</string>
+    <string name="display_filter_button">Escludi i MAC / OUI da visualizzare…</string>
     <string name="add_oui_filter_button">Aggiungi filtro OUI</string>
     <string name="add_mac_filter_button">Aggiungi filtro MAC</string>
     <string name="log_filter_button">Escludi i MAC / OUI dalla registrazione…</string>
@@ -401,4 +401,5 @@
     <string name="search_failed">Ricerca fallita</string>
     <string name="search_empty">Risultati vuoti</string>
     <string name="search_query_limit">Hai raggiunto il numero massimo di ricerche oggi. Il tuo limite verrà ripristinato domani.</string>
+    <string name="menu_debug">Debug</string>
 </resources>

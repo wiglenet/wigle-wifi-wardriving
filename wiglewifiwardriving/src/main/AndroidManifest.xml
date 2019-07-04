@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="243"
-    android:versionName="2.43">
+    android:versionCode="244"
+    android:versionName="2.44">
 
     <supports-screens
         android:anyDensity="true"
@@ -64,7 +64,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/wiglewifi"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.AppCompat">
         <activity
@@ -100,7 +100,15 @@
             android:exported="false"
             android:label="@string/error_report_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat"></activity>
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".DebugActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/menu_debug"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.AppCompat"/>
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
@@ -241,8 +249,7 @@
         <service
             android:name=".WigleService"
             android:enabled="true"
-            android:icon="@drawable/wiglewifi" />
-
+            android:icon="@mipmap/ic_launcher" />
         <uses-library
             android:name="com.google.android.maps"
             android:required="false" />

@@ -401,5 +401,5 @@
     <string name="search_failed">فشل البحث</string>
     <string name="search_empty">النتائج فارغة</string>
     <string name="search_query_limit">لقد وصلت إلى الحد الأقصى من عمليات البحث اليوم. ستتم إعادة تعيين الحد الخاص بك غدًا.</string>
-
+    <string name="menu_debug">Debug</string>
 </resources>

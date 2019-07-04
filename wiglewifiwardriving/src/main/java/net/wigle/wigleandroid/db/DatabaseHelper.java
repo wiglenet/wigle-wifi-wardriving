@@ -985,6 +985,11 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    public void clearPendingObservations() {
+        MainActivity.info("clearing pending observations");
+        pending.clear();
+    }
+
     /**
      *  walk any pending observations, lerp from last to recover to fill in their location details, add to the real queue.
      *
@@ -1166,11 +1171,17 @@ public final class DatabaseHelper extends Thread {
 
     public long getNetsWithLocCountFromDB() throws DBException {
         checkDB();
-        final Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
-        cursor.moveToFirst();
-        final long count = cursor.getLong( 0 );
-        cursor.close();
-        return count;
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
+            cursor.moveToFirst();
+            final long count = cursor.getLong( 0 );
+            return count;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     public Network getNetwork( final String bssid ) {

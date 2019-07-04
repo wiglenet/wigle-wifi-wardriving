@@ -150,6 +150,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // ignore, happens on some vm's
             MainActivity.info("exception getting scan results: " + ex, ex);
         }
+        MainActivity.info("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -187,7 +188,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         // MainActivity.info("now minus haveloctime: " + (now-lastHaveLocationTime)
         //    + " lastHaveLocationTime: " + lastHaveLocationTime);
-        if (now - lastHaveLocationTime > 30000L) {
+        if (now - lastHaveLocationTime > 45000L) {
             // no location in a while, make sure we're subscribed to updates
             MainActivity.info("no location for a while, setting location update period: " + setPeriod);
             mainActivity.setLocationUpdates(setPeriod, 0f);
@@ -888,6 +889,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 lastScanResponseTime = now;
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
+                MainActivity.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
                         ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );

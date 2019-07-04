@@ -46,8 +46,6 @@ def driverCopy = configurations.driver.copy()
 driverCopy.each {File file -> loader.addURL(file.toURI().toURL())}
 
 ext {
-    supportLibraryVersion = '28.0.0'
-    gmsLibraryBaseVersion = '16.1.0'
     inputMxcSqlDir = "etc/mccmncsqlite"
     outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
     mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"
@@ -55,14 +53,14 @@ ext {
 
 dependencies {
     // implementation project(':android-maps-utils')
-    implementation "androidx.core:core:1.0.0"
+    implementation "androidx.core:core:1.0.2"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
     implementation "com.google.android.material:material:1.0.0"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.0.0"
+    implementation "androidx.appcompat:appcompat:1.0.2"
     // note: may be cause of libhwui crash - see https://github.com/koral--/android-gif-drawable/releases/tag/v1.2.16
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.15' // Stranded (.16-> minSDK == 17)
-    // implementation "com.google.android.gms:play-services-maps:$gmsLibraryBaseVersion"
+    // implementation "com.google.android.gms:play-services-maps:16.1.0"
     // implementation 'com.google.android.gms:play-services-vision:17.0.2'
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'org.slf4j:slf4j-android:1.7.19'
@@ -73,11 +71,11 @@ dependencies {
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
     testImplementation 'junit:junit:4.12'
-    testImplementation 'androidx.test:core:1.1.0'
+    testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
     androidTestImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.0.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha02'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
 import groovy.json.JsonSlurper

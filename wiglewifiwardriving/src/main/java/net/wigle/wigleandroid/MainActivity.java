@@ -19,6 +19,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.location.GnssStatus;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
@@ -93,6 +94,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -131,7 +133,7 @@ public final class MainActivity extends AppCompatActivity {
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
-        private String[] logs = new String[20];
+        private String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
     }
@@ -1377,7 +1379,8 @@ public final class MainActivity extends AppCompatActivity {
         final State state = getStaticState();
         if (state == null) return;
         final int pointer = state.logPointer++ % state.logs.length;
-        state.logs[pointer] = Thread.currentThread().getName() + "] " + value;
+        state.logs[pointer] = SimpleDateFormat.getTimeInstance().format(new Date()) + " "
+                + Thread.currentThread().getName() + "] " + value;
         if (pointer > 10000 * state.logs.length) {
             state.logPointer -= 100 * state.logs.length;
         }
@@ -1493,16 +1496,9 @@ public final class MainActivity extends AppCompatActivity {
                 throwable.printStackTrace(new PrintStream(fos));
                 try {
                     fos.write((error + "\n\n").getBytes(ENCODING));
-                    final State state = getStaticState();
-                    final String[] logs = state.logs;
-                    int pointer = state.logPointer;
-                    final int maxPointer = pointer + logs.length;
-                    for (int i = pointer; i < maxPointer; i++) {
-                        final String log = logs[i % logs.length];
-                        if (log != null) {
-                            fos.write(log.getBytes(ENCODING));
-                            fos.write("\n".getBytes(ENCODING));
-                        }
+                    for (final String log : getLogLines()) {
+                        fos.write(log.getBytes(ENCODING));
+                        fos.write("\n".getBytes(ENCODING));
                     }
                 } catch (Throwable er) {
                     // ohwell
@@ -1514,6 +1510,31 @@ public final class MainActivity extends AppCompatActivity {
             error("error logging error: " + ex, ex);
             ex.printStackTrace();
         }
+    }
+
+    public static Iterable<String> getLogLines() {
+        final State state = getStaticState();
+        return new Iterable<String>() {
+            @Override
+            public Iterator<String> iterator() {
+                return new Iterator<String>() {
+                    int currentPointer = state.logPointer;
+                    final int maxPointer = currentPointer + state.logs.length;
+
+                    @Override
+                    public boolean hasNext() {
+                        return state.logs[currentPointer % state.logs.length] != null && currentPointer < maxPointer;
+                    }
+
+                    @Override
+                    public String next() {
+                        final String retval = state.logs[currentPointer % state.logs.length];
+                        currentPointer++;
+                        return retval;
+                    }
+                };
+            }
+        };
     }
 
     public static boolean hasSD() {
@@ -1803,13 +1824,17 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private boolean canBtBeActivated() {
-        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
-        if (bt == null) {
-            info("No bluetooth adapter");
-            return false;
-        }
-        if (!bt.isEnabled()) {
-            return true;
+        try {
+            final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+            if (bt == null) {
+                info("No bluetooth adapter");
+                return false;
+            }
+            if (!bt.isEnabled()) {
+                return true;
+            }
+        } catch (java.lang.SecurityException sex) {
+            MainActivity.warn("bt activation security exception");
         }
         return false;
     }
@@ -2091,6 +2116,32 @@ public final class MainActivity extends AppCompatActivity {
             info("Security exception adding status listener: " + ex, ex);
         }
 
+        if (Build.VERSION.SDK_INT >= 24) {
+            try {
+                locationManager.registerGnssStatusCallback(new GnssStatus.Callback() {
+                    @Override
+                    public void onStarted() {
+                    }
+
+                    @Override
+                    public void onStopped() {
+                    }
+
+                    @Override
+                    public void onFirstFix(int ttffMillis) {
+                    }
+
+                    @Override
+                    public void onSatelliteStatusChanged(GnssStatus status) {
+                        state.gpsListener.onGnssStatusChanged(status);
+                    }
+                });
+            }
+            catch (final Exception ex) {
+                error("Error registering for gnss: " + ex, ex);
+            }
+        }
+
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final boolean useNetworkLoc = prefs.getBoolean(ListFragment.PREF_USE_NETWORK_LOC, false);
 
@@ -2121,6 +2172,20 @@ public final class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public static <A> String join(final String delimiter, final Iterable<A> iterable) {
+        if (delimiter == null || iterable == null) {
+            throw new IllegalArgumentException("join argument is null. delimiter: " + delimiter
+                    + " iterable: " + iterable);
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (final A i : iterable) {
+            if (i == null) continue;
+            if (sb.length() > 0) sb.append(delimiter);
+            sb.append(i.toString());
+        }
+        return sb.toString();
     }
 
     public long getLocationSetPeriod() {

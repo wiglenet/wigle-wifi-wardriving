@@ -427,6 +427,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
 
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        if (null == intent) {
+            MainActivity.error("null intent in Bluetooth onReceive");
+            return;
+        }
         final String action = intent.getAction();
         if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
@@ -500,7 +504,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             ListFragment.lameStatic.runBt = runNetworks.size();
             sort(prefs);
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
-
         }
     }
 

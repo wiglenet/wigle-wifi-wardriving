@@ -10,6 +10,10 @@ import net.wigle.wigleandroid.MainActivity;
 public class ScanControlReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (null == intent) {
+            MainActivity.error("null intent in scan control onReceive");
+            return;
+        }
         MainActivity.info("Scan control intent type: " + intent.getAction());
         final MainActivity main = MainActivity.getMainActivity();
         //Intent result = new Intent("net.wigle.wigleandroid.RESULT_ACTION");

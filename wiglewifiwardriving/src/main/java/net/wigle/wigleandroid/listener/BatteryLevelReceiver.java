@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import net.wigle.wigleandroid.MainActivity;
+
 /**
  * keep track of battery
  */
@@ -16,6 +18,10 @@ public final class BatteryLevelReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (null == intent) {
+            MainActivity.error("null intent in battery onReceive");
+            return;
+        }
         batteryStatus = intent.getIntExtra("status", -1);
         int rawlevel = intent.getIntExtra("level", -1);
         int scale = intent.getIntExtra("scale", -1);

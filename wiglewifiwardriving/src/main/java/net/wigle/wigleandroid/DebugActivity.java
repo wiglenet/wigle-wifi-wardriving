@@ -50,11 +50,12 @@ public class DebugActivity extends AppCompatActivity {
     private void updateView() {
         // set on view
         final TextView tv = findViewById( R.id.debugreport );
-        tv.setText( "" );
+        //ALIBI: calling append() on a TextView directly (especially inside a loop) considered unreliable
+        StringBuilder sb = new StringBuilder();
         for (final String log : MainActivity.getLogLines()) {
-            tv.append(log);
-            tv.append("\n");
+            sb.append(log).append("\n");
         }
+        tv.setText( sb.toString() );
     }
 
     private void setupEmail() {

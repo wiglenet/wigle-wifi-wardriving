@@ -14,6 +14,10 @@ public class UploadReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Figure out what to do based on the intent type
+        if (null == intent) {
+            MainActivity.error("null intent in upload onReceive");
+            return;
+        }
         MainActivity.info("TerminationRec intent type: " + intent.getAction());
         switch (intent.getAction()) {
             case MainActivity.ACTION_UPLOAD:

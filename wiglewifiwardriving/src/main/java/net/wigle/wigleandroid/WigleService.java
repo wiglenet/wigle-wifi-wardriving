@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -154,91 +155,94 @@ public final class WigleService extends Service {
     }
 
     public void setupNotification() {
-        if ( ! done.get() ) {
-            final long when = System.currentTimeMillis();
-            final Context context = getApplicationContext();
-            final String title = context.getString(R.string.wigle_service);
+        try {
+            if (!done.get()) {
+                final long when = System.currentTimeMillis();
+                final Context context = getApplicationContext();
+                final String title = context.getString(R.string.wigle_service);
 
-            final Intent notificationIntent = new Intent( this, MainActivity.class );
-            final PendingIntent contentIntent = PendingIntent.getActivity( this, 0, notificationIntent, 0 );
-            final long dbNets = ListFragment.lameStatic.dbNets;
-            String text = context.getString(R.string.list_waiting_gps);
-            if ( dbNets > 0 ) {
-                long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
-                long newNets = ListFragment.lameStatic.newNets;
-                text = context.getString(R.string.run) + ": " + runNets
-                        + "  "+ context.getString(R.string.new_word) + ": " +newNets
-                        + "  "+ context.getString(R.string.db) + ": " + dbNets;
-            }
-            if (! MainActivity.isScanning(context)) {
-                text = context.getString(R.string.list_scanning_off) + " " + text;
-            }
-            if (largeIcon == null) {
-                largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
-            }
+                final Intent notificationIntent = new Intent(this, MainActivity.class);
+                final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+                final long dbNets = ListFragment.lameStatic.dbNets;
+                String text = context.getString(R.string.list_waiting_gps);
+                if (dbNets > 0) {
+                    long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
+                    long newNets = ListFragment.lameStatic.newNets;
+                    text = context.getString(R.string.run) + ": " + runNets
+                            + "  " + context.getString(R.string.new_word) + ": " + newNets
+                            + "  " + context.getString(R.string.db) + ": " + dbNets;
+                }
+                if (!MainActivity.isScanning(context)) {
+                    text = context.getString(R.string.list_scanning_off) + " " + text;
+                }
+                if (largeIcon == null) {
+                    largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.wiglewifi);
+                }
 
-            final Intent pauseSharedIntent = new Intent();
-            pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
-            pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
+                final Intent pauseSharedIntent = new Intent();
+                pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
+                pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
 
-            MainActivity ma = MainActivity.getMainActivity();
-            Notification notification = null;
+                MainActivity ma = MainActivity.getMainActivity();
+                Notification notification = null;
 
-            if (null != ma) {
-                final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-                final Intent scanSharedIntent = new Intent();
-                scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
-                scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
-                final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
+                if (null != ma) {
+                    final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final Intent scanSharedIntent = new Intent();
+                    scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
+                    scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
+                    final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                final Intent uploadSharedIntent = new Intent();
-                uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
-                uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
-                final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent ,PendingIntent.FLAG_CANCEL_CURRENT);
+                    final Intent uploadSharedIntent = new Intent();
+                    uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
+                    uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
+                    final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
-                } else {
-                    @SuppressWarnings("deprecation")
-                    final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                    builder.setContentIntent(contentIntent);
-                    builder.setNumber((int) ListFragment.lameStatic.newNets);
-                    builder.setTicker(title);
-                    builder.setContentTitle(title);
-                    builder.setContentText(text);
-                    builder.setWhen(when);
-                    builder.setLargeIcon(largeIcon);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else {
-                        builder.setSmallIcon(R.drawable.wiglewifi_small);
-                    }
-                    builder.setOngoing(true);
-                    builder.setCategory("SERVICE");
-                    builder.setPriority(NotificationCompat.PRIORITY_LOW);
-                    builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                    builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
-                    builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
-                    builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
+                        @SuppressWarnings("deprecation") final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+                        builder.setContentIntent(contentIntent);
+                        builder.setNumber((int) ListFragment.lameStatic.newNets);
+                        builder.setTicker(title);
+                        builder.setContentTitle(title);
+                        builder.setContentText(text);
+                        builder.setWhen(when);
+                        builder.setLargeIcon(largeIcon);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+                        } else {
+                            builder.setSmallIcon(R.drawable.wiglewifi_small);
+                        }
+                        builder.setOngoing(true);
+                        builder.setCategory("SERVICE");
+                        builder.setPriority(NotificationCompat.PRIORITY_LOW);
+                        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+                        builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+                        builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+                        builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
 
+                        try {
+                            //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
+                            notification = builder.build();
+                        } catch (NullPointerException npe) {
+                            MainActivity.error("NPE trying to build notification. " + npe.getMessage());
+                        }
+                    }
+
+                }
+                if (null != notification) {
                     try {
-                        //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
-                        notification = builder.build();
-                    } catch (NullPointerException npe) {
-                        MainActivity.error("NPE trying to build notification. "+npe.getMessage());
+                        startForeground(NOTIFICATION_ID, notification);
+                    } catch (Exception ex) {
+                        MainActivity.error("notification service error: ", ex);
                     }
+                } else {
+                    MainActivity.info("null notification - skipping startForeground");
                 }
-
             }
-            if (null != notification) {
-                try {
-                    startForeground(NOTIFICATION_ID, notification);
-                } catch (Exception ex) {
-                    MainActivity.error("notification service error: ", ex);
-                }
-            } else {
-                MainActivity.info("null notification - skipping startForeground");
-            }
+        } catch (Exception ex) {
+            MainActivity.error("trapped notification exception out outer level - ",ex);
         }
     }
 
@@ -276,15 +280,21 @@ public final class WigleService extends Service {
 
             //TODO: figure out how to update notification actions on exec, then we can show relevant
             if (MainActivity.isScanning(getApplicationContext())) {
-                Notification.Action pauseAction = new Notification.Action.Builder(android.R.drawable.ic_media_pause,"Pause", pauseIntent)
+                Notification.Action pauseAction = new Notification.Action.Builder(
+                        Icon.createWithResource(this, android.R.drawable.ic_media_pause),
+                        "Pause", pauseIntent)
                         .build();
                 builder.addAction(pauseAction);
             } else {
-                Notification.Action scanAction = new Notification.Action.Builder(android.R.drawable.ic_media_play,"Scan", scanIntent)
+                Notification.Action scanAction = new Notification.Action.Builder(
+                        Icon.createWithResource(this, android.R.drawable.ic_media_play),
+                        "Scan", scanIntent)
                         .build();
                 builder.addAction(scanAction);
             }
-            Notification.Action ulAction = new Notification.Action.Builder(android.R.drawable.ic_menu_upload,"Upload", uploadIntent)
+            Notification.Action ulAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_menu_upload),
+                    "Upload", uploadIntent)
                     .build();
             builder.addAction(ulAction);
 

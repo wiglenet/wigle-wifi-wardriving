@@ -34,6 +34,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
@@ -80,6 +81,7 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.InstallUtility;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -331,6 +333,14 @@ public final class MainActivity extends AppCompatActivity {
             setupFragments();
         }
         setupFilters(prefs);
+
+        // ALIBI: don't inherit MxC implant failures from backups.
+        if (InstallUtility.isFirstInstall(this)) {
+            SharedPreferences mySPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = mySPrefs.edit();
+            editor.remove(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED);
+            editor.apply();
+        }
 
         //TODO: if we can determine whether DB needs updating, we can avoid copying every time
         //if (!state.mxcDbHelper.isPresent()) {

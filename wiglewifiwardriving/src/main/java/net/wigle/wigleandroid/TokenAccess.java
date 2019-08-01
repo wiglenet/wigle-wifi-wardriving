@@ -106,6 +106,10 @@ public class TokenAccess {
 
         final KeyStore keyStore = getKeyStore();
         final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
+        if (null == key) {
+            MainActivity.warn("unable to retrieve KEYSTORE_WIGLE_CREDS_KEY_V2");
+            throw new InvalidKeyException("Unable to fetch key");
+        }
         Cipher encrypt = Cipher.getInstance(AES_CIPHER);
         encrypt.init(Cipher.ENCRYPT_MODE, key);
 

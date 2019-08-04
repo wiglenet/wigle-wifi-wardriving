@@ -1738,11 +1738,15 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static boolean shouldScanBtByDefault() {
+        return ! "Samsung".equalsIgnoreCase(android.os.Build.MANUFACTURER);
+    }
+
     private void setupActivationDialog() {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true));
+        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, shouldScanBtByDefault()));
 
         if ((willActivateBt && useBt) || willActivateWifi) {
 
@@ -1860,7 +1864,7 @@ public final class MainActivity extends AppCompatActivity {
         }
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final Editor edit = prefs.edit();
-        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
+        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, MainActivity.shouldScanBtByDefault())) {
             if (!bt.isEnabled()) {
                 info("Enable bluetooth");
                 edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);

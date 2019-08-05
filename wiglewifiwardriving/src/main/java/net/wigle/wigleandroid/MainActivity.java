@@ -1739,7 +1739,8 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public static boolean shouldScanBtByDefault() {
-        return ! "Samsung".equalsIgnoreCase(android.os.Build.MANUFACTURER);
+        final String manuf = android.os.Build.MANUFACTURER;
+        return ! ("Samsung".equalsIgnoreCase(manuf) || "Motorola".equalsIgnoreCase(manuf));
     }
 
     private void setupActivationDialog() {

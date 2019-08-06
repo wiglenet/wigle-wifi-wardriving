@@ -38,6 +38,8 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -2117,6 +2119,9 @@ public final class MainActivity extends AppCompatActivity {
         if (state.gpsListener != null) {
             // remove any old requests
             locationManager.removeUpdates(state.gpsListener);
+            if (Build.VERSION.SDK_INT >= 24) {
+                locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+            }
             locationManager.removeGpsStatusListener(state.gpsListener);
         }
 
@@ -2131,24 +2136,7 @@ public final class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= 24) {
             try {
-                locationManager.registerGnssStatusCallback(new GnssStatus.Callback() {
-                    @Override
-                    public void onStarted() {
-                    }
-
-                    @Override
-                    public void onStopped() {
-                    }
-
-                    @Override
-                    public void onFirstFix(int ttffMillis) {
-                    }
-
-                    @Override
-                    public void onSatelliteStatusChanged(GnssStatus status) {
-                        state.gpsListener.onGnssStatusChanged(status);
-                    }
-                });
+                locationManager.registerGnssStatusCallback(gnssStatusCallback);
             }
             catch (final Exception ex) {
                 error("Error registering for gnss: " + ex, ex);
@@ -2180,6 +2168,9 @@ public final class MainActivity extends AppCompatActivity {
                 info("removing location listener: " + state.gpsListener);
                 try {
                     locationManager.removeUpdates(state.gpsListener);
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    }
                 } catch (final SecurityException ex) {
                     info("Security exception removing status listener: " + ex, ex);
                 }
@@ -2342,6 +2333,10 @@ public final class MainActivity extends AppCompatActivity {
             locationManager.removeGpsStatusListener(state.gpsListener);
             try {
                 locationManager.removeUpdates(state.gpsListener);
+                if (Build.VERSION.SDK_INT >= 24) {
+                    locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                }
+
             } catch (final SecurityException ex) {
                 error("SecurityException on finish: " + ex, ex);
             }
@@ -2451,4 +2446,23 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(24)
+    private GnssStatus.Callback gnssStatusCallback = new GnssStatus.Callback() {
+        @Override
+        public void onStarted() {
+        }
+
+        @Override
+        public void onStopped() {
+        }
+
+        @Override
+        public void onFirstFix(int ttffMillis) {
+        }
+
+        @Override
+        public void onSatelliteStatusChanged(GnssStatus status) {
+            state.gpsListener.onGnssStatusChanged(status);
+        }
+    };
 }

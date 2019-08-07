@@ -1,3 +1,10 @@
+* 2.45 (08/06/2019)
+Pie Wifi throttling warnings, Q throttle disable instructions.
+Fix for RemoteServiceException.
+Fix OS upgrade auth problems.
+pt-rBR translations updates (thanks l-almeida).
+Library updates and other bug fixes.
+
 * 2.44 (07/04/2019)
 Add GNSS info to dashboard.
 Italian language fix (thx Mpegforever).

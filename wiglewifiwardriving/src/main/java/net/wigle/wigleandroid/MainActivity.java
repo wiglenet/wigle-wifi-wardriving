@@ -147,6 +147,9 @@ public final class MainActivity extends AppCompatActivity {
     private State state;
     // *** end of state that is retained ***
 
+    @RequiresApi(24)
+    private GnssStatus.Callback gnssStatusCallback = null;
+
     static final Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
@@ -2142,7 +2145,9 @@ public final class MainActivity extends AppCompatActivity {
             // remove any old requests
             locationManager.removeUpdates(state.gpsListener);
             if (Build.VERSION.SDK_INT >= 24) {
-                locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                if (gnssStatusCallback != null) {
+                    locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                }
             }
             locationManager.removeGpsStatusListener(state.gpsListener);
         }
@@ -2158,6 +2163,24 @@ public final class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= 24) {
             try {
+                gnssStatusCallback = new GnssStatus.Callback() {
+                    @Override
+                    public void onStarted() {
+                    }
+
+                    @Override
+                    public void onStopped() {
+                    }
+
+                    @Override
+                    public void onFirstFix(int ttffMillis) {
+                    }
+
+                    @Override
+                    public void onSatelliteStatusChanged(GnssStatus status) {
+                        state.gpsListener.onGnssStatusChanged(status);
+                    }
+                };
                 locationManager.registerGnssStatusCallback(gnssStatusCallback);
             }
             catch (final Exception ex) {
@@ -2191,7 +2214,9 @@ public final class MainActivity extends AppCompatActivity {
                 try {
                     locationManager.removeUpdates(state.gpsListener);
                     if (Build.VERSION.SDK_INT >= 24) {
-                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                        if (gnssStatusCallback != null) {
+                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                        }
                     }
                 } catch (final SecurityException ex) {
                     info("Security exception removing status listener: " + ex, ex);
@@ -2356,7 +2381,9 @@ public final class MainActivity extends AppCompatActivity {
             try {
                 locationManager.removeUpdates(state.gpsListener);
                 if (Build.VERSION.SDK_INT >= 24) {
-                    locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    if (gnssStatusCallback != null) {
+                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    }
                 }
 
             } catch (final SecurityException ex) {
@@ -2467,24 +2494,4 @@ public final class MainActivity extends AppCompatActivity {
             MainActivity.warn("Authentication failure on background run upload");
         }
     }
-
-    @RequiresApi(24)
-    private GnssStatus.Callback gnssStatusCallback = new GnssStatus.Callback() {
-        @Override
-        public void onStarted() {
-        }
-
-        @Override
-        public void onStopped() {
-        }
-
-        @Override
-        public void onFirstFix(int ttffMillis) {
-        }
-
-        @Override
-        public void onSatelliteStatusChanged(GnssStatus status) {
-            state.gpsListener.onGnssStatusChanged(status);
-        }
-    };
 }

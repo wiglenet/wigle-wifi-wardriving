@@ -248,8 +248,12 @@ public final class MainActivity extends AppCompatActivity {
             state = stateFragment.getState();
 
             // tell those that need it that we have a new context
-            state.gpsListener.setMainActivity(this);
-            state.wifiReceiver.setMainActivity(this);
+            if (state.gpsListener != null) {
+                state.gpsListener.setMainActivity(this);
+            }
+            if (state.wifiReceiver != null) {
+                state.wifiReceiver.setMainActivity(this);
+            }
             if (state.observationUploader != null) {
                 state.observationUploader.setContext(this);
             }

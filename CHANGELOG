@@ -1,4 +1,4 @@
-* 2.45 (08/06/2019)
+* 2.45 - 2.46 (08/07/2019)
 Pie Wifi throttling warnings, Q throttle disable instructions.
 Fix for RemoteServiceException.
 Fix OS upgrade auth problems.

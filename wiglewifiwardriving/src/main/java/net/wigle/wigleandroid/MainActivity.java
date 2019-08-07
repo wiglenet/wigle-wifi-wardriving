@@ -1550,6 +1550,16 @@ public final class MainActivity extends AppCompatActivity {
         };
     }
 
+    public static boolean isDevMode(final Context context) {
+        if(Build.VERSION.SDK_INT == 16) {
+            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                    android.provider.Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+        } else if (Build.VERSION.SDK_INT >= 17) {
+            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                    android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+        } else return false;
+    }
+
     public static boolean hasSD() {
         File sdCard = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/");
         MainActivity.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
@@ -1743,12 +1753,20 @@ public final class MainActivity extends AppCompatActivity {
         final boolean willActivateWifi = canWifiBeActivated();
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true));
+        final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
 
-        if ((willActivateBt && useBt) || willActivateWifi) {
+        if ((willActivateBt && useBt) || willActivateWifi || alertVersions) {
 
             String activationMessages = "";
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+                activationMessages = getString(R.string.pie_bad);
+            }
+            else if (Build.VERSION.SDK_INT == 29) {
+                activationMessages = getString(R.string.q_bad);
+            }
 
             if (willActivateBt && useBt) {
+                if (activationMessages.length() > 0) activationMessages += "\n";
                 activationMessages += getString(R.string.turn_on_bt);
                 if (willActivateWifi) {
                     activationMessages += "\n";

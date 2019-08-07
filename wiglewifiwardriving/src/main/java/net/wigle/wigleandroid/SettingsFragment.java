@@ -53,8 +53,7 @@ import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
 public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_ERROR_REPORT = 13;
-    private static final int MENU_DEBUG = 14
-;
+    private static final int MENU_DEBUG = 14;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
@@ -228,6 +227,23 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+
+        final TextView scanThrottleHelp = view.findViewById(R.id.scan_throttle_help);
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+            scanThrottleHelp.setText(R.string.pie_bad);
+            scanThrottleHelp.setVisibility(View.VISIBLE);
+        }
+        else if (Build.VERSION.SDK_INT == 29) {
+            final StringBuilder builder = new StringBuilder(getString(R.string.q_bad));
+            builder.append("\n\n");
+            if (!MainActivity.isDevMode(getContext())) {
+                builder.append(getString(R.string.enable_developer));
+                builder.append("\n\n");
+            }
+            builder.append(getString(R.string.disable_throttle));
+            scanThrottleHelp.setText(builder.toString());
+            scanThrottleHelp.setVisibility(View.VISIBLE);
+        }
 
         final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
         final EditText user = (EditText) view.findViewById(R.id.edit_username);

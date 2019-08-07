@@ -402,4 +402,8 @@
     <string name="search_empty">Výsledky prázdné</string>
     <string name="search_query_limit">Do dnešního dne jste dosáhli maximálního počtu vyhledávání. Váš limit se zítra vynuluje.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
+    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
+    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
+    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
 </resources>

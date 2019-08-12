@@ -248,9 +248,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
         final EditText user = (EditText) view.findViewById(R.id.edit_username);
         final TextView authUserDisplay = (TextView) view.findViewById(R.id.show_authuser);
-        final TextView authUserLabel = (TextView) view.findViewById(R.id.show_authuser_label);
+        final View authUserLayout = view.findViewById(R.id.show_authuser_label);
         final EditText passEdit = (EditText) view.findViewById(R.id.edit_password);
-        final TextView passEditLabel = (TextView) view.findViewById(R.id.edit_password_label);
+        final View passEditLayout = view.findViewById(R.id.edit_password_label);
         final CheckBox showPass = (CheckBox) view.findViewById(R.id.showpassword);
         final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
         final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
@@ -259,7 +259,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
             authUserDisplay.setVisibility(View.VISIBLE);
-            authUserLabel.setVisibility(View.VISIBLE);
+            authUserLayout.setVisibility(View.VISIBLE);
             if (!authToken.isEmpty()) {
                 deauthButton.setVisibility(View.VISIBLE);
                 deauthButton.setOnClickListener(new OnClickListener() {
@@ -272,7 +272,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 });
                 authButton.setVisibility(View.GONE);
                 passEdit.setVisibility(View.GONE);
-                passEditLabel.setVisibility(View.GONE);
+                passEditLayout.setVisibility(View.GONE);
                 showPass.setVisibility(View.GONE);
                 user.setEnabled(false);
             } else {
@@ -281,10 +281,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         } else {
             user.setEnabled(true);
             authUserDisplay.setVisibility(View.GONE);
-            authUserLabel.setVisibility(View.GONE);
+            authUserLayout.setVisibility(View.GONE);
             deauthButton.setVisibility(View.GONE);
             passEdit.setVisibility(View.VISIBLE);
-            passEditLabel.setVisibility(View.VISIBLE);
+            passEditLayout.setVisibility(View.VISIBLE);
             showPass.setVisibility(View.VISIBLE);
             authButton.setVisibility(View.VISIBLE);
             final Handler handler = new UserDownloadHandler(view, getActivity().getPackageName(),

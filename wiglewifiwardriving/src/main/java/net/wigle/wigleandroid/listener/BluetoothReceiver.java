@@ -241,98 +241,102 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch) {
         if (Build.VERSION.SDK_INT >= 21) {
             //DEBUG: MainActivity.info("LE scanResult: " + scanResult);
-            final ScanRecord scanRecord = scanResult.getScanRecord();
-            if (scanRecord != null) {
-                final BluetoothDevice device = scanResult.getDevice();
-                //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
-                //final String adDeviceName = (adData != null) ? adData.getName(): null;
+            try {
+                final ScanRecord scanRecord = scanResult.getScanRecord();
+                if (scanRecord != null) {
+                    final BluetoothDevice device = scanResult.getDevice();
+                    //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
+                    //final String adDeviceName = (adData != null) ? adData.getName(): null;
 
-                final String bssid = device.getAddress();
+                    final String bssid = device.getAddress();
 
-                final String ssid =
-                        (null ==  scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
-                                ? device.getName()
-                                :scanRecord.getDeviceName();
+                    final String ssid =
+                            (null == scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
+                                    ? device.getName()
+                                    : scanRecord.getDeviceName();
 
-                // This is questionable - of Major class being known when specific class seems thin
-                final BluetoothClass bluetoothClass = device.getBluetoothClass();
-                int type = BluetoothClass.Device.Major.UNCATEGORIZED;
-                if (bluetoothClass != null) {
-                    final int deviceClass = bluetoothClass.getDeviceClass();
-                    type = (deviceClass == 0 || deviceClass == BluetoothClass.Device.Major.UNCATEGORIZED)
-                            ? bluetoothClass.getMajorDeviceClass()
-                            : deviceClass;
-                }
-
-                if (DEBUG_BLUETOOTH_DATA) {
-                    MainActivity.info("LE deviceName: " + ssid
-                            + "\n\taddress: " + bssid
-                            + "\n\tname: " + scanRecord.getDeviceName() + " (vs. "+device.getName()+")"
-                            //+ "\n\tadName: " + adDeviceName
-                            + "\n\tclass:"
-                            + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
-                            + "(" + bluetoothClass + ")"
-                            + "\n\ttype:" + device.getType()
-                            + "\n\tRSSI:" + scanResult.getRssi()
-                            //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
-                            //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
-                            );
-
-
-                    /*final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
-                    final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
-
-                    if (adCount > 0 || scanCount > 0){
-                        final List<java.util.UUID> adUuids = adData.getUuids();
-                        final List<ParcelUuid> srUuids = scanRecord.getServiceUuids();
-                        if (scanCount > adCount) {
-                            for (ParcelUuid uuid: srUuids) {
-                                if (! adUuids.contains(uuid.getUuid())) {
-                                    MainActivity.error("\n\t\tSR: "+uuid.toString());
-                                }
-                            }
-                            scanUuidNoAdUuid++;
-                        } else if (adCount > scanCount) {
-                            for (UUID uuid: adUuids) {
-                                if (! srUuids.contains(new ParcelUuid(uuid))) {
-                                    MainActivity.error("\n\t\tAD: "+uuid.toString());
-                                }
-                            }
-                            adUuidNoScanUuid++;
-                        } else if (scanCount > 0) {
-                            for (ParcelUuid uuid: srUuids) {
-                                MainActivity.info("\n\t\t==: "+uuid.toString());
-                            }
-                        }
-                    }*/
-                }
-                try {
-                    //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
-                    final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
-                            scanRecord.getBytes(), System.currentTimeMillis());
-                    final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
-                    for (int i = 0; i < 200; i++) {
-                        if (!adRecordStore.isRecordPresent(i)) {
-                            continue;
-                        }
-                        final AdRecord adRecord = adRecordStore.getRecord(i);
-                        if (DEBUG_BLUETOOTH_DATA) {
-                            MainActivity.info("LE adRecord(" + i + "): " + adRecord);
-                        }
+                    // This is questionable - of Major class being known when specific class seems thin
+                    final BluetoothClass bluetoothClass = device.getBluetoothClass();
+                    int type = BluetoothClass.Device.Major.UNCATEGORIZED;
+                    if (bluetoothClass != null) {
+                        final int deviceClass = bluetoothClass.getDeviceClass();
+                        type = (deviceClass == 0 || deviceClass == BluetoothClass.Device.Major.UNCATEGORIZED)
+                                ? bluetoothClass.getMajorDeviceClass()
+                                : deviceClass;
                     }
-                } catch (Exception ex) {
-                    //TODO: so this happens:
-                    MainActivity.warn("failed to parse LeDevice from ScanRecord", ex);
-                    //parseScanRecordAsSparseArray explodes on array indices
-                }
 
-                final String capabilities = DEVICE_TYPE_LEGEND.get(
-                        bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
-                final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-                //ALIBI: shamelessly re-using frequency here for device type.
-                final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
-                        scanResult.getRssi(),
-                        NetworkType.BLE, location, prefs, batch);
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        MainActivity.info("LE deviceName: " + ssid
+                                        + "\n\taddress: " + bssid
+                                        + "\n\tname: " + scanRecord.getDeviceName() + " (vs. " + device.getName() + ")"
+                                        //+ "\n\tadName: " + adDeviceName
+                                        + "\n\tclass:"
+                                        + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
+                                        + "(" + bluetoothClass + ")"
+                                        + "\n\ttype:" + device.getType()
+                                        + "\n\tRSSI:" + scanResult.getRssi()
+                                //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
+                                //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
+                        );
+
+
+                        /*final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
+                        final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
+
+                        if (adCount > 0 || scanCount > 0){
+                            final List<java.util.UUID> adUuids = adData.getUuids();
+                            final List<ParcelUuid> srUuids = scanRecord.getServiceUuids();
+                            if (scanCount > adCount) {
+                                for (ParcelUuid uuid: srUuids) {
+                                    if (! adUuids.contains(uuid.getUuid())) {
+                                        MainActivity.error("\n\t\tSR: "+uuid.toString());
+                                    }
+                                }
+                                scanUuidNoAdUuid++;
+                            } else if (adCount > scanCount) {
+                                for (UUID uuid: adUuids) {
+                                    if (! srUuids.contains(new ParcelUuid(uuid))) {
+                                        MainActivity.error("\n\t\tAD: "+uuid.toString());
+                                    }
+                                }
+                                adUuidNoScanUuid++;
+                            } else if (scanCount > 0) {
+                                for (ParcelUuid uuid: srUuids) {
+                                    MainActivity.info("\n\t\t==: "+uuid.toString());
+                                }
+                            }
+                        }*/
+                    }
+                    try {
+                        //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
+                        final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
+                                scanRecord.getBytes(), System.currentTimeMillis());
+                        final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
+                        for (int i = 0; i < 200; i++) {
+                            if (!adRecordStore.isRecordPresent(i)) {
+                                continue;
+                            }
+                            final AdRecord adRecord = adRecordStore.getRecord(i);
+                            if (DEBUG_BLUETOOTH_DATA) {
+                                MainActivity.info("LE adRecord(" + i + "): " + adRecord);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        //TODO: so this happens:
+                        MainActivity.warn("failed to parse LeDevice from ScanRecord", ex);
+                        //parseScanRecordAsSparseArray explodes on array indices
+                    }
+
+                    final String capabilities = DEVICE_TYPE_LEGEND.get(
+                            bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
+                    final SharedPreferences prefs = mainActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                    //ALIBI: shamelessly re-using frequency here for device type.
+                    final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
+                            scanResult.getRssi(),
+                            NetworkType.BLE, location, prefs, batch);
+                }
+            } catch (SecurityException se) {
+                MainActivity.warn("failing to perform BTLE scans: BT perms not granted", se);
             }
         }
     }

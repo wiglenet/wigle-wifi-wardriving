@@ -73,7 +73,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
         deleteBtn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                list.remove(position);
+                if (position < list.size()) list.remove(position);
                 Gson gson = new Gson();
                 String serialized = gson.toJson(list.toArray());
                 MainActivity.info(serialized);

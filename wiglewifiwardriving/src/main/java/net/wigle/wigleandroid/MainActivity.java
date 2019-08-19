@@ -98,6 +98,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1401,7 +1402,8 @@ public final class MainActivity extends AppCompatActivity {
         final State state = getStaticState();
         if (state == null) return;
         final int pointer = state.logPointer++ % state.logs.length;
-        state.logs[pointer] = SimpleDateFormat.getTimeInstance().format(new Date()) + " "
+        final DateFormat format = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
+        state.logs[pointer] = format.format(new Date()) + " "
                 + Thread.currentThread().getName() + "] " + value;
         if (pointer > 10000 * state.logs.length) {
             state.logPointer -= 100 * state.logs.length;
@@ -1539,6 +1541,9 @@ public final class MainActivity extends AppCompatActivity {
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
+                // Collections.emptyIterator() requires api 19, but this works.
+                if (state == null) return Collections.<String>emptySet().iterator();
+
                 return new Iterator<String>() {
                     int currentPointer = state.logPointer;
                     final int maxPointer = currentPointer + state.logs.length;

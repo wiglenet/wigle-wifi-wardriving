@@ -402,8 +402,13 @@
     <string name="search_empty">Resultater tom</string>
     <string name="search_query_limit">Du har nået det maksimale antal søgninger i dag. Din grænse vil blive nulstillet i morgen.</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">Android Pie (9.0) throttles WiFi-scanninger til 2 pr. Minut. Opgrader Android hvis muligt.</string>
+    <string name="q_bad">Android 10 throttles WiFi-scanninger, medmindre det er deaktiveret i Developer Settings.</string>
+    <string name="enable_developer">Sådan aktiveres udviklerindstillinger: Indstillinger -> Om telefon -> Tryk på Build Number 7 gange.</string>
+    <string name="disable_throttle">Sådan deaktiveres WiFi-scanning-throttling: System -> Avanceret -> Udviklerindstillinger -> WiFi-scanning-throttling til slukket.</string>
+    <string name="no_internal_space_title">Ingen plads tilgængelig</string>
+    <string name="no_internal_space_message">Der er ikke nok intern applikationslagring på din enhed.</string>
+    <string name="no_external_space_title">Ingen plads tilgængelig</string>
+    <string name="no_external_space_message">Der er ikke nok ekstern applikationslagring på din enhed.</string>
+    <string name="no_mxc_space_message">Der er ikke nok intern applikationslagring på din enhed til at installere opslagningsdatabasen for celleoperatøren. Enheds-leverede ID\'er bruges.</string>
 </resources>

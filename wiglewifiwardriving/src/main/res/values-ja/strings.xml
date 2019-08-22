@@ -402,8 +402,13 @@
     <string name="search_empty">空の結果</string>
     <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">Android Pie（9.0）は、WiFiスキャンを1分あたり2に絞ります。可能であればAndroidをアップグレードします。</string>
+    <string name="q_bad">Android 10 は、開発者設定で無効にされていない限り、WiFiスキャンを抑制します。</string>
+    <string name="enable_developer">開発者向けオプションを有効にするには：[設定]-> [電話について]-> [ビルド番号]を7回タップします。</string>
+    <string name="disable_throttle">WiFiスキャンスロットリングを無効にするには：[システム]-> [詳細]-> [開発者オプション]-> [WiFiスキャンスロットリングをオフにします。</string>
+    <string name="no_internal_space_title">利用可能なスペースがありません</string>
+    <string name="no_internal_space_message">デバイスに十分な内部アプリケーションストレージがありません。</string>
+    <string name="no_external_space_title">利用可能なスペースがありません</string>
+    <string name="no_external_space_message">デバイスに十分な外部アプリケーションストレージがありません。</string>
+    <string name="no_mxc_space_message">セルオペレータルックアップデータベースをインストールするための十分な内部アプリケーションストレージがデバイスにありません。デバイス提供のIDが使用されます。</string>
 </resources>

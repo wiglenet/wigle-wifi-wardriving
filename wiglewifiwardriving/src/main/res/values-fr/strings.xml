@@ -402,8 +402,13 @@
     <string name="search_empty">Résultats vides</string>
     <string name="search_query_limit">Vous avez atteint le nombre maximal de recherches aujourd\'hui. Votre limite sera réinitialisée demain.</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">Android Pie (9.0) accélère les analyses WiFi à 2 par minute. Mettez à niveau Android si possible.</string>
+    <string name="q_bad">Android 10 accélère les analyses Wi-Fi, à moins que celles-ci ne soient désactivées dans les paramètres du développeur.</string>
+    <string name="enable_developer">Pour activer les options de développement: Paramètres -> À propos du téléphone -> Tapez Numéro de construction 7 fois.</string>
+    <string name="disable_throttle">Pour désactiver la limitation de l\'analyse WiFi: Système -> Avancé -> Options développeurs -> Limitation de l\'analyse WiFi désactivée.</string>
+    <string name="no_internal_space_title">Pas d\'espace disponible</string>
+    <string name="no_internal_space_message">Il n\'y a pas assez de stockage d\'application interne sur votre appareil.</string>
+    <string name="no_external_space_title">Pas d\'espace disponible</string>
+    <string name="no_external_space_message">Il n\'y a pas assez de stockage d\'application externe sur votre appareil.</string>
+    <string name="no_mxc_space_message">Le stockage interne des applications sur votre appareil est insuffisant pour installer la base de données de recherche des opérateurs de cellules. Les identifiants fournis par l\'appareil seront utilisés.</string>
 </resources>

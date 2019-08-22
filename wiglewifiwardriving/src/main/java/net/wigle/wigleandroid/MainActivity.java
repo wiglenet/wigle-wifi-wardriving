@@ -83,7 +83,9 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
+import net.wigle.wigleandroid.util.InsufficientSpaceException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -324,6 +326,8 @@ public final class MainActivity extends AppCompatActivity {
 
         info("setupService");
         setupService();
+        info("checkStorage");
+        checkStorage();
         info("setupDatabase");
         setupDatabase();
         info("setupBattery");
@@ -356,8 +360,24 @@ public final class MainActivity extends AppCompatActivity {
         //if (!state.mxcDbHelper.isPresent()) {
         try {
             state.mxcDbHelper.implantMxcDatabase();
+        } catch (InsufficientSpaceException isex) {
+            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+            iseDlgBuilder.setMessage(R.string.no_mxc_space_message)
+                    .setTitle(R.string.no_internal_space_title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            ;
+
+            final Dialog dialog = iseDlgBuilder.create();
+            dialog.show();
         } catch (IOException ex) {
             MainActivity.error("unable to implant mcc/mnc db", ex);
+
         }
         //}
 
@@ -2498,5 +2518,30 @@ public final class MainActivity extends AppCompatActivity {
         } catch (WiGLEAuthException waex) {
             MainActivity.warn("Authentication failure on background run upload");
         }
+    }
+
+    public boolean checkStorage() {
+        boolean safe;
+        boolean external = hasSD();
+        if (external) {
+            safe = FileUtility.checkExternalStorageDangerZone();
+        } else {
+            safe = FileUtility.checkInternalStorageDangerZone();
+        }
+        if (!safe) {
+            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+            iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
+                    .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
+                    .setCancelable(true)
+            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            final Dialog dialog = iseDlgBuilder.create();
+            dialog.show();
+        }
+        return safe;
     }
 }

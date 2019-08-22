@@ -402,8 +402,13 @@
     <string name="search_empty">结果为空</string>
     <string name="search_query_limit">您今天已达到最大搜索次数。你的限额将在明天重置。</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">Android Pie（9.0）将WiFi扫描限制为每分钟2次。尽可能升级Android。</string>
+    <string name="q_bad">除非在“开发者设置”中禁用，否则Android 10 会限制WiFi扫描。</string>
+    <string name="enable_developer">启用开发人员选项：设置 - >关于手机 - >点击内置编号7次。</string>
+    <string name="disable_throttle">要禁用WiFi扫描限制：系统 - >高级 - >开发人员选项 - > WiFi扫描限制为关闭。</string>
+    <string name="no_internal_space_title">没有可用空间</string>
+    <string name="no_internal_space_message">您的设备上没有足够的内部应用程序存储空间。</string>
+    <string name="no_external_space_title">没有可用空间</string>
+    <string name="no_external_space_message">您的设备上没有足够的外部应用程序存储空间。</string>
+    <string name="no_mxc_space_message">您的设备上没有足够的内部应用程序存储来安装单元操作员查找数据库。将使用设备提供的ID。</string>
 </resources>

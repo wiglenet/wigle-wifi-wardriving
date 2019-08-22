@@ -402,8 +402,13 @@
     <string name="search_empty">תוצאות ריקות</string>
     <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">פאי אנדרואיד (9.0) מצמצם סריקות WiFi ל -2 לדקה. שדרג אנדרואיד במידת האפשר.</string>
+    <string name="q_bad">אנדרואיד 10 מצמצם סריקות WiFi אלא אם כן הוא מושבת בהגדרות המפתח.</string>
+    <string name="enable_developer">כדי לאפשר אפשרויות מפתח: הגדרות -> אודות טלפון -> הקש Build Build 7 פעמים.</string>
+    <string name="disable_throttle">כדי להשבית את מצערת סריקת WiFi: מערכת -> מתקדם -> אפשרויות מפתחים -> מצערת סריקת WiFi למצב כבוי.</string>
+    <string name="no_internal_space_title">אין מקום פנוי</string>
+    <string name="no_internal_space_message">אין מספיק אחסון יישומי פנימי במכשיר שלך.</string>
+    <string name="no_external_space_title">אין מקום פנוי</string>
+    <string name="no_external_space_message">אין מספיק שטח אחסון ליישומים חיצוניים במכשיר שלך.</string>
+    <string name="no_mxc_space_message">אין מספיק אחסון יישומי פנימי במכשיר שלך בכדי להתקין את מסד הנתונים לחיפוש מפעיל סלולרי. יש להשתמש במזהים המסופקים במכשירים.</string>
 </resources>

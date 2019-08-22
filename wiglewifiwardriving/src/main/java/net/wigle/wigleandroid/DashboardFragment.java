@@ -31,6 +31,7 @@ public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
+  private NumberFormat  wholeNumberFormat;
   private ScrollView scrollView;
   private View landscape;
   private View portrait;
@@ -51,7 +52,16 @@ public class DashboardFragment extends Fragment {
     getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
 
     finishing = new AtomicBoolean( false );
-    numberFormat = NumberFormat.getNumberInstance( Locale.US );
+    Configuration sysConfig = getResources().getConfiguration();
+    Locale locale = null;
+    if (null != sysConfig) {
+        locale = sysConfig.locale;
+    }
+    if (null == locale) {
+        locale = Locale.US;
+    }
+    numberFormat = NumberFormat.getNumberInstance(locale);
+    wholeNumberFormat = NumberFormat.getIntegerInstance(locale);
     if ( numberFormat instanceof DecimalFormat ) {
       numberFormat.setMinimumFractionDigits(2);
       numberFormat.setMaximumFractionDigits(2);
@@ -148,13 +158,13 @@ public class DashboardFragment extends Fragment {
         updateDist( view, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev) );
 
         tv = (TextView) view.findViewById( R.id.queuesize );
-        tv.setText( getString(R.string.dash_db_queue) + " " + ListFragment.lameStatic.preQueueSize );
+        tv.setText( getString(R.string.dash_db_queue) + " " + wholeNumberFormat.format(ListFragment.lameStatic.preQueueSize) );
 
         tv = (TextView) view.findViewById( R.id.dbNets );
-        tv.setText( getString(R.string.dash_db_nets) + " " + ListFragment.lameStatic.dbNets );
+        tv.setText( getString(R.string.dash_db_nets) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbNets) );
 
         tv = (TextView) view.findViewById( R.id.dbLocs );
-        tv.setText( getString(R.string.dash_db_locs) + " " + ListFragment.lameStatic.dbLocs );
+        tv.setText( getString(R.string.dash_db_locs) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbLocs) );
 
         tv = (TextView) view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
@@ -233,7 +243,7 @@ public class DashboardFragment extends Fragment {
 
   }
 
-  private long newNetsSinceUpload() {
+  private String newNetsSinceUpload() {
     final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
     final long marker = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
     final long uploaded = prefs.getLong( ListFragment.PREF_NETS_UPLOADED, 0L );
@@ -245,7 +255,7 @@ public class DashboardFragment extends Fragment {
         newSinceUpload = 0;
       }
     }
-    return newSinceUpload;
+    return wholeNumberFormat.format(newSinceUpload);
   }
 
   private void updateDist( final View view, final int id, final String pref, final String title ) {

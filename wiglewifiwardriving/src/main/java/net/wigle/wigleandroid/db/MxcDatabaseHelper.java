@@ -2,6 +2,7 @@ package net.wigle.wigleandroid.db;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,12 +13,16 @@ import android.os.Environment;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.MccMncRecord;
+import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.InsufficientSpaceException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static net.wigle.wigleandroid.util.FileUtility.EST_MXC_DB_SIZE;
 
 public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private static final String MXC_DB_NAME = "mmcmnc.sqlite";
@@ -50,7 +55,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public void implantMxcDatabase() throws IOException {
+    public void implantMxcDatabase() throws InsufficientSpaceException, IOException {
         MainActivity.info("installing mmc/mnc database...");
         InputStream assetInputData = null;
 
@@ -59,6 +64,12 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         edit.apply();
 
         Integer installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
+
+        long freeAppSpaceBytes = FileUtility.getFreeInternalBytes();
+        //ALIBI: ugly, but can't use the assetManager to get size without decompressing
+        if (freeAppSpaceBytes <= EST_MXC_DB_SIZE) {
+            throw new InsufficientSpaceException("Unable to implant MxC database: not enough space (" + freeAppSpaceBytes + "b, " + EST_MXC_DB_SIZE + "b needed)");
+        }
 
         OutputStream mxcOutput = null;
         try {

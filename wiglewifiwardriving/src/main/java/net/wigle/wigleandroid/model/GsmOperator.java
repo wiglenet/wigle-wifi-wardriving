@@ -8,6 +8,7 @@ import android.telephony.CellIdentityLte;
 import android.telephony.CellIdentityWcdma;
 
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.InsufficientSpaceException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -267,6 +268,8 @@ public class GsmOperator {
                         //recopy the MccMnc DB file to see whether we can recover.
                         s.mxcDbHelper.implantMxcDatabase();
                         //TODO: too aggressive? operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
+                    } catch (InsufficientSpaceException sex) {
+                        MainActivity.error("GSMOp implant failed: ",sex);
                     } catch (Exception ex) {
                         MainActivity.warn("Mxc DB recopy failed", ex);
                     }

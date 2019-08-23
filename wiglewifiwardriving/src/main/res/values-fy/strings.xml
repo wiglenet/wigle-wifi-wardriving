@@ -347,8 +347,13 @@
     <string name="search_empty">Results Empty</string>
     <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">Android Pie (9.0) beperkt wifi-scans tot 2 per minuut. Upgrade Android indien mogelijk.</string>
+    <string name="q_bad">Android 10 beperkt wifi-scans tenzij uitgeschakeld in de instellingen voor ontwikkelaars.</string>
+    <string name="enable_developer">Om ontwikkelaaropties in te schakelen: Instellingen -> Over telefoon -> Tik 7 keer op Build-nummer.</string>
+    <string name="disable_throttle">Beperking van WiFi-scan uitschakelen: Systeem -> Geavanceerd -> Ontwikkelaarsopties -> Beperking van WiFi-scan uit.</string>
+    <string name="no_internal_space_title">Geen ruimte beschikbaar</string>
+    <string name="no_internal_space_message">Er is onvoldoende interne toepassingsopslag op uw apparaat.</string>
+    <string name="no_external_space_title">Geen ruimte beschikbaar</string>
+    <string name="no_external_space_message">Er is onvoldoende externe toepassingsopslag op uw apparaat.</string>
+    <string name="no_mxc_space_message">Er is onvoldoende interne toepassingsopslag op uw apparaat om de opzoekdatabase van de mobiele operator te installeren. Door het apparaat geleverde ID\'s worden gebruikt.</string>
 </resources>

@@ -358,8 +358,13 @@
     <string name="search_empty">Resultados vazios</string>
     <string name="search_query_limit">Você atingiu o número máximo de pesquisas hoje. Seu limite será redefinido amanhã.</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">O Android Pie (9.0) faz a varredura do WiFi para 2 por minuto. Atualize o Android, se possível.</string>
+    <string name="q_bad">O Android 10 limita as verificações de Wi-Fi, a menos que seja desativado nas Configurações do desenvolvedor.</string>
+    <string name="enable_developer">Para ativar as opções do desenvolvedor: Configurações -> Sobre o telefone -> Toque em Número da compilação 7 vezes.</string>
+    <string name="disable_throttle">Para desativar a otimização da varredura WiFi: Sistema -> Avançado -> Opções do desenvolvedor -> Otimização da varredura WiFi para desativado.</string>
+    <string name="no_internal_space_title">Nenhum espaço disponível</string>
+    <string name="no_internal_space_message">Não há armazenamento de aplicativos interno suficiente no seu dispositivo.</string>
+    <string name="no_external_space_title">Nenhum espaço disponível</string>
+    <string name="no_external_space_message">Não há armazenamento de aplicativos externos suficiente no seu dispositivo.</string>
+    <string name="no_mxc_space_message">Não há armazenamento de aplicativo interno suficiente no seu dispositivo para instalar o banco de dados de pesquisa do operador de célula. IDs fornecidos pelo dispositivo serão usados.</string>
 </resources>

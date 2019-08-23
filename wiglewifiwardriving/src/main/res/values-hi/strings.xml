@@ -345,8 +345,13 @@
     <string name="search_empty">परिणाम खाली</string>
     <string name="search_query_limit">आप आज अधिकतम खोज पर पहुँच गए हैं। आपकी सीमा कल रीसेट हो जाएगी।</string>
     <string name="menu_debug">Debug</string>
-    <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
-    <string name="q_bad">Android Q (10.0) throttles WiFi scans unless disabled in Developer Settings.</string>
-    <string name="enable_developer">To enabled developer options: Settings -> About Phone -> Tap Build Number 7 times.</string>
-    <string name="disable_throttle">To disable WiFi scan throttling: System -> Advanced -> Developer options -> WiFi scan throttling to off.</string>
+    <string name="pie_bad">एंड्रॉइड पाई (9.0) थ्रॉटल वाईफाई स्कैन 2 प्रति मिनट। यदि संभव हो तो Android अपग्रेड करें।</string>
+    <string name="q_bad">डेवलपर सेटिंग में अक्षम होने तक एंड्रॉइड 10 थ्रोटल्स वाईफाई स्कैन करता है।</string>
+    <string name="enable_developer">डेवलपर विकल्पों को सक्षम करने के लिए: सेटिंग्स -> फ़ोन के बारे में -> बिल्ड नंबर 7 बार टैप करें।</string>
+    <string name="disable_throttle">वाईफाई स्कैन थ्रॉटलिंग को निष्क्रिय करने के लिए: सिस्टम -> उन्नत -> डेवलपर विकल्प -> वाईफाई स्कैन थ्रॉटलिंग को बंद करना।</string>
+    <string name="no_internal_space_title">कोई स्थान उपलब्ध नहीं है</string>
+    <string name="no_internal_space_message">आपके डिवाइस पर पर्याप्त आंतरिक अनुप्रयोग संग्रहण नहीं है।</string>
+    <string name="no_external_space_title">कोई स्थान उपलब्ध नहीं है</string>
+    <string name="no_external_space_message">आपके डिवाइस पर पर्याप्त बाहरी अनुप्रयोग संग्रहण नहीं है।</string>
+    <string name="no_mxc_space_message">सेल ऑपरेटर लुकअप डेटाबेस को स्थापित करने के लिए आपके डिवाइस पर पर्याप्त आंतरिक अनुप्रयोग संग्रहण नहीं है। डिवाइस-आपूर्ति की गई आईडी का उपयोग किया जाएगा।</string>
 </resources>

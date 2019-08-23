@@ -41,6 +41,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -107,8 +108,12 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATION_DELETE = "drop table " + LOCATION_TABLE;
     private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
 
-    private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
-            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
+    private static final String LOCATED_NETS_QUERY_STEM = (Build.VERSION.SDK_INT > 19)?
+                " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0":
+                " FROM " + DatabaseHelper.NETWORK_TABLE
+            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND bssid NOT LIKE '%_%' ESCAPE '_'";
+
     //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
 
     private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;

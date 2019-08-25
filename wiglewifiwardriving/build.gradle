@@ -62,7 +62,7 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.15' // Stranded (.16-> minSDK == 17)
     implementation "com.google.android.gms:play-services-maps:17.0.0"
     implementation 'com.google.android.gms:play-services-vision:18.0.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'org.slf4j:slf4j-android:1.7.19'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'

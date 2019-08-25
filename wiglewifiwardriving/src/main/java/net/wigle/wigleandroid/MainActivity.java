@@ -1533,7 +1533,9 @@ public final class MainActivity extends AppCompatActivity {
                     fos.write(builder.toString().getBytes(ENCODING));
                 } catch (Throwable er) {
                     // ohwell
-                    error("error getting data for error: " + er, er);
+                    final String errorMessage = "error getting data for error: " + er;
+                    error(errorMessage, er);
+                    fos.write((errorMessage + "\n\n").getBytes(ENCODING));
                 }
 
                 fos.write((error + "\n\n").getBytes(ENCODING));

@@ -298,6 +298,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
             final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+            String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+            if (!QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
+                scanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.off));
+                notScanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.on));
+            } else {
+                scanningImageButton.setContentDescription(getString(R.string.list_scanning_on));
+                notScanningImageButton.setContentDescription(getString(R.string.list_scanning_off));
+            }
 
             scanningImageButton.setOnClickListener(new OnClickListener() {
                 @Override

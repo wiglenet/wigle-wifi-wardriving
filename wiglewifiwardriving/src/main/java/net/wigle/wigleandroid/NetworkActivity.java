@@ -46,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.QueryThread;
@@ -549,7 +550,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             final Button ok = (Button) view.findViewById( R.id.ok_button );
 
-            final EditText password = (EditText) view.findViewById( R.id.edit_password );
+            final TextInputEditText password = view.findViewById( R.id.edit_password );
             password.addTextChangedListener( new SettingsFragment.SetWatcher() {
                 @Override
                 public void onTextChanged( final String s ) {

@@ -98,6 +98,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
             final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
             if (showLabel) {
                 final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+                if (bounds == null || network.getLatLng() == null) return false;
                 // if on screen, and room in labeled networks, we can show the label
                 if (bounds.contains(network.getLatLng()) && MapRender.this.labeledNetworks.size() <= MAX_LABELS) {
                     return false;

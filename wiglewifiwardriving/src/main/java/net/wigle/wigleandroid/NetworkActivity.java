@@ -108,7 +108,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             network = MainActivity.getNetworkCache().get(bssid);
         }
 
-        TextView tv = (TextView) findViewById( R.id.bssid );
+        TextView tv = findViewById( R.id.bssid );
         tv.setText( bssid );
 
         if ( network == null ) {
@@ -116,18 +116,18 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         }
         else {
             // do gui work
-            tv = (TextView) findViewById( R.id.ssid );
+            tv = findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
 
             final String ouiString = network.getOui(ListFragment.lameStatic.oui);
-            tv = (TextView) findViewById( R.id.oui );
+            tv = findViewById( R.id.oui );
             tv.setText( ouiString );
 
             final int image = NetworkListUtil.getImage( network );
-            final ImageView ico = (ImageView) findViewById( R.id.wepicon );
+            final ImageView ico = findViewById( R.id.wepicon );
             ico.setImageResource( image );
 
-            final ImageView btico = (ImageView) findViewById(R.id.bticon);
+            final ImageView btico = findViewById(R.id.bticon);
             if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
                 btico.setVisibility(View.VISIBLE);
                 Integer btImageId = NetworkListUtil.getBtImage(network);
@@ -140,18 +140,18 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 btico.setVisibility(View.GONE);
             }
 
-            tv = (TextView) findViewById( R.id.na_signal );
+            tv = findViewById( R.id.na_signal );
             final int level = network.getLevel();
             tv.setTextColor( NetworkListUtil.getSignalColor( level ) );
             tv.setText( Integer.toString( level ) );
 
-            tv = (TextView) findViewById( R.id.na_type );
+            tv = findViewById( R.id.na_type );
             tv.setText( network.getType().name() );
 
-            tv = (TextView) findViewById( R.id.na_firsttime );
+            tv = findViewById( R.id.na_firsttime );
             tv.setText( NetworkListUtil.getConstructionTime(format, network ) );
 
-            tv = (TextView) findViewById( R.id.na_chan );
+            tv = findViewById( R.id.na_chan );
             Integer chan = network.getChannel();
             if ( NetworkType.WIFI.equals(network.getType()) ) {
                 chan = chan != null ? chan : network.getFrequency();
@@ -163,7 +163,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 tv.setText(cellCapabilities[0]+" "+channelCodeTypeForNetworkType(network.getType())+" "+chan);
             }
 
-            tv = (TextView) findViewById( R.id.na_cap );
+            tv = findViewById( R.id.na_cap );
             tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
 
             if ( NetworkType.GSM.equals(network.getType()) ||
@@ -188,16 +188,16 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
                             v.setVisibility(View.VISIBLE);
-                            tv = (TextView) findViewById( R.id.na_cell_status );
+                            tv = findViewById( R.id.na_cell_status );
                             tv.setText( " "+rec.getStatus() );
-                            tv = (TextView) findViewById( R.id.na_cell_brand );
+                            tv = findViewById( R.id.na_cell_brand );
                             tv.setText( " "+rec.getBrand());
-                            tv = (TextView) findViewById( R.id.na_cell_bands );
+                            tv = findViewById( R.id.na_cell_bands );
                             tv.setText( " "+rec.getBands());
                             if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
                                 v = findViewById(R.id.cell_notes_row);
                                 v.setVisibility(View.VISIBLE);
-                                tv = (TextView) findViewById( R.id.na_cell_notes );
+                                tv = findViewById( R.id.na_cell_notes );
                                 tv.setText( " "+rec.getNotes());
                             }
                         }
@@ -273,7 +273,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         final Handler handler = new Handler() {
             @Override
             public void handleMessage( final Message msg ) {
-                final TextView tv = (TextView) findViewById( R.id.na_observe );
+                final TextView tv = findViewById( R.id.na_observe );
                 if ( msg.what == MSG_OBS_UPDATE ) {
                     tv.setText( " " + Integer.toString( observations ) + "...");
                 }
@@ -362,44 +362,22 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             });
         }
 
-        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.netmap_rl );
+        final RelativeLayout rlView = findViewById( R.id.netmap_rl );
         rlView.addView( mapView );
     }
 
     private void setupButtons( final Network network ) {
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final Button connectButton = (Button) findViewById( R.id.connect_button );
         final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
         final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
 
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
-            connectButton.setEnabled( false );
-            final View connectRowView = (View) findViewById(R.id.connect_row);
-            connectRowView.setVisibility(View.GONE);
-            final View filterRowView = (View) findViewById(R.id.filter_row);
+            final View filterRowView = findViewById(R.id.filter_row);
             filterRowView.setVisibility(View.GONE);
         } else {
-            final Button hideMacButton = (Button) findViewById( R.id.hide_mac_button );
-            final Button hideOuiButton = (Button) findViewById( R.id.hide_oui_button );
-            final Button disableLogMacButton = (Button) findViewById( R.id.disable_log_mac_button );
-            connectButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    if ( Network.CRYPTO_NONE == network.getCrypto() ) {
-                        MainActivity.createConfirmation( NetworkActivity.this, "You have permission to access this network?",
-                                0, NON_CRYPTO_DIALOG);
-                    }
-                    else {
-                        final CryptoDialog cryptoDialog = CryptoDialog.newInstance(network);
-                        try {
-                            cryptoDialog.show(NetworkActivity.this.getSupportFragmentManager(), "crypto-dialog");
-                        }
-                        catch (final IllegalStateException ex) {
-                            MainActivity.error("exception showing crypto dialog: " + ex, ex);
-                        }
-                    }
-                }
-            });
+            final Button hideMacButton = findViewById( R.id.hide_mac_button );
+            final Button hideOuiButton = findViewById( R.id.hide_oui_button );
+            final Button disableLogMacButton = findViewById( R.id.disable_log_mac_button );
             if ( (null == network.getBssid()) || (network.getBssid().length() < 17) ||
                     (hideAddresses.contains(network.getBssid().toUpperCase())) ) {
                 hideMacButton.setEnabled(false);
@@ -542,13 +520,13 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             View view = inflater.inflate(R.layout.cryptodialog, container);
             dialog.setTitle(getArguments().getString("ssid"));
 
-            TextView text = (TextView) view.findViewById( R.id.security );
+            TextView text = view.findViewById( R.id.security );
             text.setText(getArguments().getString("capabilities"));
 
-            text = (TextView) view.findViewById( R.id.signal );
+            text = view.findViewById( R.id.signal );
             text.setText(getArguments().getString("level"));
 
-            final Button ok = (Button) view.findViewById( R.id.ok_button );
+            final Button ok = view.findViewById( R.id.ok_button );
 
             final TextInputEditText password = view.findViewById( R.id.edit_password );
             password.addTextChangedListener( new SettingsFragment.SetWatcher() {
@@ -560,7 +538,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
             });
 
-            final CheckBox showpass = (CheckBox) view.findViewById( R.id.showpass );
+            final CheckBox showpass = view.findViewById( R.id.showpass );
             showpass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
@@ -591,7 +569,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
             } );
 
-            Button cancel = (Button) view.findViewById( R.id.cancel_button );
+            Button cancel = view.findViewById( R.id.cancel_button );
             cancel.setOnClickListener( new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {

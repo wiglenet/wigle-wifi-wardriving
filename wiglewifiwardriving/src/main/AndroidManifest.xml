@@ -249,6 +249,7 @@
         <service
             android:name=".WigleService"
             android:enabled="true"
+            android:foregroundServiceType="location"
             android:icon="@mipmap/ic_launcher" />
         <uses-library
             android:name="com.google.android.maps"

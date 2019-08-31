@@ -292,32 +292,6 @@
             android:minHeight="0dp"
             android:background="@drawable/filter_button" />
 	</LinearLayout>
-    <LinearLayout
-        android:id="@+id/connect_row"
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        >
-		<Button android:id="@+id/connect_button"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/connect_button"
-            android:layout_weight="0"
-            android:layout_marginLeft="5dip"
-            android:layout_marginRight="10dip"
-            android:layout_marginTop="2dip"
-            android:layout_marginBottom="5dip"
-            android:background="@drawable/connect_button"
-            android:minHeight="0dp"
-            />
-		<TextView
-			android:id="@+id/connect_text"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="@string/connect_text"
-			android:layout_weight="5"
-			/>
-	</LinearLayout>
 
     <LinearLayout
 	android:orientation="vertical"

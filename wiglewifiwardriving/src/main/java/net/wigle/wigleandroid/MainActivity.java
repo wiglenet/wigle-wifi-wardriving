@@ -1496,66 +1496,102 @@ public final class MainActivity extends AppCompatActivity {
                         throw new IOException("Cannot create file: " + file);
                     }
                 }
-                final FileOutputStream fos = new FileOutputStream(file);
 
+                FileOutputStream fos = null;
                 try {
-                    final String baseErrorMessage = MainActivity.getBaseErrorMessage(throwable, false);
-                    StringBuilder builder = new StringBuilder("WigleWifi error log - ");
-                    final DateFormat format = SimpleDateFormat.getDateTimeInstance();
-                    builder.append(format.format(new Date())).append("\n");
-                    final PackageManager pm = context.getPackageManager();
-                    final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-                    builder.append("versionName: ").append(pi.versionName).append("\n");
-                    builder.append("baseError: ").append(baseErrorMessage).append("\n\n");
-                    if (detail != null) {
-                        builder.append("detail: ").append(detail).append("\n");
+                    fos = new FileOutputStream(file);
+                    PackageInfo pi = null;
+                    try {
+                        final PackageManager pm = context.getPackageManager();
+                        pi = pm.getPackageInfo(context.getPackageName(), 0);
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
                     }
-                    builder.append("packageName: ").append(pi.packageName).append("\n");
-                    builder.append("MODEL: ").append(android.os.Build.MODEL).append("\n");
-                    builder.append("RELEASE: ").append(android.os.Build.VERSION.RELEASE).append("\n");
 
-                    builder.append("BOARD: ").append(android.os.Build.BOARD).append("\n");
-                    builder.append("BRAND: ").append(android.os.Build.BRAND).append("\n");
-                    // android 1.6 android.os.Build.CPU_ABI;
-                    builder.append("DEVICE: ").append(android.os.Build.DEVICE).append("\n");
-                    builder.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
-                    builder.append("FINGERPRINT: ").append(android.os.Build.FINGERPRINT).append("\n");
-                    builder.append("HOST: ").append(android.os.Build.HOST).append("\n");
-                    builder.append("ID: ").append(android.os.Build.ID).append("\n");
-                    // android 1.6: android.os.Build.MANUFACTURER;
-                    builder.append("PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");
-                    builder.append("TAGS: ").append(android.os.Build.TAGS).append("\n");
-                    builder.append("TIME: ").append(android.os.Build.TIME).append("\n");
-                    builder.append("TYPE: ").append(android.os.Build.TYPE).append("\n");
-                    builder.append("USER: ").append(android.os.Build.USER).append("\n");
+                    try {
+                        StringBuilder builder = new StringBuilder("WigleWifi error log - ");
+                        final DateFormat format = SimpleDateFormat.getDateTimeInstance();
+                        builder.append(format.format(new Date())).append("\n");
+                        if (pi != null) {
+                            builder.append("versionName: ").append(pi.versionName).append("\n");
+                            builder.append("packageName: ").append(pi.packageName).append("\n");
+                        }
+                        if (detail != null) {
+                            builder.append("detail: ").append(detail).append("\n");
+                        }
+                        builder.append("MODEL: ").append(android.os.Build.MODEL).append("\n");
+                        builder.append("RELEASE: ").append(android.os.Build.VERSION.RELEASE).append("\n");
 
-                    // write to file
-                    fos.write(builder.toString().getBytes(ENCODING));
-                } catch (Throwable er) {
-                    // ohwell
-                    final String errorMessage = "error getting data for error: " + er;
-                    error(errorMessage, er);
-                    fos.write((errorMessage + "\n\n").getBytes(ENCODING));
+                        builder.append("BOARD: ").append(android.os.Build.BOARD).append("\n");
+                        builder.append("BRAND: ").append(android.os.Build.BRAND).append("\n");
+                        // android 1.6 android.os.Build.CPU_ABI;
+                        builder.append("DEVICE: ").append(android.os.Build.DEVICE).append("\n");
+                        builder.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
+                        builder.append("FINGERPRINT: ").append(android.os.Build.FINGERPRINT).append("\n");
+                        builder.append("HOST: ").append(android.os.Build.HOST).append("\n");
+                        builder.append("ID: ").append(android.os.Build.ID).append("\n");
+                        // android 1.6: android.os.Build.MANUFACTURER;
+                        builder.append("PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");
+                        builder.append("TAGS: ").append(android.os.Build.TAGS).append("\n");
+                        builder.append("TIME: ").append(android.os.Build.TIME).append("\n");
+                        builder.append("TYPE: ").append(android.os.Build.TYPE).append("\n");
+                        builder.append("USER: ").append(android.os.Build.USER).append("\n");
+
+                        // write to file
+                        fos.write(builder.toString().getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        final String baseErrorMessage = MainActivity.getBaseErrorMessage(throwable, false);
+                        fos.write("baseError: ".getBytes(ENCODING));
+                        fos.write(baseErrorMessage.getBytes(ENCODING));
+                        fos.write("\n\n".getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        throwable.printStackTrace(new PrintStream(fos));
+                        fos.write((error + "\n\n").getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        for (final String log : getLogLines()) {
+                            fos.write(log.getBytes(ENCODING));
+                            fos.write("\n".getBytes(ENCODING));
+                        }
+                    } catch (Throwable er) {
+                        // ohwell
+                        error("error getting logs for error: " + er, er);
+                    }
+                }
+                finally {
+                    // can't try-with-resources and support api 14
+                    try {
+                        if (fos != null) fos.close();
+                    }
+                    catch (final Exception ex) {
+                        error("error closing fos: " + ex, ex);
+                    }
                 }
 
-                fos.write((error + "\n\n").getBytes(ENCODING));
-                throwable.printStackTrace(new PrintStream(fos));
-                try {
-                    fos.write((error + "\n\n").getBytes(ENCODING));
-                    for (final String log : getLogLines()) {
-                        fos.write(log.getBytes(ENCODING));
-                        fos.write("\n".getBytes(ENCODING));
-                    }
-                } catch (Throwable er) {
-                    // ohwell
-                    error("error getting logs for error: " + er, er);
-                }
-                fos.close();
             }
         } catch (final Exception ex) {
             error("error logging error: " + ex, ex);
             ex.printStackTrace();
         }
+    }
+
+    private static void handleErrorError(FileOutputStream fos, Throwable er) throws IOException {
+        // ohwell
+        final String errorMessage = "error getting data for error: " + er;
+        error(errorMessage, er);
+        fos.write((errorMessage + "\n\n").getBytes(ENCODING));
+        er.printStackTrace(new PrintStream(fos));
     }
 
     public static Iterable<String> getLogLines() {

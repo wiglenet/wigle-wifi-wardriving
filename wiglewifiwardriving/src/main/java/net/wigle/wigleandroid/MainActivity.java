@@ -1954,8 +1954,12 @@ public final class MainActivity extends AppCompatActivity {
                 info("wifi turned on");
             }
             else {
-                info("wifi NOT turned on");
+                info("wifi NOT turned on, resultCode: " + resultCode);
             }
+        }
+        else {
+            info("MainActivity: Unhandled requestCode: " + requestCode
+                    + " resultCode: " + resultCode);
         }
     }
 

@@ -17,6 +17,10 @@
         android:layout_height="wrap_content"
         android:textColor="#000000"
         android:background="#C0C000"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:visibility="gone" />
 
     <TextView

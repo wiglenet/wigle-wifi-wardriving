@@ -70,7 +70,7 @@ public class GPSListener implements Listener, LocationListener {
             // network provider is disabled :(  so we do nothing...
             // listActivity.setLocationUpdates();
         }
-        // MainActivity.info("GPS event: " + event);
+        MainActivity.info("GPS event: " + event);
         updateLocationData(null);
     }
 
@@ -321,6 +321,7 @@ public class GPSListener implements Listener, LocationListener {
     public void checkLocationOK(final long gpsTimeout, final long netLocsTimeout) {
         if ( ! locationOK( location, getSatCount(), gpsTimeout, netLocsTimeout) ) {
             // do a self-check
+            MainActivity.info("checkLocationOK was false");
             updateLocationData(null);
         }
     }
@@ -347,11 +348,13 @@ public class GPSListener implements Listener, LocationListener {
             boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > gpsTimeout;
             gpsLost |= now - lastLocationTime > gpsTimeout;
             gpsLost |= horribleGps(location);
+            if (gpsLost) MainActivity.info("gps gpsLost");
             retval = ! gpsLost;
         }
         else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
             boolean gpsLost = now - lastNetworkLocationTime > networkLocationTimeout;
             gpsLost |= horribleGps(location);
+            if (gpsLost) MainActivity.info("network gpsLost");
             retval = ! gpsLost;
         }
 
@@ -418,7 +421,7 @@ public class GPSListener implements Listener, LocationListener {
                 con = "Galileo";
                 break;
         }
-        if (Build.VERSION.SDK_INT > 28 && constellationType == 7 /*GnssStatus.CONSTELLATION_IRNSS*/) {
+        if (Build.VERSION.SDK_INT > 28 && constellationType == GnssStatus.CONSTELLATION_IRNSS) {
             con = "IRNSS";
         }
         return con;

@@ -465,6 +465,28 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling route mapping change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().startRouteMapping();
+                } else {
+                    MainActivity.getMainActivity().endRouteMapping();
+                }
+            }
+        });
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling route logging change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().startRouteLogging(prefs);
+                } else {
+                    MainActivity.getMainActivity().endRouteLogging();
+                }
+            }
+        });
 
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
                 "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };

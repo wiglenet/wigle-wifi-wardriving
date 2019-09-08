@@ -75,6 +75,7 @@ public final class DatabaseHelper extends Thread {
     private SQLiteStatement updateNetwork;
     private SQLiteStatement updateNetworkMetadata;
     private SQLiteStatement updateNetworkType;
+    private SQLiteStatement insertRoute;
 
     public static final String NETWORK_TABLE = "network";
     private static final String NETWORK_CREATE =
@@ -105,8 +106,24 @@ public final class DatabaseHelper extends Thread {
                     + "time long not null"
                     + ")";
 
+    public static final String ROUTE_TABLE = "route";
+    private static final String ROUTE_CREATE =
+            "create table " + ROUTE_TABLE + " ( "
+                    + "_id integer primary key autoincrement,"
+                    + "run_id integer not null,"
+                    + "wifi_visible integer not null default 0,"
+                    + "cell_visible integer not null default 0,"
+                    + "bt_visible integer not null default 0,"
+                    + "lat double not null,"
+                    + "lon double not null,"
+                    + "altitude double not null,"
+                    + "accuracy float not null,"
+                    + "time long not null"
+                    + ")";
+
     private static final String LOCATION_DELETE = "drop table " + LOCATION_TABLE;
     private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
+    private static final String ROUTE_DELETE = "drop table " + ROUTE_TABLE;
 
     private static final String LOCATED_NETS_QUERY_STEM = (Build.VERSION.SDK_INT > 19)?
                 " FROM " + DatabaseHelper.NETWORK_TABLE
@@ -403,9 +420,11 @@ public final class DatabaseHelper extends Thread {
         final File dbFile = new File( dbFilename );
         boolean doCreateNetwork = false;
         boolean doCreateLocation = false;
+        boolean doCreateRoute = false;
         if ( ! dbFile.exists() && hasSD ) {
             doCreateNetwork = true;
             doCreateLocation = true;
+            doCreateRoute = true;
         }
         MainActivity.info("opening: " + dbFilename );
 
@@ -417,7 +436,7 @@ public final class DatabaseHelper extends Thread {
         }
 
         try {
-            db.rawQuery( "SELECT count(*) FROM network", null).close();
+            db.rawQuery( "SELECT count(*) FROM "+NETWORK_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
             MainActivity.info("exception selecting from network, try to create. ex: " + ex );
@@ -425,11 +444,19 @@ public final class DatabaseHelper extends Thread {
         }
 
         try {
-            db.rawQuery( "SELECT count(*) FROM location", null).close();
+            db.rawQuery( "SELECT count(*) FROM "+LOCATION_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
             MainActivity.info("exception selecting from location, try to create. ex: " + ex );
             doCreateLocation = true;
+        }
+
+        try {
+            db.rawQuery( "SELECT max(route_id) FROM "+ROUTE_TABLE, null).close();
+        }
+        catch ( final SQLiteException ex ) {
+            MainActivity.info("exception selecting from route, try to create. ex: " + ex );
+            doCreateRoute = true;
         }
 
         if ( doCreateNetwork ) {
@@ -457,6 +484,20 @@ public final class DatabaseHelper extends Thread {
                 // new database, reset a marker, if any
                 final Editor edit = prefs.edit();
                 edit.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                edit.apply();
+            }
+            catch ( final SQLiteException ex ) {
+                MainActivity.error( "sqlite exception: " + ex, ex );
+            }
+        }
+
+        if ( doCreateRoute ) {
+            MainActivity.info( "creating route table" );
+            try {
+                db.execSQL(ROUTE_CREATE);
+                // new database, start with route Zero
+                final Editor edit = prefs.edit();
+                edit.putLong( ListFragment.PREF_ROUTE_DB_RUN, 0L );
                 edit.apply();
             }
             catch ( final SQLiteException ex ) {
@@ -510,21 +551,23 @@ public final class DatabaseHelper extends Thread {
         db.execSQL("DROP INDEX IF EXISTS type");
 
         // compile statements
-        insertNetwork = db.compileStatement( "INSERT INTO network"
+        insertNetwork = db.compileStatement( "INSERT INTO "+NETWORK_TABLE
                 + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon) VALUES (?,?,?,?,?,?,?,?,?,?,?)" );
 
-        insertLocation = db.compileStatement( "INSERT INTO location"
+        insertLocation = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
                 + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
 
-        updateNetwork = db.compileStatement( "UPDATE network SET"
+        updateNetwork = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
 
-        updateNetworkMetadata = db.compileStatement( "UPDATE network SET"
+        updateNetworkMetadata = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " bestlevel = ?, bestlat = ?, bestlon = ?, ssid = ?, frequency = ?, capabilities = ? WHERE bssid = ?" );
 
-        updateNetworkType = db.compileStatement( "UPDATE network SET"
+        updateNetworkType = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " type = ? WHERE bssid = ?" );
 
+        insertRoute = db.compileStatement( "INSERT INTO "+ROUTE_TABLE
+                + " (run_id,wifi_visible,cell_visible,bt_visible,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?,?,?)" );
     }
 
     /**
@@ -562,7 +605,10 @@ public final class DatabaseHelper extends Thread {
                     if ( updateNetworkMetadata != null ) {
                         updateNetworkMetadata.close();
                     }
-                    if ( db.isOpen() ) {
+                    if ( insertRoute != null ) {
+                        insertRoute.close();
+                    }
+                if ( db.isOpen() ) {
                         db.close();
                     }
                 }
@@ -1066,6 +1112,31 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
+    /**
+     * insert a new point for the specified route
+     * @param location location of current measurement
+     * @param wifiVisible # wifi nets visible
+     * @param cellVisible # cells visible
+     * @param btVisible # bt devices visible
+     * @param runId # the current, monotonic run ID
+     */
+    public void logRouteLocation (final Location location, final int wifiVisible, final int cellVisible, final int btVisible, final long runId) {
+        if (insertRoute != null) {
+            insertRoute.bindLong(1, runId);
+            insertRoute.bindLong(2, wifiVisible);
+            insertRoute.bindLong(3, cellVisible);
+            insertRoute.bindLong(4, btVisible);
+            insertRoute.bindDouble(5, location.getLatitude());
+            insertRoute.bindDouble(6, location.getLongitude());
+            insertRoute.bindDouble(7, location.getAccuracy());
+            insertRoute.bindLong(8, location.getTime());
+            long start = System.currentTimeMillis();
+
+            insertRoute.execute();
+            logTime(start, "db route point added");
+        }
+    }
+
     public boolean isFastMode() {
         boolean fastMode = false;
         if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
@@ -1307,6 +1378,9 @@ public final class DatabaseHelper extends Thread {
             MainActivity.info( "deleting network table" );
             db.execSQL(NETWORK_DELETE);
 
+            MainActivity.info( "deleting route table" );
+            db.execSQL(ROUTE_DELETE);
+
             MainActivity.info( "creating network table" );
             db.execSQL(NETWORK_CREATE);
             if ( db.getVersion() == 0 ) {
@@ -1319,6 +1393,7 @@ public final class DatabaseHelper extends Thread {
             }
             MainActivity.info( "creating location table" );
             db.execSQL(LOCATION_CREATE);
+            db.execSQL(ROUTE_CREATE);
             db.setTransactionSuccessful();
             //TODO: update list header count
         } catch ( final SQLiteException ex ) {

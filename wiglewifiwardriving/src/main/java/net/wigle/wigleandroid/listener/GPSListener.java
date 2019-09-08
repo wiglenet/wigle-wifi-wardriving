@@ -179,6 +179,8 @@ public class GPSListener implements Listener, LocationListener {
             newOK = true;
         }
 
+        final boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+
         final boolean netLocOK = locationOK( networkLocation, satCount, gpsTimeout, netLocTimeout );
 
         boolean wasProviderChange = false;
@@ -313,6 +315,15 @@ public class GPSListener implements Listener, LocationListener {
             }
         }
 
+        if (logRoutes && null != location) {
+            final long routeId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+            try {
+                dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
+                        ListFragment.lameStatic.currCells, 0, routeId);
+            } catch (Exception ex) {
+                MainActivity.error("filed to log route update: ", ex);
+            }
+        }
         // update the UI
         mainActivity.setLocationUI();
 

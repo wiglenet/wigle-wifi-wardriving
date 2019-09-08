@@ -2153,6 +2153,10 @@ public final class MainActivity extends AppCompatActivity {
         if (state.gpsListener == null) {
             // force a listener to be created
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+            if (logRoutes) {
+                startRouteLogging(prefs);
+            }
             internalHandleScanChange(prefs.getBoolean(ListFragment.PREF_SCAN_RUNNING, true));
         }
     }
@@ -2613,4 +2617,28 @@ public final class MainActivity extends AppCompatActivity {
         }
         return safe;
     }
+
+    public void startRouteLogging(SharedPreferences prefs) {
+        // we're starting a new Run here - provide it an ID.
+        // ALIBI: we initialize this value to 0L on table setup as well.
+        long lastRouteId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+        long routeId = lastRouteId+1L;
+        final Editor edit = prefs.edit();
+        edit.putLong(ListFragment.PREF_ROUTE_DB_RUN, routeId);
+        edit.apply();
+    }
+
+    public void endRouteLogging() {
+        //TODO: null operation for now
+    }
+
+    public void startRouteMapping() {
+        //TODO: allocate state ringbuffer
+
+    }
+
+    public void endRouteMapping() {
+        //TODO: de-allocate state ringbuffer
+    }
+
 }

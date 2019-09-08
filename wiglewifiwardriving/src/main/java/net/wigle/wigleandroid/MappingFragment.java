@@ -174,6 +174,7 @@ public final class MappingFragment extends Fragment {
 
         // conditionally replace the tile source
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final boolean visualizeRoute = prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
         rlView.addView(mapView);
         // guard against not having google play services
         mapView.getMapAsync(new OnMapReadyCallback() {

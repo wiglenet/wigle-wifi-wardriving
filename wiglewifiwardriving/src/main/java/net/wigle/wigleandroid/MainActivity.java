@@ -2006,9 +2006,16 @@ public final class MainActivity extends AppCompatActivity {
             edit.commit();
             if ( state.bluetoothReceiver == null ) {
                 MainActivity.info( "new bluetoothReceiver");
+                // dynamically detect BTLE feature - prevents occasional NPEs
+                boolean hasLeSupport = true;
+                if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                    hasLeSupport = false;
+                }
+
                 // bluetooth scan listener
                 // this receiver is the main workhorse of bluetooth scanning
-                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper,
+                        hasLeSupport );
                 state.bluetoothReceiver.setupBluetoothTimer(true);
             }
             info("register bluetooth BroadcastReceiver");

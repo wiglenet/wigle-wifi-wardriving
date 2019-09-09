@@ -464,30 +464,38 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     public void batchUpdateBt(final boolean showCurrent, final boolean updateLe, final boolean updateClassic) {
         if (showCurrent) {
+            //ALIBI: if we're in current-only, strip last from networks and sets, add new to set, add revamped set to networks
             if (updateLe) {
                 networks.removeAll(leNets);
+                //TODO: 1/2: faster to clear and re-add all?
                 leNets.retainAll(nextLeNets);
+                leNets.addAll(nextLeNets);
+                networks.addAll(leNets);
             }
             if (updateClassic) {
                 networks.removeAll(btNets);
+                //TODO: 2/2: faster to clear and re-add all?
                 btNets.retainAll(nextBtNets);
+                btNets.addAll(nextBtNets);
+                networks.addAll(btNets);
             }
-        }
-        if (updateLe) {
-            for (Network net: nextLeNets) {
-                if (leNets.add(net)) {
-                    networks.add(net);
+        } else {
+            //ALIBI: if it's cumulative, add anything not in the sets to sets and networks
+            if (updateLe) {
+                for (Network net : nextLeNets) {
+                    if (leNets.add(net)) {
+                        networks.add(net);
+                    }
+                }
+            }
+            if (updateClassic) {
+                for (Network net : nextBtNets) {
+                    if (btNets.add(net)) {
+                        networks.add(net);
+                    }
                 }
             }
         }
-        if (updateClassic) {
-            for (Network net: nextBtNets) {
-                if (btNets.add(net)) {
-                    networks.add(net);
-                }
-            }
-        }
-
         if (updateClassic) {
             nextBtNets.clear();
         }

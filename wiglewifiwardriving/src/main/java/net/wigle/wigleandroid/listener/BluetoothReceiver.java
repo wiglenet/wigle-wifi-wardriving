@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.listener;
 
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -40,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 import uk.co.alt236.bluetoothlelib.device.BluetoothLeDevice;
@@ -52,6 +52,10 @@ import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
  * Created by bobzilla on 12/20/15
  */
 public final class BluetoothReceiver extends BroadcastReceiver {
+
+    // if a batch scan arrives within <x> millis of the previous batch, maybe that's to close
+    // currently seeing double-callbacks on motorola+8.1 devices
+    private final static long MIN_LE_BATCH_GAP = 50;
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
     //TODO: i18n
@@ -127,6 +131,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private long scanRequestTime = Long.MIN_VALUE;
     private boolean scanInFlight = false;
     private long lastScanResponseTime = Long.MIN_VALUE;
+
+    //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering churn
+    private AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
     private final long constructionTime = System.currentTimeMillis();
 
     // refresh thresholds - probably should either make these configurable
@@ -140,13 +147,19 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private long adUuidNoScanUuid = 0;
     private long scanUuidNoAdUuid = 0;
 
+    // prev/current sets of BSSIDs for each scan. ~ redundant w/ sets in SetBackedNetworkList in current-only mode...
+    private Set<String> latestBt = new HashSet<>();
+    private Set<String> prevBt = new HashSet<>();
 
-    public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper ) {
+    private Set<String> latestBtle = new HashSet<>();
+    private Set<String> prevBtle = new HashSet<>();
+
+    public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
 
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 21 && hasLeSupport) {
             scanCallback = new ScanCallback() {
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 private int empties = 0;
@@ -176,6 +189,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                 @Override
                 public void onBatchScanResults(List<ScanResult> results) {
+                    long responseClockTime = System.currentTimeMillis();
+                    long diff = responseClockTime - lastLeBatchResponseTime.longValue();
+                    lastLeBatchResponseTime.set(responseClockTime);
+                    if (diff < MIN_LE_BATCH_GAP) {
+                        MainActivity.error("Tried to update BTLE batch in improbably short time: "+diff);
+                        return;
+                    }
                     //MainActivity.info("LE Batch results: " + results);
                     final GPSListener gpsListener = mainActivity.getGPSListener();
 
@@ -189,6 +209,8 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         if (EMPTY_LE_THRESHOLD < empties) {
                             forceLeListReset = true;
                             empties = 0;
+                            prevBtle = new HashSet<>(latestBtle);
+                            latestBtle = new HashSet<>();
                         }
                     } else {
                         empties = 0;
@@ -196,6 +218,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) && forceLeListReset ) {
                         listAdapter.clearBluetoothLe();
+                    }
+
+                    if (results.isEmpty()) {
+                        //ALIBI: if this was an empty scan result, not further processing is required.
+                        return;
                     }
 
                     if (gpsListener != null) {
@@ -207,12 +234,17 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location, true);
                     }
+                    MainActivity.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
+                    prevBtle = new HashSet<>(latestBtle);
+                    latestBtle = new HashSet<>();
+
+                    //TODO: update lamestatic BT count
+
                     if (listAdapter != null) {
                         listAdapter.batchUpdateBt(prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true),
                                 true, false);
                     }
-                    final long newBtCount = dbHelper.getNewBtCount();
-                    ListFragment.lameStatic.newBt = newBtCount;
+                    ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
                     if (listAdapter != null) listAdapter.notifyDataSetChanged();
@@ -249,6 +281,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //final String adDeviceName = (adData != null) ? adData.getName(): null;
 
                     final String bssid = device.getAddress();
+
+                    latestBtle.add(bssid);
+                    prevBt.remove(bssid);
+                    latestBt.remove(bssid);
 
                     final String ssid =
                             (null == scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
@@ -371,10 +407,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
                     //  this is effectively how often we update the display
                     scanSettingsBuilder.setReportDelay(15000);
+                    MainActivity.error("START BLE SCANs");
                     bluetoothLeScanner.startScan(
                             Collections.<ScanFilter>emptyList(), scanSettingsBuilder.build(), scanCallback);
 
                 } else {
+                    //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
+                    //DEBUG: MainActivity.error("FLUSH BLE SCANs");
                     bluetoothLeScanner.flushPendingScanResults(scanCallback);
                 }
             }
@@ -413,6 +452,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
                 if (bluetoothLeScanner != null) {
                     if (scanning.compareAndSet(true, false)) {
+                        MainActivity.error("STOPPING BLE SCANS");
                         bluetoothLeScanner.stopScan(scanCallback);
                     } else {
                         MainActivity.error("Scanner present, comp-and-set prevented stop-scan");
@@ -444,6 +484,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 MainActivity.error("onReceive with null device - discarding this instance");
                 return;
             }
+            latestBt.add(device.getAddress());
             final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
             int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
 
@@ -501,10 +542,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+            //DEBUG:
+            MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
+            prevBt = new HashSet(latestBt);
+            latestBt = new HashSet<>();
+
+            //TODO: update lamestatic BT count
+
             final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
             if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
-            final long newBtCount = dbHelper.getNewBtCount();
-            ListFragment.lameStatic.newBt = newBtCount;
+            ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
             ListFragment.lameStatic.runBt = runNetworks.size();
             sort(prefs);
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
@@ -573,7 +620,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 MainActivity.info( "start first bluetooth scan");
                 // starts scan, sends event when done
                 final boolean scanOK = doBluetoothScan();
-                mainActivity.bluetoothScan();
 
                 if ( scanRequestTime <= 0 ) {
                     scanRequestTime = System.currentTimeMillis();
@@ -589,7 +635,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (mainActivity.isScanning()) {
             if ( ! scanInFlight ) {
                 try {
-                    //        mainActivity.bluetoothScan()
                     mainActivity.bluetoothScan();
                             //bluetoothManager.startScan();
                 }

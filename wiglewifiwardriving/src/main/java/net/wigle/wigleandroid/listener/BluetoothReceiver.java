@@ -193,7 +193,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     long diff = responseClockTime - lastLeBatchResponseTime.longValue();
                     lastLeBatchResponseTime.set(responseClockTime);
                     if (diff < MIN_LE_BATCH_GAP) {
-                        MainActivity.error("Tried to update BTLE batch in improbably short time: "+diff);
+                        MainActivity.warn("Tried to update BTLE batch in improbably short time: "+diff);
                         return;
                     }
                     //MainActivity.info("LE Batch results: " + results);
@@ -234,7 +234,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location, true);
                     }
-                    MainActivity.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
+                    //DEBUG: MainActivity.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
                     prevBtle = new HashSet<>(latestBtle);
                     latestBtle = new HashSet<>();
 
@@ -542,8 +542,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-            //DEBUG:
-            MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
+            //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
             prevBt = new HashSet(latestBt);
             latestBt = new HashSet<>();
 

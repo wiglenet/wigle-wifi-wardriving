@@ -149,14 +149,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     // prev/current sets of BSSIDs for each scan. ~ redundant w/ sets in SetBackedNetworkList in current-only mode...
     //ALIBI: both need to be synchronized since BTLE scan results can mutate/remove a BSSID from prev
-    private Set<String> iLatestBt = new HashSet<>();
-    private Set<String> latestBt = Collections.synchronizedSet(iLatestBt);
-    private Set<String> iPrevBt = new HashSet<>();
-    private Set<String> prevBt = Collections.synchronizedSet(iPrevBt);
+    private Set<String> latestBt = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> prevBt = Collections.synchronizedSet(new HashSet<String>());
 
     //ALIBI: only current synchronized since prev only ever gets copied and counted
-    private Set<String> iLatestBtle = new HashSet<>();
-    private Set<String> latestBtle = Collections.synchronizedSet(iLatestBtle);
+    private Set<String> latestBtle = Collections.synchronizedSet(new HashSet<String>());
     private Set<String> prevBtle = new HashSet<>();
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport) {

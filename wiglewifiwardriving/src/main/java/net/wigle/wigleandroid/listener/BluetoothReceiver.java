@@ -152,7 +152,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private Set<String> iLatestBt = new HashSet<>();
     private Set<String> latestBt = Collections.synchronizedSet(iLatestBt);
     private Set<String> iPrevBt = new HashSet<>();
-    private Set<String> prevBt = Collections.synchronizedSet(iLatestBt);
+    private Set<String> prevBt = Collections.synchronizedSet(iPrevBt);
 
     //ALIBI: only current synchronized since prev only ever gets copied and counted
     private Set<String> iLatestBtle = new HashSet<>();
@@ -418,7 +418,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 } else {
                     //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
                     //DEBUG: MainActivity.error("FLUSH BLE SCANs");
-                    //bluetoothLeScanner.flushPendingScanResults(scanCallback);
+                    bluetoothLeScanner.flushPendingScanResults(scanCallback);
                 }
             }
         }
@@ -715,7 +715,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
         String scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD;
-        long defaultRate = MainActivity.OG_DBT_SCAN_DEFAULT;
+        long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
         // if over 5 mph
         Location location = null;
         final GPSListener gpsListener = mainActivity.getGPSListener();

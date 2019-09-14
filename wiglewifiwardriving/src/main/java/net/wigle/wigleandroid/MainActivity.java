@@ -188,6 +188,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long SCAN_P_DEFAULT = 30000L;
+    public static final long OG_BT_SCAN_STILL_DEFAULT = 5000L;
+    public static final long OG_BT_SCAN_DEFAULT = 5000L;
+    public static final long OG_BT_SCAN_FAST_DEFAULT = 5000L;
+
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
@@ -2006,9 +2010,16 @@ public final class MainActivity extends AppCompatActivity {
             edit.commit();
             if ( state.bluetoothReceiver == null ) {
                 MainActivity.info( "new bluetoothReceiver");
+                // dynamically detect BTLE feature - prevents occasional NPEs
+                boolean hasLeSupport = true;
+                if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                    hasLeSupport = false;
+                }
+
                 // bluetooth scan listener
                 // this receiver is the main workhorse of bluetooth scanning
-                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
+                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper,
+                        hasLeSupport );
                 state.bluetoothReceiver.setupBluetoothTimer(true);
             }
             info("register bluetooth BroadcastReceiver");

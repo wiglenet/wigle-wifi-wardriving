@@ -94,6 +94,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
     public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
+    public static final String PREF_OG_BT_SCAN_PERIOD_STILL = "btGeneralScanPeriodStill";
+    public static final String PREF_OG_BT_SCAN_PERIOD = "btGeneralScanPeriod";
+    public static final String PREF_OG_BT_SCAN_PERIOD_FAST = "btGeneralScanPeriodFast";
     public static final String PREF_QUICK_PAUSE = "quickScanPause";
     public static final String GPS_SCAN_PERIOD = "gpsPeriod";
     public static final String PREF_FOUND_SOUND = "foundSound";

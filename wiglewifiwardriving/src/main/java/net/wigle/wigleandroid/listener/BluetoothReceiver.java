@@ -49,11 +49,12 @@ import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
 
 /**
+ * Central classic BT broadcast receiver and BTLE scanner.
  * Created by bobzilla on 12/20/15
  */
 public final class BluetoothReceiver extends BroadcastReceiver {
 
-    // if a batch scan arrives within <x> millis of the previous batch, maybe that's to close
+    // if a batch scan arrives within <x> millis of the previous batch, maybe that's too close
     // currently seeing double-callbacks on motorola+8.1 devices
     private final static long MIN_LE_BATCH_GAP = 50;
 
@@ -132,14 +133,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private boolean scanInFlight = false;
     private long lastScanResponseTime = Long.MIN_VALUE;
 
-    //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering churn
+    //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
     private AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
     private final long constructionTime = System.currentTimeMillis();
 
-    // refresh thresholds - probably should either make these configurable
+    // refresh threshold - probably should either make these configurable
     // arguably expiration should live per element not-seen in n scans.
     private static final int EMPTY_LE_THRESHOLD = 10;
-    private static final int EMPTY_BT_THRESHOLD = 2;
 
     // scan state
     private long lastDiscoveryAt = 0;
@@ -148,10 +148,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private long scanUuidNoAdUuid = 0;
 
     // prev/current sets of BSSIDs for each scan. ~ redundant w/ sets in SetBackedNetworkList in current-only mode...
-    private Set<String> latestBt = new HashSet<>();
-    private Set<String> prevBt = new HashSet<>();
+    //ALIBI: both need to be synchronized since BTLE scan results can mutate/remove a BSSID from prev
+    private Set<String> latestBt = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> prevBt = Collections.synchronizedSet(new HashSet<String>());
 
-    private Set<String> latestBtle = new HashSet<>();
+    //ALIBI: only current synchronized since prev only ever gets copied and counted
+    private Set<String> latestBtle = Collections.synchronizedSet(new HashSet<String>());
     private Set<String> prevBtle = new HashSet<>();
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport) {
@@ -180,8 +182,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
 
                     handleLeScanResult(scanResult, location, false);
-                    final long newBtCount = dbHelper.getNewBtCount();
-                    ListFragment.lameStatic.newBt = newBtCount;
+                    ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
                     if (listAdapter != null) listAdapter.notifyDataSetChanged();
@@ -205,12 +206,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     if (results.isEmpty()) {
                         empties++;
                         //DEBUG: MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
-                        //ALIBI: if it's been too long, we'll force-clear
+                        //ALIBI: if it's been too long with no nets seen, we'll force-clear
                         if (EMPTY_LE_THRESHOLD < empties) {
                             forceLeListReset = true;
                             empties = 0;
                             prevBtle = new HashSet<>(latestBtle);
-                            latestBtle = new HashSet<>();
+                            latestBtle.clear();
                         }
                     } else {
                         empties = 0;
@@ -236,9 +237,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
                     //DEBUG: MainActivity.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
                     prevBtle = new HashSet<>(latestBtle);
-                    latestBtle = new HashSet<>();
+                    latestBtle.clear();
 
-                    //TODO: update lamestatic BT count
+                    //TODO: ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
 
                     if (listAdapter != null) {
                         listAdapter.batchUpdateBt(prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true),
@@ -254,7 +255,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 public void onScanFailed(int errorCode) {
                     switch (errorCode) {
                         case SCAN_FAILED_ALREADY_STARTED:
-                            MainActivity.info("BluetoothLEScan already started");
+                            MainActivity.info("BluetoothLE Scan already started");
                             break;
                         default:
                             if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
@@ -420,7 +421,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
 
         /*
-        Paired device check?
+        Paired device check? could exclude paired devices...
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         for(BluetoothDevice device : pairedDevices) {
             MainActivity.info("\tpareid device: "+device.getAddress()+" - "+device.getName() + device.getBluetoothClass());
@@ -542,11 +543,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-            //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
-            prevBt = new HashSet(latestBt);
-            latestBt = new HashSet<>();
+            //DEBUG:
+            MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
+            prevBt = Collections.synchronizedSet(new HashSet(latestBt));
+            latestBt.clear();
 
-            //TODO: update lamestatic BT count
+            //TODO: ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
 
             final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
             if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
@@ -571,14 +573,26 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * Set display list adapter
+     * @param listAdapter
+     */
     public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
         this.listAdapter = listAdapter;
     }
 
+    /**
+     * get the number of BT networks seen this run
+     * @return
+     */
     public int getRunNetworkCount() {
         return runNetworks.size();
     }
 
+    /**
+     * create the bluetooth timer thread
+     * @param turnedBtOn
+     */
     public void setupBluetoothTimer( final boolean turnedBtOn ) {
         MainActivity.info( "create Bluetooth timer" );
         if ( bluetoothTimer == null ) {
@@ -695,8 +709,24 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     }
 
     public long getScanPeriod() {
-        //TODO: we should make this configurable through prefs!
-        return 5000;
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+
+        String scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD;
+        long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
+        // if over 5 mph
+        Location location = null;
+        final GPSListener gpsListener = mainActivity.getGPSListener();
+        if (gpsListener != null) {
+            location = gpsListener.getLocation();
+        }
+        if ( location != null && location.getSpeed() >= 2.2352f ) {
+            scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_FAST;
+            defaultRate = MainActivity.OG_BT_SCAN_FAST_DEFAULT;
+        } else if ( location == null || location.getSpeed() < 0.1f ) {
+            scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_STILL;
+            defaultRate = MainActivity.OG_BT_SCAN_STILL_DEFAULT;
+        }
+        return prefs.getLong( scanPref, defaultRate );
     }
 
     private Network addOrUpdateBt(final String bssid, final String ssid,

@@ -411,4 +411,13 @@
     <string name="no_external_space_title">没有可用空间</string>
     <string name="no_external_space_message">您的设备上没有足够的外部应用程序存储空间。</string>
     <string name="no_mxc_space_message">您的设备上没有足够的内部应用程序存储来安装单元操作员查找数据库。将使用设备提供的ID。</string>
+    <string name="enable_route_logging">记录执行路径</string>
+    <string name="enable_route_map_display">显示执行路线</string>
+    <string name="export_gpx_button">导出GPX</string>
+    <string name="export_gpx">将当前路由导出为GPX路由文件</string>
+    <string name="export_gpx_detail">将当前记录的路由导出为.GPX XML路由描述文件</string>
+    <string name="gpx_failed">无法导出gpx文件。\n </string>
+    <string name="gpx_no_points">GPX路由导出文件将为空。</string>
+    <string name="gpx_preparing">准备GPX导出</string>
+    <string name="gpx_exporting">导出GPX文件。</string>
 </resources>

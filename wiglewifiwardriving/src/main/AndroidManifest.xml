@@ -224,6 +224,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/m8b_paths" />
         </provider>
+        <provider
+            android:name=".util.GpxFileProvider"
+            android:authorities="${applicationId}.gpxprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/gpx_paths" />
+        </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />

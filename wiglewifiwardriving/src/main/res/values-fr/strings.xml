@@ -411,4 +411,13 @@
     <string name="no_external_space_title">Pas d\'espace disponible</string>
     <string name="no_external_space_message">Il n\'y a pas assez de stockage d\'application externe sur votre appareil.</string>
     <string name="no_mxc_space_message">Le stockage interne des applications sur votre appareil est insuffisant pour installer la base de données de recherche des opérateurs de cellules. Les identifiants fournis par l\'appareil seront utilisés.</string>
+    <string name="enable_route_logging">Journal des itinéraires pour l\'exécution</string>
+    <string name="enable_route_map_display">Afficher les itinéraires pour l\'exécution</string>
+    <string name="export_gpx_button">Exporter GPX</string>
+    <string name="export_gpx">Exporter la route actuelle en tant que fichier de route GPX</string>
+    <string name="export_gpx_detail">Exporter la route en cours de journalisation en tant que fichier de description de route XML .GPX</string>
+    <string name="gpx_failed">Impossible d\'exporter le fichier gpx.\n </string>
+    <string name="gpx_no_points">Le fichier d\'exportation de la route GPX serait vide.</string>
+    <string name="gpx_preparing">Préparation de l\'exportation GPX</string>
+    <string name="gpx_exporting">Exporter un fichier GPX.</string>
 </resources>

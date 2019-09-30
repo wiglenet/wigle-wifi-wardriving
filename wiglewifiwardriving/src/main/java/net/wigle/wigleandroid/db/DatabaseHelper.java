@@ -5,6 +5,9 @@ package net.wigle.wigleandroid.db;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,6 +72,8 @@ public final class DatabaseHelper extends Thread {
     private static final long QUEUE_CULL_TIMEOUT = 10000L;
     private long prevQueueCullTime = 0L;
     private long prevPendingQueueCullTime = 0L;
+
+    private Location lastLoggedLocation;
 
     private SQLiteStatement insertNetwork;
     private SQLiteStatement insertLocation;
@@ -136,6 +141,7 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
     public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
 
+    private static final String CLEAR_DEFAULT_ROUTE = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = 0";
 
     private SQLiteDatabase db;
 
@@ -148,6 +154,7 @@ public final class DatabaseHelper extends Thread {
     private final ArrayBlockingQueue<DBPending> pending = new ArrayBlockingQueue<>(MAX_QUEUE); // how to size this better?
     private final AtomicBoolean done = new AtomicBoolean(false);
     private final AtomicLong networkCount = new AtomicLong();
+    private final AtomicLong currentRoutePointCount = new AtomicLong();
     private final AtomicLong locationCount = new AtomicLong();
     private final AtomicLong newNetworkCount = new AtomicLong();
     private final AtomicLong newWifiCount = new AtomicLong();
@@ -452,7 +459,7 @@ public final class DatabaseHelper extends Thread {
         }
 
         try {
-            db.rawQuery( "SELECT max(route_id) FROM "+ROUTE_TABLE, null).close();
+            db.rawQuery( "SELECT max(run_id) FROM "+ROUTE_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
             MainActivity.info("exception selecting from route, try to create. ex: " + ex );
@@ -1121,18 +1128,32 @@ public final class DatabaseHelper extends Thread {
      * @param runId # the current, monotonic run ID
      */
     public void logRouteLocation (final Location location, final int wifiVisible, final int cellVisible, final int btVisible, final long runId) {
-        if (insertRoute != null) {
+        if (location == null) {
+            MainActivity.error("Null location in logRouteLocation");
+            return;
+        }
+        final double accuracy = location.getAccuracy();
+        if (insertRoute != null && location.getTime() != 0L &&
+                accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
+                accuracy > 0.0d && //ALIBI: should never happen?
+                (lastLoggedLocation == null ||
+                        ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
+                                (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
+                        )) )) {
             insertRoute.bindLong(1, runId);
             insertRoute.bindLong(2, wifiVisible);
             insertRoute.bindLong(3, cellVisible);
             insertRoute.bindLong(4, btVisible);
             insertRoute.bindDouble(5, location.getLatitude());
             insertRoute.bindDouble(6, location.getLongitude());
-            insertRoute.bindDouble(7, location.getAccuracy());
-            insertRoute.bindLong(8, location.getTime());
+            insertRoute.bindDouble(7, location.getAltitude());
+            insertRoute.bindDouble(8, location.getAccuracy());
+            insertRoute.bindLong(9, location.getTime());
             long start = System.currentTimeMillis();
 
             insertRoute.execute();
+            lastLoggedLocation = location;
+            currentRoutePointCount.incrementAndGet();
             logTime(start, "db route point added");
         }
     }
@@ -1169,6 +1190,8 @@ public final class DatabaseHelper extends Thread {
     public long getNetworkCount() {
         return networkCount.get();
     }
+
+    public long getCurrentRoutePointCount() { return currentRoutePointCount.get(); }
 
     public void getNetworkCountFromDB() throws DBException {
         networkCount.set( getCountFromDB( NETWORK_TABLE ) );
@@ -1321,6 +1344,35 @@ public final class DatabaseHelper extends Thread {
         MainActivity.info( "networkIterator (filtered)" );
         final String[] args = new String[]{};
         return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE "+filter.getFilter(), args );
+    }
+
+    public Cursor routeIterator(final long routeId) throws DBException {
+        checkDB();
+        MainActivity.info( "routeIterator" );
+        final String[] args = new String[]{String.valueOf(routeId)};
+        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = ?", args );
+    }
+    public Cursor currentRouteIterator() throws DBException {
+        checkDB();
+        MainActivity.info( "routeIterator" );
+        final String[] args = new String[]{};
+        return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
+    }
+
+    public void clearDefaultRoute() throws DBException {
+        db.execSQL(CLEAR_DEFAULT_ROUTE);
+    }
+
+    public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
+        MainActivity.info("currentRouteIterator");
+        checkDB();
+        if (prefs == null || !prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false)) {
+            return null;
+        }
+        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        final long visibleRouteId = logRoutes?prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L):0L;
+        final String[] args = new String[]{String.valueOf(visibleRouteId)};
+        return db.rawQuery( "SELECT lat,lon FROM route WHERE run_id = ?", args );
     }
 
     public Cursor getSingleNetwork( final String bssid ) throws DBException {

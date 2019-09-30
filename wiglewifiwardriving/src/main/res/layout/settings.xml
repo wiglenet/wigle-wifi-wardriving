@@ -197,11 +197,6 @@
             />
     </LinearLayout>
 
-    <CheckBox android:id="@+id/enable_route_logging"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/enable_route_logging" />
-
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -222,6 +217,12 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/enable_route_map_display" />
+
+    <CheckBox android:id="@+id/enable_route_logging"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_route_logging" />
+
 
     <TextView
         android:layout_width="fill_parent"

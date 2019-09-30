@@ -357,4 +357,13 @@
     <string name="no_external_space_title">Ei tilaa käytettävissä</string>
     <string name="no_external_space_message">Laitteellasi ei ole tarpeeksi ulkoista sovellusmuistia.</string>
     <string name="no_mxc_space_message">Laitteellasi ei ole tarpeeksi sisäistä sovellusmuistia solu-operaattorin hakutietokannan asentamiseen. Laitteen toimittamia tunnuksia käytetään.</string>
+    <string name="enable_route_logging">Lokitiet suoritettavia reittejä</string>
+    <string name="enable_route_map_display">Näytä suoritettavat reitit</string>
+    <string name="export_gpx_button">Vie GPX</string>
+    <string name="export_gpx">Vie nykyinen reitti GPX-reittitiedostona</string>
+    <string name="export_gpx_detail">Vie nykyinen kirjattava reitti .GPX XML -reittikuvaustiedostona</string>
+    <string name="gpx_failed">Gpx-tiedostoa ei voi viedä.\n </string>
+    <string name="gpx_no_points">GPX-reitin vientitiedosto olisi tyhjä.</string>
+    <string name="gpx_preparing">GPX-viennin valmistelu</string>
+    <string name="gpx_exporting">Viedään GPX-tiedostoa.</string>
 </resources>

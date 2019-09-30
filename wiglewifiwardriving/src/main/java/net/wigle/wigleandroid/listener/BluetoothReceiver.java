@@ -239,7 +239,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     prevBtle = new HashSet<>(latestBtle);
                     latestBtle.clear();
 
-                    //TODO: ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
+                    ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
 
                     if (listAdapter != null) {
                         listAdapter.batchUpdateBt(prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true),
@@ -543,12 +543,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-            //DEBUG:
-            MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
+            //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
             prevBt = Collections.synchronizedSet(new HashSet(latestBt));
             latestBt.clear();
 
-            //TODO: ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
+            ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
 
             final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
             if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);

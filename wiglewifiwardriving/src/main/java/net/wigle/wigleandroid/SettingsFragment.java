@@ -470,9 +470,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void preferenceSet(boolean value) {
                 MainActivity.info("Signaling route mapping change: "+value);
                 if (value) {
-                    MainActivity.getMainActivity().startRouteMapping();
+                    MainActivity.getMainActivity().startRouteMapping(prefs);
                 } else {
-                    MainActivity.getMainActivity().endRouteMapping();
+                    MainActivity.getMainActivity().endRouteMapping(prefs);
                 }
             }
         });

@@ -426,4 +426,11 @@
     <string name="no_mxc_space_message">There isn\'t enough internal application storage on your device to install the cell operator lookup database. Device-supplied IDs will be used.</string>
     <string name="enable_route_logging">Log routes for execution</string>
     <string name="enable_route_map_display">Display routes for execution</string>
+    <string name="export_gpx_button">Export GPX</string>
+    <string name="export_gpx">Export current route as a GPX route file</string>
+    <string name="export_gpx_detail">Export the current route being logged as a .GPX XML route-description file</string>
+    <string name="gpx_failed">Unable to export gpx file.\n </string>
+    <string name="gpx_no_points">The GPX route export file would be empty.</string>
+    <string name="gpx_preparing">Preparing GPX export</string>
+    <string name="gpx_exporting">Exporting GPX file.</string>
 </resources>

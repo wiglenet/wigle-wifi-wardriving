@@ -411,4 +411,13 @@
     <string name="no_external_space_title">אין מקום פנוי</string>
     <string name="no_external_space_message">אין מספיק שטח אחסון ליישומים חיצוניים במכשיר שלך.</string>
     <string name="no_mxc_space_message">אין מספיק אחסון יישומי פנימי במכשיר שלך בכדי להתקין את מסד הנתונים לחיפוש מפעיל סלולרי. יש להשתמש במזהים המסופקים במכשירים.</string>
+    <string name="enable_route_logging">רישום מסלולי ביצוע</string>
+    <string name="enable_route_map_display">הצגת מסלולי ביצוע</string>
+    <string name="export_gpx_button">ייצא GPX</string>
+    <string name="export_gpx">ייצא מסלול נוכחי כקובץ מסלול GPX</string>
+    <string name="export_gpx_detail">ייצא את המסלול הנוכחי שנרשם כקובץ תיאור מסלול .GPX XML</string>
+    <string name="gpx_failed">\nלא ניתן לייצא קובץ gpx.</string>
+    <string name="gpx_no_points">קובץ הייצוא של מסלול GPX יהיה ריק.</string>
+    <string name="gpx_preparing">מכין ייצוא של GPX</string>
+    <string name="gpx_exporting">מייצא קובץ GPX.</string>
 </resources>

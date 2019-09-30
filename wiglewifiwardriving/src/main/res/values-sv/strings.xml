@@ -354,4 +354,13 @@
     <string name="no_external_space_title">Inget utrymme tillgängligt</string>
     <string name="no_external_space_message">Det finns inte tillräckligt med extern applikationslagring på din enhet.</string>
     <string name="no_mxc_space_message">Det finns inte tillräckligt med internt applikationslagringsutrymme på din enhet för att installera sökoperatörsdatabasen. Enhets-ID som används kommer att användas.</string>
+    <string name="enable_route_logging">Logga rutter för körning</string>
+    <string name="enable_route_map_display">Visa rutter för körning</string>
+    <string name="export_gpx_button">Exportera GPX</string>
+    <string name="export_gpx">Exportera den aktuella rutten som en GPX-ruttfil</string>
+    <string name="export_gpx_detail">Exportera den aktuella rutten som loggas som en .GPX XML-ruttbeskrivningsfil</string>
+    <string name="gpx_failed">Det gick inte att exportera gpx-fil.\n </string>
+    <string name="gpx_no_points">GPX-ruttexportfilen skulle vara tom.</string>
+    <string name="gpx_preparing">Förbereder GPX-export</string>
+    <string name="gpx_exporting">Exporterar GPX-fil.</string>
 </resources>

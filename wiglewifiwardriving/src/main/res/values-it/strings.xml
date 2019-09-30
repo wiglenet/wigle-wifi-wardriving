@@ -411,4 +411,13 @@
     <string name="no_external_space_title">Nessuno spazio disponibile</string>
     <string name="no_external_space_message">Non è disponibile memoria sufficiente per l\'applicazione esterna sul dispositivo.</string>
     <string name="no_mxc_space_message">La memoria interna dell\'applicazione non è sufficiente sul dispositivo per installare il database di ricerca dell\'operatore di cella. Verranno utilizzati gli ID forniti dal dispositivo.</string>
+    <string name="enable_route_logging">Registra le rotte per l\'esecuzione</string>
+    <string name="enable_route_map_display">Visualizza percorsi per l\'esecuzione</string>
+    <string name="export_gpx_button">Esporta GPX</string>
+    <string name="export_gpx">Esporta il percorso corrente come file di percorso GPX</string>
+    <string name="export_gpx_detail">Esporta la rotta corrente registrata come file di descrizione della rotta XML .GPX</string>
+    <string name="gpx_failed">Impossibile esportare il file gpx.\n </string>
+    <string name="gpx_no_points">Il file di esportazione della route GPX sarebbe vuoto.</string>
+    <string name="gpx_preparing">Preparazione all\'esportazione GPX</string>
+    <string name="gpx_exporting">Esportazione di file GPX.</string>
 </resources>

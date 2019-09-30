@@ -356,4 +356,13 @@
     <string name="no_external_space_title">Geen ruimte beschikbaar</string>
     <string name="no_external_space_message">Er is onvoldoende externe toepassingsopslag op uw apparaat.</string>
     <string name="no_mxc_space_message">Er is onvoldoende interne toepassingsopslag op uw apparaat om de opzoekdatabase van de mobiele operator te installeren. Door het apparaat geleverde ID\'s worden gebruikt.</string>
+    <string name="enable_route_logging">Log routes voor uitvoering</string>
+    <string name="enable_route_map_display">Toon routes voor uitvoering</string>
+    <string name="export_gpx_button">GPX exporteren</string>
+    <string name="export_gpx">Huidige route exporteren als een GPX-routebestand</string>
+    <string name="export_gpx_detail">Exporteer de huidige route die wordt vastgelegd als een GPX XML-routebeschrijvingsbestand</string>
+    <string name="gpx_failed">Kan gpx-bestand niet exporteren.\n </string>
+    <string name="gpx_no_points">Het GPX-route-exportbestand zou leeg zijn.</string>
+    <string name="gpx_preparing">GPX-export voorbereiden</string>
+    <string name="gpx_exporting">GPX-bestand exporteren.</string>
 </resources>

@@ -30,7 +30,7 @@ public class FileUtility {
                 return (long) (stats.getAvailableBlocks() * stats.getBlockSize());
             }
         } catch (Exception ex) {
-            // if we can't determine freespace, be optimistic.
+            // if we can't determine free space, be optimistic. Possibly because of missing permission?
             MainActivity.error("Unable to determine free space: ",ex);
             return Long.MAX_VALUE;
         }

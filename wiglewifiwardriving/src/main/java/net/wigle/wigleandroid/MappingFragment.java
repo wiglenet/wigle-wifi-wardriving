@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -142,6 +143,12 @@ public final class MappingFragment extends Fragment {
     private static final float POLYLINE_TOLERANCE_COARSE = 20.0f;
     // when performing minor polyline simplification (Douglas-Peucker), this is our "tolerance value"
     private static final float POLYLINE_TOLERANCE_FINE = 50.0f;
+
+    private static final float ROUTE_WIDTH = 20.0f;
+    private static final int DARK_ROUTE = Color.BLACK;
+    private static final int LIGHT_ROUTE = Integer.parseInt("F4D03F", 16);
+
+
 
     /** Called when the activity is first created. */
     @Override
@@ -410,6 +417,7 @@ public final class MappingFragment extends Fragment {
 
                     PolylineOptions pOptions = new PolylineOptions()
                                     .clickable(false);
+                    final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
                     try {
                         Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
                         if (null == routeCursor) {
@@ -423,7 +431,9 @@ public final class MappingFragment extends Fragment {
                                 //final long time = routeCursor.getLong(2);
                                 pOptions.add(
                                         new LatLng(lat, lon));
-                                pOptions.width(20.0f); //DEFAULT: 10.0
+
+                                pOptions.color(getRouteColorForMapType(mapMode));
+                                pOptions.width(ROUTE_WIDTH); //DEFAULT: 10.0
                                 pOptions.zIndex(10000); //to overlay on traffic data
                                 segmentCount++;
                             }
@@ -540,6 +550,8 @@ public final class MappingFragment extends Fragment {
                                 if (routePolyline != null) {
                                     final List<LatLng> routePoints = routePolyline.getPoints();
                                     routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
+                                    final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                                    routePolyline.setColor(getRouteColorForMapType(mapMode));
 
                                     if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
                                         Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
@@ -1065,4 +1077,11 @@ public final class MappingFragment extends Fragment {
             return point.longitude * 1000000;
         }
     };
+
+    private int getRouteColorForMapType(final int mapType) {
+        if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_NONE) {
+            return LIGHT_ROUTE;
+        }
+        return DARK_ROUTE;
+    }
 }

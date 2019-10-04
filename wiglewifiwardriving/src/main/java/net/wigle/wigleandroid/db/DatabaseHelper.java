@@ -615,7 +615,7 @@ public final class DatabaseHelper extends Thread {
                     if ( insertRoute != null ) {
                         insertRoute.close();
                     }
-                if ( db.isOpen() ) {
+                    if ( db.isOpen() ) {
                         db.close();
                     }
                 }

@@ -22,6 +22,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -88,7 +90,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private static final String GPX_DIR = "/wiglewifi/gpx/";
     private static final String GPX_EXTENSION = ".gpx";
-    private final static String GPX_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"MapSource 6.15.5\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
+    private final static String GPX_HEADER_A = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"";
+    private final static String GPX_HEADER_B ="\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
     private final static String GPX_FOOTER = "</trkseg></trk></gpx>";
 
 
@@ -850,7 +853,17 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             name + GPX_EXTENSION);
                 }
                 FileWriter writer = new FileWriter(gpxDestFile, false);
-                writer.append(GPX_HEADER);
+                writer.append(GPX_HEADER_A);
+                String creator = "WiGLE WiFi ";
+                try {
+                    final PackageManager pm = getActivity().getApplicationContext().getPackageManager();
+                    final PackageInfo pi = pm.getPackageInfo(getActivity().getApplicationContext().getPackageName(), 0);
+                    creator += pi.versionName;
+                } catch (Exception ex) {
+                    creator += "(unknown)";
+                }
+                writer.append(creator);
+                writer.append(GPX_HEADER_B);
                 writer.append(nameStr);
                 Cursor cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
                 long segmentCount = writeSegmentsWithCursor(writer, cursor, df, routeLocs[0]);

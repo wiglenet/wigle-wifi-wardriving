@@ -146,7 +146,7 @@ public final class MappingFragment extends Fragment {
 
     private static final float ROUTE_WIDTH = 20.0f;
     private static final int DARK_ROUTE = Color.BLACK;
-    private static final int LIGHT_ROUTE = Integer.parseInt("F4D03F", 16);
+    private static final int LIGHT_ROUTE = Color.parseColor("#F4D03F");
 
 
 
@@ -1079,7 +1079,8 @@ public final class MappingFragment extends Fragment {
     };
 
     private int getRouteColorForMapType(final int mapType) {
-        if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_NONE) {
+        if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
+                && mapType != GoogleMap.MAP_TYPE_NONE) {
             return LIGHT_ROUTE;
         }
         return DARK_ROUTE;

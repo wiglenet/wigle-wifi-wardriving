@@ -411,4 +411,13 @@
     <string name="no_external_space_title">Kein Platz verfügbar</string>
     <string name="no_external_space_message">Auf Ihrem Gerät ist nicht genügend externer Anwendungsspeicher vorhanden.</string>
     <string name="no_mxc_space_message">Auf Ihrem Gerät ist nicht genügend interner Anwendungsspeicher vorhanden, um die Suchdatenbank für Mobilfunkbetreiber zu installieren. Vom Gerät bereitgestellte IDs werden verwendet.</string>
+    <string name="enable_route_logging">Routen zur Ausführung protokollieren</string>
+    <string name="enable_route_map_display">Routen zur Ausführung anzeigen</string>
+    <string name="export_gpx_button">GPX exportieren</string>
+    <string name="export_gpx">Exportiert die aktuelle Route als GPX-Routendatei</string>
+    <string name="export_gpx_detail">Exportiert die aktuelle Route, die protokolliert wird, als GPX-XML-Routenbeschreibungsdatei</string>
+    <string name="gpx_failed">Gpx-Datei kann nicht exportiert werden.\n </string>
+    <string name="gpx_no_points">Die GPX-Route-Exportdatei wäre leer.</string>
+    <string name="gpx_preparing">GPX-Export wird vorbereitet</string>
+    <string name="gpx_exporting">GPX-Datei wird exportiert.</string>
 </resources>

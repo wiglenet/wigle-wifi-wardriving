@@ -356,4 +356,13 @@
     <string name="no_external_space_title">Nincs hely</string>
     <string name="no_external_space_message">Nincs elég külső alkalmazás tárolóeszköz a készüléken.</string>
     <string name="no_mxc_space_message">A készüléken nincs elegendő belső tárhely a cellaüzemeltető keresési adatbázisának telepítéséhez. Az eszköz által szállított azonosítókat fogjuk használni.</string>
+    <string name="enable_route_logging">Naplózási útvonalak a végrehajtáshoz</string>
+    <string name="enable_route_map_display">Megjeleníti a végrehajtás útvonalait</string>
+    <string name="export_gpx_button">GPX exportálása</string>
+    <string name="export_gpx">Exportálja az aktuális útvonalat GPX útvonalfájlként</string>
+    <string name="export_gpx_detail">Exportálja az aktuálisan naplózott útvonalat .GPX XML útvonalleíró fájlként</string>
+    <string name="gpx_failed">Nem sikerült exportálni a gpx fájlt.\n </string>
+    <string name="gpx_no_points">A GPX útvonal-export fájl üres.</string>
+    <string name="gpx_preparing">A GPX exportjának előkészítése</string>
+    <string name="gpx_exporting">GPX fájl exportálása.</string>
 </resources>

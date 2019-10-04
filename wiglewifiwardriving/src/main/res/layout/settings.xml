@@ -213,6 +213,17 @@
         android:id="@+id/maptileprefs_embed"
         layout="@layout/map_tile_prefs" />
 
+    <CheckBox android:id="@+id/enable_route_map_display"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_route_map_display" />
+
+    <CheckBox android:id="@+id/enable_route_logging"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_route_logging" />
+
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

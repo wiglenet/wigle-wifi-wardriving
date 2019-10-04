@@ -89,6 +89,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";
     public static final String PREF_MAX_DB = "maxDbMarker";
+    public static final String PREF_ROUTE_DB_RUN = "routeDbRun";
     public static final String PREF_NETS_UPLOADED = "netsUploaded";
     public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
@@ -139,6 +140,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
+    public static final String PREF_LOG_ROUTES = "logRoutes";
+    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -191,6 +194,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public long newCells;
         public long newBt;
         public int currNets;
+        public int currCells;
+        public int currBt;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;

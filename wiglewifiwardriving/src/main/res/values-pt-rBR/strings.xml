@@ -367,4 +367,13 @@
     <string name="no_external_space_title">Nenhum espaço disponível</string>
     <string name="no_external_space_message">Não há armazenamento de aplicativos externos suficiente no seu dispositivo.</string>
     <string name="no_mxc_space_message">Não há armazenamento de aplicativo interno suficiente no seu dispositivo para instalar o banco de dados de pesquisa do operador de célula. IDs fornecidos pelo dispositivo serão usados.</string>
+    <string name="enable_route_logging">Rotas de log para execução</string>
+    <string name="enable_route_map_display">Exibir rotas para execução</string>
+    <string name="export_gpx_button">Exportar GPX</string>
+    <string name="export_gpx">Exportar rota atual como um arquivo de rota GPX</string>
+    <string name="export_gpx_detail">Exporte a rota atual sendo registrada como um arquivo de descrição de rota XML .GPX</string>
+    <string name="gpx_failed">Não foi possível exportar o arquivo gpx.\n </string>
+    <string name="gpx_no_points">O arquivo de exportação de rota GPX estaria vazio.</string>
+    <string name="gpx_preparing">Preparando a exportação GPX</string>
+    <string name="gpx_exporting">Exportando arquivo GPX.</string>
 </resources>

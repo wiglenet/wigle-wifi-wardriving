@@ -411,4 +411,13 @@
     <string name="no_external_space_title">Ingen plads tilgængelig</string>
     <string name="no_external_space_message">Der er ikke nok ekstern applikationslagring på din enhed.</string>
     <string name="no_mxc_space_message">Der er ikke nok intern applikationslagring på din enhed til at installere opslagningsdatabasen for celleoperatøren. Enheds-leverede ID\'er bruges.</string>
+    <string name="enable_route_logging">Log ruter til udførelse</string>
+    <string name="enable_route_map_display">Vis ruter til udførelse</string>
+    <string name="export_gpx_button">Eksporter GPX</string>
+    <string name="export_gpx">Eksporter den aktuelle rute som en GPX-rutefil</string>
+    <string name="export_gpx_detail">Eksporter den aktuelle rute, der logges som en .GPX XML-rutebeskrivelsesfil</string>
+    <string name="gpx_failed">Gpx-fil kunne ikke eksporteres.\n </string>
+    <string name="gpx_no_points">GPX-ruteeksportfilen ville være tom.</string>
+    <string name="gpx_preparing">Forbereder GPX-eksport</string>
+    <string name="gpx_exporting">Eksporterer GPX-fil.</string>
 </resources>

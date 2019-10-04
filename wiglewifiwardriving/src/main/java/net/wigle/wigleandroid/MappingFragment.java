@@ -7,7 +7,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -28,6 +30,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
+
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,6 +47,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.goebl.simplify.PointExtractor;
+import com.goebl.simplify.Simplify;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
@@ -53,6 +59,8 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
@@ -66,10 +74,17 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
+import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
+
 /**
  * show a map!
  */
 public final class MappingFragment extends Fragment {
+
+    private final String ROUTE_LINE_TAG = "routePolyline";
+
     private static class State {
         private boolean locked = true;
         private boolean firstMove = true;
@@ -81,11 +96,14 @@ public final class MappingFragment extends Fragment {
 
     private MapView mapView;
     private MapRender mapRender;
+
     private final Handler timer = new Handler();
     private AtomicBoolean finishing;
     private Location previousLocation;
     private int previousRunNets;
     private TileOverlay tileOverlay;
+    private Polyline routePolyline;
+    private Location lastLocation;
 
     private Menu menu;
 
@@ -116,6 +134,14 @@ public final class MappingFragment extends Fragment {
     private static final String HIGH_RES_TILE_TRAILER = "&sizeX=512&sizeY=512";
     private static final String ONLY_MINE_TILE_TRAILER = "&onlymine=1";
     private static final String NOT_MINE_TILE_TRAILER = "&notmine=1";
+
+    // parameters for polyline simplification package: https://github.com/hgoebl/simplify-java
+    // assume we need to undertake drastic route line complexity if we exceed this many segments
+    private static final int POLYLINE_PERF_THRESHOLD = 2500;
+    // when performing drastic polyline simplification (Radial-Distance), this is our "tolerance value"
+    private static final float POLYLINE_TOLERANCE_COARSE = 20.0f;
+    // when performing minor polyline simplification (Douglas-Peucker), this is our "tolerance value"
+    private static final float POLYLINE_TOLERANCE_FINE = 50.0f;
 
     /** Called when the activity is first created. */
     @Override
@@ -174,6 +200,7 @@ public final class MappingFragment extends Fragment {
 
         // conditionally replace the tile source
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final boolean visualizeRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
         rlView.addView(mapView);
         // guard against not having google play services
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -377,6 +404,38 @@ public final class MappingFragment extends Fragment {
                     tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
                             .tileProvider(tileProvider).transparency(0.35f));
                 }
+
+                //ALIBI: still checking prefs because we pass them to the dbHelper
+                if (null != prefs  && visualizeRoute) {
+
+                    PolylineOptions pOptions = new PolylineOptions()
+                                    .clickable(false);
+                    try {
+                        Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
+                        if (null == routeCursor) {
+                            MainActivity.info("null route cursor; not mapping");
+                        } else {
+                            long segmentCount = 0;
+
+                            for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                                final double lat = routeCursor.getDouble(0);
+                                final double lon = routeCursor.getDouble(1);
+                                //final long time = routeCursor.getLong(2);
+                                pOptions.add(
+                                        new LatLng(lat, lon));
+                                pOptions.width(20.0f); //DEFAULT: 10.0
+                                pOptions.zIndex(10000); //to overlay on traffic data
+                                segmentCount++;
+                            }
+                            MainActivity.info("Loaded route with " + segmentCount + " segments");
+                            routePolyline = googleMap.addPolyline(pOptions);
+
+                            routePolyline.setTag(ROUTE_LINE_TAG);
+                        }
+                    } catch (Exception e) {
+                        MainActivity.error("Unable to add route: ",e);
+                    }
+                }
             }
         });
         MainActivity.info("done setupMapView.");
@@ -465,6 +524,49 @@ public final class MappingFragment extends Fragment {
                             mapView.postInvalidate();
                         }
                     }
+
+                    try {
+                        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                        final boolean showRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
+                        //DEBUG: MainActivity.info("mUpdateTimeTask with non-null location. show: "+showRoute);
+                        if (showRoute) {
+                            double accuracy = location.getAccuracy();
+                            if (location.getTime() != 0 &&
+                                    accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS
+                                    && accuracy > 0.0d &&
+                                    (lastLocation == null ||
+                                            ((location.getTime() - lastLocation.getTime()) > MIN_ROUTE_LOCATION_DIFF_TIME) &&
+                                                    lastLocation.distanceTo(location)> MIN_ROUTE_LOCATION_DIFF_METERS)) {
+                                if (routePolyline != null) {
+                                    final List<LatLng> routePoints = routePolyline.getPoints();
+                                    routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
+
+                                    if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
+                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+                                        LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_COARSE, false);
+                                        routePolyline.setPoints(Arrays.asList(simplified));
+                                        MainActivity.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
+                                    } else if (routePoints.size() > 1) {
+                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+                                        LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_FINE, true);
+                                        routePolyline.setPoints(Arrays.asList(simplified));
+                                        MainActivity.error("minor route simplification: "+routePoints.size()+"->"+simplified.length);
+                                    } else {
+                                        //DEBUG: MainActivity.error("route points: " + routePoints.size());
+                                        routePolyline.setPoints(routePoints);
+                                    }
+                                } else {
+                                    MainActivity.error("route polyline null - this shouldn't happen");
+                                }
+                                lastLocation = location;
+                            } else {
+                                //DEBUG:    MainActivity.warn("time/accuracy route update DQ");
+                            }
+                        }
+                    } catch (Exception ex) {
+                        MainActivity.error("Route point update failed: ",ex);
+                    }
+
                     // set if location isn't null
                     previousLocation = location;
                 }
@@ -952,4 +1054,15 @@ public final class MappingFragment extends Fragment {
             ListFragment.lameStatic.dbHelper.addToQueue( request );
         }
     }
+    private static PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {
+        @Override
+        public double getX(LatLng point) {
+            return point.latitude * 1000000;
+        }
+
+        @Override
+        public double getY(LatLng point) {
+            return point.longitude * 1000000;
+        }
+    };
 }

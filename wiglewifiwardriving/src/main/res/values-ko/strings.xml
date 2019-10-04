@@ -354,4 +354,13 @@
     <string name="no_external_space_title">사용 가능한 공간이 없습니다</string>
     <string name="no_external_space_message">기기에 외부 애플리케이션 저장소가 충분하지 않습니다.</string>
     <string name="no_mxc_space_message">셀 운영자 조회 데이터베이스를 설치하기에 디바이스에 내부 애플리케이션 스토리지가 충분하지 않습니다. 장치 제공 ID가 사용됩니다.</string>
+    <string name="enable_route_logging">실행을위한 로그 경로</string>
+    <string name="enable_route_map_display">실행 경로 표시</string>
+    <string name="export_gpx_button">GPX 내보내기</string>
+    <string name="export_gpx">현재 경로를 GPX 경로 파일로 내보내기</string>
+    <string name="export_gpx_detail">현재 경로를 .GPX XML 경로 설명 파일로 내보내기</string>
+    <string name="gpx_failed">gpx 파일을 내보낼 수 없습니다.\n </string>
+    <string name="gpx_no_points">GPX 경로 내보내기 파일이 비어 있습니다.</string>
+    <string name="gpx_preparing">GPX 내보내기 준비</string>
+    <string name="gpx_exporting">GPX 파일을 내보내는 중입니다.</string>
 </resources>

@@ -71,6 +71,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
@@ -2164,6 +2165,14 @@ public final class MainActivity extends AppCompatActivity {
         if (state.gpsListener == null) {
             // force a listener to be created
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+            if (logRoutes) {
+                startRouteLogging(prefs);
+            }
+            boolean displayRoute = prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
+            if (displayRoute) {
+                startRouteMapping(prefs);
+            }
             internalHandleScanChange(prefs.getBoolean(ListFragment.PREF_SCAN_RUNNING, true));
         }
     }
@@ -2624,4 +2633,63 @@ public final class MainActivity extends AppCompatActivity {
         }
         return safe;
     }
+
+    /**
+     * When we start a new run/start logging for a run, provide the new run a new ID
+     * @param prefs current sharedPreferences
+     */
+    public void startRouteLogging(SharedPreferences prefs) {
+        // ALIBI: we initialize this value to 0L on table setup as well.
+        long lastRouteId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+        long routeId = lastRouteId+1L; //ALIBI: always skips the default 0 run id. (see vis below)
+        final Editor edit = prefs.edit();
+        edit.putLong(ListFragment.PREF_ROUTE_DB_RUN, routeId);
+        edit.apply();
+    }
+
+    /**
+     * since we do the prefs check on logging, no real need to do anything here
+     */
+    public void endRouteLogging() {
+        //TODO: null operation for now
+    }
+
+    /**
+     * if we're already logging the route, we'll simply use that route log when displaying.
+     * If we're not already logging, we'll log the route to run ID 0 in the routes table.
+     * ALIBI: since route lengths may be extreme, ring-buffer/dynamic allocation could cause serious problems
+     * @param prefs current sharedPreferences
+     */
+    public void startRouteMapping(SharedPreferences prefs) {
+        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        //ALIBI: we'll piggyback off the current route, if we're logging it
+        if (!logRoutes) {
+            if (state != null && state.dbHelper != null) {
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    MainActivity.warn("unable to clear default route on start-viz: ", dbe);
+                }
+            }
+        }
+    }
+
+    /**
+     * if we're logging to the default slot, we'll clear here, JiC. This might be unnecessary, or even
+     * pose problems if we decide to stop adding, but keep visualizing the route up to that point.
+     * @param prefs current sharedPreferences
+     */
+    public void endRouteMapping(SharedPreferences prefs) {
+        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        if (!logRoutes) {
+            if (state != null && state.dbHelper != null) {
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    MainActivity.warn("unable to clear default route on end-viz: ", dbe);
+                }
+            }
+        }
+    }
+
 }

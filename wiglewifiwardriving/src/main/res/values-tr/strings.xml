@@ -354,4 +354,13 @@
     <string name="no_external_space_title">Boş Alan Yok</string>
     <string name="no_external_space_message">Cihazınızda yeterli harici uygulama depolama alanı yok.</string>
     <string name="no_mxc_space_message">Hücre operatörü arama veritabanını yüklemek için cihazınızda yeterli dahili uygulama depolama alanı yok. Cihaz tarafından sağlanan ID\'ler kullanılacaktır.</string>
+    <string name="enable_route_logging">Yürütme için günlük rotaları</string>
+    <string name="enable_route_map_display">Yürütme yollarını göster</string>
+    <string name="export_gpx_button">GPX’i Dışa Aktar</string>
+    <string name="export_gpx">Geçerli rotayı GPX rota dosyası olarak dışa aktar</string>
+    <string name="export_gpx_detail">Bir .GPX XML rota açıklaması dosyası olarak kaydedilmekte olan mevcut rotayı dışa aktarın</string>
+    <string name="gpx_failed">GPX dosyası dışa aktarılamıyor.\n </string>
+    <string name="gpx_no_points">GPX yolu dışa aktarma dosyası boş olacaktı.</string>
+    <string name="gpx_preparing">GPX ihracatını hazırlama</string>
+    <string name="gpx_exporting">GPX dosyasını dışa aktarma.</string>
 </resources>

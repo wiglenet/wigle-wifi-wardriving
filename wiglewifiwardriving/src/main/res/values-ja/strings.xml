@@ -411,4 +411,13 @@
     <string name="no_external_space_title">利用可能なスペースがありません</string>
     <string name="no_external_space_message">デバイスに十分な外部アプリケーションストレージがありません。</string>
     <string name="no_mxc_space_message">セルオペレータルックアップデータベースをインストールするための十分な内部アプリケーションストレージがデバイスにありません。デバイス提供のIDが使用されます。</string>
+    <string name="enable_route_logging">実行のログルート</string>
+    <string name="enable_route_map_display">実行のルートを表示する</string>
+    <string name="export_gpx_button">GPXをエクスポート</string>
+    <string name="export_gpx">現在のルートをGPXルートファイルとしてエクスポートする</string>
+    <string name="export_gpx_detail">ログに記録されている現在のルートを.GPX XMLルート記述ファイルとしてエクスポートします</string>
+    <string name="gpx_failed">gpxファイルをエクスポートできません。\n </string>
+    <string name="gpx_no_points">GPXルートエクスポートファイルは空になります。</string>
+    <string name="gpx_preparing">GPXエクスポートの準備</string>
+    <string name="gpx_exporting">GPXファイルをエクスポートしています。</string>
 </resources>

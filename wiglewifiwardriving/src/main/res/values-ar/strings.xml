@@ -411,4 +411,13 @@
     <string name="no_external_space_title">لا المساحة المتاحة</string>
     <string name="no_external_space_message">لا يوجد مساحة تخزين كافية للتطبيق الخارجي على جهازك.</string>
     <string name="no_mxc_space_message">لا توجد مساحة تخزين داخلية كافية على جهازك لتثبيت قاعدة بيانات بحث مشغل الخلية. سيتم استخدام معرفات الجهاز الموردة.</string>
+    <string name="enable_route_logging">طرق تسجيل للتنفيذ</string>
+    <string name="enable_route_map_display">عرض طرق التنفيذ</string>
+    <string name="export_gpx_button">تصدير GPX</string>
+    <string name="export_gpx">تصدير المسار الحالي كملف مسار GPX</string>
+    <string name="export_gpx_detail">تصدير المسار الحالي الذي يتم تسجيله كملف وصف مسار XML .GPX</string>
+    <string name="gpx_failed">\nغير قادر على تصدير ملف gpx.</string>
+    <string name="gpx_no_points">سيكون ملف تصدير توجيه GPX فارغًا.</string>
+    <string name="gpx_preparing">إعداد تصدير GPX</string>
+    <string name="gpx_exporting">تصدير ملف GPX.</string>
 </resources>

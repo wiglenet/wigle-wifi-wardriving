@@ -233,6 +233,15 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/gpx_paths" />
         </provider>
+        <provider
+            android:name=".util.SqliteFileProvider"
+            android:authorities="${applicationId}.sqliteprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/sqlite_paths" />
+        </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />

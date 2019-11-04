@@ -36,6 +36,8 @@
     <string name="kml_export_text">Tüm veritabanını KML dosyasına aktar</string>
     <string name="backup_db_button">Veritabanı yedeğini al</string>
     <string name="backup_db_text">Veritabanı yedeğini al</string>
+    <string name="backup_preparing">Veritabanını yedeklemeye hazırlanıyor&#8230;</string>
+    <string name="backup_in_progress">Veritabanını yedekleme&#8230;</string>
     <string name="import_observed_button">Keşfettiklerimi içeri aktar</string>
     <string name="import_observed_text">WiGLE ile keşfettiğim ağları içeri aktar</string>
     <string name="periodstill_text">WiFi arasındaki zmn ayakta tarar</string>

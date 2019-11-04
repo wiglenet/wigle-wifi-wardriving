@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exportovat celou databázi do KML souboru</string>
     <string name="backup_db_button">Zálohovat Databáze</string>
     <string name="backup_db_text">Provést zálohu databáze</string>
+    <string name="backup_preparing">Příprava na zálohu databáze&#8230;</string>
+    <string name="backup_in_progress">Zálohování databáze&#8230;</string>
     <string name="import_observed_button">Importovat objevené</string>
     <string name="import_observed_text">Importovat moje objevené sítě z WiGLE</string>
     <string name="periodstill_text">Interval mezi WiFi skeny bez pohybu</string>

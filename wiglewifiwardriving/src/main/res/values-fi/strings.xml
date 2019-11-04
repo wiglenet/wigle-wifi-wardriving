@@ -36,6 +36,8 @@
     <string name="kml_export_text">Vie koko DB KML tiedosto</string>
     <string name="backup_db_button">Backup tietokannan</string>
     <string name="backup_db_text">Tee tietokannasta varmuuskopio</string>
+    <string name="backup_preparing">Valmistautuminen tietokannan varmuuskopiointiin&#8230;</string>
+    <string name="backup_in_progress">Tietokannan varmuuskopiointi&#8230;</string>
     <string name="import_observed_button">Tuo Havaittu</string>
     <string name="import_observed_text">Tuo minun havaittu verkkoja WiGLE</string>
     <string name="periodstill_text">Välinen aika WiFi skannaa seisoo edelleen</string>

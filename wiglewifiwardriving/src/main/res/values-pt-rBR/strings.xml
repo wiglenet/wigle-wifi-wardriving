@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exporta todo o BD para um arquivo KML</string>
     <string name="backup_db_button">Backup do BD</string>
     <string name="backup_db_text">Faz um backup do Banco de Dados</string>
+    <string name="backup_preparing">Preparando para Fazer Backup do Banco de Dados&#8230;</string>
+    <string name="backup_in_progress">Fazendo backup do banco de dados&#8230;</string>
     <string name="import_observed_button">Importar Enviadas</string>
     <string name="import_observed_text">Importa as redes que já enviei ao WiGLE</string>
     <string name="periodstill_text">Intervalo entre as buscas Wi-Fi enquanto estiver parado</string>

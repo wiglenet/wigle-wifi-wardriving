@@ -36,6 +36,8 @@
     <string name="kml_export_text">KML 파일에 전체 DB를 내보내기</string>
     <string name="backup_db_button">백업 데이터베이스</string>
     <string name="backup_db_text">데이터베이스 백업 만들기</string>
+    <string name="backup_preparing">데이터베이스 백업 준비</string>
+    <string name="backup_in_progress">데이터베이스 백업</string>
     <string name="import_observed_button">가져오기 관찰된</string>
     <string name="import_observed_text">WiGLE에서 내 관찰 네트워크를 가져오기</string>
     <string name="periodstill_text">와이파이 사이의 시간은 여전히 서 검색</string>

@@ -36,6 +36,8 @@
     <string name="kml_export_text">KML फ़ाइल को पूरे DB निर्यात</string>
     <string name="backup_db_button">बैकअप धन्यवाद</string>
     <string name="backup_db_text">एक डेटाबेस बैकअप बनाओ</string>
+    <string name="backup_preparing">डेटाबेस का बैकअप लेने की तैयारी है</string>
+    <string name="backup_in_progress">डेटाबेस का समर्थन</string>
     <string name="import_observed_button">आयात मनाया</string>
     <string name="import_observed_text">WiGLE से मेरी मनाया नेटवर्क आयात</string>
     <string name="periodstill_text">वाईफाई के बीच समय अभी भी खड़े स्कैन करता है</string>

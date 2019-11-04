@@ -36,6 +36,8 @@
     <string name="kml_export_text">過去のスキャンをKMLファイルへ出力する</string>
     <string name="backup_db_button">データベースのバックアップ</string>
     <string name="backup_db_text">データベースのバックアップを作成</string>
+    <string name="backup_preparing">データベースのバックアップの準備</string>
+    <string name="backup_in_progress">データベースのバックアップ</string>
     <string name="import_observed_button">WiGLE をインポート</string>
     <string name="import_observed_text">自分が観測したネットワークを WiGLE からインポート</string>
     <string name="periodstill_text">スキャン間隔:静止中</string>

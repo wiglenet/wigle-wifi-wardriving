@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exporter la BDD entière vers un fichier KML</string>
     <string name="backup_db_button">Sauvegarder la BDD</string>
     <string name="backup_db_text">Faire une sauvegarde de la BDD</string>
+    <string name="backup_preparing">Préparation à la sauvegarde de la BDD&#8230;</string>
+    <string name="backup_in_progress">Sauvegarde de la BDD&#8230;</string>
     <string name="import_observed_button">Importer réseaux trouvés</string>
     <string name="import_observed_text">Importer mes réseaux trouvés depuis WiGLE</string>
     <string name="periodstill_text">Temps entre les recherches WiFi à l\'arret</string>

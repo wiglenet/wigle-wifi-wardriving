@@ -36,6 +36,8 @@
     <string name="kml_export_text">ייצוא DB כולו לקובץ KML</string>
     <string name="backup_db_button">גיבוי מסד נתונים</string>
     <string name="backup_db_text">בצע גיבוי מסד הנתונים</string>
+    <string name="backup_preparing">מתכונן לגיבוי מסד נתונים&#8230;</string>
+    <string name="backup_in_progress">&#8230;גיבוי מסד נתונים</string>
     <string name="import_observed_button">ייבוא ​​נצפה</string>
     <string name="import_observed_text">ייבוא ​​רשתות נצפתה שלי WiGLE</string>
     <string name="periodstill_text">זמן בין WiFi סורק את מעמד עדיין</string>

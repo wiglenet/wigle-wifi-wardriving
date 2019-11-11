@@ -36,6 +36,8 @@
     <string name="kml_export_text">Esporta tutto il database in un file KML</string>
     <string name="backup_db_button">Backup del database</string>
     <string name="backup_db_text">Effettua un backup dell\'intero database</string>
+    <string name="backup_preparing">Preparazione per il backup del database&#8230;</string>
+    <string name="backup_in_progress">Backup del database&#8230;</string>
     <string name="import_observed_button">Importa rilevate</string>
     <string name="import_observed_text">Importa le tue rilevazioni da WiGLE</string>
     <string name="periodstill_text">Intervallo tra le ricerche WiFi quando fermo</string>

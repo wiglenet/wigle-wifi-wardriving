@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exportar todos los datos a un archivo KML</string>
     <string name="backup_db_button">Respaldar todo</string>
     <string name="backup_db_text">Haga una copia de seguridad de todos los datos</string>
+    <string name="backup_preparing">Preparación para hacer una copia de seguridad de la base de datos&#8230;</string>
+    <string name="backup_in_progress">Copia de seguridad de la base de datos&#8230;</string>
     <string name="import_observed_button">Importar mis datos desde WiGLE</string>
     <string name="import_observed_text">Importar mis datos subidos desde WiGLE</string>
     <string name="periodstill_text">Tiempo entre WiFi explora quedarse quieto</string>

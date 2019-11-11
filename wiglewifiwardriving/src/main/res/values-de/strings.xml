@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exportiere ganze DB in KML-Datei</string>
     <string name="backup_db_button">Backup DB</string>
     <string name="backup_db_text">Sicherungskopie der Datenbank erstellen</string>
+    <string name="backup_preparing">Vorbereiten der Datenbanksicherung&#8230;</string>
+    <string name="backup_in_progress">Datenbank sichern&#8230;</string>
     <string name="import_observed_button">Import beobachtete Netzwerke</string>
     <string name="import_observed_text">Import meiner Netzwerke aus WiGLE</string>
     <string name="periodstill_text">Zeit zwischen WLAN-Scans im Stillstand</string>

@@ -16,10 +16,7 @@ import net.wigle.wigleandroid.util.MagicEightUtil;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -30,11 +27,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.core.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -449,12 +442,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     /**
      * way to background load the data and show progress on the gui thread
      */
-    public static class BackupTask extends AsyncTask<Object, Integer, Integer> {
+    public class BackupTask extends AsyncTask<Object, Integer, Integer> {
         private final Fragment fragment;
-        private final MainActivity mainActivity;
+        protected final MainActivity mainActivity;
         private Pair<Boolean,String> dbResult;
+        private int prevProgress = 0;
 
-        public BackupTask ( final Fragment fragment, final MainActivity mainActivity ) {
+        private BackupTask ( final Fragment fragment, final MainActivity mainActivity ) {
             this.fragment = fragment;
             this.mainActivity = mainActivity;
             mainActivity.setTransferring();
@@ -465,18 +459,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             dbResult = ListFragment.lameStatic.dbHelper.copyDatabase(this);
             // dbResult = new Pair<Boolean,String>(Boolean.TRUE, "meh");
             return 0;
-        }
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        protected void onProgressUpdate( Integer... progress ) {
-            final View view = fragment.getView();
-            if (view != null) {
-                final TextView tv = (TextView) view.findViewById( R.id.backup_db_text );
-                if (tv != null) {
-                    tv.setText( mainActivity.getString(R.string.backup_db_text) + "\n" + progress[0] + "%" );
-                }
-            }
         }
 
         @Override
@@ -493,21 +475,79 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 }
             }
 
-            final BackupDialog dialog = BackupDialog.newInstance(dbResult.getFirst(), dbResult.getSecond());
-            final FragmentManager fm = mainActivity.getSupportFragmentManager();
-            try {
-                dialog.show(fm, "backup-dialog");
+            if (null != result) { //launch task will exist with bg thread enqueued with null return
+                if (pd.isShowing()) {
+                    pd.dismiss();
+                }
+                if (null != dbResult && dbResult.getFirst()) {
+                    // fire share intent
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE Database Backup");
+                    intent.setType("application/xsqlite-3");
+
+                    //TODO: verify local-only storage case/gpx_paths.xml
+                    final Uri fileUri = FileProvider.getUriForFile(getContext(),
+                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                    ".sqliteprovider", new File(dbResult.getSecond()));
+
+                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
+                } else {
+                    //TODO: show error
+                }
             }
-            catch (final IllegalStateException ex) {
-                MainActivity.error("Error showing backup dialog: " + ex, ex);
-            }
+
         }
 
         public void progress( int progress ) {
-            publishProgress(progress);
+            if (prevProgress != progress) {
+                prevProgress = progress;
+                publishProgress(progress);
+            }
         }
 
-        public static class BackupDialog extends DialogFragment {
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            if (pd != null) {
+                if (values.length == 1) {
+                    MainActivity.info("progress: " + values[0]);
+                    if (values[0] > 0) {
+                        pd.setIndeterminate(false);
+                        if (100 == values[0]) {
+                            if (pd.isShowing()) {
+                                pd.dismiss();
+                            }
+                            return;
+                        }
+                        pd.setMessage(getString(R.string.backup_in_progress));
+                        pd.setProgress(values[0]);
+                    } else {
+                        pd.setIndeterminate(false);
+                        pd.setMessage(getString(R.string.backup_preparing));
+                        pd.setProgress(values[0]);
+                    }
+                } else {
+                    MainActivity.warn("too many values for DB Backup progress update");
+                }
+            } else {
+                MainActivity.error("Progress dialog update failed - not defined");
+            }
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+            pd = new ProgressDialog(getContext());
+            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            pd.setCancelable(false);
+            pd.setMessage(getString(R.string.backup_preparing));
+            pd.setIndeterminate(true);
+            pd.show();
+        }
+
+        /*public static class BackupDialog extends DialogFragment {
             public static BackupDialog newInstance(final boolean status, final String message) {
                 final BackupDialog frag = new BackupDialog();
                 final Bundle args = new Bundle();
@@ -543,14 +583,18 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
                 return ad;
             }
-        }
+        }*/
     }
 
     @Override
     public void onResume() {
         MainActivity.info( "resume data." );
         super.onResume();
-        getActivity().setTitle(R.string.data_activity_name);
+        try {
+            getActivity().setTitle(R.string.data_activity_name);
+        } catch (NullPointerException npe) {
+            //Nothing to do here.
+        }
     }
 
     /**

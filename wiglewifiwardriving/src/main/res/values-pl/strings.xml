@@ -36,6 +36,8 @@
     <string name="kml_export_text">Eksport całej bazy do pliku KML</string>
     <string name="backup_db_button">Kopia zapasowa bazy danych</string>
     <string name="backup_db_text">Utwórz kopię zapasową bazy danych</string>
+    <string name="backup_preparing">Przygotowywanie kopii zapasowej bazy danych&#8230;</string>
+    <string name="backup_in_progress">Tworzenie kopii zapasowej bazy danych&#8230;</string>
     <string name="import_observed_button">Importuj obserwowane</string>
     <string name="import_observed_text">Import zaobserwowanych sieci z WiGLE</string>
     <string name="periodstill_text">Czas pomiędzy WiFi skanuje stoi w</string>

@@ -36,6 +36,8 @@
     <string name="kml_export_text">Eksporter hele DB til KML-fil</string>
     <string name="backup_db_button">Backup Database</string>
     <string name="backup_db_text">Lag en database backup</string>
+    <string name="backup_preparing">Forbereder å ta backup av databasen&#8230;</string>
+    <string name="backup_in_progress">Sikkerhetskopiere database&#8230;</string>
     <string name="import_observed_button">Import Observert</string>
     <string name="import_observed_text">Import min observerte nettverk fra WiGLE</string>
     <string name="periodstill_text">Tid mellom WiFi skanner står stille</string>

@@ -36,6 +36,8 @@
     <string name="kml_export_text">Экспорт всей БД в файл KML</string>
     <string name="backup_db_button">Резервное копирование БД</string>
     <string name="backup_db_text">Сделайте резервную копию базы данных</string>
+    <string name="backup_preparing">Подготовка к резервному копированию базы данных&#8230;</string>
+    <string name="backup_in_progress">Резервное копирование базы данных&#8230;</string>
     <string name="import_observed_button">Импорт наблюдений</string>
     <string name="import_observed_text">Импорт моих наблюдений из WiGLE</string>
     <string name="periodstill_text">Время между WiFi сканированиями стоя на месте</string>

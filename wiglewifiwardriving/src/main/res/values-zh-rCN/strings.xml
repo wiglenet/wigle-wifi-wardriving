@@ -36,6 +36,8 @@
     <string name="kml_export_text">导出整个数据库到KML文件</string>
     <string name="backup_db_button">备份数据库</string>
     <string name="backup_db_text">做一次数据库备份</string>
+    <string name="backup_preparing">准备备份数据库</string>
+    <string name="backup_in_progress">备份资料库</string>
     <string name="import_observed_button">导入观察</string>
     <string name="import_observed_text">从WiGLE中导入我的观察网络</string>
     <string name="periodstill_text">无线网络扫描的时间间隔</string>

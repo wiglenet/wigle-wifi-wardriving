@@ -36,6 +36,8 @@
     <string name="kml_export_text">KML文件導出整個數據庫</string>
     <string name="backup_db_button">備份數據庫</string>
     <string name="backup_db_text">使數據庫備份</string>
+    <string name="backup_preparing">準備備份數據庫</string>
+    <string name="backup_in_progress">備份資料庫</string>
     <string name="import_observed_button">導入觀察</string>
     <string name="import_observed_text">從 WiGLE我觀察到的網絡導入</string>
     <string name="periodstill_text">無線網絡之間的時間掃描原地踏步</string>

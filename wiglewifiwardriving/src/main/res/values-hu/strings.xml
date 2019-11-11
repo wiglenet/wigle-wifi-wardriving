@@ -36,6 +36,8 @@
     <string name="kml_export_text">Adatbázis kimentése KML-ben</string>
     <string name="backup_db_button">Biztonsági mentés</string>
     <string name="backup_db_text">Adatbázis mentés készítése</string>
+    <string name="backup_preparing">Felkészülés az adatbázis biztonsági mentésére&#8230;</string>
+    <string name="backup_in_progress">Az adatbázis biztonsági mentése&#8230;</string>
     <string name="import_observed_button">Visszaállítás</string>
     <string name="import_observed_text">Adatok visszatöltése a WiGLE-ről</string>
     <string name="periodstill_text">Közötti idő WiFi ellenőrzi álló helyzetben is</string>

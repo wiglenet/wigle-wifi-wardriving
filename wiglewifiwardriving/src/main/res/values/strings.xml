@@ -76,7 +76,7 @@
     <string name="crypto_strength">Signal strength</string>
     <string name="crypto_password">Password</string>
     <string name="crypto_show_password">Show password.</string>
-    <string name="filter_show_ssid">Show SSID\'s Matching (regex):</string>
+    <string name="filter_show_ssid">Show SSIDs Matching (regex):</string>
     <string name="filter_not_regex">Show what doesn\'t match above regular expression</string>
     <string name="filter_show_open">Show Open</string>
     <string name="filter_show_cell">Show Cell</string>

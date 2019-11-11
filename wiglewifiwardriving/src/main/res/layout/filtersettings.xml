@@ -38,16 +38,18 @@
             android:text="@string/ssid_filter_head"
             style="?android:attr/listSeparatorTextViewStyle"
             />
-        <TextView android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:text="@string/filter_show_ssid" />
-
-        <EditText
-            android:id="@+id/edit_regex"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textFilter" />
-
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_layout_regex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_regex"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textFilter"
+                android:hint="@string/filter_show_ssid"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
         <CheckBox android:id="@+id/showinvert"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

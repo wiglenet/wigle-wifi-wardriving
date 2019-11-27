@@ -1993,40 +1993,44 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void setupBluetooth() {
-        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
-        if (bt == null) {
-            info("No bluetooth adapter");
-            return;
-        }
-        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final Editor edit = prefs.edit();
-        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
-            if (!bt.isEnabled()) {
-                info("Enable bluetooth");
-                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
-                bt.enable();
-            } else {
-                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
+        try {
+            final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+            if (bt == null) {
+                info("No bluetooth adapter");
+                return;
             }
-            edit.commit();
-            if ( state.bluetoothReceiver == null ) {
-                MainActivity.info( "new bluetoothReceiver");
-                // dynamically detect BTLE feature - prevents occasional NPEs
-                boolean hasLeSupport = true;
-                if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                    hasLeSupport = false;
+            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final Editor edit = prefs.edit();
+            if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
+                if (!bt.isEnabled()) {
+                    info("Enable bluetooth");
+                    edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
+                    bt.enable();
+                } else {
+                    edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
                 }
+                edit.commit();
+                if (state.bluetoothReceiver == null) {
+                    MainActivity.info("new bluetoothReceiver");
+                    // dynamically detect BTLE feature - prevents occasional NPEs
+                    boolean hasLeSupport = true;
+                    if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                        hasLeSupport = false;
+                    }
 
-                // bluetooth scan listener
-                // this receiver is the main workhorse of bluetooth scanning
-                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper,
-                        hasLeSupport );
-                state.bluetoothReceiver.setupBluetoothTimer(true);
+                    // bluetooth scan listener
+                    // this receiver is the main workhorse of bluetooth scanning
+                    state.bluetoothReceiver = new BluetoothReceiver(this, state.dbHelper,
+                            hasLeSupport);
+                    state.bluetoothReceiver.setupBluetoothTimer(true);
+                }
+                info("register bluetooth BroadcastReceiver");
+                final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+                registerReceiver(state.bluetoothReceiver, intentFilter);
             }
-            info("register bluetooth BroadcastReceiver");
-            final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            registerReceiver(state.bluetoothReceiver, intentFilter);
+        } catch (SecurityException se) {
+            info("Security exception attempting to access bluetooth adapter", se);
         }
     }
 
@@ -2452,23 +2456,26 @@ public final class MainActivity extends AppCompatActivity {
             public void run() {
                 final Intent i = getBaseContext().getPackageManager()
                         .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (i != null) {
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                if (state.finishing.get()) {
-                    MainActivity.info("finishSoon: finish already called");
-                }
-                else {
-                    MainActivity.info("finishSoon: calling finish now");
-                    finish();
-                }
+                    if (state.finishing.get()) {
+                        MainActivity.info("finishSoon: finish already called");
+                    } else {
+                        MainActivity.info("finishSoon: calling finish now");
+                        finish();
+                    }
 
-                if (restart) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivity(i);
-                        }
-                    }, 10L);
+                    if (restart) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startActivity(i);
+                            }
+                        }, 10L);
+                    }
+                } else {
+                    warn("Intent generation failed during finishSoon thread");
                 }
             }
         }, finishTimeMillis);

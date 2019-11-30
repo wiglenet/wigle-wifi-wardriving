@@ -3,6 +3,7 @@
 
 package net.wigle.wigleandroid;
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -208,6 +209,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final LameStatic lameStatic = new LameStatic();
 
     private boolean animating = false;
+    private AnimatedVectorDrawableCompat scanningAnimation = null;
 
     static {
         final long maxMemory = Runtime.getRuntime().maxMemory();
@@ -305,13 +307,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             setScanningStatusIndicator(ma.isScanning());
             final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = view.findViewById(R.id.not_scanning);
-            AnimatedVectorDrawableCompat scanningAnimation;
             if (null != getActivity()) {
                 if (!animating) {
                     animating = true;
-                    scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
-                    scanningImageButton.setImageDrawable(scanningAnimation);
-                    scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    if (null == scanningAnimation) {
+                        scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
+                        scanningImageButton.setImageDrawable(scanningAnimation);
+                        scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
                     if (null != scanningAnimation) {
                         scanningAnimation.start();
                     }
@@ -383,6 +386,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onPause() {
         MainActivity.info("LIST: paused.");
         super.onPause();
+        if (animating) {
+            if (scanningAnimation != null) {
+                scanningAnimation.stop();
+            }
+            animating = false;
+        }
     }
 
     @Override

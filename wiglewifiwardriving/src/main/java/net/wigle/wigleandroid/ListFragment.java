@@ -306,13 +306,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = view.findViewById(R.id.not_scanning);
             AnimatedVectorDrawableCompat scanningAnimation;
-            if (null != getActivity() && !animating) {
-                animating = true;
-                scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
-                scanningImageButton.setImageDrawable(scanningAnimation);
-                scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
-                if (null != scanningAnimation ) {
-                    scanningAnimation.start();
+            if (null != getActivity()) {
+                if (!animating) {
+                    animating = true;
+                    scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
+                    scanningImageButton.setImageDrawable(scanningAnimation);
+                    scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    if (null != scanningAnimation) {
+                        scanningAnimation.start();
+                    }
                 }
             } else {
                 MainActivity.error("Null activity context - can't set animation");

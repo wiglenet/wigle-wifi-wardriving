@@ -289,9 +289,7 @@
     <string name="netwepunknown_title">unbekannt</string>
     <string name="user_stats_app_name">Benutzerstatistiken</string>
     <string name="rank_title">Rang:</string>
-    <string name="total_title">WLAN-Netzwerke gefunden</string>
     <string name="totallocs_title">WLAN-Netzwerke gesehen</string>
-    <string name="gentotal_title">gesehene Funkzellen</string>
     <string name="monthcount_title">WLAN gefunden (dieser Monat)</string>
     <string name="prevmonthcount_title">WLAN gefunden (letzter Monat)</string>
     <string name="firsttransid_title">Erste Upload-ID</string>
@@ -422,4 +420,5 @@
     <string name="gpx_exporting">GPX-Datei wird exportiert.</string>
     <string name="discovered">gefunden</string>
     <string name="new_to_us">(neu für WiGLE)</string>
+    <string name="total_seen">Insgesamt gesehen</string>
 </resources>

@@ -379,4 +379,5 @@
     <string name="gpx_exporting">Экспорт файла GPX.</string>
     <string name="discovered">открытый</string>
     <string name="new_to_us">(Новое в WiGLE)</string>
+    <string name="total_seen">Всего наблюдено</string>
 </resources>

@@ -367,4 +367,5 @@
     <string name="gpx_exporting">Exporterar GPX-fil.</string>
     <string name="discovered">Upptäckt</string>
     <string name="new_to_us">(Nytt för WiGLE)</string>
+    <string name="total_seen">Totalt observerat</string>
 </resources>

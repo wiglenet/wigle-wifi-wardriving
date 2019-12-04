@@ -370,5 +370,5 @@
     <string name="gpx_exporting">Exportando archivo GPX.</string>
     <string name="discovered">Descubiertas</string>
     <string name="new_to_us">(Nuevo en WiGLE)</string>
-
+    <string name="total_seen">Total visto</string>
 </resources>

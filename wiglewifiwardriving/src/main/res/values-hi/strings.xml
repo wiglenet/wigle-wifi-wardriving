@@ -367,4 +367,5 @@
     <string name="gpx_exporting">GPX फ़ाइल निर्यात कर रहा है।</string>
     <string name="discovered">की खोज की</string>
     <string name="new_to_us">(नए के लिए)</string>
+    <string name="total_seen">कुल देखा गया</string>
 </resources>

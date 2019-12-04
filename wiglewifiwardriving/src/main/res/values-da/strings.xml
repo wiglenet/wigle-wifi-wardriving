@@ -289,9 +289,7 @@
     <string name="netwepunknown_title">Ukendt</string>
     <string name="user_stats_app_name">Brugerstatistik</string>
     <string name="rank_title">Bruger Ranking:</string>
-    <string name="total_title">Samlet antal WiFi-netværk set</string>
     <string name="totallocs_title">Samlet antal WiFi-observationer optaget</string>
-    <string name="gentotal_title">Samlede Cell Networks Seen</string>
     <string name="monthcount_title">WiFi opdaget denne måned</string>
     <string name="prevmonthcount_title">WiFi Discovered sidste måned</string>
     <string name="firsttransid_title">Første transaktions-id</string>
@@ -422,4 +420,5 @@
     <string name="gpx_exporting">Eksporterer GPX-fil.</string>
     <string name="discovered">Opdagede</string>
     <string name="new_to_us">(nyt til WiGLE)</string>
+    <string name="total_seen">I alt observeret</string>
 </resources>

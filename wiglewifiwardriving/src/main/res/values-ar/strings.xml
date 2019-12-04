@@ -289,9 +289,7 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">إحصائيات المستخدم</string>
     <string name="rank_title">ترتيب العضو:</string>
-    <string name="total_title">مجموع شبكات واي فاي</string>
     <string name="totallocs_title">مجموع مشاهدات واي فاي المسجلة</string>
-    <string name="gentotal_title">مجموع شبكات الخلايا</string>
     <string name="monthcount_title">واي فاي اكتشف هذا الشهر</string>
     <string name="prevmonthcount_title">واي فاي اكتشف الشهر الماضي</string>
     <string name="firsttransid_title">معرف المعاملة الأول</string>
@@ -422,4 +420,5 @@
     <string name="gpx_exporting">تصدير ملف GPX.</string>
     <string name="discovered">مكتشف</string>
     <string name="new_to_us">(جديد إلى WiGLE)</string>
+    <string name="total_seen">مجموع لوحظ</string>
 </resources>

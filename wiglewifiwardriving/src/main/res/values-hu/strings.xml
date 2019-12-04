@@ -369,4 +369,5 @@
     <string name="gpx_exporting">GPX fájl exportálása.</string>
     <string name="discovered">Felfedezett</string>
     <string name="new_to_us">(Új a WiGLE-ben)</string>
+    <string name="total_seen">Összesen megfigyelt</string>
 </resources>

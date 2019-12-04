@@ -391,4 +391,5 @@
     <string name="gpx_exporting">GPX-bestân eksportearje.</string>
     <string name="discovered">Ontdekt</string>
     <string name="new_to_us">(Nieuw bij WiGLE)</string>
+    <string name="total_seen">Totaal gezien</string>
 </resources>

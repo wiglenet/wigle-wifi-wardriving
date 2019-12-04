@@ -289,9 +289,7 @@
     <string name="netwepunknown_title">לא ידוע</string>
     <string name="user_stats_app_name">סטטיסטיקות משתמש</string>
     <string name="rank_title">דירוג משתמש:</string>
-    <string name="total_title">סה"כ רשתות WiFi</string>
     <string name="totallocs_title">סה"כ תצפיות WiFi</string>
-    <string name="gentotal_title">סה"כ רשתות סלולריות</string>
     <string name="monthcount_title">התגלה החודש WiFi</string>
     <string name="prevmonthcount_title">WiFi התגלה בחודש שעבר</string>
     <string name="firsttransid_title">מזהה עסקה ראשון</string>
@@ -422,4 +420,5 @@
     <string name="gpx_exporting">מייצא קובץ GPX.</string>
     <string name="discovered">גילה</string>
     <string name="new_to_us">(חדשות ל- WiGLE)</string>
+    <string name="total_seen">סך הכל נצפה</string>
 </resources>

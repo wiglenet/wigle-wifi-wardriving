@@ -289,9 +289,7 @@
     <string name="netwepunknown_title">未知</string>
     <string name="user_stats_app_name">用户统计</string>
     <string name="rank_title">用户排名</string>
-    <string name="total_title">看到全部WiFi网络</string>
     <string name="totallocs_title">录制的WiFi观测总数</string>
-    <string name="gentotal_title">看到的全部单元网络</string>
     <string name="monthcount_title">本月发现WiFi</string>
     <string name="prevmonthcount_title">上个月发现WiFi</string>
     <string name="firsttransid_title">第一个交易ID</string>
@@ -422,4 +420,5 @@
     <string name="gpx_exporting">导出GPX文件。</string>
     <string name="discovered">发现</string>
     <string name="new_to_us">（WiGLE新手)</string>
+    <string name="total_seen">观察总数</string>
 </resources>

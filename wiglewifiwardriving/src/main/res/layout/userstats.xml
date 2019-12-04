@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/unknown_number"
-                android:textColor="#ffff00"
+                style="@style/UploadColor"
                 android:textSize="24sp"
                 android:paddingRight="5dip"/>
 
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/unknown_number"
-                android:textColor="#d0d000"
+                style="@style/UploadColor"
                 android:textSize="20sp"
                 android:paddingRight="5dip" />
 
@@ -75,11 +75,17 @@
                 android:text="@string/unknown_number"
                 android:textSize="20sp" />
         </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            />
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp">
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,13 +109,13 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:weightSum="3">
+            android:paddingBottom="3dp"
+            android:weightSum="3"
+            android:baselineAligned="false">
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:layout_weight="1">
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
@@ -129,7 +135,6 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:layout_weight="1">
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
@@ -149,7 +154,6 @@
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="10dp"
                 android:layout_weight="1">
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
@@ -171,39 +175,96 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray"
             />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total_seen"
+                android:textSize="20sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="3dp"
+            android:weightSum="3"
+            android:baselineAligned="false">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/wifi"/>
+                <TextView
+                    android:id="@+id/discoveredWiFi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="15sp"
+                    android:paddingBottom="2dp"
+                    style="@style/WiFiColor"
+                    android:paddingLeft="4dip"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/bluetooth"/>
+                <TextView
+                    android:id="@+id/discoveredBt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="15sp"
+                    android:paddingBottom="2dp"
+                    style="@style/BtColor"
+                    android:paddingLeft="2dip"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/cell"/>
+                <TextView
+                    android:id="@+id/discoveredCell"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="15sp"
+                    android:paddingBottom="2dp"
+                    style="@style/CellColor"
+                    android:paddingLeft="4dip"/>
+            </LinearLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp">
-            <TextView
-                android:id="@+id/discoveredWiFi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="16sp"
-                android:paddingBottom="2dip"
-                style="@style/WiFiColor"
-                android:paddingRight="3dip"/>
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/wifi"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/total_title"
-                android:textSize="16sp"
-                />
-
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-
+            android:paddingTop="4dp"
+            >
             <TextView
                 android:id="@+id/totalWiFiLocations"
                 android:layout_width="wrap_content"
@@ -214,10 +275,6 @@
                 style="@style/WiFiColor"
                 android:paddingRight="3dip"
                 />
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -225,57 +282,6 @@
                 android:textSize="16sp"
                 />
         </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/discoveredBt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="16sp"
-                android:paddingBottom="2dip"
-                style="@style/BtColor"
-                android:paddingRight="3dip" />
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/bluetooth"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/bttotal_title"
-                android:textSize="16sp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/discoveredCell"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="16sp"
-                android:paddingBottom="2dip"
-                style="@style/CellColor"
-                android:paddingRight="3dip" />
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/cell"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gentotal_title"
-                android:textSize="16sp"
-                />
-        </LinearLayout>
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
@@ -289,10 +295,6 @@
                 android:paddingBottom="2dip"
                 style="@style/WiFiColor"
                 android:paddingRight="3dip" />
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -313,10 +315,6 @@
                 android:paddingBottom="2dp"
                 style="@style/WiFiColor"
                 android:paddingRight="3dip" />
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

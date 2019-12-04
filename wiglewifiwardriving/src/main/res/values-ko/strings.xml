@@ -367,4 +367,5 @@
     <string name="gpx_exporting">GPX 파일을 내보내는 중입니다.</string>
     <string name="discovered">발견</string>
     <string name="new_to_us">(WiGLE을 처음 사용함)</string>
+    <string name="total_seen">총 관찰</string>
 </resources>

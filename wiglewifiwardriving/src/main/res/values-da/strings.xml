@@ -289,10 +289,8 @@
     <string name="netwepunknown_title">Ukendt</string>
     <string name="user_stats_app_name">Brugerstatistik</string>
     <string name="rank_title">Bruger Ranking:</string>
-    <string name="discovered_title">Opdagede WiFi-netværk (nyt til WiGLE)</string>
     <string name="total_title">Samlet antal WiFi-netværk set</string>
     <string name="totallocs_title">Samlet antal WiFi-observationer optaget</string>
-    <string name="gendisc_title">Opdagede Cell Networks (nyt til WiGLE)</string>
     <string name="gentotal_title">Samlede Cell Networks Seen</string>
     <string name="monthcount_title">WiFi opdaget denne måned</string>
     <string name="prevmonthcount_title">WiFi Discovered sidste måned</string>
@@ -422,4 +420,6 @@
     <string name="gpx_no_points">GPX-ruteeksportfilen ville være tom.</string>
     <string name="gpx_preparing">Forbereder GPX-eksport</string>
     <string name="gpx_exporting">Eksporterer GPX-fil.</string>
+    <string name="discovered">Opdagede</string>
+    <string name="new_to_us">(nyt til WiGLE)</string>
 </resources>

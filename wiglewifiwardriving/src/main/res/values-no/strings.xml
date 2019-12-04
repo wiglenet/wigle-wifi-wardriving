@@ -365,4 +365,6 @@
     <string name="gpx_no_points">GPX-ruteeksportfilen vil være tom.</string>
     <string name="gpx_preparing">Forbereder GPX-eksport</string>
     <string name="gpx_exporting">Eksporterer GPX-fil.</string>
+    <string name="discovered">Oppdaget</string>
+    <string name="new_to_us">(Ny hos WiGLE)</string>
 </resources>

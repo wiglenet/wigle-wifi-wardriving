@@ -289,10 +289,8 @@
     <string name="netwepunknown_title">Sconosciuto</string>
     <string name="user_stats_app_name">Individuali</string>
     <string name="rank_title">Classifica utente:</string>
-    <string name="discovered_title">Reti WiFi Scoperte (Nuove per WiGLE)</string>
     <string name="total_title">Totale Reti WiFi Viste</string>
     <string name="totallocs_title">WiFi rilevate (compreso ripetute)</string>
-    <string name="gendisc_title">Torri GSM Scoperte (Nuove per WiGLE)</string>
     <string name="gentotal_title">Totale Torri GSM Viste</string>
     <string name="monthcount_title">WiFi Scoperte Questo Mese</string>
     <string name="prevmonthcount_title">WiFi Scoperte Lo Scorso Mese</string>
@@ -422,4 +420,6 @@
     <string name="gpx_no_points">Il file di esportazione della route GPX sarebbe vuoto.</string>
     <string name="gpx_preparing">Preparazione all\'esportazione GPX</string>
     <string name="gpx_exporting">Esportazione di file GPX.</string>
+    <string name="discovered">Scoperte</string>
+    <string name="new_to_us">(Nuove per WiGLE)</string>
 </resources>

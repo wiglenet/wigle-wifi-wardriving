@@ -400,4 +400,6 @@
     <string name="gpx_no_points">Het GPX-route-exportbestand zou leeg zijn.</string>
     <string name="gpx_preparing">GPX-export voorbereiden</string>
     <string name="gpx_exporting">GPX-bestand exporteren.</string>
+    <string name="discovered">Ontdekt</string>
+    <string name="new_to_us">(Nieuw bij WiGLE)</string>
 </resources>

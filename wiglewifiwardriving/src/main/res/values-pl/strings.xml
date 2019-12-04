@@ -365,4 +365,6 @@
     <string name="gpx_no_points">Plik eksportu trasy GPX byłby pusty.</string>
     <string name="gpx_preparing">Przygotowywanie eksportu GPX</string>
     <string name="gpx_exporting">Eksportowanie pliku GPX.</string>
+    <string name="discovered">Odkryte</string>
+    <string name="new_to_us">(Nowy w WiGLE)</string>
 </resources>

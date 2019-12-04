@@ -289,10 +289,8 @@
     <string name="netwepunknown_title">unbekannt</string>
     <string name="user_stats_app_name">Benutzerstatistiken</string>
     <string name="rank_title">Rang:</string>
-    <string name="discovered_title">für WiGLE neue WLAN gefunden</string>
     <string name="total_title">WLAN-Netzwerke gefunden</string>
     <string name="totallocs_title">WLAN-Netzwerke gesehen</string>
-    <string name="gendisc_title">gefundene Funkzellen (neu für WiGLE)</string>
     <string name="gentotal_title">gesehene Funkzellen</string>
     <string name="monthcount_title">WLAN gefunden (dieser Monat)</string>
     <string name="prevmonthcount_title">WLAN gefunden (letzter Monat)</string>
@@ -422,4 +420,6 @@
     <string name="gpx_no_points">Die GPX-Route-Exportdatei wäre leer.</string>
     <string name="gpx_preparing">GPX-Export wird vorbereitet</string>
     <string name="gpx_exporting">GPX-Datei wird exportiert.</string>
+    <string name="discovered">gefunden</string>
+    <string name="new_to_us">(neu für WiGLE)</string>
 </resources>

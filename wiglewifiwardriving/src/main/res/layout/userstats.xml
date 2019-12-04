@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/stats_scrolllayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:keepScreenOn="true" >
+    android:keepScreenOn="true">
 
     <LinearLayout
         android:id="@+id/linearlayout"
@@ -78,23 +79,92 @@
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            >
-            <TextView
-                android:id="@+id/discoveredWiFiGPS"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="20sp"
-                android:paddingBottom="2dp"
-                android:textColor="#00ff00"
-                android:paddingRight="4dip"/>
+            android:paddingBottom="10dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/discovered_title"
+                android:text="@string/discovered"
                 android:textSize="20sp"
                 />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" "
+                android:textSize="20sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_to_us"
+                android:textSize="20sp"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:weightSum="3">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/wifi"/>
+                <TextView
+                    android:id="@+id/discoveredWiFiGPS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="17sp"
+                    android:paddingBottom="2dp"
+                    style="@style/WiFiColor"
+                    android:paddingLeft="4dip"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/bluetooth"/>
+                <TextView
+                    android:id="@+id/discoveredBtGPS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="17sp"
+                    android:paddingBottom="2dp"
+                    style="@style/BtColor"
+                    android:paddingLeft="2dip"/>
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/cell"/>
+                <TextView
+                    android:id="@+id/discoveredCellGPS"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/status_unknown"
+                    android:textSize="17sp"
+                    android:paddingBottom="2dp"
+                    style="@style/CellColor"
+                    android:paddingLeft="4dip"/>
+            </LinearLayout>
         </LinearLayout>
         <View
             android:layout_width="match_parent"
@@ -114,8 +184,12 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
-                android:textColor="#4aceff"
+                style="@style/WiFiColor"
                 android:paddingRight="3dip"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/wifi"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -137,9 +211,13 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
-                android:textColor="#4aceff"
+                style="@style/WiFiColor"
                 android:paddingRight="3dip"
                 />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -153,34 +231,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/discoveredBtGPS"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="16sp"
-                android:paddingBottom="2dip"
-                android:textColor="#4aceff"
-                android:paddingRight="3dip" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/btdisc_title"
-                android:textSize="16sp"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
                 android:id="@+id/discoveredBt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
-                android:textColor="#4aceff"
+                style="@style/BtColor"
                 android:paddingRight="3dip" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/bluetooth"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,34 +256,18 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:id="@+id/discoveredCellGPS"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/status_unknown"
-                android:textSize="16sp"
-                android:paddingBottom="2dip"
-                android:textColor="#4aceff"
-                android:paddingRight="3dip" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gendisc_title"
-                android:textSize="16sp"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            <TextView
                 android:id="@+id/discoveredCell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
-                android:textColor="#4aceff"
+                style="@style/CellColor"
                 android:paddingRight="3dip" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/cell"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -241,8 +287,12 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
-                android:textColor="#4aceff"
+                style="@style/WiFiColor"
                 android:paddingRight="3dip" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -261,8 +311,12 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dp"
-                android:textColor="#4aceff"
+                style="@style/WiFiColor"
                 android:paddingRight="3dip" />
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/wifi"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -281,7 +335,7 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 android:paddingBottom="2dp"
-                android:textColor="#4aceff"
+                style="@style/FgStatColor"
                 android:paddingRight="3dip" />
             <TextView
                 android:layout_width="wrap_content"
@@ -300,7 +354,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
-                android:textColor="#4aceff"
+                style="@style/FgStatColor"
                 android:paddingRight="3dip" />
             <TextView
                 android:layout_width="wrap_content"
@@ -319,7 +373,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
-                android:textColor="#4aceff"
+                style="@style/FgStatColor"
                 android:paddingRight="3dip" />
             <TextView
                 android:layout_width="wrap_content"
@@ -338,7 +392,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
-                android:textColor="#4aceff"
+                style="@style/FgStatColor"
                 android:paddingRight="3dip" />
             <TextView
                 android:layout_width="wrap_content"

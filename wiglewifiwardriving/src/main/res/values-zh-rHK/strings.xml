@@ -289,10 +289,8 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">用户统计</string>
     <string name="rank_title">用户排名</string>
-    <string name="discovered_title">发现的WiFi网络（WiGLE新手）</string>
     <string name="total_title">看到全部WiFi网络</string>
     <string name="totallocs_title">录制的WiFi观测总数</string>
-    <string name="gendisc_title">已发现的Cell Networks（WiGLE新手</string>
     <string name="gentotal_title">看到的全部单元网络</string>
     <string name="monthcount_title">本月发现WiFi</string>
     <string name="prevmonthcount_title">上个月发现WiFi</string>
@@ -413,7 +411,6 @@
     <string name="no_external_space_title">沒有可用空間</string>
     <string name="no_external_space_message">您的設備上沒有足夠的外部應用程序存儲空間。</string>
     <string name="no_mxc_space_message">您的設備上沒有足夠的內部應用程序存儲來安裝單元操作員查找數據庫。將使用設備提供的ID。</string>
-
     <string name="enable_route_logging">記錄執行路徑</string>
     <string name="enable_route_map_display">顯示執行路線</string>
     <string name="export_gpx_button">導出GPX</string>
@@ -423,4 +420,6 @@
     <string name="gpx_no_points">GPX路由導出文件將為空。</string>
     <string name="gpx_preparing">準備GPX導出</string>
     <string name="gpx_exporting">導出GPX文件。</string>
+    <string name="discovered">發現</string>
+    <string name="new_to_us">（WiGLE新手）</string>
 </resources>

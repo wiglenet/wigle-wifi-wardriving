@@ -367,4 +367,6 @@
     <string name="gpx_no_points">A GPX útvonal-export fájl üres.</string>
     <string name="gpx_preparing">A GPX exportjának előkészítése</string>
     <string name="gpx_exporting">GPX fájl exportálása.</string>
+    <string name="discovered">Felfedezett</string>
+    <string name="new_to_us">(Új a WiGLE-ben)</string>
 </resources>

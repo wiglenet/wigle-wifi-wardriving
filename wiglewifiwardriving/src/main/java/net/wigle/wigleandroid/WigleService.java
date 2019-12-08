@@ -13,6 +13,9 @@ import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.RemoteViews;
+
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -201,36 +204,10 @@ public final class WigleService extends Service {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else {
-                        @SuppressWarnings("deprecation") final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-                        builder.setContentIntent(contentIntent);
-                        builder.setNumber((int) ListFragment.lameStatic.newNets);
-                        builder.setTicker(title);
-                        builder.setContentTitle(title);
-                        builder.setContentText(text);
-                        builder.setWhen(when);
-                        builder.setLargeIcon(largeIcon);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-                        } else {
-                            builder.setSmallIcon(R.drawable.wiglewifi_small);
-                        }
-                        builder.setOngoing(true);
-                        builder.setCategory("SERVICE");
-                        builder.setPriority(NotificationCompat.PRIORITY_LOW);
-                        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-                        builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
-                        builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
-                        builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
-
-                        try {
-                            //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
-                            notification = builder.build();
-                        } catch (NullPointerException npe) {
-                            MainActivity.error("NPE trying to build notification. " + npe.getMessage());
-                        }
+                        notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     }
-
                 }
+
                 if (null != notification) {
                     try {
                         startForeground(NOTIFICATION_ID, notification);
@@ -246,6 +223,44 @@ public final class WigleService extends Service {
         }
     }
 
+    private Notification getNotification16(final String title, final Context context, final String text, final long when,
+                                            final PendingIntent contentIntent,
+                                            final PendingIntent pauseIntent,
+                                            final PendingIntent scanIntent,
+                                            final PendingIntent uploadIntent) {
+        @SuppressWarnings("deprecation") final NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(context);
+        builder.setContentIntent(contentIntent);
+        builder.setNumber((int) ListFragment.lameStatic.newNets);
+        builder.setTicker(title);
+        builder.setContentTitle(title);
+        builder.setContentText(text);
+        builder.setWhen(when);
+        builder.setLargeIcon(largeIcon);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+        } else {
+            builder.setSmallIcon(R.drawable.wiglewifi_small);
+        }
+        builder.setOngoing(true);
+        builder.setCategory("SERVICE");
+        builder.setPriority(NotificationCompat.PRIORITY_LOW);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        builder.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+        builder.addAction(android.R.drawable.ic_media_play, "Scan", scanIntent);
+        builder.addAction(android.R.drawable.ic_menu_upload, "Upload", uploadIntent);
+
+        try {
+            //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
+            return builder.build();
+        } catch (NullPointerException npe) {
+            MainActivity.error("NPE trying to build notification. " + npe.getMessage());
+            return null;
+        }
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private Notification getNotification26(final String title, final Context context, final String text,
                                            final long when, final PendingIntent contentIntent,
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
@@ -270,11 +285,12 @@ public final class WigleService extends Service {
             builder.setContentText(text);
             builder.setWhen(when);
             builder.setLargeIcon(largeIcon);
-            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
+            builder.setSmallIcon(R.drawable.ic_w_logo_simple);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             builder.setColorized(true);
+            //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
             // WiGLE Blue builder.setColor(6005486);
             builder.setColor(1973790);
 

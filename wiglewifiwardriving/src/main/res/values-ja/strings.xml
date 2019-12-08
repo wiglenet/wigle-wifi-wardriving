@@ -289,11 +289,7 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">ユーザー統計</string>
     <string name="rank_title">ユーザーランキング：</string>
-    <string name="discovered_title">発見されたWiFiネットワーク（Wi-Fiの新機能）</string>
-    <string name="total_title">見たWiFiネットワークの総数</string>
     <string name="totallocs_title">録画された全WiFi観測</string>
-    <string name="gendisc_title">発見されたセルネットワーク（WiGLEの新機能）</string>
-    <string name="gentotal_title">見た総細胞ネットワーク</string>
     <string name="monthcount_title">今月発見されたWiFi</string>
     <string name="prevmonthcount_title">先月発見されたWiFi</string>
     <string name="firsttransid_title">最初のトランザクションID</string>
@@ -422,4 +418,7 @@
     <string name="gpx_no_points">GPXルートエクスポートファイルは空になります。</string>
     <string name="gpx_preparing">GPXエクスポートの準備</string>
     <string name="gpx_exporting">GPXファイルをエクスポートしています。</string>
+    <string name="discovered">発見された</string>
+    <string name="new_to_us">（WiGLEの新機能)</string>
+    <string name="total_seen">観測合計</string>
 </resources>

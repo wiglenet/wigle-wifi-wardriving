@@ -377,4 +377,7 @@
     <string name="gpx_no_points">Файл экспорта маршрута GPX будет пустым.</string>
     <string name="gpx_preparing">Подготовка экспорта GPX</string>
     <string name="gpx_exporting">Экспорт файла GPX.</string>
+    <string name="discovered">открытый</string>
+    <string name="new_to_us">(Новое в WiGLE)</string>
+    <string name="total_seen">Всего наблюдено</string>
 </resources>

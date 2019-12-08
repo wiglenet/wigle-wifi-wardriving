@@ -365,4 +365,7 @@
     <string name="gpx_no_points">GPX yolu dışa aktarma dosyası boş olacaktı.</string>
     <string name="gpx_preparing">GPX ihracatını hazırlama</string>
     <string name="gpx_exporting">GPX dosyasını dışa aktarma.</string>
+    <string name="discovered">Bulundu</string>
+    <string name="new_to_us">(WiGLE’de yeni)</string>
+    <string name="total_seen">Toplam Gözlenen</string>
 </resources>

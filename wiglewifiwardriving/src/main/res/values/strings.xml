@@ -290,11 +290,7 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">User Statistics</string>
     <string name="rank_title">User Ranking:</string>
-    <string name="discovered_title">Discovered WiFi Networks (New to WiGLE)</string>
-    <string name="total_title">Total WiFi Networks Seen</string>
     <string name="totallocs_title">Total WiFi Observations Recorded</string>
-    <string name="gendisc_title">Discovered Cell Networks (New to WiGLE)</string>
-    <string name="gentotal_title">Total Cell Networks Seen</string>
     <string name="monthcount_title">WiFi Discovered This Month</string>
     <string name="prevmonthcount_title">WiFi Discovered Last Month</string>
     <string name="firsttransid_title">First Transaction ID</string>
@@ -413,8 +409,6 @@
     <string name="calculating_m8b">Calculating oracle</string>
     <string name="bt_gps">BT GPS</string>
     <string name="btloc_title">WiGLE.net Bluetooth Devices with Location</string>
-    <string name="btdisc_title">Discovered Bluetooth Devices (New to WiGLE)</string>
-    <string name="bttotal_title">Total Bluetooth Devices Seen</string>
     <string name="total_bt">Total Bluetooth</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) throttles WiFi scans to 2 per minute. Upgrade Android if possible.</string>
@@ -435,4 +429,7 @@
     <string name="gpx_no_points">The GPX route export file would be empty.</string>
     <string name="gpx_preparing">Preparing GPX export</string>
     <string name="gpx_exporting">Exporting GPX file.</string>
+    <string name="discovered">Discovered</string>
+    <string name="new_to_us">(New to WiGLE)</string>
+    <string name="total_seen">Total Seen</string>
 </resources>

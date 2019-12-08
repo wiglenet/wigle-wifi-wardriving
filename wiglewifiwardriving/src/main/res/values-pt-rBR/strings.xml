@@ -378,4 +378,7 @@
     <string name="gpx_no_points">O arquivo de exportação de rota GPX estaria vazio.</string>
     <string name="gpx_preparing">Preparando a exportação GPX</string>
     <string name="gpx_exporting">Exportando arquivo GPX.</string>
+    <string name="discovered">Descobertas</string>
+    <string name="new_to_us">(Novo no WiGLE)</string>
+    <string name="total_seen">Total observado</string>
 </resources>

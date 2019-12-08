@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -277,7 +278,10 @@ public class UserStatsFragment extends Fragment {
     public void onResume() {
         MainActivity.info("STATS: onResume");
         super.onResume();
-        getActivity().setTitle(R.string.user_stats_app_name);
+        Activity a = getActivity();
+        if (null != a) {
+            getActivity().setTitle(R.string.user_stats_app_name);
+        }
     }
 
     @Override

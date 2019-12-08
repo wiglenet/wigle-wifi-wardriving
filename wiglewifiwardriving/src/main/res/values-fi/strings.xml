@@ -368,4 +368,7 @@
     <string name="gpx_no_points">GPX-reitin vientitiedosto olisi tyhjä.</string>
     <string name="gpx_preparing">GPX-viennin valmistelu</string>
     <string name="gpx_exporting">Viedään GPX-tiedostoa.</string>
+    <string name="discovered">löydetty</string>
+    <string name="new_to_us">(Uusi WiGLE: lle)</string>
+    <string name="total_seen">Yhteensä nähty</string>
 </resources>

@@ -289,11 +289,7 @@
     <string name="netwepunknown_title">Neznámý</string>
     <string name="user_stats_app_name">Statistiky uživatelů</string>
     <string name="rank_title">Hodnocení uživatelů:</string>
-    <string name="discovered_title">Objevené Wi-Fi sítě (nové pro WiGLE)</string>
-    <string name="total_title">Všechny spatřené WiFi sítě</string>
     <string name="totallocs_title">Celkový zaznamenaný počet spatřených WiFi</string>
-    <string name="gendisc_title">Objevené vysílače (nové pro WiGLE)</string>
-    <string name="gentotal_title">Celkem spatřených vysílačů</string>
     <string name="monthcount_title">Objevené WiFi tento měsíc</string>
     <string name="prevmonthcount_title">Objevené WiFi poslední měsíc</string>
     <string name="firsttransid_title">První ID transakce</string>
@@ -422,4 +418,7 @@
     <string name="gpx_no_points">Exportní soubor trasy GPX by byl prázdný.</string>
     <string name="gpx_preparing">Příprava exportu GPX</string>
     <string name="gpx_exporting">Exportuje se soubor GPX.</string>
+    <string name="discovered">Objevené</string>
+    <string name="new_to_us">(nové pro WiGLE)</string>
+    <string name="total_seen">Celkem viděno</string>
 </resources>

@@ -365,4 +365,7 @@
     <string name="gpx_no_points">GPX 경로 내보내기 파일이 비어 있습니다.</string>
     <string name="gpx_preparing">GPX 내보내기 준비</string>
     <string name="gpx_exporting">GPX 파일을 내보내는 중입니다.</string>
+    <string name="discovered">발견</string>
+    <string name="new_to_us">(WiGLE을 처음 사용함)</string>
+    <string name="total_seen">총 관찰</string>
 </resources>

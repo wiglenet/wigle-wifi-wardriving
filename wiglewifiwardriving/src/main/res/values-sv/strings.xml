@@ -365,4 +365,7 @@
     <string name="gpx_no_points">GPX-ruttexportfilen skulle vara tom.</string>
     <string name="gpx_preparing">Förbereder GPX-export</string>
     <string name="gpx_exporting">Exporterar GPX-fil.</string>
+    <string name="discovered">Upptäckt</string>
+    <string name="new_to_us">(Nytt för WiGLE)</string>
+    <string name="total_seen">Totalt observerat</string>
 </resources>

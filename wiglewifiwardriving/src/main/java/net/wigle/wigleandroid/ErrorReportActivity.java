@@ -126,7 +126,7 @@ public class ErrorReportActivity extends AppCompatActivity {
 
     private String getLatestStackfilePath() {
         try {
-            File fileDir = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+            File fileDir = MainActivity.getErrorStackPath(getApplicationContext());
             if (!fileDir.canRead() || !fileDir.isDirectory()) {
                 MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
             } else {

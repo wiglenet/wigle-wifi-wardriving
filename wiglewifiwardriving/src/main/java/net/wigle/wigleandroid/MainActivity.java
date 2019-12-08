@@ -1504,6 +1504,13 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static File getErrorStackPath(final Context context) {
+        if (hasSD()) {
+            return new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+        }
+        return context.getApplicationContext().getFilesDir();
+    }
+
     public static void writeError(final Thread thread, final Throwable throwable, final Context context) {
         writeError(thread, throwable, context, null);
     }
@@ -1512,12 +1519,11 @@ public final class MainActivity extends AppCompatActivity {
         try {
             final String error = "Thread: " + thread + " throwable: " + throwable;
             error(error, throwable);
-            if (hasSD()) {
-                File file = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+            final File stackPath = getErrorStackPath(context);
+            if (stackPath.exists() && stackPath.canWrite()) {
                 //noinspection ResultOfMethodCallIgnored
-                file.mkdirs();
-                file = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory())
-                        + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt");
+                stackPath.mkdirs();
+                final File file = new File(stackPath, ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt");
                 error("Writing stackfile to: " + MainActivity.safeFilePath(file) + "/" + file.getName());
                 if (!file.exists()) {
                     if (!file.createNewFile()) {

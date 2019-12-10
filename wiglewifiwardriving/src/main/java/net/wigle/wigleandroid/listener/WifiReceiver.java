@@ -443,6 +443,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
                     if (currentNetwork != null) {
                         networks.put(currentNetwork.getBssid(), currentNetwork);
+                        ListFragment.lameStatic.currCells = 1;
                     }
                 }
 
@@ -462,6 +463,7 @@ public class WifiReceiver extends BroadcastReceiver {
                                 }
                             }
                         }
+                        ListFragment.lameStatic.currCells = infos.size();
                     }
                 } else {
                     //TODO: handle multiple SIMs in early revs?

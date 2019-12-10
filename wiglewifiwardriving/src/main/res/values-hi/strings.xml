@@ -36,6 +36,8 @@
     <string name="kml_export_text">KML फ़ाइल को पूरे DB निर्यात</string>
     <string name="backup_db_button">बैकअप धन्यवाद</string>
     <string name="backup_db_text">एक डेटाबेस बैकअप बनाओ</string>
+    <string name="backup_preparing">डेटाबेस का बैकअप लेने की तैयारी है</string>
+    <string name="backup_in_progress">डेटाबेस का समर्थन</string>
     <string name="import_observed_button">आयात मनाया</string>
     <string name="import_observed_text">WiGLE से मेरी मनाया नेटवर्क आयात</string>
     <string name="periodstill_text">वाईफाई के बीच समय अभी भी खड़े स्कैन करता है</string>
@@ -345,4 +347,25 @@
     <string name="search_empty">परिणाम खाली</string>
     <string name="search_query_limit">आप आज अधिकतम खोज पर पहुँच गए हैं। आपकी सीमा कल रीसेट हो जाएगी।</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">एंड्रॉइड पाई (9.0) थ्रॉटल वाईफाई स्कैन 2 प्रति मिनट। यदि संभव हो तो Android अपग्रेड करें।</string>
+    <string name="q_bad">डेवलपर सेटिंग में अक्षम होने तक एंड्रॉइड 10 थ्रोटल्स वाईफाई स्कैन करता है।</string>
+    <string name="enable_developer">डेवलपर विकल्पों को सक्षम करने के लिए: सेटिंग्स -> फ़ोन के बारे में -> बिल्ड नंबर 7 बार टैप करें।</string>
+    <string name="disable_throttle">वाईफाई स्कैन थ्रॉटलिंग को निष्क्रिय करने के लिए: सिस्टम -> उन्नत -> डेवलपर विकल्प -> वाईफाई स्कैन थ्रॉटलिंग को बंद करना।</string>
+    <string name="no_internal_space_title">कोई स्थान उपलब्ध नहीं है</string>
+    <string name="no_internal_space_message">आपके डिवाइस पर पर्याप्त आंतरिक अनुप्रयोग संग्रहण नहीं है।</string>
+    <string name="no_external_space_title">कोई स्थान उपलब्ध नहीं है</string>
+    <string name="no_external_space_message">आपके डिवाइस पर पर्याप्त बाहरी अनुप्रयोग संग्रहण नहीं है।</string>
+    <string name="no_mxc_space_message">सेल ऑपरेटर लुकअप डेटाबेस को स्थापित करने के लिए आपके डिवाइस पर पर्याप्त आंतरिक अनुप्रयोग संग्रहण नहीं है। डिवाइस-आपूर्ति की गई आईडी का उपयोग किया जाएगा।</string>
+    <string name="enable_route_logging">GPX फ़ाइल निर्यात कर रहा है।</string>
+    <string name="enable_route_map_display">निष्पादन के लिए मार्ग प्रदर्शित करें</string>
+    <string name="export_gpx_button">निर्यात GPX</string>
+    <string name="export_gpx">GPX रूट फ़ाइल के रूप में वर्तमान रूट निर्यात करें</string>
+    <string name="export_gpx_detail">.GPX XML मार्ग-वर्णन फ़ाइल के रूप में लॉग किए जा रहे वर्तमान मार्ग को निर्यात करें</string>
+    <string name="gpx_failed">Gpx फ़ाइल निर्यात करने में असमर्थ।\n </string>
+    <string name="gpx_no_points">GPX मार्ग निर्यात फ़ाइल खाली होगी।</string>
+    <string name="gpx_preparing">GPX निर्यात तैयार करना</string>
+    <string name="gpx_exporting">GPX फ़ाइल निर्यात कर रहा है।</string>
+    <string name="discovered">की खोज की</string>
+    <string name="new_to_us">(नए के लिए)</string>
+    <string name="total_seen">कुल देखा गया</string>
 </resources>

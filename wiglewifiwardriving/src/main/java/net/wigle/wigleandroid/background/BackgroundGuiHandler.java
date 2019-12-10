@@ -159,7 +159,8 @@ public class BackgroundGuiHandler extends Handler {
         if ( filename == null ) {
             filename = "";
         } else {
-            filename = "\n\nFile location:\n" + filepath + filename;
+            final String showPath = filepath == null ? "" : filepath;
+            filename = "\n\nFile location:\n" + showPath + filename;
         }
         error = error == null ? "" : " Error: " + error;
 

@@ -36,6 +36,8 @@
     <string name="kml_export_text">Экспорт всей БД в файл KML</string>
     <string name="backup_db_button">Резервное копирование БД</string>
     <string name="backup_db_text">Сделайте резервную копию базы данных</string>
+    <string name="backup_preparing">Подготовка к резервному копированию базы данных&#8230;</string>
+    <string name="backup_in_progress">Резервное копирование базы данных&#8230;</string>
     <string name="import_observed_button">Импорт наблюдений</string>
     <string name="import_observed_text">Импорт моих наблюдений из WiGLE</string>
     <string name="periodstill_text">Время между WiFi сканированиями стоя на месте</string>
@@ -357,4 +359,25 @@
     <string name="search_empty">Результаты Пусто</string>
     <string name="search_query_limit">Вы достигли максимального числа поисков сегодня. Ваш лимит будет сброшен завтра.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) снижает скорость сканирования WiFi до 2 в минуту. Обновите Android, если это возможно.</string>
+    <string name="q_bad">Android 10 регулирует сканирование WiFi, если не отключено в настройках разработчика.</string>
+    <string name="enable_developer">Чтобы включить параметры разработчика: Настройки -> О телефоне -> Нажмите Построить номер 7 раз.</string>
+    <string name="disable_throttle">Чтобы отключить регулирование сканирования WiFi: Система -> Дополнительно -> Параметры разработчика -> Регулирование сканирования WiFi отключено.</string>
+    <string name="no_internal_space_title">Нет свободного места</string>
+    <string name="no_internal_space_message">На вашем устройстве недостаточно внутреннего хранилища приложений.</string>
+    <string name="no_external_space_title">Нет свободного места</string>
+    <string name="no_external_space_message">На вашем устройстве недостаточно внешнего хранилища приложений.</string>
+    <string name="no_mxc_space_message">На вашем устройстве недостаточно внутренней памяти для установки базы данных поиска сотовых операторов. Будут использоваться предоставленные устройством идентификаторы.</string>
+    <string name="enable_route_logging">Лог маршрутов для выполнения</string>
+    <string name="enable_route_map_display">Показать маршруты для выполнения</string>
+    <string name="export_gpx_button">Экспорт GPX</string>
+    <string name="export_gpx">Экспорт текущего маршрута в виде файла маршрута GPX</string>
+    <string name="export_gpx_detail">Экспортируйте текущий маршрут, который регистрируется как файл описания маршрута .GPX XML</string>
+    <string name="gpx_failed">Невозможно экспортировать файл gpx.\n </string>
+    <string name="gpx_no_points">Файл экспорта маршрута GPX будет пустым.</string>
+    <string name="gpx_preparing">Подготовка экспорта GPX</string>
+    <string name="gpx_exporting">Экспорт файла GPX.</string>
+    <string name="discovered">открытый</string>
+    <string name="new_to_us">(Новое в WiGLE)</string>
+    <string name="total_seen">Всего наблюдено</string>
 </resources>

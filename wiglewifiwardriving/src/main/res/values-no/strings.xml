@@ -36,6 +36,8 @@
     <string name="kml_export_text">Eksporter hele DB til KML-fil</string>
     <string name="backup_db_button">Backup Database</string>
     <string name="backup_db_text">Lag en database backup</string>
+    <string name="backup_preparing">Forbereder å ta backup av databasen&#8230;</string>
+    <string name="backup_in_progress">Sikkerhetskopiere database&#8230;</string>
     <string name="import_observed_button">Import Observert</string>
     <string name="import_observed_text">Import min observerte nettverk fra WiGLE</string>
     <string name="periodstill_text">Tid mellom WiFi skanner står stille</string>
@@ -345,4 +347,25 @@
     <string name="search_empty">Resultater Tom</string>
     <string name="search_query_limit">Du har nådd det maksimale antallet søk i dag. Grensen din vil nullstille i morgen.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) struper WiFi-skanninger til 2 per minutt. Oppgrader Android hvis mulig.</string>
+    <string name="q_bad">Android 10 struper WiFi-skanninger med mindre den er deaktivert i utviklerinnstillinger.</string>
+    <string name="enable_developer">Slik aktiverer du utvikleralternativer: Innstillinger -> Om telefon -> Trykk på Byggenummer 7 ganger.</string>
+    <string name="disable_throttle">Det er ikke nok intern applikasjonslagring på enheten din til å installere oppslagdatabasen for celleoperatøren. Enhetsleverte ID-er vil bli brukt.</string>
+    <string name="no_internal_space_title">Ingen plass tilgjengelig</string>
+    <string name="no_internal_space_message">Det er ikke nok intern applikasjonslagring på enheten din.</string>
+    <string name="no_external_space_title">Ingen plass tilgjengelig</string>
+    <string name="no_external_space_message">Det er ikke nok ekstern applikasjonslagring på enheten din.</string>
+    <string name="no_mxc_space_message">Det er ikke nok intern applikasjonslagring på enheten din til å installere oppslagdatabasen for celleoperatøren. Enhetsleverte ID-er vil bli brukt.</string>
+    <string name="enable_route_logging">Logg ruter for utførelse</string>
+    <string name="enable_route_map_display">Vis ruter for utførelse</string>
+    <string name="export_gpx_button">Eksporter GPX</string>
+    <string name="export_gpx">Eksporter gjeldende rute som en GPX-rutefil</string>
+    <string name="export_gpx_detail">Eksporter den gjeldende ruten som blir logget som en .GPX XML-rutebeskrivelsesfil</string>
+    <string name="gpx_failed">Kan ikke eksportere gpx-fil.\n </string>
+    <string name="gpx_no_points">GPX-ruteeksportfilen vil være tom.</string>
+    <string name="gpx_preparing">Forbereder GPX-eksport</string>
+    <string name="gpx_exporting">Eksporterer GPX-fil.</string>
+    <string name="discovered">Oppdaget</string>
+    <string name="new_to_us">(Ny hos WiGLE)</string>
+    <string name="total_seen">Totalt observert</string>
 </resources>

@@ -34,9 +34,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -66,6 +69,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
@@ -78,6 +82,9 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.InstallUtility;
+import net.wigle.wigleandroid.util.InsufficientSpaceException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -92,6 +99,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -141,6 +149,9 @@ public final class MainActivity extends AppCompatActivity {
     private State state;
     // *** end of state that is retained ***
 
+    @RequiresApi(24)
+    private GnssStatus.Callback gnssStatusCallback = null;
+
     static final Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
@@ -163,6 +174,7 @@ public final class MainActivity extends AppCompatActivity {
     private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
+    private static final int ACTION_WIFI_CODE = 2;
 
     static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
@@ -175,6 +187,10 @@ public final class MainActivity extends AppCompatActivity {
     public static final long SCAN_DEFAULT = 2000L;
     public static final long SCAN_FAST_DEFAULT = 1000L;
     public static final long SCAN_P_DEFAULT = 30000L;
+    public static final long OG_BT_SCAN_STILL_DEFAULT = 5000L;
+    public static final long OG_BT_SCAN_DEFAULT = 5000L;
+    public static final long OG_BT_SCAN_FAST_DEFAULT = 5000L;
+
     public static final long DEFAULT_BATTERY_KILL_PERCENT = 2L;
     private static final long FINISH_TIME_MILLIS = 10L;
     private static final long DESTROY_FINISH_MILLIS = 3000L; // if someone force kills, how long until service finishes
@@ -242,8 +258,12 @@ public final class MainActivity extends AppCompatActivity {
             state = stateFragment.getState();
 
             // tell those that need it that we have a new context
-            state.gpsListener.setMainActivity(this);
-            state.wifiReceiver.setMainActivity(this);
+            if (state.gpsListener != null) {
+                state.gpsListener.setMainActivity(this);
+            }
+            if (state.wifiReceiver != null) {
+                state.wifiReceiver.setMainActivity(this);
+            }
             if (state.observationUploader != null) {
                 state.observationUploader.setContext(this);
             }
@@ -310,6 +330,8 @@ public final class MainActivity extends AppCompatActivity {
 
         info("setupService");
         setupService();
+        info("checkStorage");
+        checkStorage();
         info("setupDatabase");
         setupDatabase();
         info("setupBattery");
@@ -330,12 +352,36 @@ public final class MainActivity extends AppCompatActivity {
         }
         setupFilters(prefs);
 
+        // ALIBI: don't inherit MxC implant failures from backups.
+        if (InstallUtility.isFirstInstall(this)) {
+            SharedPreferences mySPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = mySPrefs.edit();
+            editor.remove(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED);
+            editor.apply();
+        }
+
         //TODO: if we can determine whether DB needs updating, we can avoid copying every time
         //if (!state.mxcDbHelper.isPresent()) {
         try {
             state.mxcDbHelper.implantMxcDatabase();
+        } catch (InsufficientSpaceException isex) {
+            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+            iseDlgBuilder.setMessage(R.string.no_mxc_space_message)
+                    .setTitle(R.string.no_internal_space_title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            ;
+
+            final Dialog dialog = iseDlgBuilder.create();
+            dialog.show();
         } catch (IOException ex) {
             MainActivity.error("unable to implant mcc/mnc db", ex);
+
         }
         //}
 
@@ -348,10 +394,24 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     private void pieScanningSettings(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT < 28) return;
+
+        final List<String> keys = Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
+                ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST);
         if (Build.VERSION.SDK_INT == 28) {
-            for (final String key : Arrays.asList(ListFragment.PREF_SCAN_PERIOD_STILL,
-                    ListFragment.PREF_SCAN_PERIOD, ListFragment.PREF_SCAN_PERIOD_FAST)) {
+            for (final String key : keys) {
                 pieScanSet(prefs, key);
+            }
+        }
+        else if (Build.VERSION.SDK_INT == 29) {
+            // see if all configs are at the P
+            for (final String key : keys) {
+                if (prefs.getLong(key, -1) != SCAN_P_DEFAULT) {
+                    return;
+                }
+            }
+            for (final String key : keys) {
+                qScanSet(prefs, key);
             }
         }
     }
@@ -361,6 +421,14 @@ public final class MainActivity extends AppCompatActivity {
         if (-1 == prefs.getLong(key, -1)) {
             info("Setting 30 second scan for " + key + " due to broken Android Pie");
             prefs.edit().putLong(key, SCAN_P_DEFAULT).commit();
+        }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private void qScanSet(final SharedPreferences prefs, final String key) {
+        if (SCAN_P_DEFAULT == prefs.getLong(key, -1)) {
+            info("Removing 30 second scan for " + key + " due to less broken Android Q");
+            prefs.edit().remove(key).commit();
         }
     }
 
@@ -1379,7 +1447,8 @@ public final class MainActivity extends AppCompatActivity {
         final State state = getStaticState();
         if (state == null) return;
         final int pointer = state.logPointer++ % state.logs.length;
-        state.logs[pointer] = SimpleDateFormat.getTimeInstance().format(new Date()) + " "
+        final DateFormat format = new SimpleDateFormat("HH:mm:ss.SSS", Locale.US);
+        state.logs[pointer] = format.format(new Date()) + " "
                 + Thread.currentThread().getName() + "] " + value;
         if (pointer > 10000 * state.logs.length) {
             state.logPointer -= 100 * state.logs.length;
@@ -1432,6 +1501,13 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static File getErrorStackPath(final Context context) {
+        if (hasSD()) {
+            return new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+        }
+        return context.getApplicationContext().getFilesDir();
+    }
+
     public static void writeError(final Thread thread, final Throwable throwable, final Context context) {
         writeError(thread, throwable, context, null);
     }
@@ -1440,71 +1516,100 @@ public final class MainActivity extends AppCompatActivity {
         try {
             final String error = "Thread: " + thread + " throwable: " + throwable;
             error(error, throwable);
-            if (hasSD()) {
-                File file = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+            final File stackPath = getErrorStackPath(context);
+            if (stackPath.exists() && stackPath.canWrite()) {
                 //noinspection ResultOfMethodCallIgnored
-                file.mkdirs();
-                file = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory())
-                        + "/wiglewifi/" + ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt");
+                stackPath.mkdirs();
+                final File file = new File(stackPath, ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt");
                 error("Writing stackfile to: " + MainActivity.safeFilePath(file) + "/" + file.getName());
                 if (!file.exists()) {
                     if (!file.createNewFile()) {
                         throw new IOException("Cannot create file: " + file);
                     }
                 }
-                final FileOutputStream fos = new FileOutputStream(file);
 
+                FileOutputStream fos = null;
                 try {
-                    final String baseErrorMessage = MainActivity.getBaseErrorMessage(throwable, false);
-                    StringBuilder builder = new StringBuilder("WigleWifi error log - ");
-                    final DateFormat format = SimpleDateFormat.getDateTimeInstance();
-                    builder.append(format.format(new Date())).append("\n");
-                    final PackageManager pm = context.getPackageManager();
-                    final PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-                    builder.append("versionName: ").append(pi.versionName).append("\n");
-                    builder.append("baseError: ").append(baseErrorMessage).append("\n\n");
-                    if (detail != null) {
-                        builder.append("detail: ").append(detail).append("\n");
+                    fos = new FileOutputStream(file);
+                    PackageInfo pi = null;
+                    try {
+                        final PackageManager pm = context.getPackageManager();
+                        pi = pm.getPackageInfo(context.getPackageName(), 0);
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
                     }
-                    builder.append("packageName: ").append(pi.packageName).append("\n");
-                    builder.append("MODEL: ").append(android.os.Build.MODEL).append("\n");
-                    builder.append("RELEASE: ").append(android.os.Build.VERSION.RELEASE).append("\n");
 
-                    builder.append("BOARD: ").append(android.os.Build.BOARD).append("\n");
-                    builder.append("BRAND: ").append(android.os.Build.BRAND).append("\n");
-                    // android 1.6 android.os.Build.CPU_ABI;
-                    builder.append("DEVICE: ").append(android.os.Build.DEVICE).append("\n");
-                    builder.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
-                    builder.append("FINGERPRINT: ").append(android.os.Build.FINGERPRINT).append("\n");
-                    builder.append("HOST: ").append(android.os.Build.HOST).append("\n");
-                    builder.append("ID: ").append(android.os.Build.ID).append("\n");
-                    // android 1.6: android.os.Build.MANUFACTURER;
-                    builder.append("PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");
-                    builder.append("TAGS: ").append(android.os.Build.TAGS).append("\n");
-                    builder.append("TIME: ").append(android.os.Build.TIME).append("\n");
-                    builder.append("TYPE: ").append(android.os.Build.TYPE).append("\n");
-                    builder.append("USER: ").append(android.os.Build.USER).append("\n");
+                    try {
+                        StringBuilder builder = new StringBuilder("WigleWifi error log - ");
+                        final DateFormat format = SimpleDateFormat.getDateTimeInstance();
+                        builder.append(format.format(new Date())).append("\n");
+                        if (pi != null) {
+                            builder.append("versionName: ").append(pi.versionName).append("\n");
+                            builder.append("packageName: ").append(pi.packageName).append("\n");
+                        }
+                        if (detail != null) {
+                            builder.append("detail: ").append(detail).append("\n");
+                        }
+                        builder.append("MODEL: ").append(android.os.Build.MODEL).append("\n");
+                        builder.append("RELEASE: ").append(android.os.Build.VERSION.RELEASE).append("\n");
 
-                    // write to file
-                    fos.write(builder.toString().getBytes(ENCODING));
-                } catch (Throwable er) {
-                    // ohwell
-                    error("error getting data for error: " + er, er);
+                        builder.append("BOARD: ").append(android.os.Build.BOARD).append("\n");
+                        builder.append("BRAND: ").append(android.os.Build.BRAND).append("\n");
+                        // android 1.6 android.os.Build.CPU_ABI;
+                        builder.append("DEVICE: ").append(android.os.Build.DEVICE).append("\n");
+                        builder.append("DISPLAY: ").append(android.os.Build.DISPLAY).append("\n");
+                        builder.append("FINGERPRINT: ").append(android.os.Build.FINGERPRINT).append("\n");
+                        builder.append("HOST: ").append(android.os.Build.HOST).append("\n");
+                        builder.append("ID: ").append(android.os.Build.ID).append("\n");
+                        // android 1.6: android.os.Build.MANUFACTURER;
+                        builder.append("PRODUCT: ").append(android.os.Build.PRODUCT).append("\n");
+                        builder.append("TAGS: ").append(android.os.Build.TAGS).append("\n");
+                        builder.append("TIME: ").append(android.os.Build.TIME).append("\n");
+                        builder.append("TYPE: ").append(android.os.Build.TYPE).append("\n");
+                        builder.append("USER: ").append(android.os.Build.USER).append("\n");
+
+                        // write to file
+                        fos.write(builder.toString().getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        final String baseErrorMessage = MainActivity.getBaseErrorMessage(throwable, false);
+                        fos.write("baseError: ".getBytes(ENCODING));
+                        fos.write(baseErrorMessage.getBytes(ENCODING));
+                        fos.write("\n\n".getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        throwable.printStackTrace(new PrintStream(fos));
+                        fos.write((error + "\n\n").getBytes(ENCODING));
+                    } catch (Throwable er) {
+                        handleErrorError(fos, er);
+                    }
+
+                    try {
+                        for (final String log : getLogLines()) {
+                            fos.write(log.getBytes(ENCODING));
+                            fos.write("\n".getBytes(ENCODING));
+                        }
+                    } catch (Throwable er) {
+                        // ohwell
+                        error("error getting logs for error: " + er, er);
+                    }
+                }
+                finally {
+                    // can't try-with-resources and support api 14
+                    try {
+                        if (fos != null) fos.close();
+                    }
+                    catch (final Exception ex) {
+                        error("error closing fos: " + ex, ex);
+                    }
                 }
 
-                fos.write((error + "\n\n").getBytes(ENCODING));
-                throwable.printStackTrace(new PrintStream(fos));
-                try {
-                    fos.write((error + "\n\n").getBytes(ENCODING));
-                    for (final String log : getLogLines()) {
-                        fos.write(log.getBytes(ENCODING));
-                        fos.write("\n".getBytes(ENCODING));
-                    }
-                } catch (Throwable er) {
-                    // ohwell
-                    error("error getting logs for error: " + er, er);
-                }
-                fos.close();
             }
         } catch (final Exception ex) {
             error("error logging error: " + ex, ex);
@@ -1512,11 +1617,22 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    private static void handleErrorError(FileOutputStream fos, Throwable er) throws IOException {
+        // ohwell
+        final String errorMessage = "error getting data for error: " + er;
+        error(errorMessage, er);
+        fos.write((errorMessage + "\n\n").getBytes(ENCODING));
+        er.printStackTrace(new PrintStream(fos));
+    }
+
     public static Iterable<String> getLogLines() {
         final State state = getStaticState();
         return new Iterable<String>() {
             @Override
             public Iterator<String> iterator() {
+                // Collections.emptyIterator() requires api 19, but this works.
+                if (state == null) return Collections.<String>emptySet().iterator();
+
                 return new Iterator<String>() {
                     int currentPointer = state.logPointer;
                     final int maxPointer = currentPointer + state.logs.length;
@@ -1535,6 +1651,16 @@ public final class MainActivity extends AppCompatActivity {
                 };
             }
         };
+    }
+
+    public static boolean isDevMode(final Context context) {
+        if(Build.VERSION.SDK_INT == 16) {
+            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                    android.provider.Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+        } else if (Build.VERSION.SDK_INT >= 17) {
+            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                    android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
+        } else return false;
     }
 
     public static boolean hasSD() {
@@ -1729,13 +1855,29 @@ public final class MainActivity extends AppCompatActivity {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true));
+        final boolean useBt = prefs.getBoolean(ListFragment.PREF_SCAN_BT, true);
+        final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+        int pieBadCount = prefs.getInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, 0);
+        int qBadCount = prefs.getInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, 0);
 
-        if ((willActivateBt && useBt) || willActivateWifi) {
+        if ((willActivateBt && useBt) || willActivateWifi || alertVersions) {
 
             String activationMessages = "";
 
+            SharedPreferences.Editor editor = prefs.edit();
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+                if (pieBadCount < 5) activationMessages = getString(R.string.pie_bad);
+                editor.putInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, pieBadCount + 1);
+
+            }
+            else if (Build.VERSION.SDK_INT == 29) {
+                if (qBadCount < 5) activationMessages = getString(R.string.q_bad);
+                editor.putInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, qBadCount + 1);
+            }
+            editor.apply();
+
             if (willActivateBt && useBt) {
+                if (activationMessages.length() > 0) activationMessages += "\n";
                 activationMessages += getString(R.string.turn_on_bt);
                 if (willActivateWifi) {
                     activationMessages += "\n";
@@ -1746,7 +1888,7 @@ public final class MainActivity extends AppCompatActivity {
                 activationMessages += getString(R.string.turn_on_wifi);
             }
             // tell user, cuz this takes a little while
-            if (!isFinishing()) {
+            if (!isFinishing() && !activationMessages.isEmpty()) {
                 WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
             }
         }
@@ -1779,20 +1921,24 @@ public final class MainActivity extends AppCompatActivity {
 
         // keep track of for later
         boolean turnedWifiOn = false;
-        if (!wifiManager.isWifiEnabled()) {
-
-            // save so we can turn it back off when we exit
-            edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, true);
-
-            // just turn it on, but not in emulator cuz it crashes it
-            if (!state.inEmulator) {
-                MainActivity.info("turning on wifi");
-                wifiManager.setWifiEnabled(true);
-                MainActivity.info("wifi on");
-                turnedWifiOn = true;
+        if (wifiManager != null && !wifiManager.isWifiEnabled()) {
+            turnedWifiOn = true;
+            // switch this to androidx call when it becomes available
+            if (Build.VERSION.SDK_INT >= 29) {
+                final Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+                startActivityForResult(panelIntent, ACTION_WIFI_CODE);
             }
-        } else {
-            edit.putBoolean(ListFragment.PREF_WIFI_WAS_OFF, false);
+            else {
+                // open wifi setting pages after a few seconds
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
+                                getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    }
+                }, 3000);
+            }
         }
         edit.apply();
 
@@ -1807,11 +1953,30 @@ public final class MainActivity extends AppCompatActivity {
         // register wifi receiver
         setupWifiReceiverIntent();
 
-        if (state.wifiLock == null) {
+        if (state.wifiLock == null && wifiManager != null) {
             MainActivity.info("lock wifi radio on");
-            // lock the radio on
+            // lock the radio on (only works in 28 (P) and lower)
             state.wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, ListFragment.WIFI_LOCK_NAME);
             state.wifiLock.acquire();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Check which request we're responding to
+        if (requestCode == ACTION_WIFI_CODE) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                info("wifi turned on");
+            }
+            else {
+                info("wifi NOT turned on, resultCode: " + resultCode);
+            }
+        }
+        else {
+            info("MainActivity: Unhandled requestCode: " + requestCode
+                    + " resultCode: " + resultCode);
         }
     }
 
@@ -1840,33 +2005,44 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void setupBluetooth() {
-        final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
-        if (bt == null) {
-            info("No bluetooth adapter");
-            return;
-        }
-        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final Editor edit = prefs.edit();
-        if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
-            if (!bt.isEnabled()) {
-                info("Enable bluetooth");
-                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
-                bt.enable();
-            } else {
-                edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
+        try {
+            final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+            if (bt == null) {
+                info("No bluetooth adapter");
+                return;
             }
-            edit.commit();
-            if ( state.bluetoothReceiver == null ) {
-                MainActivity.info( "new bluetoothReceiver");
-                // bluetooth scan listener
-                // this receiver is the main workhorse of bluetooth scanning
-                state.bluetoothReceiver = new BluetoothReceiver( this, state.dbHelper );
-                state.bluetoothReceiver.setupBluetoothTimer(true);
+            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final Editor edit = prefs.edit();
+            if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
+                if (!bt.isEnabled()) {
+                    info("Enable bluetooth");
+                    edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
+                    bt.enable();
+                } else {
+                    edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
+                }
+                edit.commit();
+                if (state.bluetoothReceiver == null) {
+                    MainActivity.info("new bluetoothReceiver");
+                    // dynamically detect BTLE feature - prevents occasional NPEs
+                    boolean hasLeSupport = true;
+                    if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+                        hasLeSupport = false;
+                    }
+
+                    // bluetooth scan listener
+                    // this receiver is the main workhorse of bluetooth scanning
+                    state.bluetoothReceiver = new BluetoothReceiver(this, state.dbHelper,
+                            hasLeSupport);
+                    state.bluetoothReceiver.setupBluetoothTimer(true);
+                }
+                info("register bluetooth BroadcastReceiver");
+                final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+                intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+                registerReceiver(state.bluetoothReceiver, intentFilter);
             }
-            info("register bluetooth BroadcastReceiver");
-            final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            registerReceiver(state.bluetoothReceiver, intentFilter);
+        } catch (SecurityException se) {
+            info("Security exception attempting to access bluetooth adapter", se);
         }
     }
 
@@ -2005,6 +2181,14 @@ public final class MainActivity extends AppCompatActivity {
         if (state.gpsListener == null) {
             // force a listener to be created
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+            if (logRoutes) {
+                startRouteLogging(prefs);
+            }
+            boolean displayRoute = prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
+            if (displayRoute) {
+                startRouteMapping(prefs);
+            }
             internalHandleScanChange(prefs.getBoolean(ListFragment.PREF_SCAN_RUNNING, true));
         }
     }
@@ -2104,6 +2288,11 @@ public final class MainActivity extends AppCompatActivity {
         if (state.gpsListener != null) {
             // remove any old requests
             locationManager.removeUpdates(state.gpsListener);
+            if (Build.VERSION.SDK_INT >= 24) {
+                if (gnssStatusCallback != null) {
+                    locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                }
+            }
             locationManager.removeGpsStatusListener(state.gpsListener);
         }
 
@@ -2118,7 +2307,7 @@ public final class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= 24) {
             try {
-                locationManager.registerGnssStatusCallback(new GnssStatus.Callback() {
+                gnssStatusCallback = new GnssStatus.Callback() {
                     @Override
                     public void onStarted() {
                     }
@@ -2135,7 +2324,8 @@ public final class MainActivity extends AppCompatActivity {
                     public void onSatelliteStatusChanged(GnssStatus status) {
                         state.gpsListener.onGnssStatusChanged(status);
                     }
-                });
+                };
+                locationManager.registerGnssStatusCallback(gnssStatusCallback);
             }
             catch (final Exception ex) {
                 error("Error registering for gnss: " + ex, ex);
@@ -2167,6 +2357,11 @@ public final class MainActivity extends AppCompatActivity {
                 info("removing location listener: " + state.gpsListener);
                 try {
                     locationManager.removeUpdates(state.gpsListener);
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        if (gnssStatusCallback != null) {
+                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                        }
+                    }
                 } catch (final SecurityException ex) {
                     info("Security exception removing status listener: " + ex, ex);
                 }
@@ -2273,23 +2468,26 @@ public final class MainActivity extends AppCompatActivity {
             public void run() {
                 final Intent i = getBaseContext().getPackageManager()
                         .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                if (i != null) {
+                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                if (state.finishing.get()) {
-                    MainActivity.info("finishSoon: finish already called");
-                }
-                else {
-                    MainActivity.info("finishSoon: calling finish now");
-                    finish();
-                }
+                    if (state.finishing.get()) {
+                        MainActivity.info("finishSoon: finish already called");
+                    } else {
+                        MainActivity.info("finishSoon: calling finish now");
+                        finish();
+                    }
 
-                if (restart) {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            startActivity(i);
-                        }
-                    }, 10L);
+                    if (restart) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startActivity(i);
+                            }
+                        }, 10L);
+                    }
+                } else {
+                    warn("Intent generation failed during finishSoon thread");
                 }
             }
         }, finishTimeMillis);
@@ -2329,6 +2527,12 @@ public final class MainActivity extends AppCompatActivity {
             locationManager.removeGpsStatusListener(state.gpsListener);
             try {
                 locationManager.removeUpdates(state.gpsListener);
+                if (Build.VERSION.SDK_INT >= 24) {
+                    if (gnssStatusCallback != null) {
+                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    }
+                }
+
             } catch (final SecurityException ex) {
                 error("SecurityException on finish: " + ex, ex);
             }
@@ -2354,20 +2558,6 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final boolean wifiWasOff = prefs.getBoolean(ListFragment.PREF_WIFI_WAS_OFF, false);
-        // don't call on emulator, it crashes it
-        if (wifiWasOff && !state.inEmulator) {
-            // well turn it of now that we're done
-            final WifiManager wifiManager = (WifiManager) getApplicationContext()
-                    .getSystemService(Context.WIFI_SERVICE);
-            MainActivity.info("turning back off wifi");
-            try {
-                wifiManager.setWifiEnabled(false);
-            } catch (Exception ex) {
-                MainActivity.error("exception turning wifi back off: " + ex, ex);
-            }
-        }
-
         endBluetooth(prefs);
 
         TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -2435,6 +2625,89 @@ public final class MainActivity extends AppCompatActivity {
             state.observationUploader.startDownload(null);
         } catch (WiGLEAuthException waex) {
             MainActivity.warn("Authentication failure on background run upload");
+        }
+    }
+
+    public boolean checkStorage() {
+        boolean safe;
+        boolean external = hasSD();
+        if (external) {
+            safe = FileUtility.checkExternalStorageDangerZone();
+        } else {
+            safe = FileUtility.checkInternalStorageDangerZone();
+        }
+        if (!safe) {
+            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+            iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
+                    .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
+                    .setCancelable(true)
+            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            final Dialog dialog = iseDlgBuilder.create();
+            dialog.show();
+        }
+        return safe;
+    }
+
+    /**
+     * When we start a new run/start logging for a run, provide the new run a new ID
+     * @param prefs current sharedPreferences
+     */
+    public void startRouteLogging(SharedPreferences prefs) {
+        // ALIBI: we initialize this value to 0L on table setup as well.
+        long lastRouteId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+        long routeId = lastRouteId+1L; //ALIBI: always skips the default 0 run id. (see vis below)
+        final Editor edit = prefs.edit();
+        edit.putLong(ListFragment.PREF_ROUTE_DB_RUN, routeId);
+        edit.apply();
+    }
+
+    /**
+     * since we do the prefs check on logging, no real need to do anything here
+     */
+    public void endRouteLogging() {
+        //TODO: null operation for now
+    }
+
+    /**
+     * if we're already logging the route, we'll simply use that route log when displaying.
+     * If we're not already logging, we'll log the route to run ID 0 in the routes table.
+     * ALIBI: since route lengths may be extreme, ring-buffer/dynamic allocation could cause serious problems
+     * @param prefs current sharedPreferences
+     */
+    public void startRouteMapping(SharedPreferences prefs) {
+        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        //ALIBI: we'll piggyback off the current route, if we're logging it
+        if (!logRoutes) {
+            if (state != null && state.dbHelper != null) {
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    MainActivity.warn("unable to clear default route on start-viz: ", dbe);
+                }
+            }
+        }
+    }
+
+    /**
+     * if we're logging to the default slot, we'll clear here, JiC. This might be unnecessary, or even
+     * pose problems if we decide to stop adding, but keep visualizing the route up to that point.
+     * @param prefs current sharedPreferences
+     */
+    public void endRouteMapping(SharedPreferences prefs) {
+        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        if (!logRoutes) {
+            if (state != null && state.dbHelper != null) {
+                try {
+                    state.dbHelper.clearDefaultRoute();
+                } catch (DBException dbe) {
+                    MainActivity.warn("unable to clear default route on end-viz: ", dbe);
+                }
+            }
         }
     }
 

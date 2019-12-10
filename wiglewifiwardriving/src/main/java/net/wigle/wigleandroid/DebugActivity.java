@@ -50,11 +50,12 @@ public class DebugActivity extends AppCompatActivity {
     private void updateView() {
         // set on view
         final TextView tv = findViewById( R.id.debugreport );
-        tv.setText( "" );
+        //ALIBI: calling append() on a TextView directly (especially inside a loop) considered unreliable
+        StringBuilder sb = new StringBuilder();
         for (final String log : MainActivity.getLogLines()) {
-            tv.append(log);
-            tv.append("\n");
+            sb.append(log).append("\n");
         }
+        tv.setText( sb.toString() );
     }
 
     private void setupEmail() {
@@ -65,7 +66,8 @@ public class DebugActivity extends AppCompatActivity {
         }
 
         final Intent emailIntent = new Intent( Intent.ACTION_SEND );
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
+        // don't encourage people to send us their random logs.
+        // emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "WigleWifi log report" );
         emailIntent.setType("text/plain");
         emailIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
@@ -79,7 +81,7 @@ public class DebugActivity extends AppCompatActivity {
         MenuItem item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_return));
         item.setIcon( android.R.drawable.ic_media_previous );
 
-        item = menu.add(0, MENU_EMAIL, 0, getString(R.string.menu_error_report));
+        item = menu.add(0, MENU_EMAIL, 0, getString(R.string.send_to) + "...");
         item.setIcon( android.R.drawable.ic_menu_send );
 
         return true;

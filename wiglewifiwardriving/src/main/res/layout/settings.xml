@@ -12,6 +12,18 @@
     >
 
     <TextView
+        android:id="@+id/scan_throttle_help"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#000000"
+        android:background="#C0C000"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:visibility="gone" />
+
+    <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_ident_head"
@@ -26,28 +38,29 @@
         android:gravity="center_horizontal"
         />
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/username"
-        />
-    <EditText
-        android:id="@+id/edit_username"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text" />
-
-    <TextView
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_layout_uname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_username"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:hint="@string/username"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/edit_password_label"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/password"
-        />
-    <EditText
-        android:id="@+id/edit_password"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edit_password"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:hint="@string/password"/>
+    </com.google.android.material.textfield.TextInputLayout>
     <TextView
         android:id="@+id/show_authuser_label"
         android:layout_width="fill_parent"
@@ -127,7 +140,7 @@
 
     <CheckBox
         android:id="@+id/boot_start"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/start_at_boot" />
 
@@ -199,6 +212,17 @@
     <include
         android:id="@+id/maptileprefs_embed"
         layout="@layout/map_tile_prefs" />
+
+    <CheckBox android:id="@+id/enable_route_map_display"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_route_map_display" />
+
+    <CheckBox android:id="@+id/enable_route_logging"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_route_logging" />
+
 
     <TextView
         android:layout_width="fill_parent"

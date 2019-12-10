@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -125,7 +126,7 @@ public class ErrorReportActivity extends AppCompatActivity {
 
     private String getLatestStackfilePath() {
         try {
-            File fileDir = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
+            File fileDir = MainActivity.getErrorStackPath(getApplicationContext());
             if (!fileDir.canRead() || !fileDir.isDirectory()) {
                 MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
             } else {
@@ -197,7 +198,12 @@ public class ErrorReportActivity extends AppCompatActivity {
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, stack);
         }
         final Intent chooserIntent = Intent.createChooser( emailIntent, "Email WigleWifi error report?" );
-        startActivity( chooserIntent );
+        try {
+            startActivity(chooserIntent);
+        }
+        catch (final ActivityNotFoundException ex) {
+            MainActivity.warn("No email activity found: " + ex, ex);
+        }
     }
 
     /* Creates the menu items */

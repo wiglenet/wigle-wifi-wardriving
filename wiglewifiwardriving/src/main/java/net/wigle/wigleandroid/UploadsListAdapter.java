@@ -189,6 +189,8 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
+                } catch (IllegalStateException ise) {
+                    MainActivity.error("had completed KML DL, but user had dissassociated activity.");
                 } catch (IllegalArgumentException e) {
                     MainActivity.error("Unable to open file: " + localFilePath);
                     e.printStackTrace();

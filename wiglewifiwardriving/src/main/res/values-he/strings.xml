@@ -36,6 +36,8 @@
     <string name="kml_export_text">ייצוא DB כולו לקובץ KML</string>
     <string name="backup_db_button">גיבוי מסד נתונים</string>
     <string name="backup_db_text">בצע גיבוי מסד הנתונים</string>
+    <string name="backup_preparing">מתכונן לגיבוי מסד נתונים&#8230;</string>
+    <string name="backup_in_progress">&#8230;גיבוי מסד נתונים</string>
     <string name="import_observed_button">ייבוא ​​נצפה</string>
     <string name="import_observed_text">ייבוא ​​רשתות נצפתה שלי WiGLE</string>
     <string name="periodstill_text">זמן בין WiFi סורק את מעמד עדיין</string>
@@ -287,11 +289,7 @@
     <string name="netwepunknown_title">לא ידוע</string>
     <string name="user_stats_app_name">סטטיסטיקות משתמש</string>
     <string name="rank_title">דירוג משתמש:</string>
-    <string name="discovered_title">רשתות WiFi נתגלו (חדשות ל- WiGLE)</string>
-    <string name="total_title">סה"כ רשתות WiFi</string>
     <string name="totallocs_title">סה"כ תצפיות WiFi</string>
-    <string name="gendisc_title">רשתות סלולריות שהתגלו (חדשות ל- WiGLE)</string>
-    <string name="gentotal_title">סה"כ רשתות סלולריות</string>
     <string name="monthcount_title">התגלה החודש WiFi</string>
     <string name="prevmonthcount_title">WiFi התגלה בחודש שעבר</string>
     <string name="firsttransid_title">מזהה עסקה ראשון</string>
@@ -402,4 +400,25 @@
     <string name="search_empty">תוצאות ריקות</string>
     <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">פאי אנדרואיד (9.0) מצמצם סריקות WiFi ל -2 לדקה. שדרג אנדרואיד במידת האפשר.</string>
+    <string name="q_bad">אנדרואיד 10 מצמצם סריקות WiFi אלא אם כן הוא מושבת בהגדרות המפתח.</string>
+    <string name="enable_developer">כדי לאפשר אפשרויות מפתח: הגדרות -> אודות טלפון -> הקש Build Build 7 פעמים.</string>
+    <string name="disable_throttle">כדי להשבית את מצערת סריקת WiFi: מערכת -> מתקדם -> אפשרויות מפתחים -> מצערת סריקת WiFi למצב כבוי.</string>
+    <string name="no_internal_space_title">אין מקום פנוי</string>
+    <string name="no_internal_space_message">אין מספיק אחסון יישומי פנימי במכשיר שלך.</string>
+    <string name="no_external_space_title">אין מקום פנוי</string>
+    <string name="no_external_space_message">אין מספיק שטח אחסון ליישומים חיצוניים במכשיר שלך.</string>
+    <string name="no_mxc_space_message">אין מספיק אחסון יישומי פנימי במכשיר שלך בכדי להתקין את מסד הנתונים לחיפוש מפעיל סלולרי. יש להשתמש במזהים המסופקים במכשירים.</string>
+    <string name="enable_route_logging">רישום מסלולי ביצוע</string>
+    <string name="enable_route_map_display">הצגת מסלולי ביצוע</string>
+    <string name="export_gpx_button">ייצא GPX</string>
+    <string name="export_gpx">ייצא מסלול נוכחי כקובץ מסלול GPX</string>
+    <string name="export_gpx_detail">ייצא את המסלול הנוכחי שנרשם כקובץ תיאור מסלול .GPX XML</string>
+    <string name="gpx_failed">\nלא ניתן לייצא קובץ gpx.</string>
+    <string name="gpx_no_points">קובץ הייצוא של מסלול GPX יהיה ריק.</string>
+    <string name="gpx_preparing">מכין ייצוא של GPX</string>
+    <string name="gpx_exporting">מייצא קובץ GPX.</string>
+    <string name="discovered">גילה</string>
+    <string name="new_to_us">(חדשות ל- WiGLE)</string>
+    <string name="total_seen">סך הכל נצפה</string>
 </resources>

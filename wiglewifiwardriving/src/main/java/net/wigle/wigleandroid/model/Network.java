@@ -32,6 +32,7 @@ public final class Network {
     private static final String DASH_STRING = " - ";
     private static final String WPA3_CAP = "[WPA3";
     private static final String WPA2_CAP = "[WPA2";
+    private static final String RSN_CAP = "[RSN";
     private static final String WPA_CAP = "[WPA";
     private static final String WEP_CAP = "[WEP";
 
@@ -142,7 +143,7 @@ public final class Network {
 
         if (this.capabilities.contains(WPA3_CAP)) {
             crypto = CRYPTO_WPA3;
-        } else if (this.capabilities.contains(WPA2_CAP)) {
+        } else if (this.capabilities.contains(WPA2_CAP) || this.capabilities.contains(RSN_CAP)) {
             crypto = CRYPTO_WPA2;
         } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;

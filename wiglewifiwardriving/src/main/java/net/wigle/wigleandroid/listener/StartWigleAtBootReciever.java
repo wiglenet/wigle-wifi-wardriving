@@ -12,6 +12,9 @@ public class StartWigleAtBootReciever extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (null == intent) {
+            return;
+        }
         Intent serviceIntent = new Intent(context, MainActivity.class);
         final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean mustStart = prefs.getBoolean( ListFragment.PREF_START_AT_BOOT, false );

@@ -14,6 +14,11 @@ public class TerminationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // Figure out what to do based on the intent type
+        if (null == intent) {
+            MainActivity.error("null intent in termination onReceive");
+            return;
+        }
+
         MainActivity.info("TerminationRec intent type: " + intent.getAction());
         switch (intent.getAction()) {
             case MainActivity.ACTION_END:

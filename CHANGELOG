@@ -1,3 +1,33 @@
+* 2.49 (12/10/2019)
+Route visualization and export.
+Put a limit on startup toast.
+Error stacks and mnc db can use internal filesystem.
+User Stats view condensation/refactor.
+Vector W icon.
+Remove old image library.
+File-export infra for database backups.
+Many bugfixes.
+
+* 2.48 (09/06/2019)
+Changes required for Android 10 (Q)
+Various bug fixes
+
+* 2.47 (08/25/2019)
+Various bug fixes:
+BT permission errors
+Cancelled KML download
+ActivityNotFoundException
+Log NPE, Setting OOB
+SQL instr on KitKat
+Dashboard Formatting
+
+* 2.45 - 2.46 (08/07/2019)
+Pie Wifi throttling warnings, Q throttle disable instructions.
+Fix for RemoteServiceException.
+Fix OS upgrade auth problems.
+pt-rBR translations updates (thanks l-almeida).
+Library updates and other bug fixes.
+
 * 2.44 (07/04/2019)
 Add GNSS info to dashboard.
 Italian language fix (thx Mpegforever).

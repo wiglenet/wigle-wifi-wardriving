@@ -36,6 +36,8 @@
     <string name="kml_export_text">KML文件導出整個數據庫</string>
     <string name="backup_db_button">備份數據庫</string>
     <string name="backup_db_text">使數據庫備份</string>
+    <string name="backup_preparing">準備備份數據庫</string>
+    <string name="backup_in_progress">備份資料庫</string>
     <string name="import_observed_button">導入觀察</string>
     <string name="import_observed_text">從 WiGLE我觀察到的網絡導入</string>
     <string name="periodstill_text">無線網絡之間的時間掃描原地踏步</string>
@@ -287,11 +289,7 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">用户统计</string>
     <string name="rank_title">用户排名</string>
-    <string name="discovered_title">发现的WiFi网络（WiGLE新手）</string>
-    <string name="total_title">看到全部WiFi网络</string>
     <string name="totallocs_title">录制的WiFi观测总数</string>
-    <string name="gendisc_title">已发现的Cell Networks（WiGLE新手</string>
-    <string name="gentotal_title">看到的全部单元网络</string>
     <string name="monthcount_title">本月发现WiFi</string>
     <string name="prevmonthcount_title">上个月发现WiFi</string>
     <string name="firsttransid_title">第一个交易ID</string>
@@ -402,4 +400,25 @@
     <string name="search_empty">結果為空</string>
     <string name="search_query_limit">您今天已達到最大搜索次數。你的限額將在明天重置。</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie（9.0）將WiFi掃描限制為每分鐘2次。盡可能升級Android。</string>
+    <string name="q_bad">除非在“開發者設置”中禁用，否則Android 10 會限制WiFi掃描。</string>
+    <string name="enable_developer">啟用開發人員選項：設置 - >關於手機 - >點擊內置編號7次。</string>
+    <string name="disable_throttle">要禁用WiFi掃描限制：系統 - >高級 - >開發人員選項 - > WiFi掃描限制為關閉。</string>
+    <string name="no_internal_space_title">沒有可用空間</string>
+    <string name="no_internal_space_message">您的設備上沒有足夠的內部應用程序存儲空間。</string>
+    <string name="no_external_space_title">沒有可用空間</string>
+    <string name="no_external_space_message">您的設備上沒有足夠的外部應用程序存儲空間。</string>
+    <string name="no_mxc_space_message">您的設備上沒有足夠的內部應用程序存儲來安裝單元操作員查找數據庫。將使用設備提供的ID。</string>
+    <string name="enable_route_logging">記錄執行路徑</string>
+    <string name="enable_route_map_display">顯示執行路線</string>
+    <string name="export_gpx_button">導出GPX</string>
+    <string name="export_gpx">將當前路由導出為GPX路由文件</string>
+    <string name="export_gpx_detail">將當前記錄的路由導出為.GPX XML路由描述文件</string>
+    <string name="gpx_failed">無法導出gpx文件。\n </string>
+    <string name="gpx_no_points">GPX路由導出文件將為空。</string>
+    <string name="gpx_preparing">準備GPX導出</string>
+    <string name="gpx_exporting">導出GPX文件。</string>
+    <string name="discovered">發現</string>
+    <string name="new_to_us">（WiGLE新手）</string>
+    <string name="total_seen">觀察總數</string>
 </resources>

@@ -34,6 +34,10 @@ public class GPSListener implements Listener, LocationListener {
     public static final float LERP_MIN_THRESHOLD_METERS = 1.0f;
     public static final float LERP_MAX_THRESHOLD_METERS = 200f;
 
+    public static final float MIN_ROUTE_LOCATION_DIFF_METERS = 3.8f;
+    public static final long MIN_ROUTE_LOCATION_DIFF_TIME = 3 * 1000;
+    public static final float MIN_ROUTE_LOCATION_PRECISION_METERS = 24.99f;
+
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private Location location;
@@ -70,7 +74,7 @@ public class GPSListener implements Listener, LocationListener {
             // network provider is disabled :(  so we do nothing...
             // listActivity.setLocationUpdates();
         }
-        // MainActivity.info("GPS event: " + event);
+        //DEBUG: MainActivity.info("GPS event: " + event);
         updateLocationData(null);
     }
 
@@ -178,6 +182,9 @@ public class GPSListener implements Listener, LocationListener {
         if ( mainActivity.inEmulator() && newLocation != null ) {
             newOK = true;
         }
+
+        final boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
+        final boolean showRoute = prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
 
         final boolean netLocOK = locationOK( networkLocation, satCount, gpsTimeout, netLocTimeout );
 
@@ -313,6 +320,22 @@ public class GPSListener implements Listener, LocationListener {
             }
         }
 
+        if (logRoutes && null != location) {
+            final long routeId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+            try {
+                dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
+                        ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
+            } catch (Exception ex) {
+                MainActivity.error("filed to log route update: ", ex);
+            }
+        } else if (showRoute && null != location) {
+            try {
+                dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
+                        ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, 0L);
+            } catch (Exception ex) {
+                MainActivity.error("filed to log default route update for viz: ", ex);
+            }
+        }
         // update the UI
         mainActivity.setLocationUI();
 
@@ -321,6 +344,7 @@ public class GPSListener implements Listener, LocationListener {
     public void checkLocationOK(final long gpsTimeout, final long netLocsTimeout) {
         if ( ! locationOK( location, getSatCount(), gpsTimeout, netLocsTimeout) ) {
             // do a self-check
+            MainActivity.info("checkLocationOK was false");
             updateLocationData(null);
         }
     }
@@ -347,11 +371,13 @@ public class GPSListener implements Listener, LocationListener {
             boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > gpsTimeout;
             gpsLost |= now - lastLocationTime > gpsTimeout;
             gpsLost |= horribleGps(location);
+            if (gpsLost) MainActivity.info("gps gpsLost");
             retval = ! gpsLost;
         }
         else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
             boolean gpsLost = now - lastNetworkLocationTime > networkLocationTimeout;
             gpsLost |= horribleGps(location);
+            if (gpsLost) MainActivity.info("network gpsLost");
             retval = ! gpsLost;
         }
 
@@ -418,7 +444,7 @@ public class GPSListener implements Listener, LocationListener {
                 con = "Galileo";
                 break;
         }
-        if (Build.VERSION.SDK_INT > 28 && constellationType == 7 /*GnssStatus.CONSTELLATION_IRNSS*/) {
+        if (Build.VERSION.SDK_INT > 28 && constellationType == GnssStatus.CONSTELLATION_IRNSS) {
             con = "IRNSS";
         }
         return con;

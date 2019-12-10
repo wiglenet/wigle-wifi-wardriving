@@ -36,6 +36,8 @@
     <string name="kml_export_text">Esporta tutto il database in un file KML</string>
     <string name="backup_db_button">Backup del database</string>
     <string name="backup_db_text">Effettua un backup dell\'intero database</string>
+    <string name="backup_preparing">Preparazione per il backup del database&#8230;</string>
+    <string name="backup_in_progress">Backup del database&#8230;</string>
     <string name="import_observed_button">Importa rilevate</string>
     <string name="import_observed_text">Importa le tue rilevazioni da WiGLE</string>
     <string name="periodstill_text">Intervallo tra le ricerche WiFi quando fermo</string>
@@ -287,11 +289,7 @@
     <string name="netwepunknown_title">Sconosciuto</string>
     <string name="user_stats_app_name">Individuali</string>
     <string name="rank_title">Classifica utente:</string>
-    <string name="discovered_title">Reti WiFi Scoperte (Nuove per WiGLE)</string>
-    <string name="total_title">Totale Reti WiFi Viste</string>
     <string name="totallocs_title">WiFi rilevate (compreso ripetute)</string>
-    <string name="gendisc_title">Torri GSM Scoperte (Nuove per WiGLE)</string>
-    <string name="gentotal_title">Totale Torri GSM Viste</string>
     <string name="monthcount_title">WiFi Scoperte Questo Mese</string>
     <string name="prevmonthcount_title">WiFi Scoperte Lo Scorso Mese</string>
     <string name="firsttransid_title">ID Prima Transazione</string>
@@ -402,4 +400,25 @@
     <string name="search_empty">Risultati vuoti</string>
     <string name="search_query_limit">Hai raggiunto il numero massimo di ricerche oggi. Il tuo limite verrà ripristinato domani.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) riduce le scansioni WiFi a 2 al minuto. Aggiorna Android se possibile.</string>
+    <string name="q_bad">Android 10 limita le scansioni WiFi a meno che non sia disabilitato nelle Impostazioni sviluppatore.</string>
+    <string name="enable_developer">Per abilitare le opzioni sviluppatore: Impostazioni -> Informazioni sul telefono -> Tocca Numero build 7 volte.</string>
+    <string name="disable_throttle">Per disabilitare la limitazione della scansione WiFi: Sistema -> Avanzate -> Opzioni sviluppatore -> Limitazione della scansione WiFi disattivata.</string>
+    <string name="no_internal_space_title">Nessuno spazio disponibile</string>
+    <string name="no_internal_space_message">Non c\'è abbastanza memoria interna per l\'applicazione sul tuo dispositivo.</string>
+    <string name="no_external_space_title">Nessuno spazio disponibile</string>
+    <string name="no_external_space_message">Non è disponibile memoria sufficiente per l\'applicazione esterna sul dispositivo.</string>
+    <string name="no_mxc_space_message">La memoria interna dell\'applicazione non è sufficiente sul dispositivo per installare il database di ricerca dell\'operatore di cella. Verranno utilizzati gli ID forniti dal dispositivo.</string>
+    <string name="enable_route_logging">Registra le rotte per l\'esecuzione</string>
+    <string name="enable_route_map_display">Visualizza percorsi per l\'esecuzione</string>
+    <string name="export_gpx_button">Esporta GPX</string>
+    <string name="export_gpx">Esporta il percorso corrente come file di percorso GPX</string>
+    <string name="export_gpx_detail">Esporta la rotta corrente registrata come file di descrizione della rotta XML .GPX</string>
+    <string name="gpx_failed">Impossibile esportare il file gpx.\n </string>
+    <string name="gpx_no_points">Il file di esportazione della route GPX sarebbe vuoto.</string>
+    <string name="gpx_preparing">Preparazione all\'esportazione GPX</string>
+    <string name="gpx_exporting">Esportazione di file GPX.</string>
+    <string name="discovered">Scoperte</string>
+    <string name="new_to_us">(Nuove per WiGLE)</string>
+    <string name="total_seen">Totale osservato</string>
 </resources>

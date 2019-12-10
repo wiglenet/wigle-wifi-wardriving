@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exportar todos los datos a un archivo KML</string>
     <string name="backup_db_button">Respaldar todo</string>
     <string name="backup_db_text">Haga una copia de seguridad de todos los datos</string>
+    <string name="backup_preparing">Preparación para hacer una copia de seguridad de la base de datos&#8230;</string>
+    <string name="backup_in_progress">Copia de seguridad de la base de datos&#8230;</string>
     <string name="import_observed_button">Importar mis datos desde WiGLE</string>
     <string name="import_observed_text">Importar mis datos subidos desde WiGLE</string>
     <string name="periodstill_text">Tiempo entre WiFi explora quedarse quieto</string>
@@ -348,4 +350,25 @@
     <string name="search_empty">Resultados vacíos</string>
     <string name="search_query_limit">Has alcanzado el número máximo de búsquedas en la actualidad. Tu límite se restablecerá mañana.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) acelera los escaneos WiFi a 2 por minuto. Actualice Android si es posible.</string>
+    <string name="q_bad">Android 10 acelera los escaneos WiFi a menos que esté deshabilitado en la Configuración del desarrollador.</string>
+    <string name="enable_developer">Para habilitar las opciones de desarrollador: Configuración -> Acerca del teléfono -> Toque Número de compilación 7 veces.</string>
+    <string name="disable_throttle">Para deshabilitar la aceleración de escaneo WiFi: Sistema -> Avanzado -> Opciones de desarrollador -> Aceleración de escaneo WiFi a apagado.</string>
+    <string name="no_internal_space_title">No hay espacio disponible</string>
+    <string name="no_internal_space_message">No hay suficiente almacenamiento interno de aplicaciones en su dispositivo.</string>
+    <string name="no_external_space_title">No hay espacio disponible</string>
+    <string name="no_external_space_message">No hay suficiente almacenamiento de aplicaciones externas en su dispositivo.</string>
+    <string name="no_mxc_space_message">No hay suficiente almacenamiento interno de aplicaciones en su dispositivo para instalar la base de datos de búsqueda del operador de celda. Se utilizarán las ID suministradas por el dispositivo.</string>
+    <string name="enable_route_logging">Registrar rutas para la ejecución</string>
+    <string name="enable_route_map_display">Mostrar rutas para la ejecución</string>
+    <string name="export_gpx_button">Exportar GPX</string>
+    <string name="export_gpx">Exportar ruta actual como un archivo de ruta GPX</string>
+    <string name="export_gpx_detail">Exporte la ruta actual que se está registrando como un archivo de descripción de ruta XML .GPX</string>
+    <string name="gpx_failed">No se puede exportar el archivo gpx.\n </string>
+    <string name="gpx_no_points">El archivo de exportación de ruta GPX estaría vacío.</string>
+    <string name="gpx_preparing">Preparando la exportación GPX</string>
+    <string name="gpx_exporting">Exportando archivo GPX.</string>
+    <string name="discovered">Descubiertas</string>
+    <string name="new_to_us">(Nuevo en WiGLE)</string>
+    <string name="total_seen">Total visto</string>
 </resources>

@@ -22,27 +22,12 @@ public class WiGLEToast {
 
     public static void showOverFragment(final FragmentActivity context, final int titleId,
                                         final String messageString) {
-        LayoutInflater inflater = context.getLayoutInflater();
-        View layout = inflater.inflate(R.layout.wigle_detail_toast,
-                (ViewGroup) context.findViewById(R.id.custom_toast_container));
-
-        TextView title = (TextView) layout.findViewById(R.id.toast_title_text);
-        title.setText(titleId);
-
-        TextView text = (TextView) layout.findViewById(R.id.toast_message_text);
-        text.setText(messageString);
-
-        Toast toast = new Toast(context.getApplicationContext());
-        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-        toast.setDuration(Toast.LENGTH_LONG);
-        toast.setView(layout);
-        toast.show();
+        showOverActivity(context, titleId, messageString, Toast.LENGTH_LONG);
     }
 
     public static void showOverActivity(final Activity context, final int titleId,
                                         final String messageString) {
-        showOverActivity(context, titleId,
-                messageString, Toast.LENGTH_SHORT);
+        showOverActivity(context, titleId, messageString, Toast.LENGTH_SHORT);
     }
 
     public static void showOverActivity(final Activity context, final int titleId,
@@ -52,10 +37,10 @@ public class WiGLEToast {
             View layout = inflater.inflate(R.layout.wigle_detail_toast,
                     (ViewGroup) context.findViewById(R.id.custom_toast_container));
 
-            TextView title = (TextView) layout.findViewById(R.id.toast_title_text);
+            TextView title = layout.findViewById(R.id.toast_title_text);
             title.setText(titleId);
 
-            TextView text = (TextView) layout.findViewById(R.id.toast_message_text);
+            TextView text = layout.findViewById(R.id.toast_message_text);
             text.setText(messageString);
 
             Toast toast = new Toast(context.getApplicationContext());

@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="244"
-    android:versionName="2.44">
+    android:versionCode="249"
+    android:versionName="2.49">
 
     <supports-screens
         android:anyDensity="true"
@@ -55,6 +55,9 @@
     <uses-feature
         android:name="android.hardware.bluetooth"
         android:required="false" />
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="false"/>
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
@@ -221,6 +224,24 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/m8b_paths" />
         </provider>
+        <provider
+            android:name=".util.GpxFileProvider"
+            android:authorities="${applicationId}.gpxprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/gpx_paths" />
+        </provider>
+        <provider
+            android:name=".util.SqliteFileProvider"
+            android:authorities="${applicationId}.sqliteprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/sqlite_paths" />
+        </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />
@@ -249,6 +270,7 @@
         <service
             android:name=".WigleService"
             android:enabled="true"
+            android:foregroundServiceType="location"
             android:icon="@mipmap/ic_launcher" />
         <uses-library
             android:name="com.google.android.maps"

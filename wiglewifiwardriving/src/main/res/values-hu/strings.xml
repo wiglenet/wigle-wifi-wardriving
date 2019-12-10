@@ -36,6 +36,8 @@
     <string name="kml_export_text">Adatbázis kimentése KML-ben</string>
     <string name="backup_db_button">Biztonsági mentés</string>
     <string name="backup_db_text">Adatbázis mentés készítése</string>
+    <string name="backup_preparing">Felkészülés az adatbázis biztonsági mentésére&#8230;</string>
+    <string name="backup_in_progress">Az adatbázis biztonsági mentése&#8230;</string>
     <string name="import_observed_button">Visszaállítás</string>
     <string name="import_observed_text">Adatok visszatöltése a WiGLE-ről</string>
     <string name="periodstill_text">Közötti idő WiFi ellenőrzi álló helyzetben is</string>
@@ -347,4 +349,25 @@
     <string name="search_empty">Eredmények üresek</string>
     <string name="search_query_limit">Ma elérte a maximális számú keresést. A határidőt holnap visszaállítja.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Az Android Pie (9.0) fojtja a WiFi sebességét percenként 2-re. Frissítse az Android rendszert, ha lehetséges.</string>
+    <string name="q_bad">Az Android 10 gátolja a WiFi-szkennelést, kivéve, ha le van tiltva a fejlesztői beállításokban.</string>
+    <string name="enable_developer">A fejlesztői lehetőségek engedélyezése: Beállítások -> A telefonról -> 7-szer érintse meg az Összeállítás számot.</string>
+    <string name="disable_throttle">A WiFi szkennelés gátlásának letiltása: Rendszer -> Speciális -> Fejlesztői beállítások -> A WiFi szkennelés gázszabályozása kikapcsolva.</string>
+    <string name="no_internal_space_title">Nincs hely</string>
+    <string name="no_internal_space_message">Nincs elég belső alkalmazástároló eszközén.</string>
+    <string name="no_external_space_title">Nincs hely</string>
+    <string name="no_external_space_message">Nincs elég külső alkalmazás tárolóeszköz a készüléken.</string>
+    <string name="no_mxc_space_message">A készüléken nincs elegendő belső tárhely a cellaüzemeltető keresési adatbázisának telepítéséhez. Az eszköz által szállított azonosítókat fogjuk használni.</string>
+    <string name="enable_route_logging">Naplózási útvonalak a végrehajtáshoz</string>
+    <string name="enable_route_map_display">Megjeleníti a végrehajtás útvonalait</string>
+    <string name="export_gpx_button">GPX exportálása</string>
+    <string name="export_gpx">Exportálja az aktuális útvonalat GPX útvonalfájlként</string>
+    <string name="export_gpx_detail">Exportálja az aktuálisan naplózott útvonalat .GPX XML útvonalleíró fájlként</string>
+    <string name="gpx_failed">Nem sikerült exportálni a gpx fájlt.\n </string>
+    <string name="gpx_no_points">A GPX útvonal-export fájl üres.</string>
+    <string name="gpx_preparing">A GPX exportjának előkészítése</string>
+    <string name="gpx_exporting">GPX fájl exportálása.</string>
+    <string name="discovered">Felfedezett</string>
+    <string name="new_to_us">(Új a WiGLE-ben)</string>
+    <string name="total_seen">Összesen megfigyelt</string>
 </resources>

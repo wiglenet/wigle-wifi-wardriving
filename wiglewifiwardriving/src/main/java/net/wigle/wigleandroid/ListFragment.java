@@ -3,6 +3,7 @@
 
 package net.wigle.wigleandroid;
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +16,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.core.view.MenuItemCompat;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,11 +30,11 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.google.android.material.internal.NavigationMenuItemView;
 import com.google.android.material.navigation.NavigationView;
 
 import net.wigle.wigleandroid.MainActivity.State;
@@ -51,8 +53,6 @@ import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.Set;
-
-import pl.droidsonroids.gif.GifImageButton;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -89,10 +89,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_DONATE = "donate";
     public static final String PREF_DB_MARKER = "dbMarker";
     public static final String PREF_MAX_DB = "maxDbMarker";
+    public static final String PREF_ROUTE_DB_RUN = "routeDbRun";
     public static final String PREF_NETS_UPLOADED = "netsUploaded";
     public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
     public static final String PREF_SCAN_PERIOD = "scanPeriod";
     public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
+    public static final String PREF_OG_BT_SCAN_PERIOD_STILL = "btGeneralScanPeriodStill";
+    public static final String PREF_OG_BT_SCAN_PERIOD = "btGeneralScanPeriod";
+    public static final String PREF_OG_BT_SCAN_PERIOD_FAST = "btGeneralScanPeriodFast";
     public static final String PREF_QUICK_PAUSE = "quickScanPause";
     public static final String GPS_SCAN_PERIOD = "gpsPeriod";
     public static final String PREF_FOUND_SOUND = "foundSound";
@@ -101,7 +105,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
     public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
     public static final String PREF_MUTED = "muted";
-    public static final String PREF_WIFI_WAS_OFF = "wifiWasOff";
     public static final String PREF_BT_WAS_OFF = "btWasOff";
     public static final String PREF_SCAN_BT = "scanBluetooth";
     public static final String PREF_DISTANCE_RUN = "distRun";
@@ -137,6 +140,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
+    public static final String PREF_LOG_ROUTES = "logRoutes";
+    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -176,8 +181,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String QUICK_SCAN_DO_NOTHING = "DO_NOTHING";
     public static final String QUICK_SCAN_PAUSE = "PAUSE";
 
-    public static final String PREF_MXC_INSTALL_PENDING = "INSTALLING_MXC";
-    public static final String PREF_MXC_REINSTALL_ATTEMPTED = "TRIED_INSTALLING_MXC";
+    public static final String PREF_MXC_REINSTALL_ATTEMPTED = "TRIED_INSTALLING_MXC2";
+    public static final String PREF_PIE_BAD_TOAST_COUNT = "PIE_BAD_TOAST_COUNT";
+    public static final String PREF_Q_BAD_TOAST_COUNT = "Q_BAD_TOAST_COUNT";
 
     /** cross-activity communication */
     public static class LameStatic {
@@ -189,6 +195,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public long newCells;
         public long newBt;
         public int currNets;
+        public int currCells;
+        public int currBt;
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
@@ -200,6 +208,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public OUI oui;
     }
     public static final LameStatic lameStatic = new LameStatic();
+
+    private boolean animating = false;
+    private AnimatedVectorDrawableCompat scanningAnimation = null;
 
     static {
         final long maxMemory = Runtime.getRuntime().maxMemory();
@@ -289,15 +300,39 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     public void setStatusUI( final View view, final String status ) {
         if ( status != null && view != null ) {
-            final TextView tv = (TextView) view.findViewById( R.id.status );
+            final TextView tv = view.findViewById( R.id.status );
             tv.setText( status );
         }
         final MainActivity ma = MainActivity.getMainActivity();
         if (null != ma && view != null) {
             setScanningStatusIndicator(ma.isScanning());
-            final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
-            final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
+            final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
+            final ImageButton notScanningImageButton = view.findViewById(R.id.not_scanning);
+            if (null != getActivity()) {
+                if (!animating) {
+                    animating = true;
+                    if (null == scanningAnimation) {
+                        scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
+                        scanningImageButton.setImageDrawable(scanningAnimation);
+                        scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
+                    if (null != scanningAnimation) {
+                        scanningAnimation.start();
+                    }
+                }
+            } else {
+                MainActivity.error("Null activity context - can't set animation");
+            }
+
             final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+            String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+            if (!QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
+                scanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.off));
+                notScanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.on));
+            } else {
+                scanningImageButton.setContentDescription(getString(R.string.list_scanning_on));
+                notScanningImageButton.setContentDescription(getString(R.string.list_scanning_off));
+            }
 
             scanningImageButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -335,7 +370,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void setScanningStatusIndicator(boolean scanning) {
         View view = getView();
         if (view != null) {
-            final GifImageButton scanningImageButton = (GifImageButton) view.findViewById(R.id.scanning);
+            final ImageButton scanningImageButton = (ImageButton) view.findViewById(R.id.scanning);
             final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
             if (scanning) {
                 scanningImageButton.setVisibility(VISIBLE);
@@ -352,6 +387,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void onPause() {
         MainActivity.info("LIST: paused.");
         super.onPause();
+        if (animating) {
+            if (scanningAnimation != null) {
+                scanningAnimation.stop();
+            }
+            animating = false;
+        }
     }
 
     @Override
@@ -363,6 +404,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         MainActivity.info("setNetCountUI");
         setNetCountUI(MainActivity.getStaticState(), getView());
         setStatusUI(null);
+        animating = false;
     }
 
     @Override

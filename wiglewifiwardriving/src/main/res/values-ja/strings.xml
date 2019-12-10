@@ -36,6 +36,8 @@
     <string name="kml_export_text">過去のスキャンをKMLファイルへ出力する</string>
     <string name="backup_db_button">データベースのバックアップ</string>
     <string name="backup_db_text">データベースのバックアップを作成</string>
+    <string name="backup_preparing">データベースのバックアップの準備</string>
+    <string name="backup_in_progress">データベースのバックアップ</string>
     <string name="import_observed_button">WiGLE をインポート</string>
     <string name="import_observed_text">自分が観測したネットワークを WiGLE からインポート</string>
     <string name="periodstill_text">スキャン間隔:静止中</string>
@@ -287,11 +289,7 @@
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">ユーザー統計</string>
     <string name="rank_title">ユーザーランキング：</string>
-    <string name="discovered_title">発見されたWiFiネットワーク（Wi-Fiの新機能）</string>
-    <string name="total_title">見たWiFiネットワークの総数</string>
     <string name="totallocs_title">録画された全WiFi観測</string>
-    <string name="gendisc_title">発見されたセルネットワーク（WiGLEの新機能）</string>
-    <string name="gentotal_title">見た総細胞ネットワーク</string>
     <string name="monthcount_title">今月発見されたWiFi</string>
     <string name="prevmonthcount_title">先月発見されたWiFi</string>
     <string name="firsttransid_title">最初のトランザクションID</string>
@@ -402,4 +400,25 @@
     <string name="search_empty">空の結果</string>
     <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie（9.0）は、WiFiスキャンを1分あたり2に絞ります。可能であればAndroidをアップグレードします。</string>
+    <string name="q_bad">Android 10 は、開発者設定で無効にされていない限り、WiFiスキャンを抑制します。</string>
+    <string name="enable_developer">開発者向けオプションを有効にするには：[設定]-> [電話について]-> [ビルド番号]を7回タップします。</string>
+    <string name="disable_throttle">WiFiスキャンスロットリングを無効にするには：[システム]-> [詳細]-> [開発者オプション]-> [WiFiスキャンスロットリングをオフにします。</string>
+    <string name="no_internal_space_title">利用可能なスペースがありません</string>
+    <string name="no_internal_space_message">デバイスに十分な内部アプリケーションストレージがありません。</string>
+    <string name="no_external_space_title">利用可能なスペースがありません</string>
+    <string name="no_external_space_message">デバイスに十分な外部アプリケーションストレージがありません。</string>
+    <string name="no_mxc_space_message">セルオペレータルックアップデータベースをインストールするための十分な内部アプリケーションストレージがデバイスにありません。デバイス提供のIDが使用されます。</string>
+    <string name="enable_route_logging">実行のログルート</string>
+    <string name="enable_route_map_display">実行のルートを表示する</string>
+    <string name="export_gpx_button">GPXをエクスポート</string>
+    <string name="export_gpx">現在のルートをGPXルートファイルとしてエクスポートする</string>
+    <string name="export_gpx_detail">ログに記録されている現在のルートを.GPX XMLルート記述ファイルとしてエクスポートします</string>
+    <string name="gpx_failed">gpxファイルをエクスポートできません。\n </string>
+    <string name="gpx_no_points">GPXルートエクスポートファイルは空になります。</string>
+    <string name="gpx_preparing">GPXエクスポートの準備</string>
+    <string name="gpx_exporting">GPXファイルをエクスポートしています。</string>
+    <string name="discovered">発見された</string>
+    <string name="new_to_us">（WiGLEの新機能)</string>
+    <string name="total_seen">観測合計</string>
 </resources>

@@ -53,8 +53,7 @@ import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
 public final class SettingsFragment extends Fragment implements DialogListener {
 
     private static final int MENU_ERROR_REPORT = 13;
-    private static final int MENU_DEBUG = 14
-;
+    private static final int MENU_DEBUG = 14;
     private static final int DONATE_DIALOG=112;
     private static final int ANONYMOUS_DIALOG=113;
     private static final int DEAUTHORIZE_DIALOG=114;
@@ -229,12 +228,29 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
         });
 
+        final TextView scanThrottleHelp = view.findViewById(R.id.scan_throttle_help);
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+            scanThrottleHelp.setText(R.string.pie_bad);
+            scanThrottleHelp.setVisibility(View.VISIBLE);
+        }
+        else if (Build.VERSION.SDK_INT == 29) {
+            final StringBuilder builder = new StringBuilder(getString(R.string.q_bad));
+            builder.append("\n\n");
+            if (!MainActivity.isDevMode(getContext())) {
+                builder.append(getString(R.string.enable_developer));
+                builder.append("\n\n");
+            }
+            builder.append(getString(R.string.disable_throttle));
+            scanThrottleHelp.setText(builder.toString());
+            scanThrottleHelp.setVisibility(View.VISIBLE);
+        }
+
         final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
         final EditText user = (EditText) view.findViewById(R.id.edit_username);
         final TextView authUserDisplay = (TextView) view.findViewById(R.id.show_authuser);
-        final TextView authUserLabel = (TextView) view.findViewById(R.id.show_authuser_label);
+        final View authUserLayout = view.findViewById(R.id.show_authuser_label);
         final EditText passEdit = (EditText) view.findViewById(R.id.edit_password);
-        final TextView passEditLabel = (TextView) view.findViewById(R.id.edit_password_label);
+        final View passEditLayout = view.findViewById(R.id.edit_password_label);
         final CheckBox showPass = (CheckBox) view.findViewById(R.id.showpassword);
         final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
         final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
@@ -243,7 +259,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
             authUserDisplay.setVisibility(View.VISIBLE);
-            authUserLabel.setVisibility(View.VISIBLE);
+            authUserLayout.setVisibility(View.VISIBLE);
             if (!authToken.isEmpty()) {
                 deauthButton.setVisibility(View.VISIBLE);
                 deauthButton.setOnClickListener(new OnClickListener() {
@@ -256,7 +272,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 });
                 authButton.setVisibility(View.GONE);
                 passEdit.setVisibility(View.GONE);
-                passEditLabel.setVisibility(View.GONE);
+                passEditLayout.setVisibility(View.GONE);
                 showPass.setVisibility(View.GONE);
                 user.setEnabled(false);
             } else {
@@ -265,10 +281,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         } else {
             user.setEnabled(true);
             authUserDisplay.setVisibility(View.GONE);
-            authUserLabel.setVisibility(View.GONE);
+            authUserLayout.setVisibility(View.GONE);
             deauthButton.setVisibility(View.GONE);
             passEdit.setVisibility(View.VISIBLE);
-            passEditLabel.setVisibility(View.VISIBLE);
+            passEditLayout.setVisibility(View.VISIBLE);
             showPass.setVisibility(View.VISIBLE);
             authButton.setVisibility(View.VISIBLE);
             final Handler handler = new UserDownloadHandler(view, getActivity().getPackageName(),
@@ -446,6 +462,28 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     MainActivity.getMainActivity().setupBluetooth();
                 } else {
                     MainActivity.getMainActivity().endBluetooth(prefs);
+                }
+            }
+        });
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling route mapping change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().startRouteMapping(prefs);
+                } else {
+                    MainActivity.getMainActivity().endRouteMapping(prefs);
+                }
+            }
+        });
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                MainActivity.info("Signaling route logging change: "+value);
+                if (value) {
+                    MainActivity.getMainActivity().startRouteLogging(prefs);
+                } else {
+                    MainActivity.getMainActivity().endRouteLogging();
                 }
             }
         });

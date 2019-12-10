@@ -12,12 +12,16 @@ import android.os.Environment;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.MccMncRecord;
+import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.InsufficientSpaceException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static net.wigle.wigleandroid.util.FileUtility.EST_MXC_DB_SIZE;
 
 public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private static final String MXC_DB_NAME = "mmcmnc.sqlite";
@@ -26,6 +30,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     private static final int MAX_INSTALL_TRIES = 5;
 
     private final Context context;
+    private final boolean hasSD;
     private SQLiteDatabase db;
     private SharedPreferences prefs;
 
@@ -38,37 +43,49 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     public MxcDatabaseHelper(Context context) {
         super(context, MXC_DB_NAME, null, MXC_DATABASE_VERSION);
         this.context = context;
+        hasSD = MainActivity.hasSD();
         prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
     }
 
-    public boolean isPresent() {
-        final String mxcPath = DATABASE_PATH + MXC_DB_NAME;
-        final File dbFile = new File(mxcPath);
-        if (dbFile.exists()) {
-            return true;
+    private File getMxcFile() {
+        final File dbFile;
+        if (hasSD) {
+            final String mxcPath = DATABASE_PATH + MXC_DB_NAME;
+            dbFile = new File(mxcPath);
         }
-        return false;
+        else {
+            dbFile = new File(context.getApplicationContext().getFilesDir(),
+                    MXC_DB_NAME);
+        }
+        return dbFile;
     }
 
-    public void implantMxcDatabase() throws IOException {
+    private boolean isPresent() {
+        final File mxcFile = getMxcFile();
+        return mxcFile != null && mxcFile.exists() && mxcFile.canRead();
+    }
+
+    public void implantMxcDatabase() throws InsufficientSpaceException, IOException {
         MainActivity.info("installing mmc/mnc database...");
         InputStream assetInputData = null;
 
-        final SharedPreferences.Editor edit = prefs.edit();
-        edit.putBoolean(ListFragment.PREF_MXC_INSTALL_PENDING, true);
-        edit.apply();
+        int installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
 
-        Integer installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
+        long freeAppSpaceBytes = FileUtility.getFreeInternalBytes();
+        //ALIBI: ugly, but can't use the assetManager to get size without decompressing
+        if (freeAppSpaceBytes <= EST_MXC_DB_SIZE) {
+            throw new InsufficientSpaceException("Unable to implant MxC database: not enough space (" + freeAppSpaceBytes + "b, " + EST_MXC_DB_SIZE + "b needed)");
+        }
 
         OutputStream mxcOutput = null;
         try {
-            if (installCount < MAX_INSTALL_TRIES) {
+            if (isPresent()) {
+                installCount = 0;
+            }
+            else if (installCount < MAX_INSTALL_TRIES) {
                 assetInputData = context.getAssets().open(MXC_DB_NAME);
-                final String outputFilePath = DATABASE_PATH + MXC_DB_NAME;
-                //context.getDatabasePath(MXC_DB_NAME).getAbsolutePath();
-                MainActivity.info("/data/data/" + context.getPackageName() + "/databases/" + MXC_DB_NAME + " vs " + outputFilePath);
-                final File outputFile = new File(outputFilePath);
-
+                final File outputFile = getMxcFile();
+                MainActivity.info("Installing mxc file at: " + outputFile);
                 mxcOutput = new FileOutputStream(outputFile);
 
                 byte[] buffer = new byte[1024];
@@ -80,6 +97,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
                 MainActivity.error("stopped trying to implant Mxc DB: reached max tries.");
             }
         } catch (IOException ioe) {
+            MainActivity.warn("Exception installing mxc: " + ioe);
             throw ioe;
         } finally {
             if (null != assetInputData) {
@@ -91,7 +109,6 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
             }
             final SharedPreferences.Editor editDone = prefs.edit();
             editDone.putInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, installCount+1);
-            editDone.putBoolean(ListFragment.PREF_MXC_INSTALL_PENDING, false);
             editDone.apply();
         }
     }
@@ -194,16 +211,17 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return operator;
     }
 
-    public boolean openDataBase() throws SQLException {
+    private boolean openDataBase() throws SQLException {
         if (!isPresent()) {
             return false;
         }
 
-        final String mxcPath = DATABASE_PATH + MXC_DB_NAME;
-
         try {
             if (null == db || !db.isOpen()) {
-                db = SQLiteDatabase.openDatabase(mxcPath, null,
+                final File mxcPath = getMxcFile();
+                MainActivity.info("trying to open db: " + mxcPath);
+                if (!mxcPath.exists() || !mxcPath.canRead()) return false;
+                db = SQLiteDatabase.openDatabase(mxcPath.getCanonicalPath(), null,
                         SQLiteDatabase.OPEN_READONLY);
             }
             return db.isOpen();

@@ -36,6 +36,8 @@
     <string name="kml_export_text">Exportera hela DB till KML-fil</string>
     <string name="backup_db_button">Backup Databas</string>
     <string name="backup_db_text">Gör en säkerhetskopia av databasen</string>
+    <string name="backup_preparing">Förbereder att säkerhetskopiera databasen&#8230;</string>
+    <string name="backup_in_progress">Säkerhetskopiera databasen&#8230;</string>
     <string name="import_observed_button">Importera Observerat</string>
     <string name="import_observed_text">Importera mina observerade nätverk från WiGLE</string>
     <string name="periodstill_text">Tid mellan WiFi skannar står still</string>
@@ -345,4 +347,25 @@
     <string name="search_empty">Resultat tom</string>
     <string name="search_query_limit">Du har nått det maximala antalet sökningar idag. Din gräns återställs i morgon.</string>
     <string name="menu_debug">Debug</string>
+    <string name="pie_bad">Android Pie (9.0) stänger av WiFi-skanningar till 2 per minut. Uppgradera Android om möjligt.</string>
+    <string name="q_bad">Android 10 stänger av WiFi-skanningar såvida det inte är inaktiverat i utvecklarinställningarna.</string>
+    <string name="enable_developer">För att aktivera utvecklaralternativ: Inställningar -> Om telefon -> Tryck på Byggnummer 7 gånger.</string>
+    <string name="disable_throttle">Så här avaktiverar du gasspjäll av WiFi-skanning: System -> Avancerat -> Utvecklaralternativ -> WiFi-skottreglage till av.</string>
+    <string name="no_internal_space_title">Inget utrymme tillgängligt</string>
+    <string name="no_internal_space_message">Det finns inte tillräckligt med intern applikationslagring på din enhet.</string>
+    <string name="no_external_space_title">Inget utrymme tillgängligt</string>
+    <string name="no_external_space_message">Det finns inte tillräckligt med extern applikationslagring på din enhet.</string>
+    <string name="no_mxc_space_message">Det finns inte tillräckligt med internt applikationslagringsutrymme på din enhet för att installera sökoperatörsdatabasen. Enhets-ID som används kommer att användas.</string>
+    <string name="enable_route_logging">Logga rutter för körning</string>
+    <string name="enable_route_map_display">Visa rutter för körning</string>
+    <string name="export_gpx_button">Exportera GPX</string>
+    <string name="export_gpx">Exportera den aktuella rutten som en GPX-ruttfil</string>
+    <string name="export_gpx_detail">Exportera den aktuella rutten som loggas som en .GPX XML-ruttbeskrivningsfil</string>
+    <string name="gpx_failed">Det gick inte att exportera gpx-fil.\n </string>
+    <string name="gpx_no_points">GPX-ruttexportfilen skulle vara tom.</string>
+    <string name="gpx_preparing">Förbereder GPX-export</string>
+    <string name="gpx_exporting">Exporterar GPX-fil.</string>
+    <string name="discovered">Upptäckt</string>
+    <string name="new_to_us">(Nytt för WiGLE)</string>
+    <string name="total_seen">Totalt observerat</string>
 </resources>

@@ -1858,18 +1858,26 @@ public final class MainActivity extends AppCompatActivity {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
         final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean useBt = (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true));
+        final boolean useBt = prefs.getBoolean(ListFragment.PREF_SCAN_BT, true);
         final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
+        int pieBadCount = prefs.getInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, 0);
+        int qBadCount = prefs.getInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, 0);
 
         if ((willActivateBt && useBt) || willActivateWifi || alertVersions) {
 
             String activationMessages = "";
+
+            SharedPreferences.Editor editor = prefs.edit();
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
-                activationMessages = getString(R.string.pie_bad);
+                if (pieBadCount < 5) activationMessages = getString(R.string.pie_bad);
+                editor.putInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, pieBadCount + 1);
+
             }
             else if (Build.VERSION.SDK_INT == 29) {
-                activationMessages = getString(R.string.q_bad);
+                if (qBadCount < 5) activationMessages = getString(R.string.q_bad);
+                editor.putInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, qBadCount + 1);
             }
+            editor.apply();
 
             if (willActivateBt && useBt) {
                 if (activationMessages.length() > 0) activationMessages += "\n";
@@ -1883,7 +1891,7 @@ public final class MainActivity extends AppCompatActivity {
                 activationMessages += getString(R.string.turn_on_wifi);
             }
             // tell user, cuz this takes a little while
-            if (!isFinishing()) {
+            if (!isFinishing() && !activationMessages.isEmpty()) {
                 WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
             }
         }

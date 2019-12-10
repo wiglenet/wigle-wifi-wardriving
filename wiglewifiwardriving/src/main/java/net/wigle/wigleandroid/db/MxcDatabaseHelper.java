@@ -79,7 +79,10 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
         OutputStream mxcOutput = null;
         try {
-            if (installCount < MAX_INSTALL_TRIES) {
+            if (isPresent()) {
+                installCount = 0;
+            }
+            else if (installCount < MAX_INSTALL_TRIES) {
                 assetInputData = context.getAssets().open(MXC_DB_NAME);
                 final File outputFile = getMxcFile();
                 MainActivity.info("Installing mxc file at: " + outputFile);

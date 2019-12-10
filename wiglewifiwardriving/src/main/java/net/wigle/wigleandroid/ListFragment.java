@@ -182,6 +182,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String QUICK_SCAN_PAUSE = "PAUSE";
 
     public static final String PREF_MXC_REINSTALL_ATTEMPTED = "TRIED_INSTALLING_MXC2";
+    public static final String PREF_PIE_BAD_TOAST_COUNT = "PIE_BAD_TOAST_COUNT";
+    public static final String PREF_Q_BAD_TOAST_COUNT = "Q_BAD_TOAST_COUNT";
 
     /** cross-activity communication */
     public static class LameStatic {

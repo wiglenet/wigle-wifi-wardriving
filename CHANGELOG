@@ -1,3 +1,13 @@
+* 2.49 (12/10/2019)
+Route visualization and export.
+Put a limit on startup toast.
+Error stacks and mnc db can use internal filesystem.
+User Stats view condensation/refactor.
+Vector W icon.
+Remove old image library.
+File-export infra for database backups.
+Many bugfixes.
+
 * 2.48 (09/06/2019)
 Changes required for Android 10 (Q)
 Various bug fixes

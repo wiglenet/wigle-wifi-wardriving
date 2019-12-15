@@ -87,10 +87,11 @@ public class KmlWriter extends AbstractBackgroundTask {
                 long btFailCount = 0L;
                 long wifiFailCount = 0L;
                 Set<String> cellSet = new HashSet<>();
-                final int totalNets = networks.size() + btNetworks.size();
-                for ( String network : networks ) {
+
+                final int totalNets = networks.size() + (btNetworks==null?0:btNetworks.size());
+                for (String network : networks) {
                     // DEBUG: MainActivity.info( "network: " + network );
-                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.WIFI );
+                    cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.WIFI);
 
                     final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                     // ALIBI: assume this was a cell net, if it didn't match for WiFi - avoid full second iteration
@@ -121,18 +122,20 @@ public class KmlWriter extends AbstractBackgroundTask {
                     }
                 }
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
-                for ( String network : btNetworks ) {
-                    // MainActivity.info( "network: " + network );
-                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.BT );
+                if (btNetworks != null) {
+                    for (String network : btNetworks) {
+                        // MainActivity.info( "network: " + network );
+                        cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.BT);
 
-                    final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
-                    if (0L == found) {
-                        btFailCount++;
-                        MainActivity.error("unfound BT network: ["+network+"]");
+                        final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
+                        if (0L == found) {
+                            btFailCount++;
+                            MainActivity.error("unfound BT network: [" + network + "]");
+                        }
+                        cursor.close();
+                        cursor = null;
+                        count++;
                     }
-                    cursor.close();
-                    cursor = null;
-                    count++;
                 }
                 MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount+" from total count: "+totalNets+" (non-bt-networks: "+ networks.size()+" btnets:"+btNetworks.size()+")");
             }

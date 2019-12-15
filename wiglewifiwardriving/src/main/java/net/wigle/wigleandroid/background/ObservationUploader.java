@@ -22,6 +22,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,6 +50,10 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLException;
+
+import static net.wigle.wigleandroid.util.FileUtility.APP_SUB_DIR;
+import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
 
 /**
  * replacement file upload task
@@ -204,7 +209,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
 
             // send file
-            final boolean hasSD = MainActivity.hasSD();
+            final boolean hasSD = FileUtility.hasSD();
 
             final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
 
@@ -627,15 +632,15 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                                final Object[] fileFilename)
             throws IOException {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
+        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
 
 
-        final boolean hasSD = MainActivity.hasSD();
+        final boolean hasSD = FileUtility.hasSD();
         File file = null;
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         if ( hasSD ) {
             final String filepath = MainActivity.safeFilePath(
-                    Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
+                    Environment.getExternalStorageDirectory() ) + APP_SUB_DIR;
             final File path = new File( filepath );
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();

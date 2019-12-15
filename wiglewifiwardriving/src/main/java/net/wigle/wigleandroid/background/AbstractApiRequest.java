@@ -10,6 +10,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -161,8 +162,8 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
     public JSONObject getCached() {
         File file = null;
-        if (MainActivity.hasSD()) {
-            file = new File(MainActivity.getSDPath() + cacheFilename);
+        if (FileUtility.hasSD()) {
+            file = new File(FileUtility.getSDPath() + cacheFilename);
             if (!file.exists() || !file.canRead()) {
                 MainActivity.warn("External cache file doesn't exist or can't be read: " + file);
                 return null;
@@ -208,7 +209,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
         FileOutputStream fos = null;
         try {
-            fos = MainActivity.createFile(context, cacheFilename, true);
+            fos = FileUtility.createFile(context, cacheFilename, true);
             // header
             ObservationUploader.writeFos(fos, result);
         }

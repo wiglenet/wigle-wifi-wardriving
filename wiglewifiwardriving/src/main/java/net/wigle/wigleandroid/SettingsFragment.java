@@ -43,6 +43,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
+import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -590,7 +591,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
      * clear cache files (i.e. on creds change)
      */
     private void clearCachefiles() {
-        final File cacheDir = new File(MainActivity.getSDPath());
+        final File cacheDir = new File(FileUtility.getSDPath());
         final File[] cacheFiles = cacheDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept( final File dir,

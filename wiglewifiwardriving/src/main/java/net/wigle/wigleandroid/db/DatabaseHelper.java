@@ -8,6 +8,8 @@ import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
+import static net.wigle.wigleandroid.util.FileUtility.APP_SUB_DIR;
+import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +35,7 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.Pair;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import android.content.Context;
 import android.content.Intent;
@@ -64,8 +67,8 @@ public final class DatabaseHelper extends Thread {
     private static final double MEDIUM_LATLON_CHANGE = 0.001D;
     private static final double BIG_LATLON_CHANGE = 0.01D;
     private static final int LEVEL_CHANGE = 5;
-    private static final String DATABASE_NAME = "wiglewifi.sqlite";
-    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
+    private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
+    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + APP_SUB_DIR;
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -417,7 +420,7 @@ public final class DatabaseHelper extends Thread {
         // if(true) throw new SQLiteException("meat puppets");
 
         String dbFilename = DATABASE_NAME;
-        final boolean hasSD = MainActivity.hasSD();
+        final boolean hasSD = FileUtility.hasSD();
         if ( hasSD ) {
             File path = new File( DATABASE_PATH );
             //noinspection ResultOfMethodCallIgnored
@@ -1392,7 +1395,7 @@ public final class DatabaseHelper extends Thread {
 
     public Pair<Boolean,String> copyDatabase(final BackupTask task) {
         final String dbFilename = DATABASE_PATH + DATABASE_NAME;
-        final String outputFilename = DATABASE_PATH + "backup-" + System.currentTimeMillis() + ".sqlite";
+        final String outputFilename = DATABASE_PATH + "backup-" + System.currentTimeMillis() + SQL_EXT;
         File file = new File(dbFilename);
         File outputFile = new File(outputFilename);
         Pair<Boolean,String> result;

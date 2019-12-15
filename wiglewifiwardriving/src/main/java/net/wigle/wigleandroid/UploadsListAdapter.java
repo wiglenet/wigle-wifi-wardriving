@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import android.view.View;
@@ -15,11 +17,15 @@ import android.widget.TextView;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.KmlDownloader;
 import net.wigle.wigleandroid.model.Upload;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+
+import static net.wigle.wigleandroid.util.FileUtility.KML_DIR;
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 /**
  * the array adapter for a list of uploads.
@@ -37,6 +43,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
 
     @SuppressLint("SetTextI18n")
     @Override
+    @NonNull
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         View row;
 
@@ -55,151 +62,156 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             return row;
         }
 
-        final String transid = upload.getTransid();
-        TextView tv = (TextView) row.findViewById(R.id.transid);
-        tv.setText(upload.getTransid());
+        if (null != upload) {
+            final String transid = upload.getTransid();
+            TextView tv = row.findViewById(R.id.transid);
+            tv.setText(upload.getTransid());
 
-        tv = (TextView) row.findViewById(R.id.total_wifi_gps);
-        tv.setText(getContext().getString(R.string.wifi_gps) + ": "
-                + numberFormat.format(upload.getTotalWifiGps()));
+            tv = row.findViewById(R.id.total_wifi_gps);
+            tv.setText(getContext().getString(R.string.wifi_gps) + ": "
+                    + numberFormat.format(upload.getTotalWifiGps()));
 
-        tv = (TextView) row.findViewById(R.id.total_bt_gps);
-        tv.setText(getContext().getString(R.string.bt_gps) + ": "
-                + numberFormat.format(upload.getTotalBtGps()));
+            tv = row.findViewById(R.id.total_bt_gps);
+            tv.setText(getContext().getString(R.string.bt_gps) + ": "
+                    + numberFormat.format(upload.getTotalBtGps()));
 
-        tv = (TextView) row.findViewById(R.id.total_cell_gps);
-        tv.setText(getContext().getString(R.string.cell_gps) + ": "
-                + numberFormat.format(upload.getTotalCellGps()));
+            tv = row.findViewById(R.id.total_cell_gps);
+            tv.setText(getContext().getString(R.string.cell_gps) + ": "
+                    + numberFormat.format(upload.getTotalCellGps()));
 
-        tv = (TextView) row.findViewById(R.id.file_size);
-        tv.setText(getContext().getString(R.string.bytes) + ": "
-                + numberFormat.format(upload.getFileSize()));
+            tv = row.findViewById(R.id.file_size);
+            tv.setText(getContext().getString(R.string.bytes) + ": "
+                    + numberFormat.format(upload.getFileSize()));
 
+            final String status = upload.getStatus();
+            final String userId = prefs.getString(ListFragment.PREF_AUTHNAME, "");
+            final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
 
-        final String status = upload.getStatus();
-        final String userid = prefs.getString(ListFragment.PREF_AUTHNAME, "");
-        final Boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-
-        if ((null != userid) && (!userid.isEmpty()) && (!isAnonymous) && ("Completed".equals(status))) {
-            ImageButton share = (ImageButton) row.findViewById(R.id.share_upload);
-            share.setVisibility(View.VISIBLE);
-            share.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    MainActivity.info("Sharing transid: " + transid);
-                    final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transid,
-                            new ApiListener() {
-                                @Override
-                                public void requestComplete(final JSONObject json, final boolean isCache) {
-                                    UploadsListAdapter.handleKmlDownload(transid, json, fragment, Intent.ACTION_SEND);
-                                }
-                            });
-                    try {
-                        task.startDownload(fragment);
-                    } catch (WiGLEAuthException waex) {
-                        MainActivity.warn("Authentication error on KML download for transid " +
-                                transid, waex);
+            if (!userId.isEmpty() && (!isAnonymous) && ("Completed".equals(status))) {
+                ImageButton share = row.findViewById(R.id.share_upload);
+                share.setVisibility(View.VISIBLE);
+                share.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        MainActivity.info("Sharing transid: " + transid);
+                        final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transid,
+                                new ApiListener() {
+                                    @Override
+                                    public void requestComplete(final JSONObject json, final boolean isCache) {
+                                        UploadsListAdapter.handleKmlDownload(transid, json, fragment, Intent.ACTION_SEND);
+                                    }
+                                });
+                        try {
+                            task.startDownload(fragment);
+                        } catch (WiGLEAuthException waex) {
+                            MainActivity.warn("Authentication error on KML download for transid " +
+                                    transid, waex);
+                        }
                     }
-                }
-            });
-            ImageButton view = (ImageButton) row.findViewById(R.id.view_upload);
-            view.setVisibility(View.VISIBLE);
-            view.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    MainActivity.info("Viewing transid: " + transid);
-                    final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transid,
-                            new ApiListener() {
-                                @Override
-                                public void requestComplete(final JSONObject json, final boolean isCache) {
-                                    UploadsListAdapter.handleKmlDownload(transid, json, fragment, Intent.ACTION_VIEW);
-                                }
-                            });
-                    try {
-                        task.startDownload(fragment);
-                    } catch (WiGLEAuthException waex) {
-                        MainActivity.warn("Authentication error on KML download for transid " +
-                                transid, waex);
+                });
+                ImageButton view = row.findViewById(R.id.view_upload);
+                view.setVisibility(View.VISIBLE);
+                view.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        MainActivity.info("Viewing transid: " + transid);
+                        final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transid,
+                                new ApiListener() {
+                                    @Override
+                                    public void requestComplete(final JSONObject json, final boolean isCache) {
+                                        UploadsListAdapter.handleKmlDownload(transid, json, fragment, Intent.ACTION_VIEW);
+                                    }
+                                });
+                        try {
+                            task.startDownload(fragment);
+                        } catch (WiGLEAuthException waex) {
+                            MainActivity.warn("Authentication error on KML download for transid " +
+                                    transid, waex);
+                        }
                     }
-                }
-            });
-        }
-        String percentDonePrefix = "";
-        String percentDoneSuffix = "%";
-        if ("Queued for Processing".equals(status)) {
-            percentDonePrefix = "#";
-            percentDoneSuffix = "";
-        }
-        tv = (TextView) row.findViewById(R.id.percent_done);
-        tv.setText(percentDonePrefix + upload.getPercentDone() + percentDoneSuffix);
+                });
+            }
+            String percentDonePrefix = "";
+            String percentDoneSuffix = "%";
+            if ("Queued for Processing".equals(status)) {
+                percentDonePrefix = "#";
+                percentDoneSuffix = "";
+            }
+            tv = row.findViewById(R.id.percent_done);
+            tv.setText(percentDonePrefix + upload.getPercentDone() + percentDoneSuffix);
 
-        tv = (TextView) row.findViewById(R.id.status);
-        tv.setText(upload.getStatus());
-
+            tv = row.findViewById(R.id.status);
+            tv.setText(upload.getStatus());
+        }
         return row;
     }
 
-    public static void handleKmlDownload(final String transid, final JSONObject json,
+    private static void handleKmlDownload(final String transId, final JSONObject json,
                                          final Fragment fragment, final String actionIntent ) {
         try {
             if (json.getBoolean("success")) {
-                MainActivity.info("transid " + transid + " worked!");
+                MainActivity.info("transid " + transId + " worked!");
                 String localFilePath = json.getString("file");
                 MainActivity.info("Local Path: "+localFilePath);
                 Intent intent = new Intent(actionIntent);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE " + transid);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE " + transId);
                 try {
-
-                    // content:// url for the file.
-                    Uri fileUri;
-                    if (MainActivity.hasSD()) {
-                        File file = new File(localFilePath);
-                        fileUri = FileProvider.getUriForFile(fragment.getContext(),
-                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                        ".kmlprovider", file);
-                    } else {
-                        File dir = new File(fragment.getContext().getFilesDir(), "app_kml");
-                        File file = new File(dir, transid+".kml");
-                        if (!file.exists()) {
-                            MainActivity.error("file does not exist: " + file.getAbsolutePath());
+                    Context c = fragment.getContext();
+                    if (null != c) {
+                        // content:// url for the file.
+                        Uri fileUri;
+                        if (FileUtility.hasSD()) {
+                            File file = new File(localFilePath);
+                            fileUri = FileProvider.getUriForFile(fragment.getContext(),
+                                    MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                            ".kmlprovider", file);
                         } else {
-                            MainActivity.info(file.getAbsolutePath());
+                            File dir = new File(c.getFilesDir(), KML_DIR);
+                            File file = new File(dir, transId + KML_EXT);
+                            if (!file.exists()) {
+                                MainActivity.error("file does not exist: " + file.getAbsolutePath());
+                            } else {
+                                MainActivity.info(file.getAbsolutePath());
+                            }
+                            fileUri = FileProvider.getUriForFile(fragment.getContext(),
+                                    MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                            ".kmlprovider", file);
                         }
-                        fileUri = FileProvider.getUriForFile(fragment.getContext(),
-                                MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                        ".kmlprovider", file);
-                    }
 
 
-                    // the old, but easier to debug way of getting a file:// url for a file
-                    //Uri fileUri = Uri.fromFile(file);
+                        // the old, but easier to debug way of getting a file:// url for a file
+                        //Uri fileUri = Uri.fromFile(file);
 
-                    if (Intent.ACTION_SEND.equals(actionIntent)) {
-                        //share case, populates arguments to work with email, drive
-                        MainActivity.info("send action called for file URI: " + fileUri.toString());
-                        intent.setType("application/vnd.google-earth.kml+xml");
-                        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    } else if (Intent.ACTION_VIEW.equals(actionIntent)) {
-                        MainActivity.info("view action called for file URI: "+fileUri.toString());
-                        intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                        if (Intent.ACTION_SEND.equals(actionIntent)) {
+                            //share case, populates arguments to work with email, drive
+                            MainActivity.info("send action called for file URI: " + fileUri.toString());
+                            intent.setType("application/vnd.google-earth.kml+xml");
+                            intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                        } else if (Intent.ACTION_VIEW.equals(actionIntent)) {
+                            MainActivity.info("view action called for file URI: "+fileUri.toString());
+                            intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                        } else {
+                            //catch-all, same as "view" for now.
+                            MainActivity.info("view action called for file URI: "+fileUri.toString());
+                            intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                        }
+                        //TODO: necessary?
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
                     } else {
-                        //catch-all, same as "view" for now.
-                        MainActivity.info("view action called for file URI: "+fileUri.toString());
-                        intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                        MainActivity.error("Unable to get context for file interaction in handleKmlDownload.");
                     }
-                    //TODO: necessary?
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
+
                 } catch (IllegalStateException ise) {
-                    MainActivity.error("had completed KML DL, but user had dissassociated activity.");
+                    MainActivity.error("had completed KML DL, but user had disassociated activity.");
                 } catch (IllegalArgumentException e) {
                     MainActivity.error("Unable to open file: " + localFilePath);
                     e.printStackTrace();
                 }
             } else {
-                MainActivity.error("Failed to download transid: " + transid);
+                MainActivity.error("Failed to download transid: " + transId);
             }
         } catch(JSONException jex) {
-            MainActivity.error("Exception downloading transid: " + transid);
+            MainActivity.error("Exception downloading transid: " + transId);
         }
     }
 }

@@ -13,11 +13,14 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
+
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
@@ -46,9 +49,9 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".kml";
+        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + KML_EXT;
 
-        final FileOutputStream fos = MainActivity.createFile(context, filename, false);
+        final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         // header
         ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
@@ -162,7 +165,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         fos.close();
 
-        bundle.putString( BackgroundGuiHandler.FILEPATH, MainActivity.getSDPath() + filename );
+        bundle.putString( BackgroundGuiHandler.FILEPATH, FileUtility.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         MainActivity.info( "done with kml export" );
 

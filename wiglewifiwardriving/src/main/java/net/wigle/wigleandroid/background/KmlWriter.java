@@ -165,6 +165,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         fos.close();
 
+        //WARNING: ignored if no SD, so this is ok, but misleading...
         bundle.putString( BackgroundGuiHandler.FILEPATH, FileUtility.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         MainActivity.info( "done with kml export" );

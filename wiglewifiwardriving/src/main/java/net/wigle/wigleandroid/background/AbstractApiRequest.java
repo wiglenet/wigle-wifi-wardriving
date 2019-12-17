@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.background;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -32,7 +34,7 @@ import java.net.URLEncoder;
  */
 public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
-    protected final String cacheFilename;
+    protected final String outputFileName;
     protected final String url;
     protected final String connectionMethod;
     protected final boolean doFormLogin;
@@ -49,13 +51,13 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     public static final String BOUNDARY = "*****";
 
     public AbstractApiRequest(final FragmentActivity context, final DatabaseHelper dbHelper,
-                              final String name, final String cacheFilename, final String url,
+                              final String name, final String outputFileName, final String url,
                               final boolean doFormLogin, final boolean doBasicLogin,
                               final boolean requiresLogin, final boolean useCacheIfPresent,
                               final String connectionMethod, final ApiListener listener,
                               final boolean createDialog) {
         super(context, dbHelper, name,createDialog);
-        this.cacheFilename = cacheFilename;
+        this.outputFileName = outputFileName;
         this.url = url;
         this.connectionMethod = connectionMethod;
         this.doFormLogin = doFormLogin;
@@ -163,13 +165,13 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     public JSONObject getCached() {
         File file = null;
         if (FileUtility.hasSD()) {
-            file = new File(FileUtility.getSDPath() + cacheFilename);
+            file = new File(FileUtility.getSDPath() + outputFileName);
             if (!file.exists() || !file.canRead()) {
                 MainActivity.warn("External cache file doesn't exist or can't be read: " + file);
                 return null;
             }
         } else {
-            file = new File(context.getCacheDir(), cacheFilename);
+            file = new File(context.getCacheDir(), outputFileName);
             if (!file.exists() || !file.canRead()) {
                 MainActivity.warn("App-internal cache file doesn't exist or can't be read: " + file);
                 return null;
@@ -205,11 +207,11 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     protected void cacheResult(final String result) {
-        if (cacheFilename == null || result == null || result.length() < 1) return;
+        if (outputFileName == null || result == null || result.length() < 1) return;
 
         FileOutputStream fos = null;
         try {
-            fos = FileUtility.createFile(context, cacheFilename, true);
+            fos = FileUtility.createFile(context, outputFileName, true);
             // header
             ObservationUploader.writeFos(fos, result);
         }
@@ -237,7 +239,11 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
 
         // download token if needed
-        final SharedPreferences prefs = fragment.getActivity().getSharedPreferences(
+        Activity fragmentActivity = fragment.getActivity();
+        if (null == fragmentActivity) {
+            throw new WiGLEAuthException("Unable to access Activity for authentication preferences.");
+        }
+        final SharedPreferences prefs = fragmentActivity.getSharedPreferences(
                 ListFragment.SHARED_PREFS, 0);
         final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
         final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
@@ -342,14 +348,19 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                             if (json.getBoolean("success")) {
                                 final String authname = json.getString("authname");
                                 final String token = json.getString("token");
-                                final SharedPreferences prefs = fragment.getContext()
-                                        .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                                final SharedPreferences.Editor edit = prefs.edit();
-                                edit.putString(ListFragment.PREF_AUTHNAME, authname);
-                                edit.apply();
-                                TokenAccess.setApiToken(prefs, token);
-                                // execute ourselves, the pending task
-                                start();
+                                Context fragmentContext = fragment.getContext();
+                                if (null != fragmentContext) {
+                                    final SharedPreferences prefs = fragmentContext
+                                            .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                    final SharedPreferences.Editor edit = prefs.edit();
+                                    edit.putString(ListFragment.PREF_AUTHNAME, authname);
+                                    edit.apply();
+                                    TokenAccess.setApiToken(prefs, token);
+                                    // execute ourselves, the pending task
+                                    start();
+                                } else {
+                                    throw new WiGLEAuthException("Unable to access credentials context");
+                                }
                             } else if (json.has("credential_0")) {
                                 String message = "login failed for " +
                                         json.getString("credential_0");

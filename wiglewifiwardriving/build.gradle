@@ -71,6 +71,7 @@ dependencies {
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
     implementation 'com.goebl:simplify:1.0.0'
+    implementation 'commons-io:commons-io:2.6'
     //TODO: MinAPI issue: implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.2.0'
     testImplementation 'junit:junit:4.12'
     testImplementation 'androidx.test:core:1.2.0'

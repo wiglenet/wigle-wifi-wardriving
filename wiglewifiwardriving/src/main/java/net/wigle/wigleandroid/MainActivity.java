@@ -30,7 +30,6 @@ import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -113,7 +112,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
-import static net.wigle.wigleandroid.util.FileUtility.APP_SUB_DIR;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -179,7 +177,6 @@ public final class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
 
-    static final String ERROR_STACK_FILENAME = "errorstack";
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     public static final String ERROR_REPORT_DIALOG = "doDialog";
 
@@ -1040,23 +1037,6 @@ public final class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    /**
-     * safely get the canonical path, as this call throws exceptions on some devices
-     */
-    public static String safeFilePath(final File file) {
-        String retval = null;
-        try {
-            retval = file.getCanonicalPath();
-        } catch (Exception ex) {
-            MainActivity.error("Failed to get filepath", ex);
-        }
-
-        if (retval == null) {
-            retval = file.getAbsolutePath();
-        }
-        return retval;
-    }
-
     @Override
     public void onDestroy() {
         MainActivity.info("MAIN: destroy.");
@@ -1281,7 +1261,7 @@ public final class MainActivity extends AppCompatActivity {
         String openString = name;
         final boolean hasSD = FileUtility.hasSD();
         if (hasSD) {
-            final String filepath = MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + APP_SUB_DIR;
+            final String filepath = FileUtility.getSDPath();
             final File path = new File(filepath);
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
@@ -1292,7 +1272,7 @@ public final class MainActivity extends AppCompatActivity {
 
         // see if it exists already
         if (!f.exists()) {
-            info("causing " + MainActivity.safeFilePath(f) + " to be made");
+            info("causing " + openString + " to be made");
             // make it happen:
             if (!f.createNewFile()) {
                 throw new IOException("Could not create file: " + openString);
@@ -1487,8 +1467,8 @@ public final class MainActivity extends AppCompatActivity {
             if (stackPath.exists() && stackPath.canWrite()) {
                 //noinspection ResultOfMethodCallIgnored
                 stackPath.mkdirs();
-                final File file = new File(stackPath, ERROR_STACK_FILENAME + "_" + System.currentTimeMillis() + ".txt");
-                error("Writing stackfile to: " + MainActivity.safeFilePath(file) + "/" + file.getName());
+                final File file = new File(stackPath, FileUtility.ERROR_STACK_FILE_PREFIX + "_" + System.currentTimeMillis() + ".txt");
+                error("Writing stackfile to: " + file.getAbsolutePath());
                 if (!file.exists()) {
                     if (!file.createNewFile()) {
                         throw new IOException("Cannot create file: " + file);
@@ -2574,7 +2554,6 @@ public final class MainActivity extends AppCompatActivity {
      */
     public void backgroundUploadFile(){
         MainActivity.info( "background upload file" );
-        if (this == null) { return; }
         final State state = getState();
         setTransferring();
         state.observationUploader = new ObservationUploader(this,

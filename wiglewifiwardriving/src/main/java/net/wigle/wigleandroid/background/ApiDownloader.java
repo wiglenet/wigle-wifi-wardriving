@@ -29,7 +29,7 @@ public class ApiDownloader extends AbstractApiRequest {
         String result = null;
         try {
             result = doDownload(this.connectionMethod);
-            if (cacheFilename != null) {
+            if (outputFileName != null) {
                 cacheResult(result);
             }
             final JSONObject json = new JSONObject(result);

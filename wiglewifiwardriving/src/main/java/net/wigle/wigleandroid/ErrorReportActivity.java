@@ -11,13 +11,14 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import net.wigle.wigleandroid.util.FileUtility;
 
 /**
  * display latest error stack, if any.
@@ -126,7 +127,7 @@ public class ErrorReportActivity extends AppCompatActivity {
 
     private String getLatestStackfilePath() {
         try {
-            File fileDir = MainActivity.getErrorStackPath(getApplicationContext());
+            File fileDir = FileUtility.getErrorStackPath(getApplicationContext());
             if (!fileDir.canRead() || !fileDir.isDirectory()) {
                 MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
             } else {

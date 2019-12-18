@@ -21,11 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static net.wigle.wigleandroid.util.FileUtility.APP_SUB_DIR;
 import static net.wigle.wigleandroid.util.FileUtility.EST_MXC_DB_SIZE;
+import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 
 public class MxcDatabaseHelper extends SQLiteOpenHelper {
-    private static final String MXC_DB_NAME = "mmcmnc.sqlite";
-    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + "/wiglewifi/";
+    private static final String MXC_DB_NAME = "mmcmnc"+SQL_EXT;
+    private static final String DATABASE_PATH = Environment.getExternalStorageDirectory() + APP_SUB_DIR;
     private static final int MXC_DATABASE_VERSION = 1;
     private static final int MAX_INSTALL_TRIES = 5;
 
@@ -43,7 +45,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     public MxcDatabaseHelper(Context context) {
         super(context, MXC_DB_NAME, null, MXC_DATABASE_VERSION);
         this.context = context;
-        hasSD = MainActivity.hasSD();
+        hasSD = FileUtility.hasSD();
         prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
     }
 

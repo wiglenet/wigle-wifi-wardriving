@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static net.wigle.wigleandroid.util.FileUtility.KML_DIR;
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 /**
  * A KML-upload grabber intended for sharing/viewing via itents
@@ -25,7 +29,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
 
     public KmlDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
                                final String transid, final ApiListener listener) {
-        super(context, dbHelper, "KmlDL", transid+".kml", MainActivity.KML_TRANSID_URL_STEM+transid, false,
+        super(context, dbHelper, "KmlDL", transid+KML_EXT, MainActivity.KML_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 
@@ -40,7 +44,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             result = doDownload(this.connectionMethod);
             writeSharefile(result, cacheFilename);
             final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                    (MainActivity.hasSD()? MainActivity.getSDPath() : context.getDir("kml", Context.MODE_PRIVATE).getAbsolutePath() + "/" ) + cacheFilename + "\"}");
+                    (FileUtility.hasSD()? FileUtility.getSDPath() : context.getDir("kml", Context.MODE_PRIVATE).getAbsolutePath() + "/" ) + cacheFilename + "\"}");
             sendBundledMessage( Status.SUCCESS.ordinal(), bundle );
             listener.requestComplete(json, false);
         } catch (final WiGLEAuthException waex) {
@@ -61,7 +65,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
      */
     protected void writeSharefile(final String result, final String filename) throws IOException {
 
-        if (MainActivity.hasSD()) {
+        if (FileUtility.hasSD()) {
             if (cacheFilename != null) {
                 //DEBUG: KmlDownloader.printDirContents(new File(MainActivity.getSDPath()));
                 //ALIBI: for external-storage, our existing "cache" method is fine to write the file
@@ -75,7 +79,8 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             //see if KML dir exists
             MainActivity.info("local storage DL...");
 
-            File kmlPath = new File(context.getFilesDir(), "app_kml");
+            //TODO: dedupe w/ MainActivity.createFile(..)
+            File kmlPath = new File(context.getFilesDir(), KML_DIR);
             if (!kmlPath.exists()) {
                 kmlPath.mkdir();
             }

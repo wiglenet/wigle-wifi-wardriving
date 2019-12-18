@@ -113,6 +113,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
+import static net.wigle.wigleandroid.util.FileUtility.APP_SUB_DIR;
 
 public final class MainActivity extends AppCompatActivity {
     //*** state that is retained ***
@@ -1056,36 +1057,6 @@ public final class MainActivity extends AppCompatActivity {
         return retval;
     }
 
-    public static String getSDPath() {
-        return MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/";
-    }
-
-    public static FileOutputStream createFile(final Context context, final String filename, final boolean isCache) throws IOException {
-        final String filepath = getSDPath();
-        final File path = new File(filepath);
-
-        final boolean hasSD = MainActivity.hasSD();
-        if (hasSD) {
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdirs();
-            final String openString = filepath + filename;
-            MainActivity.info("openString: " + openString);
-            final File file = new File(openString);
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    throw new IOException("Could not create file: " + openString);
-                }
-            }
-
-            return new FileOutputStream(file);
-        } else if (isCache) {
-            File file = File.createTempFile(filename, null, context.getCacheDir());
-            return new FileOutputStream(file);
-        }
-
-        return context.openFileOutput(filename, Context.MODE_PRIVATE);
-    }
-
     @Override
     public void onDestroy() {
         MainActivity.info("MAIN: destroy.");
@@ -1308,9 +1279,9 @@ public final class MainActivity extends AppCompatActivity {
     private static Uri resToFile(final Context context, final int resid, final String name) throws IOException {
         // throw it in our bag of fun.
         String openString = name;
-        final boolean hasSD = hasSD();
+        final boolean hasSD = FileUtility.hasSD();
         if (hasSD) {
-            final String filepath = MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/";
+            final String filepath = MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + APP_SUB_DIR;
             final File path = new File(filepath);
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
@@ -1504,13 +1475,6 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static File getErrorStackPath(final Context context) {
-        if (hasSD()) {
-            return new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/wiglewifi/");
-        }
-        return context.getApplicationContext().getFilesDir();
-    }
-
     public static void writeError(final Thread thread, final Throwable throwable, final Context context) {
         writeError(thread, throwable, context, null);
     }
@@ -1519,7 +1483,7 @@ public final class MainActivity extends AppCompatActivity {
         try {
             final String error = "Thread: " + thread + " throwable: " + throwable;
             error(error, throwable);
-            final File stackPath = getErrorStackPath(context);
+            final File stackPath = FileUtility.getErrorStackPath(context);
             if (stackPath.exists() && stackPath.canWrite()) {
                 //noinspection ResultOfMethodCallIgnored
                 stackPath.mkdirs();
@@ -1664,15 +1628,6 @@ public final class MainActivity extends AppCompatActivity {
             return android.provider.Settings.Secure.getInt(context.getContentResolver(),
                     android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
         } else return false;
-    }
-
-    public static boolean hasSD() {
-        File sdCard = new File(MainActivity.safeFilePath(Environment.getExternalStorageDirectory()) + "/");
-        MainActivity.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
-                + " read: " + sdCard.canRead() + " write: " + sdCard.canWrite()
-                + " path: " + sdCard.getAbsolutePath());
-
-        return sdCard.exists() && sdCard.isDirectory() && sdCard.canRead() && sdCard.canWrite();
     }
 
     private void setupSound() {
@@ -2633,7 +2588,7 @@ public final class MainActivity extends AppCompatActivity {
 
     public boolean checkStorage() {
         boolean safe;
-        boolean external = hasSD();
+        boolean external = FileUtility.hasSD();
         if (external) {
             safe = FileUtility.checkExternalStorageDangerZone();
         } else {

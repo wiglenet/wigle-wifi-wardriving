@@ -30,7 +30,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
@@ -230,8 +229,9 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private void setupBackupDbButton( final View view ) {
         final Button dbBackupButton = view.findViewById( R.id.backup_db_button );
 
-        //TODO: there's a question here: if the backupDb option shouldn't be used w/out SD
-        //  should we also disable the export to KML/CSV options, since they'll certainly be larger?
+        //TODO: experiments extending the provider to grant direct share access to the
+        //   databases/wiglewifi.sqlite file failing under Pie. If we can add a provider that can
+        //   reach ../databases/*, we could remove this limit
         if ( ! FileUtility.hasSD() ) {
             dbBackupButton.setEnabled(false);
         }

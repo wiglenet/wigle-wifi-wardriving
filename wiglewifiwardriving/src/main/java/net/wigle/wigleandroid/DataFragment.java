@@ -30,7 +30,6 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.FragmentActivity;
@@ -61,9 +60,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import static net.wigle.wigleandroid.ListFragment.PREF_LOG_ROUTES;
-import static net.wigle.wigleandroid.util.FileUtility.GPX_DIR;
 import static net.wigle.wigleandroid.util.FileUtility.GPX_EXT;
-import static net.wigle.wigleandroid.util.FileUtility.M8B_DIR;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_FILE_PREFIX;
 
@@ -230,12 +227,16 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     }
 
     private void setupBackupDbButton( final View view ) {
-        final Button kmlExportButton = view.findViewById( R.id.backup_db_button );
+        final Button dbBackupButton = view.findViewById( R.id.backup_db_button );
+
+        //TODO: experiments extending the provider to grant direct share access to the
+        //   databases/wiglewifi.sqlite file failing under Pie. If we can add a provider that can
+        //   reach ../databases/*, we could remove this limit
         if ( ! FileUtility.hasSD() ) {
-            kmlExportButton.setEnabled(false);
+            dbBackupButton.setEnabled(false);
         }
 
-        kmlExportButton.setOnClickListener( new OnClickListener() {
+        dbBackupButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
                 final FragmentActivity fa = getActivity();
@@ -769,28 +770,34 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             try {
                 if ( hasSD ) {
-                    final String basePath = MainActivity.safeFilePath(
-                            Environment.getExternalStorageDirectory() ) + M8B_DIR;
-                    final File path = new File( basePath );
-                    //noinspection ResultOfMethodCallIgnored
-                    path.mkdirs();
-                    if (!path.exists()) {
-                        MainActivity.info("Got '!exists': " + path);
+                    final String basePath = FileUtility.getM8bPath();
+                    if (null != basePath) {
+                        final File path = new File( basePath );
+                        //noinspection ResultOfMethodCallIgnored
+                        path.mkdirs();
+                        if (!path.exists()) {
+                            MainActivity.info("Got '!exists': " + path);
+                        }
+                        String openString = basePath + M8B_FILE_PREFIX +  M8B_EXT;
+                        //DEBUG: MainActivity.info("Opening file: " + openString);
+                        m8bDestFile = new File( openString );
+                    } else {
+                        MainActivity.error("Unable to determine m8b output base path.");
+                        return "ERROR";
                     }
-                    String openString = basePath + M8B_FILE_PREFIX +  M8B_EXT;
-                    //DEBUG: MainActivity.info("Opening file: " + openString);
-                    m8bDestFile = new File( openString );
-
                 } else {
-                    m8bDestFile = new File(getActivity().getApplication().getFilesDir(),
+                    Activity a = getActivity();
+                    if (a == null) {
+                        return "ERROR";
+                    }
+                    m8bDestFile = new File(a.getApplication().getFilesDir(),
                             M8B_FILE_PREFIX + M8B_EXT);
                 }
                 //ALIBI: always start fresh
-                boolean append = false;
-                out = new FileOutputStream(m8bDestFile, append).getChannel();
+                out = new FileOutputStream(m8bDestFile, false).getChannel();
 
             } catch (IOException ioex) {
-                MainActivity.error("Unable to open ouput: ", ioex);
+                MainActivity.error("Unable to open output: ", ioex);
                 return "ERROR";
             }
 
@@ -1000,8 +1007,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             try {
                 if ( hasSD ) {
-                    final String basePath = MainActivity.safeFilePath(
-                            Environment.getExternalStorageDirectory() ) + GPX_DIR;
+                    final String basePath = FileUtility.getGpxPath();
+                    if (null == basePath) {
+                        MainActivity.error("Unable to determine external GPX path");
+                        return null;
+                    }
                     final File path = new File( basePath );
                     //noinspection ResultOfMethodCallIgnored
                     path.mkdirs();

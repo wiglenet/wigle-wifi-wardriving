@@ -24,9 +24,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import static net.wigle.wigleandroid.util.FileUtility.KML_DIR;
-import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
-
 /**
  * the array adapter for a list of uploads.
  */
@@ -157,50 +154,37 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     Context c = fragment.getContext();
                     if (null != c) {
                         // content:// url for the file.
-                        Uri fileUri;
-                        if (FileUtility.hasSD()) {
-                            File file = new File(localFilePath);
-                            fileUri = FileProvider.getUriForFile(fragment.getContext(),
+                        File file = FileUtility.getKmlDownloadFile(c, transId, localFilePath);
+                        if (file != null) {
+                            Uri fileUri = FileProvider.getUriForFile(fragment.getContext(),
                                     MainActivity.getMainActivity().getApplicationContext().getPackageName() +
                                             ".kmlprovider", file);
-                        } else {
-                            File dir = new File(c.getFilesDir(), KML_DIR);
-                            File file = new File(dir, transId + KML_EXT);
-                            if (!file.exists()) {
-                                MainActivity.error("file does not exist: " + file.getAbsolutePath());
+                            // the old, but easier to debug way of getting a file:// url for a file
+                            //Uri fileUri = Uri.fromFile(file);
+
+                            if (Intent.ACTION_SEND.equals(actionIntent)) {
+                                //share case, populates arguments to work with email, drive
+                                MainActivity.info("send action called for file URI: " + fileUri.toString());
+                                intent.setType("application/vnd.google-earth.kml+xml");
+                                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                            } else if (Intent.ACTION_VIEW.equals(actionIntent)) {
+                                MainActivity.info("view action called for file URI: " + fileUri.toString());
+                                intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
                             } else {
-                                MainActivity.info(file.getAbsolutePath());
+                                //catch-all, same as "view" for now.
+                                MainActivity.info("view action called for file URI: " + fileUri.toString());
+                                intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
                             }
-                            fileUri = FileProvider.getUriForFile(fragment.getContext(),
-                                    MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                            ".kmlprovider", file);
-                        }
-
-
-                        // the old, but easier to debug way of getting a file:// url for a file
-                        //Uri fileUri = Uri.fromFile(file);
-
-                        if (Intent.ACTION_SEND.equals(actionIntent)) {
-                            //share case, populates arguments to work with email, drive
-                            MainActivity.info("send action called for file URI: " + fileUri.toString());
-                            intent.setType("application/vnd.google-earth.kml+xml");
-                            intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                        } else if (Intent.ACTION_VIEW.equals(actionIntent)) {
-                            MainActivity.info("view action called for file URI: "+fileUri.toString());
-                            intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                            //TODO: necessary?
+                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
                         } else {
-                            //catch-all, same as "view" for now.
-                            MainActivity.info("view action called for file URI: "+fileUri.toString());
-                            intent.setDataAndType(fileUri, "application/vnd.google-earth.kml+xml");
+                            MainActivity.error("Unable to get context for file interaction in handleKmlDownload.");
                         }
-                        //TODO: necessary?
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
                     } else {
-                        MainActivity.error("Unable to get context for file interaction in handleKmlDownload.");
+                        MainActivity.error("Failed to determine filename for transid: " + transId);
                     }
-
                 } catch (IllegalStateException ise) {
                     MainActivity.error("had completed KML DL, but user had disassociated activity.");
                 } catch (IllegalArgumentException e) {

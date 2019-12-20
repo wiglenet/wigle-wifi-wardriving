@@ -42,9 +42,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
-import uk.co.alt236.bluetoothlelib.device.BluetoothLeDevice;
-import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecord;
-import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
+//import uk.co.alt236.bluetoothlelib.device.BluetoothLeDevice;
+//import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecord;
+//import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
 
@@ -343,25 +343,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                                 }
                             }
                         }*/
-                    }
-                    try {
-                        //TODO: not seeing a lot of value from these checks yet (vs. the adData name extraction above)
-                        final BluetoothLeDevice deviceLe = new BluetoothLeDevice(device, scanResult.getRssi(),
-                                scanRecord.getBytes(), System.currentTimeMillis());
-                        final AdRecordStore adRecordStore = deviceLe.getAdRecordStore();
-                        for (int i = 0; i < 200; i++) {
-                            if (!adRecordStore.isRecordPresent(i)) {
-                                continue;
-                            }
-                            final AdRecord adRecord = adRecordStore.getRecord(i);
-                            if (DEBUG_BLUETOOTH_DATA) {
-                                MainActivity.info("LE adRecord(" + i + "): " + adRecord);
-                            }
-                        }
-                    } catch (Exception ex) {
-                        //TODO: so this happens:
-                        MainActivity.warn("failed to parse LeDevice from ScanRecord", ex);
-                        //parseScanRecordAsSparseArray explodes on array indices
                     }
 
                     final String capabilities = DEVICE_TYPE_LEGEND.get(

@@ -42,10 +42,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
-//import uk.co.alt236.bluetoothlelib.device.BluetoothLeDevice;
-//import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecord;
-//import uk.co.alt236.bluetoothlelib.device.adrecord.AdRecordStore;
-
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
 
 /**

@@ -206,6 +206,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <!-- here at WiGLE, we give you ALL the file types! -->
         <provider
             android:name=".util.KmlFileProvider"
             android:authorities="${applicationId}.kmlprovider"
@@ -241,6 +242,15 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/sqlite_paths" />
+        </provider>
+        <provider
+            android:name=".util.CsvGzFileProvider"
+            android:authorities="${applicationId}.csvgzprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/csvgz_paths" />
         </provider>
         <receiver android:name=".listener.TerminationReceiver" >
             <intent-filter>

@@ -4,18 +4,30 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.File;
+
+import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.CSV_GZ_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
@@ -129,20 +141,97 @@ public class BackgroundGuiHandler extends Handler {
             if (Status.SUCCESS.equals(status)) {
                 //ALIBI: for now, success gets a long custom toast, other messages get dialogs
                 WiGLEToast.showOverFragment(context, status.getTitle(),
-                        composeDisplayMessage(context,  msg.peekData().getString( ERROR ),
-                        msg.peekData().getString( FILEPATH ), msg.peekData().getString( FILENAME ),
-                        status.getMessage()));
-            } else {
-                final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
-                try {
-                    alertDialog.show(fm, "background-dialog");
-                } catch (IllegalStateException ex) {
-                    MainActivity.warn("illegal state in background gui handler: ", ex);
+                        composeDisplayMessage(context, msg.peekData().getString(ERROR),
+                                msg.peekData().getString(FILEPATH), msg.peekData().getString(FILENAME),
+                                status.getMessage()));
+            } else if (Status.WRITE_SUCCESS.equals(status)) {
+                final String fileName = msg.peekData().getString(FILENAME);
+                if (null != fileName) {
+                    if (fileName.endsWith(KML_EXT)) {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE KML Export");
+                        try {
+                            if (null != this.context) {
+                                final String filePath = msg.peekData().getString(FILEPATH);
+                                //MainActivity.debug("File: "+filePath+" ("+fileName+")");
+                                if (null != filePath) {
+                                    File file = FileUtility.getKmlDownloadFile(this.context, FilenameUtils.removeExtension(fileName), filePath);
+                                    if (file == null || !file.exists()) {
+                                        showError(fm, msg, status);
+                                        MainActivity.error("UNABLE to export file - no access to " + filePath + " - " + fileName);
+                                        return;
+                                    }
+                                    Uri fileUri = FileProvider.getUriForFile(context,
+                                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                                    ".kmlprovider", file);
+                                    //DEBUG: MainActivity.info("send action called for file URI: " + fileUri.toString());
+                                    intent.setType("application/vnd.google-earth.kml+xml");
+                                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    context.startActivity(Intent.createChooser(intent, context.getResources().getText(R.string.send_to)));
+                                } else {
+                                    showError(fm, msg, status);
+                                    MainActivity.error("Null filePath - unable to share.");
+                                }
+                            } else {
+                                showError(fm, msg, status);
+                                MainActivity.error("null context - cannot generate intent to share KML");
+                            }
+                        } catch (Exception ex) {
+                            showError(fm, msg, status);
+                            MainActivity.error("Failed to send file intent: ", ex);
+                        }
+                    } else if (fileName.endsWith(CSV_GZ_EXT)) {
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE CSV Export");
+                        try {
+                            if (null != this.context) {
+                                File file = FileUtility.getCsvGzFile(this.context, fileName);
+                                if (file == null || !file.exists()) {
+                                    showError(fm, msg, status);
+                                    MainActivity.error("UNABLE to export CSV file - no access to " + fileName);
+                                    return;
+                                }
+                                Uri fileUri = FileProvider.getUriForFile(context,
+                                        MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                                ".csvgzprovider", file);
+                                //DEBUG: MainActivity.info("send action called for file URI: " + fileUri.toString());
+                                intent.setType("application/gzip");
+                                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                context.startActivity(Intent.createChooser(intent, context.getResources().getText(R.string.send_to)));
+                            } else {
+                                showError(fm, msg, status);
+                                MainActivity.error("null context - cannot generate intent to share CSV");
+                            }
+                        } catch (Exception ex) {
+                            showError(fm, msg, status);
+                            MainActivity.error("Failed to send file intent: ", ex);
+                        }
+                    } else {
+                        //Other file types get a default dialog
+                        showError(fm, msg, status);
+                    }
+                } else {
+                    //Null filename - weird case
+                    showError(fm, msg, status);
                 }
+            } else {
+                showError(fm, msg, status);
             }
         }
     }
 
+    private void showError(final FragmentManager fm, final Message msg, final Status status) {
+        final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
+        try {
+            alertDialog.show(fm, "background-dialog");
+        } catch (IllegalStateException ex) {
+            MainActivity.warn("illegal state in background gui handler: ", ex);
+        }
+    }
     public static String composeDisplayMessage(Context context, String error, String filepath,
                                         String filename, final int messageId) {
         if ( filename != null ) {
@@ -151,7 +240,7 @@ public class BackgroundGuiHandler extends Handler {
             if ( index > 0 ) {
                 filename = filename.substring( 0, index );
             }
-            index = filename.indexOf( ".kml" );
+            index = filename.indexOf( KML_EXT );
             if ( index > 0 ) {
                 filename = filename.substring( 0, index );
             }

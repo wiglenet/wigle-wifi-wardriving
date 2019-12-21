@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +15,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 /**
  * A KML-upload grabber intended for sharing/viewing via itents
@@ -25,7 +28,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
 
     public KmlDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
                                final String transid, final ApiListener listener) {
-        super(context, dbHelper, "KmlDL", transid+".kml", MainActivity.KML_TRANSID_URL_STEM+transid, false,
+        super(context, dbHelper, "KmlDL", transid+KML_EXT, MainActivity.KML_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 
@@ -38,9 +41,9 @@ public class KmlDownloader extends AbstractProgressApiRequest {
         String result = null;
         try {
             result = doDownload(this.connectionMethod);
-            writeSharefile(result, cacheFilename);
+            writeSharefile(result, outputFileName);
             final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                    (MainActivity.hasSD()? MainActivity.getSDPath() : context.getDir("kml", Context.MODE_PRIVATE).getAbsolutePath() + "/" ) + cacheFilename + "\"}");
+                    FileUtility.getKmlPath(context) + "/" + outputFileName + "\"}");
             sendBundledMessage( Status.SUCCESS.ordinal(), bundle );
             listener.requestComplete(json, false);
         } catch (final WiGLEAuthException waex) {
@@ -55,18 +58,18 @@ public class KmlDownloader extends AbstractProgressApiRequest {
 
     /**
      * write string data to a file accessible for Intent-based share or view
-     * @param result
-     * @param filename
-     * @throws IOException
+     * @param result the result of the operation
+     * @param filename the filename to write
+     * @throws IOException on failure to write
      */
     protected void writeSharefile(final String result, final String filename) throws IOException {
 
-        if (MainActivity.hasSD()) {
-            if (cacheFilename != null) {
-                //DEBUG: KmlDownloader.printDirContents(new File(MainActivity.getSDPath()));
+        if (FileUtility.hasSD()) {
+            if (outputFileName != null) {
+                //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
                 //ALIBI: for external-storage, our existing "cache" method is fine to write the file
                 cacheResult(result);
-                //DEBUG: KmlDownloader.printDirContents(new File(MainActivity.getSDPath()));
+                //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
             }
         } else {
             //ALIBI: building a special directory for KML for intents
@@ -75,31 +78,19 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             //see if KML dir exists
             MainActivity.info("local storage DL...");
 
-            File kmlPath = new File(context.getFilesDir(), "app_kml");
+            File kmlPath = new File(FileUtility.getKmlPath(context));
             if (!kmlPath.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 kmlPath.mkdir();
             }
-            //DEBUG: KmlDownloader.printDirContents(kmlPath);
+            //DEBUG: FileUtility.printDirContents(kmlPath);
             if (kmlPath.exists() && kmlPath.isDirectory()) {
                 //DEBUG: MainActivity.info("... file output directory found");
                 File kmlFile = new File(kmlPath, filename);
                 FileOutputStream out = new FileOutputStream(kmlFile);
                 ObservationUploader.writeFos(out, result);
-                //DEBUG: KmlDownloader.printDirContents(kmlPath);
+                //DEBUG: FileUtility.printDirContents(kmlPath);
             }
-        }
-    }
-
-    /**
-     * file inspection debugging method - probably should get moved into a utility class eventually
-     * @param directory
-     */
-    public static  void printDirContents(final File directory) {
-        System.out.println("\tListing for: "+directory.toString());
-        File[] files = directory.listFiles();
-        System.out.println("\tSize: "+ files.length);
-        for (int i = 0; i < files.length; i++) {
-            System.out.println("\t\t"+files[i].getName()+"\t"+files[i].getAbsoluteFile());
         }
     }
 }

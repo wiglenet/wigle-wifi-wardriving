@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.background;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -10,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +51,9 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLException;
+
+import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
 
 /**
  * replacement file upload task
@@ -129,9 +133,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     /**
-     * override base startDownload
+     * override base startDownload - but instead perform an upload
      * TODO: a misnomer, really
-     * @param fragment
+     * @param fragment the fragment from which the upload was started
      * @throws WiGLEAuthException
      */
     @Override
@@ -139,19 +143,25 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         // download token if needed
         SharedPreferences prefs;
         if (null != fragment) {
-            prefs = fragment.getActivity().getSharedPreferences(
-                    ListFragment.SHARED_PREFS, 0);
+            Activity a = fragment.getActivity();
+            if (a != null) {
+                prefs = fragment.getActivity().getSharedPreferences(
+                        ListFragment.SHARED_PREFS, 0);
+            } else {
+                prefs = null;
+                MainActivity.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
+            }
         } else {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
             final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
             final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
-            MainActivity.info("authname: " + authname);
-            if ((!beAnonymous) && (authname == null) && (userName != null) && (userPass != null)) {
-                MainActivity.info("No authname, going to request token");
+            MainActivity.info("authName: " + authName);
+            if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
+                MainActivity.info("No authName, going to request token");
                 downloadTokenAndStart(fragment);
             } else {
                 start();
@@ -162,8 +172,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     /**
      * upload guts. lifted from FileUploaderTask
      * @param bundle
-     * @return
-     * @throws InterruptedException
+     * @return the Status of the upload
+     * @throws InterruptedException if the upload is interrupted
      */
     private Status doUpload( final Bundle bundle )
             throws InterruptedException {
@@ -187,8 +197,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 params.put("donate","on");
             }
             final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-            if (!beAnonymous && null == authname) {
+            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            if (!beAnonymous && null == authName) {
                 return Status.BAD_LOGIN;
             }
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
@@ -205,17 +215,18 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
 
             // send file
-            final boolean hasSD = MainActivity.hasSD();
+            final boolean hasSD = FileUtility.hasSD();
 
             final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
 
-            MainActivity.info("authname: " + authname);
+            MainActivity.info("authName: " + authName);
 
             if (beAnonymous) {
                 MainActivity.info("anonymous upload");
             }
 
-            final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath, "file", params, authname, token, getHandler());
+            final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath,
+                    "file", params, authName, token, getHandler());
 
             if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
                 if ( response != null && response.indexOf("donate=Y") > 0 ) {
@@ -282,6 +293,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     public static boolean hasDataConnection(final Context context) {
         final ConnectivityManager connMgr =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (null == connMgr) {
+            MainActivity.error("null ConnectivityManager trying to determine connection info");
+            return false;
+        }
         final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
         //noinspection SimplifiableIfStatement
@@ -292,8 +307,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     /**
+     * Given a stream of observations, write a file.
      * (directly lifted from FileUploaderTask)
-     * @return
+     * @return the Status of the write operation
      */
     public Status justWriteFile() {
         Status status = null;
@@ -607,12 +623,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     }
 
     /**
+     * Copy a date according to format into a position in a string
      * (lifted directly from FileUploaderTask)
-     * @param dateFormat
+     * @param dateFormat the DateFormat to use
      * @param stringBuffer
      * @param charBuffer
-     * @param fp
-     * @param date
+     * @param fp the position at which to insert
+     * @param date the date
      */
     private void singleCopyDateFormat(final DateFormat dateFormat, final StringBuffer stringBuffer,
                                       final CharBuffer charBuffer, final FieldPosition fp,
@@ -628,19 +645,19 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                                final Object[] fileFilename)
             throws IOException {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".csv.gz";
+        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
 
 
-        final boolean hasSD = MainActivity.hasSD();
+        final boolean hasSD = FileUtility.hasSD();
         File file = null;
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        if ( hasSD ) {
-            final String filepath = MainActivity.safeFilePath(
-                    Environment.getExternalStorageDirectory() ) + "/wiglewifi/";
-            final File path = new File( filepath );
+        final String filePath = FileUtility.getUploadFilePath();
+
+        if ( hasSD && filePath != null) {
+            final File path = new File( filePath );
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
-            String openString = filepath + filename;
+            String openString = filePath + filename;
             MainActivity.info("Opening file: " + openString);
             file = new File( openString );
             if ( ! file.exists() ) {
@@ -648,11 +665,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     throw new IOException("Could not create file: " + openString);
                 }
             }
-            bundle.putString( BackgroundGuiHandler.FILEPATH, filepath );
-            bundle.putString( BackgroundGuiHandler.FILENAME, filename );
+            bundle.putString( BackgroundGuiHandler.FILEPATH, filePath );
         }
 
-        final FileOutputStream rawFos = hasSD ? new FileOutputStream( file )
+        final FileOutputStream rawFos = (hasSD && null != file) ? new FileOutputStream( file )
                     : context.openFileOutput( filename, Context.MODE_PRIVATE );
 
         final GZIPOutputStream fos = new GZIPOutputStream( rawFos );

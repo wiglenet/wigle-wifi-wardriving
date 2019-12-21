@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -9,6 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -103,7 +106,7 @@ public class UploadsFragment extends Fragment {
 
     private static final Map<String, String> uploadStatusMap;
     static {
-        Map<String, String> statusMap = new HashMap<String, String>();
+        Map<String, String> statusMap = new HashMap<>();
         statusMap.put("W", "upload_queued");
         statusMap.put("I", "upload_parsing");
         statusMap.put("T", "upload_trilaterating");
@@ -123,10 +126,12 @@ public class UploadsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
-        MainActivity.setLocale(getActivity());
-
-        // media volume
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        Activity a = getActivity();
+        if (null != a) {
+            MainActivity.setLocale(a);
+            // media volume
+            a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        }
 
         finishing = new AtomicBoolean(false);
         numberFormat = NumberFormat.getNumberInstance(Locale.US);
@@ -144,17 +149,20 @@ public class UploadsFragment extends Fragment {
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
-        handler = new RankDownloadHandler(rootView, numberFormat,
-                getActivity().getPackageName(), getResources());
-        handler.setUploadsListAdapter(listAdapter);
-        downloadUploads();
+        final Activity a = getActivity();
+        if (null != a) {
+            handler = new RankDownloadHandler(rootView, numberFormat,
+                    getActivity().getPackageName(), getResources());
+            handler.setUploadsListAdapter(listAdapter);
+            downloadUploads();
+        }
 
         return rootView;
     }
 
     private void setupSwipeRefresh(final LinearLayout rootView) {
         // Lookup the swipe container view
-        final SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.uploads_swipe_container);
+        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.uploads_swipe_container);
 
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -190,14 +198,18 @@ public class UploadsFragment extends Fragment {
     }
 
     private void setupListView(final View view) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        if (listAdapter == null) {
-            listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow, prefs, this);
-        } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
-            listAdapter.clear();
+        final Activity a = getActivity();
+        SharedPreferences prefs;
+        if (null != a) {
+            prefs = a.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            if (listAdapter == null) {
+                listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow, prefs, this);
+            } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
+                listAdapter.clear();
+            }
         }
         // always set our current list adapter
-        final ListView listView = (ListView) view.findViewById(R.id.uploads_list_view);
+        final ListView listView = view.findViewById(R.id.uploads_list_view);
         listView.setAdapter(listAdapter);
 
     }
@@ -220,7 +232,7 @@ public class UploadsFragment extends Fragment {
             super(view, numberFormat, packageName, resources);
         }
 
-        public void setUploadsListAdapter(final UploadsListAdapter uploadsListAdapter) {
+        private void setUploadsListAdapter(final UploadsListAdapter uploadsListAdapter) {
             this.uploadsListAdapter = uploadsListAdapter;
         }
 
@@ -232,7 +244,7 @@ public class UploadsFragment extends Fragment {
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
             // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null) {
-                TextView tv = (TextView) view.findViewById(R.id.queue_depth);
+                TextView tv = view.findViewById(R.id.queue_depth);
                 final String queueDepthTitle = resources.getString(R.string.queue_depth);
                 tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
 
@@ -249,7 +261,7 @@ public class UploadsFragment extends Fragment {
                 }
 
                 final SwipeRefreshLayout swipeRefreshLayout =
-                        (SwipeRefreshLayout) view.findViewById(R.id.uploads_swipe_container);
+                        view.findViewById(R.id.uploads_swipe_container);
                 swipeRefreshLayout.setRefreshing(false);
             }
         }
@@ -303,7 +315,10 @@ public class UploadsFragment extends Fragment {
     public void onResume() {
         MainActivity.info("UPLOADS: onResume");
         super.onResume();
-        getActivity().setTitle(R.string.uploads_app_name);
+        final Activity a = getActivity();
+        if (null != a) {
+            getActivity().setTitle(R.string.uploads_app_name);
+        }
     }
 
     @Override
@@ -332,7 +347,7 @@ public class UploadsFragment extends Fragment {
 
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
         item.setIcon( android.R.drawable.ic_menu_myplaces );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
@@ -352,16 +367,19 @@ public class UploadsFragment extends Fragment {
 
     /* Handles item selections */
     @Override
-    public boolean onOptionsItemSelected( final MenuItem item ) {
+    public boolean onOptionsItemSelected( @NonNull final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
-        switch ( item.getItemId() ) {
-            case MENU_USER_STATS:
-                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
-                return true;
-            case MENU_SITE_STATS:
-                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
-                return true;
+        final Activity a = getActivity();
+        if (null != a) {
+            NavigationView navigationView = a.findViewById(R.id.left_drawer);
+            switch (item.getItemId()) {
+                case MENU_USER_STATS:
+                    MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
+                    return true;
+                case MENU_SITE_STATS:
+                    MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
+                    return true;
+            }
         }
         return false;
     }

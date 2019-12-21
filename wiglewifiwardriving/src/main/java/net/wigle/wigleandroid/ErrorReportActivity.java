@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,13 +10,14 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import net.wigle.wigleandroid.util.FileUtility;
 
 /**
  * display latest error stack, if any.
@@ -44,7 +44,7 @@ public class ErrorReportActivity extends AppCompatActivity {
         setContentView( R.layout.error );
 
         // get stack from file
-        stackFilePath = getLatestStackfilePath();
+        stackFilePath = FileUtility.getLatestStackfilePath(getApplicationContext());
         if (stackFilePath == null || stackFilePath.isEmpty()) {
             //ALIBI: we have no record of what or why - no reason to hassle user
             finish();
@@ -52,7 +52,7 @@ public class ErrorReportActivity extends AppCompatActivity {
         stack = getLatestStack(stackFilePath);
 
         // set on view
-        TextView tv = (TextView) findViewById( R.id.errorreport );
+        TextView tv = findViewById( R.id.errorreport );
         tv.setText( stack );
 
         Intent intent = getIntent();
@@ -122,35 +122,6 @@ public class ErrorReportActivity extends AppCompatActivity {
         if ( SpeechActivity.speechActivity != null ) {
             SpeechActivity.speechActivity.finish();
         }
-    }
-
-    private String getLatestStackfilePath() {
-        try {
-            File fileDir = MainActivity.getErrorStackPath(getApplicationContext());
-            if (!fileDir.canRead() || !fileDir.isDirectory()) {
-                MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
-            } else {
-                String[] files = fileDir.list();
-                if (files == null) {
-                    MainActivity.error("no files in dir: " + fileDir);
-                } else {
-                    String latestFilename = null;
-                    for (String filename : files) {
-                        if (filename.startsWith(MainActivity.ERROR_STACK_FILENAME)) {
-                            if (latestFilename == null || filename.compareTo(latestFilename) > 0) {
-                                latestFilename = filename;
-                            }
-                        }
-                    }
-                    MainActivity.info("latest filename: " + latestFilename);
-
-                    return MainActivity.safeFilePath(fileDir) + "/" + latestFilename;
-                }
-            }
-        } catch (Exception ex) {
-            MainActivity.error( "error finding stack file: " + ex, ex );
-        }
-        return null;
     }
 
     private String getLatestStack(final String filePath) {

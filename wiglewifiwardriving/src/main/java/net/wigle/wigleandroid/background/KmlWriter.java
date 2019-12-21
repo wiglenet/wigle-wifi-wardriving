@@ -13,11 +13,14 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.FileUtility;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
+
+import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
@@ -46,9 +49,9 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + ".kml";
+        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + KML_EXT;
 
-        final FileOutputStream fos = MainActivity.createFile(context, filename, false);
+        final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         // header
         ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
@@ -87,10 +90,11 @@ public class KmlWriter extends AbstractBackgroundTask {
                 long btFailCount = 0L;
                 long wifiFailCount = 0L;
                 Set<String> cellSet = new HashSet<>();
-                final int totalNets = networks.size() + btNetworks.size();
-                for ( String network : networks ) {
+
+                final int totalNets = networks.size() + (btNetworks==null?0:btNetworks.size());
+                for (String network : networks) {
                     // DEBUG: MainActivity.info( "network: " + network );
-                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.WIFI );
+                    cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.WIFI);
 
                     final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                     // ALIBI: assume this was a cell net, if it didn't match for WiFi - avoid full second iteration
@@ -121,18 +125,20 @@ public class KmlWriter extends AbstractBackgroundTask {
                     }
                 }
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
-                for ( String network : btNetworks ) {
-                    // MainActivity.info( "network: " + network );
-                    cursor = dbHelper.getSingleNetwork( network, DatabaseHelper.NetworkFilter.BT );
+                if (btNetworks != null) {
+                    for (String network : btNetworks) {
+                        // MainActivity.info( "network: " + network );
+                        cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.BT);
 
-                    final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
-                    if (0L == found) {
-                        btFailCount++;
-                        MainActivity.error("unfound BT network: ["+network+"]");
+                        final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
+                        if (0L == found) {
+                            btFailCount++;
+                            MainActivity.error("unfound BT network: [" + network + "]");
+                        }
+                        cursor.close();
+                        cursor = null;
+                        count++;
                     }
-                    cursor.close();
-                    cursor = null;
-                    count++;
                 }
                 MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount+" from total count: "+totalNets+" (non-bt-networks: "+ networks.size()+" btnets:"+btNetworks.size()+")");
             }
@@ -162,7 +168,8 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         fos.close();
 
-        bundle.putString( BackgroundGuiHandler.FILEPATH, MainActivity.getSDPath() + filename );
+        //WARNING: ignored if no SD, so this is ok, but misleading...
+        bundle.putString( BackgroundGuiHandler.FILEPATH, FileUtility.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
         MainActivity.info( "done with kml export" );
 

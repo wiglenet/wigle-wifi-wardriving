@@ -123,7 +123,7 @@
     <string name="dash_scan_off">(Scan ausgeschaltet)</string>
     <string name="dash_new_wifi">Neue WLAN</string>
     <string name="dash_vis_nets">WLAN in Reichweite:</string>
-    <string name="dash_new_upload">Neue WLAN seit letztem Hochladen:</string>
+    <string name="dash_new_upload">Neu seit letztem Hochladen:</string>
     <string name="dash_new_cells">Neue Funkzellen</string>
     <string name="dash_new_bt">Neue Bluetooth</string>
     <string name="dash_dist_run">Strecke seit Start:</string>
@@ -294,7 +294,7 @@
     <string name="prevmonthcount_title">WLAN gefunden (letzter Monat)</string>
     <string name="firsttransid_title">Erste Upload-ID</string>
     <string name="lasttransid_title">Letzte Upload-ID</string>
-    <string name="please_allow">Bitte Retche für die Benutzung freigeben</string>
+    <string name="please_allow">Bitte Rechte für die Benutzung freigeben</string>
     <string name="gps_permission">GPS (genaue Ortung)</string>
     <string name="cell_permission">Mobilfunk-Ortung (grobe Ortung)</string>
     <string name="allow_storage">Die Datenbank wird standardmäßig auf einem externen Speicher gespeichert. Bitte erlaube den Zugriff.</string>

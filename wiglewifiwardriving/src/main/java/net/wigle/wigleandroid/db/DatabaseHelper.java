@@ -1362,6 +1362,7 @@ public final class DatabaseHelper extends Thread {
     }
 
     public void clearDefaultRoute() throws DBException {
+        checkDB();
         db.execSQL(CLEAR_DEFAULT_ROUTE);
     }
 

@@ -228,14 +228,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupBackupDbButton( final View view ) {
         final Button dbBackupButton = view.findViewById( R.id.backup_db_button );
-
-        //TODO: experiments extending the provider to grant direct share access to the
-        //   databases/wiglewifi.sqlite file failing under Pie. If we can add a provider that can
-        //   reach ../databases/*, we could remove this limit
-        if ( ! FileUtility.hasSD() ) {
-            dbBackupButton.setEnabled(false);
-        }
-
         dbBackupButton.setOnClickListener( new OnClickListener() {
             @Override
             public void onClick( final View buttonView ) {
@@ -595,6 +587,9 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     if (null == c) {
                         MainActivity.error("null context in DB backup postExec");
                     } else {
+                        final File backupFile = new File(dbResult.getSecond());
+                        MainActivity.info("backupfile: " + backupFile.getAbsolutePath());
+                        MainActivity.info("exists: " + backupFile.exists() + " read: " + backupFile.canRead());
                         final Uri fileUri = FileProvider.getUriForFile(c,
                                 MainActivity.getMainActivity().getApplicationContext().getPackageName() +
                                         ".sqliteprovider", new File(dbResult.getSecond()));

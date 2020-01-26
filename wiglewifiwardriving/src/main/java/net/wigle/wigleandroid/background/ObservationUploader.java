@@ -53,6 +53,7 @@ import javax.net.ssl.SSLException;
 
 import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 
 /**
  * replacement file upload task
@@ -644,7 +645,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                                final Object[] fileFilename)
             throws IOException {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
+        final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
 
 
         final boolean hasSD = FileUtility.hasSD();

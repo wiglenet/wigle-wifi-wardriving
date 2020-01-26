@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -9,40 +10,69 @@
     android:layout_height="wrap_content" -->
     <LinearLayout
         android:id="@+id/upload_buttons"
+        android:orientation="vertical"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:layout_gravity="right"
+        android:layout_gravity="end"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <ImageButton
-            android:id="@+id/view_upload"
-            android:background="@android:drawable/ic_menu_view"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/kml_buttons"
+            android:orientation="horizontal"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_gravity="right"
-            android:layout_centerVertical="true"
-            android:layout_height="28dp"
-            android:layout_width="28dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:visibility="gone"
-            />
-        <ImageButton
-            android:id="@+id/share_upload"
-            android:background="@android:drawable/ic_menu_share"
+            android:layout_gravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/view_upload"
+                android:background="@android:drawable/ic_menu_view"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="end"
+                android:layout_height="28dp"
+                android:layout_width="28dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:visibility="gone"
+                />
+            <ImageButton
+                android:id="@+id/share_upload"
+                android:background="@android:drawable/ic_menu_share"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="end"
+                android:layout_height="28dp"
+                android:layout_width="28dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:visibility="gone"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/csv_buttons"
+            android:orientation="horizontal"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:layout_gravity="right"
-            android:layout_centerVertical="true"
-            android:layout_height="28dp"
-            android:layout_width="28dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:visibility="gone"
+            android:layout_gravity="end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/csv_status_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:scaleType="fitXY"
+                android:layout_alignParentRight="true"
+                android:layout_gravity="end"
+                android:background="@null"
+                android:paddingTop="2dp"
+                android:paddingBottom="3dp"
+                android:adjustViewBounds="true"
             />
+        </LinearLayout>
     </LinearLayout>
     <RelativeLayout android:orientation="vertical"
         android:layout_width="wrap_content"
@@ -76,44 +106,92 @@
         <LinearLayout android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/upload_row_middle"
+            android:id="@+id/upload_row_two"
+            android:weightSum="2"
             android:layout_below="@id/upload_row_top">
-            <!-- Second row -->
-            <TextView android:id="@+id/total_wifi_gps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start"
-                style="@style/SmallStats"/>
 
-            <TextView android:id="@+id/total_bt_gps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                style="@style/SmallStats"/>
-
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/wifi"/>
+                <TextView android:id="@+id/wifi_gps_lbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plus_gps"
+                    style="@style/SmallStats"/>
+                <TextView android:id="@+id/total_wifi_gps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/SmallWiFiStats"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/bluetooth"/>
+                <TextView android:id="@+id/bt_gps_lbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plus_gps"
+                    style="@style/SmallStats"/>
+                <TextView android:id="@+id/total_bt_gps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/SmallBtStats"/>
+            </LinearLayout>
         </LinearLayout>
-
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="fill_parent"
                       android:layout_height="fill_parent"
-                      android:id="@+id/upload_row_bottom"
-                      android:layout_below="@id/upload_row_middle">
-            <!-- Second row -->
-            <TextView android:id="@+id/total_cell_gps"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:gravity="start"
-                      style="@style/SmallStats"/>
-
-            <TextView android:id="@+id/file_size"
-                      android:layout_width="wrap_content"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:gravity="center"
-                      style="@style/SmallStats"/>
+                      android:id="@+id/upload_row_three"
+                      android:weightSum="2"
+                      android:layout_below="@id/upload_row_two">
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/cell"/>
+                <TextView android:id="@+id/cell_gps_lbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/plus_gps"
+                    style="@style/SmallStats"/>
+                <TextView android:id="@+id/total_cell_gps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/SmallCellStats"/>
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <TextView android:id="@+id/file_size"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    style="@style/SmallStats"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/upload_row_bottom"
+            android:layout_below="@id/upload_row_three">
+            <TextView android:id="@+id/upload_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                style="@style/SmallStats"/>
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

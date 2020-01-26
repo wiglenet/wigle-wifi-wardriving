@@ -166,6 +166,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
+    public static final String CSV_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/csv/";
     public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
     public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
 

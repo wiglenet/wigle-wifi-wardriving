@@ -1,12 +1,12 @@
 package net.wigle.wigleandroid.background;
 
-import android.content.Context;
 import android.os.Bundle;
+
 import androidx.fragment.app.FragmentActivity;
 
-import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
@@ -16,19 +16,19 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.CSV_GZ_EXT;
 
 /**
- * A KML-upload grabber intended for sharing/viewing via intents
- * Created by arkasha on 10/27/17.
+ * A CSV-upload grabber intended for re-import of CSV files
+ * Created by arkasha on 01/25/20.
  */
 
-public class KmlDownloader extends AbstractProgressApiRequest {
+public class CsvDownloader extends AbstractProgressApiRequest {
     private Status status;
 
-    public KmlDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
-                               final String transid, final ApiListener listener) {
-        super(context, dbHelper, "KmlDL", transid+KML_EXT, MainActivity.KML_TRANSID_URL_STEM+transid, false,
+    public CsvDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
+                         final String transid, final ApiListener listener) {
+        super(context, dbHelper, "CsvDL", transid+CSV_GZ_EXT, MainActivity.CSV_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 
@@ -42,8 +42,11 @@ public class KmlDownloader extends AbstractProgressApiRequest {
         try {
             result = doDownload(this.connectionMethod);
             writeSharefile(result, outputFileName);
+
+            //TODO: process file?!
+
             final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                    FileUtility.getKmlPath(context) + "/" + outputFileName + "\"}");
+                    FileUtility.getCsvGzFile(context, outputFileName) + "\"}");
             sendBundledMessage( Status.SUCCESS.ordinal(), bundle );
             listener.requestComplete(json, false);
         } catch (final WiGLEAuthException waex) {
@@ -65,6 +68,8 @@ public class KmlDownloader extends AbstractProgressApiRequest {
     protected void writeSharefile(final String result, final String filename) throws IOException {
 
         if (FileUtility.hasSD()) {
+
+            //TODO: ALL THIS MUST CHANGE
             if (outputFileName != null) {
                 //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
                 //ALIBI: for external-storage, our existing "cache" method is fine to write the file
@@ -78,19 +83,9 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             //see if KML dir exists
             MainActivity.info("local storage DL...");
 
-            File kmlPath = new File(FileUtility.getKmlPath(context));
-            if (!kmlPath.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                kmlPath.mkdir();
-            }
-            //DEBUG: FileUtility.printDirContents(kmlPath);
-            if (kmlPath.exists() && kmlPath.isDirectory()) {
-                //DEBUG: MainActivity.info("... file output directory found");
-                File kmlFile = new File(kmlPath, filename);
-                FileOutputStream out = new FileOutputStream(kmlFile);
-                ObservationUploader.writeFos(out, result);
-                //DEBUG: FileUtility.printDirContents(kmlPath);
-            }
+            File csvFile = FileUtility.getCsvGzFile(context, filename);
+            FileOutputStream out = new FileOutputStream(csvFile);
+            ObservationUploader.writeFos(out, result);
         }
     }
 }

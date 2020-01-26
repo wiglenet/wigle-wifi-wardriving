@@ -588,8 +588,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         MainActivity.error("null context in DB backup postExec");
                     } else {
                         final File backupFile = new File(dbResult.getSecond());
-                        MainActivity.info("backupfile: " + backupFile.getAbsolutePath());
-                        MainActivity.info("exists: " + backupFile.exists() + " read: " + backupFile.canRead());
+                        MainActivity.info("backupfile: " + backupFile.getAbsolutePath()
+                                + " exists: " + backupFile.exists() + " read: " + backupFile.canRead());
                         final Uri fileUri = FileProvider.getUriForFile(c,
                                 MainActivity.getMainActivity().getApplicationContext().getPackageName() +
                                         ".sqliteprovider", new File(dbResult.getSecond()));

@@ -23,7 +23,7 @@ public class FileUtility {
     private final static String KML_DIR = "app_kml";
     private final static String KML_DIR_BASE = "kml";
     private static final String M8B_DIR = APP_SUB_DIR+"m8b/";
-    private final static String BACKUPS_DIR = "backups";
+    private final static String SQLITE_BACKUPS_DIR = "sqlite";
 
     public final static String CSV_EXT = ".csv";
     public static final String ERROR_STACK_FILE_PREFIX = "errorstack";
@@ -143,7 +143,7 @@ public class FileUtility {
 
         //TODO: dedupe w/ KmlDownloader.writeSharefile()
         if (filename.endsWith(KML_EXT)) return createFileInSubdir(context, filename, KML_DIR);
-        if (filename.endsWith(SQL_EXT)) return createFileInSubdir(context, filename, BACKUPS_DIR);
+        if (filename.endsWith(SQL_EXT)) return createFileInSubdir(context, filename, SQLITE_BACKUPS_DIR);
         MainActivity.info("saving as: "+filename);
 
         return context.openFileOutput(filename, Context.MODE_PRIVATE);
@@ -225,7 +225,7 @@ public class FileUtility {
             //ALIBI: placing these right in the appdir external in storage for now.
             return FileUtility.getSDPath();
         }
-        File f = new File(context.getFilesDir(), BACKUPS_DIR);
+        File f = new File(context.getFilesDir(), SQLITE_BACKUPS_DIR);
         return f.getAbsolutePath();
     }
 

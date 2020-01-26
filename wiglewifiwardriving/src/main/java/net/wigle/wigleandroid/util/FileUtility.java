@@ -23,6 +23,7 @@ public class FileUtility {
     private final static String KML_DIR = "app_kml";
     private final static String KML_DIR_BASE = "kml";
     private static final String M8B_DIR = APP_SUB_DIR+"m8b/";
+    private final static String SQLITE_BACKUPS_DIR = "sqlite";
 
     public final static String CSV_EXT = ".csv";
     public static final String ERROR_STACK_FILE_PREFIX = "errorstack";
@@ -141,20 +142,25 @@ public class FileUtility {
         }
 
         //TODO: dedupe w/ KmlDownloader.writeSharefile()
-        if (filename.endsWith(KML_EXT)) {
-            File kmlPath = new File(context.getFilesDir(), KML_DIR);
-            if (!kmlPath.exists()) {
-                //noinspection ResultOfMethodCallIgnored
-                kmlPath.mkdir();
-            }
-            if (kmlPath.exists() && kmlPath.isDirectory()) {
-                //DEBUG: MainActivity.info("... file output directory found");
-                File kmlFile = new File(kmlPath, filename);
-                return new FileOutputStream(kmlFile);
-            }
-        }
+        if (filename.endsWith(KML_EXT)) return createFileInSubdir(context, filename, KML_DIR);
+        if (filename.endsWith(SQL_EXT)) return createFileInSubdir(context, filename, SQLITE_BACKUPS_DIR);
         MainActivity.info("saving as: "+filename);
 
+        return context.openFileOutput(filename, Context.MODE_PRIVATE);
+    }
+
+    private static FileOutputStream createFileInSubdir(final Context context, final String filename,
+                                                       final String dir) throws IOException {
+        File path = new File(context.getFilesDir(), dir);
+        if (!path.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            path.mkdir();
+        }
+        if (path.exists() && path.isDirectory()) {
+            //DEBUG: MainActivity.info("... file output directory found");
+            File kmlFile = new File(path, filename);
+            return new FileOutputStream(kmlFile);
+        }
         return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
 
@@ -206,6 +212,20 @@ public class FileUtility {
             return FileUtility.getSDPath();
         }
         File f = new File(context.getFilesDir(), KML_DIR);
+        return f.getAbsolutePath();
+    }
+
+    /**
+     * just get the DB backup location for internal purposes
+     * @param context the context of the application
+     * @return the string path suitable for intent construction
+     */
+    public static String getBackupPath(final Context context) {
+        if (hasSD()) {
+            //ALIBI: placing these right in the appdir external in storage for now.
+            return FileUtility.getSDPath();
+        }
+        File f = new File(context.getFilesDir(), SQLITE_BACKUPS_DIR);
         return f.getAbsolutePath();
     }
 

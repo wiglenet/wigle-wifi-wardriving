@@ -12,11 +12,18 @@ import net.wigle.wigleandroid.util.FileUtility;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-import static net.wigle.wigleandroid.util.FileUtility.CSV_GZ_EXT;
+import static net.wigle.wigleandroid.background.ObservationUploader.CSV_COLUMN_HEADERS;
+import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 
 /**
  * A CSV-upload grabber intended for re-import of CSV files
@@ -28,7 +35,7 @@ public class CsvDownloader extends AbstractProgressApiRequest {
 
     public CsvDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
                          final String transid, final ApiListener listener) {
-        super(context, dbHelper, "CsvDL", transid+CSV_GZ_EXT, MainActivity.CSV_TRANSID_URL_STEM+transid, false,
+        super(context, dbHelper, "CsvDL", transid+CSV_EXT, MainActivity.CSV_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 
@@ -41,14 +48,41 @@ public class CsvDownloader extends AbstractProgressApiRequest {
         String result = null;
         try {
             result = doDownload(this.connectionMethod);
-            writeSharefile(result, outputFileName);
+            writeSharefile(result, outputFileName, true);
+            sendBundledMessage( Status.PARSING.ordinal(), bundle );
+            final File compressed = FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT);
+            if (null != compressed) {
+                GZIPInputStream in = new GZIPInputStream(new FileInputStream(compressed));
+                Reader decoder = new InputStreamReader(in);
+                BufferedReader br = new BufferedReader(decoder);
 
-            //TODO: process file?!
+                String line;
+                boolean headerOneChecked = false;
+                boolean headerTwoChecked = false;
+                while ((line = br.readLine()) != null) {
+                    if (!headerOneChecked) {
+                        MainActivity.info("Giving Header One a pass");
+                        MainActivity.info(line);
+                        headerOneChecked = true;
+                    } else if (!headerTwoChecked) {
+                        if (line.contains(CSV_COLUMN_HEADERS)) {
+                            headerTwoChecked = true;
+                        } else {
+                            MainActivity.error("CSV header check failed: " + line);
+                        }
+                    } else {
+                        //TODO: process file line!
+                        MainActivity.info(line+"\n");
+                    }
+                }
 
-            final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                    FileUtility.getCsvGzFile(context, outputFileName) + "\"}");
-            sendBundledMessage( Status.SUCCESS.ordinal(), bundle );
-            listener.requestComplete(json, false);
+                final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
+                        FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT) + "\"}");
+                sendBundledMessage(Status.SUCCESS.ordinal(), bundle);
+                listener.requestComplete(json, false);
+            } else {
+                sendBundledMessage( Status.FAIL.ordinal(), bundle );
+            }
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
@@ -56,6 +90,9 @@ public class CsvDownloader extends AbstractProgressApiRequest {
         } catch (final JSONException ex) {
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
             MainActivity.error("ex: " + ex + " result: " + result, ex);
+        } catch (final Exception e) {
+            sendBundledMessage( Status.FAIL.ordinal(), bundle );
+            MainActivity.error("ex: " + e + " result: " + result +" file: " +outputFileName , e);
         }
     }
 
@@ -65,15 +102,16 @@ public class CsvDownloader extends AbstractProgressApiRequest {
      * @param filename the filename to write
      * @throws IOException on failure to write
      */
-    protected void writeSharefile(final String result, final String filename) throws IOException {
+    protected void writeSharefile(final String result, final String filename, final boolean compress) throws IOException {
 
+        String outputIntermediate = null;
         if (FileUtility.hasSD()) {
-
-            //TODO: ALL THIS MUST CHANGE
             if (outputFileName != null) {
                 //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
                 //ALIBI: for external-storage, our existing "cache" method is fine to write the file
                 cacheResult(result);
+                outputIntermediate = outputFileName;
+
                 //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
             }
         } else {
@@ -84,8 +122,34 @@ public class CsvDownloader extends AbstractProgressApiRequest {
             MainActivity.info("local storage DL...");
 
             File csvFile = FileUtility.getCsvGzFile(context, filename);
+            outputIntermediate = csvFile.getAbsolutePath();
             FileOutputStream out = new FileOutputStream(csvFile);
             ObservationUploader.writeFos(out, result);
         }
+        if (outputIntermediate != null && compress) {
+            File intermediate = FileUtility.getCsvGzFile(context, outputIntermediate);
+            if (intermediate != null) {
+                FileInputStream in = new FileInputStream(intermediate);
+                final String compressedFile = intermediate.getCanonicalPath() + FileUtility.GZ_EXT;
+
+                GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(compressedFile));
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.finish();
+                out.close();
+                boolean success = intermediate.delete();
+                MainActivity.info("deleted result: "+success+". Intermediate file "+outputIntermediate + " completed export to "+compressedFile);
+            } else {
+                MainActivity.error("Unable to get file location for "+outputIntermediate);
+            }
+        } else {
+            MainActivity.info("No compression requested; output "+outputIntermediate);
+        }
+
     }
 }

@@ -54,6 +54,8 @@ public class UploadsFragment extends Fragment {
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
 
+    public static boolean disableListButtons = false;
+
     /*
      {
        "success":true,

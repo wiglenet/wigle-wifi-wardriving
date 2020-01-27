@@ -12,8 +12,8 @@ public final class Upload {
     private final String status;
     private final long fileSize;
     private final String fileName;
-    private final Boolean uploadedFromLocal;
-    private final Boolean downloadedToLocal;
+    private Boolean uploadedFromLocal;
+    private Boolean downloadedToLocal;
 
     public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps,
                   final int percentDone, final String status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal) {
@@ -68,5 +68,13 @@ public final class Upload {
 
     public Boolean getDownloadedToLocal() {
         return downloadedToLocal;
+    }
+
+    public void setUploadedFromLocal(Boolean uploadedFromLocal) {
+        this.uploadedFromLocal = uploadedFromLocal;
+    }
+
+    public void setDownloadedToLocal(Boolean downloadedToLocal) {
+        this.downloadedToLocal = downloadedToLocal;
     }
 }

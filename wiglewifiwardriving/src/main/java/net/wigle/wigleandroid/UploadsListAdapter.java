@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,7 +13,6 @@ import androidx.core.content.FileProvider;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiListener;
@@ -26,9 +26,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 
-import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
+import static net.wigle.wigleandroid.UploadsFragment.disableListButtons;
 
-/**
+/*
  * the array adapter for a list of uploads.
  */
 public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
@@ -56,7 +56,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             row = convertView;
         }
 
-        Upload upload;
+        final Upload upload;
         try {
             upload = getItem(position);
         } catch (final IndexOutOfBoundsException ex) {
@@ -68,7 +68,6 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         if (null != upload) {
             TextView tv = row.findViewById(R.id.transid);
             final String transId = upload.getTransid();
-
 
             tv.setText(transId);
 
@@ -82,36 +81,14 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             tv.setText(numberFormat.format(upload.getTotalCellGps()));
 
             tv = row.findViewById(R.id.file_size);
-            tv.setText(getContext().getString(R.string.bytes) + ": "
+            tv.setText(context.getString(R.string.bytes) + ": "
                     + numberFormat.format(upload.getFileSize()));
 
-            //tv = row.findViewById(R.id.upload_status);
-            //tv.setText(upload.getFileName());
-
-            //tv = row.findViewById(R.id.local_status);
-            //MainActivity.error("file name: "+ upload.getFileName());
-            ImageButton ib = row.findViewById(R.id.csv_status_button);
-            tv = row.findViewById(R.id.upload_status);
-            String wholeName = upload.getFileName();
-            if (wholeName.contains("_")) {
-                wholeName = wholeName.substring(wholeName.indexOf("_")+1);
-            }
-            String message = getContext().getString(R.string.csv);
-            /*try {
-                final File f = FileUtility.getCsvGzFile(context, wholeName+FileUtility.GZ_EXT);
-                if (f.exists()) {
-                    message += getContext().getString(R.string.uploaded) + getContext().getString(R.string.click_access);
-                    ib.setImageResource(R.drawable.ic_ulstatus_uled);
-                } else {
-                    message += getContext().getString(R.string.uploaded) + getContext().getString(R.string.click_download);
-                    ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
-                }
-            } catch (NullPointerException e) {
-                message += getContext().getString(R.string.uploaded) + getContext().getString(R.string.click_download);
-                ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
-            }*/
+            final ImageButton ib = row.findViewById(R.id.csv_status_button);
+            final TextView statusTv = row.findViewById(R.id.upload_status);
+            String message = context.getString(R.string.csv);
             if (upload.getDownloadedToLocal()) {
-                message += getContext().getString(R.string.downloaded) + getContext().getString(R.string.click_access);
+                message += context.getString(R.string.downloaded) + context.getString(R.string.click_access);
                 final String fileName = transId + FileUtility.CSV_GZ_EXT;
                 ib.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -120,9 +97,8 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 });
                 ib.setImageResource(R.drawable.ic_ulstatus_dl);
             } else if (upload.getUploadedFromLocal()) {
-                message += getContext().getString(R.string.uploaded) + getContext().getString(R.string.click_access);
+                message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
                 ib.setImageResource(R.drawable.ic_ulstatus_uled);
-                //final String fileName = WIWI_PREFIX+transId + FileUtility.CSV_GZ_EXT;
                 final String fName = upload.getFileName();
                 if (fName.contains("_")) {
                     final String fileName = fName.substring(fName.indexOf("_")+1) + FileUtility.GZ_EXT;
@@ -135,31 +111,61 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     MainActivity.error("non-importable file: "+fName);
                 }
             } else {
-                final View rowView = row;
-                message += getContext().getString(R.string.uploaded) + getContext().getString(R.string.click_download);
+                message += context.getString(R.string.uploaded) + context.getString(R.string.click_download);
                 ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
                 ib.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        MainActivity.info("Downloading transid CSV: " + transId);
+                        //disable buttons
+                        disableListButtons = true;
+                        notifyDataSetChanged();
+                        MainActivity.info("Downloading transId CSV: " + transId);
                         final CsvDownloader task = new CsvDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
                                 new ApiListener() {
                                     @Override
                                     public void requestComplete(final JSONObject json, final boolean isCache) {
-                                        UploadsListAdapter.handleCsvDownload(transId, json, fragment, rowView);
+                                        Activity activity = fragment.getActivity();
+                                        UploadsListAdapter.handleCsvDownload(transId, json);
+                                        disableListButtons = false;
+                                        upload.setDownloadedToLocal(true);
+                                        if (null != activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //re-enable buttons and update the row status
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                         try {
                             task.startDownload(fragment);
                         } catch (WiGLEAuthException waex) {
-                            MainActivity.warn("Authentication error on CSV download for transid " +
+                            MainActivity.warn("Authentication error on CSV download for transId " +
                                     transId, waex);
+                            disableListButtons = false;
+                            Activity activity = fragment.getActivity();
+                            if (null != activity) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //re-enable buttons
+                                        notifyDataSetChanged();
+                                    }
+                                });
+                            }
                         }
                     }
                 });
             }
+            if (disableListButtons) {
+                ib.setEnabled(false);
+            } else {
+                ib.setEnabled(true);
+            }
             //TODO: un-uploaded files for retry
 
-            tv.setText(message);
+            statusTv.setText(message);
 
             final String status = upload.getStatus();
             final String userId = prefs.getString(ListFragment.PREF_AUTHNAME, "");
@@ -170,12 +176,26 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 share.setVisibility(View.VISIBLE);
                 share.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        MainActivity.info("Sharing transid: " + transId);
+                        MainActivity.info("Sharing transId: " + transId);
+                        //disable buttons
+                        disableListButtons = true;
+                        notifyDataSetChanged();
                         final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
                                 new ApiListener() {
                                     @Override
                                     public void requestComplete(final JSONObject json, final boolean isCache) {
                                         UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_SEND);
+                                        disableListButtons = false;
+                                        Activity activity = fragment.getActivity();
+                                        if (null != activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //re-enable buttons
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                         try {
@@ -183,30 +203,78 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         } catch (WiGLEAuthException waex) {
                             MainActivity.warn("Authentication error on KML download for transid " +
                                     transId, waex);
+                            disableListButtons = false;
+                            Activity activity = fragment.getActivity();
+                            if (null != activity) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //re-enable buttons
+                                        notifyDataSetChanged();
+                                    }
+                                });
+                            }
                         }
                     }
                 });
+                if (disableListButtons) {
+                    share.setEnabled(false);
+                } else {
+                    share.setEnabled(true);
+                }
+
                 ImageButton view = row.findViewById(R.id.view_upload);
                 view.setVisibility(View.VISIBLE);
                 view.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        MainActivity.info("Viewing transid: " + transId);
+                        MainActivity.info("Viewing transId: " + transId);
+                        //disable buttons
+                        disableListButtons = true;
+                        notifyDataSetChanged();
                         final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
                                 new ApiListener() {
                                     @Override
                                     public void requestComplete(final JSONObject json, final boolean isCache) {
                                         UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_VIEW);
+                                        disableListButtons = false;
+                                        Activity activity = fragment.getActivity();
+                                        if (null != activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //re-enable buttons
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                         try {
                             task.startDownload(fragment);
                         } catch (WiGLEAuthException waex) {
-                            MainActivity.warn("Authentication error on KML download for transid " +
+                            MainActivity.warn("Authentication error on KML download for transId " +
                                     transId, waex);
+                            disableListButtons = false;
+                            Activity activity = fragment.getActivity();
+                            if (null != activity) {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //re-enable buttons
+                                        notifyDataSetChanged();
+                                    }
+                                });
+                            }
                         }
                     }
                 });
+                if (disableListButtons) {
+                    view.setEnabled(false);
+                } else {
+                    view.setEnabled(true);
+                }
             }
+
             String percentDonePrefix = "";
             String percentDoneSuffix = "%";
             if ("Queued for Processing".equals(status)) {
@@ -219,6 +287,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             tv = row.findViewById(R.id.status);
             tv.setText(upload.getStatus());
         }
+
         return row;
     }
 
@@ -226,7 +295,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                                          final Fragment fragment, final String actionIntent ) {
         try {
             if (json.getBoolean("success")) {
-                MainActivity.info("transid " + transId + " worked!");
+                MainActivity.info("transId " + transId + " worked!");
                 String localFilePath = json.getString("file");
                 MainActivity.info("Local Path: "+localFilePath);
                 Intent intent = new Intent(actionIntent);
@@ -240,8 +309,6 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                             Uri fileUri = FileProvider.getUriForFile(fragment.getContext(),
                                     MainActivity.getMainActivity().getApplicationContext().getPackageName() +
                                             ".kmlprovider", file);
-                            // the old, but easier to debug way of getting a file:// url for a file
-                            //Uri fileUri = Uri.fromFile(file);
 
                             if (Intent.ACTION_SEND.equals(actionIntent)) {
                                 //share case, populates arguments to work with email, drive
@@ -264,7 +331,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                             MainActivity.error("Unable to get context for file interaction in handleKmlDownload.");
                         }
                     } else {
-                        MainActivity.error("Failed to determine filename for transid: " + transId);
+                        MainActivity.error("Failed to determine filename for transId: " + transId);
                     }
                 } catch (IllegalStateException ise) {
                     MainActivity.error("had completed KML DL, but user had disassociated activity.");
@@ -273,55 +340,48 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     e.printStackTrace();
                 }
             } else {
-                MainActivity.error("Failed to download transid: " + transId);
+                MainActivity.error("Failed to download transId: " + transId);
             }
         } catch(JSONException jex) {
-            MainActivity.error("Exception downloading transid: " + transId);
+            MainActivity.error("Exception downloading transId: " + transId);
         }
     }
 
-    private static void handleCsvDownload(final String transId, final JSONObject json,
-                                          final Fragment fragment, final View row) {
+    private static void handleCsvDownload(final String transId, final JSONObject json) {
         try {
             if (json.getBoolean("success")) {
-                MainActivity.info("transid " + transId + " worked!");
+                MainActivity.info("transId " + transId + " worked!");
                 String localFilePath = json.getString("file");
                 MainActivity.info("Local Path: " + localFilePath);
-
-                //TODO UI update
-                fragment.getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        row.invalidate();
-                    }
-                });
             }
         } catch (JSONException jex) {
-            MainActivity.error("Exception downloading transid CSV: " + transId);
+            MainActivity.error("Exception downloading transId CSV: " + transId);
         } catch (Exception e) {
             MainActivity.error("error updating item: ", e);
         }
     }
     private static void handleCsvShare(final String transId, final String fileName,
                                           final Fragment fragment) {
-        MainActivity.info("Initiating share for "+fileName+" ("+transId+")");
+        MainActivity.info("Initiating share for CSV "+fileName+" ("+transId+")");
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE " + transId);
         Context c = fragment.getContext();
         File csvFile = FileUtility.getCsvGzFile(c, fileName);
         if (csvFile != null && csvFile.exists()) {
-            Uri fileUri = FileProvider.getUriForFile(fragment.getContext(),
-                    MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                            ".csvgzprovider", csvFile);
+            final Context context = fragment.getContext();
+            if (null != context) {
+                Uri fileUri = FileProvider.getUriForFile(context,
+                        MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                                ".csvgzprovider", csvFile);
 
-            MainActivity.info("send action called for file URI: " + fileUri.toString());
-            intent.setType("application/gzip");
-            intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            //TODO: necessary (2/2)?
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
+                MainActivity.info("send action called for file URI: " + fileUri.toString());
+                intent.setType("application/gzip");
+                intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                //TODO: necessary (2/2)?
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                fragment.startActivity(Intent.createChooser(intent, fragment.getResources().getText(R.string.send_to)));
+            }
         } else {
             MainActivity.error("Unable to get context for file interaction in handleCsvShare.");
         }

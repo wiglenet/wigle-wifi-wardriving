@@ -69,6 +69,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private final boolean writeEntireDb;
     private final boolean writeRun;
 
+    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+
     private static class CountStats {
         int byteCount;
         int lineCount;
@@ -432,7 +434,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 + ",board=" + android.os.Build.BOARD
                 + ",brand=" + android.os.Build.BRAND
                 + "\n"
-                + "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+                + CSV_COLUMN_HEADERS;
         writeFos( fos, header );
 
         // assume header is all byte per char

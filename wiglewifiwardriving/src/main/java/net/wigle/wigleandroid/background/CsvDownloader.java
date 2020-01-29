@@ -1,12 +1,17 @@
 package net.wigle.wigleandroid.background;
 
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
+import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.LocationCsv;
+import net.wigle.wigleandroid.util.NetworkCsv;
 import net.wigle.wigleandroid.util.FileUtility;
 
 import org.json.JSONException;
@@ -19,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -33,7 +39,7 @@ import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 public class CsvDownloader extends AbstractProgressApiRequest {
     private Status status;
 
-    public CsvDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
+    public CsvDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String transid, final ApiListener listener) {
         super(context, dbHelper, "CsvDL", transid+CSV_EXT, MainActivity.CSV_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
@@ -47,50 +53,64 @@ public class CsvDownloader extends AbstractProgressApiRequest {
 
         String result = null;
         try {
-            result = doDownload(this.connectionMethod);
+            result = doDownload(this.connectionMethod, true);
             writeSharefile(result, outputFileName, true);
             sendBundledMessage( Status.PARSING.ordinal(), bundle );
             final File compressed = FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT);
             if (null != compressed) {
                 GZIPInputStream in = new GZIPInputStream(new FileInputStream(compressed));
-                Reader decoder = new InputStreamReader(in);
+                Reader decoder = new InputStreamReader(in, Charset.forName("UTF-8"));
                 BufferedReader br = new BufferedReader(decoder);
 
                 String line;
                 boolean headerOneChecked = false;
                 boolean headerTwoChecked = false;
+                //TODO: losing newlines here somehow? \n\r v. \n?
+                int addedNetworks = 0;
                 while ((line = br.readLine()) != null) {
                     if (!headerOneChecked) {
-                        MainActivity.info("Giving Header One a pass");
-                        MainActivity.info(line);
+                        //TODO: version checks belong here
+                        //DEBUG: MainActivity.info("Giving Header One a pass");
+                        //DEBUG: MainActivity.error(line);
                         headerOneChecked = true;
                     } else if (!headerTwoChecked) {
                         if (line.contains(CSV_COLUMN_HEADERS)) {
+                            //DEBUG:
+                            MainActivity.info("header validated - WiGLE CSV.");
                             headerTwoChecked = true;
                         } else {
                             MainActivity.error("CSV header check failed: " + line);
                         }
                     } else {
-                        //TODO: process file line!
-                        MainActivity.info(line+"\n");
+                        Network network = NetworkCsv.fromWiGLEWirelessCsvLine(line);
+                        Location location = LocationCsv.fromWiGLEWirelessCsvLine(line);
+                        dbHelper.addObservation(network, location, true);
+                        addedNetworks++;
                     }
                 }
+                MainActivity.info("file " + outputFileName + " added " + addedNetworks + " networks to DB.");
 
                 final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                        FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT) + "\"}");
+                        FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT) + "\", added: "+addedNetworks+"}");
+                //ALIBI: HACK: adding the new count into the filename to avoid completely re-writing the result dialog.
+                bundle.putString( BackgroundGuiHandler.FILENAME, outputFileName+"\n +"+addedNetworks );
                 sendBundledMessage(Status.SUCCESS.ordinal(), bundle);
                 listener.requestComplete(json, false);
             } else {
+                bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
                 sendBundledMessage( Status.FAIL.ordinal(), bundle );
             }
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
+            bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.status_login_fail));
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
             throw waex;
         } catch (final JSONException ex) {
+            bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
             MainActivity.error("ex: " + ex + " result: " + result, ex);
         } catch (final Exception e) {
+            bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
             MainActivity.error("ex: " + e + " result: " + result +" file: " +outputFileName , e);
         }
@@ -115,10 +135,6 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                 //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
             }
         } else {
-            //ALIBI: building a special directory for KML for intents
-            // the app files directory might have been enough here, but helps with provider_paths
-
-            //see if KML dir exists
             MainActivity.info("local storage DL...");
 
             File csvFile = FileUtility.getCsvGzFile(context, filename);
@@ -143,7 +159,7 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                 out.finish();
                 out.close();
                 boolean success = intermediate.delete();
-                MainActivity.info("deleted result: "+success+". Intermediate file "+outputIntermediate + " completed export to "+compressedFile);
+                MainActivity.info("deleted: ["+success+"] intermediate file "+outputIntermediate + " completed export to "+compressedFile);
             } else {
                 MainActivity.error("Unable to get file location for "+outputIntermediate);
             }

@@ -441,4 +441,5 @@
     <string name="click_download">&#160;Tap to sync to device.</string>
     <string name="click_access">&#160;Tap to copy.</string>
     <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Download failed: result was not saved.</string>
 </resources>

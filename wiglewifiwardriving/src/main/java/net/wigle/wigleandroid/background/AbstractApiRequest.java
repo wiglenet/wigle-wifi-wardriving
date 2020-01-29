@@ -262,7 +262,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
     }
 
-    protected String getResultString(final BufferedReader reader) throws IOException, InterruptedException {
+    protected String getResultString(final BufferedReader reader, final boolean preserveNewlines) throws IOException, InterruptedException {
         String line;
         final StringBuilder result = new StringBuilder();
         while ( (line = reader.readLine()) != null ) {
@@ -270,13 +270,17 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                 throw new InterruptedException( "we were interrupted" );
             }
             result.append(line);
-
-            // MainActivity.info("AbstractApiRequest result: " + line);
+            if (preserveNewlines) {
+                result.append("\n");
+            }
+            //MainActivity.info("AbstractApiRequest result: " + line);
         }
         return result.toString();
     }
-
     protected String doDownload(final String connectionMethod) throws IOException, InterruptedException {
+        return doDownload(connectionMethod, false);
+    }
+    protected String doDownload(final String connectionMethod, final boolean preserveNewlines) throws IOException, InterruptedException {
         final boolean setBoundary = false;
 
         PreConnectConfigurator preConnectConfigurator = null;
@@ -321,7 +325,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         final BufferedReader input = new BufferedReader(
                 new InputStreamReader( HttpFileUploader.getInputStream( conn ), HttpFileUploader.ENCODING) );
         try {
-            return getResultString(input);
+            return getResultString(input, preserveNewlines);
         }
         finally {
             try {

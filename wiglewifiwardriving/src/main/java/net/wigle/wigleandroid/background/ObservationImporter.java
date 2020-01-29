@@ -59,7 +59,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
     }
 
     @Override
-    protected String getResultString(final BufferedReader reader) throws IOException, InterruptedException {
+    protected String getResultString(final BufferedReader reader, final boolean preserveNewlines) throws IOException, InterruptedException {
         Bundle bundle = new Bundle();
         try {
             JsonFactory f = new MappingJsonFactory();

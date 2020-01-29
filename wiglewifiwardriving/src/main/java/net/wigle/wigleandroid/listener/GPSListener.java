@@ -344,7 +344,7 @@ public class GPSListener implements Listener, LocationListener {
     public void checkLocationOK(final long gpsTimeout, final long netLocsTimeout) {
         if ( ! locationOK( location, getSatCount(), gpsTimeout, netLocsTimeout) ) {
             // do a self-check
-            MainActivity.info("checkLocationOK was false");
+            //DEBUG: MainActivity.info("checkLocationOK was false");
             updateLocationData(null);
         }
     }

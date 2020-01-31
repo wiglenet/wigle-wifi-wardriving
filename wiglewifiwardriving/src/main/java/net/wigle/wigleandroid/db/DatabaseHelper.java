@@ -79,6 +79,7 @@ public final class DatabaseHelper extends Thread {
 
     private SQLiteStatement insertNetwork;
     private SQLiteStatement insertLocation;
+    private SQLiteStatement insertLocationExternal;
     private SQLiteStatement updateNetwork;
     private SQLiteStatement updateNetworkMetadata;
     private SQLiteStatement updateNetworkType;
@@ -110,7 +111,8 @@ public final class DatabaseHelper extends Thread {
                     + "lon double not null,"
                     + "altitude double not null,"
                     + "accuracy float not null,"
-                    + "time long not null"
+                    + "time long not null,"
+                    + "external integer not null default 0"
                     + ")";
 
     public static final String ROUTE_TABLE = "route";
@@ -205,20 +207,25 @@ public final class DatabaseHelper extends Thread {
         public final boolean newForRun;
         public final boolean frequencyChanged;
         public final boolean typeMorphed;
+        public final int external;
 
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun ) {
             this(network, level, location, newForRun, false, false);
         }
 
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
+            this(network, level, location, newForRun, false, false, 0);
+        }
+
+        public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed, final int external ) {
             this.network = network;
             this.level = level;
             this.location = location;
             this.newForRun = newForRun;
             this.frequencyChanged = frequencyChanged;
             this.typeMorphed = typeMorphed;
+            this.external = external;
         }
-
     }
 
     /** holder for updates which we'll attempt to interpolate based on timing */
@@ -480,6 +487,10 @@ public final class DatabaseHelper extends Thread {
                     // only diff to version 2 is the "bestlevel", "bestlat", "bestlon" columns in network table
                     db.setVersion(2);
                 }
+                if (db.getVersion() == 2) {
+                    // only diff to version 3 is the "external" column on the location table
+                    db.setVersion(3);
+                }
             }
             catch ( final SQLiteException ex ) {
                 MainActivity.error( "sqlite exception: " + ex, ex );
@@ -554,6 +565,17 @@ public final class DatabaseHelper extends Thread {
                     db.setVersion(2);
                 }
             }
+        } else if ( db.getVersion() == 2) {
+            MainActivity.info("upgrading db from 2 to 3");
+            try {
+                db.execSQL( "ALTER TABLE "+LOCATION_TABLE+" ADD COLUMN external integer not null default 0" );
+                db.setVersion(3);
+            } catch ( SQLiteException ex ) {
+                MainActivity.info("ex: " + ex, ex);
+                if ( "duplicate column name".equals( ex.toString() ) ) {
+                    db.setVersion(3);
+                }
+            }
         }
 
         // drop index, was never publicly released
@@ -565,6 +587,9 @@ public final class DatabaseHelper extends Thread {
 
         insertLocation = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
                 + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
+
+        insertLocationExternal = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
+                + " (bssid,level,lat,lon,altitude,accuracy,time,external) VALUES (?,?,?,?,?,?,?,?)" );
 
         updateNetwork = db.compileStatement( "UPDATE "+NETWORK_TABLE+" SET"
                 + " lasttime = ?, lastlat = ?, lastlon = ? WHERE bssid = ?" );
@@ -608,6 +633,9 @@ public final class DatabaseHelper extends Thread {
                     if ( insertLocation != null ) {
                         insertLocation.close();
                     }
+                    if ( insertLocationExternal != null) {
+                        insertLocationExternal.close();
+                    }
                     if ( updateNetwork != null ) {
                         updateNetwork.close();
                     }
@@ -642,10 +670,10 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
-    public void blockingAddObservation( final Network network, final Location location, final boolean newForRun )
+    public void blockingAddExternalObservation(final Network network, final Location location, final boolean newForRun )
             throws InterruptedException {
 
-        final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun, false, false );
+        final DBUpdate update = new DBUpdate( network, network.getLevel(), location, newForRun, false, false, 1 );
         queue.put(update);
     }
 
@@ -704,7 +732,7 @@ public final class DatabaseHelper extends Thread {
     @SuppressWarnings("deprecation")
     private void addObservation( final DBUpdate update, final int drainSize ) throws DBException {
         checkDB();
-        if (insertNetwork == null || insertLocation == null
+        if (insertNetwork == null || insertLocation == null || insertLocationExternal == null
                 || updateNetwork == null || updateNetworkMetadata == null) {
 
             MainActivity.warn("A stored procedure is null, not adding observation");
@@ -846,24 +874,45 @@ public final class DatabaseHelper extends Thread {
 
         if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
             // MainActivity.info("inserting loc: " + network.getSsid() );
-            insertLocation.bindString( 1, bssid );
-            insertLocation.bindLong( 2, update.level );  // make sure to use the update's level, network's is mutable...
-            insertLocation.bindDouble( 3, location.getLatitude() );
-            insertLocation.bindDouble( 4, location.getLongitude() );
-            insertLocation.bindDouble( 5, location.getAltitude() );
-            insertLocation.bindDouble( 6, location.getAccuracy() );
-            insertLocation.bindLong( 7, location.getTime() );
-            if ( db.isDbLockedByOtherThreads() ) {
-                // this is kinda lame, make this better
-                MainActivity.error( "db locked by another thread, waiting to loc insert. bssid: " + bssid
-                        + " drainSize: " + drainSize );
-                MainActivity.sleep(1000L);
+            long start;
+            if (update.external == 1) {
+                insertLocationExternal.bindString(1, bssid);
+                insertLocationExternal.bindLong(2, update.level);  // make sure to use the update's level, network's is mutable...
+                insertLocationExternal.bindDouble(3, location.getLatitude());
+                insertLocationExternal.bindDouble(4, location.getLongitude());
+                insertLocationExternal.bindDouble(5, location.getAltitude());
+                insertLocationExternal.bindDouble(6, location.getAccuracy());
+                insertLocationExternal.bindLong(7, location.getTime());
+                insertLocationExternal.bindLong( 8, 1);
+                if (db.isDbLockedByOtherThreads()) {
+                    // this is kinda lame, make this better
+                    MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
+                            + " drainSize: " + drainSize);
+                    MainActivity.sleep(1000L);
+                }
+                start = System.currentTimeMillis();
+                // INSERT
+                insertLocationExternal.execute();
+                logTime(start, "db location inserted: " + bssid + " drainSize: " + drainSize);
+            } else {
+                insertLocation.bindString(1, bssid);
+                insertLocation.bindLong(2, update.level);  // make sure to use the update's level, network's is mutable...
+                insertLocation.bindDouble(3, location.getLatitude());
+                insertLocation.bindDouble(4, location.getLongitude());
+                insertLocation.bindDouble(5, location.getAltitude());
+                insertLocation.bindDouble(6, location.getAccuracy());
+                insertLocation.bindLong(7, location.getTime());
+                if (db.isDbLockedByOtherThreads()) {
+                    // this is kinda lame, make this better
+                    MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
+                            + " drainSize: " + drainSize);
+                    MainActivity.sleep(1000L);
+                }
+                start = System.currentTimeMillis();
+                // INSERT
+                insertLocation.execute();
+                logTime(start, "db location inserted: " + bssid + " drainSize: " + drainSize);
             }
-            long start = System.currentTimeMillis();
-            // INSERT
-            insertLocation.execute();
-            logTime( start, "db location inserted: " + bssid + " drainSize: " + drainSize );
-
             // update the count
             locationCount.incrementAndGet();
             // update the cache
@@ -1331,7 +1380,7 @@ public final class DatabaseHelper extends Thread {
         checkDB();
         MainActivity.info( "locationIterator fromId: " + fromId );
         final String[] args = new String[]{ Long.toString( fromId ) };
-        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ?", args );
+        return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ? AND external = 0", args );
     }
 
     public Cursor networkIterator() throws DBException {

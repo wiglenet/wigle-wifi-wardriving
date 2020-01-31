@@ -82,10 +82,14 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                             MainActivity.error("CSV header check failed: " + line);
                         }
                     } else {
-                        Network network = NetworkCsv.fromWiGLEWirelessCsvLine(line);
-                        Location location = LocationCsv.fromWiGLEWirelessCsvLine(line);
-                        dbHelper.addObservation(network, location, true);
-                        addedNetworks++;
+                        try {
+                            Network network = NetworkCsv.fromWiGLEWirelessCsvLine(line);
+                            Location location = LocationCsv.fromWiGLEWirelessCsvLine(line);
+                            dbHelper.blockingAddExternalObservation(network, location, true);
+                            addedNetworks++;
+                        } catch (Exception ex) {
+                            MainActivity.error("Failed to insert external network.", ex);
+                        }
                     }
                 }
                 MainActivity.info("file " + outputFileName + " added " + addedNetworks + " networks to DB.");

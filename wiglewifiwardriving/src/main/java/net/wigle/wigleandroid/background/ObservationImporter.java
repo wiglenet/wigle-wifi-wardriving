@@ -105,7 +105,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                                 capabilities, level, NetworkType.WIFI);
                             final Location location = new Location("wigle");
                             final boolean newForRun = true;
-                            ListFragment.lameStatic.dbHelper.blockingAddObservation(
+                            ListFragment.lameStatic.dbHelper.blockingAddExternalObservation(
                                 network, location, newForRun);
 
                             if ((i % 1000) == 0) {

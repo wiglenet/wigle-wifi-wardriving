@@ -9,6 +9,7 @@ import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIF
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
 import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.hasSD;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +69,7 @@ public final class DatabaseHelper extends Thread {
     private static final int LEVEL_CHANGE = 5;
     private static final String DATABASE_NAME = "wiglewifi"+SQL_EXT;
     private static final String EXTERNAL_DATABASE_PATH = FileUtility.getSDPath();
+    private static final String INTERNAL_DB_PATH = "databases/";
     private static final int DB_PRIORITY = Process.THREAD_PRIORITY_BACKGROUND;
     private static final Object TRANS_LOCK = new Object();
 
@@ -1362,6 +1364,7 @@ public final class DatabaseHelper extends Thread {
     }
 
     public void clearDefaultRoute() throws DBException {
+        checkDB();
         db.execSQL(CLEAR_DEFAULT_ROUTE);
     }
 
@@ -1393,14 +1396,16 @@ public final class DatabaseHelper extends Thread {
 
 
     public Pair<Boolean,String> copyDatabase(final BackupTask task) {
-        final String dbFilename = EXTERNAL_DATABASE_PATH + DATABASE_NAME;
-        final String outputFilename = EXTERNAL_DATABASE_PATH + "backup-" + System.currentTimeMillis() + SQL_EXT;
-        File file = new File(dbFilename);
-        File outputFile = new File(outputFilename);
+        File file = context.getDatabasePath(DATABASE_NAME);
+        String outputFilename = "backup-" + System.currentTimeMillis() + SQL_EXT;
+
+        if (hasSD()) {
+            file = new File(EXTERNAL_DATABASE_PATH, DATABASE_NAME);
+        }
         Pair<Boolean,String> result;
         try {
             InputStream input = new FileInputStream(file);
-            OutputStream output = new FileOutputStream(outputFile);
+            FileOutputStream output = FileUtility.createFile(context, outputFilename, false);
             byte[] buffer = new byte[1024];
             int bytesRead;
             final long total = file.length();
@@ -1414,9 +1419,11 @@ public final class DatabaseHelper extends Thread {
             }
             output.close();
             input.close();
-            result = new Pair<>(Boolean.TRUE, outputFilename);
+            final File outputFile = new File(FileUtility.getBackupPath(context), outputFilename);
+            result = new Pair<>(Boolean.TRUE, outputFile.getAbsolutePath());
         }
         catch ( IOException ex ) {
+            MainActivity.error("backup failure: " + ex, ex);
             result = new Pair<>(Boolean.FALSE, "ERROR: " + ex);
         }
 

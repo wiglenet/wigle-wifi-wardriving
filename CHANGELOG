@@ -1,3 +1,9 @@
+* 2.50 (01/31/2019)
+All saves now can export from internal storage.
+Remove unused BTLE lib.
+German language fixes (thanks designer2k2!).
+Various bug fixes.
+
 * 2.49 (12/10/2019)
 Route visualization and export.
 Put a limit on startup toast.

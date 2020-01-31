@@ -26,6 +26,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 
+import static android.view.View.GONE;
 import static net.wigle.wigleandroid.UploadsFragment.disableListButtons;
 
 /*
@@ -84,86 +85,109 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             tv.setText(context.getString(R.string.bytes) + ": "
                     + numberFormat.format(upload.getFileSize()));
 
+            final String status = upload.getStatus();
+            final String userId = prefs.getString(ListFragment.PREF_AUTHNAME, "");
+            final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+
             final ImageButton ib = row.findViewById(R.id.csv_status_button);
             final TextView statusTv = row.findViewById(R.id.upload_status);
             String message = context.getString(R.string.csv);
-            if (upload.getDownloadedToLocal()) {
-                message += context.getString(R.string.downloaded) + context.getString(R.string.click_access);
-                final String fileName = transId + FileUtility.CSV_GZ_EXT;
-                ib.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        handleCsvShare(transId, fileName, fragment);
-                    }
-                });
-                ib.setImageResource(R.drawable.ic_ulstatus_dl);
-            } else if (upload.getUploadedFromLocal()) {
-                message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
-                ib.setImageResource(R.drawable.ic_ulstatus_uled);
-                final String fName = upload.getFileName();
-                if (fName.contains("_")) {
-                    final String fileName = fName.substring(fName.indexOf("_")+1) + FileUtility.GZ_EXT;
+            if (!userId.isEmpty() && (!isAnonymous)) {
+                if (upload.getDownloadedToLocal()) {
+                    message += context.getString(R.string.downloaded) + context.getString(R.string.click_access);
+                    final String fileName = transId + FileUtility.CSV_GZ_EXT;
                     ib.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             handleCsvShare(transId, fileName, fragment);
                         }
                     });
+                    ib.setImageResource(R.drawable.ic_ulstatus_dl);
+                } else if (upload.getUploadedFromLocal()) {
+                    if ("Completed".equals(status)) {
+                        message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
+                        ib.setImageResource(R.drawable.ic_ulstatus_uled);
+                        final String fName = upload.getFileName();
+                        if (fName.contains("_")) {
+                            final String fileName = fName.substring(fName.indexOf("_") + 1) + FileUtility.GZ_EXT;
+                            ib.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View v) {
+                                    handleCsvShare(transId, fileName, fragment);
+                                }
+                            });
+                        } else {
+                            MainActivity.error("non-importable file: " + fName);
+                        }
+                    } else {
+                        message += context.getString(R.string.not_proc) + context.getString(R.string.click_access);
+                        ib.setImageResource(R.drawable.ic_ulstatus_queued);
+                    }
                 } else {
-                    MainActivity.error("non-importable file: "+fName);
+                    if ("Completed".equals(status)) {
+                        message += context.getString(R.string.uploaded) + context.getString(R.string.click_download);
+                        ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
+                        ib.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                //disable buttons
+                                disableListButtons = true;
+                                notifyDataSetChanged();
+                                MainActivity.info("Downloading transId CSV: " + transId);
+                                final CsvDownloader task = new CsvDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
+                                        new ApiListener() {
+                                            @Override
+                                            public void requestComplete(final JSONObject json, final boolean isCache) {
+                                                UploadsListAdapter.handleCsvDownload(transId, json);
+                                                upload.setDownloadedToLocal(true);
+                                            }
+                                        });
+                                try {
+                                    task.startDownload(fragment);
+                                } catch (WiGLEAuthException waex) {
+                                    MainActivity.warn("Authentication error on CSV download for transId " +
+                                            transId, waex);
+                                } finally {
+                                    disableListButtons = false;
+                                    Activity activity = fragment.getActivity();
+                                    if (null != activity) {
+                                        activity.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                //re-enable buttons
+                                                notifyDataSetChanged();
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        message += context.getString(R.string.not_proc);
+                        ib.setImageResource(R.drawable.ic_ulstatus_queuenotlocal);
+                        ib.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                MainActivity.error("not available yet - nothing to do for " + transId);
+                            }
+                        });
+                    }
+                }
+                if (disableListButtons) {
+                    ib.setEnabled(false);
+                } else {
+                    ib.setEnabled(true);
                 }
             } else {
-                message += context.getString(R.string.uploaded) + context.getString(R.string.click_download);
-                ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
-                ib.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        //disable buttons
-                        disableListButtons = true;
-                        notifyDataSetChanged();
-                        MainActivity.info("Downloading transId CSV: " + transId);
-                        final CsvDownloader task = new CsvDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
-                                new ApiListener() {
-                                    @Override
-                                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                                        Activity activity = fragment.getActivity();
-                                        UploadsListAdapter.handleCsvDownload(transId, json);
-                                        upload.setDownloadedToLocal(true);
-                                    }
-                                });
-                        try {
-                            task.startDownload(fragment);
-                        } catch (WiGLEAuthException waex) {
-                            MainActivity.warn("Authentication error on CSV download for transId " +
-                                    transId, waex);
-                        } finally {
-                            disableListButtons = false;
-                            Activity activity = fragment.getActivity();
-                            if (null != activity) {
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //re-enable buttons
-                                        notifyDataSetChanged();
-                                    }
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-            if (disableListButtons) {
+                MainActivity.error("no user set - no download controls to offer.");
+                ib.setVisibility(GONE);
                 ib.setEnabled(false);
-            } else {
-                ib.setEnabled(true);
+                statusTv.setVisibility(GONE);
             }
+
             //TODO: un-uploaded files for retry
 
             statusTv.setText(message);
 
-            final String status = upload.getStatus();
-            final String userId = prefs.getString(ListFragment.PREF_AUTHNAME, "");
-            final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-
+            ImageButton share = row.findViewById(R.id.share_upload);
+            ImageButton view = row.findViewById(R.id.view_upload);
             if (!userId.isEmpty() && (!isAnonymous) && ("Completed".equals(status))) {
-                ImageButton share = row.findViewById(R.id.share_upload);
                 share.setVisibility(View.VISIBLE);
                 share.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -204,7 +228,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     share.setEnabled(true);
                 }
 
-                ImageButton view = row.findViewById(R.id.view_upload);
+
                 view.setVisibility(View.VISIBLE);
                 view.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
@@ -244,6 +268,11 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 } else {
                     view.setEnabled(true);
                 }
+            } else {
+                share.setVisibility(View.INVISIBLE);
+                share.setEnabled(false);
+                view.setVisibility(View.INVISIBLE);
+                view.setEnabled(false);
             }
 
             String percentDonePrefix = "";

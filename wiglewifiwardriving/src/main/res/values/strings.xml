@@ -442,4 +442,5 @@
     <string name="click_access">&#160;Tap to copy.</string>
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Download failed: result was not saved.</string>
+    <string name="not_proc">&#160;not processed.</string>
 </resources>

@@ -1,5 +1,5 @@
-* 2.50 (01/??/2019)
-All saves now can export of internal storage.
+* 2.50 (01/31/2019)
+All saves now can export from internal storage.
 Remove unused BTLE lib.
 German language fixes (thanks designer2k2!).
 Various bug fixes.

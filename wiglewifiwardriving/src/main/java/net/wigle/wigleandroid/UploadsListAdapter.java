@@ -137,14 +137,24 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                                             public void requestComplete(final JSONObject json, final boolean isCache) {
                                                 UploadsListAdapter.handleCsvDownload(transId, json);
                                                 upload.setDownloadedToLocal(true);
+                                                disableListButtons = false;
+                                                Activity activity = fragment.getActivity();
+                                                if (null != activity) {
+                                                    activity.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            //re-enable buttons
+                                                            notifyDataSetChanged();
+                                                        }
+                                                    });
+                                                }
                                             }
                                         });
                                 try {
                                     task.startDownload(fragment);
-                                } catch (WiGLEAuthException waex) {
-                                    MainActivity.warn("Authentication error on CSV download for transId " +
+                                } catch (Exception waex) {
+                                    MainActivity.warn("Error on CSV download for transId " +
                                             transId, waex);
-                                } finally {
                                     disableListButtons = false;
                                     Activity activity = fragment.getActivity();
                                     if (null != activity) {
@@ -200,14 +210,24 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                                     @Override
                                     public void requestComplete(final JSONObject json, final boolean isCache) {
                                         UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_SEND);
+                                        disableListButtons = false;
+                                        Activity activity = fragment.getActivity();
+                                        if (null != activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //re-enable buttons
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                         try {
                             task.startDownload(fragment);
-                        } catch (WiGLEAuthException waex) {
-                            MainActivity.warn("Authentication error on KML download for transId " +
-                                    transId, waex);
-                        } finally {
+                        } catch (Exception e) {
+                            MainActivity.warn("Error on KML download for transId " +
+                                    transId, e);
                             disableListButtons = false;
                             Activity activity = fragment.getActivity();
                             if (null != activity) {
@@ -241,14 +261,24 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                                     @Override
                                     public void requestComplete(final JSONObject json, final boolean isCache) {
                                         UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_VIEW);
+                                        disableListButtons = false;
+                                        Activity activity = fragment.getActivity();
+                                        if (null != activity) {
+                                            activity.runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    //re-enable buttons
+                                                    notifyDataSetChanged();
+                                                }
+                                            });
+                                        }
                                     }
                                 });
                         try {
                             task.startDownload(fragment);
-                        } catch (WiGLEAuthException waex) {
+                        } catch (Exception e) {
                             MainActivity.warn("Authentication error on KML download for transId " +
-                                    transId, waex);
-                        } finally {
+                                    transId, e);
                             disableListButtons = false;
                             Activity activity = fragment.getActivity();
                             if (null != activity) {

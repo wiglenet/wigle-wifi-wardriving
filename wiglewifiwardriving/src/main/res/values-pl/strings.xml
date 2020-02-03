@@ -368,4 +368,14 @@
     <string name="discovered">Odkryte</string>
     <string name="new_to_us">(Nowy w WiGLE)</string>
     <string name="total_seen">Łącznie zaobserwowane</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;pobrane.</string>
+    <string name="uploaded">&#160;przesłane.</string>
+    <string name="click_retry">&#160;Stuknij wskaźnik, aby spróbować ponownie.</string>
+    <string name="click_download">&#160;Stuknij wskaźnik, aby zsynchronizować z urządzeniem.</string>
+    <string name="click_access">&#160;Stuknij wskaźnik, aby skopiować.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Pobieranie nie powiodło się: wynik nie został zapisany.</string>
+    <string name="not_proc">&#160;nieprzetworzony.</string>
 </resources>

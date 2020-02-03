@@ -432,14 +432,13 @@
     <string name="discovered">Discovered</string>
     <string name="new_to_us">(New to WiGLE)</string>
     <string name="total_seen">Total Seen</string>
-
     <string name="csv">CSV</string>
     <string name="kml">KML</string>
     <string name="downloaded">&#160;downloaded.</string>
     <string name="uploaded">&#160;uploaded.</string>
-    <string name="click_retry">&#160;Tap to retry.</string>
-    <string name="click_download">&#160;Tap to sync to device.</string>
-    <string name="click_access">&#160;Tap to copy.</string>
+    <string name="click_retry">&#160;Tap indicator to retry.</string>
+    <string name="click_download">&#160;Tap indicator to sync to device.</string>
+    <string name="click_access">&#160;Tap indicator to copy.</string>
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Download failed: result was not saved.</string>
     <string name="not_proc">&#160;not processed.</string>

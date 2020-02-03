@@ -421,4 +421,14 @@
     <string name="discovered">Objevené</string>
     <string name="new_to_us">(nové pro WiGLE)</string>
     <string name="total_seen">Celkem viděno</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;staženo.</string>
+    <string name="uploaded">&#160;nahráno.</string>
+    <string name="click_retry">&#160;Klepnutím na indikátor zkuste akci opakovat.</string>
+    <string name="click_download">&#160;Klepnutím na indikátor synchronizujte zařízení.</string>
+    <string name="click_access">&#160;Klepnutím na indikátor zkopírujte.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Stahování se nezdařilo: výsledek nebyl uložen.</string>
+    <string name="not_proc">&#160;nezpracováno.</string>
 </resources>

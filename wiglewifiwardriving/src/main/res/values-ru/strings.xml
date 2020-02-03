@@ -380,4 +380,14 @@
     <string name="discovered">открытый</string>
     <string name="new_to_us">(Новое в WiGLE)</string>
     <string name="total_seen">Всего наблюдено</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;скачал.</string>
+    <string name="uploaded">&#160;загружено.</string>
+    <string name="click_retry">&#160;Нажмите индикатор, чтобы повторить попытку.</string>
+    <string name="click_download">&#160;Нажмите индикатор для синхронизации с устройством.</string>
+    <string name="click_access">&#160;Нажмите индикатор, чтобы скопировать.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Загрузка не удалась: результат не был сохранен.</string>
+    <string name="not_proc">&#160;не обработан.</string>
 </resources>

@@ -421,4 +421,14 @@
     <string name="discovered">גילה</string>
     <string name="new_to_us">(חדשות ל- WiGLE)</string>
     <string name="total_seen">סך הכל נצפה</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">הורדת.&#160;</string>
+    <string name="uploaded">הועלה.&#160;</string>
+    <string name="click_retry">הקש על מחוון כדי לנסות שוב.&#160;</string>
+    <string name="click_download">הקש על מחוון כדי לסנכרן עם המכשיר.&#160;</string>
+    <string name="click_access">הקש על מחוון כדי להעתיק.&#160;</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">ההורדה נכשלה: התוצאה לא נשמרה.</string>
+    <string name="not_proc">לא מעובד.&#160;</string>
 </resources>

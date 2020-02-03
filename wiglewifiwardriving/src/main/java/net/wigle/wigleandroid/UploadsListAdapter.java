@@ -43,6 +43,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         this.prefs = prefs;
         this.fragment = fragment;
         this.context = context;
+        UploadsFragment.disableListButtons = false;
     }
 
     @SuppressLint("SetTextI18n")

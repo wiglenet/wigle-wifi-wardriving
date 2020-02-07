@@ -196,9 +196,8 @@ public class UploadsFragment extends Fragment {
             final int pageStart = page * ROW_COUNT;
             final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
             final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
-                    //TODO: verify we can provide null cache file names
                     /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
-                    //cachefiles are too problematic with infinite scroll.
+                    //ALIBI: cachefiles are too problematic with infinite scroll
                     downloadUrl, false, true, true, ApiDownloader.REQUEST_GET,
                     new ApiListener() {
                         @Override

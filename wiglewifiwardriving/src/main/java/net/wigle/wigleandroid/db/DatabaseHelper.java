@@ -875,44 +875,24 @@ public final class DatabaseHelper extends Thread {
         if ( !blank && (isNew || bigChange || (! fastMode && changeWorthy )) ) {
             // MainActivity.info("inserting loc: " + network.getSsid() );
             long start;
-            if (update.external == 1) {
-                insertLocationExternal.bindString(1, bssid);
-                insertLocationExternal.bindLong(2, update.level);  // make sure to use the update's level, network's is mutable...
-                insertLocationExternal.bindDouble(3, location.getLatitude());
-                insertLocationExternal.bindDouble(4, location.getLongitude());
-                insertLocationExternal.bindDouble(5, location.getAltitude());
-                insertLocationExternal.bindDouble(6, location.getAccuracy());
-                insertLocationExternal.bindLong(7, location.getTime());
-                insertLocationExternal.bindLong( 8, 1);
-                if (db.isDbLockedByOtherThreads()) {
-                    // this is kinda lame, make this better
-                    MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
-                            + " drainSize: " + drainSize);
-                    MainActivity.sleep(1000L);
-                }
-                start = System.currentTimeMillis();
-                // INSERT
-                insertLocationExternal.execute();
-                logTime(start, "db location inserted: " + bssid + " drainSize: " + drainSize);
-            } else {
-                insertLocation.bindString(1, bssid);
-                insertLocation.bindLong(2, update.level);  // make sure to use the update's level, network's is mutable...
-                insertLocation.bindDouble(3, location.getLatitude());
-                insertLocation.bindDouble(4, location.getLongitude());
-                insertLocation.bindDouble(5, location.getAltitude());
-                insertLocation.bindDouble(6, location.getAccuracy());
-                insertLocation.bindLong(7, location.getTime());
-                if (db.isDbLockedByOtherThreads()) {
-                    // this is kinda lame, make this better
-                    MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
-                            + " drainSize: " + drainSize);
-                    MainActivity.sleep(1000L);
-                }
-                start = System.currentTimeMillis();
-                // INSERT
-                insertLocation.execute();
-                logTime(start, "db location inserted: " + bssid + " drainSize: " + drainSize);
+            insertLocationExternal.bindString(1, bssid);
+            insertLocationExternal.bindLong(2, update.level);  // make sure to use the update's level, network's is mutable...
+            insertLocationExternal.bindDouble(3, location.getLatitude());
+            insertLocationExternal.bindDouble(4, location.getLongitude());
+            insertLocationExternal.bindDouble(5, location.getAltitude());
+            insertLocationExternal.bindDouble(6, location.getAccuracy());
+            insertLocationExternal.bindLong(7, location.getTime());
+            insertLocationExternal.bindLong( 8, update.external);
+            if (db.isDbLockedByOtherThreads()) {
+                // this is kinda lame, make this better
+                MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
+                        + " drainSize: " + drainSize);
+                MainActivity.sleep(1000L);
             }
+            start = System.currentTimeMillis();
+            // INSERT
+            insertLocationExternal.execute();
+            logTime(start, "db location inserted: " + bssid + " drainSize: " + drainSize);
             // update the count
             locationCount.incrementAndGet();
             // update the cache

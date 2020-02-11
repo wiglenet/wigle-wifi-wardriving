@@ -315,18 +315,18 @@ public class KmlWriter extends AbstractBackgroundTask {
     }
 
     private static String encryptionStringForCapabilities(final String capabilities) {
-		if (capabilities.contains("WPA3")) {
-			return "WPA3";
-		} else if (capabilities.contains("WPA2")) {
-			return "WPA2";
-		} else if (capabilities.contains("WPA")) {
-			return "WPA";
-		} else if (capabilities.contains("WEP")) {
-			return "WEP";
-		} else {
-			return "Unknown";
-		}
-	}
+        if (capabilities.contains("WPA3")) {
+            return "WPA3";
+        } else if (capabilities.contains("WPA2")) {
+            return "WPA2";
+        } else if (capabilities.contains("WPA")) {
+            return "WPA";
+        } else if (capabilities.contains("WEP")) {
+            return "WEP";
+        } else {
+            return "Unknown";
+        }
+    }
 
     private void filterIllegalXml( byte[] data ) {
         for ( int i = 0; i < data.length; i++ ) {

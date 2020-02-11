@@ -314,7 +314,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         return lineCount;
     }
 
-    private String encryptionStringForCapabilities(final String capabilities) {
+    private static String encryptionStringForCapabilities(final String capabilities) {
         if (capabilities.contains("WPA3")) {
             return "WPA3";
         } else if (capabilities.contains("WPA2")) {

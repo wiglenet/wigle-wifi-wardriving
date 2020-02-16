@@ -9,7 +9,10 @@ import net.wigle.wigleandroid.MainActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * file space and name routines
@@ -34,6 +37,8 @@ public class FileUtility {
     public static final String M8B_FILE_PREFIX = "export";
     public static final String M8B_EXT = ".m8b";
     public static final String SQL_EXT = ".sqlite";
+
+    public static final String WIWI_PREFIX = "WigleWifi_";
 
     //ALIBI: can't actually read the size of compressed assets via the asset manager - has to be hardcoded
     //  this can be updated by checking the size of wiglewifiwardriving/src/main/assets/mmcmnc.sqlite on build
@@ -257,7 +262,7 @@ public class FileUtility {
         }
     }
 
-    public static File getCsvGzFile(final Context context, final String fileName) {
+    public static File getCsvGzFile(final Context context, final String fileName) throws NullPointerException {
         File file;
         if (hasSD()) {
             file = new File(getSDPath(), fileName);
@@ -271,7 +276,6 @@ public class FileUtility {
             //DEBUG: MainActivity.info(file.getAbsolutePath());
             return file;
         }
-
     }
 
     /**
@@ -332,12 +336,43 @@ public class FileUtility {
      * @param directory the directory to enumerate
      */
     public static void printDirContents(final File directory) {
-        System.out.println("\tListing for: "+directory.toString());
+        MainActivity.info("Listing for: "+directory.toString());
         File[] files = directory.listFiles();
-        System.out.println("\tSize: "+ files.length);
-        for (int i = 0; i < files.length; i++) {
-            System.out.println("\t\t"+files[i].getName()+"\t"+files[i].getAbsoluteFile());
+        if (files != null) {
+            MainActivity.info("\t# files: " + files.length);
+            for (File file : files) {
+                MainActivity.info("\t\t" + file.getName() + "\t" + file.getAbsoluteFile());
+            }
+        } else {
+            MainActivity.error("Null file listing for "+directory.toString());
         }
+    }
+
+    public static List<File> getCsvUploadsAndDownloads() {
+        List<File> rawFiles = new ArrayList<>();
+
+        final String location = FileUtility.getUploadFilePath();
+        if (null != location) {
+            final File directory = new File(location);
+            if (directory.exists()) {
+                File[] files = directory.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(CSV_GZ_EXT);
+                    }
+                });
+                if (null != files) {
+                    for (File file : files) {
+                        if (file.getName().endsWith(CSV_GZ_EXT)) {
+                            rawFiles.add(file);
+                            //} else {
+                            //DEBUG: MainActivity.info("skipping: " + files[i].getName());
+                        }
+                    }
+                }
+            }
+        }
+        return rawFiles;
     }
 
 }

@@ -21,6 +21,7 @@ import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
 
 import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
@@ -49,7 +50,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + KML_EXT;
+        final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + KML_EXT;
 
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         // header

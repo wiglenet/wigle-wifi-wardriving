@@ -421,4 +421,14 @@
     <string name="discovered">発見された</string>
     <string name="new_to_us">（WiGLEの新機能)</string>
     <string name="total_seen">観測合計</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;ダウンロードしました。</string>
+    <string name="uploaded">&#160;アップロードしました。</string>
+    <string name="click_retry">&#160;インジケータをタップして再試行します。</string>
+    <string name="click_download">&#160;インジケータをタップしてデバイスに同期します。</string>
+    <string name="click_access">&#160;インジケーターをタップしてコピーします。</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">ダウンロードに失敗しました：結果は保存されませんでした。</string>
+    <string name="not_proc">&#160;処理されていません。</string>
 </resources>

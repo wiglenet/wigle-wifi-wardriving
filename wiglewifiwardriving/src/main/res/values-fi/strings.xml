@@ -371,4 +371,14 @@
     <string name="discovered">löydetty</string>
     <string name="new_to_us">(Uusi WiGLE: lle)</string>
     <string name="total_seen">Yhteensä nähty</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;ladattu.</string>
+    <string name="uploaded">&#160;ladattu.</string>
+    <string name="click_retry">&#160;Napauta osoitinta yrittääksesi uudelleen.</string>
+    <string name="click_download">&#160;Napauta ilmaisinta synkronoidaksesi laitteeseen.</string>
+    <string name="click_access">&#160;Napauta ilmaisinta kopioidaksesi.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Lataus epäonnistui: tulosta ei tallennettu.</string>
+    <string name="not_proc">&#160;käsittelemätön.</string>
 </resources>

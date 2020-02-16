@@ -421,4 +421,14 @@
     <string name="discovered">Opdagede</string>
     <string name="new_to_us">(nyt til WiGLE)</string>
     <string name="total_seen">I alt observeret</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;downloadet.</string>
+    <string name="uploaded">&#160;uploadet.</string>
+    <string name="click_retry">&#160;Tryk på indikatoren for at prøve igen.</string>
+    <string name="click_download">&#160;Tryk på indikator for at synkronisere med enheden.</string>
+    <string name="click_access">&#160;Tryk på indikator for at kopiere.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Download mislykkedes: resultatet blev ikke gemt.</string>
+    <string name="not_proc">&#160;ikke behandlet.</string>
 </resources>

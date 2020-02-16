@@ -368,4 +368,14 @@
     <string name="discovered">की खोज की</string>
     <string name="new_to_us">(नए के लिए)</string>
     <string name="total_seen">कुल देखा गया</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;डाउनलोड किया।</string>
+    <string name="uploaded">&#160;अपलोड की गई।</string>
+    <string name="click_retry">&#160;सूचक को पुनः प्रयास करने के लिए टैप करें।</string>
+    <string name="click_download">&#160;डिवाइस पर सिंक करने के लिए संकेतक टैप करें।</string>
+    <string name="click_access">&#160;कॉपी करने के लिए संकेतक टैप करें।</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">डाउनलोड विफल: परिणाम सहेजा नहीं गया था।</string>
+    <string name="not_proc">&#160;संसाधित नहीं।</string>
 </resources>

@@ -296,4 +296,13 @@ public final class Network implements ClusterItem {
         BigDecimal[2] dlUlFrequs =
         return 0;
     }*/
+
+    public static Integer frequencyForWiFiChannel(final int channel) {
+        for (Map.Entry<Integer,Integer> entry: freqToChan.entrySet()) {
+            if (entry.getValue().equals(channel)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
 }

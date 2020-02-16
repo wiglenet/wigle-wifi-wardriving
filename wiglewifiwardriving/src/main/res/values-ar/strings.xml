@@ -421,4 +421,14 @@
     <string name="discovered">مكتشف</string>
     <string name="new_to_us">(جديد إلى WiGLE)</string>
     <string name="total_seen">مجموع لوحظ</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded"> تحميلها.&#160;</string>
+    <string name="uploaded">تحميلها.&#160;</string>
+    <string name="click_retry">اضغط على المؤشر لإعادة المحاولة.&#160;</string>
+    <string name="click_download">اضغط على المؤشر للمزامنة مع الجهاز.&#160;</string>
+    <string name="click_access">اضغط على المؤشر لنسخ.&#160;</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">أخفق التنزيل: لم يتم حفظ النتيجة.</string>
+    <string name="not_proc">لم تتم معالجتها.&#160;</string>
 </resources>

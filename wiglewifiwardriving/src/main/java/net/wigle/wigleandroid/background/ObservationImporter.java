@@ -59,7 +59,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
     }
 
     @Override
-    protected String getResultString(final BufferedReader reader) throws IOException, InterruptedException {
+    protected String getResultString(final BufferedReader reader, final boolean preserveNewlines) throws IOException, InterruptedException {
         Bundle bundle = new Bundle();
         try {
             JsonFactory f = new MappingJsonFactory();
@@ -105,7 +105,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                                 capabilities, level, NetworkType.WIFI);
                             final Location location = new Location("wigle");
                             final boolean newForRun = true;
-                            ListFragment.lameStatic.dbHelper.blockingAddObservation(
+                            ListFragment.lameStatic.dbHelper.blockingAddExternalObservation(
                                 network, location, newForRun);
 
                             if ((i % 1000) == 0) {

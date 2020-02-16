@@ -78,7 +78,6 @@ public final class DatabaseHelper extends Thread {
     private Location lastLoggedLocation;
 
     private SQLiteStatement insertNetwork;
-    private SQLiteStatement insertLocation;
     private SQLiteStatement insertLocationExternal;
     private SQLiteStatement updateNetwork;
     private SQLiteStatement updateNetworkMetadata;
@@ -585,9 +584,6 @@ public final class DatabaseHelper extends Thread {
         insertNetwork = db.compileStatement( "INSERT INTO "+NETWORK_TABLE
                 + " (bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,type,bestlevel,bestlat,bestlon) VALUES (?,?,?,?,?,?,?,?,?,?,?)" );
 
-        insertLocation = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
-                + " (bssid,level,lat,lon,altitude,accuracy,time) VALUES (?,?,?,?,?,?,?)" );
-
         insertLocationExternal = db.compileStatement( "INSERT INTO " + LOCATION_TABLE
                 + " (bssid,level,lat,lon,altitude,accuracy,time,external) VALUES (?,?,?,?,?,?,?,?)" );
 
@@ -629,9 +625,6 @@ public final class DatabaseHelper extends Thread {
                 synchronized ( this ) {
                     if ( insertNetwork != null ) {
                         insertNetwork.close();
-                    }
-                    if ( insertLocation != null ) {
-                        insertLocation.close();
                     }
                     if ( insertLocationExternal != null) {
                         insertLocationExternal.close();
@@ -732,7 +725,7 @@ public final class DatabaseHelper extends Thread {
     @SuppressWarnings("deprecation")
     private void addObservation( final DBUpdate update, final int drainSize ) throws DBException {
         checkDB();
-        if (insertNetwork == null || insertLocation == null || insertLocationExternal == null
+        if (insertNetwork == null || insertLocationExternal == null
                 || updateNetwork == null || updateNetworkMetadata == null) {
 
             MainActivity.warn("A stored procedure is null, not adding observation");

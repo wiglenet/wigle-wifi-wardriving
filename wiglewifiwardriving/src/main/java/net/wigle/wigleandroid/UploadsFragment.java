@@ -106,7 +106,7 @@ public class UploadsFragment extends Fragment {
 
     private int currentPage = 0;
     private final ArrayList<Parcelable> resultList = new ArrayList<>(ROW_COUNT);
-    private boolean busy = false;
+    private AtomicBoolean busy = new AtomicBoolean(false);
 
     private static final String[] ALL_ROW_KEYS = new String[] {
             KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE
@@ -167,7 +167,7 @@ public class UploadsFragment extends Fragment {
             handler = new RankDownloadHandler(rootView, numberFormat,
                     getActivity().getPackageName(), getResources());
             handler.setUploadsListAdapter(listAdapter);
-            busy = false;
+            busy.set(false);
             downloadUploads(0);
         }
 
@@ -192,10 +192,10 @@ public class UploadsFragment extends Fragment {
         if (handler == null) {
             MainActivity.error("downloadUploads handler is null");
         }
-        if (!busy) {
+        if (!busy.get()) {
             final int pageStart = page * ROW_COUNT;
             final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
-            busy = true;
+            busy.set(true);
             final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
                     /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
                     //ALIBI: cachefiles are too problematic with infinite scroll
@@ -206,7 +206,7 @@ public class UploadsFragment extends Fragment {
                             if (!isCache) {
                                 handleUploads(json, handler);
                             } // cache is too big a problem with the infini-scroll.
-                            busy = false;
+                            busy.set(false);
                         }
                     });
             try {
@@ -359,7 +359,7 @@ public class UploadsFragment extends Fragment {
         message.setData(bundle);
         message.what = MSG_RANKING_DONE;
         handler.sendMessage(message);
-        busy = false;
+        busy.set(false);
     }
 
     @Override

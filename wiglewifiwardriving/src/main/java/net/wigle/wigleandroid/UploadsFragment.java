@@ -308,7 +308,7 @@ public class UploadsFragment extends Fragment {
         final Bundle bundle = new Bundle();
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            List<File> filesOnDevice = FileUtility.getCsvUploadsAndDownloads();
+            List<File> filesOnDevice = FileUtility.getCsvUploadsAndDownloads(getContext());
             for (int i = 0; i < list.length(); i++) {
                 final JSONObject row = list.getJSONObject(i);
                 final Bundle rowBundle = new Bundle();

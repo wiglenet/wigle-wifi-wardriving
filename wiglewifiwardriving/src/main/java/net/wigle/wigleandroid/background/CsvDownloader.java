@@ -129,22 +129,14 @@ public class CsvDownloader extends AbstractProgressApiRequest {
     protected void writeSharefile(final String result, final String filename, final boolean compress) throws IOException {
 
         String outputIntermediate = null;
-        if (FileUtility.hasSD()) {
-            if (outputFileName != null) {
-                //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
-                //ALIBI: for external-storage, our existing "cache" method is fine to write the file
-                cacheResult(result);
-                outputIntermediate = outputFileName;
+        if (outputFileName != null) {
+            //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
+            //ALIBI: for external-storage, our existing "cache" method is fine to write the file,
+            // for internal we must disable using the cache area so we get known filename.
+            cacheResult(result, false);
+            outputIntermediate = outputFileName;
 
-                //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
-            }
-        } else {
-            MainActivity.info("local storage DL...");
-
-            File csvFile = FileUtility.getCsvGzFile(context, filename);
-            outputIntermediate = csvFile.getAbsolutePath();
-            FileOutputStream out = new FileOutputStream(csvFile);
-            ObservationUploader.writeFos(out, result);
+            //DEBUG: FileUtility.printDirContents(new File(MainActivity.getSDPath()));
         }
         if (outputIntermediate != null && compress) {
             File intermediate = FileUtility.getCsvGzFile(context, outputIntermediate);

@@ -654,7 +654,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final boolean hasSD = FileUtility.hasSD();
         File file = null;
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        final String filePath = FileUtility.getUploadFilePath();
+        final String filePath = FileUtility.getUploadFilePath(context);
 
         if ( hasSD && filePath != null) {
             final File path = new File( filePath );

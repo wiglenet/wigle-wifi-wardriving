@@ -207,11 +207,15 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     protected void cacheResult(final String result) {
+        cacheResult(result, true);
+    }
+
+    protected void cacheResult(final String result, final boolean internalCacheArea) {
         if (outputFileName == null || result == null || result.length() < 1) return;
 
         FileOutputStream fos = null;
         try {
-            fos = FileUtility.createFile(context, outputFileName, true);
+            fos = FileUtility.createFile(context, outputFileName, internalCacheArea);
             // header
             ObservationUploader.writeFos(fos, result);
         }

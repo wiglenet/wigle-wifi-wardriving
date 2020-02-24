@@ -120,11 +120,12 @@ public class FileUtility {
      * Create an output file sensitive to the SD availability of the install - currently used for network temp files and KmlWriter output
      * @param context Context of the application
      * @param filename the filename to store
-     * @param isCache whether to locate this in the cache directory
+     * @param internalCacheArea whether to locate this in the cache directory if internal storage
      * @return tje FileOutputStream of the new file
      * @throws IOException if unable to create the file/directory.
      */
-    public static FileOutputStream createFile(final Context context, final String filename, final boolean isCache) throws IOException {
+    public static FileOutputStream createFile(final Context context, final String filename,
+                                              final boolean internalCacheArea) throws IOException {
         final String filepath = getSDPath();
         final File path = new File(filepath);
 
@@ -141,8 +142,9 @@ public class FileUtility {
                 }
             }
             return new FileOutputStream(file);
-        } else if (isCache) {
+        } else if (internalCacheArea) {
             File file = File.createTempFile(filename, null, context.getCacheDir());
+            MainActivity.info("creating file: " + file.getCanonicalPath());
             return new FileOutputStream(file);
         }
 
@@ -174,11 +176,11 @@ public class FileUtility {
      * @return external file location if we're using external/otherwise null
      * //TODO: do we write uploads to context.getApplicationContext().getFilesDir() if !hasSD?
      */
-    public static String getUploadFilePath() {
+    public static String getUploadFilePath(final Context context) throws IOException {
         if ( hasSD() ) {
             return getSDPath();
         }
-        return null;
+        return context.getApplicationContext().getFilesDir().getCanonicalPath();
     }
 
     /**
@@ -348,10 +350,10 @@ public class FileUtility {
         }
     }
 
-    public static List<File> getCsvUploadsAndDownloads() {
+    public static List<File> getCsvUploadsAndDownloads(final Context context) throws IOException {
         List<File> rawFiles = new ArrayList<>();
 
-        final String location = FileUtility.getUploadFilePath();
+        final String location = FileUtility.getUploadFilePath(context);
         if (null != location) {
             final File directory = new File(location);
             if (directory.exists()) {

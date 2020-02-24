@@ -22,5 +22,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="5dp"
+        android:hint="X"
         android:gravity="center_horizontal|top"/>
 </RelativeLayout>

@@ -21,8 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -31,6 +31,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.Upload;
+import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.MenuUtil;
 
@@ -103,6 +104,10 @@ public class UploadsFragment extends Fragment {
 
     private static final int ROW_COUNT = 100;
 
+    private int currentPage = 0;
+    private final ArrayList<Parcelable> resultList = new ArrayList<>(ROW_COUNT);
+    private AtomicBoolean busy = new AtomicBoolean(false);
+
     private static final String[] ALL_ROW_KEYS = new String[] {
             KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE
         };
@@ -162,7 +167,8 @@ public class UploadsFragment extends Fragment {
             handler = new RankDownloadHandler(rootView, numberFormat,
                     getActivity().getPackageName(), getResources());
             handler.setUploadsListAdapter(listAdapter);
-            downloadUploads();
+            busy.set(false);
+            downloadUploads(0);
         }
 
         return rootView;
@@ -176,29 +182,40 @@ public class UploadsFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                downloadUploads();
+                resultList.clear();
+                downloadUploads(0);
             }
         });
     }
 
-    private void downloadUploads() {
+    private void downloadUploads(final int page) {
         if (handler == null) {
             MainActivity.error("downloadUploads handler is null");
-            return;
         }
-        final String monthUrl = MainActivity.UPLOADS_STATS_URL + "?pageend=" + ROW_COUNT;
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "uploads-cache.json", monthUrl, false, true, true, ApiDownloader.REQUEST_GET,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleUploads(json, handler);
-                    }
-                });
-        try {
-            task.startDownload(this);
-        } catch (WiGLEAuthException waex) {
-            MainActivity.info("Transactions Download Failed due to failed auth");
+        if (!busy.get()) {
+            final int pageStart = page * ROW_COUNT;
+            final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
+            busy.set(true);
+            final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
+                    /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
+                    //ALIBI: cachefiles are too problematic with infinite scroll
+                    downloadUrl, false, true, true, ApiDownloader.REQUEST_GET,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(final JSONObject json, final boolean isCache) {
+                            if (!isCache) {
+                                handleUploads(json, handler);
+                            } // cache is too big a problem with the infini-scroll.
+                            busy.set(false);
+                        }
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                MainActivity.info("Transactions Download Failed due to failed auth");
+            }
+        } else {
+            MainActivity.error("preventing download because previous is still in progress.");
         }
     }
 
@@ -214,8 +231,16 @@ public class UploadsFragment extends Fragment {
             }
         }
         // always set our current list adapter
-        final ListView listView = view.findViewById(R.id.uploads_list_view);
+        final AbsListView listView = view.findViewById(R.id.uploads_list_view);
         listView.setAdapter(listAdapter);
+        listView.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                currentPage++;
+                downloadUploads(currentPage);
+                return true;
+            }
+        });
 
     }
 
@@ -283,7 +308,6 @@ public class UploadsFragment extends Fragment {
         final Bundle bundle = new Bundle();
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
             List<File> filesOnDevice = FileUtility.getCsvUploadsAndDownloads();
             for (int i = 0; i < list.length(); i++) {
                 final JSONObject row = list.getJSONObject(i);
@@ -335,6 +359,7 @@ public class UploadsFragment extends Fragment {
         message.setData(bundle);
         message.what = MSG_RANKING_DONE;
         handler.sendMessage(message);
+        busy.set(false);
     }
 
     @Override
@@ -417,5 +442,4 @@ public class UploadsFragment extends Fragment {
         }
         return false;
     }
-
 }

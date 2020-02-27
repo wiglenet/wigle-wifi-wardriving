@@ -374,6 +374,7 @@ public class UploadsFragment extends Fragment {
     public void onResume() {
         MainActivity.info("UPLOADS: onResume");
         super.onResume();
+        busy.set(false);
         final Activity a = getActivity();
         if (null != a) {
             getActivity().setTitle(R.string.uploads_app_name);

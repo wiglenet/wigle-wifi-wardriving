@@ -104,12 +104,12 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     });
                     ib.setImageResource(R.drawable.ic_ulstatus_dl);
                 } else if (upload.getUploadedFromLocal()) {
+                    final String fName = upload.getFileName();
+                    final String fileName = fName.substring(fName.indexOf("_") + 1) + FileUtility.GZ_EXT;
                     if ("Completed".equals(status)) {
                         message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
                         ib.setImageResource(R.drawable.ic_ulstatus_uled);
-                        final String fName = upload.getFileName();
                         if (fName.contains("_")) {
-                            final String fileName = fName.substring(fName.indexOf("_") + 1) + FileUtility.GZ_EXT;
                             ib.setOnClickListener(new View.OnClickListener() {
                                 public void onClick(View v) {
                                     handleCsvShare(transId, fileName, fragment);
@@ -121,6 +121,11 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     } else {
                         message += context.getString(R.string.not_proc) + context.getString(R.string.click_access);
                         ib.setImageResource(R.drawable.ic_ulstatus_queued);
+                        ib.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View v) {
+                                handleCsvShare(transId, fileName, fragment);
+                            }
+                        });
                     }
                 } else {
                     if ("Completed".equals(status)) {

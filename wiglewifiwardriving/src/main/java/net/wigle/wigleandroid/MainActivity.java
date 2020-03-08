@@ -2466,18 +2466,21 @@ public final class MainActivity extends AppCompatActivity {
         if (state.dbHelper != null) state.dbHelper.close();
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (state.gpsListener != null) {
-            locationManager.removeGpsStatusListener(state.gpsListener);
+        if (state.gpsListener != null && locationManager != null) {
             try {
+                locationManager.removeGpsStatusListener(state.gpsListener);
                 locationManager.removeUpdates(state.gpsListener);
                 if (Build.VERSION.SDK_INT >= 24) {
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
                 }
-
             } catch (final SecurityException ex) {
                 error("SecurityException on finish: " + ex, ex);
+            } catch (final IllegalStateException ise) {
+                error("ISE turning off GPS: ",ise);
+            } catch (final NullPointerException npe) {
+                error("NPE turning off GPS: ", npe);
             }
         }
 

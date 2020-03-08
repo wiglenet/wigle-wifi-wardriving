@@ -1960,7 +1960,7 @@ public final class MainActivity extends AppCompatActivity {
                 } else {
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
                 }
-                edit.commit();
+                edit.apply();
                 if (state.bluetoothReceiver == null) {
                     MainActivity.info("new bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
@@ -1982,6 +1982,10 @@ public final class MainActivity extends AppCompatActivity {
             }
         } catch (SecurityException se) {
             info("Security exception attempting to access bluetooth adapter", se);
+        } catch (Exception e) {
+            //ALIBI: there's a lot of wonkiness in real-world BT adapters
+            //  seeing them go null during this block after null check passes,
+            MainActivity.error("failure initializing bluetooth: ",e);
         }
     }
 

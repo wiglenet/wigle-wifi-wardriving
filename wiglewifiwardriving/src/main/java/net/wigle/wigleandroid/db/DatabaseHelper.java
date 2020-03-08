@@ -1385,7 +1385,9 @@ public final class DatabaseHelper extends Thread {
 
     public void clearDefaultRoute() throws DBException {
         checkDB();
-        db.execSQL(CLEAR_DEFAULT_ROUTE);
+        if (null != db) {
+            db.execSQL(CLEAR_DEFAULT_ROUTE);
+        }
     }
 
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{

@@ -1960,7 +1960,7 @@ public final class MainActivity extends AppCompatActivity {
                 } else {
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
                 }
-                edit.commit();
+                edit.apply();
                 if (state.bluetoothReceiver == null) {
                     MainActivity.info("new bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
@@ -1982,6 +1982,10 @@ public final class MainActivity extends AppCompatActivity {
             }
         } catch (SecurityException se) {
             info("Security exception attempting to access bluetooth adapter", se);
+        } catch (Exception e) {
+            //ALIBI: there's a lot of wonkiness in real-world BT adapters
+            //  seeing them go null during this block after null check passes,
+            MainActivity.error("failure initializing bluetooth: ",e);
         }
     }
 
@@ -2462,18 +2466,21 @@ public final class MainActivity extends AppCompatActivity {
         if (state.dbHelper != null) state.dbHelper.close();
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (state.gpsListener != null) {
-            locationManager.removeGpsStatusListener(state.gpsListener);
+        if (state.gpsListener != null && locationManager != null) {
             try {
+                locationManager.removeGpsStatusListener(state.gpsListener);
                 locationManager.removeUpdates(state.gpsListener);
                 if (Build.VERSION.SDK_INT >= 24) {
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
                 }
-
             } catch (final SecurityException ex) {
                 error("SecurityException on finish: " + ex, ex);
+            } catch (final IllegalStateException ise) {
+                error("ISE turning off GPS: ",ise);
+            } catch (final NullPointerException npe) {
+                error("NPE turning off GPS: ", npe);
             }
         }
 

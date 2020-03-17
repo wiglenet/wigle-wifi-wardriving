@@ -825,14 +825,15 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             mgrs m = mgrs.fromUtm(utm.fromLatLon(lat, lon));
 
                             Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
-
-                            Set<mgrs> locs = mjg.get(kslice2);
-                            if (locs == null) {
-                                locs = new HashSet<>();
-                                mjg.put(kslice2, locs);
-                            }
-                            if (locs.add(m)) {
-                                records++;
+                            if (null != kslice2) {
+                                Set<mgrs> locs = mjg.get(kslice2);
+                                if (locs == null) {
+                                    locs = new HashSet<>();
+                                    mjg.put(kslice2, locs);
+                                }
+                                if (locs.add(m)) {
+                                    records++;
+                                }
                             }
                         }
                     } catch (IndexOutOfBoundsException ioobe) {

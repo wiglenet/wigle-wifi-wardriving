@@ -1,4 +1,7 @@
-* 2.50 - 2.51 (01/31/2019)
+* 2.52 (??/??/2020)
+Russian language fixes (thanks drygdryg!).
+
+* 2.50 - 2.51 (01/31/2020)
 All saves now can export from internal storage.
 Remove unused BTLE lib.
 German language fixes (thanks designer2k2!).

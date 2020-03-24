@@ -390,7 +390,7 @@
     <string name="not_proc">&#160;не обработан.</string>
     <string name="list_scanning_on">(Сканирование включено)</string>
     <string name="news_app_name">Новости WiGLE.net</string>
-    <string name="site_stats_app_name">Статистика WiGLE.net</string>
+    <string name="site_stats_app_name">WiGLE.net Статистика</string>
     <string name="tab_news">Новости</string>
     <string name="tab_rank">Рейтинги</string>
     <string name="tab_search">Поиск</string>
@@ -401,7 +401,7 @@
     <string name="totallocs_title">Всего зафиксировано наблюдений Wi-Fi</string>
     <string name="transtot_title">Загружено файлов на WiGLE.net</string>
     <string name="user_centric">Мой рейтинг</string>
-    <string name="user_stats_app_name">Статистика пользователя</string>
+    <string name="user_stats_app_name">человек пользователя</string>
     <string name="userstot_title">Всего зарегистрировано на WiGLE.net пользователей</string>
     <string name="wifi_gps">Wi-Fi GPS</string>
     <string name="uploads_app_name">Выгрузки на WiGLE.net</string>

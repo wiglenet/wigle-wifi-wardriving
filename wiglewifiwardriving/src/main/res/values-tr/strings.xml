@@ -368,4 +368,14 @@
     <string name="discovered">Bulundu</string>
     <string name="new_to_us">(WiGLE’de yeni)</string>
     <string name="total_seen">Toplam Gözlenen</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;İndirildi.</string>
+    <string name="uploaded">&#160;Yüklenen.</string>
+    <string name="click_retry">&#160;Tekrar denemek için göstergeye dokunun.</string>
+    <string name="click_download">&#160;Cihazla senkronize etmek için göstergeye dokunun.</string>
+    <string name="click_access">&#160;Kopyalamak için göstergeye dokunun.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">İndirme başarısız oldu: sonuç kaydedilmedi.</string>
+    <string name="not_proc">&#160;işlenmemiş.</string>
 </resources>

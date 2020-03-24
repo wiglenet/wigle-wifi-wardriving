@@ -21,8 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
@@ -31,17 +31,21 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.Upload;
+import net.wigle.wigleandroid.ui.EndlessScrollListener;
+import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,6 +54,8 @@ public class UploadsFragment extends Fragment {
     private static final int MSG_RANKING_DONE = 100;
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
+
+    public static boolean disableListButtons = false;
 
     /*
      {
@@ -92,11 +98,18 @@ public class UploadsFragment extends Fragment {
     private static final String KEY_STATUS = "status";
     private static final String KEY_PERCENT_DONE = "percentDone";
     private static final String KEY_FILE_SIZE = "fileSize";
+    private static final String KEY_FILE_NAME = "fileName";
+    private static final String KEY_UPLOADED = "uploadedFromLocal";
+    private static final String KEY_DOWNLOADED = "downloadedToLocal";
 
     private static final int ROW_COUNT = 100;
 
+    private int currentPage = 0;
+    private final ArrayList<Parcelable> resultList = new ArrayList<>(ROW_COUNT);
+    private AtomicBoolean busy = new AtomicBoolean(false);
+
     private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE,
+            KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE
         };
 
     private AtomicBoolean finishing;
@@ -154,7 +167,8 @@ public class UploadsFragment extends Fragment {
             handler = new RankDownloadHandler(rootView, numberFormat,
                     getActivity().getPackageName(), getResources());
             handler.setUploadsListAdapter(listAdapter);
-            downloadUploads();
+            busy.set(false);
+            downloadUploads(0);
         }
 
         return rootView;
@@ -168,32 +182,40 @@ public class UploadsFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                downloadUploads();
+                resultList.clear();
+                downloadUploads(0);
             }
         });
     }
 
-    private void downloadUploads() {
+    private void downloadUploads(final int page) {
         if (handler == null) {
             MainActivity.error("downloadUploads handler is null");
-            return;
         }
-        final String monthUrl = MainActivity.UPLOADS_STATS_URL + "?pageend=" + ROW_COUNT;
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "uploads-cache.json", monthUrl, false, true, true, ApiDownloader.REQUEST_GET,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleUploads(json, handler);
-                    }
-                });
-        try {
-            task.startDownload(this);
-        } catch (WiGLEAuthException waex) {
-            MainActivity.info("Transactions Download Failed due to failed auth");
+        if (!busy.get()) {
+            final int pageStart = page * ROW_COUNT;
+            final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
+            busy.set(true);
+            final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
+                    /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
+                    //ALIBI: cachefiles are too problematic with infinite scroll
+                    downloadUrl, false, true, true, ApiDownloader.REQUEST_GET,
+                    new ApiListener() {
+                        @Override
+                        public void requestComplete(final JSONObject json, final boolean isCache) {
+                            if (!isCache) {
+                                handleUploads(json, handler);
+                            } // cache is too big a problem with the infini-scroll.
+                            busy.set(false);
+                        }
+                    });
+            try {
+                task.startDownload(this);
+            } catch (WiGLEAuthException waex) {
+                MainActivity.info("Transactions Download Failed due to failed auth");
+            }
+        } else {
+            MainActivity.error("preventing download because previous is still in progress.");
         }
     }
 
@@ -209,8 +231,16 @@ public class UploadsFragment extends Fragment {
             }
         }
         // always set our current list adapter
-        final ListView listView = view.findViewById(R.id.uploads_list_view);
+        final AbsListView listView = view.findViewById(R.id.uploads_list_view);
         listView.setAdapter(listAdapter);
+        listView.setOnScrollListener(new EndlessScrollListener() {
+            @Override
+            public boolean onLoadMore(int page, int totalItemsCount) {
+                currentPage++;
+                downloadUploads(currentPage);
+                return true;
+            }
+        });
 
     }
 
@@ -255,11 +285,11 @@ public class UploadsFragment extends Fragment {
                         final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
                                 row.getLong(KEY_TOTAL_BT_GPS),
                                 row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
-                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE));
+                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
+                                row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
                         uploadsListAdapter.add(upload);
                     }
                 }
-
                 final SwipeRefreshLayout swipeRefreshLayout =
                         view.findViewById(R.id.uploads_swipe_container);
                 swipeRefreshLayout.setRefreshing(false);
@@ -268,7 +298,7 @@ public class UploadsFragment extends Fragment {
     }
 
     private void handleUploads(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleUploads");
+        //MainActivity.info("handleUploads");
 
         if (json == null) {
             MainActivity.info("handleUploads null json, returning");
@@ -278,17 +308,45 @@ public class UploadsFragment extends Fragment {
         final Bundle bundle = new Bundle();
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
+            List<File> filesOnDevice = FileUtility.getCsvUploadsAndDownloads(getContext());
             for (int i = 0; i < list.length(); i++) {
                 final JSONObject row = list.getJSONObject(i);
                 final Bundle rowBundle = new Bundle();
                 for (final String key : ALL_ROW_KEYS) {
                     rowBundle.putLong(key, row.getLong(key));
                 }
-                rowBundle.putString(KEY_TRANSID, row.getString(KEY_TRANSID));
+                final String transId = row.getString(KEY_TRANSID);
+                rowBundle.putString(KEY_TRANSID, transId);
+                final String fileName = row.getString(KEY_FILE_NAME);
+                rowBundle.putString(KEY_FILE_NAME, fileName);
+                //TODO: annotate with file status
                 rowBundle.putString(KEY_STATUS, this.statusValue(row.getString(KEY_STATUS)));
                 resultList.add(rowBundle);
+                boolean onDevice = false;
+
+                final String withExt = fileName+FileUtility.GZ_EXT;
+                for (int j = 0; j < filesOnDevice.size(); j++) {
+                    final File f = filesOnDevice.get(j);
+                    if (withExt.contains(f.getName())) {
+                        onDevice = true;
+                        rowBundle.putBoolean(KEY_UPLOADED, true);
+                        rowBundle.putBoolean(KEY_DOWNLOADED, false);
+                        filesOnDevice.remove(j);
+                        break;
+                    } else if (f.getName().startsWith(transId)) {
+                        onDevice = true;
+                        rowBundle.putBoolean(KEY_UPLOADED, false);
+                        rowBundle.putBoolean(KEY_DOWNLOADED, true);
+                        filesOnDevice.remove(j);
+                        break;
+                    }
+                }
+                if (! onDevice) {
+                    rowBundle.putBoolean(KEY_UPLOADED, false);
+                    rowBundle.putBoolean(KEY_DOWNLOADED, false);
+                }
             }
+            //TODO: remaining elements in filesOnDevice are likely failed uploads - we can offer the option to retry
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
             bundle.putString(KEY_QUEUE_DEPTH, json.getString(KEY_QUEUE_DEPTH));
         } catch (final JSONException ex) {
@@ -301,6 +359,7 @@ public class UploadsFragment extends Fragment {
         message.setData(bundle);
         message.what = MSG_RANKING_DONE;
         handler.sendMessage(message);
+        busy.set(false);
     }
 
     @Override
@@ -315,6 +374,7 @@ public class UploadsFragment extends Fragment {
     public void onResume() {
         MainActivity.info("UPLOADS: onResume");
         super.onResume();
+        busy.set(false);
         final Activity a = getActivity();
         if (null != a) {
             getActivity().setTitle(R.string.uploads_app_name);
@@ -383,5 +443,4 @@ public class UploadsFragment extends Fragment {
         }
         return false;
     }
-
 }

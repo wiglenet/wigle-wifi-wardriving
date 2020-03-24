@@ -370,4 +370,14 @@
     <string name="discovered">Felfedezett</string>
     <string name="new_to_us">(Új a WiGLE-ben)</string>
     <string name="total_seen">Összesen megfigyelt</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;letöltve.</string>
+    <string name="uploaded">&#160;feltöltve.</string>
+    <string name="click_retry">&#160;Érintse meg a jelzőt az újrapróbálkozáshoz.</string>
+    <string name="click_download">&#160;Érintse meg az indikátort az eszközhöz való szinkronizáláshoz.</string>
+    <string name="click_access">&#160;Koppintson a mutatóra.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">A letöltés sikertelen: az eredmény nem mentve.</string>
+    <string name="not_proc">&#160;nem feldolgozott.</string>
 </resources>

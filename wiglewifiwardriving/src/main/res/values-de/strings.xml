@@ -421,4 +421,14 @@
     <string name="discovered">gefunden</string>
     <string name="new_to_us">(neu für WiGLE)</string>
     <string name="total_seen">Insgesamt gesehen</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;heruntergeladen.</string>
+    <string name="uploaded">&#160;hochgeladen</string>
+    <string name="click_retry">&#160;Tippen Sie auf, um es erneut zu versuchen.</string>
+    <string name="click_download">&#160;Tippen Sie hier, um mit dem Gerät zu synchronisieren.</string>
+    <string name="click_access">&#160;Tippen Sie zum Kopieren auf die Anzeige.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Download fehlgeschlagen.</string>
+    <string name="not_proc">&#160;nicht verarbeitet.</string>
 </resources>

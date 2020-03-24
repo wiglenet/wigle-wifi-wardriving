@@ -19,7 +19,7 @@ import java.io.IOException;
 import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
 /**
- * A KML-upload grabber intended for sharing/viewing via itents
+ * A KML-upload grabber intended for sharing/viewing via intents
  * Created by arkasha on 10/27/17.
  */
 

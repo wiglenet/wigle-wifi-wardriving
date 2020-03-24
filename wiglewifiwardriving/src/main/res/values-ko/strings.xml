@@ -368,4 +368,14 @@
     <string name="discovered">발견</string>
     <string name="new_to_us">(WiGLE을 처음 사용함)</string>
     <string name="total_seen">총 관찰</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;다운로드했습니다.</string>
+    <string name="uploaded">&#160;업로드했습니다.</string>
+    <string name="click_retry">&#160;다시 시도하려면 표시기를 누릅니다.</string>
+    <string name="click_download">&#160;표시기를 눌러 기기와 동기화합니다.</string>
+    <string name="click_access">&#160;복사하려면 표시기를 누릅니다.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">다운로드 실패 : 결과가 저장되지 않았습니다.</string>
+    <string name="not_proc">&#160;진행되지 않았다.</string>
 </resources>

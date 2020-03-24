@@ -1,4 +1,10 @@
-* 2.50 - 2.51 (01/31/2019)
+* 2.52 (03/24/2020)
+Uploads pane download/upload controls.
+"Backup Database" can share from internal storage.
+Russian language fixes (thanks drygdryg!).
+Various bug fixes.
+
+* 2.50 - 2.51 (01/31/2020)
 All saves now can export from internal storage.
 Remove unused BTLE lib.
 German language fixes (thanks designer2k2!).

@@ -815,26 +815,31 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
                 @Override
                 public boolean handleRow(final Cursor cursor) {
-                    final String bssid = cursor.getString(0);
-                    final float lat = cursor.getFloat(1);
-                    final float lon = cursor.getFloat(2);
-                    if (!(-80<=lat && lat<=84)) {
-                        non_utm++;
-                    } else {
-                        mgrs m = mgrs.fromUtm(utm.fromLatLon(lat,lon));
+                    try {
+                        final String bssid = cursor.getString(0);
+                        final float lat = cursor.getFloat(1);
+                        final float lon = cursor.getFloat(2);
+                        if (!(-80 <= lat && lat <= 84)) {
+                            non_utm++;
+                        } else {
+                            mgrs m = mgrs.fromUtm(utm.fromLatLon(lat, lon));
 
-                        Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
-
-                        Set<mgrs> locs = mjg.get(kslice2);
-                        if (locs==null){
-                            locs = new HashSet<>();
-                            mjg.put(kslice2,locs);
+                            Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
+                            if (null != kslice2) {
+                                Set<mgrs> locs = mjg.get(kslice2);
+                                if (locs == null) {
+                                    locs = new HashSet<>();
+                                    mjg.put(kslice2, locs);
+                                }
+                                if (locs.add(m)) {
+                                    records++;
+                                }
+                            }
                         }
-                        if(locs.add(m)){
-                            records++;
-                        }
+                    } catch (IndexOutOfBoundsException ioobe) {
+                        //ALIBI: seeing ArrayIndexOutOfBoundsException: length=3; index=-2 from geodesy.mgrs.fromUtm(mgrs.java:64)
+                        MainActivity.error("Bad UTM ", ioobe);
                     }
-
 
                     rows++;
                     if (rows % 1000 == 0) {

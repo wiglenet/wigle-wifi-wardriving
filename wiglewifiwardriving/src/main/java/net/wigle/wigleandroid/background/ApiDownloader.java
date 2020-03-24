@@ -21,7 +21,7 @@ public class ApiDownloader extends AbstractApiRequest {
                          final boolean doBasicLogin, final boolean requiresLogin,
                          final String connectionMethod, final ApiListener listener) {
         super(context, dbHelper, "ApiDL", cacheFilename, url, doFormLogin, doBasicLogin,
-                requiresLogin, true, connectionMethod, listener, false);
+                requiresLogin, cacheFilename != null, connectionMethod, listener, false);
     }
 
     @Override

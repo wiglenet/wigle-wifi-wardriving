@@ -95,14 +95,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=" "
-                android:textSize="20sp"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@string/new_to_us"
                 android:textSize="20sp"
+                android:paddingStart="14sp"
+                android:paddingLeft="14sp"
+                android:paddingRight="14sp"
                 />
         </LinearLayout>
         <LinearLayout

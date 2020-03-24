@@ -12,7 +12,15 @@ public class MagicEightUtil {
      */
     public static Integer extractKeyFrom(String mac, byte[] macbytes, SipKey sipkey, int n) {
 
+        if (mac.length() != 17) {
+            //ALIBI: invalid MAC
+            return null;
+        }
+
         Integer kslice2 = Integer.valueOf( extractIntKeyFrom(mac,macbytes,sipkey,n) );
+        if (kslice2 == -1) {
+            return null;
+        }
         return kslice2;
     }
 

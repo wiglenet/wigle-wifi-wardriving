@@ -399,4 +399,14 @@
     <string name="discovered">Oppdaget</string>
     <string name="new_to_us">(Ny hos WiGLE)</string>
     <string name="total_seen">Totalt observert</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;lastet ned.</string>
+    <string name="uploaded">&#160;opp.</string>
+    <string name="click_retry">&#160;Trykk på indikatoren for å prøve på nytt.</string>
+    <string name="click_download">&#160;Trykk på indikatoren for å synkronisere med enheten.</string>
+    <string name="click_access">&#160;Trykk på indikatoren for å kopiere.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Nedlastingen mislyktes: resultatet ble ikke lagret.</string>
+    <string name="not_proc">&#160;ikke behandlet.</string>
 </resources>

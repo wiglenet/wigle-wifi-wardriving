@@ -164,6 +164,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
     public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
     public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
+    public static final String CSV_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/csv/";
     public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
     public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
 
@@ -1956,7 +1957,7 @@ public final class MainActivity extends AppCompatActivity {
                 } else {
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, false);
                 }
-                edit.commit();
+                edit.apply();
                 if (state.bluetoothReceiver == null) {
                     MainActivity.info("new bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
@@ -1978,6 +1979,10 @@ public final class MainActivity extends AppCompatActivity {
             }
         } catch (SecurityException se) {
             info("Security exception attempting to access bluetooth adapter", se);
+        } catch (Exception e) {
+            //ALIBI: there's a lot of wonkiness in real-world BT adapters
+            //  seeing them go null during this block after null check passes,
+            MainActivity.error("failure initializing bluetooth: ",e);
         }
     }
 
@@ -2458,18 +2463,21 @@ public final class MainActivity extends AppCompatActivity {
         if (state.dbHelper != null) state.dbHelper.close();
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (state.gpsListener != null) {
-            locationManager.removeGpsStatusListener(state.gpsListener);
+        if (state.gpsListener != null && locationManager != null) {
             try {
+                locationManager.removeGpsStatusListener(state.gpsListener);
                 locationManager.removeUpdates(state.gpsListener);
                 if (Build.VERSION.SDK_INT >= 24) {
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
                 }
-
             } catch (final SecurityException ex) {
                 error("SecurityException on finish: " + ex, ex);
+            } catch (final IllegalStateException ise) {
+                error("ISE turning off GPS: ",ise);
+            } catch (final NullPointerException npe) {
+                error("NPE turning off GPS: ", npe);
             }
         }
 

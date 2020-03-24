@@ -368,4 +368,14 @@
     <string name="discovered">Upptäckt</string>
     <string name="new_to_us">(Nytt för WiGLE)</string>
     <string name="total_seen">Totalt observerat</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;hämtas.</string>
+    <string name="uploaded">&#160;uppladdad.</string>
+    <string name="click_retry">&#160;Tryck på indikatorn för att försöka igen.</string>
+    <string name="click_download">&#160;Tryck på indikatorn för att synkronisera till enheten.</string>
+    <string name="click_access">&#160;Tryck på indikatorn för att kopiera.</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">Nedladdningen misslyckades: resultatet sparades inte.</string>
+    <string name="not_proc">&#160;inte bearbetad.</string>
 </resources>

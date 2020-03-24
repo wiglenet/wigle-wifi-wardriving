@@ -421,4 +421,14 @@
     <string name="discovered">发现</string>
     <string name="new_to_us">（WiGLE新手)</string>
     <string name="total_seen">观察总数</string>
+    <string name="csv">CSV</string>
+    <string name="kml">KML</string>
+    <string name="downloaded">&#160;已下载。</string>
+    <string name="uploaded">&#160;已上传。</string>
+    <string name="click_retry">&#160;点按指示器以重试。</string>
+    <string name="click_download">&#160;点按指示器以同步到设备。</string>
+    <string name="click_access">&#160;点击指示器进行复制。</string>
+    <string name="plus_gps">+GPS:&#160;</string>
+    <string name="dl_failed">下载失败：未保存结果。</string>
+    <string name="not_proc">&#160;未处理。</string>
 </resources>

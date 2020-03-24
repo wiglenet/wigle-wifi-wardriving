@@ -54,6 +54,7 @@ import javax.net.ssl.SSLException;
 
 import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
+import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 
 /**
  * replacement file upload task
@@ -68,6 +69,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private final boolean justWriteFile;
     private final boolean writeEntireDb;
     private final boolean writeRun;
+
+    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type";
 
     private static class CountStats {
         int byteCount;
@@ -431,8 +434,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 + ",display=" + android.os.Build.DISPLAY
                 + ",board=" + android.os.Build.BOARD
                 + ",brand=" + android.os.Build.BRAND
-                + "\n"
-                + "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+                + NEWLINE
+                + CSV_COLUMN_HEADERS
+                + NEWLINE;
         writeFos( fos, header );
 
         // assume header is all byte per char
@@ -645,13 +649,13 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                                                final Object[] fileFilename)
             throws IOException {
         final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        final String filename = "WigleWifi_" + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
+        final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
 
 
         final boolean hasSD = FileUtility.hasSD();
         File file = null;
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        final String filePath = FileUtility.getUploadFilePath();
+        final String filePath = FileUtility.getUploadFilePath(context);
 
         if ( hasSD && filePath != null) {
             final File path = new File( filePath );

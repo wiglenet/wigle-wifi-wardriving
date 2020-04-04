@@ -619,20 +619,24 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             if (pd != null) {
                 if (values.length == 1) {
                     MainActivity.info("progress: " + values[0]);
-                    if (values[0] > 0) {
-                        pd.setIndeterminate(false);
-                        if (100 == values[0]) {
-                            if (pd.isShowing()) {
-                                pd.dismiss();
+                    try {
+                        if (values[0] > 0) {
+                            pd.setIndeterminate(false);
+                            if (100 == values[0]) {
+                                if (pd.isShowing()) {
+                                    pd.dismiss();
+                                }
+                                return;
                             }
-                            return;
+                            pd.setMessage(getString(R.string.backup_in_progress));
+                            pd.setProgress(values[0]);
+                        } else {
+                            pd.setIndeterminate(false);
+                            pd.setMessage(getString(R.string.backup_preparing));
+                            pd.setProgress(values[0]);
                         }
-                        pd.setMessage(getString(R.string.backup_in_progress));
-                        pd.setProgress(values[0]);
-                    } else {
-                        pd.setIndeterminate(false);
-                        pd.setMessage(getString(R.string.backup_preparing));
-                        pd.setProgress(values[0]);
+                    } catch (IllegalStateException iex) {
+                        MainActivity.error("lost ability to update progress dialog - detatched fragment?", iex);
                     }
                 } else {
                     MainActivity.warn("too many values for DB Backup progress update");

@@ -222,6 +222,7 @@ public final class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
+        workAroundGoogleMapsBug();
 
         // set language
         setLocale(this);
@@ -414,6 +415,23 @@ public final class MainActivity extends AppCompatActivity {
             for (final String key : keys) {
                 qScanSet(prefs, key);
             }
+        }
+    }
+
+    private void workAroundGoogleMapsBug() {
+        try {
+            SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);
+            if (!googleBug.contains("fixed")) {
+                info("working around google maps bug 154855417");
+                File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
+                corruptedZoomTables.delete();
+                googleBug.edit().putBoolean("fixed", true).apply();
+            }
+            else {
+                info("already worked around google maps bug 154855417");
+            }
+        } catch (Exception e) {
+            warn("Exception in workAroundGoogleMapsBug: " + e);
         }
     }
 

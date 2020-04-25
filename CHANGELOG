@@ -1,3 +1,6 @@
+* 2.53 (04/24/2020)
+Workaround for Google Maps Bug https://issuetracker.google.com/issues/154855417
+
 * 2.52 (03/24/2020)
 Uploads pane download/upload controls.
 "Backup Database" can share from internal storage.

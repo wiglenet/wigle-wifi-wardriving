@@ -67,14 +67,14 @@ public final class Network implements ClusterItem {
         freqToChanTemp.put(5240, 48);
         freqToChanTemp.put(5260, 52);
         freqToChanTemp.put(5280, 56);
-        freqToChanTemp.put(5300, 58);
-        freqToChanTemp.put(5320, 60);
+        freqToChanTemp.put(5300, 60);
+        freqToChanTemp.put(5320, 64);
 
         freqToChanTemp.put(5500, 100);
         freqToChanTemp.put(5520, 104);
         freqToChanTemp.put(5540, 108);
         freqToChanTemp.put(5560, 112);
-        freqToChanTemp.put(5570, 116);
+        freqToChanTemp.put(5580, 116);
         freqToChanTemp.put(5600, 120);
         freqToChanTemp.put(5620, 124);
         freqToChanTemp.put(5640, 128);

@@ -10,14 +10,14 @@ public class MagicEightUtil {
      * read mac from text string into macbytes. run siphahsh(skipkeky,macbytes) and mask
      * the low-n bits (n=10 would only produce integer less than 1024)
      */
-    public static Integer extractKeyFrom(String mac, byte[] macbytes, SipKey sipkey, int n) {
+    public static Long extractKeyFrom(String mac, byte[] macbytes, SipKey sipkey, int n) {
 
         if (mac.length() != 17) {
             //ALIBI: invalid MAC
             return null;
         }
 
-        Integer kslice2 = Integer.valueOf( extractIntKeyFrom(mac,macbytes,sipkey,n) );
+        Long kslice2 = Long.valueOf( extractLongKeyFrom(mac,macbytes,sipkey,n) );
         if (kslice2 == -1) {
             return null;
         }
@@ -28,8 +28,7 @@ public class MagicEightUtil {
      * read mac from text string into macbytes. run siphahsh(skipkeky,macbytes) and mask
      * the low-n bits (n=10 would only produce integer less than 1024)
      */
-    public static int extractIntKeyFrom(String mac, byte[] macbytes, SipKey sipkey, int n) {
-
+    public static long extractLongKeyFrom(String mac, byte[] macbytes, SipKey sipkey, int n) {
         for ( int i = 0; i < macbytes.length; i++ ) {
             char hi = mac.charAt(i*3);
             char lo = mac.charAt(i*3+1);
@@ -37,12 +36,9 @@ public class MagicEightUtil {
             byte lob = nybbleFrom(lo);
             macbytes[i] = (byte)( hib | lob);
         }
-
         long siph = SipHash.digest(sipkey, macbytes);
-
         long mask = (1L << n ) - 1;
-
-        return (int)(siph & mask);
+        return (siph & mask);
     }
 
     /**

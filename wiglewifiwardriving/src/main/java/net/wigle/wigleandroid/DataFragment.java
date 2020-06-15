@@ -804,7 +804,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             final SipKey sipkey = new SipKey(new byte[16]);
             final byte[] macBytes = new byte[6];
-            final Map<Integer,Set<mgrs>> mjg = new TreeMap<>();
+            final Map<Long,Set<mgrs>> mjg = new TreeMap<>();
 
             final long genStart = System.currentTimeMillis();
 
@@ -828,12 +828,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         } else {
                             mgrs m = mgrs.fromUtm(utm.fromLatLon(lat, lon));
 
-                            Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
+                            Long kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
+
                             if (null != kslice2) {
                                 Set<mgrs> locs = mjg.get(kslice2);
                                 if (locs == null) {
                                     locs = new HashSet<>();
-                                    mjg.put(kslice2, locs);
+                                    mjg.put((long)kslice2, locs);
                                 }
                                 if (locs.add(m)) {
                                     records++;
@@ -888,8 +889,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             bb.clear();
                             byte[] mstr = new byte[9];
                             int outElements = 0;
-                            for ( Map.Entry<Integer,Set<mgrs>> me : mjg.entrySet()) {
-                                int key = me.getKey().intValue();
+                            for ( Map.Entry<Long,Set<mgrs>> me : mjg.entrySet()) {
+                                long key = me.getKey();
                                 for ( mgrs m : me.getValue() ) {
                                     if (bb.remaining() < recordsize ) {
                                         bb.flip();
@@ -899,7 +900,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                                         bb.clear();
                                     }
                                     m.populateBytes(mstr);
-                                    bb.putInt(key).put(mstr);
+                                    bb.putLong(key).put(mstr);
                                 }
                                 outElements++;
                                 if (outElements % 100 == 0) {

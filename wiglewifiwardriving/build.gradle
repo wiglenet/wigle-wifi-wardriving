@@ -13,6 +13,7 @@ android {
         targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -66,20 +67,21 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.3.1'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'commons-io:commons-io:2.6'
     //TODO: MinAPI issue: implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.2.0'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'androidx.test:core:1.2.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
-    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
 
 import groovy.json.JsonSlurper
+import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 task downloadFile (type: Download) {
@@ -99,7 +101,7 @@ task createMccMncDB (dependsOn: 'downloadFile') {
         sqlcmds.collect{it.trim()}.findAll{!it.isEmpty() && !it.startsWith("--")}.each{
             try {
                 sql.execute(it)
-            } catch(java.sql.SQLException e) {
+            } catch(SQLException e) {
                 System.err << "Invalid SQL statement: " + it
                 e.printStackTrace(System.err)
                 throw new GradleException('Preformulated MCC/MNC Database SQL Failure.')
@@ -108,7 +110,7 @@ task createMccMncDB (dependsOn: 'downloadFile') {
     }
 
     delete outputMxcDbFile
-    def sql = groovy.sql.Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
+    def sql = Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
     new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) {loadScript(sql, it)}
     def inputFile = new File("$mxcDictionaryFile")
     def mccMap = new JsonSlurper().parseText(inputFile.text)

@@ -5,7 +5,7 @@ apply plugin: 'de.undercouch.download'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"

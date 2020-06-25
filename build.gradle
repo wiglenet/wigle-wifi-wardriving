@@ -9,9 +9,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'de.undercouch:gradle-download-task:3.4.3'
-        classpath 'org.codehaus.groovy:groovy-android-gradle-plugin:2.0.1'
     }
 }
 

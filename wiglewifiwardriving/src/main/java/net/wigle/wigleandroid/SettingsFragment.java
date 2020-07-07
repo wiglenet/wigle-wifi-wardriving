@@ -10,6 +10,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Build;
@@ -537,6 +538,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
         SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
+        TextView appVersion = view.findViewById(R.id.app_version);
+        final String appName = getString(R.string.app_name);
+        if (null != appVersion) {
+            try {
+                String versionName = activity.getApplicationContext().getPackageManager().getPackageInfo(activity.getApplicationContext().getPackageName(), 0).versionName;
+                appVersion.setText(appName+" v."+versionName);
+            } catch (PackageManager.NameNotFoundException e) {
+                MainActivity.error("Unable to get version number: ",e);
+            }
+        }
     }
 
     private void updateRegister(final View view) {

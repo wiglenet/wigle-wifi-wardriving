@@ -451,6 +451,25 @@
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"
     android:paddingTop="10dip" android:paddingBottom="10dip"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <TextView
+            android:id="@+id/app_version"
+            android:textSize="12sp"
+            style="@style/StatRankColor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            android:layout_marginEnd="6dip"
+            android:layout_marginLeft="6dip"
+            android:layout_marginStart="6dip"/>
+    </LinearLayout>
 
 </LinearLayout>
 </ScrollView>

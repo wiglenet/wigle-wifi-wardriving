@@ -1,3 +1,10 @@
+* 2.54 (07/24/2020)
+Support for Android 11 Beta
+Better WPA3 heuristics
+Fixed frequencies (thanks christianrowlands!)
+More bits for Magic Eight Ball
+Show version in settings
+
 * 2.53 (04/24/2020)
 Workaround for Google Maps Bug https://issuetracker.google.com/issues/154855417
 

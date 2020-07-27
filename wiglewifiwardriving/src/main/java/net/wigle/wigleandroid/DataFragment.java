@@ -55,6 +55,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -1006,7 +1007,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             // TODO: android R FS changes
             final boolean hasSD = FileUtility.hasSD();
 
-            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
             final String name = df.format(new Date());
             final String nameStr = "<name>" + name + "</name><trkseg>\n";
 

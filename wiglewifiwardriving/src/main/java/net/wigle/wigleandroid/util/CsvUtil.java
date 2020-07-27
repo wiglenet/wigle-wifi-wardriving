@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Quick and dirty line-based CSV to string array mapper.
@@ -18,8 +19,7 @@ public class CsvUtil {
     public static final char CR = '\r';
     public static final char LF = '\n';
 
-    @SuppressLint("SimpleDateFormat")
-    private static final SimpleDateFormat CSV_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat CSV_TIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
     public static String[] lineToArray(final String line) {
         List<String> a = new ArrayList<>();

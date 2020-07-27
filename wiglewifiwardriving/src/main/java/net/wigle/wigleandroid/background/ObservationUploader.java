@@ -403,7 +403,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
      * @throws PackageManager.NameNotFoundException
      * @throws InterruptedException
      */
-    @SuppressLint("SimpleDateFormat")
     private long writeFileWithCursor( final OutputStream fos, final Bundle bundle,
                                       final ObservationUploader.CountStats countStats,
                                       final Cursor cursor ) throws IOException,
@@ -413,7 +412,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
 
         final long start = System.currentTimeMillis();
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
         countStats.lineCount = 0;
         final int total = cursor.getCount();
         long fileWriteMillis = 0;
@@ -643,11 +642,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         charBuffer.position( charBuffer.position() + stringBuffer.length() );
     }
 
-    @SuppressLint("SimpleDateFormat")
     public static OutputStream getOutputStream(final Context context, final Bundle bundle,
                                                final Object[] fileFilename)
             throws IOException {
-        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
         final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
 
 

@@ -901,7 +901,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                                         bb.clear();
                                     }
                                     m.populateBytes(mstr);
-                                    bb.putLong(key).put(mstr);
+                                    //ALIBI: relying on narrowing primitive conversion to get the low int bytes - https://docs.oracle.com/javase/specs/jls/se10/html/jls-5.html#jls-5.1.3
+                                    bb.putInt((int)key).put(mstr);
                                 }
                                 outElements++;
                                 if (outElements % 100 == 0) {

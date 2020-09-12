@@ -7,9 +7,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -19,6 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
@@ -32,7 +35,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 
-import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -112,6 +114,8 @@ public final class MappingFragment extends Fragment {
     public static final String MAP_DIALOG_PREFIX = "";
     public static LocationListener STATIC_LOCATION_LISTENER = null;
 
+    private NumberFormat numberFormat;
+
     static final int UPDATE_MAP_FILTER = 1;
 
     private static final int DEFAULT_ZOOM = 17;
@@ -145,8 +149,8 @@ public final class MappingFragment extends Fragment {
     private static final float POLYLINE_TOLERANCE_FINE = 50.0f;
 
     private static final float ROUTE_WIDTH = 20.0f;
-    private static final int DARK_ROUTE = Color.BLACK;
-    private static final int LIGHT_ROUTE = Color.parseColor("#F4D03F");
+    private static final int OVERLAY_DARK = Color.BLACK;
+    private static final int OVERLAY_LIGHT = Color.parseColor("#F4D03F");
 
 
 
@@ -160,6 +164,16 @@ public final class MappingFragment extends Fragment {
         MainActivity.setLocale(getActivity());
         finishing = new AtomicBoolean(false);
 
+        Configuration sysConfig = getResources().getConfiguration();
+        Locale locale = null;
+        if (null != sysConfig) {
+            locale = sysConfig.locale;
+        }
+        if (null == locale) {
+            locale = Locale.US;
+        }
+        numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMaximumFractionDigits(1);
         // media volume
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -506,6 +520,8 @@ public final class MappingFragment extends Fragment {
     private class MapRunnable implements Runnable {
         @Override
         public void run() {
+            final View view = getView();
+            final SharedPreferences prefs = getActivity() != null?getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
                 final Location location = ListFragment.lameStatic.location;
@@ -536,7 +552,6 @@ public final class MappingFragment extends Fragment {
                     }
 
                     try {
-                        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                         final boolean showRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
                         //DEBUG: MainActivity.info("mUpdateTimeTask with non-null location. show: "+showRoute);
                         if (showRoute) {
@@ -583,9 +598,8 @@ public final class MappingFragment extends Fragment {
                     previousLocation = location;
                 }
 
-                previousRunNets = ListFragment.lameStatic.runNets;
 
-                final View view = getView();
+                previousRunNets = ListFragment.lameStatic.runNets;
 
                 if (view != null) {
                     TextView tv = (TextView) view.findViewById(R.id.stats_run);
@@ -600,6 +614,12 @@ public final class MappingFragment extends Fragment {
 
                     tv = (TextView) view.findViewById( R.id.stats_dbnets );
                     tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
+                    if (prefs != null) {
+                        float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+                        final String distString = DashboardFragment.metersToString(numberFormat, getActivity(), dist, true);
+                        tv = (TextView) view.findViewById(R.id.rundistance);
+                        tv.setText(distString);
+                    }
                 }
 
                 final long period = 1000L;
@@ -1081,8 +1101,8 @@ public final class MappingFragment extends Fragment {
     private int getRouteColorForMapType(final int mapType) {
         if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
                 && mapType != GoogleMap.MAP_TYPE_NONE) {
-            return LIGHT_ROUTE;
+            return OVERLAY_LIGHT;
         }
-        return DARK_ROUTE;
+        return OVERLAY_DARK;
     }
 }

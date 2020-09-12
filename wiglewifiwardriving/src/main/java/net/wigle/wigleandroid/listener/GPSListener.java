@@ -38,6 +38,9 @@ public class GPSListener implements Listener, LocationListener {
     public static final long MIN_ROUTE_LOCATION_DIFF_TIME = 3 * 1000;
     public static final float MIN_ROUTE_LOCATION_PRECISION_METERS = 24.99f;
 
+    //Minimum difference between updates to change total distance.
+    public static final float DIST_MIN_T = 0.5f;
+
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
     private Location location;
@@ -235,7 +238,7 @@ public class GPSListener implements Listener, LocationListener {
             if ( prevGpsLocation != null ) {
                 float dist = location.distanceTo( prevGpsLocation );
                 //MainActivity.info( "dist: " + dist );
-                if ( dist > 0f ) {
+                if ( dist > DIST_MIN_T ) {
                     final Editor edit = prefs.edit();
                     edit.putFloat( ListFragment.PREF_DISTANCE_RUN,
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );

@@ -126,14 +126,17 @@
             android:id="@+id/rundistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="3dp"
-            android:textColor="#A000"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingLeft="13dp"
+            android:paddingRight="13dp"
+            android:textColor="#FFFF"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:background="#33EEEEEE"/>
+            android:background="#AA333333"/>
         <View
             android:layout_width="2dp"
             android:layout_height="25dp"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="0dp" />
     </LinearLayout>
 </RelativeLayout>

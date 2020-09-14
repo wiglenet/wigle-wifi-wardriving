@@ -14,6 +14,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:paddingBottom="3dp"
         android:background="#AA000000"
         android:weightSum="21">
         <TextView

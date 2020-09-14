@@ -25,6 +25,7 @@ import android.os.Bundle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 import androidx.core.content.ContextCompat;
 
@@ -37,6 +38,12 @@ public class GPSListener implements Listener, LocationListener {
     public static final float MIN_ROUTE_LOCATION_DIFF_METERS = 3.8f;
     public static final long MIN_ROUTE_LOCATION_DIFF_TIME = 3 * 1000;
     public static final float MIN_ROUTE_LOCATION_PRECISION_METERS = 24.99f;
+
+    //Minimum difference between updates to change total distance.
+    // ALIBI: Don't know if B. Bonzai is a user
+    public static final float MACH_1_3_METERS_SEC = 445.9f; // compensate for use on vehicles up to the HB-88
+    // ALIBI: excludes the snail-stumbling community until they work out weight/power supply problems
+    public static final float SLOW_METERS_SEC = 0.025f;     // snails actually vary between 0.013m/s and 0.0028m/s
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
@@ -235,7 +242,8 @@ public class GPSListener implements Listener, LocationListener {
             if ( prevGpsLocation != null ) {
                 float dist = location.distanceTo( prevGpsLocation );
                 //MainActivity.info( "dist: " + dist );
-                if ( dist > 0f ) {
+                if (realisticMovement(dist, (float)(location.getTime()-prevGpsLocation.getTime())*0.001f,
+                    prevGpsLocation.getAccuracy(), location.getAccuracy())) {
                     final Editor edit = prefs.edit();
                     edit.putFloat( ListFragment.PREF_DISTANCE_RUN,
                             dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );
@@ -478,4 +486,28 @@ public class GPSListener implements Listener, LocationListener {
         return getLocation();
     }
 
+    /**
+     * classify speed as realistic or unrealistic for distance calcs. mostly a stop-gap,
+     * Kalman filtering would be better
+     * @param distanceMeters meters travelled
+     * @param timeDiffSecs time since previous measurement
+     * @return true if the movement is realistically possible, false if it's obvious bunk
+     */
+    public static boolean realisticMovement(float distanceMeters, float timeDiffSecs, float lastAccuracyMeters, float currentAccuracyMeters) {
+        final float metersSecondJump = distanceMeters/timeDiffSecs;
+        if (metersSecondJump > MACH_1_3_METERS_SEC || metersSecondJump < SLOW_METERS_SEC || Float.isNaN(metersSecondJump)) {
+            //DEBUG: MainActivity.info("DQ: "+metersSecondJump+"m/s");
+            return false;
+        }
+        if (currentAccuracyMeters > 10 && currentAccuracyMeters > distanceMeters) {
+            //DEBUG: MainActivity.info("ACC DQ: "+currentAccuracyMeters+"m ac, dist: "+distanceMeters);
+            return false;
+        }
+        //ALIBI: Jump on fix
+        if ((currentAccuracyMeters-lastAccuracyMeters) > distanceMeters) {
+            //DEBUG: MainActivity.info("JUMP DQ: "+(currentAccuracyMeters-lastAccuracyMeters)+"m, "+distanceMeters+"m");
+            return false;
+        }
+        return true;
+    }
 }

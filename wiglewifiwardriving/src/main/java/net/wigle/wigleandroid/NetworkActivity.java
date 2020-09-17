@@ -46,6 +46,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
@@ -279,6 +280,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
+                    // ALIBI:  assumes all observations belong to one "cluster" w/ a single centroid.
+                    // we could check and perform multi-cluster here
+                    // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
+                    // but that seems less likely w/ one individual's observations
+                    final LatLng estCentroid = computeBasicLocation(obsMap);
 
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
@@ -288,6 +294,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                 final LatLng latLon = obs.getKey();
                                 final int level = obs.getValue();
 
+                                // default to initial position
                                 if (count == 0 && network.getLatLng() == null) {
                                     final CameraPosition cameraPosition = new CameraPosition.Builder()
                                             .target(latLon).zoom(DEFAULT_ZOOM).build();
@@ -301,6 +308,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                         .strokeWidth(0)
                                         .zIndex(level));
                                 count++;
+                            }
+                            // if we got a good centroid, display it and center on it
+                            if (null != estCentroid && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+                                //TODO: improve zoom based on obs distances?
+                                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(estCentroid).zoom(DEFAULT_ZOOM).build();
+                                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                                googleMap.addMarker(new MarkerOptions().position(estCentroid));
                             }
                             MainActivity.info("observation count: " + count);
                         }
@@ -331,6 +346,48 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             }
         });
         ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
+
+    private final LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
+        double latSum = 0.0;
+        double lonSum = 0.0;
+        double weightSum = 0.0;
+        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+            if (null != obs.getKey()) {
+                float cleanSignal = cleanSignal((float) obs.getValue());
+                cleanSignal *= cleanSignal;
+                latSum += (obs.getKey().latitude * cleanSignal);
+                lonSum += (obs.getKey().longitude * cleanSignal);
+                weightSum += cleanSignal;
+            }
+        }
+        double trilateratedLatitude = 0;
+        double trilateratedLongitude = 0;
+        if (weightSum > 0) {
+            trilateratedLatitude = latSum / weightSum;
+            trilateratedLongitude = lonSum / weightSum;
+        }
+        return new LatLng(trilateratedLatitude, trilateratedLongitude);
+    }
+
+    /**
+     * optimistic signal weighting
+     * @param signal
+     * @return
+     */
+    public static float cleanSignal(Float signal) {
+        float signalMemo = signal;
+        if (signal == null || signal == 0f) {
+            return 100f;
+        } else if (signal >= -200 && signal < 0) {
+            signalMemo += 200f;
+        } else if (signal <= 0 || signal > 200) {
+            signalMemo = 100f;
+        }
+        if (signalMemo < 1f) {
+            signalMemo = 1f;
+        }
+        return signalMemo;
     }
 
     private void setupMap( final Network network, final Bundle savedInstanceState ) {

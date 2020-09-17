@@ -301,6 +301,6 @@
 				android:layout_marginBottom="3dip"
 				android:minHeight="0dp"
 				android:background="@drawable/filter_button" />
-		</LinearLayout>
+	</LinearLayout>
 	</RelativeLayout>
 </LinearLayout>

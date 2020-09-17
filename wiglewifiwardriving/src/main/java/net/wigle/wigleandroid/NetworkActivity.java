@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -285,11 +286,12 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
                     // but that seems less likely w/ one individual's observations
                     final LatLng estCentroid = computeBasicLocation(obsMap);
-
+                    final int zoomLevel = computeZoom(obsMap, estCentroid);
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(final GoogleMap googleMap) {
                             int count = 0;
+                            int maxDistMeters = 0;
                             for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
                                 final LatLng latLon = obs.getKey();
                                 final int level = obs.getValue();
@@ -313,7 +315,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                             if (null != estCentroid && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
                                 //TODO: improve zoom based on obs distances?
                                 final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(estCentroid).zoom(DEFAULT_ZOOM).build();
+                                        .target(estCentroid).zoom(zoomLevel).build();
                                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                                 googleMap.addMarker(new MarkerOptions().position(estCentroid));
                             }
@@ -368,6 +370,37 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             trilateratedLongitude = lonSum / weightSum;
         }
         return new LatLng(trilateratedLatitude, trilateratedLongitude);
+    }
+
+    private final int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
+        float maxDist = 0f;
+        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+            float[] res = new float[3];
+            Location.distanceBetween(centroid.latitude, centroid.longitude, obs.getKey().latitude, obs.getKey().longitude, res);
+            if(res[0] > maxDist) {
+                maxDist = res[0];
+            }
+        }
+        MainActivity.info("max dist: "+maxDist);
+        if (maxDist < 135) {
+            return 18;
+        } else if (maxDist < 275) {
+            return 17;
+        } else if (maxDist < 550) {
+            return 16;
+        } else if (maxDist < 1100) {
+            return 15;
+        } else if (maxDist < 2250) {
+            return 14;
+        } else if (maxDist < 4500) {
+            return 13;
+        } else if (maxDist < 9000) {
+            return 12;
+        } else if (maxDist < 18000) {
+            return 11;
+        } else {
+            return DEFAULT_ZOOM;
+        }
     }
 
     /**

@@ -19,17 +19,21 @@ import java.util.Locale;
 public class NetworkListUtil {
 
     //color by signal strength
-    private static final int COLOR_1 = Color.rgb(70, 170, 0);
-    private static final int COLOR_2 = Color.rgb(170, 170, 0);
-    private static final int COLOR_3 = Color.rgb(170, 95, 30);
-    private static final int COLOR_4 = Color.rgb(180, 60, 40);
-    private static final int COLOR_5 = Color.rgb(180, 45, 70);
+    private static final int COLOR_1 = Color.rgb(0, 255, 0);
+    private static final int COLOR_2 = Color.rgb(85, 255, 0);
+    private static final int COLOR_3 = Color.rgb(170, 255, 0);
+    private static final int COLOR_4 = Color.rgb(255, 255, 0);
+    private static final int COLOR_5 = Color.rgb(255, 170, 0);
+    private static final int COLOR_6 = Color.rgb(255, 85, 0);
+    private static final int COLOR_7 = Color.rgb(255, 0, 0);
 
-    private static final int COLOR_1A = Color.argb(128, 70, 170, 0);
-    private static final int COLOR_2A = Color.argb(128, 170, 170, 0);
-    private static final int COLOR_3A = Color.argb(128, 170, 95, 30);
-    private static final int COLOR_4A = Color.argb(128, 180, 60, 40);
-    private static final int COLOR_5A = Color.argb(128, 180, 45, 70);
+    private static final int COLOR_1A = Color.argb(128, 0, 255, 0);
+    private static final int COLOR_2A = Color.argb(128, 85, 255, 0);
+    private static final int COLOR_3A = Color.argb(128, 170, 255, 0);
+    private static final int COLOR_4A = Color.argb(128, 255, 255, 0);
+    private static final int COLOR_5A = Color.argb(128, 255, 170, 0);
+    private static final int COLOR_6A = Color.argb(128, 255, 85, 0);
+    private static final int COLOR_7A = Color.argb(128, 255, 0, 0);
 
     public static String getConstructionTime(final SimpleDateFormat format, final Network network) {
         return format.format(new Date(network.getConstructionTime()));
@@ -52,16 +56,19 @@ public class NetworkListUtil {
 
     public static int getSignalColor(final int level, final boolean alpha) {
         int color = alpha ? COLOR_1A : COLOR_1;
-        if (level <= -90) {
-            color = alpha ? COLOR_5A : COLOR_5;
+        if (level <= -100) {
+            color = alpha ? COLOR_7A : COLOR_7;
+        } else if (level <= -90) {
+            color = alpha ? COLOR_6A : COLOR_6;
         } else if (level <= -80) {
-            color = alpha ? COLOR_4A : COLOR_4;
+            color = alpha ? COLOR_5A : COLOR_5;
         } else if (level <= -70) {
-            color = alpha ? COLOR_3A : COLOR_3;
+            color = alpha ? COLOR_4A : COLOR_4;
         } else if (level <= -60) {
+            color = alpha ? COLOR_3A : COLOR_3;
+        } else if (level <= -50) {
             color = alpha ? COLOR_2A : COLOR_2;
         }
-
         return color;
     }
 
@@ -252,6 +259,4 @@ public class NetworkListUtil {
 
         return resource;
     }
-
-
 }

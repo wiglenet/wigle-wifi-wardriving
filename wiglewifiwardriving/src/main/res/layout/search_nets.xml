@@ -48,5 +48,4 @@
                 android:text="@string/reset_button"/>
         </LinearLayout>
     </LinearLayout>
-
 </ScrollView>

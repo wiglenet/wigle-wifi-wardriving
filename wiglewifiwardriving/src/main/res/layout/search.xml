@@ -47,5 +47,4 @@
         android:hint="CA1E234FECABE"
         android:layout_weight="1"
         />
-
 </LinearLayout>

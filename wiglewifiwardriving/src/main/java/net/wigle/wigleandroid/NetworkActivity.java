@@ -44,6 +44,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -303,12 +304,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                     googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                                 }
 
-                                googleMap.addCircle(new CircleOptions()
-                                        .center(latLon)
-                                        .radius(4)
-                                        .fillColor(NetworkListUtil.getSignalColor(level, true))
-                                        .strokeWidth(0)
-                                        .zIndex(level));
+                                BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
+                                        getApplicationContext(), level);
+
+                                googleMap.addMarker(new MarkerOptions().icon(obsIcon)
+                                        .position(latLon).zIndex(level));
                                 count++;
                             }
                             // if we got a good centroid, display it and center on it

@@ -2,9 +2,22 @@ package net.wigle.wigleandroid.ui;
 
 import android.bluetooth.BluetoothClass;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.provider.Settings;
 
+import androidx.annotation.ColorInt;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -70,6 +83,29 @@ public class NetworkListUtil {
             color = alpha ? COLOR_2A : COLOR_2;
         }
         return color;
+    }
+
+    public static BitmapDescriptor getSignalBitmap(@NonNull Context context, final int level) {
+        int color = getSignalColor(level, true);
+        return getBitmapFromVector(context, R.drawable.observation, color);
+    }
+
+    public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
+                                                       @DrawableRes int vectorResourceId,
+                                                       @ColorInt int tintColor) {
+        Drawable vectorDrawable = ResourcesCompat.getDrawable(
+                context.getResources(), vectorResourceId, null);
+        if (vectorDrawable == null) {
+            MainActivity.error("Requested vector resource was not found");
+            return BitmapDescriptorFactory.defaultMarker();
+        }
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        DrawableCompat.setTint(vectorDrawable, tintColor);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     public static int getImage(final Network network) {

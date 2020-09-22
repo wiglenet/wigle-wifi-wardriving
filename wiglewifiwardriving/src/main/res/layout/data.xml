@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollview"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 <LinearLayout
@@ -52,7 +51,6 @@
             android:layout_height="wrap_content"
             android:text="@string/csv_run_export_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/csv_run_export_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/csv_run_export_text"
@@ -70,7 +68,6 @@
             android:layout_height="wrap_content"
             android:text="@string/kml_run_export_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/kml_run_export_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/kml_run_export_text"
@@ -88,7 +85,6 @@
             android:layout_height="wrap_content"
             android:text="@string/csv_export_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/csv_export_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/csv_export_text"
@@ -106,7 +102,6 @@
             android:layout_height="wrap_content"
             android:text="@string/kml_export_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/kml_export_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/kml_export_text"
@@ -126,7 +121,6 @@
             android:text="@string/export_m8b_button"
             android:layout_weight="0"/>
         <TextView
-            android:id="@+id/export_m8b_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/export_m8b"
@@ -147,7 +141,6 @@
             android:text="@string/export_gpx_button"
             android:layout_weight="0"/>
         <TextView
-            android:id="@+id/export_gpx_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/export_gpx"
@@ -191,7 +184,6 @@
             android:layout_height="wrap_content"
             android:text="@string/import_observed_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/import_observed_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/import_observed_text"
@@ -260,7 +252,6 @@
             android:textColor="#FFFF5555"
             android:text="@string/clear_db_button" android:layout_weight="0"/>
         <TextView
-            android:id="@+id/clear_db_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear_db_text"

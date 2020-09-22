@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mainlayout"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +7,6 @@
     android:weightSum="2">
     
     <LinearLayout
-        android:id="@+id/topboxlayout"
         android:orientation="horizontal"
         android:layout_weight="1"
         android:layout_height="match_parent"
@@ -18,7 +16,6 @@
         <include layout="@layout/dashtop"/>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/bottomboxlayout"
         android:orientation="horizontal"
         android:layout_weight="1"
         android:layout_height="fill_parent"

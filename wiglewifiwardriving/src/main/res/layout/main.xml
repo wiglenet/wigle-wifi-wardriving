@@ -37,13 +37,11 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/inline_status_bar_frame">
+                android:layout_height="wrap_content">
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inline_status_bar_left"
                     android:layout_weight="6">
                     <TextView
                         android:id="@+id/inline_progress_status"

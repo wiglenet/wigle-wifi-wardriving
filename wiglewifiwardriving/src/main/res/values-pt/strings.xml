@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Últimas marcador upload:</string>
     <string name="maxout_maxid_button">Maxout DB marcador</string>
     <string name="maxout_maxid_text">Set marcador para:</string>
-    <string name="connect_button">Conectar</string>
-    <string name="connect_text">com a permissão do operador de rede</string>
     <string name="csv_run_export_button">CSV Exportar Run</string>
     <string name="csv_run_export_text">Exportação executar atual para arquivo CSV</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Anunciar mudanças de status GPS</string>
     <string name="mute">Silenciar</string>
     <string name="play">Jogar</string>
-    <string name="unknown">Desconhecido</string>
     <string name="sort_text">Opções de classificação</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">DB consulta local</string>
     <string name="reset_button">Campos redefinir</string>
-    <string name="list_query_clear">Argumentos claros Consulta</string>
     <string name="crypto_security">Segurança</string>
     <string name="crypto_strength">Intensidade do sinal</string>
     <string name="crypto_password">Senha</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">Fila DB:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">Locais DB:</string>
-    <string name="dash_no_loc">Localização não!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Endereço</string>
     <string name="no_address_found">Nenhum endereço geocodificados encontrados</string>
     <string name="problem_with_field">Problema com o campo</string>
-    <string name="turning_wifi_off">Voltando WiFi off</string>
     <string name="lost_location">Localização perdido</string>
     <string name="have_location">Agora têm de localização</string>
     <string name="wifi_jammed">WiFi aparece encravado, desligar, e então, Wi-Fi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Mantenha On Screen</string>
     <string name="menu_labels_off">Etiquetas Off</string>
     <string name="menu_labels_on">Em rótulos</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom Out</string>
     <string name="menu_turn_off_lockon">Desligar o Lockon</string>
     <string name="menu_turn_on_lockon">Turn On Lockon</string>
     <string name="menu_show_old">Mostrar Run &amp; New</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">Marca:</string>
     <string name="cell_network_notes">Notas:</string>
     <string name="bluetooth_pref_text">Ativar a digitalização por Bluetooth</string>
-    <string name="turning_bt_off">Desligar o Bluetooth</string>
     <string name="turn_on_bt">Ligando o Bluetooth</string>
     <string name="filter_show_bt">Mostrar Bluetooth</string>
     <string name="error_invalid_bssid">O BSSID deve ter 12 caracteres ou conter um curinga (%)</string>
@@ -345,7 +336,6 @@
     <string name="search_local">Procure seu banco de dados local</string>
     <string name="search_failed">Pesquisa falhada</string>
     <string name="search_empty">Resultados vazios</string>
-    <string name="search_query_limit">Você atingiu o número máximo de pesquisas hoje. Seu limite será redefinido amanhã.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">O Android Pie (9.0) faz a varredura do WiFi para 2 por minuto. Atualize o Android, se possível.</string>
     <string name="q_bad">O Android 10 limita as verificações de Wi-Fi, a menos que seja desativado nas Configurações do desenvolvedor.</string>

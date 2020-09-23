@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Legfrissebb jelölő:</string>
     <string name="maxout_maxid_button">Maximum</string>
     <string name="maxout_maxid_text">Beállítás:</string>
-    <string name="connect_button">Csatlakozás</string>
-    <string name="connect_text">a működtető engedélyével</string>
     <string name="csv_run_export_button">Futás CSV</string>
     <string name="csv_run_export_text">Jelenlegi futás kimentése CSV-ben</string>
     <string name="csv_export_button">Adatbázis CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS státusz változás</string>
     <string name="mute">Némítás be</string>
     <string name="play">Némítás ki</string>
-    <string name="unknown">Ismeretlen</string>
     <string name="sort_text">Rendezés</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL helyettesítők: %,_):</string>
     <string name="search_button">Lekérdezés</string>
     <string name="reset_button">Mezők törlése</string>
-    <string name="list_query_clear">Lekérdezés törlése</string>
     <string name="crypto_security">Biztonság</string>
     <string name="crypto_strength">Jelerősség</string>
     <string name="crypto_password">Jelszó</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">Adatbázis várólista:</string>
     <string name="dash_db_nets">Adatbázis hálózatok:</string>
     <string name="dash_db_locs">Adatbázis helyek:</string>
-    <string name="dash_no_loc">Nincs hely!</string>
     <string name="dash_short_loc">Hely:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mé</string>
@@ -166,7 +161,6 @@
     <string name="address">Cím</string>
     <string name="no_address_found">Nem található geokódolt cím</string>
     <string name="problem_with_field">Probléma a mezővel</string>
-    <string name="turning_wifi_off">WiFi kikapcsolása</string>
     <string name="lost_location">A GPS vétel megszűnt</string>
     <string name="have_location">A helyforrás a</string>
     <string name="wifi_jammed">A WiFi beakadt, most újraindítom.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Ne aludjon a képernyő</string>
     <string name="menu_labels_off">Cimkék ki</string>
     <string name="menu_labels_on">Cimkék be</string>
-    <string name="menu_zoom_in">Zoom +</string>
-    <string name="menu_zoom_out">Zoom -</string>
     <string name="menu_turn_off_lockon">Követés ki</string>
     <string name="menu_turn_on_lockon">Követés be</string>
     <string name="menu_show_old">A futást is mutassa</string>
@@ -336,7 +328,6 @@
     <string name="cell_network_brand">Márka:</string>
     <string name="cell_network_notes">Megjegyzések:</string>
     <string name="bluetooth_pref_text">Engedélyezze a Bluetooth szkennelést</string>
-    <string name="turning_bt_off">A Bluetooth kikapcsolása</string>
     <string name="turn_on_bt">A Bluetooth bekapcsolása</string>
     <string name="filter_show_bt">Bluetooth megjelenítése</string>
     <string name="error_invalid_bssid">A BSSID-nek 12 karakter hosszúnak kell lennie, vagy tartalmaznia kell egy helyettesítő karaktert (%)</string>
@@ -347,7 +338,6 @@
     <string name="search_local">Keresés a helyi adatbázisban</string>
     <string name="search_failed">A keresés sikertelen</string>
     <string name="search_empty">Eredmények üresek</string>
-    <string name="search_query_limit">Ma elérte a maximális számú keresést. A határidőt holnap visszaállítja.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Az Android Pie (9.0) fojtja a WiFi sebességét percenként 2-re. Frissítse az Android rendszert, ha lehetséges.</string>
     <string name="q_bad">Az Android 10 gátolja a WiFi-szkennelést, kivéve, ha le van tiltva a fejlesztői beállításokban.</string>

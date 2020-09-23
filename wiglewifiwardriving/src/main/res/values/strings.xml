@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="maxout_maxid_button">Maxout DB marker</string>
     <string name="maxout_maxid_text">Set marker to:</string>
-    <string name="connect_button">Connect</string>
-    <string name="connect_text">with permission of network operator</string>
     <string name="csv_run_export_button">CSV Export Run</string>
     <string name="csv_run_export_text">Export current run to CSV file</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS status changes</string>
     <string name="mute">Mute Audio</string>
     <string name="play">Play Audio</string>
-    <string name="unknown">Unknown</string>
     <string name="sort_text">Sort Options</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Query Local DB</string>
     <string name="reset_button">Reset Fields</string>
-    <string name="list_query_clear">Clear Query Arguments</string>
     <string name="crypto_security">Security</string>
     <string name="crypto_strength">Signal strength</string>
     <string name="crypto_password">Password</string>
@@ -135,7 +131,6 @@
     <string name="dash_db_queue">DB Queue:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Locations:</string>
-    <string name="dash_no_loc">No Location!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -167,7 +162,6 @@
     <string name="address">Address</string>
     <string name="no_address_found">No geocoded address found</string>
     <string name="problem_with_field">Problem with field</string>
-    <string name="turning_wifi_off">Turning WiFi back off</string>
     <string name="lost_location">Lost Location</string>
     <string name="have_location">Now have location from</string>
     <string name="wifi_jammed">WiFi appears jammed, turning off, and then on, WiFi.</string>
@@ -184,8 +178,6 @@
     <string name="menu_screen_wake">Keep Screen On</string>
     <string name="menu_labels_off">Labels Off</string>
     <string name="menu_labels_on">Labels On</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom Out</string>
     <string name="menu_turn_off_lockon">Turn Off Lockon</string>
     <string name="menu_turn_on_lockon">Turn On Lockon</string>
     <string name="menu_show_old">Show Run&amp;New</string>
@@ -273,7 +265,6 @@
     <string name="map_toast_terrain">Map Type: Terrain</string>
     <string name="map_needs_playservice">Map requires Google Play Service</string>
     <string name="register">Register</string>
-    <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
@@ -295,13 +286,9 @@
     <string name="prevmonthcount_title">WiFi Discovered Last Month</string>
     <string name="firsttransid_title">First Transaction ID</string>
     <string name="lasttransid_title">Latest Transaction ID</string>
-    <string name="please_allow">Please allow permission to use</string>
     <string name="gps_permission">GPS (Fine Location)</string>
     <string name="cell_permission">Cell Location (Coarse Location)</string>
-    <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
-    <string name="restart">Restarting to use external storage</string>
     <string name="rank_stats_app_name">WiGLE.net Rankings</string>
-    <string name="total_wifi">Total WiFi</string>
     <string name="total_cell">Total Cell</string>
     <string name="tab_rank">Rankings</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
@@ -309,8 +296,6 @@
     <string name="queue_depth">File Processing Queue Depth</string>
     <string name="news_app_name">WiGLE.net News</string>
     <string name="tab_news">News</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">Cell GPS</string>
     <string name="bytes">Bytes</string>
     <string name="rank_all_time">All Time Rankings</string>
     <string name="rank_month">Month Rankings</string>
@@ -388,7 +373,6 @@
     <string name="cell_network_brand">Brand:</string>
     <string name="cell_network_notes">Notes:</string>
     <string name="bluetooth_pref_text">Enable Bluetooth Scanning</string>
-    <string name="turning_bt_off">Turning Bluetooth back off</string>
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID must be 12 characters long or contain a wildcard (%)</string>
@@ -399,7 +383,6 @@
     <string name="search_local">Search Your Local Database</string>
     <string name="search_failed">Search Failed</string>
     <string name="search_empty">Results Empty</string>
-    <string name="search_query_limit">You\'ve reached the maximum number of searches today. Your limit will reset tomorrow.</string>
     <string name="export_m8b_button">Export &#x2791;</string>
     <string name="export_m8b">Export Geolocation Magic (8) Ball</string>
     <string name="export_m8b_detail">Generate an oracle for determining your approximate location. See: \n\n https://github.com/wiglenet/m8b \n\n Default slice = 30 will be used, to allow combination with other magic &#x2791; balls.\n\nThis may take a while - please connect external power connected if you have a large database.</string>
@@ -407,7 +390,6 @@
     <string name="m8b_sizing">Determining oracle inputs</string>
     <string name="exporting_m8b_final">Writing oracle file</string>
     <string name="calculating_m8b">Calculating oracle</string>
-    <string name="bt_gps">BT GPS</string>
     <string name="btloc_title">WiGLE.net Bluetooth Devices with Location</string>
     <string name="total_bt">Total Bluetooth</string>
     <string name="menu_debug">Debug</string>

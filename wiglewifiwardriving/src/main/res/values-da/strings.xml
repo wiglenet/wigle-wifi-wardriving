@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Nyeste upload markør:</string>
     <string name="maxout_maxid_button">Max DB markør</string>
     <string name="maxout_maxid_text">Sæt max kør til:</string>
-    <string name="connect_button">Tilslut kun</string>
-    <string name="connect_text">med tilladelse fra netoperatøren</string>
     <string name="csv_run_export_button">Start CSV Eksport</string>
     <string name="csv_run_export_text">Eksport aktuelle forløb til CSV-fil</string>
     <string name="csv_export_button">CSV Eksport til DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Meddel GPS-status ændres</string>
     <string name="mute">Lydløs</string>
     <string name="play">Spil</string>
-    <string name="unknown">Ukendt</string>
     <string name="sort_text">Sorter Optioner</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL-wildcards: %,_):</string>
     <string name="search_button">Forspør Lokal DB</string>
     <string name="reset_button">Unlstil</string>
-    <string name="list_query_clear">Ryd Forspørgelse argumenter</string>
     <string name="crypto_security">Sikkerhed</string>
     <string name="crypto_strength">Signalstyrke</string>
     <string name="crypto_password">Adgangs kode</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB kø:</string>
     <string name="dash_db_nets">DB Net:</string>
     <string name="dash_db_locs">DB Steder:</string>
-    <string name="dash_no_loc">Ingen lokation</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Adresse</string>
     <string name="no_address_found">Ingen geokodede fundet adressen</string>
     <string name="problem_with_field">Problem med feltet</string>
-    <string name="turning_wifi_off">Slukker for WiFi</string>
     <string name="lost_location">Kan ikke finde din lokation</string>
     <string name="have_location">Nu har placering fra</string>
     <string name="wifi_jammed">Din WiFi er låst, slukke, og så tænd for din Wi-Fi igen.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Hold skærmen tændt</string>
     <string name="menu_labels_off">Etiketter fra</string>
     <string name="menu_labels_on">Etiketter til</string>
-    <string name="menu_zoom_in">Zoom ind</string>
-    <string name="menu_zoom_out">Zoom ud</string>
     <string name="menu_turn_off_lockon">Sluk Lokation</string>
     <string name="menu_turn_on_lockon">Tænd Lokation</string>
     <string name="menu_show_old">Vis Run &amp; Ny</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">Korttype: Terræn</string>
     <string name="map_needs_playservice">Kort kræver Google Play Service</string>
     <string name="register">Tilmeld</string>
-    <string name="at">på</string>
     <string name="drawer_open">Skuffe åben</string>
     <string name="drawer_close">Skuffe tæt</string>
     <string name="site_stats_app_name">WiGLE.net Statistik</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">WiFi Discovered sidste måned</string>
     <string name="firsttransid_title">Første transaktions-id</string>
     <string name="lasttransid_title">Seneste Transaktions ID</string>
-    <string name="please_allow">Tillad venligst tilladelse til brug</string>
     <string name="gps_permission">GPS (Fin placering)</string>
     <string name="cell_permission">Cellplacering (grov placering)</string>
-    <string name="allow_storage">Databasen sættes som standard på eksternt lager, vær venlig at tillade media / filopbevaring</string>
-    <string name="restart">Genstart for at bruge ekstern lagring</string>
     <string name="rank_stats_app_name">WiGLE.net placeringer</string>
-    <string name="total_wifi">Total WiFi</string>
     <string name="total_cell">Total Cell</string>
     <string name="tab_rank">placering</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">Filbehandlingskødybde</string>
     <string name="news_app_name">WiGLE.net Nyheder</string>
     <string name="tab_news">Nyheder</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">Cell GPS</string>
     <string name="bytes">bytes</string>
     <string name="rank_all_time">Alle tidspositioner</string>
     <string name="rank_month">Måned rangeringer</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">Brand:</string>
     <string name="cell_network_notes">Noter:</string>
     <string name="bluetooth_pref_text">Aktivér Bluetooth-scanning</string>
-    <string name="turning_bt_off">Slår Bluetooth tilbage</string>
     <string name="turn_on_bt">Aktiverer Bluetooth</string>
     <string name="filter_show_bt">Vis Bluetooth</string>
     <string name="error_invalid_bssid">BSSID skal være 12 tegn lang eller indeholde et wildcard (%)</string>
@@ -398,7 +382,6 @@
     <string name="search_local">Søg i din lokale database</string>
     <string name="search_failed">Søgningen mislykkedes</string>
     <string name="search_empty">Resultater tom</string>
-    <string name="search_query_limit">Du har nået det maksimale antal søgninger i dag. Din grænse vil blive nulstillet i morgen.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) throttles WiFi-scanninger til 2 pr. Minut. Opgrader Android hvis muligt.</string>
     <string name="q_bad">Android 10 throttles WiFi-scanninger, medmindre det er deaktiveret i Developer Settings.</string>

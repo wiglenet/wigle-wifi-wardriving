@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Common ultility methods for the network list
+ * Common utility methods for the network list
  */
 public class NetworkListUtil {
 

@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Son yükleme işaretleyicisi:</string>
     <string name="maxout_maxid_button">Maxout veritabanı işaretleyicisi</string>
     <string name="maxout_maxid_text">İşaretleyici ayarla:</string>
-    <string name="connect_button">Bağlan</string>
-    <string name="connect_text">Ağ operatörünün izniyle</string>
     <string name="csv_run_export_button">CSV dışarı aktarım</string>
     <string name="csv_run_export_text">Şu andaki aramayı CSV`ye aktar</string>
     <string name="csv_export_button">CSV`den veritabanına aktarım</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS durum değişikliklerinde uyar</string>
     <string name="mute">Sessiz</string>
     <string name="play">Çal</string>
-    <string name="unknown">Bilinmeyen</string>
     <string name="sort_text">Sıralama Seçenekleri</string>
     <string name="listdialog_button">Tamam</string>
     <string name="cryptodialog_button">Tamam</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (örn: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Yerel Veritabanı sorgusu</string>
     <string name="reset_button">Alanları temizle</string>
-    <string name="list_query_clear">Soruguları temizle</string>
     <string name="crypto_security">Güvenlik</string>
     <string name="crypto_strength">Sinyal gücü</string>
     <string name="crypto_password">Parola</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Sıralaması:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Konumları:</string>
-    <string name="dash_no_loc">Kayıtlı Konum Yok!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Addres</string>
     <string name="no_address_found">Coğrafik adres bulunamadı!</string>
     <string name="problem_with_field">Problem with field</string>
-    <string name="turning_wifi_off">WiFi tekrar kapatılıyor</string>
     <string name="lost_location">Konum kaybedildi</string>
     <string name="have_location">Konum bulundu</string>
     <string name="wifi_jammed">WiFi engelleniyor gibi, kapatıp, tekrar WiFi\'yi açın.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Ekranı açık tut</string>
     <string name="menu_labels_off">Etiketler kapalı</string>
     <string name="menu_labels_on">Etiketler açık</string>
-    <string name="menu_zoom_in">Yakınlaştır</string>
-    <string name="menu_zoom_out">Uzaklaştır</string>
     <string name="menu_turn_off_lockon">Kilitlemeyi Kapat</string>
     <string name="menu_turn_on_lockon">Kilitlemeyi Aç</string>
     <string name="menu_show_old">Show Run&amp;New</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">Marka:</string>
     <string name="cell_network_notes">Notlar:</string>
     <string name="bluetooth_pref_text">Bluetooth Taramayı Etkinleştir</string>
-    <string name="turning_bt_off">Bluetooth\'u kapatma</string>
     <string name="turn_on_bt">Bluetooth\'u açma</string>
     <string name="filter_show_bt">Bluetooth\'u göster</string>
     <string name="error_invalid_bssid">BSSID, 12 karakter uzunluğunda olmalı veya bir joker karakter içermelidir (%)</string>
@@ -345,7 +336,6 @@
     <string name="search_local">Yerel Veritabanınızı Arayın</string>
     <string name="search_failed">Arama Başarısız Oldu</string>
     <string name="search_empty">Boş Sonuçlar</string>
-    <string name="search_query_limit">Bugün maksimum arama sayısına ulaştınız. Sınırın yarın sıfırlanacak.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0), WiFi taramalarını dakikada 2\'ye kadar atıyor. Mümkünse Android\'i yükseltin.</string>
     <string name="q_bad">Android 10, Geliştirici Ayarlarında devre dışı bırakılmadığı sürece WiFi taramalarını engellemektedir.</string>

@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="maxout_maxid_button">Maxout DB marker</string>
     <string name="maxout_maxid_text">Set marker to:</string>
-    <string name="connect_button">Connect</string>
-    <string name="connect_text">with permission of network operator</string>
     <string name="csv_run_export_button">CSV Export Run</string>
     <string name="csv_run_export_text">Export current run to CSV file</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS status changes</string>
     <string name="mute">Mute Audio</string>
     <string name="play">Play Audio</string>
-    <string name="unknown">Unknown</string>
     <string name="sort_text">Sort Options</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Query Local DB</string>
     <string name="reset_button">Reset Fields</string>
-    <string name="list_query_clear">Clear Query Arguments</string>
     <string name="crypto_security">Security</string>
     <string name="crypto_strength">Signal strength</string>
     <string name="crypto_password">Password</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Queue:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Locations:</string>
-    <string name="dash_no_loc">No Location!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Address</string>
     <string name="no_address_found">No geocoded address found</string>
     <string name="problem_with_field">Problem with field</string>
-    <string name="turning_wifi_off">Turning WiFi back off</string>
     <string name="lost_location">Lost Location</string>
     <string name="have_location">Now have location from</string>
     <string name="wifi_jammed">WiFi appears jammed, turning off, and then on, WiFi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Keep Screen On</string>
     <string name="menu_labels_off">Labels Off</string>
     <string name="menu_labels_on">Labels On</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom Out</string>
     <string name="menu_turn_off_lockon">Turn Off Lockon</string>
     <string name="menu_turn_on_lockon">Turn On Lockon</string>
     <string name="menu_show_old">Show Run&amp;New</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">Map Type: Terrain</string>
     <string name="map_needs_playservice">Map requires Google Play Service</string>
     <string name="register">Register</string>
-    <string name="at">at</string>
     <string name="drawer_open">Drawer Open</string>
     <string name="drawer_close">Drawer Close</string>
     <string name="site_stats_app_name">WiGLE.net Statistics</string>
@@ -294,10 +285,8 @@
     <string name="prevmonthcount_title">Wifi Discovered Last Month</string>
     <string name="firsttransid_title">First Transaction ID</string>
     <string name="lasttransid_title">Latest Transaction ID</string>
-    <string name="please_allow">Please allow permission to use</string>
     <string name="gps_permission">GPS (Fine Location)</string>
     <string name="cell_permission">Cell Location (Coarse Location)</string>
-    <string name="allow_storage">Database is put on external storage by default, please allow media/file storage</string>
     <string name="activate">activate now</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -365,7 +354,6 @@
     <string name="cell_network_brand">Brand:</string>
     <string name="cell_network_notes">Notes:</string>
     <string name="bluetooth_pref_text">Enable Bluetooth Scanning</string>
-    <string name="turning_bt_off">Turning Bluetooth back off</string>
     <string name="turn_on_bt">Turning on Bluetooth</string>
     <string name="filter_show_bt">Show Bluetooth</string>
     <string name="error_invalid_bssid">BSSID må være 12 tegn lang eller inneholde et jokertegn (%)</string>
@@ -376,7 +364,6 @@
     <string name="search_local">Søk i din lokale database</string>
     <string name="search_failed">Søke mislyktes</string>
     <string name="search_empty">Resultater Tom</string>
-    <string name="search_query_limit">Du har nådd det maksimale antallet søk i dag. Grensen din vil nullstille i morgen.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) struper WiFi-skanninger til 2 per minutt. Oppgrader Android hvis mulig.</string>
     <string name="q_bad">Android 10 struper WiFi-skanninger med mindre den er deaktivert i utviklerinnstillinger.</string>

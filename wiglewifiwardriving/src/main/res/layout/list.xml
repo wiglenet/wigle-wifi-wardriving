@@ -35,7 +35,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:id="@+id/wifi_ico"
                 android:src="@drawable/wifi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,7 +56,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:id="@+id/cell_ico"
                 android:src="@drawable/cell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,7 +81,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:id="@+id/bt_icon"
                 android:src="@drawable/bluetooth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,7 +104,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="5">
             <ImageView
-                android:id="@+id/db_icon"
                 android:src="@drawable/database"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -230,8 +226,7 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/blank"
-			android:text=""
+            android:text=""
 			android:layout_weight="5"
 			/>
 		<TextView

@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Letzter Upload-Marker:</string>
     <string name="maxout_maxid_button">DB Marker auf letzten Eintrag setzen</string>
     <string name="maxout_maxid_text">Setze Marker auf:</string>
-    <string name="connect_button">Verbinden</string>
-    <string name="connect_text">mit Genehmigung der Netzbetreiber</string>
     <string name="csv_run_export_button">CSV Export Lauf</string>
     <string name="csv_run_export_text">Exportiere Lauf in CSV-Datei</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS-Statusänderungen</string>
     <string name="mute">Lautlos</string>
     <string name="play">Laut</string>
-    <string name="unknown">Unbekannt</string>
     <string name="sort_text">Sortieren nach</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (z.B.: 0A:2C:EF:3D:25:1B) (SQL Platzhalter: %,_):</string>
     <string name="search_button">Abfrage in lokaler DB</string>
     <string name="reset_button">Felder zurücksetzen</string>
-    <string name="list_query_clear">Query-Argumente zurücksetzen</string>
     <string name="crypto_security">Verschlüsselung</string>
     <string name="crypto_strength">Signalstärke</string>
     <string name="crypto_password">Passwort</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Warteschlange:</string>
     <string name="dash_db_nets">WLAN in DB:</string>
     <string name="dash_db_locs">Standorte in DB:</string>
-    <string name="dash_no_loc">Keine Position!</string>
     <string name="dash_short_loc">Pos:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Adresse</string>
     <string name="no_address_found">Keine geokodierte Adresse gefunden</string>
     <string name="problem_with_field">Problem mit Feld</string>
-    <string name="turning_wifi_off">WLAN ausgeschaltet</string>
     <string name="lost_location">Position verloren</string>
     <string name="have_location">Aktueller Standort aus</string>
     <string name="wifi_jammed">WLAN scheint abgestürzt, ausschalten und dann wieder an.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Display eingeschaltet lassen</string>
     <string name="menu_labels_off">Labels aus</string>
     <string name="menu_labels_on">Labels an</string>
-    <string name="menu_zoom_in">Einzoomen</string>
-    <string name="menu_zoom_out">Auszoomen</string>
     <string name="menu_turn_off_lockon">Sperre ausschalten</string>
     <string name="menu_turn_on_lockon">Sperre einschalten</string>
     <string name="menu_show_old">Zeige Lauf &amp; Neu</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">Kartentyp: Terrain</string>
     <string name="map_needs_playservice">Karte benötigt Google Play Service</string>
     <string name="register">Registrieren</string>
-    <string name="at">at</string>
     <string name="drawer_open">Drawer öffnen</string>
     <string name="drawer_close">Drawer schließen</string>
     <string name="site_stats_app_name">WiGLE.net Statistiken</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">WLAN gefunden (letzter Monat)</string>
     <string name="firsttransid_title">Erste Upload-ID</string>
     <string name="lasttransid_title">Letzte Upload-ID</string>
-    <string name="please_allow">Bitte Rechte für die Benutzung freigeben</string>
     <string name="gps_permission">GPS (genaue Ortung)</string>
     <string name="cell_permission">Mobilfunk-Ortung (grobe Ortung)</string>
-    <string name="allow_storage">Die Datenbank wird standardmäßig auf einem externen Speicher gespeichert. Bitte erlaube den Zugriff.</string>
-    <string name="restart">Neustart, um externen Speicher zu nutzen</string>
     <string name="rank_stats_app_name">WiGLE.net Ränge</string>
-    <string name="total_wifi">WLAN gesamt</string>
     <string name="total_cell">Funkzellen gesamt</string>
     <string name="tab_rank">Ränge</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">Dateien in Warteschlange</string>
     <string name="news_app_name">WiGLE.net News</string>
     <string name="tab_news">Neuigkeiten</string>
-    <string name="wifi_gps">WLAN (GPS)</string>
-    <string name="cell_gps">Mobilfunk (GPS)</string>
     <string name="bytes">Bytes</string>
     <string name="rank_all_time">Langzeitränge</string>
     <string name="rank_month">monatliche Ränge</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">Marke:</string>
     <string name="cell_network_notes">Anmerkungen:</string>
     <string name="bluetooth_pref_text">Bluetooth-Scannen aktivieren</string>
-    <string name="turning_bt_off">Bluetooth ausschalten</string>
     <string name="turn_on_bt">Bluetooth einschalten</string>
     <string name="filter_show_bt">Bluetooth anzeigen</string>
     <string name="error_invalid_bssid">BSSID muss 12 Zeichen lang sein oder einen Platzhalter (%) enthalten</string>
@@ -398,7 +382,6 @@
     <string name="search_local">Suchen Sie in Ihrer lokalen Datenbank</string>
     <string name="search_failed">Suche fehlgeschlagen</string>
     <string name="search_empty">Ergebnisse leer</string>
-    <string name="search_query_limit">Sie haben heute die maximale Anzahl an Suchen erreicht. Ihr Limit wird morgen zurückgesetzt.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) drosselt WiFi-Scans auf 2 pro Minute. Wenn möglich, aktualisieren Sie Android.</string>
     <string name="q_bad">Android 10 drosselt WLAN-Scans, sofern dies nicht in den Entwicklereinstellungen deaktiviert ist.</string>

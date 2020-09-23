@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Latest upload marker:</string>
     <string name="maxout_maxid_button">Maxout DB marker</string>
     <string name="maxout_maxid_text">Set marker to:</string>
-    <string name="connect_button">接続</string>
-    <string name="connect_text">(管理者の許可が必要)</string>
     <string name="csv_run_export_button">RUN to CSV</string>
     <string name="csv_run_export_text">現在のスキャンをCSVファイルへ出力する</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPSの状態を音声で通知する</string>
     <string name="mute">音声通知しない</string>
     <string name="play">音声通知する</string>
-    <string name="unknown">unknown</string>
     <string name="sort_text">並べ替え</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">ローカルDBを調べる</string>
     <string name="reset_button">リセット</string>
-    <string name="list_query_clear">クリア</string>
     <string name="crypto_security">暗号化</string>
     <string name="crypto_strength">信号強度</string>
     <string name="crypto_password">パスワード</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB queue:</string>
     <string name="dash_db_nets">DB Net:</string>
     <string name="dash_db_locs">DB Locations:</string>
-    <string name="dash_no_loc">不明</string>
     <string name="dash_short_loc">位置:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">住所</string>
     <string name="no_address_found">住所が見つかりません</string>
     <string name="problem_with_field">フィールドに問題</string>
-    <string name="turning_wifi_off">無線LANをオフ</string>
     <string name="lost_location">位置不明</string>
     <string name="have_location">位置</string>
     <string name="wifi_jammed">WiFi が停止しました。Wi-Fi を一旦無効にしてください</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">画面のスリープを抑止</string>
     <string name="menu_labels_off">ESSID ラベル非表示</string>
     <string name="menu_labels_on">ESSID ラベル表示</string>
-    <string name="menu_zoom_in">ズームイン</string>
-    <string name="menu_zoom_out">ズームアウト</string>
     <string name="menu_turn_off_lockon">現在地に追従する</string>
     <string name="menu_turn_on_lockon">現在地に追従しない</string>
     <string name="menu_show_old">軌跡を消さない</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">地図の種類：地形</string>
     <string name="map_needs_playservice">地図にはGoogle Playサービスが必要です</string>
     <string name="register">登録</string>
-    <string name="at">〜で</string>
     <string name="drawer_open">引き出しを開く</string>
     <string name="drawer_close">引き出しクローズ</string>
     <string name="site_stats_app_name">WiGLE.netの統計</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">先月発見されたWiFi</string>
     <string name="firsttransid_title">最初のトランザクションID</string>
     <string name="lasttransid_title">最新の取引ID</string>
-    <string name="please_allow">使用を許可してください</string>
     <string name="gps_permission">GPS（ファインロケーション）</string>
     <string name="cell_permission">セルの場所（粗い場所）</string>
-    <string name="allow_storage">データベースはデフォルトで外部ストレージに保存されます。メディア/ファイルの保存を許可してください</string>
-    <string name="restart">外部ストレージを使用するために再起動する</string>
     <string name="rank_stats_app_name">WiGLE.netのランキング</string>
-    <string name="total_wifi">総WiFi</string>
     <string name="total_cell">トータルセル</string>
     <string name="tab_rank">ランキング</string>
     <string name="uploads_app_name">WiGLE.netのアップロード</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">ファイル処理キューの深さ</string>
     <string name="news_app_name">WiGLE.netニュース</string>
     <string name="tab_news">ニュース</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">セルGPS</string>
     <string name="bytes">バイト</string>
     <string name="rank_all_time">すべてのタイムランキング</string>
     <string name="rank_month">月ランキング</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">ブランド:</string>
     <string name="cell_network_notes">ノート:</string>
     <string name="bluetooth_pref_text">Bluetoothスキャンを有効にする</string>
-    <string name="turning_bt_off">Bluetoothをオフに戻す</string>
     <string name="turn_on_bt">Bluetoothをオンにする</string>
     <string name="filter_show_bt">Bluetoothを表示する</string>
     <string name="error_invalid_bssid">BSSIDは12文字の長さであるか、またはワイルドカード（％）を含む必要があります</string>
@@ -398,7 +382,6 @@
     <string name="search_local">ローカルデータベースを検索する</string>
     <string name="search_failed">検索失敗</string>
     <string name="search_empty">空の結果</string>
-    <string name="search_query_limit">あなたは今日最大検索数に達しました。あなたの制限は明日リセットされます。</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie（9.0）は、WiFiスキャンを1分あたり2に絞ります。可能であればAndroidをアップグレードします。</string>
     <string name="q_bad">Android 10 は、開発者設定で無効にされていない限り、WiFiスキャンを抑制します。</string>

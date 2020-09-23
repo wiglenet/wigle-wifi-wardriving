@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Siste opplasting markør:</string>
     <string name="maxout_maxid_button">Maxout DB markør</string>
     <string name="maxout_maxid_text">Sett markør til:</string>
-    <string name="connect_button">Koble</string>
-    <string name="connect_text">med tillatelse fra nettoperatøren</string>
     <string name="csv_run_export_button">CSV Eksport Run</string>
     <string name="csv_run_export_text">Eksporter nåværende kjøre til CSV fil</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Kunngjøre GPS endres</string>
     <string name="mute">Lydløs</string>
     <string name="play">Spill</string>
-    <string name="unknown">Ukjent</string>
     <string name="sort_text">Sorter Alternativer</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (SQL jokertegn: %,_):</string>
     <string name="search_button">Query Lokal DB</string>
     <string name="reset_button">Reset Fields</string>
-    <string name="list_query_clear">Clear Query Argumenter</string>
     <string name="crypto_security">Sikkerhet</string>
     <string name="crypto_strength">Signalstyrke</string>
     <string name="crypto_password">Passord</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Kø:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Locations:</string>
-    <string name="dash_no_loc">No Sted!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Adresse</string>
     <string name="no_address_found">Ingen geokodet adresse funnet</string>
     <string name="problem_with_field">Problem med felt</string>
-    <string name="turning_wifi_off">Slå WiFi back off</string>
     <string name="lost_location">Mistet Sted</string>
     <string name="have_location">Nå har stedet fra</string>
     <string name="wifi_jammed">WiFi vises fast, slå av, og så videre, Wi-Fi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Hold skjermen på</string>
     <string name="menu_labels_off">Etiketter Off</string>
     <string name="menu_labels_on">Etiketter på</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom ut</string>
     <string name="menu_turn_off_lockon">Turn Off Lockon</string>
     <string name="menu_turn_on_lockon">Turn On Lockon</string>
     <string name="menu_show_old">Vis Run &amp; New</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">Merke:</string>
     <string name="cell_network_notes">Merknader:</string>
     <string name="bluetooth_pref_text">Aktiver Bluetooth-skanning</string>
-    <string name="turning_bt_off">Slår av Bluetooth</string>
     <string name="turn_on_bt">Slår på Bluetooth</string>
     <string name="filter_show_bt">Vis Bluetooth</string>
     <string name="error_invalid_bssid">BSSID må være 12 tegn lang eller inneholde et jokertegn (%)</string>
@@ -345,7 +336,6 @@
     <string name="search_local">Søk i din lokale database</string>
     <string name="search_failed">Søke mislyktes</string>
     <string name="search_empty">Resultater Tom</string>
-    <string name="search_query_limit">Du har nådd det maksimale antallet søk i dag. Grensen din vil nullstille i morgen.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) struper WiFi-skanninger til 2 per minutt. Oppgrader Android hvis mulig.</string>
     <string name="q_bad">Android 10 struper WiFi-skanninger med mindre den er deaktivert i utviklerinnstillinger.</string>

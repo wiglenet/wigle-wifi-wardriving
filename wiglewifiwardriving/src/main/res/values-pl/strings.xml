@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Ostatnio przesłany:</string>
     <string name="maxout_maxid_button">ustaw znacznik na max</string>
     <string name="maxout_maxid_text">Ustaw znacznik:</string>
-    <string name="connect_button">Połącz</string>
-    <string name="connect_text">za zgodą operatora sieci</string>
     <string name="csv_run_export_button">Eksportuj bieg do CSV</string>
     <string name="csv_run_export_text">Eksportuj ostatnie sieci do pliku CSV</string>
     <string name="csv_export_button">Eksport bazy do CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Powiedz o zmianie statusu GPS</string>
     <string name="mute">Wyciszenie</string>
     <string name="play">Mów</string>
-    <string name="unknown">Nieznany</string>
     <string name="sort_text">Opcje sortowania</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (np: 0A:2C:EF:3D:25:1B) (wieloznaczniki SQL: %,_):</string>
     <string name="search_button">Zapytanie do lokalnej bazy</string>
     <string name="reset_button">Zresetuj pola</string>
-    <string name="list_query_clear">Wyczyść argumenty zapytania</string>
     <string name="crypto_security">Bezpieczeństwo</string>
     <string name="crypto_strength">Siła sygnału</string>
     <string name="crypto_password">Hasło</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">Kolejka bazy:</string>
     <string name="dash_db_nets">Sieci w bazie:</string>
     <string name="dash_db_locs">Lokalizacje sieci:</string>
-    <string name="dash_no_loc">Brak położenia!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Adres</string>
     <string name="no_address_found">Nie można znaleźć adresu</string>
     <string name="problem_with_field">Problem z polem</string>
-    <string name="turning_wifi_off">Wyłączenie WiFi</string>
     <string name="lost_location">Utracone położenie</string>
     <string name="have_location">Uzyskano położenie z</string>
     <string name="wifi_jammed">WiFi jest zacięte, wyłaczanie i włączanie.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Ekran zawsze wł.</string>
     <string name="menu_labels_off">Etykiety wył.</string>
     <string name="menu_labels_on">Etykiety wł.</string>
-    <string name="menu_zoom_in">Przybliż</string>
-    <string name="menu_zoom_out">Oddal</string>
     <string name="menu_turn_off_lockon">Moja pozycja</string>
     <string name="menu_turn_on_lockon">Odblokuj mapę</string>
     <string name="menu_show_old">Pokaż Run &amp; New</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">Marka:</string>
     <string name="cell_network_notes">Uwagi:</string>
     <string name="bluetooth_pref_text">Włącz skanowanie Bluetooth</string>
-    <string name="turning_bt_off">Wyłączenie Bluetooth</string>
     <string name="turn_on_bt">Włączanie Bluetooth</string>
     <string name="filter_show_bt">Pokaż Bluetooth</string>
     <string name="error_invalid_bssid">Identyfikator BSSID może mieć 12 znaków lub zawierać symbol wieloznaczny (%)</string>
@@ -345,7 +336,6 @@
     <string name="search_local">Przeszukaj lokalną bazę danych</string>
     <string name="search_failed">Wyszukiwanie nie powiodło się</string>
     <string name="search_empty">Wyniki Empty</string>
-    <string name="search_query_limit">Masz już maksymalną liczbę wyszukiwań. Twój limit zostanie zresetowany jutro.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) ogranicza skanowanie Wi-Fi do 2 na minutę. Zaktualizuj Androida, jeśli to możliwe.</string>
     <string name="q_bad">Android 10 ogranicza skanowanie Wi-Fi, chyba że jest wyłączone w Ustawieniach programisty.</string>

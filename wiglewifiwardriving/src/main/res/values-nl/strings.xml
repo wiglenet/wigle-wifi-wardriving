@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Laatste uploadmarker:</string>
     <string name="maxout_maxid_button">Maximaliseer DB-marker</string>
     <string name="maxout_maxid_text">Marker instellen op:</string>
-    <string name="connect_button">Verbind</string>
-    <string name="connect_text">Vraag eerst toestemming aan de netwerkbeheerder.</string>
     <string name="csv_run_export_button">CSV-export (run)</string>
     <string name="csv_run_export_text">Run exporteren naar een CSV-bestand</string>
     <string name="csv_export_button">CSV-export (DB)</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS-statusverandering met geluid melden</string>
     <string name="mute">Stil</string>
     <string name="play">Geluid</string>
-    <string name="unknown">Onbekend</string>
     <string name="sort_text">Sorteerinstellingen</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (bijv.: 0A:2C:EF:3D:25:1B) (SQL jokertekens: %,_):</string>
     <string name="search_button">Query lokaal uitvoeren</string>
     <string name="reset_button">Wissen</string>
-    <string name="list_query_clear">Leeg Query toevoegingen</string>
     <string name="crypto_security">Beveiliging</string>
     <string name="crypto_strength">Signaalsterkte</string>
     <string name="crypto_password">Wachtwoord</string>
@@ -135,7 +131,6 @@
     <string name="dash_db_queue">DB-wachtrij:</string>
     <string name="dash_db_nets">DB-netwerken:</string>
     <string name="dash_db_locs">DB-locaties:</string>
-    <string name="dash_no_loc">Geen locatie</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -167,7 +162,6 @@
     <string name="address">Adres</string>
     <string name="no_address_found">Geen geolocatie gevonden</string>
     <string name="problem_with_field">Probleem met veld</string>
-    <string name="turning_wifi_off">WiFi weer uitschakelen</string>
     <string name="lost_location">Geen locatie meer</string>
     <string name="have_location">Locatie gevonden</string>
     <string name="wifi_jammed">WiFi lijkt bezet of vastgelopen te zijn; schakel Wi-Fi uit en weer in</string>
@@ -184,8 +178,6 @@
     <string name="menu_screen_wake">Scherm aanlaten</string>
     <string name="menu_labels_off">Labels uit</string>
     <string name="menu_labels_on">Labels aan</string>
-    <string name="menu_zoom_in">Inzoomen</string>
-    <string name="menu_zoom_out">Uitzoomen</string>
     <string name="menu_turn_off_lockon">Locatie ontgr.</string>
     <string name="menu_turn_on_lockon">Locatie vergr.</string>
     <string name="menu_show_old">Run &amp; nieuwe tonen</string>
@@ -273,16 +265,13 @@
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
     <string name="map_needs_playservice">Map vereist Google Play Service</string>
     <string name="register">Registreren</string>
-    <string name="at">op</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
-    <string name="restart">Opnieuw opstarten om externe opslag te gebruiken</string>
     <string name="rank_stats_app_name">WiGLE.net-ranglijsten</string>
-    <string name="total_wifi">Totaal wifi</string>
     <string name="total_cell">Totaal aantal cellen</string>
     <string name="tab_rank">Rankings</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
@@ -290,8 +279,6 @@
     <string name="queue_depth">Wachtrijdiepte bestandsverwerking</string>
     <string name="news_app_name">WiGLE.net Nieuws</string>
     <string name="tab_news">Nieuws</string>
-    <string name="wifi_gps">GPS WiFi</string>
-    <string name="cell_gps">Mobiele GPS</string>
     <string name="bytes">Bytes</string>
     <string name="rank_all_time">All time ranglijsten</string>
     <string name="rank_month">Ranglijsten maand</string>
@@ -369,7 +356,6 @@
     <string name="cell_network_brand">Merk:</string>
     <string name="cell_network_notes">Notes:</string>
     <string name="bluetooth_pref_text">Schakel Bluetooth-scannen in</string>
-    <string name="turning_bt_off">Bluetooth uitschakelen</string>
     <string name="turn_on_bt">Bluetooth inschakelen</string>
     <string name="filter_show_bt">Toon Bluetooth</string>
     <string name="error_invalid_bssid">BSSID moet 12 tekens lang zijn of een wildcard bevatten (%)</string>
@@ -380,7 +366,6 @@
     <string name="search_local">Doorzoek uw lokale database</string>
     <string name="search_failed">Zoeken mislukt</string>
     <string name="search_empty">Resultaten leeg</string>
-    <string name="search_query_limit">U heeft vandaag het maximale aantal zoekopdrachten bereikt. Je limiet wordt morgen opnieuw ingesteld.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) beperkt wifi-scans tot 2 per minuut. Upgrade Android indien mogelijk.</string>
     <string name="q_bad">Android 10 beperkt wifi-scans tenzij uitgeschakeld in de instellingen voor ontwikkelaars.</string>

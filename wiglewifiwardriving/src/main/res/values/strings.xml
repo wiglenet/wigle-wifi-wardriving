@@ -418,6 +418,7 @@
     <string name="kml">KML</string>
     <string name="downloaded">&#160;downloaded.</string>
     <string name="uploaded">&#160;uploaded.</string>
+    <string name="click_retry">&#160;Tap indicator to retry.</string>
     <string name="click_download">&#160;Tap indicator to sync to device.</string>
     <string name="click_access">&#160;Tap indicator to copy.</string>
     <string name="plus_gps">+GPS:&#160;</string>

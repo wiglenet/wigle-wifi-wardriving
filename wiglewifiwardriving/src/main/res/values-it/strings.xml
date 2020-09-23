@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Segnalibro dell\'ultimo caricamento:</string>
     <string name="maxout_maxid_button">Massimizza il segnalibro del database</string>
     <string name="maxout_maxid_text">Imposta il segnalibro al valore:</string>
-    <string name="connect_button">Connetti</string>
-    <string name="connect_text">con l\'autorizzazione del proprietario della rete</string>
     <string name="csv_run_export_button">Esporta la sessione in CSV</string>
     <string name="csv_run_export_text">Esporta l\' attuale sessione in un file CSV</string>
     <string name="csv_export_button">Esporta il DB in CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Cambiamenti di stato GPS</string>
     <string name="mute">Disattiva audio</string>
     <string name="play">Attiva audio</string>
-    <string name="unknown">Sconosciuto</string>
     <string name="sort_text">Opzioni di ordinamento</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (es: 0A:2C:EF:3D:25:1B) (caratteri jolly SQL: %,_):</string>
     <string name="search_button">Cerca nel DB locale</string>
     <string name="reset_button">Pulisci i campi</string>
-    <string name="list_query_clear">Pulisci il campo di ricerca</string>
     <string name="crypto_security">Crittografia</string>
     <string name="crypto_strength">Potenza segnale</string>
     <string name="crypto_password">Password</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">Lunghezza coda del DB:</string>
     <string name="dash_db_nets">Reti nel DB:</string>
     <string name="dash_db_locs">Localizzazioni nel DB:</string>
-    <string name="dash_no_loc">Posizione non disponibile!</string>
     <string name="dash_short_loc">Pos:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Indirizzo</string>
     <string name="no_address_found">Nessun indirizzo geocodificato trovato</string>
     <string name="problem_with_field">Problema con il segnale</string>
-    <string name="turning_wifi_off">Spegnimento del WiFi in corso</string>
     <string name="lost_location">Posizione Persa</string>
     <string name="have_location">Posizione fornita da</string>
     <string name="wifi_jammed">Il sensore WiFi sembra bloccato, si prega di riavviare.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Mantieni lo schermo acceso</string>
     <string name="menu_labels_off">Non mostrare etichette</string>
     <string name="menu_labels_on">Attiva etichette</string>
-    <string name="menu_zoom_in">Ingrandisci</string>
-    <string name="menu_zoom_out">Riduci</string>
     <string name="menu_turn_off_lockon">Non seguire la posizione corrente</string>
     <string name="menu_turn_on_lockon">Segui la posizione corrente</string>
     <string name="menu_show_old">Attiva tutte quelle trovate</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">Tipo di Mappa: Terreno</string>
     <string name="map_needs_playservice">La Mappa necessità di Google Play Service</string>
     <string name="register">Registrarsi</string>
-    <string name="at">presso</string>
     <string name="drawer_open">Cassetto Aperto</string>
     <string name="drawer_close">Cassetto Chiuso</string>
     <string name="site_stats_app_name">Generali</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">WiFi Scoperte Lo Scorso Mese</string>
     <string name="firsttransid_title">ID Prima Transazione</string>
     <string name="lasttransid_title">ID Ultima Transazione</string>
-    <string name="please_allow">Si prega di consentire il permesso all\'utilizzo</string>
     <string name="gps_permission">GPS (Localizzazione precisa)</string>
     <string name="cell_permission">GSM (Localizzazione grossolana)</string>
-    <string name="allow_storage">Per impostazione predefinita, il database à posizionato sull\'unità esterna, si prega di consentire la scrittura sui supporti/file</string>
-    <string name="restart">Occorre riavviare per l\'uso della SD</string>
     <string name="rank_stats_app_name">Graduatorie WiGLE.net</string>
-    <string name="total_wifi">WiFi totali</string>
     <string name="total_cell">Celle totali</string>
     <string name="tab_rank">Graduatorie</string>
     <string name="uploads_app_name">Caricati in WiGLE.net</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">Avanzamento nella coda dei file</string>
     <string name="news_app_name">Novità WiGLE.net</string>
     <string name="tab_news">Novità</string>
-    <string name="wifi_gps">GPS WiFi</string>
-    <string name="cell_gps">GPS Celle</string>
     <string name="bytes">Byte</string>
     <string name="rank_all_time">Graduatoria assoluta</string>
     <string name="rank_month">Gradutoria mensile</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">Marca:</string>
     <string name="cell_network_notes">Gli appunti:</string>
     <string name="bluetooth_pref_text">Abilita la scansione Bluetooth</string>
-    <string name="turning_bt_off">Disattivazione del Bluetooth</string>
     <string name="turn_on_bt">Accensione del Bluetooth</string>
     <string name="filter_show_bt">Mostra Bluetooth</string>
     <string name="error_invalid_bssid">BSSID deve essere lungo 12 caratteri o contenere un carattere jolly (%)</string>
@@ -398,7 +382,6 @@
     <string name="search_local">Cerca nel tuo database locale</string>
     <string name="search_failed">Ricerca fallita</string>
     <string name="search_empty">Risultati vuoti</string>
-    <string name="search_query_limit">Hai raggiunto il numero massimo di ricerche oggi. Il tuo limite verrà ripristinato domani.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) riduce le scansioni WiFi a 2 al minuto. Aggiorna Android se possibile.</string>
     <string name="q_bad">Android 10 limita le scansioni WiFi a meno che non sia disabilitato nelle Impostazioni sviluppatore.</string>

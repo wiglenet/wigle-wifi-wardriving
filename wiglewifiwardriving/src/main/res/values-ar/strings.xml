@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">أحدث علامة تحميل:</string>
     <string name="maxout_maxid_button">علامة Maxout DB</string>
     <string name="maxout_maxid_text">اضبط العلامة على:</string>
-    <string name="connect_button">Connect</string>
-    <string name="connect_text">with permission of network operator</string>
     <string name="csv_run_export_button">تصدير تصدير CSV</string>
     <string name="csv_run_export_text">تصدير المدى الحالي إلى ملف CSV</string>
     <string name="csv_export_button">تصدير CSV DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Announce GPS status changes</string>
     <string name="mute">كتم</string>
     <string name="play">رنين</string>
-    <string name="unknown">Unknown</string>
     <string name="sort_text">Sort Options</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (مثلا: 0A:2C:EF:3D:25:1B) (SQL البدل: %,_):</string>
     <string name="search_button">Query Local DB</string>
     <string name="reset_button">Reset Fields</string>
-    <string name="list_query_clear">Clear Query Arguments</string>
     <string name="crypto_security">Security</string>
     <string name="crypto_strength">Signal strength</string>
     <string name="crypto_password">Password</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Queue:</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Locations:</string>
-    <string name="dash_no_loc">No Location!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Address</string>
     <string name="no_address_found">No geocoded address found</string>
     <string name="problem_with_field">Problem with field</string>
-    <string name="turning_wifi_off">Turning WiFi back off</string>
     <string name="lost_location">Lost Location</string>
     <string name="have_location">Now have location from</string>
     <string name="wifi_jammed">WiFi appears jammed, turning off, and then on, Wi-Fi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Keep Screen On</string>
     <string name="menu_labels_off">Labels Off</string>
     <string name="menu_labels_on">Labels On</string>
-    <string name="menu_zoom_in">Zoom In</string>
-    <string name="menu_zoom_out">Zoom Out</string>
     <string name="menu_turn_off_lockon">Turn Off Lockon</string>
     <string name="menu_turn_on_lockon">Turn On Lockon</string>
     <string name="menu_show_old">Show Run&amp;New</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">خريطة نوع: التضاريس</string>
     <string name="map_needs_playservice">تتطلب الخريطة خدمة Google Play</string>
     <string name="register">تسجيل</string>
-    <string name="at">في</string>
     <string name="drawer_open">درج مفتوح</string>
     <string name="drawer_close">إغلاق الدرج</string>
     <string name="site_stats_app_name">إحصائيات WiGLE.net</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">واي فاي اكتشف الشهر الماضي</string>
     <string name="firsttransid_title">معرف المعاملة الأول</string>
     <string name="lasttransid_title">أحدث معرف المعاملة</string>
-    <string name="please_allow">يرجى السماح باستخدام إذن</string>
     <string name="gps_permission">GPS (موقع جيد)</string>
     <string name="cell_permission">موقع الخلية (موقع خشن)</string>
-    <string name="allow_storage">يتم وضع قاعدة البيانات على وحدة التخزين الخارجية بشكل افتراضي ، يرجى السماح بتخزين الوسائط / الملفات</string>
-    <string name="restart">إعادة التشغيل لاستخدام التخزين الخارجي</string>
     <string name="rank_stats_app_name">تصنيفات WiGLE.net</string>
-    <string name="total_wifi">مجموع واي فاي</string>
     <string name="total_cell">خلية كاملة</string>
     <string name="tab_rank">التصنيف العالمي</string>
     <string name="uploads_app_name">WiGLE.net التحميلات</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">معالجة ملف قائمة الانتظار العمق</string>
     <string name="news_app_name">أخبار WiGLE.net</string>
     <string name="tab_news">أخبار</string>
-    <string name="wifi_gps">واي فاي GPS</string>
-    <string name="cell_gps">خلية GPS</string>
     <string name="bytes">بايت</string>
     <string name="rank_all_time">كل الوقت الترتيب</string>
     <string name="rank_month">ترتيب الشهر</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">:علامة تجارية</string>
     <string name="cell_network_notes">:ملاحظات</string>
     <string name="bluetooth_pref_text">تمكين المسح الضوئي عبر البلوتوث</string>
-    <string name="turning_bt_off">إيقاف تشغيل البلوتوث</string>
     <string name="turn_on_bt">تشغيل البلوتوث</string>
     <string name="filter_show_bt">عرض البلوتوث</string>
     <string name="error_invalid_bssid">يجب أن يكون طول BSSID 12 حرفًا أو يحتوي على حرف بدل (٪)</string>
@@ -398,7 +382,6 @@
     <string name="search_local">ابحث في قاعدة البيانات المحلية الخاصة بك</string>
     <string name="search_failed">فشل البحث</string>
     <string name="search_empty">النتائج فارغة</string>
-    <string name="search_query_limit">لقد وصلت إلى الحد الأقصى من عمليات البحث اليوم. ستتم إعادة تعيين الحد الخاص بك غدًا.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">يقوم نظام أندرويد باي (9.0) بإبطال شبكة WiFi إلى 2 في الدقيقة. ترقية Android إذا كان ذلك ممكنًا.</string>
     <string name="q_bad">يمسح نظام Android 10 throttles WiFi ما لم يتم تعطيله في إعدادات المطور.</string>

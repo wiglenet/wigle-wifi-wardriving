@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Últimos subidos:</string>
     <string name="maxout_maxid_button">Est. Contador al Max.</string>
     <string name="maxout_maxid_text">Establecer marcador a:</string>
-    <string name="connect_button">Conectar</string>
-    <string name="connect_text">con el permiso del operador de red</string>
     <string name="csv_run_export_button">Exportar a CSV</string>
     <string name="csv_run_export_text">Exportar ejecución actual a un archivo CSV</string>
     <string name="csv_export_button">Exportar todo a CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Anunciar cambios de estado de GPS</string>
     <string name="mute">Silencio</string>
     <string name="play">Silenc. Desact.</string>
-    <string name="unknown">Desconocido</string>
     <string name="sort_text">Ordenar</string>
     <string name="listdialog_button">Aceptar</string>
     <string name="cryptodialog_button">Aceptar</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (e.g.: 0A:2C:EF:3D:25:1B) (comodines: %,_):</string>
     <string name="search_button">Buscar en Datos Locales</string>
     <string name="reset_button">Restablecer Campos</string>
-    <string name="list_query_clear">Limpiar argumentos de busqueda</string>
     <string name="crypto_security">Seguridad</string>
     <string name="crypto_strength">Intensidad de la señal</string>
     <string name="crypto_password">Contraseña</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">No subidos:</string>
     <string name="dash_db_nets">Total Redes:</string>
     <string name="dash_db_locs">Total Ubicaciones:</string>
-    <string name="dash_no_loc">Sin ubicación!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">kilometros</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Dirección</string>
     <string name="no_address_found">No se encontró la dirección</string>
     <string name="problem_with_field">Problema con el campo</string>
-    <string name="turning_wifi_off">Apagando WiFi</string>
     <string name="lost_location">Se perdió la localización</string>
     <string name="have_location">Localización encontrada con</string>
     <string name="wifi_jammed">WiFi bloqueado, reiniciandolo.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Mantener la pantalla encendida</string>
     <string name="menu_labels_off">Ocultar Etiquetas</string>
     <string name="menu_labels_on">Mostrar Etiquetas</string>
-    <string name="menu_zoom_in">Acercar</string>
-    <string name="menu_zoom_out">Alejar</string>
     <string name="menu_turn_off_lockon">Apagar Seguimiento de posición</string>
     <string name="menu_turn_on_lockon">Activar Seguimiento de posición</string>
     <string name="menu_show_old">Mostrar Todos</string>
@@ -337,7 +329,6 @@
     <string name="cell_network_brand">Marca:</string>
     <string name="cell_network_notes">Notas:</string>
     <string name="bluetooth_pref_text">Habilitar escaneo Bluetooth</string>
-    <string name="turning_bt_off">Desactivando Bluetooth</string>
     <string name="turn_on_bt">Encendido de Bluetooth</string>
     <string name="filter_show_bt">Mostrar Bluetooth</string>
     <string name="error_invalid_bssid">BSSID debe tener 12 caracteres o contener un comodín (%)</string>
@@ -348,7 +339,6 @@
     <string name="search_local">Busca tu base de datos local</string>
     <string name="search_failed">Búsqueda fallida</string>
     <string name="search_empty">Resultados vacíos</string>
-    <string name="search_query_limit">Has alcanzado el número máximo de búsquedas en la actualidad. Tu límite se restablecerá mañana.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) acelera los escaneos WiFi a 2 por minuto. Actualice Android si es posible.</string>
     <string name="q_bad">Android 10 acelera los escaneos WiFi a menos que esté deshabilitado en la Configuración del desarrollador.</string>

@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">최근 업로드 마커 :</string>
     <string name="maxout_maxid_button">Maxout DB 마커</string>
     <string name="maxout_maxid_text">에 마커를 설정합니다 :</string>
-    <string name="connect_button">연결</string>
-    <string name="connect_text">네트워크 운영자의 승인</string>
     <string name="csv_run_export_button">CSV 내보내기 실행</string>
     <string name="csv_run_export_text">CSV 파일에 현재 실행 내보내기</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS 상태 변경을 발표</string>
     <string name="mute">음소거</string>
     <string name="play">놀이</string>
-    <string name="unknown">알 수없는</string>
     <string name="sort_text">정렬 옵션</string>
     <string name="listdialog_button">확인</string>
     <string name="cryptodialog_button">확인</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (예 : 0A:2C:EF:3D:25:1B) (SQL 와일드 카드 : %,_):</string>
     <string name="search_button">검색어 로컬 DB</string>
     <string name="reset_button">재설정 필드</string>
-    <string name="list_query_clear">삭제 쿼리 인수</string>
     <string name="crypto_security">보안</string>
     <string name="crypto_strength">신호 강도</string>
     <string name="crypto_password">암호</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB 대기열 :</string>
     <string name="dash_db_nets">DB 네츠 :</string>
     <string name="dash_db_locs">DB 위치 :</string>
-    <string name="dash_no_loc">없음 위치!</string>
     <string name="dash_short_loc">LOC :</string>
     <string name="km_short">km</string>
     <string name="mi_short">미</string>
@@ -166,7 +161,6 @@
     <string name="address">주소</string>
     <string name="no_address_found">찾지 코드 화됨 주소 없음</string>
     <string name="problem_with_field">필드 문제</string>
-    <string name="turning_wifi_off">와이파이를 다시 해제</string>
     <string name="lost_location">분실 장소</string>
     <string name="have_location">지금부터 위치를</string>
     <string name="wifi_jammed">와이파이는 와이파이에 다음 해제하고, 고장이 나타납니다.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">화면 계속</string>
     <string name="menu_labels_off">오프 라벨</string>
     <string name="menu_labels_on">레이블</string>
-    <string name="menu_zoom_in">확대</string>
-    <string name="menu_zoom_out">축소</string>
     <string name="menu_turn_off_lockon">Lockon 끄기</string>
     <string name="menu_turn_on_lockon">Lockon 켭니다</string>
     <string name="menu_show_old">실행 및 새보기</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">상표:</string>
     <string name="cell_network_notes">노트:</string>
     <string name="bluetooth_pref_text">Bluetooth 스캐닝 활성화</string>
-    <string name="turning_bt_off">Bluetooth 다시 켜기</string>
     <string name="turn_on_bt">블루투스 켜기</string>
     <string name="filter_show_bt">블루투스 표시</string>
     <string name="error_invalid_bssid">BSSID는 12 자이거나 와일드 카드 (%)를 포함해야합니다.</string>
@@ -345,7 +336,6 @@
     <string name="search_local">로컬 데이터베이스 검색</string>
     <string name="search_failed">검색 실패</string>
     <string name="search_empty">빈 결과</string>
-    <string name="search_query_limit">오늘 최대 검색 수에 도달했습니다. 한도가 내일 다시 설정됩니다.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0)는 WiFi 스캔을 분당 2로 제한합니다. 가능하면 Android를 업그레이드하십시오.</string>
     <string name="q_bad">Android 10 는 개발자 설정에서 비활성화하지 않으면 WiFi 스캔을 조절합니다.</string>

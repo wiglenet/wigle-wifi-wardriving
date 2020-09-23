@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Último marcador do BD:</string>
     <string name="maxout_maxid_button">Maxi. marcador do BD</string>
     <string name="maxout_maxid_text">Configurar marcador em:</string>
-    <string name="connect_button">Conectar</string>
-    <string name="connect_text">com a permissão do operador de rede</string>
     <string name="csv_run_export_button">Exportar em CSV</string>
     <string name="csv_run_export_text">Exporta a sessão atual para um arquivo CSV</string>
     <string name="csv_export_button">Exportar BD em CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Anunciar mudança de estado do GPS</string>
     <string name="mute">Desativar som</string>
     <string name="play">Ativar som</string>
-    <string name="unknown">Desconhecido</string>
     <string name="sort_text">Ordenar por</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (Coringas SQL: %,_):</string>
     <string name="search_button">Pesquisar no Banco Local</string>
     <string name="reset_button">Limpar Campos</string>
-    <string name="list_query_clear">Limpar Argumentos de Pesquisa</string>
     <string name="crypto_security">Segurança</string>
     <string name="crypto_strength">Nível de Sinal</string>
     <string name="crypto_password">Senha</string>
@@ -135,7 +131,6 @@
     <string name="dash_db_queue">Fila do BD:</string>
     <string name="dash_db_nets">Redes no BD:</string>
     <string name="dash_db_locs">Localizações no BD:</string>
-    <string name="dash_no_loc">Sem Localização!</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -167,7 +162,6 @@
     <string name="address">Endereço</string>
     <string name="no_address_found">Endereço geocodificado não encontrado</string>
     <string name="problem_with_field">Problema com o campo</string>
-    <string name="turning_wifi_off">Desligando o WiFi</string>
     <string name="lost_location">Localização Perdida</string>
     <string name="have_location">Localização recebida do</string>
     <string name="wifi_jammed">WiFi parece estar travado, desligando e ligando o Wi-Fi.</string>
@@ -184,8 +178,6 @@
     <string name="menu_screen_wake">Manter a tela ligada</string>
     <string name="menu_labels_off">Esconder Nomes</string>
     <string name="menu_labels_on">Mostrar Nomes</string>
-    <string name="menu_zoom_in">Aumentar Zoom</string>
-    <string name="menu_zoom_out">Diminuir Zoom</string>
     <string name="menu_turn_off_lockon">Destravar o Mapa</string>
     <string name="menu_turn_on_lockon">Travar o Mapa</string>
     <string name="menu_show_old">Todas Desta Sessão</string>
@@ -273,7 +265,6 @@
     <string name="map_toast_terrain">Estilo do Mapa: Terreno</string>
     <string name="map_needs_playservice">Mapa precisa do Google Play Services</string>
     <string name="register">Registre-se</string>
-    <string name="at">em</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
@@ -347,7 +338,6 @@
     <string name="cell_network_brand">Marca:</string>
     <string name="cell_network_notes">Notas:</string>
     <string name="bluetooth_pref_text">Ativar o scan por Bluetooth</string>
-    <string name="turning_bt_off">Desligar o Bluetooth</string>
     <string name="turn_on_bt">Ligando o Bluetooth</string>
     <string name="filter_show_bt">Mostrar Bluetooth</string>
     <string name="error_invalid_bssid">O BSSID deve ter 12 caracteres ou conter um curinga (%)</string>
@@ -358,7 +348,6 @@
     <string name="search_local">Procure seu banco de dados local</string>
     <string name="search_failed">Pesquisa falhada</string>
     <string name="search_empty">Resultados vazios</string>
-    <string name="search_query_limit">Você atingiu o número máximo de pesquisas hoje. Seu limite será redefinido amanhã.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">O Android Pie (9.0) faz a varredura do WiFi para 2 por minuto. Atualize o Android, se possível.</string>
     <string name="q_bad">O Android 10 limita as verificações de Wi-Fi, a menos que seja desativado nas Configurações do desenvolvedor.</string>

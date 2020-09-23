@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Latest अपलोड मार्कर:</string>
     <string name="maxout_maxid_button">Maxout DB मार्कर</string>
     <string name="maxout_maxid_text">मार्कर सेट:</string>
-    <string name="connect_button">कनेक्ट</string>
-    <string name="connect_text">नेटवर्क ऑपरेटर की अनुमति के साथ</string>
     <string name="csv_run_export_button">सीएसवी निर्यात भागो</string>
     <string name="csv_run_export_text">CSV फ़ाइल के लिए वर्तमान रन निर्यात</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">जीपीएस स्थिति परिवर्तन की घोषणा</string>
     <string name="mute">मूक</string>
     <string name="play">खेल</string>
-    <string name="unknown">अज्ञात</string>
     <string name="sort_text">सॉर्ट विकल्प</string>
     <string name="listdialog_button">ठीक है</string>
     <string name="cryptodialog_button">ठीक है</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (पूर्व: 0A:2C:EF:3D:25:1B) (एसक्यूएल वाइल्डकार्ड: %,_):</string>
     <string name="search_button">क्वेरी स्थानीय DB</string>
     <string name="reset_button">रीसेट फील्ड्स</string>
-    <string name="list_query_clear">साफ़ प्रश्न तर्क</string>
     <string name="crypto_security">सुरक्षा</string>
     <string name="crypto_strength">संकेत संख्या</string>
     <string name="crypto_password">पासवर्ड</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">डीबी कतार:</string>
     <string name="dash_db_nets">डीबी जाल</string>
     <string name="dash_db_locs">डीबी स्थान:</string>
-    <string name="dash_no_loc">नहीं स्थान!</string>
     <string name="dash_short_loc">नियंत्रण रेखा:</string>
     <string name="km_short">मी</string>
     <string name="mi_short">मील</string>
@@ -166,7 +161,6 @@
     <string name="address">पता</string>
     <string name="no_address_found">नहीं भूकूटित पाया पता</string>
     <string name="problem_with_field">क्षेत्र के साथ समस्या</string>
-    <string name="turning_wifi_off">वाईफ़ाई वापस बंद</string>
     <string name="lost_location">खोया स्थान</string>
     <string name="have_location">अब से स्थान है</string>
     <string name="wifi_jammed">वाईफ़ाई जाम दिखाई देता है, बंद, और वाईफाई, पर तब.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">पर स्क्रीन रखें</string>
     <string name="menu_labels_off">के बाहर लेबल</string>
     <string name="menu_labels_on">में लेबल</string>
-    <string name="menu_zoom_in">ज़ूमइन</string>
-    <string name="menu_zoom_out">ज़ूमआउट</string>
     <string name="menu_turn_off_lockon">ऑफ Lockon मुड़ें</string>
     <string name="menu_turn_on_lockon">Lockon में मुड़ें</string>
     <string name="menu_show_old">भागो और नई दिखाएँ</string>
@@ -334,7 +326,6 @@
     <string name="cell_network_brand">ब्रांड:</string>
     <string name="cell_network_notes">टिप्पणियाँ:</string>
     <string name="bluetooth_pref_text">ब्लूटूथ स्कैनिंग सक्षम करें</string>
-    <string name="turning_bt_off">ब्लूटूथ को वापस बंद करना</string>
     <string name="turn_on_bt">ब्लूटूथ चालू करना</string>
     <string name="filter_show_bt">ब्लूटूथ दिखाएं</string>
     <string name="error_invalid_bssid">BSSID 12 वर्णों का होना चाहिए या इसमें वाइल्डकार्ड (%) होना चाहिए</string>
@@ -345,7 +336,6 @@
     <string name="search_local">अपने स्थानीय डेटाबेस खोजें</string>
     <string name="search_failed">खोज विफल</string>
     <string name="search_empty">परिणाम खाली</string>
-    <string name="search_query_limit">आप आज अधिकतम खोज पर पहुँच गए हैं। आपकी सीमा कल रीसेट हो जाएगी।</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">एंड्रॉइड पाई (9.0) थ्रॉटल वाईफाई स्कैन 2 प्रति मिनट। यदि संभव हो तो Android अपग्रेड करें।</string>
     <string name="q_bad">डेवलपर सेटिंग में अक्षम होने तक एंड्रॉइड 10 थ्रोटल्स वाईफाई स्कैन करता है।</string>

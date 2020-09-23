@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Poslední hodnota DB při nahrání:</string>
     <string name="maxout_maxid_button">Maximalizovat značku DB</string>
     <string name="maxout_maxid_text">Nastavit značku DB na:</string>
-    <string name="connect_button">Připojit</string>
-    <string name="connect_text">s povolením provozovatele sít</string>
     <string name="csv_run_export_button">Exportovat do CSV</string>
     <string name="csv_run_export_text">Exportovat aktuální scan do CSV souboru</string>
     <string name="csv_export_button">Export DB do CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Oznamovat změny GPS</string>
     <string name="mute">Ztlumit</string>
     <string name="play">Přehrávat</string>
-    <string name="unknown">Neznámý</string>
     <string name="sort_text">Možnosti řazení</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (např: 0A:2C:EF:3D:25:1B) (SQL wildcards: %,_):</string>
     <string name="search_button">Vyhledat v lokální DB</string>
     <string name="reset_button">Vymazat pole</string>
-    <string name="list_query_clear">Vymazat parametry vyhledávání</string>
     <string name="crypto_security">Zabezpečení</string>
     <string name="crypto_strength">Síla signálu</string>
     <string name="crypto_password">Heslo</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB Fronta:</string>
     <string name="dash_db_nets">Počet WiFi v DB:</string>
     <string name="dash_db_locs">Počet lokací v DB:</string>
-    <string name="dash_no_loc">Bez polohy!</string>
     <string name="dash_short_loc">Pol:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +161,6 @@
     <string name="address">Adresa</string>
     <string name="no_address_found">Nebyla nalezena žádná adresa</string>
     <string name="problem_with_field">Problém se zadáváním</string>
-    <string name="turning_wifi_off">Opět vypínám WiFi</string>
     <string name="lost_location">Poloha ztracena</string>
     <string name="have_location">Nyní mám polohu z</string>
     <string name="wifi_jammed">WiFi je zaseknutá, vypínám a zapínám Wi-Fi</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Zakázat uspání displeje</string>
     <string name="menu_labels_off">Popisky vypnuty</string>
     <string name="menu_labels_on">Popisky zapnuty</string>
-    <string name="menu_zoom_in">Přiblížit</string>
-    <string name="menu_zoom_out">Oddálit</string>
     <string name="menu_turn_off_lockon">Vypnout centrování</string>
     <string name="menu_turn_on_lockon">Zapnout centrování</string>
     <string name="menu_show_old">Ukázat aktuální a nové</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">Typ mapy: Terénní</string>
     <string name="map_needs_playservice">Mapa vyžaduje službu Google Play</string>
     <string name="register">Registrovat</string>
-    <string name="at">na</string>
     <string name="drawer_open">Panel je otevřený</string>
     <string name="drawer_close">Panel je zavřený</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">Objevené WiFi poslední měsíc</string>
     <string name="firsttransid_title">První ID transakce</string>
     <string name="lasttransid_title">Poslední ID transakce</string>
-    <string name="please_allow">Povolte prosím oprávnění aplikace</string>
     <string name="gps_permission">GPS (přesná poloha)</string>
     <string name="cell_permission">Umístění podle sítě (přibližná poloha)</string>
-    <string name="allow_storage">Databáze je ve výchozím nastavení ukládána na externí úložiště, povolte ukládání médií a souborů</string>
-    <string name="restart">Restartování pro použití externího úložiště</string>
     <string name="rank_stats_app_name">WiGLE.net Žebříčky</string>
-    <string name="total_wifi">Celkové WiFi</string>
     <string name="total_cell">Celkové vysílače</string>
     <string name="tab_rank">Žebříčky</string>
     <string name="uploads_app_name">WiGLE.net Uploady</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">Hloubka fronty pro zpracování souborů</string>
     <string name="news_app_name">WiGLE.net Zprávy</string>
     <string name="tab_news">Zprávy</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">Vysílače s GPS</string>
     <string name="bytes">Byty</string>
     <string name="rank_all_time">Celkové hodnocení:</string>
     <string name="rank_month">Měsíční hodnocení:</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">Značka:</string>
     <string name="cell_network_notes">Poznámky:</string>
     <string name="bluetooth_pref_text">Povolit skenování Bluetooth</string>
-    <string name="turning_bt_off">Opětovné vypínání Bluetooth</string>
     <string name="turn_on_bt">Zapínání Bluetooth</string>
     <string name="filter_show_bt">Zobrazit Bluetooth</string>
     <string name="error_invalid_bssid">BSSID musí mít délku 12 znaků nebo obsahuje zástupný znak (%)</string>
@@ -398,7 +382,6 @@
     <string name="search_local">Vyhledejte místní databázi</string>
     <string name="search_failed">Hledání se nezdařilo</string>
     <string name="search_empty">Výsledky prázdné</string>
-    <string name="search_query_limit">Do dnešního dne jste dosáhli maximálního počtu vyhledávání. Váš limit se zítra vynuluje.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) snižuje WiFi skenování na 2 za minutu. Pokud je to možné, upgradujte Android.</string>
     <string name="q_bad">Android 10 škrtá skenování WiFi, pokud to není zakázáno v Nastavení vývojáře.</string>

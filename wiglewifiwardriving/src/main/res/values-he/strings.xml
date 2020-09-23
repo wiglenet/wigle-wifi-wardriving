@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">אחרון להעלות את הסמן:</string>
     <string name="maxout_maxid_button">Maxout DB סמן</string>
     <string name="maxout_maxid_text">הגדר סמן ל:</string>
-    <string name="connect_button">לחבר</string>
-    <string name="connect_text">עם אישור של מפעיל הרשת</string>
     <string name="csv_run_export_button">CSV יצוא הפעלה</string>
     <string name="csv_run_export_text">ייצוא לרוץ הנוכחית קובץ CSV</string>
     <string name="csv_export_button">CSV Export DB</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">הכרז על מצב השינויים GPS</string>
     <string name="mute">להשתיק</string>
     <string name="play">משחק</string>
-    <string name="unknown">לא ידוע</string>
     <string name="sort_text">אפשרויות מיון</string>
     <string name="listdialog_button">בסדר</string>
     <string name="cryptodialog_button">בסדר</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (לשעבר: 0A:2C:EF:3D:25:1B) (SQL בתווים כלליים: %,_):</string>
     <string name="search_button">DB מקומי Query</string>
     <string name="reset_button">איפוס שדות</string>
-    <string name="list_query_clear">שאילתה טיעונים נקה</string>
     <string name="crypto_security">בטחון</string>
     <string name="crypto_strength">עוצמת האות</string>
     <string name="crypto_password">סיסמה</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">DB תור:</string>
     <string name="dash_db_nets">DB נטס:</string>
     <string name="dash_db_locs">DB מיקומים:</string>
-    <string name="dash_no_loc">לא מיקום!</string>
     <string name="dash_short_loc">לוק:</string>
     <string name="km_short">ק&quot;מ</string>
     <string name="mi_short">מי</string>
@@ -166,7 +161,6 @@
     <string name="address">כתובת</string>
     <string name="no_address_found">לא מצאו כתובת geocoded</string>
     <string name="problem_with_field">בעיה עם שדה</string>
-    <string name="turning_wifi_off">מפנה את הגב WiFi</string>
     <string name="lost_location">אבודים מיקום</string>
     <string name="have_location">כעת יש מיקום מ</string>
     <string name="wifi_jammed">WiFi נראה תקוע, כיבוי ולאחר מכן, Wi-Fi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">שמור על המסך</string>
     <string name="menu_labels_off">תוויות כבוי</string>
     <string name="menu_labels_on">התוויות על</string>
-    <string name="menu_zoom_in">להתמקד</string>
-    <string name="menu_zoom_out">זום אאוט</string>
     <string name="menu_turn_off_lockon">כיבוי Lockon</string>
     <string name="menu_turn_on_lockon">הפעל Lockon</string>
     <string name="menu_show_old">הצג הפעלה וניו</string>
@@ -272,7 +264,6 @@
     <string name="map_toast_terrain">סוג מפה: שטח</string>
     <string name="map_needs_playservice">המפה דורשת שירות Google Play</string>
     <string name="register">הירשם</string>
-    <string name="at">בְּ-</string>
     <string name="drawer_open">מגירה פתוחה</string>
     <string name="drawer_close">מגירה סגור</string>
     <string name="site_stats_app_name">סטטיסטיקה של WiGLE.net</string>
@@ -294,13 +285,9 @@
     <string name="prevmonthcount_title">WiFi התגלה בחודש שעבר</string>
     <string name="firsttransid_title">מזהה עסקה ראשון</string>
     <string name="lasttransid_title">מזהה עסקה אחרון</string>
-    <string name="please_allow">המתן הרשאה לשימוש</string>
     <string name="gps_permission">GPS (מיקום יפה)</string>
     <string name="cell_permission">מיקום סלולרי (מיקום גס)</string>
-    <string name="allow_storage">מסד הנתונים הוא לשים על אחסון חיצוני כברירת מחדל, נא לאפשר מדיה / אחסון קבצים</string>
-    <string name="restart">הפעלה מחדש כדי להשתמש באחסון חיצוני</string>
     <string name="rank_stats_app_name">WiGLE.net דירוגים</string>
-    <string name="total_wifi">סה"כ WiFi</string>
     <string name="total_cell">סה"כ תא</string>
     <string name="tab_rank">דירוגים</string>
     <string name="uploads_app_name">העלאות של WiGLE.net</string>
@@ -308,8 +295,6 @@
     <string name="queue_depth">עומק תור עיבוד הקובץ</string>
     <string name="news_app_name">חדשות WiGLE.net</string>
     <string name="tab_news">חֲדָשׁוֹת</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">סלולרי GPS</string>
     <string name="bytes">בתים</string>
     <string name="rank_all_time">כל הזמנים דירוגים</string>
     <string name="rank_month">דירוג חודש</string>
@@ -387,7 +372,6 @@
     <string name="cell_network_brand">מותג:</string>
     <string name="cell_network_notes">הערות:</string>
     <string name="bluetooth_pref_text">הפעל את סריקת Bluetooth</string>
-    <string name="turning_bt_off">כיבוי Bluetooth</string>
     <string name="turn_on_bt">הפעלת Bluetooth</string>
     <string name="filter_show_bt">הצג Bluetooth</string>
     <string name="error_invalid_bssid">BSSID חייב להכיל 12 תווים או להכיל תו כללי (%)</string>
@@ -398,7 +382,6 @@
     <string name="search_local">חפש את מסד הנתונים המקומי שלך</string>
     <string name="search_failed">החיפוש נכשל</string>
     <string name="search_empty">תוצאות ריקות</string>
-    <string name="search_query_limit">הגעת למספר המרבי של חיפושים היום. המגבלה שלך תאופס מחר.</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">פאי אנדרואיד (9.0) מצמצם סריקות WiFi ל -2 לדקה. שדרג אנדרואיד במידת האפשר.</string>
     <string name="q_bad">אנדרואיד 10 מצמצם סריקות WiFi אלא אם כן הוא מושבת בהגדרות המפתח.</string>

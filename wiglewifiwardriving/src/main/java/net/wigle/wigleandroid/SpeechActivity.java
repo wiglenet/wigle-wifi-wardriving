@@ -54,7 +54,8 @@ public class SpeechActivity extends AppCompatActivity {
 
         // speech spinner
         Spinner spinner = (Spinner) findViewById(R.id.speak_spinner );
-        if ( ! TTS.hasTTS() ) {
+        //TODO: this may no longer be necessary
+        if (MainActivity.getMainActivity() == null || MainActivity.getStaticState().tts == null) {
             // no text to speech :(
             spinner.setEnabled( false );
             final TextView speakText = (TextView) findViewById(R.id.speak_text );

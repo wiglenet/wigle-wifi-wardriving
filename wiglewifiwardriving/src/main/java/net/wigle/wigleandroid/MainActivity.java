@@ -1231,11 +1231,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             config.locale = newLocale;
             MainActivity.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
-            if (mainActivity != null) {
-                Intent checkTTSIntent = new Intent();
-                checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-                mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
-            }
+            ttsCheckIntent();
+        }
+    }
+
+    public static void ttsCheckIntent() {
+        if (mainActivity != null) {
+            Intent checkTTSIntent = new Intent();
+            checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+            mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+        } else {
+            MainActivity.error("could not launch TTS check due to pre-instantiation state");
         }
     }
 
@@ -1670,19 +1676,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // make volume change "media"
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        /*try {
-            if (TTS.hasTTS()) {
-                // don't reuse an old one, has to be on *this* context
-                if (state.tts != null) {
-                    state.tts.shutdown();
-                }
-                // this has to have the parent activity, for whatever wacky reasons
-                state.tts = new TTS(this);
-            }
-        } catch (Exception ex) {
-            error("exception setting TTS: " + ex, ex);
-        }*/
-
         TelephonyManager tele = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (tele != null && state.phoneState == null) {
             state.phoneState = new PhoneState();
@@ -1694,10 +1687,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
-
-        Intent checkTTSIntent = new Intent();
-        checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-        startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+        ttsCheckIntent();
     }
 
     /**

@@ -398,6 +398,9 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             return 12;
         } else if (maxDist < 18000) {
             return 11;
+        } else if (maxDist < 36000) {
+            // ALiBI: cells can be this big.
+            return 10;
         } else {
             return DEFAULT_ZOOM;
         }

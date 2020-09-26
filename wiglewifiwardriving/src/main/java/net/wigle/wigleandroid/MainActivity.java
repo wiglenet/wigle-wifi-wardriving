@@ -48,6 +48,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
@@ -113,7 +115,8 @@ import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
-public final class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+
     //*** state that is retained ***
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
@@ -131,7 +134,7 @@ public final class MainActivity extends AppCompatActivity {
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
-        TTS tts;
+        TextToSpeech tts;
         boolean inEmulator;
         PhoneState phoneState;
         ObservationUploader observationUploader;
@@ -177,6 +180,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
+    private static final int ACTION_TTS_CODE = 3;
 
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     public static final String ERROR_REPORT_DIALOG = "doDialog";
@@ -1217,7 +1221,6 @@ public final class MainActivity extends AppCompatActivity {
             } else {
                 MainActivity.info("\tlang: "+lang);
                 newLocale = new Locale(lang);
-
             }
         } else if ("".equals(lang) && ORIG_LOCALE != null && !current.equals(ORIG_LOCALE.getLanguage())) {
             newLocale = ORIG_LOCALE;
@@ -1228,6 +1231,38 @@ public final class MainActivity extends AppCompatActivity {
             config.locale = newLocale;
             MainActivity.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+            ttsCheckIntent();
+        }
+    }
+
+    public static void ttsCheckIntent() {
+        if (mainActivity != null) {
+            Intent checkTTSIntent = new Intent();
+            checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+            mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+        } else {
+            MainActivity.error("could not launch TTS check due to pre-instantiation state");
+        }
+    }
+
+    /**
+     * hack to get locale
+     * @param context
+     * @param config
+     * @return
+     */
+    public static Locale getLocale(final Context context, final Configuration config) {
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String lang = prefs.getString(ListFragment.PREF_LANGUAGE, "");
+        final String current = config.locale.getLanguage();
+        MainActivity.info("current lang: " + current + " new lang: " + lang);
+        if (lang.contains("-r")) {
+            String[] parts = lang.split("-r");
+            MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
+            return new Locale(parts[0], parts[1]);
+        } else {
+            MainActivity.info("\tlang: "+lang);
+            return new Locale(lang);
         }
     }
 
@@ -1641,19 +1676,6 @@ public final class MainActivity extends AppCompatActivity {
         // make volume change "media"
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        try {
-            if (TTS.hasTTS()) {
-                // don't reuse an old one, has to be on *this* context
-                if (state.tts != null) {
-                    state.tts.shutdown();
-                }
-                // this has to have the parent activity, for whatever wacky reasons
-                state.tts = new TTS(this);
-            }
-        } catch (Exception ex) {
-            error("exception setting TTS: " + ex, ex);
-        }
-
         TelephonyManager tele = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (tele != null && state.phoneState == null) {
             state.phoneState = new PhoneState();
@@ -1665,6 +1687,7 @@ public final class MainActivity extends AppCompatActivity {
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
+        ttsCheckIntent();
     }
 
     /**
@@ -1930,8 +1953,15 @@ public final class MainActivity extends AppCompatActivity {
             else {
                 info("wifi NOT turned on, resultCode: " + resultCode);
             }
-        }
-        else {
+        } else if (requestCode == ACTION_TTS_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                state.tts = new TextToSpeech(this, this);
+            } else {
+                Intent installTTSIntent = new Intent();
+                installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installTTSIntent);
+            }
+        } else {
             info("MainActivity: Unhandled requestCode: " + requestCode
                     + " resultCode: " + resultCode);
         }
@@ -2078,7 +2108,7 @@ public final class MainActivity extends AppCompatActivity {
 
     public void speak(final String string) {
         if (!MainActivity.getMainActivity().isMuted() && state.tts != null) {
-            state.tts.speak(string);
+            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null);
         }
     }
 
@@ -2674,4 +2704,24 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * respond to TTS initialization
+     * @param status status of initialization
+     */
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS && state != null && state.tts != null) {
+            Locale locale = getLocale(getApplicationContext(), getApplicationContext().getResources().getConfiguration());
+            error("LOCALE: "+locale);
+            if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
+                state.tts.setLanguage(locale);
+            } else {
+                error("preferred locale: [" +locale+"] not available on device.");
+            }
+        } else if (status == TextToSpeech.SUCCESS) {
+            error("TTS init successful, but TTS engine was null");
+        } else if (status == TextToSpeech.ERROR) {
+            error("TTS init failed: "+status);
+        }
+    }
 }

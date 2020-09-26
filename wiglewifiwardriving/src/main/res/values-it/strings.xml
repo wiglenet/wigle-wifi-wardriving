@@ -114,6 +114,7 @@
     <string name="tab_dash">Riepilogo</string>
     <string name="tab_data">Database</string>
     <string name="tab_stats">Statistiche</string>
+    <string name="tab_search">Ricerca</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulla</string>
     <string name="dash_scan_off">Scansione disattivata</string>

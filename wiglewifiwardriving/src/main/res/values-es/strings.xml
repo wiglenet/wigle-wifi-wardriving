@@ -114,6 +114,7 @@
     <string name="tab_dash">Resumen</string>
     <string name="tab_data">Datos</string>
     <string name="tab_stats">Estadística</string>
+    <string name="tab_search">Buscar</string>
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Exploración apagada)</string>

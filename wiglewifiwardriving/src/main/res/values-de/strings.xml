@@ -114,6 +114,7 @@
     <string name="tab_dash">Übersicht</string>
     <string name="tab_data">Daten</string>
     <string name="tab_stats">Statistiken</string>
+    <string name="tab_search">Suche</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="dash_scan_off">(Scan ausgeschaltet)</string>

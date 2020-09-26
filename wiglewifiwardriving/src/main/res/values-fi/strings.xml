@@ -114,6 +114,7 @@
     <string name="tab_dash">Kojelauta</string>
     <string name="tab_data">Tiedot</string>
     <string name="tab_stats">Tilasto</string>
+    <string name="tab_search">Hae</string>
     <string name="ok">OK</string>
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>

@@ -114,6 +114,7 @@
     <string name="tab_dash">Pano</string>
     <string name="tab_data">Veri</string>
     <string name="tab_stats">Istatistik</string>
+    <string name="tab_search">Arama</string>
     <string name="ok">Tamam</string>
     <string name="cancel">İptal</string>
     <string name="dash_scan_off">(Tarama Kapalı)</string>

@@ -114,6 +114,7 @@
     <string name="tab_dash">仪表盘</string>
     <string name="tab_data">数据库</string>
     <string name="tab_stats">统计</string>
+    <string name="tab_search">搜索</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（扫描关闭的网络）</string>

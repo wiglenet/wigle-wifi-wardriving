@@ -114,6 +114,7 @@
     <string name="tab_dash">Tableau de bord</string>
     <string name="tab_data">Base de données</string>
     <string name="tab_stats">Statistiques</string>
+    <string name="tab_search">Chercher</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="dash_scan_off">(Numérisation désactivée)</string>

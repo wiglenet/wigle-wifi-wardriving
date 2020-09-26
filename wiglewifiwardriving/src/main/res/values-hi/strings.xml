@@ -114,6 +114,7 @@
     <string name="tab_dash">डैशबोर्ड</string>
     <string name="tab_data">डेटा</string>
     <string name="tab_stats">आंकड़े</string>
+    <string name="tab_search">खोज</string>
     <string name="ok">ठीक है</string>
     <string name="cancel">रद्द करें</string>
     <string name="dash_scan_off">(स्कैनिंग बंद कर दिया)</string>

@@ -114,6 +114,7 @@
     <string name="tab_dash">לוח מחוונים</string>
     <string name="tab_data">נתונים</string>
     <string name="tab_stats">סטטיסטיקות</string>
+    <string name="tab_search">לחפש</string>
     <string name="ok">בסדר</string>
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>

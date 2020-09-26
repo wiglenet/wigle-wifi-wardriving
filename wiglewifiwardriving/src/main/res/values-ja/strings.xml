@@ -114,6 +114,7 @@
     <string name="tab_dash">ダッシュボード</string>
     <string name="tab_data">データ</string>
     <string name="tab_stats">統計</string>
+    <string name="tab_search">探す</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(スキャン停止中)</string>

@@ -114,6 +114,7 @@
     <string name="tab_dash">Műszerfal</string>
     <string name="tab_data">Adatbázis</string>
     <string name="tab_stats">Statisztika</string>
+    <string name="tab_search">Keresés</string>
     <string name="ok">OK</string>
     <string name="cancel">Mégse</string>
     <string name="dash_scan_off">(Szkennelés kikapcsolva)</string>

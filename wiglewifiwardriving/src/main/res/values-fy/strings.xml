@@ -114,6 +114,7 @@
     <string name="tab_dash">Oersjoch</string>
     <string name="tab_data">Gegevens</string>
     <string name="tab_stats">Statistieken</string>
+    <string name="tab_search">Zoeken</string>
     <string name="ok">OK</string>
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>

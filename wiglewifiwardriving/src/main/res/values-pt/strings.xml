@@ -114,6 +114,7 @@
     <string name="tab_dash">Painel de instrumentos</string>
     <string name="tab_data">Dados</string>
     <string name="tab_stats">Estatisticas</string>
+    <string name="tab_search">Pesquisar</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Scanning desligado)</string>

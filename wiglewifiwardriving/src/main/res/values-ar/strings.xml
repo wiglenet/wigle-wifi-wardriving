@@ -114,6 +114,7 @@
     <string name="tab_dash">Dashboard</string>
     <string name="tab_data">Data</string>
     <string name="tab_stats">إحصائيات</string>
+    <string name="tab_search">بحث</string>
     <string name="ok">حسنا</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(تم إيقاف تشغيل المسح)</string>

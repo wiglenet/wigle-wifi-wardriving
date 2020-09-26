@@ -114,6 +114,7 @@
     <string name="tab_dash">Instrumentbræt</string>
     <string name="tab_data">Data</string>
     <string name="tab_stats">Statistik</string>
+    <string name="tab_search">Søg</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuller</string>
     <string name="dash_scan_off">(Scanning er slukket)</string>

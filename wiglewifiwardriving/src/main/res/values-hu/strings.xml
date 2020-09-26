@@ -262,6 +262,7 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
+    <string name="user_stats_app_name">Felhasználói statisztikák</string>
     <string name="activate">aktiváld most</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>

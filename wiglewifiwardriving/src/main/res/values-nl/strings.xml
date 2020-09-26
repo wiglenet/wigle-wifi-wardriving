@@ -271,6 +271,7 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
+    <string name="user_stats_app_name">Gebruikersstatistieken</string>
     <string name="rank_stats_app_name">WiGLE.net-ranglijsten</string>
     <string name="total_cell">Totaal aantal cellen</string>
     <string name="tab_rank">Rankings</string>

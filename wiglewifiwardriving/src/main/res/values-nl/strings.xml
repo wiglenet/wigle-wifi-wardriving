@@ -265,6 +265,14 @@
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
     <string name="map_needs_playservice">Map vereist Google Play Service</string>
     <string name="register">Registreren</string>
+    <string name="drawer_open">Lade open</string>
+    <string name="drawer_close">Lade gesloten</string>
+    <string name="site_stats_app_name">WiGLE.net Statistieken</string>
+    <string name="netloc_title">WiGLE.net WiFi-netwerken met locatie</string>
+    <string name="loctotal_title">WiGLE.net WiFi-netwerkwaarnemingen</string>
+    <string name="genloc_title">WiGLE.net Cell Towers met locatie</string>
+    <string name="userstot_title">Totaal aantal geregistreerde gebruikers van WiGLE.net</string>
+    <string name="transtot_title">Bestanden geüpload naar WiGLE.net</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>

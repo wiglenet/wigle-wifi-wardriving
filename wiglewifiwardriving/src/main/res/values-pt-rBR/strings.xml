@@ -265,6 +265,14 @@
     <string name="map_toast_terrain">Estilo do Mapa: Terreno</string>
     <string name="map_needs_playservice">Mapa precisa do Google Play Services</string>
     <string name="register">Registre-se</string>
+    <string name="drawer_open">Gaveta aberta</string>
+    <string name="drawer_close">Fechar gaveta</string>
+    <string name="site_stats_app_name">Estatísticas WiGLE.net</string>
+    <string name="netloc_title">Redes WiGLE.net WiGLE.net com localização</string>
+    <string name="loctotal_title">Observações da rede WiFi WiGLE.net</string>
+    <string name="genloc_title">Torres de celular WiGLE.net com localização</string>
+    <string name="userstot_title">Total de usuários registrados no WiGLE.net</string>
+    <string name="transtot_title">Arquivos enviados para WiGLE.net</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>

@@ -114,6 +114,7 @@
     <string name="tab_dash">仪表盘</string>
     <string name="tab_data">数据库</string>
     <string name="tab_stats">统计</string>
+    <string name="tab_search">搜索</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（扫描关闭的网络）</string>
@@ -382,6 +383,15 @@
     <string name="search_local">搜索本地数据库</string>
     <string name="search_failed">搜索失败</string>
     <string name="search_empty">结果为空</string>
+    <string name="export_m8b_button">出口 &#x2791;</string>
+    <string name="export_m8b">导出地理位置魔术（8）球</string>
+    <string name="export_m8b_detail">生成一个用于确定您的大概位置的oracle。参见：\n\n https://github.com/wiglenet/m8b \n\n将使用默认切片= 30，以允许与其他魔法结合使用。 \n\n这可能需要一段时间-如果数据库很大，请连接外部电源。</string>
+    <string name="m8b_failed">无法导出m8b文件。\n</string>
+    <string name="m8b_sizing">确定&#x2791;输入</string>
+    <string name="exporting_m8b_final">编写&#x2791;文件</string>
+    <string name="calculating_m8b">计算&#x2791;</string>
+    <string name="btloc_title">WiGLE.net具有位置的蓝牙设备</string>
+    <string name="total_bt">WiGLE.net具有位置的蓝牙设备</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie（9.0）将WiFi扫描限制为每分钟2次。尽可能升级Android。</string>
     <string name="q_bad">除非在“开发者设置”中禁用，否则Android 10 会限制WiFi扫描。</string>

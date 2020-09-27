@@ -114,6 +114,7 @@
     <string name="tab_dash">Übersicht</string>
     <string name="tab_data">Daten</string>
     <string name="tab_stats">Statistiken</string>
+    <string name="tab_search">Suche</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="dash_scan_off">(Scan ausgeschaltet)</string>
@@ -382,7 +383,16 @@
     <string name="search_local">Suchen Sie in Ihrer lokalen Datenbank</string>
     <string name="search_failed">Suche fehlgeschlagen</string>
     <string name="search_empty">Ergebnisse leer</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Export &#x2791;</string>
+    <string name="export_m8b">Export Geolocation Magic (8) Ball</string>
+    <string name="export_m8b_detail">Generieren Sie ein Orakel, um Ihren ungefähren Standort zu bestimmen. Siehe: \n\n https://github.com/wiglenet/m8b \n\n Standard-Slice = 30 wird verwendet, um die Kombination mit anderer Magie zu ermöglichen &#x2791; Bälle. \n\nDies kann eine Weile dauern - bitte schließen Sie eine externe Stromversorgung an, wenn Sie eine große Datenbank haben.</string>
+    <string name="m8b_failed">M8B-Datei kann nicht exportiert werden.\n</string>
+    <string name="m8b_sizing">Orakeleingänge bestimmen</string>
+    <string name="exporting_m8b_final">Orakel-Datei schreiben</string>
+    <string name="calculating_m8b">Orakel berechnen</string>
+    <string name="btloc_title">WiGLE.net Bluetooth-Geräte mit Standort</string>
+    <string name="total_bt">Insgesamt Bluetooth</string>
+    <string name="menu_debug">Debuggen</string>
     <string name="pie_bad">Android Pie (9.0) drosselt WiFi-Scans auf 2 pro Minute. Wenn möglich, aktualisieren Sie Android.</string>
     <string name="q_bad">Android 10 drosselt WLAN-Scans, sofern dies nicht in den Entwicklereinstellungen deaktiviert ist.</string>
     <string name="enable_developer">So aktivieren Sie die Entwickleroptionen: Einstellungen -> Informationen zum Telefon -> Tippen Sie siebenmal auf Build-Nummer.</string>

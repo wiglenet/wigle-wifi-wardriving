@@ -264,6 +264,8 @@
     <string name="map_toast_terrain">Карта: Рельеф</string>
     <string name="map_needs_playservice">Карта зависит от Сервисов Google Play</string>
     <string name="register">Зарегистрироваться</string>
+    <string name="drawer_open">Ящик открыт</string>
+    <string name="drawer_close">Ящик Закрыть</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
@@ -288,6 +290,7 @@
     <string name="authorize">Автозироваться (войти)</string>
     <string name="anonymous_confirm">Загружать анонимно? Это удалит данные для авторизации с вашего устройства.</string>
     <string name="title_activity_activate">Сканировать для активации</string>
+    <string name="unknown_number">\?\?</string>
     <string name="show_discovered_since">Открытые сети</string>
     <string name="show_discovered">Показать открытые сети на карте</string>
     <string name="map_none">Никакие</string>

@@ -385,7 +385,7 @@
     <string name="search_empty">Results Empty</string>
     <string name="export_m8b_button">Export &#x2791;</string>
     <string name="export_m8b">Export Geolocation Magic (8) Ball</string>
-    <string name="export_m8b_detail">Generate an oracle for determining your approximate location. See: \n\n https://github.com/wiglenet/m8b \n\n Default slice = 30 will be used, to allow combination with other magic &#x2791; balls.\n\nThis may take a while - please connect external power connected if you have a large database.</string>
+    <string name="export_m8b_detail">Generate an oracle for determining your approximate location. See: \n\n https://github.com/wiglenet/m8b \n\n Default slice = 30 will be used, to allow combination with other magic &#x2791; balls.\n\nThis may take a while - please connect external power if you have a large database.</string>
     <string name="m8b_failed">Unable to export m8b file.\n</string>
     <string name="m8b_sizing">Determining oracle inputs</string>
     <string name="exporting_m8b_final">Writing oracle file</string>

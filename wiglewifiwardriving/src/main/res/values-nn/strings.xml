@@ -114,6 +114,7 @@
     <string name="tab_dash">Dashboard</string>
     <string name="tab_data">Database</string>
     <string name="tab_stats">Statistics</string>
+    <string name="tab_search">Søk</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="dash_scan_off">(Scanning Turned Off)</string>
@@ -278,7 +279,7 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
-    <string name="user_stats_app_name">User Statistics</string>
+    <string name="user_stats_app_name">Brukerstatistikk</string>
     <string name="rank_title">User Ranking:</string>
     <string name="totallocs_title">Total Wifi Observations Recorded</string>
     <string name="monthcount_title">Wifi Discovered This Month</string>
@@ -364,7 +365,16 @@
     <string name="search_local">Søk i din lokale database</string>
     <string name="search_failed">Søke mislyktes</string>
     <string name="search_empty">Resultater Tom</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Eksport &#x2791;</string>
+    <string name="export_m8b">Eksporter Geolocation Magic (8) Ball</string>
+    <string name="export_m8b_detail">Generer et orakel for å bestemme din omtrentlige beliggenhet. Se: \n\n https://github.com/wiglenet/m8b \n\n Standard slice = 30 vil bli brukt, for å tillate kombinasjon med andre magiske &#x2791; baller.\n\nDette kan ta en stund - vennligst koble til ekstern strøm hvis du har en stor database.</string>
+    <string name="m8b_failed">Kan ikke eksportere m8b-filen.\n</string>
+    <string name="m8b_sizing">Bestemme orakelinnganger</string>
+    <string name="exporting_m8b_final">Skriver orakelfil</string>
+    <string name="calculating_m8b">Beregner orakel</string>
+    <string name="btloc_title">WiGLE.net Bluetooth-enheter med plassering</string>
+    <string name="total_bt">Total Bluetooth</string>
+    <string name="menu_debug">Feilsøk</string>
     <string name="pie_bad">Android Pie (9.0) struper WiFi-skanninger til 2 per minutt. Oppgrader Android hvis mulig.</string>
     <string name="q_bad">Android 10 struper WiFi-skanninger med mindre den er deaktivert i utviklerinnstillinger.</string>
     <string name="enable_developer">Slik aktiverer du utvikleralternativer: Innstillinger -> Om telefon -> Trykk på Byggenummer 7 ganger.</string>

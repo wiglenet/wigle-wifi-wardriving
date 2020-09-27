@@ -359,7 +359,7 @@
     <string name="search_empty">Resultados vacíos</string>
     <string name="export_m8b_button">Exportar &#x2791;</string>
     <string name="export_m8b">Exportar bola mágica de geolocalización (8)</string>
-    <string name="export_m8b_detail">Genere un oráculo para determinar su ubicación aproximada. Ver: \n\n https://github.com/wiglenet/m8b \n\nSe usará el segmento predeterminado = 30, para permitir la combinación con otra magia &#x2791; bolas. \n\nEsto puede llevar un tiempo; conecte la alimentación externa si tiene una base de datos grande.</string>
+    <string name="export_m8b_detail">Genere un oráculo para determinar su ubicación aproximada. Ver: \n\nhttps://github.com/wiglenet/m8b\n\nSe usará el segmento predeterminado = 30, para permitir la combinación con otras bolas mágicas &#x2791;.\n\nEsto puede llevar un tiempo - por favor conecte el poder si tiene una gran base de datos.</string>
     <string name="m8b_failed">No se puede exportar el archivo m8b.\n</string>
     <string name="m8b_sizing">Determinando las entradas de Oracle</string>
     <string name="exporting_m8b_final">Escribir archivo de Oracle</string>

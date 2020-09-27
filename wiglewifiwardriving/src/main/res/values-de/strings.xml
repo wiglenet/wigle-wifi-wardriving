@@ -385,7 +385,7 @@
     <string name="search_empty">Ergebnisse leer</string>
     <string name="export_m8b_button">Export &#x2791;</string>
     <string name="export_m8b">Export Geolocation Magic (8) Ball</string>
-    <string name="export_m8b_detail">Generieren Sie ein Orakel, um Ihren ungefähren Standort zu bestimmen. Siehe: \n\n https://github.com/wiglenet/m8b \n\n Standard-Slice = 30 wird verwendet, um die Kombination mit anderer Magie zu ermöglichen &#x2791; Bälle. \n\nDies kann eine Weile dauern - bitte schließen Sie eine externe Stromversorgung an, wenn Sie eine große Datenbank haben.</string>
+    <string name="export_m8b_detail">Generieren Sie ein Orakel, um Ihren ungefähren Standort zu bestimmen. Siehe: \n\nhttps://github.com/wiglenet/m8b \n\nStandard-Slice = 30 wird verwendet, um die Kombination mit anderen magischen &#x2791; Bällen zu ermöglichen. \n\nDies kann eine Weile dauern - bitte schließen Sie eine externe an Stromversorgung, wenn Sie eine große Datenbank haben.</string>
     <string name="m8b_failed">M8B-Datei kann nicht exportiert werden.\n</string>
     <string name="m8b_sizing">Orakeleingänge bestimmen</string>
     <string name="exporting_m8b_final">Orakel-Datei schreiben</string>

@@ -359,7 +359,7 @@
     <string name="search_empty">परिणाम खाली</string>
     <string name="export_m8b_button">निर्यात &#x2791;</string>
     <string name="export_m8b">निर्यात जियोलोकेशन मैजिक (8) बॉल</string>
-    <string name="export_m8b_detail">अपने अनुमानित स्थान को निर्धारित करने के लिए एक ओरेकल बनाएं। देखें: \n\n https://github.com/wiglenet/m8b \n\n डिफ़ॉल्ट स्लाइस = 30 का उपयोग किया जाएगा, अन्य जादू के साथ संयोजन की अनुमति देने के लिए &#x2791; गेंदों। \n\n यह कुछ समय ले सकता है - यदि आपके पास एक बड़ा डेटाबेस है, तो कृपया बाहरी बिजली कनेक्ट करें।</string>
+    <string name="export_m8b_detail">अपने अनुमानित स्थान को निर्धारित करने के लिए एक ओरेकल बनाएं। देखें: \n\n https://github.com/wiglenet/m8b \n\n डिफ़ॉल्ट स्लाइस = 30 का उपयोग अन्य जादू &#x2791; गेंदों के साथ संयोजन की अनुमति देने के लिए किया जाएगा। \n\n इसमें कुछ समय लग सकता है - कृपया बाहरी कनेक्ट करें यदि आपके पास एक बड़ा डेटाबेस है तो शक्ति।</string>
     <string name="m8b_failed">M8b फ़ाइल निर्यात करने में असमर्थ।\n</string>
     <string name="m8b_sizing">Oracle आदानों का निर्धारण</string>
     <string name="exporting_m8b_final">लेखन oracle फ़ाइल</string>

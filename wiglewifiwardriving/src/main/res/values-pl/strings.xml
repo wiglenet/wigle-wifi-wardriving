@@ -357,7 +357,16 @@
     <string name="search_local">Przeszukaj lokalną bazę danych</string>
     <string name="search_failed">Wyszukiwanie nie powiodło się</string>
     <string name="search_empty">Wyniki Empty</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Eksportuj &#x2791;</string>
+    <string name="export_m8b">Eksportuj magiczną piłkę geolokalizacyjną (8)</string>
+    <string name="export_m8b_detail">Wygeneruj wyrocznię do określenia przybliżonej lokalizacji. Widzieć: \n\n https://github.com/wiglenet/m8b \n\n Zostanie użyty domyślny plasterek = 30, aby umożliwić połączenie z innymi magicznymi &#x2791; kulami.\n\n To może chwilę potrwać - podłącz zewnętrzne zasilanie, jeśli masz dużą bazę danych.</string>
+    <string name="m8b_failed">Nie można wyeksportować pliku m8b.\n</string>
+    <string name="m8b_sizing">Określanie danych wejściowych oracle</string>
+    <string name="exporting_m8b_final">Pisanie pliku oracle</string>
+    <string name="calculating_m8b">Obliczanie wyroczni</string>
+    <string name="btloc_title">Urządzenia Bluetooth WiGLE.net z lokalizacją</string>
+    <string name="total_bt">Całkowity Bluetooth</string>
+    <string name="menu_debug">Odpluskwić</string>
     <string name="pie_bad">Android Pie (9.0) ogranicza skanowanie Wi-Fi do 2 na minutę. Zaktualizuj Androida, jeśli to możliwe.</string>
     <string name="q_bad">Android 10 ogranicza skanowanie Wi-Fi, chyba że jest wyłączone w Ustawieniach programisty.</string>
     <string name="enable_developer">Aby włączyć opcje programisty: Ustawienia -> Informacje o telefonie -> Stuknij Numer kompilacji 7 razy.</string>

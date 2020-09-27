@@ -357,7 +357,16 @@
     <string name="search_local">अपने स्थानीय डेटाबेस खोजें</string>
     <string name="search_failed">खोज विफल</string>
     <string name="search_empty">परिणाम खाली</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">निर्यात &#x2791;</string>
+    <string name="export_m8b">निर्यात जियोलोकेशन मैजिक (8) बॉल</string>
+    <string name="export_m8b_detail">अपने अनुमानित स्थान को निर्धारित करने के लिए एक ओरेकल बनाएं। देखें: \n\n https://github.com/wiglenet/m8b \n\n डिफ़ॉल्ट स्लाइस = 30 का उपयोग किया जाएगा, अन्य जादू के साथ संयोजन की अनुमति देने के लिए &#x2791; गेंदों। \n\n यह कुछ समय ले सकता है - यदि आपके पास एक बड़ा डेटाबेस है, तो कृपया बाहरी बिजली कनेक्ट करें।</string>
+    <string name="m8b_failed">M8b फ़ाइल निर्यात करने में असमर्थ।\n</string>
+    <string name="m8b_sizing">Oracle आदानों का निर्धारण</string>
+    <string name="exporting_m8b_final">लेखन oracle फ़ाइल</string>
+    <string name="calculating_m8b">परिकलन की गणना</string>
+    <string name="btloc_title">स्थान के साथ ब्लूटूथ उपकरण</string>
+    <string name="total_bt">कुल ब्लूटूथ</string>
+    <string name="menu_debug">डिबग</string>
     <string name="pie_bad">एंड्रॉइड पाई (9.0) थ्रॉटल वाईफाई स्कैन 2 प्रति मिनट। यदि संभव हो तो Android अपग्रेड करें।</string>
     <string name="q_bad">डेवलपर सेटिंग में अक्षम होने तक एंड्रॉइड 10 थ्रोटल्स वाईफाई स्कैन करता है।</string>
     <string name="enable_developer">डेवलपर विकल्पों को सक्षम करने के लिए: सेटिंग्स -> फ़ोन के बारे में -> बिल्ड नंबर 7 बार टैप करें।</string>

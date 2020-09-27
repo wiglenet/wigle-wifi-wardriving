@@ -383,7 +383,16 @@
     <string name="search_local">חפש את מסד הנתונים המקומי שלך</string>
     <string name="search_failed">החיפוש נכשל</string>
     <string name="search_empty">תוצאות ריקות</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">&#x2791; יְצוּא</string>
+    <string name="export_m8b">ייצוא קסם מיקום גיאוגרפי (8)</string>
+    <string name="export_m8b_detail">צור אורקל לקביעת המיקום המשוער שלך. ראה: n https://github.com/wiglenet/m8bייעשה שימוש בנתח ברירת מחדל = 30, כדי לאפשר שילוב עם קסם אחר &#x2791; כדורים.n\ זה עשוי לקחת זמן מה - אנא חבר חשמל חיצוני המחובר אם יש לך מסד נתונים גדול.</string>
+    <string name="m8b_failed">לא ניתן לייצא את קובץ m8b.</string>
+    <string name="m8b_sizing">קביעת תשומות אורקל</string>
+    <string name="exporting_m8b_final">כתיבת קובץ אורקל</string>
+    <string name="calculating_m8b">חישוב אורקל</string>
+    <string name="btloc_title">WiGLE.net התקני Bluetooth עם מיקום</string>
+    <string name="total_bt">סה"כ Bluetooth</string>
+    <string name="menu_debug">לנפות</string>
     <string name="pie_bad">פאי אנדרואיד (9.0) מצמצם סריקות WiFi ל -2 לדקה. שדרג אנדרואיד במידת האפשר.</string>
     <string name="q_bad">אנדרואיד 10 מצמצם סריקות WiFi אלא אם כן הוא מושבת בהגדרות המפתח.</string>
     <string name="enable_developer">כדי לאפשר אפשרויות מפתח: הגדרות -> אודות טלפון -> הקש Build Build 7 פעמים.</string>

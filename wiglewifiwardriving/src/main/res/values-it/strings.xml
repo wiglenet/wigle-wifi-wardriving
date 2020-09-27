@@ -383,6 +383,15 @@
     <string name="search_local">Cerca nel tuo database locale</string>
     <string name="search_failed">Ricerca fallita</string>
     <string name="search_empty">Risultati vuoti</string>
+    <string name="export_m8b_button">Esporta &#x2791;</string>
+    <string name="export_m8b">Esporta geolocalizzazione Magic (8) Ball</string>
+    <string name="export_m8b_detail">Genera un oracolo per determinare la tua posizione approssimativa. Vedi: \n\n https://github.com/wiglenet/m8b \n\nVerrà utilizzato lo slice predefinito = 30, per consentire la combinazione con altre magie &#x2791; palline. \n\nL'operazione potrebbe richiedere un po 'di tempo. Collega l'alimentazione esterna se disponi di un database di grandi dimensioni.</string>
+    <string name="m8b_failed">Impossibile esportare il file m8b.\n</string>
+    <string name="m8b_sizing">Determinazione degli input Oracle</string>
+    <string name="exporting_m8b_final">Scrittura di file Oracle</string>
+    <string name="calculating_m8b">Calcolo dell\'oracolo</string>
+    <string name="btloc_title">Dispositivi Bluetooth WiGLE.net con posizione</string>
+    <string name="total_bt">Bluetooth totale</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie (9.0) riduce le scansioni WiFi a 2 al minuto. Aggiorna Android se possibile.</string>
     <string name="q_bad">Android 10 limita le scansioni WiFi a meno che non sia disabilitato nelle Impostazioni sviluppatore.</string>

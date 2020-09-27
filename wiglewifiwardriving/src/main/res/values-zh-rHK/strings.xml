@@ -383,6 +383,15 @@
     <string name="search_local">搜索本地數據庫</string>
     <string name="search_failed">搜索失敗</string>
     <string name="search_empty">結果為空</string>
+    <string name="export_m8b_button">出口 &#x2791;</string>
+    <string name="export_m8b">導出地理位置魔術（8）球</string>
+    <string name="export_m8b_detail">生成一個用於確定您的大概位置的oracle。請參閱：\n\n https://github.com/wiglenet/m8b \n\n將使用默認切片= 30，以允許與其他魔術組合使用。 \n\n這可能需要一段時間-如果您的數據庫很大，請連接外部電源。</string>
+    <string name="m8b_failed">無法導出m8b文件。\n</string>
+    <string name="m8b_sizing">確定&#x2791;输入</string>
+    <string name="exporting_m8b_final">編寫&#x2791;文件</string>
+    <string name="calculating_m8b">計算&#x2791;</string>
+    <string name="btloc_title">WiGLE.net具有位置的藍牙設備</string>
+    <string name="total_bt">總藍牙</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie（9.0）將WiFi掃描限制為每分鐘2次。盡可能升級Android。</string>
     <string name="q_bad">除非在“開發者設置”中禁用，否則Android 10 會限制WiFi掃描。</string>

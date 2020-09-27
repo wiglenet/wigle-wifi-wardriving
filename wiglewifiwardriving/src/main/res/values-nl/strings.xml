@@ -375,7 +375,16 @@
     <string name="search_local">Doorzoek uw lokale database</string>
     <string name="search_failed">Zoeken mislukt</string>
     <string name="search_empty">Resultaten leeg</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Exporteren &#x2791;</string>
+    <string name="export_m8b">Geolocatie Magic (8) Ball exporteren</string>
+    <string name="export_m8b_detail">Genereer een orakel om uw geschatte locatie te bepalen. Zie: \n\n https://github.com/wiglenet/m8b \n\nStandaard slice = 30 zal worden gebruikt, om combinatie met andere magie mogelijk te maken &#x2791; ballen. \n\nDit kan even duren - sluit de externe voeding aan als je een grote database hebt.</string>
+    <string name="m8b_failed">Kan m8b-bestand niet exporteren.\n</string>
+    <string name="m8b_sizing">Oracle-ingangen bepalen</string>
+    <string name="exporting_m8b_final">Oracle-bestand schrijven</string>
+    <string name="calculating_m8b">Orakel berekenen</string>
+    <string name="btloc_title">WiGLE.net Bluetooth-apparaten met locatie</string>
+    <string name="total_bt">Totaal Bluetooth</string>
+    <string name="menu_debug">Foutopsporing</string>
     <string name="pie_bad">Android Pie (9.0) beperkt wifi-scans tot 2 per minuut. Upgrade Android indien mogelijk.</string>
     <string name="q_bad">Android 10 beperkt wifi-scans tenzij uitgeschakeld in de instellingen voor ontwikkelaars.</string>
     <string name="enable_developer">Om ontwikkelaaropties in te schakelen: Instellingen -> Over telefoon -> Tik 7 keer op Build-nummer.</string>

@@ -383,7 +383,16 @@
     <string name="search_local">ローカルデータベースを検索する</string>
     <string name="search_failed">検索失敗</string>
     <string name="search_empty">空の結果</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">書き出す &#x2791;</string>
+    <string name="export_m8b">ジオロケーションマジック（8）ボールのエクスポート</string>
+    <string name="export_m8b_detail">おおよその場所を決定するためのオラクルを生成します。参照：\n\n https://github.com/wiglenet/m8b \n\n他の魔法との組み合わせを可能にするために、デフォルトのスライス= 30が使用されます&#x2791;ボール。\n\nこれにはしばらく時間がかかる場合があります-データベースが大きい場合は、外部電源を接続してください。</string>
+    <string name="m8b_failed">m8bファイルをエクスポートできません。\n</string>
+    <string name="m8b_sizing">オラクル入力の決定</string>
+    <string name="exporting_m8b_final">Oracleファイルの書き込み</string>
+    <string name="calculating_m8b">オラクルの計算</string>
+    <string name="btloc_title">WiGLE.net Bluetoothデバイスと位置情報</string>
+    <string name="total_bt">合計Bluetooth</string>
+    <string name="menu_debug">デバッグ</string>
     <string name="pie_bad">Android Pie（9.0）は、WiFiスキャンを1分あたり2に絞ります。可能であればAndroidをアップグレードします。</string>
     <string name="q_bad">Android 10 は、開発者設定で無効にされていない限り、WiFiスキャンを抑制します。</string>
     <string name="enable_developer">開発者向けオプションを有効にするには：[設定]-> [電話について]-> [ビルド番号]を7回タップします。</string>

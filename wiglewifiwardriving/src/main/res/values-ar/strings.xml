@@ -383,7 +383,16 @@
     <string name="search_local">ابحث في قاعدة البيانات المحلية الخاصة بك</string>
     <string name="search_failed">فشل البحث</string>
     <string name="search_empty">النتائج فارغة</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">&#x2791; تصدير </string>
+    <string name="export_m8b">تصدير ماجيك تحديد الموقع الجغرافي (8) كرة</string>
+    <string name="export_m8b_detail">قم بإنشاء أوراكل لتحديد موقعك التقريبي. انظر: https://github.com/wiglenet/m8b \n\n سيتم استخدام الشريحة الافتراضية = 30 ، للسماح بالدمج مع السحر الآخر &#x2791; ؛ كرات. n\n\ قد يستغرق هذا بعض الوقت - يرجى توصيل طاقة خارجية متصلة إذا كان لديك قاعدة بيانات كبيرة.</string>
+    <string name="m8b_failed">تعذر تصدير ملف m8b\n.</string>
+    <string name="m8b_sizing">تحديد مدخلات أوراكل</string>
+    <string name="exporting_m8b_final">كتابة ملف أوراكل</string>
+    <string name="calculating_m8b">حساب أوراكل</string>
+    <string name="btloc_title">أجهزة بلوتوث WiGLE.net مع الموقع</string>
+    <string name="total_bt">إجمالي بلوتوث</string>
+    <string name="menu_debug">تصحيح</string>
     <string name="pie_bad">يقوم نظام أندرويد باي (9.0) بإبطال شبكة WiFi إلى 2 في الدقيقة. ترقية Android إذا كان ذلك ممكنًا.</string>
     <string name="q_bad">يمسح نظام Android 10 throttles WiFi ما لم يتم تعطيله في إعدادات المطور.</string>
     <string name="enable_developer">لتمكين خيارات المطور: الإعدادات -> حول الهاتف -> اضغط على Build Number 7 مرات.</string>

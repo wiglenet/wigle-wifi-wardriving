@@ -383,7 +383,16 @@
     <string name="search_local">Rechercher dans votre base de données locale</string>
     <string name="search_failed">La recherche a échoué</string>
     <string name="search_empty">Résultats vides</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Exportation &#x2791;</string>
+    <string name="export_m8b">Exporter la balle magique de géolocalisation (8)</string>
+    <string name="export_m8b_detail">Générez un oracle pour déterminer votre emplacement approximatif. Voir: \n\nhttps://github.com/wiglenet/m8b \n\nLa tranche par défaut = 30 sera utilisée, pour permettre la combinaison avec d\'autres magies &#x2791; boules. \n\nCela peut prendre un certain temps - veuillez connecter une alimentation externe si vous avez une grande base de données.</string>
+    <string name="m8b_failed">Impossible d\'exporter le fichier m8b.\n</string>
+    <string name="m8b_sizing">Déterminer les entrées oracle</string>
+    <string name="exporting_m8b_final">Écriture du fichier oracle</string>
+    <string name="calculating_m8b">Calcul d\'oracle</string>
+    <string name="btloc_title">Périphériques Bluetooth WiGLE.net avec localisation</string>
+    <string name="total_bt">Bluetooth total</string>
+    <string name="menu_debug">Déboguer</string>
     <string name="pie_bad">Android Pie (9.0) accélère les analyses WiFi à 2 par minute. Mettez à niveau Android si possible.</string>
     <string name="q_bad">Android 10 accélère les analyses Wi-Fi, à moins que celles-ci ne soient désactivées dans les paramètres du développeur.</string>
     <string name="enable_developer">Pour activer les options de développement: Paramètres -> À propos du téléphone -> Tapez Numéro de construction 7 fois.</string>

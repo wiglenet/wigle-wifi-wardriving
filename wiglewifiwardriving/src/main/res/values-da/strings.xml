@@ -383,7 +383,16 @@
     <string name="search_local">Søg i din lokale database</string>
     <string name="search_failed">Søgningen mislykkedes</string>
     <string name="search_empty">Resultater tom</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Eksport &#x2791;</string>
+    <string name="export_m8b">Eksportér Geolocation Magic (8) Ball</string>
+    <string name="export_m8b_detail">Generer et orakel til bestemmelse af din omtrentlige placering. Se: \n\n https://github.com/wiglenet/m8b \n\n Standardskive = 30 vil blive brugt for at tillade kombination med anden magi &#x2791; bolde. \n\nDette kan tage et stykke tid - tilslut ekstern strøm tilsluttet, hvis du har en stor database.</string>
+    <string name="m8b_failed">Kunne ikke eksportere m8b-filen.\n</string>
+    <string name="m8b_sizing">Bestemmelse af oracle-indgange</string>
+    <string name="exporting_m8b_final">Skrivning af oracle-fil</string>
+    <string name="calculating_m8b">Beregning af orakel</string>
+    <string name="btloc_title">WiGLE.net Bluetooth-enheder med placering</string>
+    <string name="total_bt">Samlet Bluetooth</string>
+    <string name="menu_debug">Fejlfinde</string>
     <string name="pie_bad">Android Pie (9.0) throttles WiFi-scanninger til 2 pr. Minut. Opgrader Android hvis muligt.</string>
     <string name="q_bad">Android 10 throttles WiFi-scanninger, medmindre det er deaktiveret i Developer Settings.</string>
     <string name="enable_developer">Sådan aktiveres udviklerindstillinger: Indstillinger -> Om telefon -> Tryk på Build Number 7 gange.</string>

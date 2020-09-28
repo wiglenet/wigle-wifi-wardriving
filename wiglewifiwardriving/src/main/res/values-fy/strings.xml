@@ -280,6 +280,14 @@
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">Gebruikersstatistieken</string>
+    <string name="rank_title">Gebruikersrangschikking:</string>
+    <string name="totallocs_title">Totaal aantal geregistreerde wifi-observaties</string>
+    <string name="monthcount_title">WiFi ontdekt deze maand</string>
+    <string name="prevmonthcount_title">WiFi ontdekt vorige maand</string>
+    <string name="firsttransid_title">Eerste transactie-ID</string>
+    <string name="lasttransid_title">Laatste transactie-ID</string>
+    <string name="gps_permission">GPS (fijne locatie)</string>
+    <string name="cell_permission">Cellocatie (grove locatie)</string>
     <string name="rank_stats_app_name">WiGLE.net Ranglist</string>
     <string name="total_cell">Totale Cell</string>
     <string name="tab_rank">Ranglist</string>

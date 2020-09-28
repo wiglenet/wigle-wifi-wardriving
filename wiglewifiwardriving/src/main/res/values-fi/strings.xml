@@ -280,6 +280,32 @@
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">Käyttäjätilastot</string>
+    <string name="rank_title">Käyttäjien sijoitus:</string>
+    <string name="totallocs_title">Tallennettujen WiFi-havaintojen kokonaismäärä</string>
+    <string name="monthcount_title">WiFi löydetty tässä kuussa</string>
+    <string name="prevmonthcount_title">WiFi löydetty viime kuussa</string>
+    <string name="firsttransid_title">Ensimmäisen tapahtuman tunnus</string>
+    <string name="lasttransid_title">Viimeisin tapahtuman tunnus</string>
+    <string name="gps_permission">GPS (hieno sijainti)</string>
+    <string name="cell_permission">Solun sijainti (karkea sijainti)</string>
+    <string name="rank_stats_app_name">WiGLE.net-ranking</string>
+    <string name="total_cell">Solujen kokonaismäärä</string>
+    <string name="tab_rank">Sijoitukset</string>
+    <string name="uploads_app_name">WiGLE.net-lataukset</string>
+    <string name="tab_uploads">Lataukset</string>
+    <string name="queue_depth">Tiedoston käsittelyjonon syvyys</string>
+    <string name="news_app_name">WiGLE.net-uutiset</string>
+    <string name="tab_news">Uutiset</string>
+    <string name="bytes">Tavua</string>
+    <string name="rank_all_time">Kaikkien aikojen ranking</string>
+    <string name="rank_month">Kuukausilistat</string>
+    <string name="all_time_title">WiFi löydetty koko ajan</string>
+    <string name="month_rank_title">Kuukausiluokitus:</string>
+    <string name="user_centric">Omat sijoitukset</string>
+    <string name="not_user_centric">Kärkisijoitukset</string>
+    <string name="prevrank_title">Käyttäjien sijoitus viime kuussa</string>
+    <string name="prevmonthrank_title">Kuukauden sijoitus viime kuussa</string>
+    <string name="list_scanning_on">(Skannaus käytössä)</string>
     <string name="activate">Aktivoi nyt</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -359,7 +385,7 @@
     <string name="search_empty">Tulokset tyhjä</string>
     <string name="export_m8b_button">Viedä &#x2791;</string>
     <string name="export_m8b">Vie maantieteellisen sijainnin taika (8) pallo</string>
-    <string name="export_m8b_detail">Luo oraakeli arvioidun sijaintisi määrittämiseksi. Katso: \n\n https://github.com/wiglenet/m8b \n\nOletussektoria = 30 käytetään, jotta yhdistelmä muiden taikuuksien kanssa voidaan sallia &#x2791; pallot. \n\nSe voi viedä hetken - kytke ulkoinen virtalähde, jos sinulla on suuri tietokanta.</string>
+    <string name="export_m8b_detail">Luo oraakeli arvioidun sijaintisi määrittämiseksi. Katso:\n\nhttps://github.com/wiglenet/m8b\n\nOletusleikettä = 30 käytetään, jotta yhdistelmä muiden taikamaisten &#x2791; pallojen kanssa voidaan sallia.\n\nTämä voi viedä hetken - kytke ulkoinen virtaa, jos sinulla on suuri tietokanta.</string>
     <string name="m8b_failed">M8b-tiedoston vienti epäonnistui.\n</string>
     <string name="m8b_sizing">Oracle-tulojen määrittäminen</string>
     <string name="exporting_m8b_final">Oracle-tiedoston kirjoittaminen</string>

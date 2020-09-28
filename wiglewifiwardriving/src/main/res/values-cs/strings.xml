@@ -385,7 +385,7 @@
     <string name="search_empty">Výsledky prázdné</string>
     <string name="export_m8b_button">Vývozní &#x2791;</string>
     <string name="export_m8b">Export geolokační magické (8) koule</string>
-    <string name="export_m8b_detail">Vytvořte věštec pro určení vaší přibližné polohy. Viz: \n\n https://github.com/wiglenet/m8b \n\n Bude použit výchozí řez = 30, což umožní kombinaci s jinými kouzly &#x2791; koule. \n\nTo může chvíli trvat - pokud máte velkou databázi, připojte externí napájení.</string>
+    <string name="export_m8b_detail">Vytvořte věštec pro určení vaší přibližné polohy. Viz: \n\nhttps://github.com/wiglenet/m8b \n\nBude použit výchozí řez = 30, což umožní kombinaci s jinými kouzly &#x2791;. \n\nTo může chvíli trvat - připojte externí moc, pokud máte velkou databázi.</string>
     <string name="m8b_failed">Soubor m8b nelze exportovat.\n</string>
     <string name="m8b_sizing">Určení Oracle vstupů</string>
     <string name="exporting_m8b_final">Zápis souboru Oracle</string>

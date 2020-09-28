@@ -280,6 +280,32 @@
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">Estadísticas de usuario</string>
+    <string name="rank_title">Clasificación de usuarios:</string>
+    <string name="totallocs_title">Total de observaciones WiFi registradas</string>
+    <string name="monthcount_title">WiFi descubierto este mes</string>
+    <string name="prevmonthcount_title">WiFi descubierto el mes pasado</string>
+    <string name="firsttransid_title">ID de la primera transacción</string>
+    <string name="lasttransid_title">ID de transacción más reciente</string>
+    <string name="gps_permission">GPS (buena ubicación)</string>
+    <string name="cell_permission">Ubicación de celda (ubicación aproximada)</string>
+    <string name="rank_stats_app_name">Clasificaciones de WiGLE.net</string>
+    <string name="total_cell">Celda total</string>
+    <string name="tab_rank">Clasificaciones</string>
+    <string name="uploads_app_name">Subidas de WiGLE.net</string>
+    <string name="tab_uploads">Subidas</string>
+    <string name="queue_depth">Profundidad de la cola de procesamiento de archivos</string>
+    <string name="news_app_name">Noticias de WiGLE.net</string>
+    <string name="tab_news">Noticias</string>
+    <string name="bytes">Bytes</string>
+    <string name="rank_all_time">Rankings de todos los tiempos</string>
+    <string name="rank_month">Clasificaciones del mes</string>
+    <string name="all_time_title">WiFi descubierto todo el tiempo</string>
+    <string name="month_rank_title">Clasificación del mes:</string>
+    <string name="user_centric">Mis clasificaciones</string>
+    <string name="not_user_centric">Rankings superiores</string>
+    <string name="prevrank_title">Clasificación de usuarios el mes pasado</string>
+    <string name="prevmonthrank_title">Clasificación mensual el mes pasado</string>
+    <string name="list_scanning_on">(Escaneo activado)</string>
     <string name="activate">activa ahora</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -359,7 +385,7 @@
     <string name="search_empty">Resultados vacíos</string>
     <string name="export_m8b_button">Exportar &#x2791;</string>
     <string name="export_m8b">Exportar bola mágica de geolocalización (8)</string>
-    <string name="export_m8b_detail">Genere un oráculo para determinar su ubicación aproximada. Ver: \n\n https://github.com/wiglenet/m8b \n\nSe usará el segmento predeterminado = 30, para permitir la combinación con otra magia &#x2791; bolas. \n\nEsto puede llevar un tiempo; conecte la alimentación externa si tiene una base de datos grande.</string>
+    <string name="export_m8b_detail">Genere un oráculo para determinar su ubicación aproximada. Ver: \n\nhttps://github.com/wiglenet/m8b\n\nSe usará el segmento predeterminado = 30, para permitir la combinación con otras bolas mágicas &#x2791;.\n\nEsto puede llevar un tiempo - por favor conecte el poder si tiene una gran base de datos.</string>
     <string name="m8b_failed">No se puede exportar el archivo m8b.\n</string>
     <string name="m8b_sizing">Determinando las entradas de Oracle</string>
     <string name="exporting_m8b_final">Escribir archivo de Oracle</string>

@@ -385,7 +385,7 @@
     <string name="search_empty">Resultater tom</string>
     <string name="export_m8b_button">Eksport &#x2791;</string>
     <string name="export_m8b">Eksportér Geolocation Magic (8) Ball</string>
-    <string name="export_m8b_detail">Generer et orakel til bestemmelse af din omtrentlige placering. Se: \n\n https://github.com/wiglenet/m8b \n\n Standardskive = 30 vil blive brugt for at tillade kombination med anden magi &#x2791; bolde. \n\nDette kan tage et stykke tid - tilslut ekstern strøm tilsluttet, hvis du har en stor database.</string>
+    <string name="export_m8b_detail">Generer et orakel til bestemmelse af din omtrentlige placering. Se: \n\n https://github.com/wiglenet/m8b \n\n Standardskive = 30 vil blive brugt for at tillade kombination med andre magiske &#x2791; bolde. \n\nDette kan tage et stykke tid - tilslut venligst ekstern strøm, hvis du har en stor database.</string>
     <string name="m8b_failed">Kunne ikke eksportere m8b-filen.\n</string>
     <string name="m8b_sizing">Bestemmelse af oracle-indgange</string>
     <string name="exporting_m8b_final">Skrivning af oracle-fil</string>

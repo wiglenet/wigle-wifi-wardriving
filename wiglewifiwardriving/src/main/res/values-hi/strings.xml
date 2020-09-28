@@ -280,6 +280,32 @@
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
     <string name="user_stats_app_name">उपयोगकर्ता आँकड़े</string>
+    <string name="rank_title">उपयोगकर्ता रैंकिंग:</string>
+    <string name="totallocs_title">कुल वाईफाई अवलोकन रिकॉर्ड किए गए</string>
+    <string name="monthcount_title">WiFi ने इस महीने की खोज की</string>
+    <string name="prevmonthcount_title">वाईफ़ाई पिछले महीने की खोज की</string>
+    <string name="firsttransid_title">पहला लेन-देन आईडी</string>
+    <string name="lasttransid_title">नवीनतम लेन-देन आईडी</string>
+    <string name="gps_permission">GPS (ठीक स्थान)</string>
+    <string name="cell_permission">सेल स्थान (मोटे स्थान)</string>
+    <string name="rank_stats_app_name">WiGLE.net रैंकिंग</string>
+    <string name="total_cell">कुल सेल</string>
+    <string name="tab_rank">रैंकिंग</string>
+    <string name="uploads_app_name">WiGLE.net अपलोड</string>
+    <string name="tab_uploads">अपलोड</string>
+    <string name="queue_depth">फ़ाइल प्रसंस्करण कतार गहराई</string>
+    <string name="news_app_name">WiGLE.net समाचार</string>
+    <string name="tab_news">समाचार</string>
+    <string name="bytes">बाइट्स</string>
+    <string name="rank_all_time">सभी समय रैंकिंग</string>
+    <string name="rank_month">महीने की रैंकिंग</string>
+    <string name="all_time_title">सभी समय वाईफाई की खोज की</string>
+    <string name="month_rank_title">माह रैंकिंग:</string>
+    <string name="user_centric">मेरी रैंकिंग</string>
+    <string name="not_user_centric">शीर्ष रैंकिंग</string>
+    <string name="prevrank_title">प्रयोक्ता रैंकिंग पिछले महीने</string>
+    <string name="prevmonthrank_title">महीना रैंकिंग पिछले महीने</string>
+    <string name="list_scanning_on">(स्कैनिंग चालू)</string>
     <string name="activate">अब सक्रिय करें</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
@@ -359,7 +385,7 @@
     <string name="search_empty">परिणाम खाली</string>
     <string name="export_m8b_button">निर्यात &#x2791;</string>
     <string name="export_m8b">निर्यात जियोलोकेशन मैजिक (8) बॉल</string>
-    <string name="export_m8b_detail">अपने अनुमानित स्थान को निर्धारित करने के लिए एक ओरेकल बनाएं। देखें: \n\n https://github.com/wiglenet/m8b \n\n डिफ़ॉल्ट स्लाइस = 30 का उपयोग किया जाएगा, अन्य जादू के साथ संयोजन की अनुमति देने के लिए &#x2791; गेंदों। \n\n यह कुछ समय ले सकता है - यदि आपके पास एक बड़ा डेटाबेस है, तो कृपया बाहरी बिजली कनेक्ट करें।</string>
+    <string name="export_m8b_detail">अपने अनुमानित स्थान को निर्धारित करने के लिए एक ओरेकल बनाएं। देखें: \n\n https://github.com/wiglenet/m8b \n\n डिफ़ॉल्ट स्लाइस = 30 का उपयोग अन्य जादू &#x2791; गेंदों के साथ संयोजन की अनुमति देने के लिए किया जाएगा। \n\n इसमें कुछ समय लग सकता है - कृपया बाहरी कनेक्ट करें यदि आपके पास एक बड़ा डेटाबेस है तो शक्ति।</string>
     <string name="m8b_failed">M8b फ़ाइल निर्यात करने में असमर्थ।\n</string>
     <string name="m8b_sizing">Oracle आदानों का निर्धारण</string>
     <string name="exporting_m8b_final">लेखन oracle फ़ाइल</string>

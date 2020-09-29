@@ -23,5 +23,6 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="5dp"
         android:hint="X"
+        android:contentDescription="@string/cancel"
         android:gravity="center_horizontal|top"/>
 </RelativeLayout>

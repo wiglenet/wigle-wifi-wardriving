@@ -422,6 +422,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    /**
+     * ALIBI: API (unsupported) will get registered for this in the pre-release reports, but this
+     * works around the ZoomTable Array Index OOB bugs. 80% of violations in pre-release report are this.
+     */
     private void workAroundGoogleMapsBug() {
         try {
             SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);

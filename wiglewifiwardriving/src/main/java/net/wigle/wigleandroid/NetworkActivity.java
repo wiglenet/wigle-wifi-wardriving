@@ -357,10 +357,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
             if (null != obs.getKey()) {
                 float cleanSignal = cleanSignal((float) obs.getValue());
-                cleanSignal *= cleanSignal;
-                latSum += (obs.getKey().latitude * cleanSignal);
-                lonSum += (obs.getKey().longitude * cleanSignal);
-                weightSum += cleanSignal;
+                final double latV = obs.getKey().latitude;
+                final double lonV = obs.getKey().longitude;
+                if (Math.abs(latV) > 0.01d && Math.abs(lonV) > 0.01d) { // 0 GPS-coord check
+                    cleanSignal *= cleanSignal;
+                    latSum += (obs.getKey().latitude * cleanSignal);
+                    lonSum += (obs.getKey().longitude * cleanSignal);
+                    weightSum += cleanSignal;
+                }
             }
         }
         double trilateratedLatitude = 0;

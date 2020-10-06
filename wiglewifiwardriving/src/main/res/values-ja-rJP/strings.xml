@@ -324,7 +324,7 @@
     <string name="authorize">承認（ログイン）</string>
     <string name="anonymous_confirm">匿名でアップロードしますか？これにより、既存のログイン情報がデバイスから削除されます。</string>
     <string name="title_activity_activate">スキャンしてアクティブ化</string>
-    <string name="unknown_number">??</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">以来発見されたネットワークを表示</string>
     <string name="show_discovered">発見されたネットワークを地図上に表示</string>
     <string name="map_none">なし</string>

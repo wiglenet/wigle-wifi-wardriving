@@ -135,6 +135,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
         TextToSpeech tts;
+        boolean ttsChecked = false;
         boolean inEmulator;
         PhoneState phoneState;
         ObservationUploader observationUploader;
@@ -1235,7 +1236,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             config.locale = newLocale;
             MainActivity.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
-            ttsCheckIntent();
+            //ALIBI: loop protection
+            if (MainActivity.getMainActivity() != null &&
+                    MainActivity.getMainActivity().state != null &&
+                    MainActivity.getMainActivity().state.ttsChecked == false) {
+                ttsCheckIntent();
+            }
         }
     }
 
@@ -2720,6 +2726,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
                 state.tts.setLanguage(locale);
             } else {
+                state.ttsChecked = true;
                 error("preferred locale: [" +locale+"] not available on device.");
             }
         } else if (status == TextToSpeech.SUCCESS) {

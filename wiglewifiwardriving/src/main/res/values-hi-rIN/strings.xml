@@ -324,7 +324,7 @@
     <string name="authorize">अधिकृत करें (लॉगिन)</string>
     <string name="anonymous_confirm">गुमनाम रूप से अपलोड करें? इससे आपके डिवाइस से किसी भी मौजूदा लॉगिन जानकारी को हटा दिया जाएगा.</string>
     <string name="title_activity_activate">सक्रिय करने के लिए स्कैन करें</string>
-    <string name="unknown_number">??</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since"> नेटवर्क की खोज कब से है यह दिखाएँ</string>
     <string name="show_discovered">मानचित्र पर खोजे गए नेटवर्क दिखाएँ</string>
     <string name="map_none">कोई नहीं</string>

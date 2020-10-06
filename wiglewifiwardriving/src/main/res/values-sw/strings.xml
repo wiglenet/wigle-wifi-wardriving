@@ -324,7 +324,7 @@
     <string name="authorize">Idhinisha (kuingia)</string>
     <string name="anonymous_confirm">Pakia bila kujulikana? Hii itaondoa maelezo yoyote ya kuingia kwenye kifaa chako.</string>
     <string name="title_activity_activate">Tambaza ili uamilishe</string>
-    <string name="unknown_number">??</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">Onyesha Mitandao Iliyogunduliwa Tangu</string>
     <string name="show_discovered">Onyesha Mitandao Iliyogunduliwa kwenye Ramani</string>
     <string name="map_none">Hakuna</string>

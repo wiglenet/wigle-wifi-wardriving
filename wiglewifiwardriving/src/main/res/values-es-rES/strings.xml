@@ -324,7 +324,7 @@
     <string name="authorize">Autorizar (iniciar sesión)</string>
     <string name="anonymous_confirm">¿Cargar de forma anónima? Esto eliminará cualquier información de inicio de sesión existente de su dispositivo.</string>
     <string name="title_activity_activate">Escanear para activar</string>
-    <string name="unknown_number">??</string>
+    <string name="unknown_number">\??</string>
     <string name="show_discovered_since">Mostrar redes descubiertas desde</string>
     <string name="show_discovered">Mostrar redes descubiertas en el mapa</string>
     <string name="map_none">Ninguna</string>

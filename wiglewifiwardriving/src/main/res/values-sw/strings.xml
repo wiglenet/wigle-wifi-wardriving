@@ -10,7 +10,7 @@
     <string name="network_activity_name">WiGLE WiFi - Mtandao</string>
     <string name="data_activity_name">WiGLE WiFi - Hifadhidata</string>
     <string name="dbresult_activity_name">WiGLE WiFi - Matokeo ya Utafutaji</string>
-    <string name="upload_button">Pakia kwa WiGLE.net</string>
+    <string name="upload_button">Pakia kwa\nWiGLE.net</string>
     <string name="username">Jina la mtumiaji la WiGLE</string>
     <string name="password">Nywila ya WiGLE</string>
     <string name="show_current">Onyesha mitandao ya sasa tu</string>

@@ -2,30 +2,30 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, előadás vezeték hálózatok, feltölteni a WiGLE adatbázis.
+Wardriving: netstumble, vezeték nélküli hálózatok megjelenítése, feltöltés a WiGLE adatbázisba.
 
 Description (4000 characters):
-Wigle egy nyílt forráskódú wardriving app netstumble, a kijelző és a térkép található vezeték nélküli hálózatok és a sejt torony a világ bármely pontján, könnyű feltölteni a WiGLE.net adatbázisba. Wigle 2001-ben indult, és ma már több mint 125 millió WiFi hálózatok leképezett világszerte.
+A Wigle egy nyílt forráskódú wardriving alkalmazás a netstumble-höz, amely megjeleníti és feltérképezi a talált vezeték nélküli hálózatokat és cellatornyokat bárhol a világon, és könnyen fel tudja ezeket tölteni a WiGLE.net adatbázisába. A WiGLE 2001-ben indult, és ma már több mint 125 millió WiFi-hálózatot térképezett fel világszerte.
 
-• A globális versenyképességhez Wigle ranglistán a legtöbb hálózat található!
-• Exportálás CSV fájlokat SD-kártyán (vesszővel elválasztott értékek)!
-• Exportálás KML fájlokat SD kártya (importálni a Google Maps/Earth)!
-• Audió és text-to-speech riasztó!
-• Helyi adatbázis a pálya új hálózatokat található!
-• Valós idejű térképe található hálózat (OpenStreetMap)!
-• Tudja mozgatni app az SD kártyára!
-• Mute gombot, hogy állítsa le az összes hang/beszéd azonnal!
-• Bluetooth GPS támogatás révén Hamis helyek!
-• Nincs hirdetések!
+• Versenyezzen a WiGLE globális ranglistáján a legtöbb felfedezett hálózattal
+• Exportáljon CSV-fájlokba az SD-kártyára (vesszővel elválasztott értékek)
+• Exportáljon KML-fájlokba az SD-kártyára (Google Mapsbe/Earthbe történő importálása)
+• Hang- és felolvasásos riasztások
+• Helyi adatbázis az új hálózatok követéséhez
+• Valós idejű térkép a talált hálózatokról (OpenStreetMap)
+• Áthelyezheti az alkalmazást az SD-kártyára
+• Némítás gomb, az összes hang/beszéd azonnali leállításához
+• Bluetooth GPS támogatás a hamis helyek révén
+• Nincsenek hirdetések
 
 Kiadási megjegyzések: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-A WiFi és a sejtek tornyok kell térképezni, meg kell várni a készülék, hogy meghatározzák a jelenlegi helyéről, GPS-en keresztül vagy hálózati helyre.
-A térképen: a körök WiFi, négyzet sejt torony. Világos színek hálózatok látott, lila is újak a helyi adatbázisban.
-Ha problémája van a bejelentkezéssel, vagy javaslata van, küldjön egy e-mailt a Wigle-admin@wigle.net és mi szívesen segít ki.
-Needs "olvasás Phone állam" annak érdekében, hogy közölje, ha a telefon hívás van folyamatban, hogy a hangot a szoftver (hang és beszéd).
-Fájlok állnak rendelkezésre, hogy segítsen a humán fordítás a nem angol nyelven. Ez volt a legnagyobb mechanikus fordítás, mert nyilvánvalóan nem tudjuk ezeket a nyelveket. Segíts te is, hogy javítsa a dolgokat, hogy húzza a kéréseket:
+A WiFi és cellatornyok térképezéséhez meg kell várnia, hogy az eszköz meghatározza a jelenlegi helyet, GPS vagy hálózati hely alapján.
+A térképen: a körök WiFi-k, a négyzetek cellatornyok. A világos színek már látott hálózatokat jelentenek, a lilák újak a helyi adatbázisban.
+Ha problémája van a bejelentkezéssel, vagy javaslata van, küldjön e-mailt a wigle-admin@wigle.net címre, és szívesen segítünk.
+A „Telefon állapotának olvasása” engedély azért szükséges, hogy észre vegy, hogy hívás van folyamatban, és némitani kell a hangokat (és a beszédet).
+Rendelkezésre állnak olyan fájlok, amelyek a fordítást segítik. Ez főleg gépi fordítás volt, mert nyilvánvalóan senki nem ismer minden nyelvet. Segíthet jobbá tenni a dolgokat az által, hogy beolvasztási kéréseket nyit itt:
 https://github.com/wiglenet/wigle-wifi-wardriving/pulls
-vagy elküldi őket wigle-admin@wigle.net.
+vagy elküldi őket a wigle-admin@wigle.net címre.
 
-Tartsa a botladozó!
+Folytassa a felfedezést!

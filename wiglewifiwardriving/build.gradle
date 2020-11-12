@@ -54,7 +54,7 @@ ext {
 
 dependencies {
     implementation project(':android-maps-utils')
-    implementation "androidx.core:core:1.3.1"
+    implementation "androidx.core:core:1.3.2"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation "com.google.android.material:material:1.2.1"

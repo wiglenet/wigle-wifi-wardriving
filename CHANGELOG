@@ -1,5 +1,8 @@
-* 2.56 ()
+* 2.56 (11/12/2020)
 Hungarian language hacktoberfest overhaul (thanks meskobalazs!)
+Many human-updated translations
+Bug fixes and text-to-speech refactor
+Distances on maps, and better network detail markers
 
 * 2.55 (08/20/2020)
 Make okhttp work on Android 4.x

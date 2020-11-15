@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.GnssStatus;
@@ -1973,9 +1974,20 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
                 state.tts = new TextToSpeech(this, this);
             } else {
-                Intent installTTSIntent = new Intent();
-                installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                startActivity(installTTSIntent);
+                try {
+                    PackageManager pm = getPackageManager();
+                    Intent installTTSIntent = new Intent();
+                    installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    ResolveInfo resolveInfo = pm.resolveActivity( installTTSIntent, PackageManager.MATCH_DEFAULT_ONLY );
+
+                    if( resolveInfo == null ) {
+                        error("ACTION_TTS_CALLBACK: resolve ACTION_INSTALL_TTS_DATA via package mgr.");
+                    } else {
+                        startActivity(installTTSIntent);
+                    }
+                } catch (Exception e) {
+                    error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA",e);
+                }
             }
         } else {
             info("MainActivity: Unhandled requestCode: " + requestCode

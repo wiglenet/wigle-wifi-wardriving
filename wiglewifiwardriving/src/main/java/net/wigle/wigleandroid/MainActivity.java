@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -1247,9 +1248,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static void ttsCheckIntent() {
         if (mainActivity != null) {
-            Intent checkTTSIntent = new Intent();
-            checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-            mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+            try {
+                Intent checkTTSIntent = new Intent();
+                checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+                mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+            } catch (ActivityNotFoundException e) {
+                error("TTS check not available in your device." + e.fillInStackTrace());
+                //TODO: does make sense to disable the TTS pref here, or is this recoverable?
+            }
         } else {
             MainActivity.error("could not launch TTS check due to pre-instantiation state");
         }

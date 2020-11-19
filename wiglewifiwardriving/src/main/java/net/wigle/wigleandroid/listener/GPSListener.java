@@ -488,26 +488,32 @@ public class GPSListener implements Listener, LocationListener {
 
     /**
      * classify speed as realistic or unrealistic for distance calcs. mostly a stop-gap,
-     * Kalman filtering would be better
+     * Kalman filtering would be better. Disabled after practical testing problems.
      * @param distanceMeters meters travelled
      * @param timeDiffSecs time since previous measurement
      * @return true if the movement is realistically possible, false if it's obvious bunk
      */
     public static boolean realisticMovement(float distanceMeters, float timeDiffSecs, float lastAccuracyMeters, float currentAccuracyMeters) {
-        final float metersSecondJump = distanceMeters/timeDiffSecs;
+        if (distanceMeters == 0f) {
+            return false;
+        }
+
+        /*final float metersSecondJump = distanceMeters/timeDiffSecs;
+        //Without smoothing, this results in massive loss of distance.
         if (metersSecondJump > MACH_1_3_METERS_SEC || metersSecondJump < SLOW_METERS_SEC || Float.isNaN(metersSecondJump)) {
             //DEBUG: MainActivity.info("DQ: "+metersSecondJump+"m/s");
             return false;
         }
+        //Great in theory. Real-world testing of GPS accuracy makes this appear impractical
         if (currentAccuracyMeters > 10 && currentAccuracyMeters > distanceMeters) {
             //DEBUG: MainActivity.info("ACC DQ: "+currentAccuracyMeters+"m ac, dist: "+distanceMeters);
             return false;
         }
-        //ALIBI: Jump on fix
+        //ALIBI: Jump on fix, disabled pending further successful testing.
         if ((currentAccuracyMeters-lastAccuracyMeters) > distanceMeters) {
             //DEBUG: MainActivity.info("JUMP DQ: "+(currentAccuracyMeters-lastAccuracyMeters)+"m, "+distanceMeters+"m");
             return false;
-        }
+        }*/
         return true;
     }
 }

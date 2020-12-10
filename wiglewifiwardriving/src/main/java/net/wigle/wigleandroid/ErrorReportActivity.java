@@ -28,7 +28,7 @@ import net.wigle.wigleandroid.util.FileUtility;
 public class ErrorReportActivity extends AppCompatActivity {
     // https://developer.android.com/reference/android/os/TransactionTooLargeException
     // ALIBI: this may still be too big in some cases, but we know we can't be bigger than the max - the size of the other data we package
-    public final static int MAX_STACK_TRANSACTION_SIZE = (1024 * 1024) - 512;
+    public final static int MAX_STACK_TRANSACTION_SIZE = (1024 * (1024-2));
 
     private static final int MENU_EXIT = 11;
     private static final int MENU_EMAIL = 12;
@@ -171,9 +171,11 @@ public class ErrorReportActivity extends AppCompatActivity {
         final Intent chooserIntent = Intent.createChooser( emailIntent, "Email WigleWifi error report?" );
         try {
             startActivity(chooserIntent);
-        }
-        catch (final ActivityNotFoundException ex) {
-            MainActivity.warn("No email activity found: " + ex, ex);
+        } catch (final ActivityNotFoundException ex) {
+            MainActivity.warn("No email activity found: " + ex.getLocalizedMessage(), ex);
+        } catch (final RuntimeException re) {
+            MainActivity.warn("Runtime exception trying to send stack intent [stack: "+
+                    (null!=stack?stack.length():"(none)")+" file:"+stackFile+"]; ", re);
         }
     }
 

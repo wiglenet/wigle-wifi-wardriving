@@ -69,13 +69,12 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.AppCompat">
+        android:theme="@style/Theme.AppCompat.DayNight">
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|uiMode"
             android:label="@string/list_app_name"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -85,7 +84,6 @@
             android:name=".ActivateActivity"
             android:label="@string/title_activity_activate"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
             <meta-data
@@ -102,24 +100,21 @@
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/error_report_name"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat"/>
+            android:launchMode="singleTask"/>
         <activity
             android:name=".DebugActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/menu_debug"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat"/>
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".SpeechActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
             android:exported="false"
             android:label="@string/speech_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -132,8 +127,7 @@
             android:exported="false"
             android:label="@string/network_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -156,8 +150,7 @@
             android:exported="false"
             android:label="@string/filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -170,8 +163,7 @@
             android:exported="false"
             android:label="@string/mac_filter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".FilterActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".FilterActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -184,8 +176,7 @@
             android:exported="false"
             android:label="@string/mapfilter_app_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data
@@ -198,8 +189,7 @@
             android:exported="false"
             android:label="@string/dbresult_activity_name"
             android:launchMode="singleTask"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.AppCompat">
+            android:parentActivityName=".MainActivity">
 
             <!-- Parent activity meta-data to support API level 7+ -->
             <meta-data

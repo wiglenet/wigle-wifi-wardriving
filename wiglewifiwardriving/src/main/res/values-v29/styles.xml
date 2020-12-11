@@ -1,72 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorControlNormal">#AAAAAA</item>
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:textColor">#333</item>
+        <item name="android:textColorPrimary">#000</item>
+        <item name="android:colorBackground">#BBB</item>
+        <item name="colorControlNormal">#000</item>
     </style>
     <style name="NavigationDrawerStyle">
         <item name="android:textSize">24sp</item>
     </style>
     <style name="WiFiColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#AAEE50</item>
+        <item name="android:textColor">#559950</item>
     </style>
     <style name="CellColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#F88</item>
+        <item name="android:textColor">#B33</item>
     </style>
     <style name="BtColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#18ffff</item>
+        <item name="android:textColor">#189999</item>
     </style>
     <style name="BtDarkColor" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#3388AA</item>
     </style>
     <style name="DividerColor">
-        <item name="android:background">#903030</item>
+        <item name="android:background">#802020</item>
     </style>
     <style name="UploadColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#eaba44</item>
+        <item name="android:textColor">#BA9A44</item>
     </style>
     <style name="KeyStatColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#00ff00</item>
+        <item name="android:textColor">#009900</item>
     </style>
     <style name="StatColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#B0B0B0</item>
+        <item name="android:textColor">#303030</item>
     </style>
     <style name="SmallStats" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">#B0B0B0</item>
+        <item name="android:textColor">#202020</item>
     </style>
     <style name="SmallWiFiStats" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">#AAEE50</item>
+        <item name="android:textColor">#559950</item>
     </style>
     <style name="SmallCellStats" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">#F88</item>
+        <item name="android:textColor">#B33</item>
     </style>
     <style name="SmallBtStats" parent="TextAppearance.AppCompat.Small">
-        <item name="android:textColor">#18ffff</item>
+        <item name="android:textColor">#189999</item>
     </style>
     <style name="FgStatColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#E0E0F0</item>
+        <item name="android:textColor">#303050</item>
     </style>
     <style name="UserNameColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#4aceff</item>
+        <item name="android:textColor">#4a9aaa</item>
     </style>
     <style name="StatWiFiColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#00ff00</item>
+        <item name="android:textColor">#009900</item>
     </style>
     <style name="StatRankColor" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#ffff00</item>
+        <item name="android:textColor">#AA7700</item>
     </style>
     <style name="invertedText">
+        <item name="android:textColor">#B0B0B0</item>
+        <item name="android:background">#303030</item>
+    </style>
+    <style name="ListOui" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#405050</item>
+    </style>
+    <style name="ListTimestamp" parent="TextAppearance.AppCompat.Small">
         <item name="android:textColor">#303030</item>
-        <item name="android:background">#B0B0B0</item>
+    </style>
+    <style name="ListDetail" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#000</item>
+    </style>
+    <style name="ListSsid" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#111111</item>
+    </style>
+    <style name="NavDrawerStyle">
+        <item name="android:background">#0FFF</item>
     </style>
     <style name="NavDrawerMenuItem">
-        <item name="android:color">#80000000</item>
+        <item name="android:color">#80FFFFFF</item>
     </style>
     <style name="NavDrawerMenuItemDelim">
-        <item name="android:color">#80909090</item>
+        <item name="android:color">#80B0B0B0</item>
     </style>
     <style name="NewsTitleStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">22sp</item>
-        <item name="android:textColor">#60f0f0</item>
+        <item name="android:textColor">#306060</item>
         <item name="android:gravity">center</item>
     </style>
     <style name="NewsDateStyle" parent="TextAppearance.AppCompat">
@@ -79,12 +97,12 @@
         <item name="android:gravity">start</item>
     </style>
     <style name="ToastStyle">
-        <item name="android:color">#80000000</item>
+        <item name="android:color">#C0FFFFFF</item>
     </style>
     <style name="MapOverlay">
-        <item name="android:background">#AA000000</item>
+        <item name="android:background">#AAFFFFFF</item>
     </style>
     <style name="NetworkViewOverlay">
-        <item name="android:background">#AA000000</item>
+        <item name="android:background">#AAFFFFFF</item>
     </style>
 </resources>

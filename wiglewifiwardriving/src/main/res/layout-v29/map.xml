@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
@@ -37,7 +38,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="wifi new vs run" />
+                android:text="wifi new vs run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -58,7 +60,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="cell new vs. run" />
+                android:text="cell new vs. run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -82,7 +85,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="bt new vs run"/>
+                android:text="bt new vs run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -104,7 +108,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="database" />
+                android:text="database"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
+	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<LinearLayout android:orientation="horizontal"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:paddingTop="1sp">
+		<!-- First row -->
+		<ImageView
+			android:id="@+id/wepicon"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="wep icon"
+			android:paddingLeft="2dp"
+			android:paddingRight="10dp"
+			android:text="wepicon" />
+		<ImageView
+			android:id="@+id/bticon"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="wep icon"
+			android:paddingTop="1dp"
+			android:paddingLeft="0dp"
+			android:paddingRight="4dp"
+			android:text="bticon"
+			android:visibility="gone"/>
+
+		<TextView android:id="@+id/ssid" android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			style="@style/ListSsid"/>
+		<LinearLayout android:orientation="horizontal"
+					  android:layout_width="fill_parent" android:layout_height="fill_parent"
+					  android:gravity="right">
+			<TextView android:id="@+id/oui" android:layout_width="wrap_content"
+					  android:layout_height="wrap_content"
+					  style="@style/ListOui"/>
+			<TextView android:id="@+id/time" android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				style="@style/ListTimestamp"/>
+		</LinearLayout>
+	</LinearLayout>
+	<LinearLayout android:orientation="horizontal"
+			android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<!-- Second row -->
+		<TextView android:id="@+id/level_string" android:layout_width="wrap_content"
+			android:layout_height="wrap_content"/>
+		<TextView android:id="@+id/detail" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_weight="5"
+			style="@style/ListDetail"/>
+	</LinearLayout>
+</LinearLayout>
+

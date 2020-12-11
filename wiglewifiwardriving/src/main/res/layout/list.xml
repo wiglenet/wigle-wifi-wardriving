@@ -16,19 +16,8 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:layout_weight="4"
-            android:textColor="#AAAAAA"
             android:text="@string/run"
         />
-
-        <!--TextView
-            android:id="@+id/stats_new"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/new_word"
-            android:textColor="#AAAAAA"
-            android:textSize="15sp"
-        / -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -42,13 +31,13 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="wifi new vs run" />
+                android:text="wifi new vs run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent" android:layout_height="wrap_content"
                 android:id="@+id/stats_wifi"
                 android:textSize="15sp"
-                style="@style/WiFiColor"
-                />
+                style="@style/WiFiColor" />
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
@@ -63,7 +52,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="cell new vs. run" />
+                android:text="cell new vs. run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -88,7 +78,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="bt new vs run" />
+                android:text="bt new vs run"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -111,7 +102,8 @@
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="database" />
+                android:text="database"
+                app:tint="?attr/colorControlNormal" />
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -191,7 +183,6 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             >
-
         <ImageButton
             android:id="@+id/not_scanning"
             android:background="#00000000"
@@ -216,7 +207,8 @@
             android:layout_height="44dip"
             app:srcCompat="@drawable/ic_wifi_simplified"
             android:scaleType="fitCenter"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            app:tint="?attr/colorControlNormal"/>
         </LinearLayout>
 
     </LinearLayout>

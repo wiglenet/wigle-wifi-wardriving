@@ -8,13 +8,15 @@
         android:angle="90"/ -->
     <!-- solid android:color="#eaba44" / -->
     <corners android:radius="5dp" />
-    <gradient
-        android:startColor="#444"
-        android:endColor="#323232"
-        android:angle="90" />
+
+    <solid
+        android:color="#EFEFEF"/>
     <corners android:radius="5dp" />
     <stroke
         android:width="2dp"
         android:color="#ffae17" />
-    <padding android:left="0dip" android:top="0dip" android:right="0dip" android:bottom="0dip" />
+    <padding android:left="0dip"
+        android:top="0dip"
+        android:right="0dip"
+        android:bottom="0dip" />
 </shape>

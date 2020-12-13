@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="signal_one">#006F00</color>
+    <color name="signal_two">#3B6B00</color>
+    <color name="signal_three">#556500</color>
+    <color name="signal_four">#785B00</color>
+    <color name="signal_five">#AB8000</color>
+    <color name="signal_six">#AB3600</color>
+    <color name="signal_seven">#C00000</color>
+</resources>

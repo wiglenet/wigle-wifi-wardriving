@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -145,7 +146,12 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             tv = findViewById( R.id.na_signal );
             final int level = network.getLevel();
-            tv.setTextColor( NetworkListUtil.getSignalColor( level ) );
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                tv.setTextColor( NetworkListUtil.getTextColorForSignal(this, level));
+            } else {
+                tv.setTextColor( NetworkListUtil.getSignalColor( level, false) );
+            }
             tv.setText( Integer.toString( level ) );
 
             tv = findViewById( R.id.na_type );

@@ -1,9 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
-import android.graphics.Color;
-import android.provider.Settings;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,10 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -250,10 +246,10 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
         }
         // info( "listing net: " + network.getBssid() );
 
-        final ImageView ico = (ImageView) row.findViewById(R.id.wepicon);
+        final ImageView ico = row.findViewById(R.id.wepicon);
         ico.setImageResource(NetworkListUtil.getImage(network));
 
-        final ImageView btico = (ImageView) row.findViewById(R.id.bticon);
+        final ImageView btico = row.findViewById(R.id.bticon);
         if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
             btico.setVisibility(View.VISIBLE);
             Integer btImageId = NetworkListUtil.getBtImage(network);
@@ -266,23 +262,27 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             btico.setVisibility(View.GONE);
         }
 
-        TextView tv = (TextView) row.findViewById(R.id.ssid);
+        TextView tv = row.findViewById(R.id.ssid);
         tv.setText(network.getSsid() + " ");
 
-        tv = (TextView) row.findViewById(R.id.oui);
+        tv = row.findViewById(R.id.oui);
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
 
-        tv = (TextView) row.findViewById(R.id.time);
+        tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));
 
-        tv = (TextView) row.findViewById(R.id.level_string);
+        tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();
-        tv.setTextColor(NetworkListUtil.getSignalColor(level));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            tv.setTextColor(NetworkListUtil.getTextColorForSignal(parent.getContext(), level));
+        } else {
+            tv.setTextColor(NetworkListUtil.getSignalColor(level, false));
+        }
         tv.setText(Integer.toString(level));
 
-        tv = (TextView) row.findViewById(R.id.detail);
+        tv = row.findViewById(R.id.detail);
         String det = network.getDetail();
         tv.setText(det);
         // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );

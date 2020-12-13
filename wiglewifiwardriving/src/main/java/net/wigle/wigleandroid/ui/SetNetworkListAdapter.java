@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -217,7 +218,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
 
         tv = (TextView) row.findViewById(R.id.level_string);
         final int level = network.getLevel();
-        tv.setTextColor(NetworkListUtil.getSignalColor(level));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            tv.setTextColor(NetworkListUtil.getTextColorForSignal(parent.getContext(), level));
+        } else {
+            tv.setTextColor(NetworkListUtil.getSignalColor(level, false));
+        }
         tv.setText(Integer.toString(level));
 
         tv = (TextView) row.findViewById(R.id.detail);

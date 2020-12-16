@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name ="colorNavigationItem" format="color"/>
+    <attr name ="colorNavigationItemBorder" format="color"/>
     <attr name ="colorNavigationItemSelected" format="color"/>
     <attr name ="colorNavigationItemExit" format="color"/>
+    <attr name ="colorNavigationItemFg" format="color"/>
+    <attr name ="colorNavigationItemSelectedFg" format="color"/>
+    <attr name ="colorNavigationItemExitFg" format="color"/>
     <attr name ="drawableNavigationItemBackground" format="reference"/>
     <attr name ="drawableNavigationItemExitBackground" format="reference"/>
 </resources>

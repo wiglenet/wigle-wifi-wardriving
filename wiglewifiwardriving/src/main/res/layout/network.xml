@@ -43,31 +43,27 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:id="@+id/ssid"
-					android:textSize="24sp"
-					android:textColor="#AAEE50"
 					android:gravity="left"
-					android:layout_weight="10" />
+					android:layout_weight="10"
+					style="@style/NetDetailSsid" />
 			</LinearLayout>
 
 			<LinearLayout android:orientation="horizontal"
 				android:layout_width="fill_parent" android:layout_height="wrap_content">
 				<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:paddingLeft="4dp"
-				android:paddingStart="4dp"
-				android:id="@+id/bssid"
-				android:textSize="20sp"
-				android:textColor="#AAAA00"
-				android:layout_weight="6"
-				android:gravity="left"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="4dp"
+					android:paddingStart="4dp"
+					android:id="@+id/bssid"
+					android:layout_weight="6"
+					android:gravity="left"
+					style="@style/NetDetailBssid"
 				/>
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:id="@+id/oui"
-					android:textSize="18sp"
-					android:textColor="#A0A0A0"
 					android:gravity="left"
 					android:layout_weight="5"
 					/>

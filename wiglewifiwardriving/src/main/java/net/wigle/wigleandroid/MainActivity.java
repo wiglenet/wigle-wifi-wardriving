@@ -41,6 +41,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -230,6 +231,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
         workAroundGoogleMapsBug();
+
+        if (Build.VERSION.SDK_INT > 28) {
+            //Support dark/light themes in Android 10 and above
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+        } else {
+            //Force night mode
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
 
         // set language
         setLocale(this);
@@ -631,20 +640,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             actionBar.setHomeButtonEnabled(true);
         }
 
+        //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
         SpannableString spanString = new SpannableString("    "+uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         uStats.setTitle(spanString);
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
         spanString = new SpannableString("    "+sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         sStats.setTitle(spanString);
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
         spanString = new SpannableString("    "+rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         rStats.setTitle(spanString);
 
         navigationView.getMenu().getItem(0).setCheckable(true);
@@ -1101,7 +1111,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.bluetoothReceiver != null) {
             state.bluetoothReceiver.stopScanning();
         }
-
         finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 

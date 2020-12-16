@@ -4,7 +4,7 @@
         <shape
             android:shape="rectangle">
             <solid
-                style="@style/NavDrawerMenuItem"/>
+                style="@color/colorNavigationItem"/>
         </shape>
     </item>
     <item android:top="-2dp" android:right="-2dp" android:left="-2dp">
@@ -12,7 +12,7 @@
             <solid android:color="@android:color/transparent" />
             <stroke
                 android:width="1dp"
-                style="@style/NavDrawerMenuItemDelim" />
+                android:color="@color/colorNavigationItemBorder" />
         </shape>
     </item>
 </layer-list>

@@ -5,9 +5,14 @@
         <item name="android:textColorPrimary">#AAAAAA</item>
         <item name="android:colorBackground">#1A1A1A</item>
         <item name="colorControlNormal">#AAAAAA</item>
+        <item name="colorNavigationItemSelected">#B0B0B0</item>
+        <item name="colorNavigationItem">#353535</item>
     </style>
     <style name="NavigationDrawerStyle">
         <item name="android:textSize">24sp</item>
+    </style>
+    <style name="NavDrawerStyle" parent="">
+        <item name="android:background">#B0000000</item>
     </style>
     <style name="WiFiColor" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#AAEE50</item>
@@ -57,14 +62,14 @@
     <style name="StatRankColor" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#ffff00</item>
     </style>
+    <style name="InvertedBackground">
+        <item name="android:background">#B0B0B0</item>
+    </style>
     <style name="InvertedText">
         <item name="android:textColor">#303030</item>
     </style>
     <style name="NonInvertedText">
         <item name="android:textColor">#B0B0B0</item>
-    </style>
-    <style name="InvertedBackground">
-        <item name="android:background">#B0B0B0</item>
     </style>
     <style name="ListOui" parent="TextAppearance.AppCompat.Small">
         <item name="android:textColor">#808080</item>
@@ -77,15 +82,6 @@
     </style>
     <style name="ListSsid" parent="TextAppearance.AppCompat">
         <item name="android:textColor">#EEEEEE</item>
-    </style>
-    <style name="NavDrawerStyle" parent="">
-        <item name="android:background">#0000</item>
-    </style>
-    <style name="NavDrawerMenuItem">
-        <item name="android:color">#80000000</item>
-    </style>
-    <style name="NavDrawerMenuItemDelim">
-        <item name="android:color">#80909090</item>
     </style>
     <style name="ButtonBackground">
         <item name="android:startColor">#444</item>
@@ -113,5 +109,17 @@
     </style>
     <style name="NetworkViewOverlay">
         <item name="android:background">#AA000000</item>
+    </style>
+    <style name="NetDetailSsid">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">#AAEE50</item>
+    </style>
+    <style name="NetDetailBssid">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#AAAA00</item>
+    </style>
+    <style name="NetDetailOui">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#A0A0A0</item>
     </style>
 </resources>

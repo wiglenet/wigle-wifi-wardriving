@@ -7,4 +7,11 @@
     <color name="signal_five">#AB8000</color>
     <color name="signal_six">#AB3600</color>
     <color name="signal_seven">#C00000</color>
+    <color name ="colorNavigationItem">#B0B0B0</color>
+    <color name ="colorNavigationItemSelected">#303030</color>
+    <color name ="colorNavigationItemExit">#FFEEEE</color>
+    <color name ="colorNavigationItemFg">#303030</color>
+    <color name ="colorNavigationItemSelectedFg">#B0B0B0</color>
+    <color name ="colorNavigationItemExitFg">#303030</color>
+    <color name ="colorNavigationItemBorder">#AA030303</color>
 </resources>

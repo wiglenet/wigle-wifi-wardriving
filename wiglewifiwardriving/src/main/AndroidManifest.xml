@@ -72,7 +72,7 @@
         android:theme="@style/Theme.AppCompat">
         <activity
             android:name=".MainActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|uiMode"
             android:label="@string/list_app_name"
             android:launchMode="singleTask"
             android:theme="@style/Theme.AppCompat">

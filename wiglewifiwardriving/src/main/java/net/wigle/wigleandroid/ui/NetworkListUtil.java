@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.provider.Settings;
 
 import androidx.annotation.ColorInt;
@@ -13,6 +14,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -93,8 +95,15 @@ public class NetworkListUtil {
     public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
                                                        @DrawableRes int vectorResourceId,
                                                        @ColorInt int tintColor) {
-        Drawable vectorDrawable = ResourcesCompat.getDrawable(
-                context.getResources(), vectorResourceId, null);
+
+        Drawable vectorDrawable;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            vectorDrawable = VectorDrawableCompat.create(context.getResources(), vectorResourceId,
+                    null);
+        } else {
+            vectorDrawable = ResourcesCompat.getDrawable(
+                    context.getResources(), vectorResourceId, null);
+        }
         if (vectorDrawable == null) {
             MainActivity.error("Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();

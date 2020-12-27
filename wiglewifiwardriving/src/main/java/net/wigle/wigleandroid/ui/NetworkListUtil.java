@@ -169,9 +169,9 @@ public class NetworkListUtil {
                             + " in network: " + network);
             }
         } else if (NetworkType.BT.equals(network.getType())) {
-            resource = drawable.bt_ico;
+            resource = drawable.ic_bt;
         } else if (NetworkType.BLE.equals(network.getType())) {
-            resource = drawable.btle_ico;
+            resource = drawable.ic_btle;
         } else {
             resource = drawable.tower_ico;
         }

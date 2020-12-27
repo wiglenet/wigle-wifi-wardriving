@@ -136,7 +136,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/bluetooth"/>
+                    app:srcCompat="@drawable/ic_bt"/>
                 <TextView
                     android:id="@+id/discoveredBtGPS"
                     android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/bluetooth"/>
+                    app:srcCompat="@drawable/ic_bt"/>
                 <TextView
                     android:id="@+id/discoveredBt"
                     android:layout_width="wrap_content"

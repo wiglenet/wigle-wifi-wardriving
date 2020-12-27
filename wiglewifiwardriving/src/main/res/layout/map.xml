@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
     <RelativeLayout
         android:id="@+id/map_rl"
         android:orientation="vertical"
@@ -75,7 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:src="@drawable/bluetooth"
+                app:srcCompat="@drawable/ic_bt_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="run bluetooth"

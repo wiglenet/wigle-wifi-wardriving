@@ -136,7 +136,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_bt"/>
+                    app:srcCompat="@drawable/ic_bt_sm"/>
                 <TextView
                     android:id="@+id/discoveredBtGPS"
                     android:layout_width="wrap_content"
@@ -155,7 +155,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/cell"/>
+                    app:srcCompat="@drawable/ic_cell_sm"/>
                 <TextView
                     android:id="@+id/discoveredCellGPS"
                     android:layout_width="wrap_content"
@@ -219,7 +219,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_bt"/>
+                    app:srcCompat="@drawable/ic_bt_sm"/>
                 <TextView
                     android:id="@+id/discoveredBt"
                     android:layout_width="wrap_content"
@@ -238,7 +238,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/cell"/>
+                    app:srcCompat="@drawable/ic_cell_sm"/>
                 <TextView
                     android:id="@+id/discoveredCell"
                     android:layout_width="wrap_content"

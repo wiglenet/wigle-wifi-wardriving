@@ -173,7 +173,7 @@ public class NetworkListUtil {
         } else if (NetworkType.BLE.equals(network.getType())) {
             resource = drawable.ic_btle;
         } else {
-            resource = drawable.tower_ico;
+            resource = drawable.ic_cell;
         }
 
         return resource;

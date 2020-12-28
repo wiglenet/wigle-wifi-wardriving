@@ -129,11 +129,11 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1">
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     app:srcCompat="@drawable/ic_bt_sm"
-                    app:tint="?attr/colorControlNormal"/>
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -155,11 +155,10 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1">
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/cell"
-                    app:tint="?attr/colorControlNormal"
+                    app:srcCompat="@drawable/ic_cell_sm"
                     />
                 <TextView
                     android:layout_width="wrap_content"

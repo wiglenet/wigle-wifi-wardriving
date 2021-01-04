@@ -83,8 +83,8 @@
         app:menu="@menu/leftmenu"
         app:itemTextAppearance="@style/NavigationDrawerStyle"
         app:itemBackground="@drawable/drawer_item_background"
-        app:itemTextColor="@color/colorNavigationItemFg"
-        app:itemIconTint="@color/colorNavigationItemFg"
+        app:itemTextColor="@color/drawer_item_color"
+        app:itemIconTint="@color/drawer_item_color"
         app:itemShapeFillColor="@color/nav_shape_selector"
     />
     <!-- app:itemBackground: nav element line delimiters -->

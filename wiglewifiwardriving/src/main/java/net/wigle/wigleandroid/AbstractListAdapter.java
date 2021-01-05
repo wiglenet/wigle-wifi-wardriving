@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
+import androidx.core.view.LayoutInflaterCompat;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -19,7 +21,7 @@ public abstract class AbstractListAdapter<M> extends ArrayAdapter<M> {
     public AbstractListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
 
-        this.mInflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        this.mInflater = LayoutInflater.from(context);
         numberFormat = NumberFormat.getNumberInstance( Locale.US );
         numberFormat.setGroupingUsed(true);
     }

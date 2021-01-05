@@ -313,7 +313,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 if (!animating) {
                     animating = true;
                     if (null == scanningAnimation) {
-                        scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity().getApplicationContext(), R.drawable.animated_wifi_simplified);
+                        scanningAnimation = AnimatedVectorDrawableCompat.create(getActivity(), R.drawable.animated_wifi_simplified);
                         scanningImageButton.setImageDrawable(scanningAnimation);
                         scanningImageButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     }
@@ -647,14 +647,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupList( final View view ) {
         State state = MainActivity.getStaticState();
         if (state.listAdapter == null) {
-            state.listAdapter = new SetNetworkListAdapter( getActivity().getApplicationContext(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter( getActivity(), R.layout.row );
         }
         // always set our current list adapter
         state.wifiReceiver.setListAdapter(state.listAdapter);
         if (null != state.bluetoothReceiver) {
             state.bluetoothReceiver.setListAdapter(state.listAdapter);
         }
-        final ListView listView = (ListView) view.findViewById( R.id.ListView01 );
+        final ListView listView = view.findViewById( R.id.ListView01 );
         setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }
 

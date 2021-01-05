@@ -152,6 +152,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
+        int uiMode;
     }
 
     private State state;
@@ -235,7 +236,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (Build.VERSION.SDK_INT > 28) {
             //Support dark/light themes in Android 10 and above
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            // ALIBI: when the preference is complete, we'll allow storage of one of:
+            // [AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM , MODE_NIGHT_YES , MODE_NIGHT_NO];
             AppCompatDelegate.setDefaultNightMode(displayMode);
         } else {
             //Force night mode
@@ -321,6 +324,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         state.inEmulator = id == null;
         state.inEmulator = state.inEmulator || "sdk".equals(android.os.Build.PRODUCT);
         state.inEmulator = state.inEmulator || "google_sdk".equals(android.os.Build.PRODUCT);
+
+        state.uiMode = getResources().getConfiguration().uiMode;
 
         info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
         info("android release: '" + Build.VERSION.RELEASE);
@@ -1173,6 +1178,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+        if (Build.VERSION.SDK_INT > 28) {
+            if (newConfig.uiMode != state.uiMode) {
+                error("uiMode change - need to update");
+                //TODO: a full restart here is absolutely unnecessary,
+                // however we don't have a way to reset the UI because we've linked service to the MainAcitity recreate
+                finishSoon(0, true);
+            }
+        }
     }
 
     @SuppressLint("ApplySharedPref")

@@ -231,10 +231,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
         workAroundGoogleMapsBug();
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
         if (Build.VERSION.SDK_INT > 28) {
             //Support dark/light themes in Android 10 and above
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            AppCompatDelegate.setDefaultNightMode(displayMode);
         } else {
             //Force night mode
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -267,7 +269,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         fm.executePendingTransactions();
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         pieScanningSettings(prefs);
 
         if (stateFragment != null && stateFragment.getState() != null) {

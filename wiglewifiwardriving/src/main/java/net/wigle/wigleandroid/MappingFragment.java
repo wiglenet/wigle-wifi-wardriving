@@ -602,22 +602,23 @@ public final class MappingFragment extends Fragment {
                 previousRunNets = ListFragment.lameStatic.runNets;
 
                 if (view != null) {
-                    TextView tv = (TextView) view.findViewById(R.id.stats_run);
+                    TextView tv = view.findViewById(R.id.stats_run);
                     tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(
                             ListFragment.lameStatic.runNets+ListFragment.lameStatic.runBt));
-                    tv = (TextView) view.findViewById(R.id.stats_wifi);
+                    tv = view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
-                    tv = (TextView) view.findViewById( R.id.stats_cell );
+                    tv = view.findViewById( R.id.stats_cell );
                     tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
-                    tv = (TextView) view.findViewById( R.id.stats_bt );
+                    tv = view.findViewById( R.id.stats_bt );
                     tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
 
-                    tv = (TextView) view.findViewById( R.id.stats_dbnets );
+                    tv = view.findViewById( R.id.stats_dbnets );
                     tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
                     if (prefs != null) {
                         float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
-                        final String distString = DashboardFragment.metersToString(numberFormat, getActivity(), dist, true);
-                        tv = (TextView) view.findViewById(R.id.rundistance);
+                        final String distString = DashboardFragment.metersToString(prefs,
+                                numberFormat, getActivity(), dist, true);
+                        tv = view.findViewById(R.id.rundistance);
                         tv.setText(distString);
                     }
                 }

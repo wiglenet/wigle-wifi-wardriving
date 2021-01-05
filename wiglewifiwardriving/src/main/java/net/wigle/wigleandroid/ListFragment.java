@@ -142,6 +142,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_START_AT_BOOT = "startAtBoot";
     public static final String PREF_LOG_ROUTES = "logRoutes";
     public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
+    public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";
@@ -699,12 +700,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
 
         try {
-            TextView tv = (TextView) view.findViewById( R.id.LocationTextView06 );
+            TextView tv = view.findViewById( R.id.LocationTextView06 );
             tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
 
             final Location location = state.gpsListener.getLocation();
 
-            tv = (TextView) view.findViewById( R.id.LocationTextView01 );
+            tv = view.findViewById( R.id.LocationTextView01 );
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
@@ -720,25 +721,27 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             }
             tv.setText( getString(R.string.list_short_lat) + " " + latText );
 
-            tv = (TextView) view.findViewById( R.id.LocationTextView02 );
+            tv = view.findViewById( R.id.LocationTextView02 );
             tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
 
-            tv = (TextView) view.findViewById( R.id.LocationTextView03 );
+            tv = view.findViewById( R.id.LocationTextView03 );
             tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, getActivity(), location.getSpeed()) ) );
 
-            TextView tv4 = (TextView) view.findViewById( R.id.LocationTextView04 );
-            TextView tv5 = (TextView) view.findViewById( R.id.LocationTextView05 );
+            TextView tv4 = view.findViewById( R.id.LocationTextView04 );
+            TextView tv5 = view.findViewById( R.id.LocationTextView05 );
             if ( location == null ) {
                 tv4.setText( "" );
                 tv5.setText( "" );
-            }
-            else {
-                String distString = DashboardFragment.metersToString(
-                        state.numberFormat0, getActivity(), location.getAccuracy(), true);
-                tv4.setText( "+/- " + distString );
-                distString = DashboardFragment.metersToString(
-                        state.numberFormat0, getActivity(), (float) location.getAltitude(), true );
-                tv5.setText( getString(R.string.list_short_alt) + " " + distString );
+            } else {
+                if (main != null) {
+                    final SharedPreferences prefs = main.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                    final String distString = DashboardFragment.metersToString(prefs,
+                            state.numberFormat0, main, location.getAccuracy(), true);
+                    tv4.setText("+/- " + distString);
+                    final String accString = DashboardFragment.metersToString(prefs,
+                            state.numberFormat0, main, (float) location.getAltitude(), true);
+                    tv5.setText(getString(R.string.list_short_alt) + " " + accString);
+                }
             }
         }
         catch ( IncompatibleClassChangeError ex ) {
@@ -764,7 +767,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
 
     private void setupUploadButton( final View view ) {
-        final Button button = (Button) view.findViewById( R.id.upload_button );
+        final Button button = view.findViewById( R.id.upload_button );
 
         if (MainActivity.getMainActivity().isTransferring()) {
             button.setEnabled(false);

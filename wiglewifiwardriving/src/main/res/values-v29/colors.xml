@@ -7,6 +7,10 @@
     <color name="signal_five">#AB8000</color>
     <color name="signal_six">#AB3600</color>
     <color name="signal_seven">#C00000</color>
+    <color name="gps_sat">#127700</color>
+    <color name="gps_network">#888800</color>
+    <color name="gps_passive">#AA6600</color>
+    <color name="gps_none">#990000</color>
     <color name ="colorNavigationItem">#B0B0B0</color>
     <color name ="colorNavigationItemSelected">#303030</color>
     <color name ="colorNavigationItemExit">#FFEEEE</color>

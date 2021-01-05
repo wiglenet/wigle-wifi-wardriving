@@ -755,7 +755,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_MILES, true ) ) {
             final float dist = prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
-            final String distString = DashboardFragment.metersToString( numberFormat1, mainActivity, dist, false );
+            final String distString = DashboardFragment.metersToString(prefs, numberFormat1, mainActivity, dist, false );
             builder.append(mainActivity.getString(R.string.tts_from)).append(" ")
                     .append(distString).append( ", " );
         }

@@ -12,6 +12,6 @@
     <color name ="colorNavigationItemExit">#FFEEEE</color>
     <color name ="colorNavigationItemFg">#303030</color>
     <color name ="colorNavigationItemSelectedFg">#B0B0B0</color>
-    <color name ="colorNavigationItemExitFg">#303030</color>
+    <color name ="colorNavigationItemExitFg">#770000</color>
     <color name ="colorNavigationItemBorder">#AA030303</color>
 </resources>

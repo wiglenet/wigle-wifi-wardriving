@@ -27,6 +27,7 @@ import java.util.Set;
  * the array adapter for a list of networks.
  * note: separators aren't drawn if areAllItemsEnabled or isEnabled are false
  */
+@Deprecated
 public final class NetworkListAdapter extends AbstractListAdapter<Network> {
 
     private final SimpleDateFormat format;

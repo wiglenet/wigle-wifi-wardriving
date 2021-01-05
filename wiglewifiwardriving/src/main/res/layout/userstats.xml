@@ -117,7 +117,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/wifi"/>
+                    app:srcCompat="@drawable/ic_wifi_sm"/>
                 <TextView
                     android:id="@+id/discoveredWiFiGPS"
                     android:layout_width="wrap_content"
@@ -200,7 +200,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/wifi"/>
+                    app:srcCompat="@drawable/ic_wifi_sm"/>
                 <TextView
                     android:id="@+id/discoveredWiFi"
                     android:layout_width="wrap_content"

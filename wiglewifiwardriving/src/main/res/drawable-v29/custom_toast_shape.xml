@@ -5,5 +5,8 @@
     <solid
         android:color="#DDFFFFFF" />
     <corners
-        android:topLeftRadius="20dp"/>
+        android:topLeftRadius="28dp"/>
+    <stroke
+        android:color="#000000"
+        android:width="2dp"/>
 </shape>

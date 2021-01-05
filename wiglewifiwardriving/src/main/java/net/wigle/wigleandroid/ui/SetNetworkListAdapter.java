@@ -1,11 +1,15 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
@@ -16,7 +20,6 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -72,23 +75,25 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
     }
 
     @Override
-    public void add(Network network) {
-        switch (network.getType()) {
-            case WIFI:
-                addWiFi( network );
-                break;
-            case CDMA:
-            case GSM:
-            case WCDMA:
-            case LTE:
-                addCell(network);
-                break;
-            case BT:
-                addBluetooth(network);
-                break;
-            case BLE:
-                addBluetoothLe(network);
-                break;
+    public void add( Network network) {
+        if (null != network) {
+            switch (network.getType()) {
+                case WIFI:
+                    addWiFi(network);
+                    break;
+                case CDMA:
+                case GSM:
+                case WCDMA:
+                case LTE:
+                    addCell(network);
+                    break;
+                case BT:
+                    addBluetooth(network);
+                    break;
+                case BLE:
+                    addBluetoothLe(network);
+                    break;
+            }
         }
     }
 
@@ -160,6 +165,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         return true;
     }
 
+    @Override
     public void sort(Comparator comparator) {
         networks.sort(comparator);
     }
@@ -189,10 +195,10 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
         // info( "listing net: " + network.getBssid() );
 
-        final ImageView ico = (ImageView) row.findViewById(R.id.wepicon);
+        final ImageView ico = row.findViewById(R.id.wepicon);
         ico.setImageResource(NetworkListUtil.getImage(network));
 
-        final ImageView btico = (ImageView) row.findViewById(R.id.bticon);
+        final ImageView btico = row.findViewById(R.id.bticon);
         if (NetworkType.BT.equals(network.getType()) || NetworkType.BLE.equals(network.getType())) {
             btico.setVisibility(View.VISIBLE);
             Integer btImageId = NetworkListUtil.getBtImage(network);
@@ -200,23 +206,25 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
                 btico.setVisibility(View.GONE);
             } else {
                 btico.setImageResource(btImageId);
+                ImageViewCompat.setImageTintList(btico, ColorStateList.valueOf(
+                        ContextCompat.getColor(getContext(), R.color.colorNavigationItemFg)));
             }
         } else {
             btico.setVisibility(View.GONE);
         }
 
-        TextView tv = (TextView) row.findViewById(R.id.ssid);
+        TextView tv = row.findViewById(R.id.ssid);
         tv.setText(network.getSsid() + " ");
 
-        tv = (TextView) row.findViewById(R.id.oui);
+        tv = row.findViewById(R.id.oui);
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
 
-        tv = (TextView) row.findViewById(R.id.time);
+        tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));
 
-        tv = (TextView) row.findViewById(R.id.level_string);
+        tv = row.findViewById(R.id.level_string);
         final int level = network.getLevel();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             tv.setTextColor(NetworkListUtil.getTextColorForSignal(parent.getContext(), level));
@@ -225,7 +233,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
         tv.setText(Integer.toString(level));
 
-        tv = (TextView) row.findViewById(R.id.detail);
+        tv = row.findViewById(R.id.detail);
         String det = network.getDetail();
         tv.setText(det);
         // status( position + " view done. ms: " + (System.currentTimeMillis() - start ) );

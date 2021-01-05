@@ -4,8 +4,8 @@
     android:layout_width="240dp"
     android:layout_height="48dp"
     android:gravity="center_vertical|start"
-    android:clipToPadding="false"
-    android:background="@drawable/wigle_menu_item_exit">
+    android:clipToPadding="false">
+    <!-- android:background="@drawable/wigle_menu_item_exit" -->
     <ImageView
         android:id="@+id/icon"
         android:layout_width="@dimen/menu_item_icon_size"
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/icon"
-        android:textColor="@color/drawer_item_color"
+        android:textColor="@color/colorNavigationItemExitFg"
         android:gravity="center_vertical"
         android:paddingLeft="24dp"
         android:text="@string/menu_exit"

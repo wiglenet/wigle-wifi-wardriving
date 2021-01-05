@@ -175,7 +175,7 @@ public class DashboardFragment extends Fragment {
         TextView conType = view.findViewById(R.id.contype);
         TextView conCount = view.findViewById(R.id.concount);
 
-        ImageView iv = (ImageView) view.findViewById(R.id.fixtype);
+        ImageView iv = view.findViewById(R.id.fixtype);
         if (location == null) {
             tv.setTextColor(Color.RED);
             iv.setImageResource(R.drawable.gpsnone);
@@ -204,7 +204,7 @@ public class DashboardFragment extends Fragment {
                     fixMeta.setText(satString);
                 }
                 tv.setTextColor(Color.GREEN);
-                iv.setImageResource(R.drawable.gps);
+                iv.setImageResource(R.drawable.ic_gps);
                 iv.setColorFilter(Color.GREEN);
                 iv.setVisibility(View.VISIBLE);
 
@@ -222,13 +222,13 @@ public class DashboardFragment extends Fragment {
             } else if (location.getProvider().equals(LocationManager.NETWORK_PROVIDER)) {
                 fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.YELLOW);
-                iv.setImageResource(R.drawable.wifi);
+                iv.setImageResource(R.drawable.ic_wifi);
                 iv.setVisibility(View.VISIBLE);
                 iv.setColorFilter(Color.YELLOW);
             } else if (location.getProvider().equals(LocationManager.PASSIVE_PROVIDER)) {
                 fixMeta.setVisibility(View.INVISIBLE);
                 tv.setTextColor(Color.parseColor("#FFA500"));
-                iv.setImageResource(R.drawable.cell);
+                iv.setImageResource(R.drawable.ic_cell);
                 iv.setVisibility(View.VISIBLE);
                 iv.setColorFilter(Color.parseColor("#FFA500"));
             } else {

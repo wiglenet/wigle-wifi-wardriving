@@ -87,5 +87,4 @@
         app:itemIconTint="@color/drawer_item_color"
         app:itemShapeFillColor="@color/nav_shape_selector"
     />
-    <!-- app:itemBackground: nav element line delimiters -->
 </androidx.drawerlayout.widget.DrawerLayout>

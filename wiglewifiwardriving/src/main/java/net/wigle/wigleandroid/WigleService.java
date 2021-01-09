@@ -291,9 +291,11 @@ public final class WigleService extends Service {
             builder.setVisibility(Notification.VISIBILITY_PUBLIC);
             builder.setColorized(true);
             //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
-            // WiGLE Blue builder.setColor(6005486);
-            builder.setColor(1973790);
-
+            // WiGLE Blue: builder.setColor(6005486);
+            if (Build.VERSION.SDK_INT < 29) {
+                //Classic charcoal:
+                builder.setColor(1973790);
+            }
             //TODO: figure out how to update notification actions on exec, then we can show relevant
             if (MainActivity.isScanning(getApplicationContext())) {
                 Notification.Action pauseAction = new Notification.Action.Builder(

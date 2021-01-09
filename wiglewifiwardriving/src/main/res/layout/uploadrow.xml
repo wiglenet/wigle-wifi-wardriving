@@ -106,7 +106,6 @@
             android:id="@+id/upload_row_two"
             android:weightSum="2"
             android:layout_below="@id/upload_row_top">
-
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -114,7 +113,7 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/wifi"/>
+                    app:srcCompat="@drawable/ic_wifi_sm"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -132,7 +131,8 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/bluetooth"/>
+                    app:srcCompat="@drawable/ic_bt_sm"
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -157,7 +157,8 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/cell"/>
+                    app:srcCompat="@drawable/ic_cell_sm"
+                    />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

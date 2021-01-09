@@ -41,6 +41,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -151,6 +152,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
+        int uiMode;
     }
 
     private State state;
@@ -230,6 +232,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
         workAroundGoogleMapsBug();
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+
+        if (Build.VERSION.SDK_INT > 28) {
+            //Support dark/light themes in Android 10 and above
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            // ALIBI: when the preference is complete, we'll allow storage of one of:
+            // [AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM , MODE_NIGHT_YES , MODE_NIGHT_NO];
+            AppCompatDelegate.setDefaultNightMode(displayMode);
+        } else {
+            //Force night mode
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
 
         // set language
         setLocale(this);
@@ -258,7 +272,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         fm.executePendingTransactions();
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         pieScanningSettings(prefs);
 
         if (stateFragment != null && stateFragment.getState() != null) {
@@ -311,6 +324,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         state.inEmulator = id == null;
         state.inEmulator = state.inEmulator || "sdk".equals(android.os.Build.PRODUCT);
         state.inEmulator = state.inEmulator || "google_sdk".equals(android.os.Build.PRODUCT);
+
+        state.uiMode = getResources().getConfiguration().uiMode;
 
         info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
         info("android release: '" + Build.VERSION.RELEASE);
@@ -631,20 +646,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             actionBar.setHomeButtonEnabled(true);
         }
 
+        //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
         SpannableString spanString = new SpannableString("    "+uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         uStats.setTitle(spanString);
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
         spanString = new SpannableString("    "+sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         sStats.setTitle(spanString);
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
         spanString = new SpannableString("    "+rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         rStats.setTitle(spanString);
 
         navigationView.getMenu().getItem(0).setCheckable(true);
@@ -1101,7 +1117,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.bluetoothReceiver != null) {
             state.bluetoothReceiver.stopScanning();
         }
-
         finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 
@@ -1163,6 +1178,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+        if (Build.VERSION.SDK_INT > 28) {
+            if (newConfig.uiMode != state.uiMode) {
+                error("uiMode change - need to update");
+                //TODO: a full restart here is absolutely unnecessary,
+                // however we don't have a way to reset the UI because we've linked service to the MainAcitity recreate
+                finishSoon(0, true);
+            }
+        }
     }
 
     @SuppressLint("ApplySharedPref")

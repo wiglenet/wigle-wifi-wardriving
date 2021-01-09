@@ -5,5 +5,4 @@
     android:layout_height="fill_parent"
     android:keepScreenOn="true"
     android:paddingLeft="3dp">
-
 </ScrollView>

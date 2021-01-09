@@ -222,7 +222,7 @@ public class RankStatsFragment extends Fragment {
     private void setupListView(final View view) {
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (listAdapter == null) {
-            listAdapter = new RankListAdapter(getActivity().getApplicationContext(), R.layout.rankrow);
+            listAdapter = new RankListAdapter(getActivity(), R.layout.rankrow);
         } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
             listAdapter.clear();
         }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
     <RelativeLayout
         android:id="@+id/map_rl"
         android:orientation="vertical"
@@ -14,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:paddingBottom="3dp"
-        android:background="#AA000000"
+        style="@style/MapOverlay"
         android:weightSum="21">
         <TextView
             android:id="@+id/stats_run"
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:layout_weight="4"
-            android:textColor="#AAAAAA"
+            style="@style/StatColor"
             android:text="@string/run" />
         <LinearLayout
             android:orientation="horizontal"
@@ -30,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:src="@drawable/wifi"
+                app:srcCompat="@drawable/ic_wifi_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="run wifi"
@@ -51,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:src="@drawable/cell"
+                app:srcCompat="@drawable/ic_cell_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="run cell"
@@ -75,14 +76,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="4">
             <ImageView
-                android:src="@drawable/bluetooth"
+                app:srcCompat="@drawable/ic_bt_sm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="run bluetooth"
                 android:paddingTop="3dp"
                 android:paddingLeft="1dp"
                 android:paddingRight="2dp"
-                android:text="bt new vs run" />
+                android:text="bt new vs run"/>
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

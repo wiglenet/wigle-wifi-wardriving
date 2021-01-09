@@ -225,7 +225,7 @@ public class UploadsFragment extends Fragment {
         if (null != a) {
             prefs = a.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             if (listAdapter == null) {
-                listAdapter = new UploadsListAdapter(getActivity().getApplicationContext(), R.layout.uploadrow, prefs, this);
+                listAdapter = new UploadsListAdapter(getActivity(), R.layout.uploadrow, prefs, this);
             } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
                 listAdapter.clear();
             }

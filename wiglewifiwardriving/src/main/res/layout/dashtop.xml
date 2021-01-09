@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -168,7 +169,7 @@
                 android:layout_toLeftOf="@+id/fixmeta"
                 android:paddingRight="4dp"
                 android:paddingTop="8dp"
-                android:tint="#46AA00"
+                app:tint="#46AA00"
                 />
 
             <TextView
@@ -214,7 +215,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        style="@style/invertedText"
+        style="@style/InvertedBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -224,8 +225,8 @@
             android:layout_height="wrap_content"
             android:paddingLeft="3dp"
             android:text="@string/dash_time_run"
-            android:textColor="#303030"
             android:textSize="30sp"
+            style="@style/InvertedText"
             />
 
         <TextView
@@ -234,8 +235,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingRight="4dp"
-            android:textColor="#303030"
             android:textSize="30sp"
+            style="@style/InvertedText"
             />
     </RelativeLayout>
 
@@ -243,14 +244,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="3dp"
             android:text="@string/dash_time_scanning"
-            android:textColor="#B0B0B0"
             android:textSize="30sp"
+            style="@style/NonInvertedText"
             />
 
         <TextView
@@ -259,7 +259,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingRight="4dp"
-            android:textColor="#B0B0B0"
-            android:textSize="30sp"/>
+            android:textSize="30sp"
+            style="@style/NonInvertedText"
+            />
     </RelativeLayout>
 </LinearLayout>

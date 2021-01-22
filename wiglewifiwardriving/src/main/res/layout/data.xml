@@ -45,6 +45,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/csv_run_export_button"
             android:layout_width="wrap_content"
@@ -62,6 +63,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/kml_run_export_button"
             android:layout_width="wrap_content"
@@ -79,6 +81,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/csv_export_button"
             android:layout_width="wrap_content"
@@ -96,6 +99,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/kml_export_button"
             android:layout_width="wrap_content"
@@ -114,6 +118,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dip"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/export_m8b_button"
             android:layout_width="wrap_content"
@@ -134,6 +139,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dip"
         android:visibility="gone"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/export_gpx_button"
             android:layout_width="wrap_content"
@@ -159,6 +165,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/backup_db_button"
             android:layout_width="wrap_content"
@@ -178,6 +185,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dip"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/import_observed_button"
             android:layout_width="wrap_content"
@@ -210,6 +218,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/reset_maxid_button"
             android:layout_width="wrap_content"
@@ -228,6 +237,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/maxout_maxid_button"
             android:layout_width="wrap_content"
@@ -245,6 +255,7 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:baselineAligned="false"
         >
         <Button android:id="@+id/clear_db"
             android:layout_width="wrap_content"

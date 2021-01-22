@@ -225,7 +225,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="3dp"
             android:text="@string/dash_time_run"
-            android:textSize="30sp"
+            android:textSize="30dp"
             style="@style/InvertedText"
             />
 
@@ -235,7 +235,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingRight="4dp"
-            android:textSize="30sp"
+            android:textSize="30dp"
             style="@style/InvertedText"
             />
     </RelativeLayout>
@@ -249,7 +249,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="3dp"
             android:text="@string/dash_time_scanning"
-            android:textSize="30sp"
+            android:textSize="30dp"
             style="@style/NonInvertedText"
             />
 
@@ -259,7 +259,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:paddingRight="4dp"
-            android:textSize="30sp"
+            android:textSize="30dp"
             style="@style/NonInvertedText"
             />
     </RelativeLayout>

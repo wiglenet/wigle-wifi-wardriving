@@ -316,8 +316,9 @@ public class GPSListener implements Listener, LocationListener {
             final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );
             if ( speechGPS ) {
                 // no quotes or the voice pauses
-                final String speakAnnounce = location == null ? "Lost Location"
-                        : "Now have location from " + location.getProvider() + ".";
+
+                final String speakAnnounce = location == null ? mainActivity.getString(R.string.lost_location)
+                        : mainActivity.getString(R.string.have_location) + " " + location.getProvider() + ".";
                 mainActivity.speak( speakAnnounce );
             }
 

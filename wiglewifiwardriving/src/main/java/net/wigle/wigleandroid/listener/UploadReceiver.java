@@ -18,7 +18,7 @@ public class UploadReceiver extends BroadcastReceiver {
             MainActivity.error("null intent in upload onReceive");
             return;
         }
-        MainActivity.info("TerminationRec intent type: " + intent.getAction());
+        MainActivity.info("UploadReceiver intent type: " + intent.getAction());
         switch (intent.getAction()) {
             case MainActivity.ACTION_UPLOAD:
                 MainActivity.info("Received upload action");
@@ -32,7 +32,7 @@ public class UploadReceiver extends BroadcastReceiver {
                 }
                 return;
             default:
-                MainActivity.info("TerminationRec: unhandled intent action: " + intent.getAction());
+                MainActivity.info("UploadReceiver: unhandled intent action: " + intent.getAction());
         }
     }
 }

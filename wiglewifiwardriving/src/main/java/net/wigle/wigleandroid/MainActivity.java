@@ -149,10 +149,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
-        private String[] logs = new String[25];
+        private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
         int uiMode;
+        AtomicBoolean uiRestart;
     }
 
     private State state;
@@ -225,7 +226,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
-
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -250,9 +250,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setContentView(R.layout.main);
 
         mainActivity = this;
-
-        // set language
-        setLocale(this);
 
         setupPermissions();
         setupMenuDrawer();
@@ -294,6 +291,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state = new State();
             state.finishing = new AtomicBoolean(false);
             state.transferring = new AtomicBoolean(false);
+            state.uiRestart = new AtomicBoolean(false);
 
             // set it up for retain
             stateFragment = new StateFragment();
@@ -399,7 +397,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     dialog.dismiss();
                 }
             });
-            ;
 
             final Dialog dialog = iseDlgBuilder.create();
             dialog.show();
@@ -851,11 +848,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         /**
          * alternate instantiation with a prefs-back checkbox inline - String prefs only
-         * @param message
-         * @param checkboxLabel
-         * @param tabPos
-         * @param dialogId
-         * @return
+         * @param message the message to display in the dialog
+         * @param checkboxLabel the label for the checkbox in the dialog
+         * @param tabPos the tab state
+         * @param dialogId the dialog id
+         * @return a ConfirmationDialog instance
          */
         public static ConfirmationDialog newInstance(final String message, final String checkboxLabel,
                                                      final String persistPrefKey,
@@ -1088,36 +1085,41 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         MainActivity.info("MAIN: destroy.");
         super.onDestroy();
 
-        try {
-            info("unregister batteryLevelReceiver");
-            unregisterReceiver(batteryLevelReceiver);
-        } catch (final IllegalArgumentException ex) {
-            info("batteryLevelReceiver not registered: " + ex);
+        if (!state.uiRestart.get()) {
+            try {
+                info("unregister batteryLevelReceiver");
+                unregisterReceiver(batteryLevelReceiver);
+            } catch (final IllegalArgumentException ex) {
+                info("batteryLevelReceiver not registered: " + ex);
+            }
+
+            try {
+                info("unregister wifiReceiver");
+                unregisterReceiver(state.wifiReceiver);
+            } catch (final IllegalArgumentException ex) {
+                info("wifiReceiver not registered: " + ex);
+            }
+
+            if (state.tts != null) state.tts.shutdown();
+
+            //TODO: redundant with endBluetooth?
+            final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            } try {
+                info("unregister bluetoothReceiver");
+                unregisterReceiver( state.bluetoothReceiver );
+            } catch ( final IllegalArgumentException ex ) {
+                info( "bluetoothReceiver not registered: " + ex );
+            }
+            if (state.bluetoothReceiver != null) {
+                state.bluetoothReceiver.stopScanning();
+            }
+            finishSoon(DESTROY_FINISH_MILLIS, false);
+        } else {
+            state.uiRestart.set(false);
         }
 
-        try {
-            info("unregister wifiReceiver");
-            unregisterReceiver(state.wifiReceiver);
-        } catch (final IllegalArgumentException ex) {
-            info("wifiReceiver not registered: " + ex);
-        }
-
-        if (state.tts != null) state.tts.shutdown();
-
-        //TODO: redundant with endBluetooth?
-        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
-        } try {
-            info("unregister bluetoothReceiver");
-            unregisterReceiver( state.bluetoothReceiver );
-        } catch ( final IllegalArgumentException ex ) {
-            info( "bluetoothReceiver not registered: " + ex );
-        }
-        if (state.bluetoothReceiver != null) {
-            state.bluetoothReceiver.stopScanning();
-        }
-        finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 
     @Override
@@ -1180,10 +1182,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         mDrawerToggle.onConfigurationChanged(newConfig);
         if (Build.VERSION.SDK_INT > 28) {
             if (newConfig.uiMode != state.uiMode) {
-                error("uiMode change - need to update");
-                //TODO: a full restart here is absolutely unnecessary,
-                // however we don't have a way to reset the UI because we've linked service to the MainAcitity recreate
-                finishSoon(0, true);
+                info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
+                state.uiMode = newConfig.uiMode;
+                //DEBUG:
+                finishSoon(0, true, true);
             }
         }
     }
@@ -1243,16 +1245,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final String current = config.locale.getLanguage();
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
-        if (!"".equals(lang) && !current.equals(lang)) {
+        if (!lang.isEmpty() && !current.equals(lang)) {
             if (lang.contains("-r")) {
                 String[] parts = lang.split("-r");
                 MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
                 newLocale = new Locale(parts[0], parts[1]);
             } else {
-                MainActivity.info("\tlang: "+lang);
+                MainActivity.info("\tlang: "+lang + " current: "+current);
                 newLocale = new Locale(lang);
             }
-        } else if ("".equals(lang) && ORIG_LOCALE != null && !current.equals(ORIG_LOCALE.getLanguage())) {
+        } else if (lang.isEmpty() && ORIG_LOCALE != null && !ORIG_LOCALE.getLanguage().isEmpty()
+                && !current.equals(ORIG_LOCALE.getLanguage())) {
             newLocale = ORIG_LOCALE;
         }
 
@@ -1287,14 +1290,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     /**
      * hack to get locale
-     * @param context
-     * @param config
-     * @return
+     * @param context the Android context for which to get the locale
+     * @param config the Configuration of the applications
+     * @return the Locale according to device and configuration
      */
     public static Locale getLocale(final Context context, final Configuration config) {
         final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final String lang = prefs.getString(ListFragment.PREF_LANGUAGE, "");
         final String current = config.locale.getLanguage();
+        String lang = prefs.getString(ListFragment.PREF_LANGUAGE, current);
+        if (lang.isEmpty()) {
+            lang = current;
+        }
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         if (lang.contains("-r")) {
             String[] parts = lang.split("-r");
@@ -1516,8 +1522,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
-
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.addNetwork(network);
@@ -1529,7 +1533,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.updateNetwork(network);
@@ -1541,7 +1544,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.reCluster();
@@ -1727,12 +1729,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
-        ttsCheckIntent();
     }
 
     /**
      * Instantiate both both BSSID matchers - inital load
-     * @param prefs
+     * @param prefs the preferences instance for which to get matchers
      */
     private void setupFilters(final SharedPreferences prefs) {
         if (null != state) {
@@ -1744,7 +1745,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     /**
      * Trigger recreation of BSSID address filter from prefs
-     * @param addressKey
+     * @param addressKey the preferences key for which to create a settings entry.
      */
     public void updateAddressFilter(final String addressKey) {
         if (null != state) {
@@ -1759,8 +1760,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     /**
      * Accessor for state BSSID matchers
-     * @param addressKey
-     * @return
+     * @param addressKey the preferences key for which to build the matcher
+     * @return the matcher corresponding to the key as set in the preferences
      */
     public Matcher getBssidFilterMatcher(final String addressKey) {
         if (null != state) {
@@ -1775,17 +1776,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     /**
      * Build a BSSID matcher from preferences for the supplied key
-     * @param prefs
-     * @param addressKey
-     * @return
+     * @param prefs the SharedPreferences instance for the application
+     * @param addressKey the preferences key of the matching settings for which to build the matcher
+     * @return a Matcher instance corresponding to the current user settings from preferences
      */
     private Matcher generateBssidFilterMatcher( final SharedPreferences prefs,  final String addressKey) {
         Gson gson = new Gson();
         Matcher matcher = null;
-        final String f = prefs.getString( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS, "");
         String[] values = gson.fromJson(prefs.getString(addressKey, "[]"), String[].class);
         if(values.length>0) {
-            StringBuffer sb = new StringBuffer("^(");
+            StringBuilder sb = new StringBuilder("^(");
             boolean first = true;
             for (String value: values) {
 
@@ -1920,17 +1920,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null == wifiManager) {
             return false;
         }
-        if (!wifiManager.isWifiEnabled() && !state.inEmulator) {
-            return true;
-        }
-        return false;
+        return !wifiManager.isWifiEnabled() && !state.inEmulator;
     }
 
     private void setupWifi() {
         // warn about turning off network notification
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
-        if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
+        if ("1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
             WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
         }
 
@@ -2500,10 +2497,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void finishSoon() {
-        finishSoon(FINISH_TIME_MILLIS, false);
+        finishSoon(FINISH_TIME_MILLIS, false, false);
     }
 
     public void finishSoon(final long finishTimeMillis, final boolean restart) {
+        finishSoon(finishTimeMillis, restart, false);
+    }
+
+    public void finishSoon(final long finishTimeMillis, final boolean restart, final boolean uiOnly) {
         MainActivity.info("Will finish in " + finishTimeMillis + "ms");
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -2517,7 +2518,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         MainActivity.info("finishSoon: finish already called");
                     } else {
                         MainActivity.info("finishSoon: calling finish now");
-                        finish();
+                        if (uiOnly) {
+                            info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
+                            state.uiRestart.set(true);
+                            MainActivity.super.recreate();
+                            /*new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivity(i);
+                                }
+                            }, 10L);*/
+                        } else {
+                            finish();
+                        }
                     }
 
                     if (restart) {
@@ -2541,92 +2554,93 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void finish() {
         info("MAIN: finish.");
-        if (state.wifiReceiver != null) {
-            info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
-        }
+        if (!state.uiRestart.get()) {
+            if (state.wifiReceiver != null) {
+                info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+            }
 
-        final boolean wasFinishing = state.finishing.getAndSet(true);
-        if (wasFinishing) {
-            info("MAIN: finish called twice!");
-        }
+            final boolean wasFinishing = state.finishing.getAndSet(true);
+            if (wasFinishing) {
+                info("MAIN: finish called twice!");
+            }
 
-        // interrupt this just in case
-        final ObservationUploader observationUploader = state.observationUploader;
-        if (observationUploader != null) {
-            observationUploader.setInterrupted();
-        }
+            // interrupt this just in case
+            final ObservationUploader observationUploader = state.observationUploader;
+            if (observationUploader != null) {
+                observationUploader.setInterrupted();
+            }
 
-        if (state.gpsListener != null) {
-            // save our location for later runs
-            state.gpsListener.saveLocation();
-        }
+            if (state.gpsListener != null) {
+                // save our location for later runs
+                state.gpsListener.saveLocation();
+            }
 
-        // close the db. not in destroy, because it'll still write after that.
-        if (state.dbHelper != null) state.dbHelper.close();
+            // close the db. not in destroy, because it'll still write after that.
+            if (state.dbHelper != null) state.dbHelper.close();
 
-        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (state.gpsListener != null && locationManager != null) {
-            try {
-                locationManager.removeGpsStatusListener(state.gpsListener);
-                locationManager.removeUpdates(state.gpsListener);
-                if (Build.VERSION.SDK_INT >= 24) {
-                    if (gnssStatusCallback != null) {
-                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+            final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (state.gpsListener != null && locationManager != null) {
+                try {
+                    locationManager.removeGpsStatusListener(state.gpsListener);
+                    locationManager.removeUpdates(state.gpsListener);
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        if (gnssStatusCallback != null) {
+                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                        }
                     }
+                } catch (final SecurityException ex) {
+                    error("SecurityException on finish: " + ex, ex);
+                } catch (final IllegalStateException ise) {
+                    error("ISE turning off GPS: ", ise);
+                } catch (final NullPointerException npe) {
+                    error("NPE turning off GPS: ", npe);
                 }
-            } catch (final SecurityException ex) {
-                error("SecurityException on finish: " + ex, ex);
-            } catch (final IllegalStateException ise) {
-                error("ISE turning off GPS: ",ise);
-            } catch (final NullPointerException npe) {
-                error("NPE turning off GPS: ", npe);
             }
-        }
 
-        // stop the service, so when we die it's both stopped and unbound and will die
-        final Intent serviceIntent = new Intent(this, WigleService.class);
-        stopService(serviceIntent);
-        try {
-            // have to use the app context to bind to the service, cuz we're in tabs
-            getApplicationContext().unbindService(state.serviceConnection);
-        } catch (final IllegalArgumentException ex) {
-            MainActivity.info("serviceConnection not registered: " + ex, ex);
-        }
-
-        // release the lock before turning wifi off
-        if (state.wifiLock != null && state.wifiLock.isHeld()) {
+            // stop the service, so when we die it's both stopped and unbound and will die
+            final Intent serviceIntent = new Intent(this, WigleService.class);
+            stopService(serviceIntent);
             try {
-                state.wifiLock.release();
-            } catch (Exception ex) {
-                MainActivity.error("exception releasing wifi lock: " + ex, ex);
+                // have to use the app context to bind to the service, cuz we're in tabs
+                getApplicationContext().unbindService(state.serviceConnection);
+            } catch (final IllegalArgumentException ex) {
+                MainActivity.info("serviceConnection not registered: " + ex, ex);
             }
-        }
 
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        endBluetooth(prefs);
-
-        TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        if (tele != null && state.phoneState != null) {
-            tele.listen(state.phoneState, PhoneStateListener.LISTEN_NONE);
-        }
-
-        if (state.tts != null) {
-            if (!isMuted()) {
-                // give time for the above "done" to be said
-                sleep(250);
+            // release the lock before turning wifi off
+            if (state.wifiLock != null && state.wifiLock.isHeld()) {
+                try {
+                    state.wifiLock.release();
+                } catch (Exception ex) {
+                    MainActivity.error("exception releasing wifi lock: " + ex, ex);
+                }
             }
-            state.tts.shutdown();
-        }
 
-        // clean up.
-        if (state.soundPop != null) {
-            state.soundPop.release();
-        }
-        if (state.soundNewPop != null) {
-            state.soundNewPop.release();
-        }
-        info("MAIN: finish complete.");
+            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            endBluetooth(prefs);
 
+            TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            if (tele != null && state.phoneState != null) {
+                tele.listen(state.phoneState, PhoneStateListener.LISTEN_NONE);
+            }
+
+            if (state.tts != null) {
+                if (!isMuted()) {
+                    // give time for the above "done" to be said
+                    sleep(250);
+                }
+                state.tts.shutdown();
+            }
+
+            // clean up.
+            if (state.soundPop != null) {
+                state.soundPop.release();
+            }
+            if (state.soundNewPop != null) {
+                state.soundNewPop.release();
+            }
+            info("MAIN: finish complete.");
+        }
         super.finish();
     }
 
@@ -2763,15 +2777,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS && state != null && state.tts != null) {
             Locale locale = getLocale(getApplicationContext(), getApplicationContext().getResources().getConfiguration());
-            error("LOCALE: "+locale);
+            info("LOCALE: "+locale);
             if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
                 state.tts.setLanguage(locale);
             } else {
                 state.ttsChecked = true;
-                error("preferred locale: [" +locale+"] not available on device.");
+                info("preferred locale: [" +locale+"] not available on device.");
             }
         } else if (status == TextToSpeech.SUCCESS) {
-            error("TTS init successful, but TTS engine was null");
+            info("TTS init successful, but TTS engine was null");
         } else if (status == TextToSpeech.ERROR) {
             error("TTS init failed: "+status);
         }

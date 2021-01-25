@@ -245,11 +245,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
 
+        mainActivity = this;
+
         // set language
         setLocale(this);
         setContentView(R.layout.main);
-
-        mainActivity = this;
 
         setupPermissions();
         setupMenuDrawer();
@@ -1185,7 +1185,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
                 state.uiMode = newConfig.uiMode;
                 //DEBUG:
-                finishSoon(0, true, true);
+                finishSoon(0, false, true);
             }
         }
     }
@@ -1728,6 +1728,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             } catch (SecurityException ex) {
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
+        }
+        if (MainActivity.getMainActivity() != null &&
+                MainActivity.getMainActivity().state != null &&
+                MainActivity.getMainActivity().state.ttsChecked == false) {
+            ttsCheckIntent();
         }
     }
 
@@ -2781,9 +2786,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
                 state.tts.setLanguage(locale);
             } else {
-                state.ttsChecked = true;
                 info("preferred locale: [" +locale+"] not available on device.");
             }
+            state.ttsChecked = true;
         } else if (status == TextToSpeech.SUCCESS) {
             info("TTS init successful, but TTS engine was null");
         } else if (status == TextToSpeech.ERROR) {

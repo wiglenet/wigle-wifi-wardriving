@@ -2054,7 +2054,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final Editor edit = prefs.edit();
             if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
-                if (!bt.isEnabled()) {
+                //NB: almost certainly getting specious 'false' answers to isEnabled.
+                //  BluetoothAdapter.STATE_TURNING_OFF also a possible match
+                if (bt.getState() == BluetoothAdapter.STATE_OFF ||
+                        bt.getState() == BluetoothAdapter.STATE_TURNING_OFF) {
                     info("Enable bluetooth");
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
                     bt.enable();
@@ -2111,6 +2114,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
 
         final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
+        //ALIBI: this pref seems to be persisting across runs, shutting down BT on exit when it was active on start.
+        Editor removeBtPref = prefs.edit();
+        removeBtPref.remove(ListFragment.PREF_BT_WAS_OFF);
+        removeBtPref.apply();
+
         // don't call on emulator, it crashes it
         if ( btWasOff && ! state.inEmulator ) {
             // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?

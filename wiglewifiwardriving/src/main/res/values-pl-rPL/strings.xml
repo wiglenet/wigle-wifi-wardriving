@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Pobieranie nie powiodło się: wynik nie został zapisany.</string>
     <string name="not_proc">&#160;nieprzetworzony.</string>
+    <string name="theme_settings_label">Motyw wyświetlacza</string>
+    <string name="theme_light_label">światła</string>
+    <string name="theme_dark_label">ciemny</string>
+    <string name="theme_follow_label">śledzić system</string>
 </resources>

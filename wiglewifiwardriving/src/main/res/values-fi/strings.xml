@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Lataus epäonnistui: tulosta ei tallennettu.</string>
     <string name="not_proc">&#160;käsittelemätön.</string>
+    <string name="theme_settings_label">Näytä teema</string>
+    <string name="theme_light_label">Kevyt</string>
+    <string name="theme_dark_label">Tumma</string>
+    <string name="theme_follow_label">Seuraa järjestelmää</string>
 </resources>

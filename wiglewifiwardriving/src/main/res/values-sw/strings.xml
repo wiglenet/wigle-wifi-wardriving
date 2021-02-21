@@ -424,4 +424,8 @@
     <string name="plus_gps">+GPS: </string>
     <string name="dl_failed">Imeshindwa kupakua: matokeo hayajahifadhiwa.</string>
     <string name="not_proc"> haijachakatwa.</string>
+    <string name="theme_settings_label">Onyesha mandhari</string>
+    <string name="theme_light_label">Nyepesi</string>
+    <string name="theme_dark_label">Meusi</string>
+    <string name="theme_follow_label">Fuata mfumo</string>
 </resources>

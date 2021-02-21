@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Nedladdningen misslyckades: resultatet sparades inte.</string>
     <string name="not_proc">&#160;inte bearbetad.</string>
+    <string name="theme_settings_label">Visa tema</string>
+    <string name="theme_light_label">Ljus</string>
+    <string name="theme_dark_label">Mörkt</string>
+    <string name="theme_follow_label">Följ systemet</string>
 </resources>

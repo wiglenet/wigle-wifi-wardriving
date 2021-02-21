@@ -192,7 +192,31 @@
             android:layout_gravity="left"
             />
     </LinearLayout>
-
+    <LinearLayout
+        android:id="@+id/theme_section"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        android:visibility="gone"
+        >
+        <Spinner android:id="@+id/theme_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/theme_settings_label"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/theme_settings_label"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Downloaden mislukt: resultaat is niet opgeslagen.</string>
     <string name="not_proc">&#160;niet verwerkt.</string>
+    <string name="theme_settings_label">Thema weergeven</string>
+    <string name="theme_light_label">Lichte</string>
+    <string name="theme_dark_label">Donkere</string>
+    <string name="theme_follow_label">Volg systeem</string>
 </resources>

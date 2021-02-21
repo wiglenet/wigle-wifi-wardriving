@@ -424,4 +424,8 @@
     <string name="plus_gps">+GPS:</string>
     <string name="dl_failed">डाउनलोड विफल हुआ: परिणाम सहेजा नहीं गया था.</string>
     <string name="not_proc">संसाधित नहीं किया गया.</string>
+    <string name="theme_settings_label">विषय प्रदर्शित करें</string>
+    <string name="theme_light_label">प्रकाश</string>
+    <string name="theme_dark_label">डार्क</string>
+    <string name="theme_follow_label">सिस्टम का पालन करें</string>
 </resources>

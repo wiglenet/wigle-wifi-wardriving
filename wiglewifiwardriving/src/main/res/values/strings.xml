@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Download failed: result was not saved.</string>
     <string name="not_proc">&#160;not processed.</string>
+    <string name="theme_settings_label">Display theme</string>
+    <string name="theme_light_label">Light</string>
+    <string name="theme_dark_label">Dark</string>
+    <string name="theme_follow_label">Follow System</string>
 </resources>

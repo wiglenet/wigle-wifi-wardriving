@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">İndirme başarısız oldu: sonuç kaydedilmedi.</string>
     <string name="not_proc">&#160;işlenmemiş.</string>
+    <string name="theme_settings_label">Ekran teması</string>
+    <string name="theme_light_label">Açık</string>
+    <string name="theme_dark_label">Koyu</string>
+    <string name="theme_follow_label">Sistemi takip et</string>
 </resources>

@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Download mislykkedes: resultatet blev ikke gemt.</string>
     <string name="not_proc">&#160;ikke behandlet.</string>
+    <string name="theme_settings_label">Vis tema</string>
+    <string name="theme_light_label">Lys</string>
+    <string name="theme_dark_label">Mørk</string>
+    <string name="theme_follow_label">Følg systemet</string>
 </resources>

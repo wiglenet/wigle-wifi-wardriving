@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">다운로드 실패 : 결과가 저장되지 않았습니다.</string>
     <string name="not_proc">&#160;진행되지 않았다.</string>
+    <string name="theme_settings_label">디스플레이 테마</string>
+    <string name="theme_light_label">라이트</string>
+    <string name="theme_dark_label">다크</string>
+    <string name="theme_follow_label">팔로우 시스템</string>
 </resources>

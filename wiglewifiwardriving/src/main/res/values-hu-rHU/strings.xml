@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">A letöltés sikertelen: az eredmény nem lett mentve.</string>
     <string name="not_proc">&#160;nem feldolgozott.</string>
+    <string name="theme_settings_label">Téma megjelenítése</string>
+    <string name="theme_light_label">Fény</string>
+    <string name="theme_dark_label">Sötét</string>
+    <string name="theme_follow_label">Kövesse a rendszert</string>
 </resources>

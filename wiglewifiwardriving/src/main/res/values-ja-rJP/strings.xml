@@ -424,4 +424,8 @@
     <string name="plus_gps">+ GPS： </string>
     <string name="dl_failed">ダウンロードに失敗しました：結果は保存されませんでした。</string>
     <string name="not_proc"> 処理されていません。</string>
+    <string name="theme_settings_label">テーマを表示</string>
+    <string name="theme_light_label">ライト</string>
+    <string name="theme_dark_label">ダーク</string>
+    <string name="theme_follow_label">フォローシステム</string>
 </resources>

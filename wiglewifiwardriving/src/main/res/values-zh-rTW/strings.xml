@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">下載失敗：未保存結果。</string>
     <string name="not_proc">&#160;未處理。</string>
+    <string name="theme_settings_label">顯示主題</string>
+    <string name="theme_light_label">燈光模式</string>
+    <string name="theme_dark_label">暗模式</string>
+    <string name="theme_follow_label">追踪系統</string>
 </resources>

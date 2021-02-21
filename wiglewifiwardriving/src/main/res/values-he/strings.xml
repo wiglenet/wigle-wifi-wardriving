@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">ההורדה נכשלה: התוצאה לא נשמרה.</string>
     <string name="not_proc">לא מעובד.&#160;</string>
+    <string name="theme_settings_label">נושא תצוגה</string>
+    <string name="theme_light_label">אור</string>
+    <string name="theme_dark_label">כהה</string>
+    <string name="theme_follow_label">עקוב אחר המערכת</string>
 </resources>

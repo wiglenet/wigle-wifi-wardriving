@@ -119,7 +119,6 @@ import java.util.regex.Pattern;
 import static android.location.LocationManager.GPS_PROVIDER;
 
 public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
-
     //*** state that is retained ***
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
@@ -2722,6 +2721,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             dialog.show();
         }
         return safe;
+    }
+
+    public static void setTheme(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT > 28) {
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            info("set theme called: "+displayMode);
+            AppCompatDelegate.setDefaultNightMode(displayMode);
+        }
     }
 
     /**

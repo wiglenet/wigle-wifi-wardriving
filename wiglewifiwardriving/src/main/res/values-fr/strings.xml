@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Échec du téléchargement: le résultat n\'a pas été enregistré.</string>
     <string name="not_proc">&#160;non traité.</string>
+    <string name="theme_settings_label">Thème d\'affichage</string>
+    <string name="theme_light_label">Lumière</string>
+    <string name="theme_dark_label">Sombre</string>
+    <string name="theme_follow_label">Suivez système</string>
 </resources>

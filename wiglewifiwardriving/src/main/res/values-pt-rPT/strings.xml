@@ -424,4 +424,8 @@
     <string name="plus_gps">+GPS: </string>
     <string name="dl_failed">O download falhou: o resultado não foi guardado.</string>
     <string name="not_proc">não processado.</string>
+    <string name="theme_settings_label">Tema de exibição</string>
+    <string name="theme_light_label">Luz</string>
+    <string name="theme_dark_label">Escuro</string>
+    <string name="theme_follow_label">Seguir sistema</string>
 </resources>

@@ -100,16 +100,18 @@ public class DashboardFragment extends Fragment {
     public void run() {
         // make sure the app isn't trying to finish
         if ( ! finishing.get() ) {
-          final View view = getView();
-          if (view != null) {
-            updateUI( view );
-          }
-
-          final long period = 1000L;
-          // info("wifitimer: " + period );
-          timer.postDelayed( this, period );
-        }
-        else {
+            try {
+                final View view = getView();
+                if (view != null) {
+                    updateUI(view);
+                }
+            } catch (Exception e) {
+                MainActivity.error("failed to update dash UI: ",e);
+            }
+            final long period = 1000L;
+            // info("wifitimer: " + period );
+            timer.postDelayed( this, period );
+        } else {
           MainActivity.info( "finishing mapping timer" );
         }
     }

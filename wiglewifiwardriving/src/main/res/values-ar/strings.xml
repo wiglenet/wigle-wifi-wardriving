@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">أخفق التنزيل: لم يتم حفظ النتيجة.</string>
     <string name="not_proc">لم تتم معالجتها.&#160;</string>
+    <string name="theme_settings_label">عرض الموضوع</string>
+    <string name="theme_light_label">الضوء</string>
+    <string name="theme_dark_label">المظلم</string>
+    <string name="theme_follow_label">اتبع النظام</string>
 </resources>

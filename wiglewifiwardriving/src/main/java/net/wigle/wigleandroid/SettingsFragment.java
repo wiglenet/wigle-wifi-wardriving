@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import android.text.Editable;
@@ -505,6 +507,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
         SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
+
+        if (Build.VERSION.SDK_INT > 28) {
+            View theme = view.findViewById(R.id.theme_section);
+            theme.setVisibility(View.VISIBLE);
+            final Integer[] themes = new Integer[] {AppCompatDelegate.MODE_NIGHT_YES, AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM};
+            final String[] themeName = new String[]{getString(R.string.theme_dark_label), getString(R.string.theme_light_label), getString(R.string.theme_follow_label)};
+            SettingsUtil.doSpinner(R.id.theme_spinner, view, ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES, themes, themeName, getContext());
+        }
 
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);

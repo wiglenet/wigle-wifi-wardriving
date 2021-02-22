@@ -425,4 +425,8 @@
     <string name="prevmonthrank_title">Месячный рейтинг за последний месяц</string>
     <string name="prevrank_title">Рейтинг пользователя за последний месяц</string>
     <string name="calculating_m8b">Вычисление оракула</string>
+    <string name="theme_settings_label">Тема отображения</string>
+    <string name="theme_light_label">Легкий</string>
+    <string name="theme_dark_label">Темный</string>
+    <string name="theme_follow_label">Следить за системой</string>
 </resources>

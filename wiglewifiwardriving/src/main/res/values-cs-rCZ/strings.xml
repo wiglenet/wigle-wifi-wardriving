@@ -425,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Stahování se nezdařilo: výsledek nebyl uložen.</string>
     <string name="not_proc">&#160;nezpracováno.</string>
+    <string name="theme_settings_label">Zobrazit téma</string>
+    <string name="theme_light_label">světelný</string>
+    <string name="theme_dark_label">tmavý</string>
+    <string name="theme_follow_label">Sledujte systém</string>
 </resources>

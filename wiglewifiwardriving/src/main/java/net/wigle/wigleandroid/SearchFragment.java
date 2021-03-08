@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,9 +105,9 @@ public class SearchFragment extends Fragment {
 
                 final String fail = SearchUtil.setupQuery(view, getActivity(), local);
 
-                if (fail != null) {
-                    // toast!
-                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
+                final FragmentActivity a = getActivity();
+                if (fail != null && null != a && !a.isFinishing()) {
+                    WiGLEToast.showOverFragment(a, R.string.error_general, fail);
                 } else {
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
                     final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);

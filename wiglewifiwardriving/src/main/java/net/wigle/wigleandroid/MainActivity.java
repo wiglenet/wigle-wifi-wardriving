@@ -1954,9 +1954,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
-                                getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
-                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                        if (!isFinishing()) {
+                            WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
+                                    getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
+                            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                        }
                     }
                 }, 3000);
             }

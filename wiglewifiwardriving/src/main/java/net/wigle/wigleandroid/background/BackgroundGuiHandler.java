@@ -6,6 +6,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -63,13 +64,19 @@ public class BackgroundGuiHandler extends Handler {
     public void handleMessage( final Message msg ) {
         synchronized ( lock ) {
             if (msg.what == AUTHENTICATION_ERROR) {
-                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
+                final Activity a = this.context;
+                if (null != a && !a.isFinishing()) {
+                    WiGLEToast.showOverActivity(a, R.string.error_general, context.getString(R.string.status_login_fail));
+                }
                 if (pp != null) {
                     pp.hide();
                 }
             }
             if (msg.what == CONNECTION_ERROR) {
-                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.no_wigle_conn));
+                final Activity a = this.context;
+                if (null != a && !a.isFinishing()) {
+                    WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.no_wigle_conn));
+                }
                 if (pp != null) {
                     pp.hide();
                 }
@@ -140,10 +147,13 @@ public class BackgroundGuiHandler extends Handler {
 
             if (Status.SUCCESS.equals(status)) {
                 //ALIBI: for now, success gets a long custom toast, other messages get dialogs
-                WiGLEToast.showOverFragment(context, status.getTitle(),
-                        composeDisplayMessage(context, msg.peekData().getString(ERROR),
-                                msg.peekData().getString(FILEPATH), msg.peekData().getString(FILENAME),
-                                status.getMessage()));
+                final FragmentActivity a = context;
+                if (null != a && !a.isFinishing()) {
+                    WiGLEToast.showOverFragment(context, status.getTitle(),
+                            composeDisplayMessage(context, msg.peekData().getString(ERROR),
+                                    msg.peekData().getString(FILEPATH), msg.peekData().getString(FILENAME),
+                                    status.getMessage()));
+                }
             } else if (Status.WRITE_SUCCESS.equals(status)) {
                 final String fileName = msg.peekData().getString(FILENAME);
                 if (null != fileName) {

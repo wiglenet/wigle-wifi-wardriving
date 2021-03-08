@@ -77,7 +77,9 @@ public class ActivateActivity extends Activity {
                         .build();
         if (!barcodeDetector.isOperational()) {
             //ALIBI: this *should* be unreachable, but the diversity of android devices and implementation can make this happen
-            WiGLEToast.showOverActivity(this, R.string.error_general, getString(R.string.no_barcode_support_text));
+            if (!isFinishing()) {
+                WiGLEToast.showOverActivity(this, R.string.error_general, getString(R.string.no_barcode_support_text));
+            }
             Log.e(LOG_TAG, "Barcode detection not available on this device.");
             this.finish();
         } else {

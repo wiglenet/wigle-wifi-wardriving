@@ -19,6 +19,8 @@ import android.os.Message;
 import android.os.Parcelable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -207,8 +209,10 @@ public class DBResultActivity extends AppCompatActivity {
                 } else if (msg.what == MSG_QUERY_EMPTY) {
                     tv.setText( getString(R.string.search_empty)  );
                     listAdapter.clear();
-                    WiGLEToast.showOverActivity(activity, R.string.app_name,
-                            getString(R.string.search_empty), Toast.LENGTH_LONG);
+                    if (null != activity && !activity.isFinishing()) {
+                        WiGLEToast.showOverActivity(activity, R.string.app_name,
+                                getString(R.string.search_empty), Toast.LENGTH_LONG);
+                    }
                 }
             }
         };
@@ -565,14 +569,18 @@ public class DBResultActivity extends AppCompatActivity {
                 if (statusView != null) {
                     statusView.setText(activityContext.getString(R.string.search_failed));
                 }
-                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
-                        activityContext.getString(R.string.search_failed), Toast.LENGTH_LONG);
+                if (null != activityContext && !activityContext.isFinishing()) {
+                    WiGLEToast.showOverActivity(activityContext, R.string.app_name,
+                            activityContext.getString(R.string.search_failed), Toast.LENGTH_LONG);
+                }
             } else if (msg.what == MSG_PARSE_FAILED) {
                 if (statusView != null) {
                     statusView.setText(activityContext.getString(R.string.search_empty));
                 }
-                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
-                        activityContext.getString(R.string.search_empty), Toast.LENGTH_LONG);
+                if (null != activityContext && !activityContext.isFinishing()) {
+                    WiGLEToast.showOverActivity(activityContext, R.string.app_name,
+                            activityContext.getString(R.string.search_empty), Toast.LENGTH_LONG);
+                }
             }
         }
     }

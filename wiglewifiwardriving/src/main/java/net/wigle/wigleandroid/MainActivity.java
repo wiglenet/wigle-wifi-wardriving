@@ -398,7 +398,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             });
 
             final Dialog dialog = iseDlgBuilder.create();
-            dialog.show();
+            if (!isFinishing()) {
+                dialog.show();
+            }
         } catch (IOException ex) {
             MainActivity.error("unable to implant mcc/mnc db", ex);
 
@@ -2720,7 +2722,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             });
             final Dialog dialog = iseDlgBuilder.create();
-            dialog.show();
+            if (!isFinishing()) {
+                dialog.show();
+            }
         }
         return safe;
     }

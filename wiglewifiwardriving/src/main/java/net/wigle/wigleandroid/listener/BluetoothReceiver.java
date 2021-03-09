@@ -32,6 +32,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -113,7 +114,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         DEVICE_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
-    private MainActivity mainActivity;
+    private final WeakReference<MainActivity> mainActivity;
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
     //TODO: this is pretty redundant with the central network list,
@@ -153,7 +154,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private Set<String> prevBtle = new HashSet<>();
 
     public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport) {
-        this.mainActivity = mainActivity;
+        this.mainActivity = new WeakReference<>(mainActivity);
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
 
@@ -343,11 +344,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     final String capabilities = DEVICE_TYPE_LEGEND.get(
                             bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
-                    final SharedPreferences prefs = mainActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                    //ALIBI: shamelessly re-using frequency here for device type.
-                    final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
-                            scanResult.getRssi(),
-                            NetworkType.BLE, location, prefs, batch);
+                    if (mainActivity.get() != null) {
+                        final SharedPreferences prefs = mainActivity.get()
+                                .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                        //ALIBI: shamelessly re-using frequency here for device type.
+                        final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
+                                scanResult.getRssi(),
+                                NetworkType.BLE, location, prefs, batch);
+                    }
                 }
             } catch (SecurityException se) {
                 MainActivity.warn("failing to perform BTLE scans: BT perms not granted", se);
@@ -417,12 +421,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (bluetoothAdapter != null) {
             bluetoothAdapter.cancelDiscovery();
 
-            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-            final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-
-            if (listAdapter != null && showCurrent) {
-                listAdapter.clearBluetoothLe();
-                listAdapter.clearBluetooth();
+            if (mainActivity.get() != null) {
+                final SharedPreferences prefs = mainActivity.get().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
+                if (listAdapter != null && showCurrent) {
+                    listAdapter.clearBluetoothLe();
+                    listAdapter.clearBluetooth();
+                }
             }
 
 
@@ -447,91 +452,93 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(final Context context, final Intent intent) {
-
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        if (null == intent) {
-            MainActivity.error("null intent in Bluetooth onReceive");
-            return;
-        }
-        final String action = intent.getAction();
-        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-
-            final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (device == null) {
-                // as reported in bug feed
-                MainActivity.error("onReceive with null device - discarding this instance");
+        final MainActivity m = mainActivity.get();
+        if (m != null) {
+            final SharedPreferences prefs = m.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            if (null == intent) {
+                MainActivity.error("null intent in Bluetooth onReceive");
                 return;
             }
-            latestBt.add(device.getAddress());
-            final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
-            int  rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI,Short.MIN_VALUE);
+            final String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 
-            final String bssid = device.getAddress();
-            final String ssid = device.getName();
+                final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device == null) {
+                    // as reported in bug feed
+                    MainActivity.error("onReceive with null device - discarding this instance");
+                    return;
+                }
+                latestBt.add(device.getAddress());
+                final BluetoothClass btClass = intent.getParcelableExtra(BluetoothDevice.EXTRA_CLASS);
+                int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
 
-            int type;
+                final String bssid = device.getAddress();
+                final String ssid = device.getName();
 
-            if (btClass == null && device != null) {
-                type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
-                        device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
-            } else {
-                type = btClass.getDeviceClass();
-            }
+                int type;
 
-            if (DEBUG_BLUETOOTH_DATA) {
-                String log = "BT deviceName: " + device.getName()
-                        + "\n\taddress: " + bssid
-                        + "\n\tname: " + ssid
-                        + "\n\tRSSI dBM: " + rssi
-                        + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
-                        + "("+type+")"
-                        + "\n\tbondState: " + device.getBondState();
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                    log += "\n\tuuids: " + device.getUuids();
+                if (btClass == null && device != null) {
+                    type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
+                            device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
+                } else {
+                    type = btClass.getDeviceClass();
                 }
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    log += "\n\ttype:" + device.getType();
+                if (DEBUG_BLUETOOTH_DATA) {
+                    String log = "BT deviceName: " + device.getName()
+                            + "\n\taddress: " + bssid
+                            + "\n\tname: " + ssid
+                            + "\n\tRSSI dBM: " + rssi
+                            + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
+                            + "(" + type + ")"
+                            + "\n\tbondState: " + device.getBondState();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                        log += "\n\tuuids: " + device.getUuids();
+                    }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                        log += "\n\ttype:" + device.getType();
+                    }
+
+                    MainActivity.info(log);
                 }
 
-                MainActivity.info(log);
-            }
-
-            final String capabilities = DEVICE_TYPE_LEGEND.get(type)
+                final String capabilities = DEVICE_TYPE_LEGEND.get(type)
                     /*+ " (" + device.getBluetoothClass().getMajorDeviceClass()
                     + ":" +device.getBluetoothClass().getDeviceClass() + ")"*/
-                    + ";" + device.getBondState();
-            final GPSListener gpsListener = mainActivity.getGPSListener();
+                        + ";" + device.getBondState();
+                final GPSListener gpsListener = m.getGPSListener();
 
-            Location location = null;
-            if (gpsListener != null) {
-                final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-                final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
-                gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                location = gpsListener.getLocation();
-            } else {
-                MainActivity.warn("null gpsListener in BTR onReceive");
+                Location location = null;
+                if (gpsListener != null) {
+                    final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
+                    final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+                    gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
+                    location = gpsListener.getLocation();
+                } else {
+                    MainActivity.warn("null gpsListener in BTR onReceive");
+                }
+
+                //ALIBI: shamelessly re-using frequency here for device type.
+                final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
+                sort(prefs);
+                if (listAdapter != null) listAdapter.notifyDataSetChanged();
+
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
+                //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
+                prevBt = Collections.synchronizedSet(new HashSet(latestBt));
+                latestBt.clear();
+
+                ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
+
+                final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
+                if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
+                ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
+                ListFragment.lameStatic.runBt = runNetworks.size();
+                sort(prefs);
+                if (listAdapter != null) listAdapter.notifyDataSetChanged();
             }
-
-            //ALIBI: shamelessly re-using frequency here for device type.
-            final Network network =  addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
-            sort(prefs);
-            if (listAdapter != null) listAdapter.notifyDataSetChanged();
-
-        } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
-            //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
-            prevBt = Collections.synchronizedSet(new HashSet(latestBt));
-            latestBt.clear();
-
-            ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
-
-            final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
-            if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
-            ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
-            ListFragment.lameStatic.runBt = runNetworks.size();
-            sort(prefs);
-            if (listAdapter != null) listAdapter.notifyDataSetChanged();
         }
     }
 
@@ -571,13 +578,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      */
     public void setupBluetoothTimer( final boolean turnedBtOn ) {
         MainActivity.info( "create Bluetooth timer" );
-        if ( bluetoothTimer == null ) {
+        final MainActivity m = mainActivity.get();
+        if ( bluetoothTimer == null) {
             bluetoothTimer = new Handler();
             final Runnable mUpdateTimeTask = new Runnable() {
                 @Override
                 public void run() {
                     // make sure the app isn't trying to finish
-                    if ( ! mainActivity.isFinishing() ) {
+                    if ( null != m && !m.isFinishing() ) {
                         // info( "timer start scan" );
                         // schedule a bluetooth scan
                         doBluetoothScan();
@@ -620,89 +628,89 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     public boolean doBluetoothScan() {
         boolean success = false;
+        final MainActivity m = mainActivity.get();
+        if (null != m) {
+            if (m.isScanning()) {
+                if (!scanInFlight) {
+                    try {
+                        m.bluetoothScan();
+                        //bluetoothManager.startScan();
+                    } catch (Exception ex) {
+                        MainActivity.warn("exception starting bt scan: " + ex, ex);
+                    }
+                    if (success) {
+                        scanInFlight = true;
+                    }
+                }
 
-        if (mainActivity.isScanning()) {
-            if ( ! scanInFlight ) {
-                try {
-                    mainActivity.bluetoothScan();
-                            //bluetoothManager.startScan();
+                final long now = System.currentTimeMillis();
+                if (lastScanResponseTime < 0) {
+                    // use now, since we made a request
+                    lastScanResponseTime = now;
+                } else {
+                    // are we seeing jams?
                 }
-                catch (Exception ex) {
-                    MainActivity.warn("exception starting bt scan: " + ex, ex);
-                }
-                if ( success ) {
-                    scanInFlight = true;
-                }
-            }
-
-            final long now = System.currentTimeMillis();
-            if ( lastScanResponseTime < 0 ) {
-                // use now, since we made a request
-                lastScanResponseTime = now;
             } else {
-                // are we seeing jams?
+                // scanning is off. since we're the only timer, update the UI
+                m.setNetCountUI();
+                m.setLocationUI();
+                m.setStatusUI("Scanning Turned Off");
+                // keep the scan times from getting huge
+                scanRequestTime = System.currentTimeMillis();
+                // reset this
+                lastScanResponseTime = Long.MIN_VALUE;
             }
-        } else {
-            // scanning is off. since we're the only timer, update the UI
-            mainActivity.setNetCountUI();
-            mainActivity.setLocationUI();
-            mainActivity.setStatusUI("Scanning Turned Off" );
-            // keep the scan times from getting huge
-            scanRequestTime = System.currentTimeMillis();
-            // reset this
-            lastScanResponseTime = Long.MIN_VALUE;
-        }
+            // battery kill
+            if ( ! m.isTransferring() ) {
+                final SharedPreferences prefs = m.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+                long batteryKill = prefs.getLong(
+                        ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
 
-        // battery kill
-        if ( ! mainActivity.isTransferring() ) {
-            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-            long batteryKill = prefs.getLong(
-                    ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
-
-            if ( mainActivity.getBatteryLevelReceiver() != null ) {
-                final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
-                final int batteryStatus = mainActivity.getBatteryLevelReceiver().getBatteryStatus();
-                // MainActivity.info("batteryStatus: " + batteryStatus);
-                // give some time since starting up to change this configuration
-                if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
+                if ( m.getBatteryLevelReceiver() != null ) {
+                    final int batteryLevel = m.getBatteryLevelReceiver().getBatteryLevel();
+                    final int batteryStatus = m.getBatteryLevelReceiver().getBatteryStatus();
+                    // MainActivity.info("batteryStatus: " + batteryStatus);
+                    // give some time since starting up to change this configuration
+                    if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
                         && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
                         && (System.currentTimeMillis() - constructionTime) > 30000L) {
-                    if (null != mainActivity) {
-                        final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
-                                + mainActivity.getString(R.string.battery_postfix);
-                        if (!mainActivity.isFinishing()) {
-                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
+                        final String text = m.getString(R.string.battery_at) + " " + batteryLevel + " "
+                                + m.getString(R.string.battery_postfix);
+                        if (!m.isFinishing()) {
+                            WiGLEToast.showOverActivity(m, R.string.error_general, text);
                         }
                         MainActivity.warn("low battery, shutting down");
-                        mainActivity.speak(text);
-                        mainActivity.finishSoon(4000L, false);
+                        m.speak(text);
+                        m.finishSoon(4000L, false);
                     }
                 }
             }
         }
-
         return success;
     }
 
     public long getScanPeriod() {
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-
-        String scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD;
-        long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
-        // if over 5 mph
-        Location location = null;
-        final GPSListener gpsListener = mainActivity.getGPSListener();
-        if (gpsListener != null) {
-            location = gpsListener.getLocation();
+        final MainActivity m = mainActivity.get();
+        if (null != m) {
+            final SharedPreferences prefs = m.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            String scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD;
+            long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
+            // if over 5 mph
+            Location location = null;
+            final GPSListener gpsListener = m.getGPSListener();
+            if (gpsListener != null) {
+                location = gpsListener.getLocation();
+            }
+            if (location != null && location.getSpeed() >= 2.2352f) {
+                scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_FAST;
+                defaultRate = MainActivity.OG_BT_SCAN_FAST_DEFAULT;
+            } else if (location == null || location.getSpeed() < 0.1f) {
+                scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_STILL;
+                defaultRate = MainActivity.OG_BT_SCAN_STILL_DEFAULT;
+            }
+            return prefs.getLong(scanPref, defaultRate);
         }
-        if ( location != null && location.getSpeed() >= 2.2352f ) {
-            scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_FAST;
-            defaultRate = MainActivity.OG_BT_SCAN_FAST_DEFAULT;
-        } else if ( location == null || location.getSpeed() < 0.1f ) {
-            scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_STILL;
-            defaultRate = MainActivity.OG_BT_SCAN_STILL_DEFAULT;
-        }
-        return prefs.getLong( scanPref, defaultRate );
+        return 0L;
     }
 
     private Network addOrUpdateBt(final String bssid, final String ssid,
@@ -773,8 +781,9 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         }
 
+        final MainActivity m = mainActivity.get();
         final boolean ssidSpeak = prefs.getBoolean(ListFragment.PREF_SPEAK_SSID, false)
-                && !mainActivity.isMuted();
+                && null != m && !m.isMuted();
 
         if (newForRun) {
             // ALIBI: There are simply a lot of these - not sure this is practical
@@ -790,53 +799,54 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             network.setLatLng( LatLng );
         }
 
-        final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
-        final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS );
-        final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_LOG_ADDRS );
 
-        //Update display
-        if (listAdapter != null) {
-            if (btTypeUpdate) {
-                listAdapter.morphBluetoothToLe(network);
-            }
-            if ( showCurrent || newForRun ) {
-                if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
-                    if (batch) {
-                        if (NetworkType.BT.equals(network.getType())) {
-                            listAdapter.enqueueBluetooth(network);
-                        } else if (NetworkType.BLE.equals(network.getType())) {
-                            listAdapter.enqueueBluetoothLe(network);
-                        }
-                    } else {
-                        if (NetworkType.BT.equals(network.getType())) {
-                            listAdapter.addBluetooth(network);
-                        } else if (NetworkType.BLE.equals(network.getType())) {
-                            listAdapter.addBluetoothLe(network);
+        final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
+        if (null != m) {
+            final Matcher bssidMatcher = m.getBssidFilterMatcher(ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+            final Matcher bssidDbMatcher = m.getBssidFilterMatcher(ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+            //Update display
+            if (listAdapter != null) {
+                if (btTypeUpdate) {
+                    listAdapter.morphBluetoothToLe(network);
+                }
+                if (showCurrent || newForRun) {
+                    if (FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network)) {
+                        if (batch) {
+                            if (NetworkType.BT.equals(network.getType())) {
+                                listAdapter.enqueueBluetooth(network);
+                            } else if (NetworkType.BLE.equals(network.getType())) {
+                                listAdapter.enqueueBluetoothLe(network);
+                            }
+                        } else {
+                            if (NetworkType.BT.equals(network.getType())) {
+                                listAdapter.addBluetooth(network);
+                            } else if (NetworkType.BLE.equals(network.getType())) {
+                                listAdapter.addBluetoothLe(network);
+                            }
                         }
                     }
+
+                } else {
+                    network.setLevel(strength != Integer.MAX_VALUE ? strength : -113);
                 }
-
+            }
+            //Store to DB
+            boolean matches = false;
+            if (bssidDbMatcher != null) {
+                bssidDbMatcher.reset(network.getBssid());
+                matches = bssidDbMatcher.find();
+            }
+            if ( location != null ) {
+                // w/ location
+                if (!matches) {
+                    dbHelper.addObservation(network, location, newForRun, deviceTypeUpdate, btTypeUpdate);
+                }
             } else {
-                network.setLevel(strength != Integer.MAX_VALUE?strength:-113);
-            }
-        }
-
-        //Store to DB
-        boolean matches = false;
-        if (bssidDbMatcher != null) {
-            bssidDbMatcher.reset(network.getBssid());
-            matches = bssidDbMatcher.find();
-        }
-        if ( location != null ) {
-            // w/ location
-            if (!matches) {
-                dbHelper.addObservation(network, location, newForRun, deviceTypeUpdate, btTypeUpdate);
-            }
-        } else {
-            // bob asks "since BT are often indoors, should we be saving regardless of loc?"
-            // w/out location
-            if (!matches) {
-                dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);
+                // bob asks "since BT are often indoors, should we be saving regardless of loc?"
+                // w/out location
+                if (!matches) {
+                    dbHelper.pendingObservation(network, newForRun, deviceTypeUpdate, btTypeUpdate);
+                }
             }
         }
         return network;

@@ -65,6 +65,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -597,6 +598,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 super.onDrawerOpened(drawerView);
                 final ActionBar actionBar = getSupportActionBar();
                 if (actionBar != null) actionBar.setTitle("Menu");
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethodManager != null && getCurrentFocus() != null) {
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    View current = getCurrentFocus();
+                    if (null != current) {
+                        current.clearFocus();
+                    }
+                }
             }
         };
         // Set the drawer toggle as the DrawerListener

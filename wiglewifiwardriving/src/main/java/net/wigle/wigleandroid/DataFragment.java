@@ -131,7 +131,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
                 }
                 if (fail != null) {
-                    // toast!
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     // start db result activity

@@ -901,10 +901,8 @@ public class WifiReceiver extends BroadcastReceiver {
                     MainActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
                     if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
                         final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
-                        if (!disableToast &&  null != mainActivity && !mainActivity.isFinishing()) {
-                            if (null != mainActivity && !mainActivity.isFinishing()) {
-                                WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed));
-                            }
+                        if (!disableToast) {
+                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed));
                         }
                         scanInFlight = false;
                         try {
@@ -952,9 +950,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     if (null != mainActivity) {
                         final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
                             + mainActivity.getString(R.string.battery_postfix);
-                        if (!mainActivity.isFinishing()) {
-                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
-                        }
+                        WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
                         MainActivity.warn("low battery, shutting down");
                         mainActivity.speak(text);
                         mainActivity.finishSoon(4000L, false);

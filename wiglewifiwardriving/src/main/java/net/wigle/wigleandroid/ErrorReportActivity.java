@@ -96,7 +96,9 @@ public class ErrorReportActivity extends AppCompatActivity {
                         } });
 
                     try {
-                        ad.show();
+                        if (!isFinishing()) {
+                            ad.show();
+                        }
                     }
                     catch ( WindowManager.BadTokenException windowEx ) {
                         MainActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );

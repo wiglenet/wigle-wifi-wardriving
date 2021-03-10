@@ -1,11 +1,11 @@
 package net.wigle.wigleandroid;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,8 +46,7 @@ public class SearchFragment extends Fragment {
         MainActivity.info("SEARCH: onCreateView. orientation: " + orientation);
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.search_nets, container, false);
 
-        final SharedPreferences prefs = getActivity().getApplicationContext().
-                getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+
 
         if (ListFragment.lameStatic.queryArgs != null) {
             for (final int id : new int[]{R.id.query_address, R.id.query_ssid, R.id.query_bssid}) {
@@ -64,7 +63,10 @@ public class SearchFragment extends Fragment {
             }
         }
 
-        if ((prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty()) || !TokenAccess.hasApiToken(prefs)) {
+        final Activity a = getActivity();
+        final SharedPreferences prefs = (null != a)?a.getApplicationContext().
+                getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
+        if ((null == prefs || prefs.getString(ListFragment.PREF_AUTHNAME, "").isEmpty()) || !TokenAccess.hasApiToken(prefs)) {
             RadioButton rb = scrollView.findViewById(R.id.radio_search_local);
             if (null != rb) {
                 rb.setChecked(true);
@@ -86,7 +88,6 @@ public class SearchFragment extends Fragment {
                 rb.setChecked(true);
             }
         }
-
         setupQueryButtons( scrollView );
         return scrollView;
 
@@ -94,7 +95,7 @@ public class SearchFragment extends Fragment {
 
 
     private void setupQueryButtons( final View view ) {
-        Button button = (Button) view.findViewById( R.id.search_button );
+        Button button = view.findViewById( R.id.search_button );
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View buttonView) {
@@ -105,9 +106,8 @@ public class SearchFragment extends Fragment {
 
                 final String fail = SearchUtil.setupQuery(view, getActivity(), local);
 
-                final FragmentActivity a = getActivity();
-                if (fail != null && null != a && !a.isFinishing()) {
-                    WiGLEToast.showOverFragment(a, R.string.error_general, fail);
+                if (fail != null) {
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(!local);
                     final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
@@ -117,7 +117,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        button = (Button) view.findViewById( R.id.reset_button );
+        button = view.findViewById( R.id.reset_button );
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View buttonView) {

@@ -1914,9 +1914,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 activationMessages += getString(R.string.turn_on_wifi);
             }
             // tell user, cuz this takes a little while
-            if (!isFinishing() && !activationMessages.isEmpty()) {
-                WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
-            }
+            WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
         }
     }
 
@@ -1933,7 +1931,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // warn about turning off network notification
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
-        if ("1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
+        if ("1".equals(notifOn) && state.wifiReceiver == null) {
             WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
         }
 
@@ -1956,11 +1954,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (!isFinishing()) {
-                            WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
-                                    getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
-                            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                        }
+                        WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
+                                getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
+                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     }
                 }, 3000);
             }
@@ -2215,9 +2211,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // check if there is a gps
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
-            if (locProvider == null && !isFinishing()) {
+            if (locProvider == null) {
                 WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.no_gps_device), Toast.LENGTH_LONG);
-            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER) && !isFinishing()) {
+            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
                 // gps exists, but isn't on
                 WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_gps), Toast.LENGTH_LONG);
 

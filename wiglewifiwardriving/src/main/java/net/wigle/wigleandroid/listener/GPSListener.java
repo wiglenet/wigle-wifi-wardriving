@@ -305,12 +305,10 @@ public class GPSListener implements Listener, LocationListener {
                     + " newLocation: " + newLocation );
 
             final boolean disableToast = prefs.getBoolean( ListFragment.PREF_DISABLE_TOAST, false );
-            if (!disableToast && null != mainActivity && !mainActivity.isFinishing()) {
+            if (!disableToast) {
                 final String announce = location == null ? mainActivity.getString(R.string.lost_location)
                         : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
-                if (null != mainActivity && ! mainActivity.isFinishing()) {
-                    WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
-                }
+                WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
             }
 
             final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );

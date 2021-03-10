@@ -34,7 +34,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -193,10 +192,7 @@ public final class MappingFragment extends Fragment {
                 MainActivity.error("security exception oncreateview map: " + ex, ex);
             }
         } else {
-            final FragmentActivity a = getActivity();
-            if (null != a && !a.isFinishing()) {
-                WiGLEToast.showOverFragment(a, R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
-            }
+            WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
         }
         MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
@@ -215,7 +211,7 @@ public final class MappingFragment extends Fragment {
 
     private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
         // view
-        final RelativeLayout rlView = (RelativeLayout) view.findViewById(R.id.map_rl);
+        final RelativeLayout rlView = view.findViewById(R.id.map_rl);
 
         if (mapView != null) {
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
@@ -224,7 +220,8 @@ public final class MappingFragment extends Fragment {
         }
 
         // conditionally replace the tile source
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Activity a = getActivity();
+        final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
         final boolean visualizeRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
         rlView.addView(mapView);
         // guard against not having google play services
@@ -366,13 +363,10 @@ public final class MappingFragment extends Fragment {
 
                             try {
                                 final byte[] data = downloadData(new URL(s), userAgent, authToken);
-                                if (data != null) {
-                                    return new Tile(providerTileRes, providerTileRes, data);
-                                }
+                                return new Tile(providerTileRes, providerTileRes, data);
                             } catch (MalformedURLException e) {
                                 throw new AssertionError(e);
                             }
-                            return null;
                         }
 
                         /*
@@ -573,12 +567,12 @@ public final class MappingFragment extends Fragment {
                                     routePolyline.setColor(getRouteColorForMapType(mapMode));
 
                                     if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
-                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+                                        Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_COARSE, false);
                                         routePolyline.setPoints(Arrays.asList(simplified));
                                         MainActivity.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
                                     } else if (routePoints.size() > 1) {
-                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+                                        Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_FINE, true);
                                         routePolyline.setPoints(Arrays.asList(simplified));
                                         MainActivity.error("minor route simplification: "+routePoints.size()+"->"+simplified.length);
@@ -917,27 +911,19 @@ public final class MappingFragment extends Fragment {
                         switch (newMapType) {
                             case GoogleMap.MAP_TYPE_NORMAL:
                                 newMapType = GoogleMap.MAP_TYPE_SATELLITE;
-                                if (null != a && !a.isFinishing()) {
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
-                                }
+                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_SATELLITE:
                                 newMapType = GoogleMap.MAP_TYPE_HYBRID;
-                                if (null != a && !a.isFinishing()) {
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
-                                }
+                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_HYBRID:
                                 newMapType = GoogleMap.MAP_TYPE_TERRAIN;
-                                if (null != a && !a.isFinishing()) {
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
-                                }
+                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
                                 break;
                             case GoogleMap.MAP_TYPE_TERRAIN:
                                 newMapType = GoogleMap.MAP_TYPE_NORMAL;
-                                if (null != a && !a.isFinishing()) {
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
-                                }
+                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
                                 break;
                             default:
                                 MainActivity.error("unhandled mapType: " + newMapType);
@@ -1015,7 +1001,7 @@ public final class MappingFragment extends Fragment {
                 }
             } );
 
-            Button cancel = (Button) view.findViewById( R.id.cancel_button );
+            Button cancel = view.findViewById( R.id.cancel_button );
             cancel.setOnClickListener( new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {
@@ -1100,7 +1086,7 @@ public final class MappingFragment extends Fragment {
             ListFragment.lameStatic.dbHelper.addToQueue( request );
         }
     }
-    private static PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {
+    private static final PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {
         @Override
         public double getX(LatLng point) {
             return point.latitude * 1000000;

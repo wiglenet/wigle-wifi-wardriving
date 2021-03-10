@@ -676,9 +676,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         && (System.currentTimeMillis() - constructionTime) > 30000L) {
                         final String text = m.getString(R.string.battery_at) + " " + batteryLevel + " "
                                 + m.getString(R.string.battery_postfix);
-                        if (!m.isFinishing()) {
-                            WiGLEToast.showOverActivity(m, R.string.error_general, text);
-                        }
+                        WiGLEToast.showOverActivity(m, R.string.error_general, text);
                         MainActivity.warn("low battery, shutting down");
                         m.speak(text);
                         m.finishSoon(4000L, false);

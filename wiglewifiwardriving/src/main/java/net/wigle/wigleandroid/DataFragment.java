@@ -131,10 +131,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
                 }
                 if (fail != null) {
-                    final FragmentActivity a = getActivity();
-                    if (null != a && !a.isFinishing()) {
-                        WiGLEToast.showOverFragment(a, R.string.error_general, fail);
-                    }
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     // start db result activity
                     final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
@@ -521,22 +518,16 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             case EXPORT_M8B_DIALOG: {
                 if (!exportM8bFile()) {
                     MainActivity.warn("Failed to export m8b.");
-                    final FragmentActivity a = getActivity();
-                    if (null != a && !a.isFinishing()) {
-                        WiGLEToast.showOverFragment(a, R.string.error_general,
-                                getString(R.string.m8b_failed));
-                    }
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
+                            getString(R.string.m8b_failed));
                 }
                 break;
             }
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile()) {
                     MainActivity.warn("Failed to export gpx.");
-                    final FragmentActivity a = getActivity();
-                    if (null != a && !a.isFinishing()) {
-                        WiGLEToast.showOverFragment(a, R.string.error_general,
-                                getString(R.string.gpx_failed));
-                    }
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
+                            getString(R.string.gpx_failed));
                 }
                 break;
             }
@@ -740,12 +731,9 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             new AsyncGpxExportTask().execute(totalRoutePoints);
         } else {
             MainActivity.error("no points to create route");
-            final FragmentActivity a = getActivity();
-            if (null != a && !a.isFinishing()) {
-                WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,
-                        getString(R.string.gpx_no_points));
-                //NO POINTS
-            }
+            WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,
+                    getString(R.string.gpx_no_points));
+            //NO POINTS
         }
         return true;
     }

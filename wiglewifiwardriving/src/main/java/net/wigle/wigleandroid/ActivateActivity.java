@@ -66,7 +66,7 @@ public class ActivateActivity extends Activity {
 
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
-        cameraView = (SurfaceView)findViewById(R.id.camera_view);
+        cameraView = findViewById(R.id.camera_view);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.e(LOG_TAG, "Attempt to initialize camera capture with a pre-SDKv23 client");
             return;
@@ -77,9 +77,7 @@ public class ActivateActivity extends Activity {
                         .build();
         if (!barcodeDetector.isOperational()) {
             //ALIBI: this *should* be unreachable, but the diversity of android devices and implementation can make this happen
-            if (!isFinishing()) {
-                WiGLEToast.showOverActivity(this, R.string.error_general, getString(R.string.no_barcode_support_text));
-            }
+            WiGLEToast.showOverActivity(this, R.string.error_general, getString(R.string.no_barcode_support_text));
             Log.e(LOG_TAG, "Barcode detection not available on this device.");
             this.finish();
         } else {

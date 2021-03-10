@@ -1914,7 +1914,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 activationMessages += getString(R.string.turn_on_wifi);
             }
             // tell user, cuz this takes a little while
-            WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
+            if (!activationMessages.isEmpty()) {
+                WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
+            }
         }
     }
 

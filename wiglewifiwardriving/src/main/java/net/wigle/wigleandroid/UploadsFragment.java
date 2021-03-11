@@ -291,10 +291,10 @@ public class UploadsFragment extends Fragment {
                         uploadsListAdapter.add(upload);
                     }
                 }
+                final SwipeRefreshLayout swipeRefreshLayout =
+                        view.findViewById(R.id.uploads_swipe_container);
+                swipeRefreshLayout.setRefreshing(false);
             }
-            final SwipeRefreshLayout swipeRefreshLayout =
-                    view.findViewById(R.id.uploads_swipe_container);
-            swipeRefreshLayout.setRefreshing(false);
         }
     }
 

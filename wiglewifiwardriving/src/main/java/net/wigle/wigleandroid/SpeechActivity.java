@@ -41,19 +41,19 @@ public class SpeechActivity extends AppCompatActivity {
         this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
 
         final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        doCheckbox( prefs, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS );
-        doCheckbox( prefs, R.id.speech_run, ListFragment.PREF_SPEAK_RUN );
-        doCheckbox( prefs, R.id.speech_new_wifi, ListFragment.PREF_SPEAK_NEW_WIFI );
-        doCheckbox( prefs, R.id.speech_new_cell, ListFragment.PREF_SPEAK_NEW_CELL );
-        doCheckbox( prefs, R.id.speech_queue, ListFragment.PREF_SPEAK_QUEUE );
-        doCheckbox( prefs, R.id.speech_miles, ListFragment.PREF_SPEAK_MILES );
-        doCheckbox( prefs, R.id.speech_time, ListFragment.PREF_SPEAK_TIME );
-        doCheckbox( prefs, R.id.speech_battery, ListFragment.PREF_SPEAK_BATTERY );
-        doCheckbox( prefs, R.id.speech_ssid, ListFragment.PREF_SPEAK_SSID, false );
-        doCheckbox( prefs, R.id.speech_wifi_restart, ListFragment.PREF_SPEAK_WIFI_RESTART );
+        doTtsCheckbox( prefs, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS );
+        doTtsCheckbox( prefs, R.id.speech_run, ListFragment.PREF_SPEAK_RUN );
+        doTtsCheckbox( prefs, R.id.speech_new_wifi, ListFragment.PREF_SPEAK_NEW_WIFI );
+        doTtsCheckbox( prefs, R.id.speech_new_cell, ListFragment.PREF_SPEAK_NEW_CELL );
+        doTtsCheckbox( prefs, R.id.speech_queue, ListFragment.PREF_SPEAK_QUEUE );
+        doTtsCheckbox( prefs, R.id.speech_miles, ListFragment.PREF_SPEAK_MILES );
+        doTtsCheckbox( prefs, R.id.speech_time, ListFragment.PREF_SPEAK_TIME );
+        doTtsCheckbox( prefs, R.id.speech_battery, ListFragment.PREF_SPEAK_BATTERY );
+        doTtsCheckbox( prefs, R.id.speech_ssid, ListFragment.PREF_SPEAK_SSID, false );
+        doTtsCheckbox( prefs, R.id.speech_wifi_restart, ListFragment.PREF_SPEAK_WIFI_RESTART );
 
         // speech spinner
-        Spinner spinner = (Spinner) findViewById(R.id.speak_spinner );
+        Spinner spinner = findViewById(R.id.speak_spinner );
         //TODO: this may no longer be necessary
         if (MainActivity.getMainActivity() == null || MainActivity.getStaticState().tts == null) {
             // no text to speech :(
@@ -79,12 +79,12 @@ public class SpeechActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void doCheckbox( final SharedPreferences prefs, final int id, final String pref ) {
-        doCheckbox( prefs, id, pref, true );
+    private void doTtsCheckbox(final SharedPreferences prefs, final int id, final String pref ) {
+        doTtsCheckbox( prefs, id, pref, true );
     }
 
-    private void doCheckbox( final SharedPreferences prefs, final int id, final String pref, final boolean defaultVal ) {
-        final CheckBox box = (CheckBox) findViewById( id );
+    private void doTtsCheckbox(final SharedPreferences prefs, final int id, final String pref, final boolean defaultVal ) {
+        final CheckBox box = findViewById( id );
         box.setChecked( prefs.getBoolean( pref, defaultVal ) );
         box.setOnCheckedChangeListener( new OnCheckedChangeListener() {
             @Override
@@ -92,6 +92,12 @@ public class SpeechActivity extends AppCompatActivity {
                 final Editor editor = prefs.edit();
                 editor.putBoolean( pref, isChecked );
                 editor.apply();
+                if (!isChecked) {
+                    MainActivity m = MainActivity.getMainActivity();
+                    if (null != m && !m.isFinishing()) {
+                        m.interruptSpeak();
+                    }
+                }
             }
         });
     }

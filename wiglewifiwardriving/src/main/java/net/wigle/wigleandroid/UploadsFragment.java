@@ -105,8 +105,7 @@ public class UploadsFragment extends Fragment {
     private static final int ROW_COUNT = 100;
 
     private int currentPage = 0;
-    private final ArrayList<Parcelable> resultList = new ArrayList<>(ROW_COUNT);
-    private AtomicBoolean busy = new AtomicBoolean(false);
+    private final AtomicBoolean busy = new AtomicBoolean(false);
 
     private static final String[] ALL_ROW_KEYS = new String[] {
             KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_PERCENT_DONE, KEY_FILE_SIZE
@@ -182,7 +181,9 @@ public class UploadsFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                resultList.clear();
+                if (null != listAdapter) {
+                    listAdapter.clear();
+                }
                 downloadUploads(0);
             }
         });
@@ -272,28 +273,28 @@ public class UploadsFragment extends Fragment {
             final Bundle bundle = msg.getData();
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            // MainActivity.info("handleMessage. results: " + results);
+
+            //DEBUG: MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null) {
                 TextView tv = view.findViewById(R.id.queue_depth);
                 final String queueDepthTitle = resources.getString(R.string.queue_depth);
                 tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
-
-                uploadsListAdapter.clear();
-                for (final Parcelable result : results) {
-                    if (result instanceof Bundle) {
-                        final Bundle row = (Bundle) result;
-                        final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_BT_GPS),
-                                row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
-                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
-                                row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
-                        uploadsListAdapter.add(upload);
+                    uploadsListAdapter.clear();
+                    for (final Parcelable result : results) {
+                        if (result instanceof Bundle) {
+                            final Bundle row = (Bundle) result;
+                            final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
+                                    row.getLong(KEY_TOTAL_BT_GPS),
+                                    row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
+                                    row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
+                                    row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
+                            uploadsListAdapter.add(upload);
+                        }
                     }
-                }
-                final SwipeRefreshLayout swipeRefreshLayout =
-                        view.findViewById(R.id.uploads_swipe_container);
-                swipeRefreshLayout.setRefreshing(false);
             }
+            final SwipeRefreshLayout swipeRefreshLayout =
+                    view.findViewById(R.id.uploads_swipe_container);
+            swipeRefreshLayout.setRefreshing(false);
         }
     }
 
@@ -308,6 +309,7 @@ public class UploadsFragment extends Fragment {
         final Bundle bundle = new Bundle();
         try {
             final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
+            final ArrayList<Parcelable> resultList = new ArrayList<>(ROW_COUNT);
             List<File> filesOnDevice = FileUtility.getCsvUploadsAndDownloads(getContext());
             for (int i = 0; i < list.length(); i++) {
                 final JSONObject row = list.getJSONObject(i);

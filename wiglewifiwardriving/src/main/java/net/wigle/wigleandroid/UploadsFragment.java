@@ -279,18 +279,18 @@ public class UploadsFragment extends Fragment {
                 TextView tv = view.findViewById(R.id.queue_depth);
                 final String queueDepthTitle = resources.getString(R.string.queue_depth);
                 tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
-                    uploadsListAdapter.clear();
-                    for (final Parcelable result : results) {
-                        if (result instanceof Bundle) {
-                            final Bundle row = (Bundle) result;
-                            final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
-                                    row.getLong(KEY_TOTAL_BT_GPS),
-                                    row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
-                                    row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
-                                    row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
-                            uploadsListAdapter.add(upload);
-                        }
+                uploadsListAdapter.clear();
+                for (final Parcelable result : results) {
+                    if (result instanceof Bundle) {
+                        final Bundle row = (Bundle) result;
+                        final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
+                                row.getLong(KEY_TOTAL_BT_GPS),
+                                row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
+                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
+                                row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
+                        uploadsListAdapter.add(upload);
                     }
+                }
             }
             final SwipeRefreshLayout swipeRefreshLayout =
                     view.findViewById(R.id.uploads_swipe_container);

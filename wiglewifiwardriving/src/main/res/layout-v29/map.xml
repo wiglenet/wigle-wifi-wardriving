@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <RelativeLayout
+        android:id="@+id/map_rl"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="3dp"
+        style="@style/MapOverlay"
+        android:weightSum="21">
+        <TextView
+            android:id="@+id/stats_run"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_weight="4"
+            style="@style/StatColor"
+            android:text="@string/run" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4">
+            <ImageView
+                app:srcCompat="@drawable/ic_wifi_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run wifi"
+                android:paddingTop="3dp"
+                android:paddingLeft="1dp"
+                android:paddingRight="2dp"
+                android:text="wifi new vs run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_wifi"
+                android:textSize="15sp"
+                style="@style/WiFiColor" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4">
+            <ImageView
+                app:srcCompat="@drawable/ic_cell_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run cell"
+                android:paddingTop="3dp"
+                android:paddingLeft="1dp"
+                android:paddingRight="2dp"
+                android:text="cell new vs. run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_cell"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                android:text="@string/stats"
+                style="@style/CellColor" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/bt_list_total"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4">
+            <ImageView
+                app:srcCompat="@drawable/ic_bt_sm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run bluetooth"
+                android:paddingTop="3dp"
+                android:paddingLeft="1dp"
+                android:paddingRight="2dp"
+                android:text="bt new vs run"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_bt"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                style="@style/BtColor" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5">
+            <ImageView
+                android:src="@drawable/database"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="run DB"
+                android:paddingTop="3dp"
+                android:paddingLeft="1dp"
+                android:paddingRight="2dp"
+                android:text="database"
+                app:tint="?attr/colorControlNormal" />
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/stats_dbnets"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/nope"
+        android:layout_height="wrap_content"
+        android:paddingTop="40dp"
+        android:layout_alignParentRight="true">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_map"
+            android:textSize="24sp"
+            android:text="@string/mapless"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/info"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true">
+        <TextView
+            android:id="@+id/rundistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingLeft="13dp"
+            android:paddingRight="13dp"
+            android:textColor="#FFFF"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:background="#AA333333"/>
+        <View
+            android:layout_width="2dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="0dp" />
+    </LinearLayout>
+</RelativeLayout>

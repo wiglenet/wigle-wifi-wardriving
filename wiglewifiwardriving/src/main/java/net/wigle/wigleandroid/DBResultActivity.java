@@ -19,6 +19,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -138,7 +139,7 @@ public class DBResultActivity extends AppCompatActivity {
 
     private void setupList() {
         // not set by nonconfig retain
-        listAdapter = new SetNetworkListAdapter( getApplicationContext(), R.layout.row );
+        listAdapter = new SetNetworkListAdapter( this, R.layout.row );
         final ListView listView = (ListView) findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }

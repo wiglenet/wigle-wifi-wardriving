@@ -66,7 +66,7 @@ public class ActivateActivity extends Activity {
 
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
-        cameraView = (SurfaceView)findViewById(R.id.camera_view);
+        cameraView = findViewById(R.id.camera_view);
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             Log.e(LOG_TAG, "Attempt to initialize camera capture with a pre-SDKv23 client");
             return;

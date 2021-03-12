@@ -13,8 +13,10 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,9 +45,11 @@ import android.widget.TextView;
 //import com.google.android.gms.maps.MapView;
 //import com.google.android.gms.maps.MapsInitializer;
 //import com.google.android.gms.maps.OnMapReadyCallback;
+//import com.google.android.gms.maps.model.BitmapDescriptor;
 //import com.google.android.gms.maps.model.CameraPosition;
 //import com.google.android.gms.maps.model.CircleOptions;
 //import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
@@ -143,7 +147,12 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             tv = findViewById( R.id.na_signal );
             final int level = network.getLevel();
-            tv.setTextColor( NetworkListUtil.getSignalColor( level ) );
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                tv.setTextColor( NetworkListUtil.getTextColorForSignal(this, level));
+            } else {
+                tv.setTextColor( NetworkListUtil.getSignalColor( level, false) );
+            }
             tv.setText( Integer.toString( level ) );
 
             tv = findViewById( R.id.na_type );
@@ -280,28 +289,42 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
                 else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
-
+                    // ALIBI:  assumes all observations belong to one "cluster" w/ a single centroid.
+                    // we could check and perform multi-cluster here
+                    // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
+                    // but that seems less likely w/ one individual's observations
+//                    final LatLng estCentroid = computeBasicLocation(obsMap);
+//                    final int zoomLevel = computeZoom(obsMap, estCentroid);
 //                    mapView.getMapAsync(new OnMapReadyCallback() {
 //                        @Override
 //                        public void onMapReady(final GoogleMap googleMap) {
 //                            int count = 0;
+//                            int maxDistMeters = 0;
 //                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
 //                                final LatLng latLon = obs.getKey();
 //                                final int level = obs.getValue();
 //
+//                                // default to initial position
 //                                if (count == 0 && network.getLatLng() == null) {
 //                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
 //                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
 //                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //                                }
 //
-//                                googleMap.addCircle(new CircleOptions()
-//                                        .center(latLon)
-//                                        .radius(4)
-//                                        .fillColor(NetworkListUtil.getSignalColor(level, true))
-//                                        .strokeWidth(0)
-//                                        .zIndex(level));
+//                                BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
+//                                        getApplicationContext(), level);
+//
+//                                googleMap.addMarker(new MarkerOptions().icon(obsIcon)
+//                                        .position(latLon).zIndex(level));
 //                                count++;
+//                            }
+//                            // if we got a good centroid, display it and center on it
+//                            if (null != estCentroid && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+//                                //TODO: improve zoom based on obs distances?
+//                                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                        .target(estCentroid).zoom(zoomLevel).build();
+//                                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                                googleMap.addMarker(new MarkerOptions().position(estCentroid));
 //                            }
 //                            MainActivity.info("observation count: " + count);
 //                        }
@@ -332,6 +355,86 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 //            }
 //        });
 //        ListFragment.lameStatic.dbHelper.addToQueue( request );
+    }
+
+    private final LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
+        double latSum = 0.0;
+        double lonSum = 0.0;
+        double weightSum = 0.0;
+        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+            if (null != obs.getKey()) {
+                float cleanSignal = cleanSignal((float) obs.getValue());
+                final double latV = obs.getKey().latitude;
+                final double lonV = obs.getKey().longitude;
+                if (Math.abs(latV) > 0.01d && Math.abs(lonV) > 0.01d) { // 0 GPS-coord check
+                    cleanSignal *= cleanSignal;
+                    latSum += (obs.getKey().latitude * cleanSignal);
+                    lonSum += (obs.getKey().longitude * cleanSignal);
+                    weightSum += cleanSignal;
+                }
+            }
+        }
+        double trilateratedLatitude = 0;
+        double trilateratedLongitude = 0;
+        if (weightSum > 0) {
+            trilateratedLatitude = latSum / weightSum;
+            trilateratedLongitude = lonSum / weightSum;
+        }
+        return new LatLng(trilateratedLatitude, trilateratedLongitude);
+    }
+
+    private final int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
+        float maxDist = 0f;
+        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+            float[] res = new float[3];
+            Location.distanceBetween(centroid.latitude, centroid.longitude, obs.getKey().latitude, obs.getKey().longitude, res);
+            if(res[0] > maxDist) {
+                maxDist = res[0];
+            }
+        }
+        MainActivity.info("max dist: "+maxDist);
+        if (maxDist < 135) {
+            return 18;
+        } else if (maxDist < 275) {
+            return 17;
+        } else if (maxDist < 550) {
+            return 16;
+        } else if (maxDist < 1100) {
+            return 15;
+        } else if (maxDist < 2250) {
+            return 14;
+        } else if (maxDist < 4500) {
+            return 13;
+        } else if (maxDist < 9000) {
+            return 12;
+        } else if (maxDist < 18000) {
+            return 11;
+        } else if (maxDist < 36000) {
+            // ALiBI: cells can be this big.
+            return 10;
+        } else {
+            return DEFAULT_ZOOM;
+        }
+    }
+
+    /**
+     * optimistic signal weighting
+     * @param signal
+     * @return
+     */
+    public static float cleanSignal(Float signal) {
+        float signalMemo = signal;
+        if (signal == null || signal == 0f) {
+            return 100f;
+        } else if (signal >= -200 && signal < 0) {
+            signalMemo += 200f;
+        } else if (signal <= 0 || signal > 200) {
+            signalMemo = 100f;
+        }
+        if (signalMemo < 1f) {
+            signalMemo = 1f;
+        }
+        return signalMemo;
     }
 
     private void setupMap( final Network network, final Bundle savedInstanceState ) {

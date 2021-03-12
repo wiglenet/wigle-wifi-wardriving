@@ -6,6 +6,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -227,7 +228,10 @@ public class BackgroundGuiHandler extends Handler {
     private void showError(final FragmentManager fm, final Message msg, final Status status) {
         final BackgroundAlertDialog alertDialog = BackgroundAlertDialog.newInstance(msg, status);
         try {
-            alertDialog.show(fm, "background-dialog");
+            final Activity a = MainActivity.getMainActivity();
+            if (null != a && !a.isFinishing()) {
+                alertDialog.show(fm, "background-dialog");
+            }
         } catch (IllegalStateException ex) {
             MainActivity.warn("illegal state in background gui handler: ", ex);
         }

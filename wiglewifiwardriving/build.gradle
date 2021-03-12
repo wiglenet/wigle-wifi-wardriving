@@ -2,11 +2,10 @@ import groovy.sql.Sql
 
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
-apply plugin: 'groovyx.android'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
@@ -14,6 +13,7 @@ android {
         targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -54,33 +54,34 @@ ext {
 
 dependencies {
     // implementation project(':android-maps-utils')
-    implementation "androidx.core:core:1.1.0"
+    implementation "androidx.core:core:1.3.2"
     implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.1.0"
-    implementation "com.google.android.material:material:1.0.0"
+    implementation "androidx.appcompat:appcompat:1.2.0"
+    implementation "com.google.android.material:material:1.3.0"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.appcompat:appcompat:1.2.0"
     // implementation "com.google.android.gms:play-services-maps:17.0.0"
-    // implementation 'com.google.android.gms:play-services-vision:19.0.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    // implementation 'com.google.android.gms:play-services-vision:20.1.3'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.slf4j:slf4j-android:1.7.19'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
-    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'commons-io:commons-io:2.6'
     //TODO: MinAPI issue: implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.2.0'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'androidx.test:core:1.2.0'
+    testImplementation 'junit:junit:4.13'
+    testImplementation 'androidx.test:core:1.3.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
-    androidTestImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
 import groovy.json.JsonSlurper
+import java.sql.SQLException
 
 //TODO: this runs every time, which isn't optimal. just needs to run before build
 task downloadFile (type: Download) {
@@ -100,7 +101,7 @@ task createMccMncDB (dependsOn: 'downloadFile') {
         sqlcmds.collect{it.trim()}.findAll{!it.isEmpty() && !it.startsWith("--")}.each{
             try {
                 sql.execute(it)
-            } catch(java.sql.SQLException e) {
+            } catch(SQLException e) {
                 System.err << "Invalid SQL statement: " + it
                 e.printStackTrace(System.err)
                 throw new GradleException('Preformulated MCC/MNC Database SQL Failure.')
@@ -109,7 +110,7 @@ task createMccMncDB (dependsOn: 'downloadFile') {
     }
 
     delete outputMxcDbFile
-    def sql = groovy.sql.Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
+    def sql = Sql.newInstance("jdbc:sqlite:$outputMxcDbFile",'','','org.sqlite.JDBC')
     new File("$inputMxcSqlDir/").eachFileMatch(~/.*\.sql/) {loadScript(sql, it)}
     def inputFile = new File("$mxcDictionaryFile")
     def mccMap = new JsonSlurper().parseText(inputFile.text)

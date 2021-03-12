@@ -22,7 +22,6 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="#1A1A1A"
             android:id="@+id/inline_status_bar"
             android:visibility="gone"
             android:layout_alignParentBottom="true"
@@ -37,13 +36,11 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/inline_status_bar_frame">
+                android:layout_height="wrap_content">
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inline_status_bar_left"
                     android:layout_weight="6">
                     <TextView
                         android:id="@+id/inline_progress_status"
@@ -81,10 +78,13 @@
         android:layout_height="match_parent"
         android:layout_gravity="left|start"
         android:choiceMode="singleChoice"
-        android:background="#0000"
+        android:clipToPadding="false"
+        style="@style/NavDrawerStyle"
         app:menu="@menu/leftmenu"
-        app:itemTextColor="@color/drawer_item"
-        app:itemBackground="@drawable/drawer_item"
         app:itemTextAppearance="@style/NavigationDrawerStyle"
+        app:itemBackground="@drawable/drawer_item_background"
+        app:itemTextColor="@color/drawer_item_color"
+        app:itemIconTint="@color/drawer_item_color"
+        app:itemShapeFillColor="@color/nav_shape_selector"
     />
 </androidx.drawerlayout.widget.DrawerLayout>

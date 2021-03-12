@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/scrollview"
-	android:layout_width="fill_parent"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 <LinearLayout
 	android:id="@+id/linearlayout"
@@ -39,7 +38,6 @@
         />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/input_layout_uname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
@@ -159,7 +157,6 @@
             android:prompt="@string/battery_kill_text"
             />
         <TextView
-            android:id="@+id/battery_kill_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/battery_kill_text"
@@ -186,7 +183,6 @@
             android:ellipsize="end"
             />
         <TextView
-            android:id="@+id/language_text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/language_text"
@@ -196,7 +192,31 @@
             android:layout_gravity="left"
             />
     </LinearLayout>
-
+    <LinearLayout
+        android:id="@+id/theme_section"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        android:visibility="gone"
+        >
+        <Spinner android:id="@+id/theme_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/theme_settings_label"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/theme_settings_label"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -209,9 +229,7 @@
         android:layout_height="wrap_content"
         android:text="@string/circle_size_map" />
 
-    <include
-        android:id="@+id/maptileprefs_embed"
-        layout="@layout/map_tile_prefs" />
+    <include layout="@layout/map_tile_prefs" />
 
     <CheckBox android:id="@+id/enable_route_map_display"
         android:layout_width="fill_parent"
@@ -253,7 +271,6 @@
             />
         <!-- style="@style/mySpinnerItemStyle" -->
         <TextView
-            android:id="@+id/periodstill_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/periodstill_text"
@@ -280,7 +297,6 @@
             android:layout_gravity="top"
             />
         <TextView
-            android:id="@+id/period_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/period_text"
@@ -306,7 +322,6 @@
             android:prompt="@string/periodfast_text"
             />
         <TextView
-            android:id="@+id/periodfast_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/periodfast_text"
@@ -332,7 +347,6 @@
             android:prompt="@string/gps_text"
             />
         <TextView
-            android:id="@+id/gps_text"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:text="@string/gps_text"
@@ -358,7 +372,6 @@
             android:prompt="@string/reset_wifi_text"
             />
         <TextView
-            android:id="@+id/reset_wifi_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/reset_wifi_text"
@@ -384,7 +397,6 @@
             android:prompt="@string/settings_gps_timeout"
             />
         <TextView
-            android:id="@+id/gps_timeout_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/settings_gps_timeout"
@@ -410,7 +422,6 @@
             android:prompt="@string/settings_net_loc_timeout"
             />
         <TextView
-            android:id="@+id/net_loc_timeout_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/settings_net_loc_timeout"
@@ -436,7 +447,6 @@
             android:prompt="@string/quick_pause_text"
             />
         <TextView
-            android:id="@+id/quick_pause_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/quick_pause_text"
@@ -451,6 +461,25 @@
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"
     android:paddingTop="10dip" android:paddingBottom="10dip"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <TextView
+            android:id="@+id/app_version"
+            android:textSize="12sp"
+            style="@style/StatRankColor"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            android:layout_marginEnd="6dip"
+            android:layout_marginLeft="6dip"
+            android:layout_marginStart="6dip"/>
+    </LinearLayout>
 
 </LinearLayout>
 </ScrollView>

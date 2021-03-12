@@ -2,30 +2,30 @@ Title (30 characters):
 WiGLE Wifi Wardriving
 
 Promo (80 characters):
-Wardriving: netstumble, zobrazit bezdrátové sítě, nahrát do databáze WiGLE.
+Wardriving: netstumble, zobrazení bezdrátových sítí, nahrávání do databáze WiGLE.
 
 Description (4000 characters):
-WiGLE je open source wardriving aplikaci netstumble, displej a mapa nalezeno bezdrátové sítě a mobilní věže kdekoli na světě, snadno nahrát do databáze WiGLE.net. WiGLE byla zahájena v roce 2001 a nyní má více než 125 milionů sítě WiFi mapovány na celém světě.
+WiGLE je open source wardriving aplikace na netstumbling, zobrazování a mapování nalezených bezdrátových sítí a mobilních věží kdekoli na světě, které můžete snadno nahrát do databáze WiGLE.net. WiGLE byl zahájen v roce 2001 a nyní má zmapováno přes 125 milionů WiFi sítí na celém světě.
 
-• Konkurovat na globálním WiGLE žebříčku pro většinu sítí nacházejících se!
-• Export do CSV souborů na SD kartu (hodnoty oddělené čárkami)!
-• Export do KML souborů na SD kartě (importovat do Mapy Google/Earth)!
-• Audio a text-to-speech upozornění!
-• Lokální databáze sledovat nové sítě nalezeno!
+• Soutěžte na globálním WiGLE žebříčku o nejvíce nalezených sítí!
+• Export do CSV souboru na SD kartu (comma separated values)!
+• Export do KML souboru na SD kartu (lze importovat do Map Google/Google Earth)!
+• Audio a text-to-speech upozorňování!
+• Lokální databáze pro sledování nově nalezených sítí!
 • Real-time mapa nalezených sítí (OpenStreetMap)!
 • Můžete přesunout aplikaci na SD kartu!
-• Tlačítko "Ztlumit" okamžitě vypnout všechny zvukové/řeč!
-• Bluetooth GPS podporovat prostřednictvím modelových lokalit!
-• Žádné reklamy!
+• Tlačítko "Ztlumit" okamžitě vypne všechny zvuky a řečový výstup!
+• Podpora Bluetooth GPS prostřednictvím falešných lokalit!
+• Bez reklam!
 
-Poznámky k vydání: https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
+Poznámky k vydání (anglicky): https://github.com/wiglenet/wigle-wifi-wardriving/blob/master/TODO
 
-U WiFi a mobilní věže, které mají být mapovány, musíte čekat na vaše zařízení k určení aktuální polohy, pomocí GPS nebo umístění v síti.
-Na mapě: kruhy jsou WiFi, čtverce jsou mobilní věže. Světlé barvy jsou sítě neviděl, ty fialové jsou nové pro lokální databázi.
-Pokud máte problémy s přihlášením, nebo máte připomínky, pošlete nám e-mail na wigle-admin@wigle.net a budeme rádi pomohli.
-Potřebuje "Čte Telefon stát" za účelem zjistit, zda je telefonní hovor, ztlumit zvuk (zvuky a řeč).
-Soubory jsou k dispozici na pomoc s lidským překladem do neanglické jazyky. To bylo většinou mechanický překlad, protože samozřejmě nevím, všechny tyto jazyky. Můžete pomoci zlepšit situaci tím, že požadavky tahat na:
+Abyste mohli začít mapovat WiFi a mobilní věže, musíte počkat na určení polohy pomocí GPS nebo sítě.
+Na mapě: kruhy znázorňují WiFi, čtverce jsou mobilní věže. Světlé barvy jsou nenalezené sítě, fialové jsou v lokální databázi nové.
+Pokud máte problémy s přihlášením, nebo máte připomínky, pošlete nám e-mail (v angličtině) na wigle-admin@wigle.net a rádi pomůžeme.
+Aplikace potřebuje oprávnění "Číst stav telefonu", aby mohla detekovat telefonní hovor a ztlumit zvuky a řečový výstup.
+Jsou k dispozici soubory na pomoc s lidským překladem do neanglických jazyků. Toto je většinou mechanický překlad, protože samozřejmě neznáme všechny tyto jazyky. Můžete pomoci zlepšit situaci pull requestem na:
 https://github.com/wiglenet/wigle-wifi-wardriving/pulls
 nebo odesláním na wigle-admin@wigle.net.
 
-Mějte na klopýtnutí!
+Keep on stumbling!

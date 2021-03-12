@@ -10,12 +10,15 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import android.text.Editable;
@@ -489,8 +492,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
         });
 
-        final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es", "fi", "fr", "fy",
-                "he", "hi", "hu", "it", "ja", "ko", "nl", "no", "pl", "pt", "pt-rBR", "ru", "sv", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
+        final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
+                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ru", "sv",
+                "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
                 getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
                 getString(R.string.language_de), getString(R.string.language_es), getString(R.string.language_fi),
@@ -499,10 +503,18 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
                 getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
                 getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
-                getString(R.string.language_tr), getString(R.string.language_zh_cn),
+                getString(R.string.language_sw), getString(R.string.language_tr), getString(R.string.language_zh_cn),
                 getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
         SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
+
+        if (Build.VERSION.SDK_INT > 28) {
+            View theme = view.findViewById(R.id.theme_section);
+            theme.setVisibility(View.VISIBLE);
+            final Integer[] themes = new Integer[] {AppCompatDelegate.MODE_NIGHT_YES, AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM};
+            final String[] themeName = new String[]{getString(R.string.theme_dark_label), getString(R.string.theme_light_label), getString(R.string.theme_follow_label)};
+            SettingsUtil.doSpinner(R.id.theme_spinner, view, ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES, themes, themeName, getContext());
+        }
 
         final String off = getString(R.string.off);
         final String sec = " " + getString(R.string.sec);
@@ -537,6 +549,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
         SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
+        TextView appVersion = view.findViewById(R.id.app_version);
+        final String appName = getString(R.string.app_name);
+        if (null != appVersion) {
+            try {
+                String versionName = activity.getApplicationContext().getPackageManager().getPackageInfo(activity.getApplicationContext().getPackageName(), 0).versionName;
+                appVersion.setText(appName+" v."+versionName);
+            } catch (PackageManager.NameNotFoundException e) {
+                MainActivity.error("Unable to get version number: ",e);
+            }
+        }
     }
 
     private void updateRegister(final View view) {

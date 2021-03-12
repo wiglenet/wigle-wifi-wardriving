@@ -22,7 +22,6 @@
             android:layout_gravity="top"
             />
         <TextView
-            android:id="@+id/show_discovered_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/show_discovered"
@@ -51,7 +50,6 @@
             />
         <!-- style="@style/mySpinnerItemStyle" -->
         <TextView
-            android:id="@+id/show_discovered_since"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:text="@string/show_discovered_since"

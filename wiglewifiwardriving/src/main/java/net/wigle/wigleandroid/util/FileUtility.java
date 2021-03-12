@@ -100,6 +100,10 @@ public class FileUtility {
      * @return true if we can find it and we have permission
      */
     public static boolean hasSD() {
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.Q) {
+            // past android 10 external doesn't detect properly, but also isn't available
+            return false;
+        }
         File sdCard = new File(safeFilePath(Environment.getExternalStorageDirectory()) + "/");
         MainActivity.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
                 + " read: " + sdCard.canRead() + " write: " + sdCard.canWrite()

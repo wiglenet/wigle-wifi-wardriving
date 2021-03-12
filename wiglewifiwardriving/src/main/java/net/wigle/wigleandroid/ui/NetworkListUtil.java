@@ -20,8 +20,8 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+// import com.google.android.gms.maps.model.BitmapDescriptor;
+// import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
@@ -112,12 +112,12 @@ public class NetworkListUtil {
         return color;
     }
 
-    public static BitmapDescriptor getSignalBitmap(@NonNull Context context, final int level) {
+    /*public static BitmapDescriptor getSignalBitmap(@NonNull Context context, final int level) {
         int color = getSignalColor(level, true);
         return getBitmapFromVector(context, drawable.observation, color);
-    }
+    }*/
 
-    public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
+    /*public static BitmapDescriptor getBitmapFromVector(@NonNull Context context,
                                                        @DrawableRes int vectorResourceId,
                                                        @ColorInt int tintColor) {
 
@@ -140,7 +140,7 @@ public class NetworkListUtil {
         DrawableCompat.setTint(vectorDrawable, tintColor);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
+    }*/
 
     public static int getImage(final Network network) {
         int resource;

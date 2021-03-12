@@ -121,12 +121,13 @@
         android:layout_width="wrap_content"
         android:id="@+id/nope"
         android:layout_height="wrap_content"
+        android:paddingTop="40dp"
         android:layout_alignParentRight="true">
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/no_map"
-            android:textSize="32sp"
+            android:textSize="24sp"
             android:text="@string/mapless"
             />
     </LinearLayout>

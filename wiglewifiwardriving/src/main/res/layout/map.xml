@@ -113,13 +113,19 @@
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
-    <TextView
-        android:layout_width="fill_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/nope"
         android:layout_height="wrap_content"
-        android:id="@+id/no_map"
-        android:textSize="24sp"
-        android:text="@string/mapless"
-        />
+        android:layout_alignParentRight="true">
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_map"
+            android:textSize="32sp"
+            android:text="@string/mapless"
+            />
+    </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:id="@+id/info"

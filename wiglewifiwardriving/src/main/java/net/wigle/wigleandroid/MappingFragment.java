@@ -7,9 +7,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.Activity;
@@ -19,6 +21,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
@@ -32,7 +35,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 
-import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,6 +115,8 @@ public final class MappingFragment extends Fragment {
     public static final String MAP_DIALOG_PREFIX = "";
     public static LocationListener STATIC_LOCATION_LISTENER = null;
 
+    private NumberFormat numberFormat;
+
     static final int UPDATE_MAP_FILTER = 1;
 
     private static final int DEFAULT_ZOOM = 17;
@@ -146,8 +150,8 @@ public final class MappingFragment extends Fragment {
     private static final float POLYLINE_TOLERANCE_FINE = 50.0f;
 
     private static final float ROUTE_WIDTH = 20.0f;
-    private static final int DARK_ROUTE = Color.BLACK;
-    private static final int LIGHT_ROUTE = Color.parseColor("#F4D03F");
+    private static final int OVERLAY_DARK = Color.BLACK;
+    private static final int OVERLAY_LIGHT = Color.parseColor("#F4D03F");
 
 
 
@@ -161,6 +165,16 @@ public final class MappingFragment extends Fragment {
         MainActivity.setLocale(getActivity());
         finishing = new AtomicBoolean(false);
 
+        Configuration sysConfig = getResources().getConfiguration();
+        Locale locale = null;
+        if (null != sysConfig) {
+            locale = sysConfig.locale;
+        }
+        if (null == locale) {
+            locale = Locale.US;
+        }
+        numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMaximumFractionDigits(1);
         // media volume
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -179,7 +193,7 @@ public final class MappingFragment extends Fragment {
 //                MainActivity.error("security exception oncreateview map: " + ex, ex);
 //            }
 //        } else {
-//            WiGLEToast.showOverFragment(this.getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
+//            WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
 //        }
 //        MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
@@ -196,248 +210,245 @@ public final class MappingFragment extends Fragment {
         return view;
     }
 
-//    private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
-//        // view
-//        final RelativeLayout rlView = (RelativeLayout) view.findViewById(R.id.map_rl);
+//   private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
+//       // view
+//       final RelativeLayout rlView = view.findViewById(R.id.map_rl);
 //
-//        if (mapView != null) {
-//            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//            mapView.setLayoutParams(params);
-//        }
+//         if (mapView != null) {
+//             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+//                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//             mapView.setLayoutParams(params);
+//         }
 //
-//        // conditionally replace the tile source
-//        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-//        final boolean visualizeRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
-//        rlView.addView(mapView);
-//        // guard against not having google play services
-//        mapView.getMapAsync(new OnMapReadyCallback() {
-//            @Override
-//            public void onMapReady(final GoogleMap googleMap) {
-//                if (ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
-//                        android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-//                        || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
-//                        android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//                    googleMap.setMyLocationEnabled(true);
-//                }
+//         // conditionally replace the tile source
+//         final Activity a = getActivity();
+//         final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
+//         final boolean visualizeRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
+//         rlView.addView(mapView);
+//         // guard against not having google play services
+//         mapView.getMapAsync(new OnMapReadyCallback() {
+//             @Override
+//             public void onMapReady(final GoogleMap googleMap) {
+//                 if (ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+//                          android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+//                         || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
+//                         android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//                     googleMap.setMyLocationEnabled(true);
+//                 }
 //
-//                googleMap.setBuildingsEnabled(true);
-//                if (null != prefs) {
-//                    final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
-//                    googleMap.setTrafficEnabled(showTraffic);
-//                    final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-//                    googleMap.setMapType(mapType);
-//                } else {
-//                    googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-//                }
-//                mapRender = new MapRender(getActivity(), googleMap, false);
+//                 googleMap.setBuildingsEnabled(true);
+//                 if (null != prefs) {
+//                     final boolean showTraffic = prefs.getBoolean(ListFragment.PREF_MAP_TRAFFIC, true);
+//                     googleMap.setTrafficEnabled(showTraffic);
+//                     final int mapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                     googleMap.setMapType(mapType);
+//                 } else {
+//                     googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+//                 }
+//                 mapRender = new MapRender(getActivity(), googleMap, false);
 //
-//                // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
-//                googleMap.setIndoorEnabled(false);
+//                 // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
+//                 googleMap.setIndoorEnabled(false);
 //
-//                googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-//                    @Override
-//                    public boolean onMyLocationButtonClick() {
-//                        if (!state.locked) {
+//                 googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+//                     @Override
+//                     public boolean onMyLocationButtonClick() {
+//                         if (!state.locked) {
 //
-//                            state.locked = true;
-//                            if (menu != null) {
-//                                MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
-//                                String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-//                                item.setTitle(name);
-//                                MainActivity.info("on-my-location received - activating lock");
-//                            }
-//                        }
-//                        return false;
-//                    }
-//                });
+//                             state.locked = true;
+//                             if (menu != null) {
+//                                 MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+//                                 String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+//                                 item.setTitle(name);
+//                                 MainActivity.info("on-my-location received - activating lock");
+//                             }
+//                         }
+//                         return false;
+//                     }
+//                 });
 //
-//                googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
-//                    @Override
-//                    public void onCameraMoveStarted(int reason) {
-//                        if (reason ==REASON_GESTURE) {
-//                            if (state.locked) {
-//                                state.locked = false;
-//                                if (menu != null) {
-//                                    MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
-//                                    String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-//                                    item.setTitle(name);
-//                                }
-//                            }
-//                        } else if (reason ==REASON_API_ANIMATION) {
-//                            //DEBUG: MainActivity.info("Camera moved due to user tap");
-//                            //TODO: should we combine this case with REASON_GESTURE?
-//                        } else if (reason ==REASON_DEVELOPER_ANIMATION) {
-//                            //MainActivity.info("Camera moved due to app directive");
-//                        }
-//                    }
+//                 googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+//                     @Override
+//                     public void onCameraMoveStarted(int reason) {
+//                         if (reason ==REASON_GESTURE) {
+//                             if (state.locked) {
+//                                 state.locked = false;
+//                                 if (menu != null) {
+//                                     MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+//                                     String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+//                                     item.setTitle(name);
+//                                 }
+//                             }
+//                         } else if (reason ==REASON_API_ANIMATION) {
+//                             //DEBUG: MainActivity.info("Camera moved due to user tap");
+//                             //TODO: should we combine this case with REASON_GESTURE?
+//                         } else if (reason ==REASON_DEVELOPER_ANIMATION) {
+//                             //MainActivity.info("Camera moved due to app directive");
+//                         }
+//                     }
 //
+//                 });
 //
-//                });
+//                 // controller
+//                 final LatLng centerPoint = getCenter(getActivity(), oldCenter, previousLocation);
+//                 float zoom = DEFAULT_ZOOM;
+//                 if (oldZoom >= 0) {
+//                     zoom = oldZoom;
+//                 } else {
+//                     if (null != prefs) {
+//                         zoom = prefs.getFloat(ListFragment.PREF_PREV_ZOOM, zoom);
+//                     }
+//                 }
 //
-//                // controller
-//                final LatLng centerPoint = getCenter(getActivity(), oldCenter, previousLocation);
-//                float zoom = DEFAULT_ZOOM;
-//                if (oldZoom >= 0) {
-//                    zoom = oldZoom;
-//                } else {
-//                    if (null != prefs) {
-//                        zoom = prefs.getFloat(ListFragment.PREF_PREV_ZOOM, zoom);
-//                    }
-//                }
-//
-//                final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                        .target(centerPoint).zoom(zoom).build();
-//                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//
-//
-//                if (null != prefs && !ListFragment.PREF_MAP_NO_TILE.equals(
-//                        prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-//                                ListFragment.PREF_MAP_NO_TILE))) {
-//                    final int providerTileRes = MainActivity.isHighDefinition()?512:256;
-//
-//                    //TODO: DRY up token composition vs AbstractApiRequest?
-//                    String ifAuthToken = null;
-//                    try {
-//                        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-//                        final String token = TokenAccess.getApiToken(prefs);
-//                        if ((null != authname) && (null != token)) {
-//                            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
-//                            ifAuthToken = "Basic " + encoded;
-//                        }
-//                    } catch (UnsupportedEncodingException ueex) {
-//                        MainActivity.error("map tiles: unable to encode credentials for mine/others", ueex);
-//                    } catch (UnsupportedOperationException uoex) {
-//                        MainActivity.error("map tiles: unable to access credentials for mine/others", uoex);
-//                    } catch (Exception ex) {
-//                        MainActivity.error("map tiles: unable to access credentials for mine/others", ex);
-//                    }
-//                    final String authToken = ifAuthToken;
-//
-//                    final String userAgent = AbstractApiRequest.getUserAgentString();
+//                 final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                       .target(centerPoint).zoom(zoom).build();
+//                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //
 //
-//                    TileProvider tileProvider = new TileProvider() {
-//                        @Override
-//                        public Tile getTile(int x, int y, int zoom) {
-//                            if (!checkTileExists(x, y, zoom)) {
-//                                return null;
-//                            }
+//                 if (null != prefs && !ListFragment.PREF_MAP_NO_TILE.equals(
+//                         prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+//                                 ListFragment.PREF_MAP_NO_TILE))) {
+//                     final int providerTileRes = MainActivity.isHighDefinition()?512:256;
 //
-//                            final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
-//                            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-//                            String tileContents = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-//                                    ListFragment.PREF_MAP_NO_TILE);
+//                     //TODO: DRY up token composition vs AbstractApiRequest?
+//                     String ifAuthToken = null;
+//                     try {
+//                         final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+//                         final String token = TokenAccess.getApiToken(prefs);
+//                         if ((null != authname) && (null != token)) {
+//                             final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+//                             ifAuthToken = "Basic " + encoded;
+//                         }
+//                     } catch (UnsupportedEncodingException ueex) {
+//                         MainActivity.error("map tiles: unable to encode credentials for mine/others", ueex);
+//                     } catch (UnsupportedOperationException uoex) {
+//                         MainActivity.error("map tiles: unable to access credentials for mine/others", uoex);
+//                     } catch (Exception ex) {
+//                         MainActivity.error("map tiles: unable to access credentials for mine/others", ex);
+//                     }
+//                     final String authToken = ifAuthToken;
 //
-//                            String sinceString = String.format("%d0000-00000", since);
-//                            String toString = String.format("%d0000-00000", thisYear+1);
-//                            String s = String.format(MAP_TILE_URL_FORMAT,
-//                                    zoom, x, y, sinceString, toString);
+//                     final String userAgent = AbstractApiRequest.getUserAgentString();
 //
-//                            if (MainActivity.isHighDefinition()) {
-//                                    s += HIGH_RES_TILE_TRAILER;
-//                            }
+//                     TileProvider tileProvider = new TileProvider() {
+//                         @Override
+//                         public Tile getTile(int x, int y, int zoom) {
+//                             if (!checkTileExists(x, y, zoom)) {
+//                                 return null;
+//                             }
 //
-//                            // ALIBI: defaults to "ALL"
-//                            if (ListFragment.PREF_MAP_ONLYMINE_TILE.equals(tileContents)) {
-//                                s += ONLY_MINE_TILE_TRAILER;
-//                            } else if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(tileContents)) {
-//                                s += NOT_MINE_TILE_TRAILER;
-//                            }
+//                             final Long since = prefs.getLong(ListFragment.PREF_SHOW_DISCOVERED_SINCE, 2001);
+//                             int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+//                             String tileContents = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
+//                                     ListFragment.PREF_MAP_NO_TILE);
 //
-//                            //DEBUG: MainActivity.info("map URL: " + s);
+//                             String sinceString = String.format("%d0000-00000", since);
+//                             String toString = String.format("%d0000-00000", thisYear+1);
+//                             String s = String.format(MAP_TILE_URL_FORMAT,
+//                                     zoom, x, y, sinceString, toString);
 //
-//                            try {
-//                                final byte[] data = downloadData(new URL(s), userAgent, authToken);
-//                                if (data != null) {
-//                                    return new Tile(providerTileRes, providerTileRes, data);
-//                                }
-//                            } catch (MalformedURLException e) {
-//                                throw new AssertionError(e);
-//                            }
-//                            return null;
-//                        }
+//                             if (MainActivity.isHighDefinition()) {
+//                                     s += HIGH_RES_TILE_TRAILER;
+//                             }
 //
-//                        /*
-//                         * depends on supported levels on the server
-//                         */
-//                        private boolean checkTileExists(int x, int y, int zoom) {
-//                            int minZoom = 0;
-//                            int maxZoom = 24;
+//                             // ALIBI: defaults to "ALL"
+//                             if (ListFragment.PREF_MAP_ONLYMINE_TILE.equals(tileContents)) {
+//                                 s += ONLY_MINE_TILE_TRAILER;
+//                             } else if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(tileContents)) {
+//                                 s += NOT_MINE_TILE_TRAILER;
+//                             }
 //
-//                            if ((zoom < minZoom || zoom > maxZoom)) {
-//                                return false;
-//                            }
+//                             //DEBUG: MainActivity.info("map URL: " + s);
 //
-//                            return true;
-//                        }
+//                             try {
+//                                 final byte[] data = downloadData(new URL(s), userAgent, authToken);
+//                                 return new Tile(providerTileRes, providerTileRes, data);
+//                             } catch (MalformedURLException e) {
+//                                 throw new AssertionError(e);
+//                             }
+//                         }
 //
-//                        private byte[] downloadData(final URL url, final String userAgent, final String authToken) {
-//                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                            InputStream is = null;
-//                            try {
-//                                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-//                                if (null != authToken) {
-//                                    conn.setRequestProperty("Authorization", authToken);
-//                                }
-//                                conn.setRequestProperty("User-Agent", userAgent);
-//                                is = conn.getInputStream();
-//                                byte[] byteChunk = new byte[4096];
-//                                int n;
+//                         /*
+//                          * depends on supported levels on the server
+//                          */
+//                         private boolean checkTileExists(int x, int y, int zoom) {
+//                             int minZoom = 0;
+//                             int maxZoom = 24;
 //
-//                                while ((n = is.read(byteChunk)) > 0) {
-//                                    baos.write(byteChunk, 0, n);
-//                                }
-//                            } catch (IOException e) {
-//                                MainActivity.error("Failed while reading bytes from " +
-//                                        url.toExternalForm() + ": "+ e.getMessage());
-//                                e.printStackTrace();
-//                            } finally {
-//                                if (is != null) {
-//                                    try {
-//                                        is.close();
-//                                    } catch (IOException ioex) {
-//                                        MainActivity.error("Failed while closing InputStream " +
-//                                                url.toExternalForm() + ": "+ ioex.getMessage());
-//                                        ioex.printStackTrace();
-//                                    }
-//                                }
-//                            }
-//                            return baos.toByteArray();
-//                        }
-//                    };
+//                             if ((zoom < minZoom || zoom > maxZoom)) {
+//                                 return false;
+//                             }
+//
+//                             return true;
+//                         }
+//
+//                         private byte[] downloadData(final URL url, final String userAgent, final String authToken) {
+//                             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                             InputStream is = null;
+//                             try {
+//                                 HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+//                                 if (null != authToken) {
+//                                     conn.setRequestProperty("Authorization", authToken);
+//                                 }
+//                                 conn.setRequestProperty("User-Agent", userAgent);
+//                                 is = conn.getInputStream();
+//                                 byte[] byteChunk = new byte[4096];
+//                                 int n;
+//
+//                                 while ((n = is.read(byteChunk)) > 0) {
+//                                     baos.write(byteChunk, 0, n);
+//                                 }
+//                             } catch (IOException e) {
+//                                 MainActivity.error("Failed while reading bytes from " +
+//                                         url.toExternalForm() + ": "+ e.getMessage());
+//                                 e.printStackTrace();
+//                             } finally {
+//                                 if (is != null) {
+//                                     try {
+//                                         is.close();
+//                                     } catch (IOException ioex) {
+//                                         MainActivity.error("Failed while closing InputStream " +
+//                                                 url.toExternalForm() + ": "+ ioex.getMessage());
+//                                         ioex.printStackTrace();
+//                                     }
+//                                 }
+//                             }
+//                             return baos.toByteArray();
+//                         }
+//                     };
 //
 //
 //
-//                    tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
-//                            .tileProvider(tileProvider).transparency(0.35f));
-//                }
+//                     tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
+//                             .tileProvider(tileProvider).transparency(0.35f));
+//                 }
 //
-//                //ALIBI: still checking prefs because we pass them to the dbHelper
-//                if (null != prefs  && visualizeRoute) {
+//                 //ALIBI: still checking prefs because we pass them to the dbHelper
+//                 if (null != prefs  && visualizeRoute) {
 //
-//                    PolylineOptions pOptions = new PolylineOptions()
-//                                    .clickable(false);
-//                    final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-//                    try {
-//                        Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
-//                        if (null == routeCursor) {
-//                            MainActivity.info("null route cursor; not mapping");
-//                        } else {
-//                            long segmentCount = 0;
+//                     PolylineOptions pOptions = new PolylineOptions()
+//                                     .clickable(false);
+//                     final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                     try {
+//                         Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
+//                         if (null == routeCursor) {
+//                             MainActivity.info("null route cursor; not mapping");
+//                         } else {
+//                             long segmentCount = 0;
 //
-//                            for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-//                                final double lat = routeCursor.getDouble(0);
-//                                final double lon = routeCursor.getDouble(1);
-//                                //final long time = routeCursor.getLong(2);
-//                                pOptions.add(
-//                                        new LatLng(lat, lon));
+//                             for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+//                                 final double lat = routeCursor.getDouble(0);
+//                                 final double lon = routeCursor.getDouble(1);
+//                                 //final long time = routeCursor.getLong(2);
+//                                 pOptions.add(
+//                                         new LatLng(lat, lon));
 //
-//                                pOptions.color(getRouteColorForMapType(mapMode));
-//                                pOptions.width(ROUTE_WIDTH); //DEFAULT: 10.0
-//                                pOptions.zIndex(10000); //to overlay on traffic data
-//                                segmentCount++;
-//                            }
+//                                 pOptions.color(getRouteColorForMapType(mapMode));
+//                                 pOptions.width(ROUTE_WIDTH); //DEFAULT: 10.0
+//                                 pOptions.zIndex(10000); //to overlay on traffic data
+//                                 segmentCount++;
+//                             }
+//
 //                            MainActivity.info("Loaded route with " + segmentCount + " segments");
 //                            routePolyline = googleMap.addPolyline(pOptions);
 //
@@ -507,6 +518,8 @@ public final class MappingFragment extends Fragment {
     private class MapRunnable implements Runnable {
         @Override
         public void run() {
+            final View view = getView();
+            final SharedPreferences prefs = getActivity() != null?getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
                 final Location location = ListFragment.lameStatic.location;
@@ -535,19 +548,17 @@ public final class MappingFragment extends Fragment {
 //                            mapView.postInvalidate();
 //                        }
                     }
-
 //                    try {
-//                        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 //                        final boolean showRoute = prefs != null && prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
 //                        //DEBUG: MainActivity.info("mUpdateTimeTask with non-null location. show: "+showRoute);
 //                        if (showRoute) {
 //                            double accuracy = location.getAccuracy();
 //                            if (location.getTime() != 0 &&
-//                                    accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS
-//                                    && accuracy > 0.0d &&
-//                                    (lastLocation == null ||
-//                                            ((location.getTime() - lastLocation.getTime()) > MIN_ROUTE_LOCATION_DIFF_TIME) &&
-//                                                    lastLocation.distanceTo(location)> MIN_ROUTE_LOCATION_DIFF_METERS)) {
+//                              accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS
+//                              && accuracy > 0.0d &&
+//                              (lastLocation == null ||
+//                                  ((location.getTime() - lastLocation.getTime()) > MIN_ROUTE_LOCATION_DIFF_TIME) &&
+//                                 lastLocation.distanceTo(location)> MIN_ROUTE_LOCATION_DIFF_METERS)) {
 //                                if (routePolyline != null) {
 //                                    final List<LatLng> routePoints = routePolyline.getPoints();
 //                                    routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
@@ -555,12 +566,12 @@ public final class MappingFragment extends Fragment {
 //                                    routePolyline.setColor(getRouteColorForMapType(mapMode));
 //
 //                                    if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
-//                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+//                                        Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
 //                                        LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_COARSE, false);
 //                                        routePolyline.setPoints(Arrays.asList(simplified));
 //                                        MainActivity.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
 //                                    } else if (routePoints.size() > 1) {
-//                                        Simplify<LatLng> simplify = new Simplify<LatLng>(new LatLng[0], latLngPointExtractor);
+//                                        Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
 //                                        LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_FINE, true);
 //                                        routePolyline.setPoints(Arrays.asList(simplified));
 //                                        MainActivity.error("minor route simplification: "+routePoints.size()+"->"+simplified.length);
@@ -584,23 +595,29 @@ public final class MappingFragment extends Fragment {
                     previousLocation = location;
                 }
 
+
                 previousRunNets = ListFragment.lameStatic.runNets;
 
-                final View view = getView();
-
                 if (view != null) {
-                    TextView tv = (TextView) view.findViewById(R.id.stats_run);
+                    TextView tv = view.findViewById(R.id.stats_run);
                     tv.setText(getString(R.string.run) + ": " + UINumberFormat.counterFormat(
                             ListFragment.lameStatic.runNets+ListFragment.lameStatic.runBt));
-                    tv = (TextView) view.findViewById(R.id.stats_wifi);
+                    tv = view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
-                    tv = (TextView) view.findViewById( R.id.stats_cell );
+                    tv = view.findViewById( R.id.stats_cell );
                     tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
-                    tv = (TextView) view.findViewById( R.id.stats_bt );
+                    tv = view.findViewById( R.id.stats_bt );
                     tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
 
-                    tv = (TextView) view.findViewById( R.id.stats_dbnets );
+                    tv = view.findViewById( R.id.stats_dbnets );
                     tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
+                    if (prefs != null) {
+                        float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+                        final String distString = DashboardFragment.metersToString(prefs,
+                                numberFormat, getActivity(), dist, true);
+                        tv = view.findViewById(R.id.rundistance);
+                        tv.setText(distString);
+                    }
                 }
 
                 final long period = 1000L;
@@ -889,22 +906,23 @@ public final class MappingFragment extends Fragment {
 //                    @Override
 //                    public void onMapReady(final GoogleMap googleMap) {
 //                        int newMapType = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                        final Activity a = getActivity();
 //                        switch (newMapType) {
 //                            case GoogleMap.MAP_TYPE_NORMAL:
 //                                newMapType = GoogleMap.MAP_TYPE_SATELLITE;
-//                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
+//                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
 //                                break;
 //                            case GoogleMap.MAP_TYPE_SATELLITE:
 //                                newMapType = GoogleMap.MAP_TYPE_HYBRID;
-//                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
+//                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
 //                                break;
 //                            case GoogleMap.MAP_TYPE_HYBRID:
 //                                newMapType = GoogleMap.MAP_TYPE_TERRAIN;
-//                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
+//                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
 //                                break;
 //                            case GoogleMap.MAP_TYPE_TERRAIN:
 //                                newMapType = GoogleMap.MAP_TYPE_NORMAL;
-//                                WiGLEToast.showOverActivity(getActivity(), R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
+//                                WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
 //                                break;
 //                            default:
 //                                MainActivity.error("unhandled mapType: " + newMapType);
@@ -982,7 +1000,7 @@ public final class MappingFragment extends Fragment {
                 }
             } );
 
-            Button cancel = (Button) view.findViewById( R.id.cancel_button );
+            Button cancel = view.findViewById( R.id.cancel_button );
             cancel.setOnClickListener( new OnClickListener() {
                 @Override
                 public void onClick( final View buttonView ) {
@@ -1067,7 +1085,7 @@ public final class MappingFragment extends Fragment {
             ListFragment.lameStatic.dbHelper.addToQueue( request );
         }
     }
-    private static PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {
+    private static final PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {
         @Override
         public double getX(LatLng point) {
             return point.latitude * 1000000;
@@ -1082,8 +1100,8 @@ public final class MappingFragment extends Fragment {
     private int getRouteColorForMapType(final int mapType) {
 //        if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
 //                && mapType != GoogleMap.MAP_TYPE_NONE) {
-//            return LIGHT_ROUTE;
+//            return OVERLAY_LIGHT;
 //        }
-        return DARK_ROUTE;
+        return OVERLAY_DARK;
     }
 }

@@ -6,14 +6,12 @@
     android:layout_height="wrap_content"
     android:padding="4dp"
     >
-
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/queue_depth"
         android:textSize="18sp"
         />
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/uploads_swipe_container"
         android:layout_width="match_parent"
@@ -23,5 +21,4 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"/>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 </LinearLayout>

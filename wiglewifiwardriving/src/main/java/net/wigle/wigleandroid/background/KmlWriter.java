@@ -42,14 +42,13 @@ public class KmlWriter extends AbstractBackgroundTask {
         this.btNetworks = (btNetworks == null) ? null : new HashSet<String>(btNetworks);
     }
 
-    @SuppressLint("SimpleDateFormat")
     @Override
     protected void subRun() throws IOException {
         final Bundle bundle = new Bundle();
 
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
         final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + KML_EXT;
 
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);

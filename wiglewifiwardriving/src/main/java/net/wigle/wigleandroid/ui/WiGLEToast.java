@@ -32,24 +32,26 @@ public class WiGLEToast {
 
     public static void showOverActivity(final Activity context, final int titleId,
         final String messageString, final int toastLength) {
-        if (Build.VERSION.SDK_INT != 25) {
-            LayoutInflater inflater = context.getLayoutInflater();
-            View layout = inflater.inflate(R.layout.wigle_detail_toast,
-                    (ViewGroup) context.findViewById(R.id.custom_toast_container));
+        if (null != context && !context.isFinishing()) {
+            if (Build.VERSION.SDK_INT != 25) {
+                LayoutInflater inflater = context.getLayoutInflater();
+                View layout = inflater.inflate(R.layout.wigle_detail_toast,
+                        (ViewGroup) context.findViewById(R.id.custom_toast_container));
 
-            TextView title = layout.findViewById(R.id.toast_title_text);
-            title.setText(titleId);
+                TextView title = layout.findViewById(R.id.toast_title_text);
+                title.setText(titleId);
 
-            TextView text = layout.findViewById(R.id.toast_message_text);
-            text.setText(messageString);
+                TextView text = layout.findViewById(R.id.toast_message_text);
+                text.setText(messageString);
 
-            Toast toast = new Toast(context.getApplicationContext());
-            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-            toast.setDuration(toastLength);
-            toast.setView(layout);
-            toast.show();
-        } else {
-            MainActivity.info("toast disabled because 7.1.x bombs: "+messageString);
+                Toast toast = new Toast(context.getApplicationContext());
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.setDuration(toastLength);
+                toast.setView(layout);
+                toast.show();
+            } else {
+                MainActivity.info("toast disabled because 7.1.x bombs: " + messageString);
+            }
         }
     }
 

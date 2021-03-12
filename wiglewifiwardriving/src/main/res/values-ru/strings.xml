@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">ID маркера последней загрузки:</string>
     <string name="maxout_maxid_button">Установить максимальный ID маркера в БД</string>
     <string name="maxout_maxid_text">Установить маркер в:</string>
-    <string name="connect_button">Соединиться</string>
-    <string name="connect_text">с разрешения оператора сети</string>
     <string name="csv_run_export_button">Экспорт пробега в CSV</string>
     <string name="csv_run_export_text">Экспорт текущего пробега в файл CSV</string>
     <string name="csv_export_button">Экспорт БД в CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Анонс изменений GPS статуса</string>
     <string name="mute">Выкл. звук</string>
     <string name="play">Проигрывать звук</string>
-    <string name="unknown">Неизвестно</string>
     <string name="sort_text">Параметры сортировки</string>
     <string name="listdialog_button">ОК</string>
     <string name="cryptodialog_button">ОК</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (например: 0A:2C:EF:3D:25:1B) (SQL символы: %,_):</string>
     <string name="search_button">Запрос к локальной БД</string>
     <string name="reset_button">Сброс</string>
-    <string name="list_query_clear">Очистить аргументы запроса</string>
     <string name="crypto_security">Безопасность</string>
     <string name="crypto_strength">Уровень сигнала</string>
     <string name="crypto_password">Пароль</string>
@@ -134,7 +130,6 @@
     <string name="dash_db_queue">Очередь БД:</string>
     <string name="dash_db_nets">Сетей в БД:</string>
     <string name="dash_db_locs">Местоположений в БД:</string>
-    <string name="dash_no_loc">Местоположение отсутствует!</string>
     <string name="dash_short_loc">Спутники:</string>
     <string name="km_short">км</string>
     <string name="mi_short">миль</string>
@@ -166,7 +161,6 @@
     <string name="address">Адрес</string>
     <string name="no_address_found">Адрес не найден</string>
     <string name="problem_with_field">Проблема с полем</string>
-    <string name="turning_wifi_off">Отключение Wi-Fi обратно</string>
     <string name="lost_location">Местоположение потеряно</string>
     <string name="have_location">Местоположение определено по</string>
     <string name="wifi_jammed">Похоже, Wi-Fi завис — выключите, а затем включите Wi-Fi.</string>
@@ -183,8 +177,6 @@
     <string name="menu_screen_wake">Не выключать экран</string>
     <string name="menu_labels_off">Скрыть подписи</string>
     <string name="menu_labels_on">Показать подписи</string>
-    <string name="menu_zoom_in">Увеличить</string>
-    <string name="menu_zoom_out">Уменьшить</string>
     <string name="menu_turn_off_lockon">Выключить привязкку</string>
     <string name="menu_turn_on_lockon">Включить привязкку</string>
     <string name="menu_show_old">Показывать пробег и новые</string>
@@ -242,6 +234,7 @@
     <string name="language_pt_rBR">português brasileiro (бразильский португа́льский)</string>
     <string name="language_ru">Ру́сский</string>
     <string name="language_sv">svenska (шведский)</string>
+    <string name="language_sw">Kiswahili (суахили)</string>
     <string name="language_tr">Türkçe (турецкий)</string>
     <string name="language_zh_cn">简体中文 (китайский упрощённый: автор: Geekeyes）</string>
     <string name="language_zh_tw">繁体中文 台灣 (китайский традиционный — Тайвань)</string>
@@ -272,7 +265,8 @@
     <string name="map_toast_terrain">Карта: Рельеф</string>
     <string name="map_needs_playservice">Карта зависит от Сервисов Google Play</string>
     <string name="register">Зарегистрироваться</string>
-    <string name="at">на</string>
+    <string name="drawer_open">Ящик открыт</string>
+    <string name="drawer_close">Ящик Закрыть</string>
     <string name="netwpa3_title">WPA3</string>
     <string name="netwpa2_title">WPA2</string>
     <string name="netwpa_title">WPA</string>
@@ -297,6 +291,7 @@
     <string name="authorize">Автозироваться (войти)</string>
     <string name="anonymous_confirm">Загружать анонимно? Это удалит данные для авторизации с вашего устройства.</string>
     <string name="title_activity_activate">Сканировать для активации</string>
+    <string name="unknown_number">\?\?</string>
     <string name="show_discovered_since">Открытые сети</string>
     <string name="show_discovered">Показать открытые сети на карте</string>
     <string name="map_none">Никакие</string>
@@ -344,7 +339,6 @@
     <string name="cell_network_brand">марка:</string>
     <string name="cell_network_notes">Заметки:</string>
     <string name="bluetooth_pref_text">Включить сканирование Bluetooth</string>
-    <string name="turning_bt_off">Отключение Bluetooth обратно</string>
     <string name="turn_on_bt">Включение Bluetooth</string>
     <string name="filter_show_bt">Показывать устройства Bluetooth</string>
     <string name="error_invalid_bssid">BSSID должен быть длиной 12 символов или содержать подстановочный знак (%)</string>
@@ -355,7 +349,6 @@
     <string name="search_local">Поиск в вашей локальной базе данных</string>
     <string name="search_failed">Поиск не удался</string>
     <string name="search_empty">Результаты Пусто</string>
-    <string name="search_query_limit">Вы достигли максимального числа поисков сегодня. Ваш лимит будет сброшен завтра.</string>
     <string name="menu_debug">Отладка</string>
     <string name="pie_bad">Android Pie (9.0) снижает скорость сканирования Wi-Fi до 2 раз в минуту. Обновите Android, если это возможно.</string>
     <string name="q_bad">В Android 10 установлена квота для приложений на сканирование Wi-Fi сетей, если ограничение не снято в настройках для разработчиков.</string>
@@ -397,15 +390,12 @@
     <string name="tab_uploads">Выгрузки</string>
     <string name="total_bt">Всего устройств Bluetooth</string>
     <string name="total_cell">Всего сотовых вышек</string>
-    <string name="total_wifi">Всего Wi-Fi</string>
     <string name="totallocs_title">Всего зафиксировано наблюдений Wi-Fi</string>
     <string name="transtot_title">Загружено файлов на WiGLE.net</string>
     <string name="user_centric">Мой рейтинг</string>
     <string name="user_stats_app_name">человек пользователя</string>
     <string name="userstot_title">Всего зарегистрировано на WiGLE.net пользователей</string>
-    <string name="wifi_gps">Wi-Fi GPS</string>
     <string name="uploads_app_name">Выгрузки на WiGLE.net</string>
-    <string name="restart">Перезапуск для использования внешнего хранилища</string>
     <string name="rank_title">Рейтинг пользователя:</string>
     <string name="rank_all_time">Рейтинг за всё время</string>
     <string name="rank_month">Месячный рейтинг</string>
@@ -413,10 +403,7 @@
     <string name="queue_depth">Глубина очереди обработки файлов</string>
     <string name="prevmonthcount_title">сетей Wi-Fi обнаружено в прошлом месяце</string>
     <string name="all_time_title">Обнаружено Wi-Fi за всё время</string>
-    <string name="bt_gps">BT GPS</string>
     <string name="bytes">Байт</string>
-    <string name="cell_gps">Сотовых вышек GPS</string>
-    <string name="allow_storage">База данных по умолчанию размещается во внешнем хранилище — пожалуйста, дайте разрешение на доступ к хранилищу</string>
     <string name="btloc_title">Устройства Bluetooth с местоположением на  WiGLE.net</string>
     <string name="cell_permission">Местоположение сотовой вышки (примерное)</string>
     <string name="delete_db_confirm">Вы уверены, что хотите очистить локальную базу данных? Вы можете повторно загрузить данные из WiGLE, но информация о местоположении и наблюдениях будет утеряна.</string>
@@ -435,8 +422,11 @@
     <string name="monthcount_title">Обнаружено сетей Wi-Fi в этом месяце:</string>
     <string name="netloc_title">Сети Wi-Fi с местоположением на WiGLE.net</string>
     <string name="not_user_centric">Топ рейтинги</string>
-    <string name="please_allow">Пожалуйста, предоставьте разрешение для использования</string>
     <string name="prevmonthrank_title">Месячный рейтинг за последний месяц</string>
     <string name="prevrank_title">Рейтинг пользователя за последний месяц</string>
     <string name="calculating_m8b">Вычисление оракула</string>
+    <string name="theme_settings_label">Тема отображения</string>
+    <string name="theme_light_label">Легкий</string>
+    <string name="theme_dark_label">Темный</string>
+    <string name="theme_follow_label">Следить за системой</string>
 </resources>

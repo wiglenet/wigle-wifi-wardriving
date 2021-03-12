@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">Dernier marqueur d\'upload :</string>
     <string name="maxout_maxid_button">Mettre au maximum de marqueur dans la base</string>
     <string name="maxout_maxid_text">Règler le marqueur :</string>
-    <string name="connect_button">Se connecter</string>
-    <string name="connect_text">avec la permission de l\'opérateur réseau</string>
     <string name="csv_run_export_button">Exporter le parcours vers CSV</string>
     <string name="csv_run_export_text">Exporter la parcours actuelle vers un fichier CSV</string>
     <string name="csv_export_button">Exporter la BDD vers CSV</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">Annoncer les changements d\'état GPS</string>
     <string name="mute">Muet</string>
     <string name="play">Jouer</string>
-    <string name="unknown">Inconnu</string>
     <string name="sort_text">Options de tri</string>
     <string name="listdialog_button">OK</string>
     <string name="cryptodialog_button">OK</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID (ex: 0A:2C:EF:3D:25:1B) (jokers SQL: %,_) :</string>
     <string name="search_button">Interroger la BDD locale</string>
     <string name="reset_button">Réinitialiser les champs</string>
-    <string name="list_query_clear">Effacer les arguments de recherche</string>
     <string name="crypto_security">Sécurité</string>
     <string name="crypto_strength">Puissance du signal</string>
     <string name="crypto_password">Mot de passe</string>
@@ -118,6 +114,7 @@
     <string name="tab_dash">Tableau de bord</string>
     <string name="tab_data">Base de données</string>
     <string name="tab_stats">Statistiques</string>
+    <string name="tab_search">Chercher</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
     <string name="dash_scan_off">(Numérisation désactivée)</string>
@@ -134,7 +131,6 @@
     <string name="dash_db_queue">File d\'attente de la BDD :</string>
     <string name="dash_db_nets">Réseaux dans la BDD :</string>
     <string name="dash_db_locs">Emplacements dans la BDD :</string>
-    <string name="dash_no_loc">Localisation inconnue!</string>
     <string name="dash_short_loc">Loc :</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -166,7 +162,6 @@
     <string name="address">Adresse</string>
     <string name="no_address_found">Aucune adresse géocodée trouvée</string>
     <string name="problem_with_field">Problème avec le champ</string>
-    <string name="turning_wifi_off">Réactivation du WiFi</string>
     <string name="lost_location">Localisation perdue</string>
     <string name="have_location">Vouz avez maintenant une localisation par </string>
     <string name="wifi_jammed">Le WiFi semble bloqué, désactivez-le puis réactivez le.</string>
@@ -183,8 +178,6 @@
     <string name="menu_screen_wake">Gardez l\'écran allumé</string>
     <string name="menu_labels_off">Étiquettes désactivées</string>
     <string name="menu_labels_on">Étiquettes activées</string>
-    <string name="menu_zoom_in">Zoom avant</string>
-    <string name="menu_zoom_out">Zoom arrière</string>
     <string name="menu_turn_off_lockon">Verrouillage désactivé</string>
     <string name="menu_turn_on_lockon">Verrouillage activé</string>
     <string name="menu_show_old">Voir En cours &amp; Nouveaux</string>
@@ -242,6 +235,7 @@
     <string name="language_pt_rBR">português brasileiro (portugais brésilien)</string>
     <string name="language_ru">ру́сский (russe)</string>
     <string name="language_sv">svenska (suédois)</string>
+    <string name="language_sw">Kiswahili (Swahili)</string>
     <string name="language_tr">Türkçe (turc)</string>
     <string name="language_zh_cn">简体中文（chinois simplifié: par Geekeyes）</string>
     <string name="language_zh_tw">繁体中文 台灣 (chinois traditionnel - Taïwan)</string>
@@ -272,7 +266,6 @@
     <string name="map_toast_terrain">Type de carte : Terrain</string>
     <string name="map_needs_playservice">La carte nécessite Google Play Service</string>
     <string name="register">Enregistrement</string>
-    <string name="at">à</string>
     <string name="drawer_open">Tiroir ouvert</string>
     <string name="drawer_close">Tiroir fermé</string>
     <string name="site_stats_app_name">Statistiques WiGLE.net</string>
@@ -294,13 +287,9 @@
     <string name="prevmonthcount_title">WiFi découverts le mois dernier</string>
     <string name="firsttransid_title">ID première transaction</string>
     <string name="lasttransid_title">ID dernière transaction</string>
-    <string name="please_allow">Svp, veuillez donner l\'autorisation d\'utilisation</string>
     <string name="gps_permission">GPS (localisation exacte)</string>
     <string name="cell_permission">Localisation Cellulaire (localisation approximative)</string>
-    <string name="allow_storage">La base de données est sauvegardée sur un support externe par défaut, svp autorisez le stockage du média/fichier</string>
-    <string name="restart">Redémarrage pour utiliser le stockage externe</string>
     <string name="rank_stats_app_name">Classements WiGLE.net</string>
-    <string name="total_wifi">Total WiFi</string>
     <string name="total_cell">Total tours cellulaires</string>
     <string name="tab_rank">Classements</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
@@ -308,8 +297,6 @@
     <string name="queue_depth">Longueur de la file d\'attente de traitement des fichiers</string>
     <string name="news_app_name">Nouvelles de WiGLE.net</string>
     <string name="tab_news">Nouvelles</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">Tours Cellulaires GPS</string>
     <string name="bytes">Octets</string>
     <string name="rank_all_time">Classement de tous les temps</string>
     <string name="rank_month">Classements mensuels</string>
@@ -387,7 +374,6 @@
     <string name="cell_network_brand">Marque:</string>
     <string name="cell_network_notes">Remarques:</string>
     <string name="bluetooth_pref_text">Activer la numérisation Bluetooth</string>
-    <string name="turning_bt_off">Désactiver Bluetooth</string>
     <string name="turn_on_bt">Activer Bluetooth</string>
     <string name="filter_show_bt">Afficher Bluetooth</string>
     <string name="error_invalid_bssid">BSSID doit comporter 12 caractères ou contenir un caractère générique (%)</string>
@@ -398,8 +384,16 @@
     <string name="search_local">Rechercher dans votre base de données locale</string>
     <string name="search_failed">La recherche a échoué</string>
     <string name="search_empty">Résultats vides</string>
-    <string name="search_query_limit">Vous avez atteint le nombre maximal de recherches aujourd\'hui. Votre limite sera réinitialisée demain.</string>
-    <string name="menu_debug">Debug</string>
+    <string name="export_m8b_button">Exportation &#x2791;</string>
+    <string name="export_m8b">Exporter la balle magique de géolocalisation (8)</string>
+    <string name="export_m8b_detail">Générez un oracle pour déterminer votre emplacement approximatif. Voir: \n\nhttps://github.com/wiglenet/m8b \n\nLa tranche par défaut = 30 sera utilisée, pour permettre la combinaison avec d\'autres magies &#x2791; boules. \n\nCela peut prendre un certain temps - veuillez connecter une alimentation externe si vous avez une grande base de données.</string>
+    <string name="m8b_failed">Impossible d\'exporter le fichier m8b.\n</string>
+    <string name="m8b_sizing">Déterminer les entrées oracle</string>
+    <string name="exporting_m8b_final">Écriture du fichier oracle</string>
+    <string name="calculating_m8b">Calcul d\'oracle</string>
+    <string name="btloc_title">Périphériques Bluetooth WiGLE.net avec localisation</string>
+    <string name="total_bt">Bluetooth total</string>
+    <string name="menu_debug">Déboguer</string>
     <string name="pie_bad">Android Pie (9.0) accélère les analyses WiFi à 2 par minute. Mettez à niveau Android si possible.</string>
     <string name="q_bad">Android 10 accélère les analyses Wi-Fi, à moins que celles-ci ne soient désactivées dans les paramètres du développeur.</string>
     <string name="enable_developer">Pour activer les options de développement: Paramètres -> À propos du téléphone -> Tapez Numéro de construction 7 fois.</string>
@@ -431,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">Échec du téléchargement: le résultat n\'a pas été enregistré.</string>
     <string name="not_proc">&#160;non traité.</string>
+    <string name="theme_settings_label">Thème d\'affichage</string>
+    <string name="theme_light_label">Lumière</string>
+    <string name="theme_dark_label">Sombre</string>
+    <string name="theme_follow_label">Suivez système</string>
 </resources>

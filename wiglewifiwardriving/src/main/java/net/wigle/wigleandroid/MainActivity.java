@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.GnssStatus;
@@ -39,6 +41,7 @@ import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -48,6 +51,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.SpannableString;
@@ -60,6 +65,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -111,7 +117,7 @@ import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
 
-public final class MainActivity extends AppCompatActivity {
+public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     //*** state that is retained ***
     public static class State {
         public MxcDatabaseHelper mxcDbHelper;
@@ -129,7 +135,8 @@ public final class MainActivity extends AppCompatActivity {
         NumberFormat numberFormat0;
         NumberFormat numberFormat1;
         NumberFormat numberFormat8;
-        TTS tts;
+        TextToSpeech tts;
+        boolean ttsChecked = false;
         boolean inEmulator;
         PhoneState phoneState;
         ObservationUploader observationUploader;
@@ -140,9 +147,11 @@ public final class MainActivity extends AppCompatActivity {
         private boolean screenLocked = false;
         private PowerManager.WakeLock wakeLock;
         private int logPointer = 0;
-        private String[] logs = new String[25];
+        private final String[] logs = new String[25];
         Matcher bssidLogExclusions;
         Matcher bssidDisplayExclusions;
+        int uiMode;
+        AtomicBoolean uiRestart;
     }
 
     private State state;
@@ -175,6 +184,7 @@ public final class MainActivity extends AppCompatActivity {
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
+    private static final int ACTION_TTS_CODE = 3;
 
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     public static final String ERROR_REPORT_DIALOG = "doDialog";
@@ -214,21 +224,30 @@ public final class MainActivity extends AppCompatActivity {
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
-
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         info("MAIN onCreate. state:  " + state);
+        workAroundGoogleMapsBug();
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
-        // set language
-        setLocale(this);
-        setContentView(R.layout.main);
+        if (Build.VERSION.SDK_INT > 28) {
+            //Support dark/light themes in Android 10 and above
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            // ALIBI: when the preference is complete, we'll allow storage of one of:
+            // [AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM , MODE_NIGHT_YES , MODE_NIGHT_NO];
+            AppCompatDelegate.setDefaultNightMode(displayMode);
+        } else {
+            //Force night mode
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
 
         mainActivity = this;
 
         // set language
         setLocale(this);
+        setContentView(R.layout.main);
 
         setupPermissions();
         setupMenuDrawer();
@@ -248,7 +267,6 @@ public final class MainActivity extends AppCompatActivity {
         fm.executePendingTransactions();
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         pieScanningSettings(prefs);
 
         if (stateFragment != null && stateFragment.getState() != null) {
@@ -271,6 +289,7 @@ public final class MainActivity extends AppCompatActivity {
             state = new State();
             state.finishing = new AtomicBoolean(false);
             state.transferring = new AtomicBoolean(false);
+            state.uiRestart = new AtomicBoolean(false);
 
             // set it up for retain
             stateFragment = new StateFragment();
@@ -301,6 +320,8 @@ public final class MainActivity extends AppCompatActivity {
         state.inEmulator = id == null;
         state.inEmulator = state.inEmulator || "sdk".equals(android.os.Build.PRODUCT);
         state.inEmulator = state.inEmulator || "google_sdk".equals(android.os.Build.PRODUCT);
+
+        state.uiMode = getResources().getConfiguration().uiMode;
 
         info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
         info("android release: '" + Build.VERSION.RELEASE);
@@ -374,10 +395,11 @@ public final class MainActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
             });
-            ;
 
             final Dialog dialog = iseDlgBuilder.create();
-            dialog.show();
+            if (!isFinishing()) {
+                dialog.show();
+            }
         } catch (IOException ex) {
             MainActivity.error("unable to implant mcc/mnc db", ex);
 
@@ -412,6 +434,27 @@ public final class MainActivity extends AppCompatActivity {
             for (final String key : keys) {
                 qScanSet(prefs, key);
             }
+        }
+    }
+
+    /**
+     * ALIBI: API (unsupported) will get registered for this in the pre-release reports, but this
+     * works around the ZoomTable Array Index OOB bugs. 80% of violations in pre-release report are this.
+     */
+    private void workAroundGoogleMapsBug() {
+        try {
+            SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);
+            if (!googleBug.contains("fixed")) {
+                info("working around google maps bug 154855417");
+                File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
+                corruptedZoomTables.delete();
+                googleBug.edit().putBoolean("fixed", true).apply();
+            }
+            else {
+                info("already worked around google maps bug 154855417");
+            }
+        } catch (Exception e) {
+            warn("Exception in workAroundGoogleMapsBug: " + e);
         }
     }
 
@@ -553,6 +596,15 @@ public final class MainActivity extends AppCompatActivity {
                 super.onDrawerOpened(drawerView);
                 final ActionBar actionBar = getSupportActionBar();
                 if (actionBar != null) actionBar.setTitle("Menu");
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethodManager != null && getCurrentFocus() != null) {
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    View current = getCurrentFocus();
+                    if (null != current) {
+                        current.clearFocus();
+                    }
+                }
             }
         };
         // Set the drawer toggle as the DrawerListener
@@ -600,20 +652,21 @@ public final class MainActivity extends AppCompatActivity {
             actionBar.setHomeButtonEnabled(true);
         }
 
+        //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
         SpannableString spanString = new SpannableString("    "+uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         uStats.setTitle(spanString);
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
         spanString = new SpannableString("    "+sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         sStats.setTitle(spanString);
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
         spanString = new SpannableString("    "+rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0); //fix the color to white
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
         rStats.setTitle(spanString);
 
         navigationView.getMenu().getItem(0).setCheckable(true);
@@ -804,11 +857,11 @@ public final class MainActivity extends AppCompatActivity {
 
         /**
          * alternate instantiation with a prefs-back checkbox inline - String prefs only
-         * @param message
-         * @param checkboxLabel
-         * @param tabPos
-         * @param dialogId
-         * @return
+         * @param message the message to display in the dialog
+         * @param checkboxLabel the label for the checkbox in the dialog
+         * @param tabPos the tab state
+         * @param dialogId the dialog id
+         * @return a ConfirmationDialog instance
          */
         public static ConfirmationDialog newInstance(final String message, final String checkboxLabel,
                                                      final String persistPrefKey,
@@ -1041,37 +1094,41 @@ public final class MainActivity extends AppCompatActivity {
         MainActivity.info("MAIN: destroy.");
         super.onDestroy();
 
-        try {
-            info("unregister batteryLevelReceiver");
-            unregisterReceiver(batteryLevelReceiver);
-        } catch (final IllegalArgumentException ex) {
-            info("batteryLevelReceiver not registered: " + ex);
+        if (!state.uiRestart.get()) {
+            try {
+                info("unregister batteryLevelReceiver");
+                unregisterReceiver(batteryLevelReceiver);
+            } catch (final IllegalArgumentException ex) {
+                info("batteryLevelReceiver not registered: " + ex);
+            }
+
+            try {
+                info("unregister wifiReceiver");
+                unregisterReceiver(state.wifiReceiver);
+            } catch (final IllegalArgumentException ex) {
+                info("wifiReceiver not registered: " + ex);
+            }
+
+            if (state.tts != null) state.tts.shutdown();
+
+            //TODO: redundant with endBluetooth?
+            final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            } try {
+                info("unregister bluetoothReceiver");
+                unregisterReceiver( state.bluetoothReceiver );
+            } catch ( final IllegalArgumentException ex ) {
+                info( "bluetoothReceiver not registered: " + ex );
+            }
+            if (state.bluetoothReceiver != null) {
+                state.bluetoothReceiver.stopScanning();
+            }
+            finishSoon(DESTROY_FINISH_MILLIS, false);
+        } else {
+            state.uiRestart.set(false);
         }
 
-        try {
-            info("unregister wifiReceiver");
-            unregisterReceiver(state.wifiReceiver);
-        } catch (final IllegalArgumentException ex) {
-            info("wifiReceiver not registered: " + ex);
-        }
-
-        if (state.tts != null) state.tts.shutdown();
-
-        //TODO: redundant with endBluetooth?
-        final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.cancelDiscovery();
-        } try {
-            info("unregister bluetoothReceiver");
-            unregisterReceiver( state.bluetoothReceiver );
-        } catch ( final IllegalArgumentException ex ) {
-            info( "bluetoothReceiver not registered: " + ex );
-        }
-        if (state.bluetoothReceiver != null) {
-            state.bluetoothReceiver.stopScanning();
-        }
-
-        finishSoon(DESTROY_FINISH_MILLIS, false);
     }
 
     @Override
@@ -1132,6 +1189,14 @@ public final class MainActivity extends AppCompatActivity {
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+        if (Build.VERSION.SDK_INT > 28) {
+            if (newConfig.uiMode != state.uiMode) {
+                info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
+                state.uiMode = newConfig.uiMode;
+                //DEBUG:
+                finishSoon(0, false, true);
+            }
+        }
     }
 
     @SuppressLint("ApplySharedPref")
@@ -1189,17 +1254,17 @@ public final class MainActivity extends AppCompatActivity {
         final String current = config.locale.getLanguage();
         MainActivity.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
-        if (!"".equals(lang) && !current.equals(lang)) {
+        if (!lang.isEmpty() && !current.equals(lang)) {
             if (lang.contains("-r")) {
                 String[] parts = lang.split("-r");
                 MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
                 newLocale = new Locale(parts[0], parts[1]);
             } else {
-                MainActivity.info("\tlang: "+lang);
+                MainActivity.info("\tlang: "+lang + " current: "+current);
                 newLocale = new Locale(lang);
-
             }
-        } else if ("".equals(lang) && ORIG_LOCALE != null && !current.equals(ORIG_LOCALE.getLanguage())) {
+        } else if (lang.isEmpty() && ORIG_LOCALE != null && !ORIG_LOCALE.getLanguage().isEmpty()
+                && !current.equals(ORIG_LOCALE.getLanguage())) {
             newLocale = ORIG_LOCALE;
         }
 
@@ -1208,6 +1273,51 @@ public final class MainActivity extends AppCompatActivity {
             config.locale = newLocale;
             MainActivity.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+            //ALIBI: loop protection
+            if (MainActivity.getMainActivity() != null &&
+                    MainActivity.getMainActivity().state != null &&
+                    MainActivity.getMainActivity().state.ttsChecked == false) {
+                ttsCheckIntent();
+            }
+        }
+    }
+
+    public static void ttsCheckIntent() {
+        if (mainActivity != null) {
+            try {
+                Intent checkTTSIntent = new Intent();
+                checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+                mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+            } catch (ActivityNotFoundException e) {
+                error("TTS check not available in your device." + e.fillInStackTrace());
+                //TODO: does make sense to disable the TTS pref here, or is this recoverable?
+            }
+        } else {
+            MainActivity.error("could not launch TTS check due to pre-instantiation state");
+        }
+    }
+
+    /**
+     * hack to get locale
+     * @param context the Android context for which to get the locale
+     * @param config the Configuration of the applications
+     * @return the Locale according to device and configuration
+     */
+    public static Locale getLocale(final Context context, final Configuration config) {
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final String current = config.locale.getLanguage();
+        String lang = prefs.getString(ListFragment.PREF_LANGUAGE, current);
+        if (lang.isEmpty()) {
+            lang = current;
+        }
+        MainActivity.info("current lang: " + current + " new lang: " + lang);
+        if (lang.contains("-r")) {
+            String[] parts = lang.split("-r");
+            MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
+            return new Locale(parts[0], parts[1]);
+        } else {
+            MainActivity.info("\tlang: "+lang);
+            return new Locale(lang);
         }
     }
 
@@ -1420,8 +1530,6 @@ public final class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
-
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.addNetwork(network);
@@ -1433,7 +1541,6 @@ public final class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.updateNetwork(network);
@@ -1445,7 +1552,6 @@ public final class MainActivity extends AppCompatActivity {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final State state = mainActivity.getState();
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
             if (f != null) {
                 f.reCluster();
@@ -1620,19 +1726,6 @@ public final class MainActivity extends AppCompatActivity {
         // make volume change "media"
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        try {
-            if (TTS.hasTTS()) {
-                // don't reuse an old one, has to be on *this* context
-                if (state.tts != null) {
-                    state.tts.shutdown();
-                }
-                // this has to have the parent activity, for whatever wacky reasons
-                state.tts = new TTS(this);
-            }
-        } catch (Exception ex) {
-            error("exception setting TTS: " + ex, ex);
-        }
-
         TelephonyManager tele = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         if (tele != null && state.phoneState == null) {
             state.phoneState = new PhoneState();
@@ -1644,11 +1737,16 @@ public final class MainActivity extends AppCompatActivity {
                 info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
+        if (MainActivity.getMainActivity() != null &&
+                MainActivity.getMainActivity().state != null &&
+                MainActivity.getMainActivity().state.ttsChecked == false) {
+            ttsCheckIntent();
+        }
     }
 
     /**
      * Instantiate both both BSSID matchers - inital load
-     * @param prefs
+     * @param prefs the preferences instance for which to get matchers
      */
     private void setupFilters(final SharedPreferences prefs) {
         if (null != state) {
@@ -1660,7 +1758,7 @@ public final class MainActivity extends AppCompatActivity {
 
     /**
      * Trigger recreation of BSSID address filter from prefs
-     * @param addressKey
+     * @param addressKey the preferences key for which to create a settings entry.
      */
     public void updateAddressFilter(final String addressKey) {
         if (null != state) {
@@ -1675,8 +1773,8 @@ public final class MainActivity extends AppCompatActivity {
 
     /**
      * Accessor for state BSSID matchers
-     * @param addressKey
-     * @return
+     * @param addressKey the preferences key for which to build the matcher
+     * @return the matcher corresponding to the key as set in the preferences
      */
     public Matcher getBssidFilterMatcher(final String addressKey) {
         if (null != state) {
@@ -1691,17 +1789,16 @@ public final class MainActivity extends AppCompatActivity {
 
     /**
      * Build a BSSID matcher from preferences for the supplied key
-     * @param prefs
-     * @param addressKey
-     * @return
+     * @param prefs the SharedPreferences instance for the application
+     * @param addressKey the preferences key of the matching settings for which to build the matcher
+     * @return a Matcher instance corresponding to the current user settings from preferences
      */
     private Matcher generateBssidFilterMatcher( final SharedPreferences prefs,  final String addressKey) {
         Gson gson = new Gson();
         Matcher matcher = null;
-        final String f = prefs.getString( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS, "");
         String[] values = gson.fromJson(prefs.getString(addressKey, "[]"), String[].class);
         if(values.length>0) {
-            StringBuffer sb = new StringBuffer("^(");
+            StringBuilder sb = new StringBuilder("^(");
             boolean first = true;
             for (String value: values) {
 
@@ -1824,7 +1921,7 @@ public final class MainActivity extends AppCompatActivity {
                 activationMessages += getString(R.string.turn_on_wifi);
             }
             // tell user, cuz this takes a little while
-            if (!isFinishing() && !activationMessages.isEmpty()) {
+            if (!activationMessages.isEmpty()) {
                 WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
             }
         }
@@ -1836,17 +1933,14 @@ public final class MainActivity extends AppCompatActivity {
         if (null == wifiManager) {
             return false;
         }
-        if (!wifiManager.isWifiEnabled() && !state.inEmulator) {
-            return true;
-        }
-        return false;
+        return !wifiManager.isWifiEnabled() && !state.inEmulator;
     }
 
     private void setupWifi() {
         // warn about turning off network notification
         final String notifOn = Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
-        if (notifOn != null && "1".equals(notifOn) && state.wifiReceiver == null && !isFinishing()) {
+        if ("1".equals(notifOn) && state.wifiReceiver == null) {
             WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
         }
 
@@ -1909,8 +2003,26 @@ public final class MainActivity extends AppCompatActivity {
             else {
                 info("wifi NOT turned on, resultCode: " + resultCode);
             }
-        }
-        else {
+        } else if (requestCode == ACTION_TTS_CODE) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                state.tts = new TextToSpeech(this, this);
+            } else {
+                try {
+                    PackageManager pm = getPackageManager();
+                    Intent installTTSIntent = new Intent();
+                    installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                    ResolveInfo resolveInfo = pm.resolveActivity( installTTSIntent, PackageManager.MATCH_DEFAULT_ONLY );
+
+                    if( resolveInfo == null ) {
+                        error("ACTION_TTS_CALLBACK: resolve ACTION_INSTALL_TTS_DATA via package mgr.");
+                    } else {
+                        startActivity(installTTSIntent);
+                    }
+                } catch (Exception e) {
+                    error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA",e);
+                }
+            }
+        } else {
             info("MainActivity: Unhandled requestCode: " + requestCode
                     + " resultCode: " + resultCode);
         }
@@ -1950,7 +2062,10 @@ public final class MainActivity extends AppCompatActivity {
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final Editor edit = prefs.edit();
             if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
-                if (!bt.isEnabled()) {
+                //NB: almost certainly getting specious 'false' answers to isEnabled.
+                //  BluetoothAdapter.STATE_TURNING_OFF also a possible match
+                if (bt.getState() == BluetoothAdapter.STATE_OFF ||
+                        bt.getState() == BluetoothAdapter.STATE_TURNING_OFF) {
                     info("Enable bluetooth");
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
                     bt.enable();
@@ -2007,6 +2122,11 @@ public final class MainActivity extends AppCompatActivity {
         }
 
         final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
+        //ALIBI: this pref seems to be persisting across runs, shutting down BT on exit when it was active on start.
+        Editor removeBtPref = prefs.edit();
+        removeBtPref.remove(ListFragment.PREF_BT_WAS_OFF);
+        removeBtPref.apply();
+
         // don't call on emulator, it crashes it
         if ( btWasOff && ! state.inEmulator ) {
             // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?
@@ -2057,7 +2177,7 @@ public final class MainActivity extends AppCompatActivity {
 
     public void speak(final String string) {
         if (!MainActivity.getMainActivity().isMuted() && state.tts != null) {
-            state.tts.speak(string);
+            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null);
         }
     }
 
@@ -2100,9 +2220,9 @@ public final class MainActivity extends AppCompatActivity {
             // check if there is a gps
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
-            if (locProvider == null && !isFinishing()) {
+            if (locProvider == null) {
                 WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.no_gps_device), Toast.LENGTH_LONG);
-            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER) && !isFinishing()) {
+            } else if (!locationManager.isProviderEnabled(GPS_PROVIDER)) {
                 // gps exists, but isn't on
                 WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turn_on_gps), Toast.LENGTH_LONG);
 
@@ -2398,10 +2518,14 @@ public final class MainActivity extends AppCompatActivity {
     }
 
     public void finishSoon() {
-        finishSoon(FINISH_TIME_MILLIS, false);
+        finishSoon(FINISH_TIME_MILLIS, false, false);
     }
 
     public void finishSoon(final long finishTimeMillis, final boolean restart) {
+        finishSoon(finishTimeMillis, restart, false);
+    }
+
+    public void finishSoon(final long finishTimeMillis, final boolean restart, final boolean uiOnly) {
         MainActivity.info("Will finish in " + finishTimeMillis + "ms");
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -2415,7 +2539,19 @@ public final class MainActivity extends AppCompatActivity {
                         MainActivity.info("finishSoon: finish already called");
                     } else {
                         MainActivity.info("finishSoon: calling finish now");
-                        finish();
+                        if (uiOnly) {
+                            info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
+                            state.uiRestart.set(true);
+                            MainActivity.super.recreate();
+                            /*new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    startActivity(i);
+                                }
+                            }, 10L);*/
+                        } else {
+                            finish();
+                        }
                     }
 
                     if (restart) {
@@ -2439,92 +2575,93 @@ public final class MainActivity extends AppCompatActivity {
     @Override
     public void finish() {
         info("MAIN: finish.");
-        if (state.wifiReceiver != null) {
-            info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
-        }
+        if (!state.uiRestart.get()) {
+            if (state.wifiReceiver != null) {
+                info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+            }
 
-        final boolean wasFinishing = state.finishing.getAndSet(true);
-        if (wasFinishing) {
-            info("MAIN: finish called twice!");
-        }
+            final boolean wasFinishing = state.finishing.getAndSet(true);
+            if (wasFinishing) {
+                info("MAIN: finish called twice!");
+            }
 
-        // interrupt this just in case
-        final ObservationUploader observationUploader = state.observationUploader;
-        if (observationUploader != null) {
-            observationUploader.setInterrupted();
-        }
+            // interrupt this just in case
+            final ObservationUploader observationUploader = state.observationUploader;
+            if (observationUploader != null) {
+                observationUploader.setInterrupted();
+            }
 
-        if (state.gpsListener != null) {
-            // save our location for later runs
-            state.gpsListener.saveLocation();
-        }
+            if (state.gpsListener != null) {
+                // save our location for later runs
+                state.gpsListener.saveLocation();
+            }
 
-        // close the db. not in destroy, because it'll still write after that.
-        if (state.dbHelper != null) state.dbHelper.close();
+            // close the db. not in destroy, because it'll still write after that.
+            if (state.dbHelper != null) state.dbHelper.close();
 
-        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (state.gpsListener != null && locationManager != null) {
-            try {
-                locationManager.removeGpsStatusListener(state.gpsListener);
-                locationManager.removeUpdates(state.gpsListener);
-                if (Build.VERSION.SDK_INT >= 24) {
-                    if (gnssStatusCallback != null) {
-                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+            final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (state.gpsListener != null && locationManager != null) {
+                try {
+                    locationManager.removeGpsStatusListener(state.gpsListener);
+                    locationManager.removeUpdates(state.gpsListener);
+                    if (Build.VERSION.SDK_INT >= 24) {
+                        if (gnssStatusCallback != null) {
+                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                        }
                     }
+                } catch (final SecurityException ex) {
+                    error("SecurityException on finish: " + ex, ex);
+                } catch (final IllegalStateException ise) {
+                    error("ISE turning off GPS: ", ise);
+                } catch (final NullPointerException npe) {
+                    error("NPE turning off GPS: ", npe);
                 }
-            } catch (final SecurityException ex) {
-                error("SecurityException on finish: " + ex, ex);
-            } catch (final IllegalStateException ise) {
-                error("ISE turning off GPS: ",ise);
-            } catch (final NullPointerException npe) {
-                error("NPE turning off GPS: ", npe);
             }
-        }
 
-        // stop the service, so when we die it's both stopped and unbound and will die
-        final Intent serviceIntent = new Intent(this, WigleService.class);
-        stopService(serviceIntent);
-        try {
-            // have to use the app context to bind to the service, cuz we're in tabs
-            getApplicationContext().unbindService(state.serviceConnection);
-        } catch (final IllegalArgumentException ex) {
-            MainActivity.info("serviceConnection not registered: " + ex, ex);
-        }
-
-        // release the lock before turning wifi off
-        if (state.wifiLock != null && state.wifiLock.isHeld()) {
+            // stop the service, so when we die it's both stopped and unbound and will die
+            final Intent serviceIntent = new Intent(this, WigleService.class);
+            stopService(serviceIntent);
             try {
-                state.wifiLock.release();
-            } catch (Exception ex) {
-                MainActivity.error("exception releasing wifi lock: " + ex, ex);
+                // have to use the app context to bind to the service, cuz we're in tabs
+                getApplicationContext().unbindService(state.serviceConnection);
+            } catch (final IllegalArgumentException ex) {
+                MainActivity.info("serviceConnection not registered: " + ex, ex);
             }
-        }
 
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        endBluetooth(prefs);
-
-        TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        if (tele != null && state.phoneState != null) {
-            tele.listen(state.phoneState, PhoneStateListener.LISTEN_NONE);
-        }
-
-        if (state.tts != null) {
-            if (!isMuted()) {
-                // give time for the above "done" to be said
-                sleep(250);
+            // release the lock before turning wifi off
+            if (state.wifiLock != null && state.wifiLock.isHeld()) {
+                try {
+                    state.wifiLock.release();
+                } catch (Exception ex) {
+                    MainActivity.error("exception releasing wifi lock: " + ex, ex);
+                }
             }
-            state.tts.shutdown();
-        }
 
-        // clean up.
-        if (state.soundPop != null) {
-            state.soundPop.release();
-        }
-        if (state.soundNewPop != null) {
-            state.soundNewPop.release();
-        }
-        info("MAIN: finish complete.");
+            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            endBluetooth(prefs);
 
+            TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            if (tele != null && state.phoneState != null) {
+                tele.listen(state.phoneState, PhoneStateListener.LISTEN_NONE);
+            }
+
+            if (state.tts != null) {
+                if (!isMuted()) {
+                    // give time for the above "done" to be said
+                    sleep(250);
+                }
+                state.tts.shutdown();
+            }
+
+            // clean up.
+            if (state.soundPop != null) {
+                state.soundPop.release();
+            }
+            if (state.soundNewPop != null) {
+                state.soundNewPop.release();
+            }
+            info("MAIN: finish complete.");
+        }
         super.finish();
     }
 
@@ -2590,9 +2727,19 @@ public final class MainActivity extends AppCompatActivity {
                 }
             });
             final Dialog dialog = iseDlgBuilder.create();
-            dialog.show();
+            if (!isFinishing()) {
+                dialog.show();
+            }
         }
         return safe;
+    }
+
+    public static void setTheme(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT > 28) {
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            info("set theme called: "+displayMode);
+            AppCompatDelegate.setDefaultNightMode(displayMode);
+        }
     }
 
     /**
@@ -2653,4 +2800,25 @@ public final class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * respond to TTS initialization
+     * @param status status of initialization
+     */
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS && state != null && state.tts != null) {
+            Locale locale = getLocale(getApplicationContext(), getApplicationContext().getResources().getConfiguration());
+            info("LOCALE: "+locale);
+            if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
+                state.tts.setLanguage(locale);
+            } else {
+                info("preferred locale: [" +locale+"] not available on device.");
+            }
+            state.ttsChecked = true;
+        } else if (status == TextToSpeech.SUCCESS) {
+            info("TTS init successful, but TTS engine was null");
+        } else if (status == TextToSpeech.ERROR) {
+            error("TTS init failed: "+status);
+        }
+    }
 }

@@ -77,11 +77,11 @@ public class SettingsUtil {
         Object period = null;
         if ( periods instanceof Long[] ) {
             period = prefs.getLong( pref, (Long) spinDefault );
-        }
-        else if ( periods instanceof String[] ) {
+        } else if ( periods instanceof String[] ) {
             period = prefs.getString( pref, (String) spinDefault );
-        }
-        else {
+        } else if (periods instanceof Integer[] ) {
+            period = prefs.getInt( pref, (Integer) spinDefault);
+        } else {
             MainActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
         }
 
@@ -107,19 +107,21 @@ public class SettingsUtil {
                 // MainActivity.info( pref + " setting period: " + period );
                 if ( period instanceof Long ) {
                     editor.putLong( pref, (Long) period );
-                }
-                else if ( period instanceof String ) {
+                } else if ( period instanceof String ) {
                     editor.putString( pref, (String) period );
-                }
-                else {
+                } else if (period instanceof Integer) {
+                    editor.putInt(pref, (Integer)period);
+                } else {
                     MainActivity.error("unhandled object type: " + period + " class: " + period.getClass());
                 }
                 editor.apply();
 
-                if ( period instanceof String ) {
+                if ( pref.equals(ListFragment.PREF_LANGUAGE) ) {
                     MainActivity.setLocale( context, context.getResources().getConfiguration() );
                 }
-
+                if ( pref.equals(ListFragment.PREF_DAYNIGHT_MODE) ) {
+                    MainActivity.setTheme(prefs);
+                }
             }
             @Override
             public void onNothingSelected( final AdapterView<?> arg0 ) {}

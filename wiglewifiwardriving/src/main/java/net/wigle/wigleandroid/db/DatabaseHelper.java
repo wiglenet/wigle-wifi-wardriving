@@ -5,6 +5,7 @@ package net.wigle.wigleandroid.db;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
+import static net.wigle.wigleandroid.MainActivity.info;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
@@ -431,6 +432,7 @@ public final class DatabaseHelper extends Thread {
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             dbFilename = EXTERNAL_DATABASE_PATH + DATABASE_NAME;
+            info("made path: " + path + " exists: " + path.exists() + " write: " + path.canWrite());
         }
         final File dbFile = new File( dbFilename );
         boolean doCreateNetwork = false;

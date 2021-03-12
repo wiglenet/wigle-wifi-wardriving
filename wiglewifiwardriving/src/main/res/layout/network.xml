@@ -1,298 +1,305 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/mainlayout"
-    android:orientation="vertical"
+	android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		<RelativeLayout
+			android:id="@+id/netmap_rl"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent">
+		</RelativeLayout>
 
-    <LinearLayout android:orientation="horizontal"
-	    android:layout_width="fill_parent" android:layout_height="wrap_content">
-
-	    <ImageView android:id="@+id/wepicon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="6dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:contentDescription="@string/crypto" />
-
-		<ImageView
-			android:id="@+id/bticon"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:contentDescription="wep icon"
-            android:paddingTop="8dp"
-			android:paddingLeft="0dp"
-			android:paddingRight="4dp"
-			android:text="bticon"
-			android:visibility="gone"/>
-
-		<TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ssid"
-            android:textSize="24sp"
-            android:textColor="#AAEE50"
-            android:gravity="left"
-            android:layout_weight="10" />
-	</LinearLayout>
-
-	<LinearLayout android:orientation="horizontal"
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<TextView
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-        android:paddingLeft="4dp"
-        android:paddingStart="4dp"
-		android:id="@+id/bssid"
-		android:textSize="20sp"
-		android:textColor="#AAAA00"
-		android:layout_weight="6"
-		android:gravity="left"
-		/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/oui"
-            android:textSize="18sp"
-            android:textColor="#808080"
-            android:gravity="left"
-            android:layout_weight="5"
-            />
-    </LinearLayout>
-    <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-    	<TextView
-		android:id="@+id/na_signal_text"
-		android:text="@string/network_signal"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:layout_marginRight="2dip"
-        android:gravity="right"
-		/>
-    	<TextView
-		android:id="@+id/na_signal"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:gravity="left"
-		/>
-
-		<TextView
-		android:id="@+id/na_type_text"
-		android:text="@string/network_type"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:layout_marginRight="2dip"
-        android:gravity="right"
-		/>
-		<TextView
-		android:id="@+id/na_type"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:gravity="left"
-		/>
-
-		<TextView
-		android:id="@+id/na_firsttime_text"
-		android:text="@string/network_firstseen"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:layout_marginRight="2dip"
-        android:gravity="right"
-		/>
-		<TextView
-		android:id="@+id/na_firsttime"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_weight="1"
-        android:gravity="left"
-		/>
-
-    </LinearLayout>
-
-    <LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    >
-    	<TextView
-		android:id="@+id/na_cap_text"
-		android:text="@string/network_capa"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		/>
-    	<TextView
-		android:id="@+id/na_cap"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		/>
-	</LinearLayout>
-
-	<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-	android:weightSum="10"
-    >
-    	<TextView
-		android:id="@+id/na_chan_text"
-		android:text="@string/network_channel"
-		android:layout_width="0dp"
-		android:layout_weight="2"
-		android:layout_height="wrap_content"
-		/>
-    	<TextView
-		android:id="@+id/na_chan"
-		android:layout_width="0dp"
-		android:layout_weight="3"
-		android:layout_height="wrap_content"
-		/>
-
-		<TextView
-		android:id="@+id/na_observe_text"
-		android:text="@string/network_observations"
-		android:layout_width="0dp"
-		android:layout_weight="3"
-		android:gravity="right"
-		android:layout_height="wrap_content"
-		/>
-    	<TextView
-		android:id="@+id/na_observe"
-		android:text="@string/network_querying"
-		android:layout_width="0dp"
-		android:layout_weight="2"
-		android:layout_height="wrap_content"
-		/>
-	</LinearLayout>
-	<LinearLayout
-		android:id="@+id/cell_info"
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:visibility="gone"
-        android:layout_marginRight="15dp">
-		<LinearLayout
-			android:orientation="horizontal"
+		<LinearLayout android:orientation="vertical"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-            android:weightSum="4"
-			>
-			<TextView
-				android:id="@+id/na_cell_status_lbl"
-				android:text="@string/cell_network_status"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-				android:layout_height="wrap_content"
+			android:paddingBottom="4dp"
+			style="@style/NetworkViewOverlay">
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
+				<ImageView android:id="@+id/wepicon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingTop="6dp"
+					android:paddingLeft="4dp"
+					android:paddingRight="4dp"
+					android:contentDescription="@string/crypto" />
+
+				<ImageView
+					android:id="@+id/bticon"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:contentDescription="wep icon"
+					android:paddingTop="8dp"
+					android:paddingLeft="0dp"
+					android:paddingRight="4dp"
+					android:text="bticon"
+					android:visibility="gone"/>
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/ssid"
+					android:gravity="left"
+					android:layout_weight="10"
+					style="@style/NetDetailSsid" />
+			</LinearLayout>
+
+			<LinearLayout android:orientation="horizontal"
+				android:layout_width="fill_parent" android:layout_height="wrap_content">
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:paddingLeft="4dp"
+					android:paddingStart="4dp"
+					android:id="@+id/bssid"
+					android:layout_weight="6"
+					android:gravity="left"
+					style="@style/NetDetailBssid"
 				/>
-			<TextView
-				android:id="@+id/na_cell_status"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-				android:layout_height="wrap_content"
-				/>
-			<TextView
-				android:id="@+id/na_cell_brand_lbl"
-				android:text="@string/cell_network_brand"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-				android:layout_height="wrap_content"
-				/>
-			<TextView
-				android:id="@+id/na_cell_brand"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-				android:layout_height="wrap_content"
-				/>
-		</LinearLayout>
-		<LinearLayout
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:id="@+id/oui"
+					android:gravity="left"
+					android:layout_weight="5"
+					/>
+			</LinearLayout>
+			<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			>
-			<TextView
-				android:id="@+id/na_cell_bands_lbl"
-				android:text="@string/cell_network_bands"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				<TextView
+					android:text="@string/network_signal"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_marginRight="2dip"
+					android:textStyle="bold"
+					android:gravity="right"
 				/>
-			<TextView
-				android:id="@+id/na_cell_bands"
-                android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
+				<TextView
+					android:id="@+id/na_signal"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:gravity="left"
 				/>
+
+				<TextView
+					android:text="@string/network_type"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:layout_marginRight="2dip"
+					android:textStyle="bold"
+					android:gravity="right"
+				/>
+				<TextView
+					android:id="@+id/na_type"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:gravity="left"
+				/>
+
+				<TextView
+					android:text="@string/network_firstseen"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:textStyle="bold"
+					android:layout_marginRight="2dip"
+					android:gravity="right"
+				/>
+				<TextView
+					android:id="@+id/na_firsttime"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:gravity="left"
+				/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingHorizontal="2dp"
+			>
+				<TextView
+					android:text="@string/network_capa"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+				/>
+				<TextView
+					android:id="@+id/na_cap"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+				/>
+			</LinearLayout>
+
+			<LinearLayout
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:weightSum="10"
+				android:paddingHorizontal="2dp"
+				>
+				<TextView
+					android:text="@string/network_channel"
+					android:layout_width="0dp"
+					android:layout_weight="2"
+					android:layout_height="wrap_content"
+				/>
+				<TextView
+					android:id="@+id/na_chan"
+					android:layout_width="0dp"
+					android:layout_weight="3"
+					android:layout_height="wrap_content"
+				/>
+
+				<TextView
+					android:text="@string/network_observations"
+					android:layout_width="0dp"
+					android:layout_weight="3"
+					android:gravity="right"
+					android:layout_height="wrap_content"
+				/>
+				<TextView
+					android:id="@+id/na_observe"
+					android:text="@string/network_querying"
+					android:layout_width="0dp"
+					android:layout_weight="2"
+					android:layout_height="wrap_content"
+				/>
+			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/cell_info"
+				android:orientation="vertical"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone"
+				android:layout_marginRight="15dp"
+				android:paddingHorizontal="2dp">
+				<LinearLayout
+					android:orientation="horizontal"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:weightSum="4"
+					>
+					<TextView
+						android:text="@string/cell_network_status"
+						android:layout_width="0dp"
+						android:layout_weight="1"
+						android:layout_height="wrap_content"
+						/>
+					<TextView
+						android:id="@+id/na_cell_status"
+						android:layout_width="0dp"
+						android:layout_weight="1"
+						android:layout_height="wrap_content"
+						/>
+					<TextView
+						android:text="@string/cell_network_brand"
+						android:layout_width="0dp"
+						android:layout_weight="1"
+						android:layout_height="wrap_content"
+						/>
+					<TextView
+						android:id="@+id/na_cell_brand"
+						android:layout_width="0dp"
+						android:layout_weight="1"
+						android:layout_height="wrap_content"
+						/>
+				</LinearLayout>
+				<LinearLayout
+					android:orientation="horizontal"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:paddingHorizontal="2dp"
+					>
+					<TextView
+						android:text="@string/cell_network_bands"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="13sp"
+						/>
+					<TextView
+						android:id="@+id/na_cell_bands"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="13sp"
+						/>
+				</LinearLayout>
+				<LinearLayout
+					android:id="@+id/cell_notes_row"
+					android:visibility="gone"
+					android:orientation="horizontal"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:paddingHorizontal="2dp"
+					>
+					<TextView
+						android:text="@string/cell_network_notes"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="13sp"
+						/>
+					<TextView
+						android:id="@+id/na_cell_notes"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:textSize="13sp"
+						/>
+				</LinearLayout>
+			</LinearLayout>
 		</LinearLayout>
-		<LinearLayout
-			android:id="@+id/cell_notes_row"
-			android:visibility="gone"
+		<LinearLayout android:id="@+id/filter_row"
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			>
-			<TextView
-				android:id="@+id/na_cell_notes_lbl"
-				android:text="@string/cell_network_notes"
-				android:layout_width="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentLeft="true">
+			<Button android:id="@+id/hide_mac_button"
+				android:text="@string/hide_mac"
+				android:layout_weight="4"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				/>
-			<TextView
-				android:id="@+id/na_cell_notes"
-				android:layout_width="wrap_content"
+				android:layout_marginLeft="3dip"
+				android:layout_marginRight="2dip"
+				android:layout_marginTop="5dip"
+				android:layout_marginBottom="3dip"
+				android:minHeight="0dp"
+				android:background="@drawable/filter_button"/>
+			<Button android:id="@+id/hide_oui_button"
+				android:text="@string/hide_oui"
+				android:layout_weight="4"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				/>
-		</LinearLayout>
+				android:layout_marginLeft="2dip"
+				android:layout_marginRight="2dip"
+				android:layout_marginTop="5dip"
+				android:layout_marginBottom="3dip"
+				android:minHeight="0dp"
+				android:background="@drawable/filter_button" />
+			<Button android:id="@+id/disable_log_mac_button"
+				android:text="@string/block_mac"
+				android:layout_weight="4"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="2dip"
+				android:layout_marginRight="3dip"
+				android:layout_marginTop="5dip"
+				android:layout_marginBottom="3dip"
+				android:minHeight="0dp"
+				android:background="@drawable/filter_button" />
 	</LinearLayout>
-    <LinearLayout
-        android:orientation="vertical"
-	android:layout_width="fill_parent"
-	android:layout_height="2dip"
-	android:background="#A07070"
-	/>
-	<LinearLayout android:id="@+id/filter_row"
-        android:orientation="horizontal"
-		android:layout_width="fill_parent" android:layout_height="wrap_content">
-		<Button android:id="@+id/hide_mac_button"
-			android:text="@string/hide_mac"
-			android:layout_weight="4"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-            android:layout_marginLeft="3dip"
-            android:layout_marginRight="2dip"
-            android:layout_marginTop="5dip"
-            android:layout_marginBottom="3dip"
-            android:minHeight="0dp"
-            android:background="@drawable/filter_button"/>
-		<Button android:id="@+id/hide_oui_button"
-			android:text="@string/hide_oui"
-			android:layout_weight="4"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-            android:layout_marginLeft="2dip"
-            android:layout_marginRight="2dip"
-            android:layout_marginTop="5dip"
-            android:layout_marginBottom="3dip"
-            android:minHeight="0dp"
-            android:background="@drawable/filter_button" />
-        <Button android:id="@+id/disable_log_mac_button"
-			android:text="@string/block_mac"
-			android:layout_weight="4"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-            android:layout_marginLeft="2dip"
-            android:layout_marginRight="3dip"
-            android:layout_marginTop="5dip"
-            android:layout_marginBottom="3dip"
-            android:minHeight="0dp"
-            android:background="@drawable/filter_button" />
-	</LinearLayout>
-
     <LinearLayout
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
@@ -313,5 +320,4 @@
 		android:layout_width="fill_parent"
         android:layout_height="fill_parent">
     </RelativeLayout>
-
 </LinearLayout>

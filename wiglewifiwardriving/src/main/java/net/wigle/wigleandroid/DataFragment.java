@@ -55,6 +55,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -130,7 +131,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
                 }
                 if (fail != null) {
-                    // toast!
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
                 } else {
                     // start db result activity
@@ -619,20 +619,24 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             if (pd != null) {
                 if (values.length == 1) {
                     MainActivity.info("progress: " + values[0]);
-                    if (values[0] > 0) {
-                        pd.setIndeterminate(false);
-                        if (100 == values[0]) {
-                            if (pd.isShowing()) {
-                                pd.dismiss();
+                    try {
+                        if (values[0] > 0) {
+                            pd.setIndeterminate(false);
+                            if (100 == values[0]) {
+                                if (pd.isShowing()) {
+                                    pd.dismiss();
+                                }
+                                return;
                             }
-                            return;
+                            pd.setMessage(getString(R.string.backup_in_progress));
+                            pd.setProgress(values[0]);
+                        } else {
+                            pd.setIndeterminate(false);
+                            pd.setMessage(getString(R.string.backup_preparing));
+                            pd.setProgress(values[0]);
                         }
-                        pd.setMessage(getString(R.string.backup_in_progress));
-                        pd.setProgress(values[0]);
-                    } else {
-                        pd.setIndeterminate(false);
-                        pd.setMessage(getString(R.string.backup_preparing));
-                        pd.setProgress(values[0]);
+                    } catch (IllegalStateException iex) {
+                        MainActivity.error("lost ability to update progress dialog - detatched fragment?", iex);
                     }
                 } else {
                     MainActivity.warn("too many values for DB Backup progress update");
@@ -800,7 +804,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             final SipKey sipkey = new SipKey(new byte[16]);
             final byte[] macBytes = new byte[6];
-            final Map<Integer,Set<mgrs>> mjg = new TreeMap<>();
+            final Map<Long,Set<mgrs>> mjg = new TreeMap<>();
 
             final long genStart = System.currentTimeMillis();
 
@@ -824,12 +828,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         } else {
                             mgrs m = mgrs.fromUtm(utm.fromLatLon(lat, lon));
 
-                            Integer kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
+                            Long kslice2 = MagicEightUtil.extractKeyFrom(bssid, macBytes, sipkey, SLICE_BITS);
+
                             if (null != kslice2) {
                                 Set<mgrs> locs = mjg.get(kslice2);
                                 if (locs == null) {
                                     locs = new HashSet<>();
-                                    mjg.put(kslice2, locs);
+                                    mjg.put((long)kslice2, locs);
                                 }
                                 if (locs.add(m)) {
                                     records++;
@@ -884,8 +889,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             bb.clear();
                             byte[] mstr = new byte[9];
                             int outElements = 0;
-                            for ( Map.Entry<Integer,Set<mgrs>> me : mjg.entrySet()) {
-                                int key = me.getKey().intValue();
+                            for ( Map.Entry<Long,Set<mgrs>> me : mjg.entrySet()) {
+                                long key = me.getKey();
                                 for ( mgrs m : me.getValue() ) {
                                     if (bb.remaining() < recordsize ) {
                                         bb.flip();
@@ -895,7 +900,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                                         bb.clear();
                                     }
                                     m.populateBytes(mstr);
-                                    bb.putInt(key).put(mstr);
+                                    //ALIBI: relying on narrowing primitive conversion to get the low int bytes - https://docs.oracle.com/javase/specs/jls/se10/html/jls-5.html#jls-5.1.3
+                                    bb.putInt((int)key).put(mstr);
                                 }
                                 outElements++;
                                 if (outElements % 100 == 0) {
@@ -1001,7 +1007,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             // TODO: android R FS changes
             final boolean hasSD = FileUtility.hasSD();
 
-            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
             final String name = df.format(new Date());
             final String nameStr = "<name>" + name + "</name><trkseg>\n";
 

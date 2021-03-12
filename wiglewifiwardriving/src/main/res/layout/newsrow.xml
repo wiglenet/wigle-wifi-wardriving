@@ -6,23 +6,16 @@
 <TextView android:id="@+id/subject" android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:textSize="22sp"
-          android:textColor="#60f0f0"
-          android:gravity="center"/>
+	      style="@style/NewsTitleStyle"/>/>
 
 <TextView android:id="@+id/poster_date" android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-          android:textSize="14sp"
-          android:textColor="#808080"
-          android:gravity="center"/>
-
+	      style="@style/NewsDateStyle"/>
 <TextView android:id="@+id/post" android:layout_width="fill_parent"
 		  android:layout_height="wrap_content"
 		  android:layout_weight="1"
-		  android:textSize="18sp"
-		  android:textColor="#eeeeee"
-		  android:gravity="start"/>
+		  style="@style/NewsPostStyle"/>
 
 <TextView android:id="@+id/link" android:layout_width="fill_parent"
           android:layout_height="wrap_content"
@@ -30,6 +23,5 @@
           android:textSize="16sp"
           android:gravity="start"
           android:layout_marginBottom="4sp"/>
-
 </LinearLayout>
 

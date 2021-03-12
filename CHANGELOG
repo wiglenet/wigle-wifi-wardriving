@@ -1,3 +1,29 @@
+* 2.60 (02/05/2021)
+Bluetooth enable, TTS, crash reporter fixes
+UI and lifecycle modernization
+Czech language update (thanks eda-abec!)
+
+* 2.56 - 2.59 (11/19/2020)
+Hungarian language hacktoberfest overhaul (thanks meskobalazs!)
+Many human-updated translations
+Bug fixes and text-to-speech refactor
+Distances on maps, and better network detail markers
+
+* 2.55 (08/20/2020)
+Make okhttp work on Android 4.x
+Fix filename encoding bug.
+Fix magic8ball binary translation.
+
+* 2.54 (07/24/2020)
+Support for Android 11 Beta
+Better WPA3 heuristics
+Fixed frequencies (thanks christianrowlands!)
+More bits for Magic Eight Ball
+Show version in settings
+
+* 2.53 (04/24/2020)
+Workaround for Google Maps Bug https://issuetracker.google.com/issues/154855417
+
 * 2.52 (03/24/2020)
 Uploads pane download/upload controls.
 "Backup Database" can share from internal storage.

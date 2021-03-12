@@ -31,6 +31,10 @@ public final class Network {
     private static final String BAR_STRING = " | ";
     private static final String DASH_STRING = " - ";
     private static final String WPA3_CAP = "[WPA3";
+    private static final String SAE_CAP = "SAE";
+    private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
+    private static final String OWE_CAP = "OWE";    //ALIBI: handles both OWE and OWE_TRANSITION
+    //TODO: how we do distinguish between RSN-EAP-CCMP WPA2 and WPA3 implementations?
     private static final String WPA2_CAP = "[WPA2";
     private static final String RSN_CAP = "[RSN";
     private static final String WPA_CAP = "[WPA";
@@ -65,14 +69,14 @@ public final class Network {
         freqToChanTemp.put(5240, 48);
         freqToChanTemp.put(5260, 52);
         freqToChanTemp.put(5280, 56);
-        freqToChanTemp.put(5300, 58);
-        freqToChanTemp.put(5320, 60);
+        freqToChanTemp.put(5300, 60);
+        freqToChanTemp.put(5320, 64);
 
         freqToChanTemp.put(5500, 100);
         freqToChanTemp.put(5520, 104);
         freqToChanTemp.put(5540, 108);
         freqToChanTemp.put(5560, 112);
-        freqToChanTemp.put(5570, 116);
+        freqToChanTemp.put(5580, 116);
         freqToChanTemp.put(5600, 120);
         freqToChanTemp.put(5620, 124);
         freqToChanTemp.put(5640, 128);
@@ -141,7 +145,7 @@ public final class Network {
             this.showCapabilities = null;
         }
 
-        if (this.capabilities.contains(WPA3_CAP)) {
+        if (this.capabilities.contains(WPA3_CAP) || this.capabilities.contains(SUITE_B_192_CAP) || this.capabilities.contains(OWE_CAP) || this.capabilities.contains(SAE_CAP)) {
             crypto = CRYPTO_WPA3;
         } else if (this.capabilities.contains(WPA2_CAP) || this.capabilities.contains(RSN_CAP)) {
             crypto = CRYPTO_WPA2;

@@ -24,8 +24,6 @@
     <string name="reset_maxid_text">最新上传的标记：</string>
     <string name="maxout_maxid_button">Maxout数据库标记</string>
     <string name="maxout_maxid_text">设置标记：</string>
-    <string name="connect_button">连接</string>
-    <string name="connect_text">和网络运行商的的許可</string>
     <string name="csv_run_export_button">CSV文件导出运行</string>
     <string name="csv_run_export_text">导出当前运行的到CSV文件</string>
     <string name="csv_export_button">CSV文件导出到数据库</string>
@@ -50,7 +48,6 @@
     <string name="speech_gps">GPS状态改变</string>
     <string name="mute">静音</string>
     <string name="play">播放</string>
-    <string name="unknown">未知</string>
     <string name="sort_text">排序选项</string>
     <string name="listdialog_button">确定</string>
     <string name="cryptodialog_button">确定</string>
@@ -71,7 +68,6 @@
     <string name="query_bssid">BSSID（例如：0A:2C:EF:3D:25:1B）（SQL通配符：%,_):</string>
     <string name="search_button">本地数据库的查询</string>
     <string name="reset_button">重置字段</string>
-    <string name="list_query_clear">清除查询参数</string>
     <string name="crypto_security">安全</string>
     <string name="crypto_strength">信号强度</string>
     <string name="crypto_password">密码</string>
@@ -118,6 +114,7 @@
     <string name="tab_dash">仪表盘</string>
     <string name="tab_data">数据库</string>
     <string name="tab_stats">统计</string>
+    <string name="tab_search">搜索</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（扫描关闭的网络）</string>
@@ -134,7 +131,6 @@
     <string name="dash_db_queue">数据库的队列：</string>
     <string name="dash_db_nets">数据库的网络：</string>
     <string name="dash_db_locs">数据库的位置：</string>
-    <string name="dash_no_loc">沒有位置！</string>
     <string name="dash_short_loc">位置：</string>
     <string name="km_short">公里</string>
     <string name="mi_short">米</string>
@@ -166,7 +162,6 @@
     <string name="address">地址</string>
     <string name="no_address_found">沒有找到有地理编码的地址。</string>
     <string name="problem_with_field">字段的问题</string>
-    <string name="turning_wifi_off">正在关闭WiFi</string>
     <string name="lost_location">位置丢失</string>
     <string name="have_location">现在的位置来自</string>
     <string name="wifi_jammed">WiFi出现堵塞，关闭，然后又启动，Wi-Fi。</string>
@@ -183,8 +178,6 @@
     <string name="menu_screen_wake">保持屏幕开启</string>
     <string name="menu_labels_off">关闭标签</string>
     <string name="menu_labels_on">开启标签</string>
-    <string name="menu_zoom_in">放大</string>
-    <string name="menu_zoom_out">缩小</string>
     <string name="menu_turn_off_lockon">关闭跟踪</string>
     <string name="menu_turn_on_lockon">打开跟踪</string>
     <string name="menu_show_old">显示运行中的和新的网络</string>
@@ -242,6 +235,7 @@
     <string name="language_pt_rBR">português brasileiro (巴西葡萄牙语)</string>
     <string name="language_ru">ру́сский (俄语)</string>
     <string name="language_sv">svenska (瑞典语)</string>
+    <string name="language_sw">Kiswahili (斯瓦希里语)</string>
     <string name="language_tr">Türkçe (土耳其语)</string>
     <string name="language_zh_cn">简体中文（极客之眼汉化）</string>
     <string name="language_zh_tw">繁体中文 台灣</string>
@@ -272,7 +266,6 @@
     <string name="map_toast_terrain">地图类型：地形</string>
     <string name="map_needs_playservice">地图需要Google Play服务</string>
     <string name="register">寄存器</string>
-    <string name="at">在</string>
     <string name="drawer_open">抽屉打开</string>
     <string name="drawer_close">抽屉关闭</string>
     <string name="site_stats_app_name">WiGLE.net统计</string>
@@ -294,13 +287,9 @@
     <string name="prevmonthcount_title">上个月发现WiFi</string>
     <string name="firsttransid_title">第一个交易ID</string>
     <string name="lasttransid_title">最新的交易ID</string>
-    <string name="please_allow">请允许使用</string>
     <string name="gps_permission">GPS（精细位置)</string>
     <string name="cell_permission">小区位置（粗略位置）</string>
-    <string name="allow_storage">数据库默认置于外部存储器上，请允许媒体/文件存储</string>
-    <string name="restart">重新启动以使用外部存储</string>
     <string name="rank_stats_app_name">WiGLE.net排名</string>
-    <string name="total_wifi">总WiFi数</string>
     <string name="total_cell">总信号塔数</string>
     <string name="tab_rank">排名</string>
     <string name="uploads_app_name">WiGLE.net上传</string>
@@ -308,8 +297,6 @@
     <string name="queue_depth">文件处理队列深度</string>
     <string name="news_app_name">WiGLE.net新闻</string>
     <string name="tab_news">新闻</string>
-    <string name="wifi_gps">WiFi GPS</string>
-    <string name="cell_gps">移动 GPS</string>
     <string name="bytes">字节</string>
     <string name="rank_all_time">所有时间排名</string>
     <string name="rank_month">月排名</string>
@@ -387,7 +374,6 @@
     <string name="cell_network_brand">牌：</string>
     <string name="cell_network_notes">笔记：</string>
     <string name="bluetooth_pref_text">启用蓝牙扫描</string>
-    <string name="turning_bt_off">关闭蓝牙功能</string>
     <string name="turn_on_bt">打开蓝牙</string>
     <string name="filter_show_bt">显示蓝牙</string>
     <string name="error_invalid_bssid">BSSID必须长度为12个字符或包含通配符（％）</string>
@@ -398,7 +384,15 @@
     <string name="search_local">搜索本地数据库</string>
     <string name="search_failed">搜索失败</string>
     <string name="search_empty">结果为空</string>
-    <string name="search_query_limit">您今天已达到最大搜索次数。你的限额将在明天重置。</string>
+    <string name="export_m8b_button">出口 &#x2791;</string>
+    <string name="export_m8b">导出地理位置魔术（8）球</string>
+    <string name="export_m8b_detail">生成一个用于确定您的大概位置的oracle。参见：\n\n https://github.com/wiglenet/m8b \n\n将使用默认切片= 30，以允许与其他魔法结合使用。 \n\n这可能需要一段时间-如果数据库很大，请连接外部电源。</string>
+    <string name="m8b_failed">无法导出m8b文件。\n</string>
+    <string name="m8b_sizing">确定&#x2791;输入</string>
+    <string name="exporting_m8b_final">编写&#x2791;文件</string>
+    <string name="calculating_m8b">计算&#x2791;</string>
+    <string name="btloc_title">WiGLE.net具有位置的蓝牙设备</string>
+    <string name="total_bt">WiGLE.net具有位置的蓝牙设备</string>
     <string name="menu_debug">Debug</string>
     <string name="pie_bad">Android Pie（9.0）将WiFi扫描限制为每分钟2次。尽可能升级Android。</string>
     <string name="q_bad">除非在“开发者设置”中禁用，否则Android 10 会限制WiFi扫描。</string>
@@ -431,4 +425,8 @@
     <string name="plus_gps">+GPS:&#160;</string>
     <string name="dl_failed">下载失败：未保存结果。</string>
     <string name="not_proc">&#160;未处理。</string>
+    <string name="theme_settings_label">显示主题</string>
+    <string name="theme_light_label">灯光模式</string>
+    <string name="theme_dark_label">暗模式</string>
+    <string name="theme_follow_label">追踪系统</string>
 </resources>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent">
     <RelativeLayout
         android:id="@+id/map_rl"
         android:orientation="vertical"
@@ -117,6 +117,13 @@
                 android:textSize="15sp" />
         </LinearLayout>
     </LinearLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/no_map"
+        android:textSize="24sp"
+        android:text="@string/mapless"
+        />
     <LinearLayout
         android:layout_width="wrap_content"
         android:id="@+id/info"

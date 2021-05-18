@@ -154,6 +154,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Matcher bssidDisplayExclusions;
         int uiMode;
         AtomicBoolean uiRestart;
+        AtomicBoolean ttsNag = new AtomicBoolean(true);
     }
 
     private State state;
@@ -234,17 +235,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         workAroundGoogleMapsBug();
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
-        if (Build.VERSION.SDK_INT > 28) {
-            //Support dark/light themes in Android 10 and above
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            // ALIBI: when the preference is complete, we'll allow storage of one of:
-            // [AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM , MODE_NIGHT_YES , MODE_NIGHT_NO];
-            AppCompatDelegate.setDefaultNightMode(displayMode);
-        } else {
-            //Force night mode
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-
+        setTheme(prefs);
         mainActivity = this;
 
         // set language
@@ -264,8 +255,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // test the error reporting
         // if( true ){ throw new RuntimeException( "weee" ); }
 
-        final FragmentManager fm = getSupportFragmentManager();
         // force the retained fragments to live
+        final FragmentManager fm = getSupportFragmentManager();
         fm.executePendingTransactions();
         StateFragment stateFragment = (StateFragment) fm.findFragmentByTag(STATE_FRAGMENT_TAG);
 
@@ -1286,13 +1277,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static void ttsCheckIntent() {
         if (mainActivity != null) {
-            try {
-                Intent checkTTSIntent = new Intent();
-                checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
-                mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
-            } catch (ActivityNotFoundException e) {
-                error("TTS check not available in your device." + e.fillInStackTrace());
-                //TODO: does make sense to disable the TTS pref here, or is this recoverable?
+            if (null != mainActivity.getState() && mainActivity.getState().ttsNag.compareAndSet(true, false)) {
+                try {
+                    Intent checkTTSIntent = new Intent();
+                    checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+                    mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
+                } catch (ActivityNotFoundException e) {
+                    error("TTS check not available in your device." + e.fillInStackTrace());
+                    //TODO: does make sense to disable the TTS pref here, or is this recoverable?
+                }
             }
         } else {
             MainActivity.error("could not launch TTS check due to pre-instantiation state");
@@ -2742,6 +2735,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
             info("set theme called: "+displayMode);
             AppCompatDelegate.setDefaultNightMode(displayMode);
+        } else {
+            //Force night mode
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
     }
 
@@ -2819,7 +2815,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
             state.ttsChecked = true;
         } else if (status == TextToSpeech.SUCCESS) {
-            info("TTS init successful, but TTS engine was null");
+            info("TTS init successful, but state or TTS engine was null");
         } else if (status == TextToSpeech.ERROR) {
             error("TTS init failed: "+status);
         }

@@ -35,7 +35,7 @@ public final class Network implements ClusterItem {
     private static final String WPA3_CAP = "[WPA3";
     private static final String SAE_CAP = "SAE";
     private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
-    private static final String OWE_CAP = "OWE";    //ALIBI: handles both OWE and OWE_TRANSITION
+    //private static final String OWE_CAP = "OWE";    //handles both OWE and OWE_TRANSITION
     //TODO: how we do distinguish between RSN-EAP-CCMP WPA2 and WPA3 implementations?
     private static final String WPA2_CAP = "[WPA2";
     private static final String RSN_CAP = "[RSN";
@@ -147,7 +147,7 @@ public final class Network implements ClusterItem {
             this.showCapabilities = null;
         }
 
-        if (this.capabilities.contains(WPA3_CAP) || this.capabilities.contains(SUITE_B_192_CAP) || this.capabilities.contains(OWE_CAP) || this.capabilities.contains(SAE_CAP)) {
+        if (this.capabilities.contains(WPA3_CAP) || this.capabilities.contains(SUITE_B_192_CAP) || this.capabilities.contains(SAE_CAP)) {
             crypto = CRYPTO_WPA3;
         } else if (this.capabilities.contains(WPA2_CAP) || this.capabilities.contains(RSN_CAP)) {
             crypto = CRYPTO_WPA2;

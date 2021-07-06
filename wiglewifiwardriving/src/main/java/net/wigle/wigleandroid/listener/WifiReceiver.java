@@ -1,7 +1,5 @@
 package net.wigle.wigleandroid.listener;
 
-import static android.location.LocationManager.GPS_PROVIDER;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -15,7 +13,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
-import net.wigle.wigleandroid.DashboardFragment;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
@@ -27,6 +24,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.FilterMatcher;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 
@@ -35,7 +33,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.SQLException;
 import android.location.Location;
 import android.net.wifi.ScanResult;
@@ -755,7 +752,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
         if ( prefs.getBoolean( ListFragment.PREF_SPEAK_MILES, true ) ) {
             final float dist = prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
-            final String distString = DashboardFragment.metersToString(prefs, numberFormat1, mainActivity, dist, false );
+            final String distString = UINumberFormat.metersToString(prefs, numberFormat1, mainActivity, dist, false );
             builder.append(mainActivity.getString(R.string.tts_from)).append(" ")
                     .append(distString).append( ", " );
         }

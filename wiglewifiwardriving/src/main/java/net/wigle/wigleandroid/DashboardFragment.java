@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -23,6 +22,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -273,7 +273,7 @@ public class DashboardFragment extends Fragment {
 
   private void updateDist(final View view, final SharedPreferences prefs, final int id, final String pref, final String title ) {
       float dist = prefs.getFloat(pref, 0f);
-      final String distString = metersToString(prefs, numberFormat, getActivity(), dist, false);
+      final String distString = UINumberFormat.metersToString(prefs, numberFormat, getActivity(), dist, false);
       final TextView tv = view.findViewById(id);
       tv.setText( title + " " + distString );
   }
@@ -295,26 +295,6 @@ public class DashboardFragment extends Fragment {
       final String durString = timeString(cumulative);
       final TextView tv = view.findViewById( id );
       tv.setText(durString );
-  }
-
-  public static String metersToString(final SharedPreferences prefs, final NumberFormat numberFormat, final Context context, final float meters,
-      final boolean useShort ) {
-      final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
-      String retval;
-      if ( meters > 3000f ) {
-          if ( metric ) {
-              retval = numberFormat.format( meters / 1000f ) + " " + context.getString(R.string.km_short);
-          } else {
-              retval = numberFormat.format( meters / 1609.344f ) + " " +
-                      (useShort ? context.getString(R.string.mi_short) : context.getString(R.string.miles));
-          }
-      } else if (metric) {
-          retval = numberFormat.format( meters ) + " " + (useShort ? context.getString(R.string.m_short) : context.getString(R.string.meters));
-      } else {
-          retval = numberFormat.format( meters * 3.2808399f  ) + " " +
-              (useShort ? context.getString(R.string.ft_short) : context.getString(R.string.feet));
-      }
-      return retval;
   }
 
   @Override

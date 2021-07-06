@@ -3,7 +3,6 @@
 
 package net.wigle.wigleandroid;
 
-import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -735,10 +734,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             } else {
                 if (main != null) {
                     final SharedPreferences prefs = main.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                    final String distString = DashboardFragment.metersToString(prefs,
+                    final String distString = UINumberFormat.metersToString(prefs,
                             state.numberFormat0, main, location.getAccuracy(), true);
                     tv4.setText("+/- " + distString);
-                    final String accString = DashboardFragment.metersToString(prefs,
+                    final String accString = UINumberFormat.metersToString(prefs,
                             state.numberFormat0, main, (float) location.getAltitude(), true);
                     tv5.setText(getString(R.string.list_short_alt) + " " + accString);
                 }

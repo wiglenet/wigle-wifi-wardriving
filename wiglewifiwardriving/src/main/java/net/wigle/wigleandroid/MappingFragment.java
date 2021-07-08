@@ -614,7 +614,7 @@ public final class MappingFragment extends Fragment {
                     tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
                     if (prefs != null) {
                         float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
-                        final String distString = DashboardFragment.metersToString(prefs,
+                        final String distString = UINumberFormat.metersToString(prefs,
                                 numberFormat, getActivity(), dist, true);
                         tv = view.findViewById(R.id.rundistance);
                         tv.setText(distString);

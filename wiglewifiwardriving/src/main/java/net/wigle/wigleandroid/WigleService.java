@@ -7,17 +7,22 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
+import net.wigle.wigleandroid.ui.UINumberFormat;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class WigleService extends Service {
@@ -168,12 +173,31 @@ public final class WigleService extends Service {
                 final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
                 final long dbNets = ListFragment.lameStatic.dbNets;
                 String text = context.getString(R.string.list_waiting_gps);
+
+                String distString = "";
+                SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                if (prefs != null) {
+                    Locale locale = null;
+                    Configuration sysConfig = getResources().getConfiguration();
+                    if (null != sysConfig) {
+                        locale = sysConfig.locale;
+                    }
+                    if (null == locale) {
+                        locale = Locale.US;
+                    }
+                    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+                    numberFormat.setMaximumFractionDigits(1);
+
+                    final float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+                    distString = " ("+UINumberFormat.metersToString(prefs, numberFormat, this, dist, true) + ")";
+                }
                 if (dbNets > 0) {
                     long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
                     long newNets = ListFragment.lameStatic.newNets;
                     text = context.getString(R.string.run) + ": " + runNets
                             + "  " + context.getString(R.string.new_word) + ": " + newNets
-                            + "  " + context.getString(R.string.db) + ": " + dbNets;
+                            + "  " + context.getString(R.string.db) + ": " + dbNets
+                            + distString;
                 }
                 if (!MainActivity.isScanning(context)) {
                     text = context.getString(R.string.list_scanning_off) + " " + text;

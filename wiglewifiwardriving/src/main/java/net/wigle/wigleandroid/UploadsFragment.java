@@ -193,10 +193,9 @@ public class UploadsFragment extends Fragment {
         if (handler == null) {
             MainActivity.error("downloadUploads handler is null");
         }
-        if (!busy.get()) {
+        if (busy.compareAndSet(false, true)) {
             final int pageStart = page * ROW_COUNT;
             final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
-            busy.set(true);
             final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
                     /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
                     //ALIBI: cachefiles are too problematic with infinite scroll
@@ -257,6 +256,8 @@ public class UploadsFragment extends Fragment {
 
     private final static class RankDownloadHandler extends DownloadHandler {
         private UploadsListAdapter uploadsListAdapter;
+        private final AtomicBoolean lockListAdapter = new AtomicBoolean(false);
+
 
         private RankDownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
                                 final Resources resources) {
@@ -275,25 +276,29 @@ public class UploadsFragment extends Fragment {
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
 
             //DEBUG: MainActivity.info("handleMessage. results: " + results);
-            if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null) {
-                TextView tv = view.findViewById(R.id.queue_depth);
-                final String queueDepthTitle = resources.getString(R.string.queue_depth);
-                tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
-                uploadsListAdapter.clear();
-                for (final Parcelable result : results) {
-                    if (result instanceof Bundle) {
-                        final Bundle row = (Bundle) result;
-                        final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_BT_GPS),
-                                row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
-                                row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
-                                row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
-                        uploadsListAdapter.add(upload);
+            if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null && lockListAdapter.compareAndSet(false, true)) {
+                try {
+                    TextView tv = view.findViewById(R.id.queue_depth);
+                    final String queueDepthTitle = resources.getString(R.string.queue_depth);
+                    tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
+                    uploadsListAdapter.clear();
+                    for (final Parcelable result : results) {
+                        if (result instanceof Bundle) {
+                            final Bundle row = (Bundle) result;
+                            final Upload upload = new Upload(row.getString(KEY_TRANSID), row.getLong(KEY_TOTAL_WIFI_GPS),
+                                    row.getLong(KEY_TOTAL_BT_GPS),
+                                    row.getLong(KEY_TOTAL_CELL_GPS), (int) row.getLong(KEY_PERCENT_DONE),
+                                    row.getString(KEY_STATUS), row.getLong(KEY_FILE_SIZE), row.getString(KEY_FILE_NAME),
+                                    row.getBoolean(KEY_UPLOADED), row.getBoolean(KEY_DOWNLOADED));
+                            uploadsListAdapter.add(upload);
+                        }
                     }
+                } finally {
+                    lockListAdapter.set(false);
+                    final SwipeRefreshLayout swipeRefreshLayout =
+                            view.findViewById(R.id.uploads_swipe_container);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
-                final SwipeRefreshLayout swipeRefreshLayout =
-                        view.findViewById(R.id.uploads_swipe_container);
-                swipeRefreshLayout.setRefreshing(false);
             }
         }
     }

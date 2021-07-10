@@ -88,6 +88,7 @@ import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
@@ -235,8 +236,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         workAroundGoogleMapsBug();
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
-        setTheme(prefs);
-        setNavTheme(prefs);
+        ThemeUtil.setTheme(prefs);
+        ThemeUtil.setNavTheme(this.getWindow(), this, prefs);
         mainActivity = this;
 
         // set language
@@ -2729,29 +2730,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
         return safe;
-    }
-
-    public static void setTheme(final SharedPreferences prefs) {
-        if (Build.VERSION.SDK_INT > 28) {
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            info("set theme called: "+displayMode);
-            AppCompatDelegate.setDefaultNightMode(displayMode);
-        } else {
-            //Force night mode
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-    }
-
-    public void setNavTheme(final SharedPreferences prefs) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            final int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
-                    (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                            nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-                getWindow().setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            }
-        }
     }
 
     /**

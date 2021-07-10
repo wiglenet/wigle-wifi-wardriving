@@ -65,6 +65,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -107,15 +108,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         networkActivity = this;
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-        final int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
-                (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                        nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-                getWindow().setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            }
-        }
+        ThemeUtil.setNavTheme(getWindow(), this, prefs);
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );

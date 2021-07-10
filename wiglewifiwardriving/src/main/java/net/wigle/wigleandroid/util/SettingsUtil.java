@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.Spinner;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 
 import java.util.Arrays;
 
@@ -120,9 +122,9 @@ public class SettingsUtil {
                     MainActivity.setLocale( context, context.getResources().getConfiguration() );
                 }
                 if ( pref.equals(ListFragment.PREF_DAYNIGHT_MODE) ) {
-                    MainActivity.setTheme(prefs);
+                    ThemeUtil.setTheme(prefs);
                     try {
-                        MainActivity.getMainActivity().setNavTheme(prefs);
+                        ThemeUtil.setNavTheme(((Activity) v.getContext()).getWindow(), context, prefs);
                     } catch (NullPointerException npe) {
                         //ALIBI: ignorable here.
                     }

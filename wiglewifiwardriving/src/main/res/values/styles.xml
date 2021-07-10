@@ -81,7 +81,7 @@
         <item name="android:textColor">#B0B0B0</item>
     </style>
     <style name="ListSsid" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">#EEEEEE</item>
+        <item name="android:textColor">@color/colorListSsidText</item>
     </style>
     <style name="NewsTitleStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">22sp</item>

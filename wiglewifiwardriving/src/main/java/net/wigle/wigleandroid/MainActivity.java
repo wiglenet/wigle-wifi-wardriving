@@ -236,6 +236,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
         setTheme(prefs);
+        setNavTheme(prefs);
         mainActivity = this;
 
         // set language
@@ -2738,6 +2739,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         } else {
             //Force night mode
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        }
+    }
+
+    public void setNavTheme(final SharedPreferences prefs) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+            final int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
+                    (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
+                            nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
+                getWindow().setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            }
         }
     }
 

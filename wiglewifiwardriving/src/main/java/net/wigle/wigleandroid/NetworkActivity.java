@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -20,6 +21,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -101,6 +105,17 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         MainActivity.setLocale( this );
         setContentView(R.layout.network);
         networkActivity = this;
+
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+        final int nightModeFlags = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
+                (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
+                        nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
+                getWindow().setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            }
+        }
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
@@ -215,11 +230,10 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     MainActivity.warn("unable to get operatorCode for "+bssid);
                 }
             }
-
-            setupMap( network, savedInstanceState );
+            setupMap(network, savedInstanceState, prefs );
             // kick off the query now that we have our map
             setupQuery();
-            setupButtons( network );
+            setupButtons(network, prefs);
         }
     }
 
@@ -240,7 +254,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         if (mapView != null) {
             mapView.onResume();
         } else {
-            setupMap( network, null );
+            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            setupMap( network, null, prefs);
         }
     }
 
@@ -436,7 +451,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         return signalMemo;
     }
 
-    private void setupMap( final Network network, final Bundle savedInstanceState ) {
+    private void setupMap( final Network network, final Bundle savedInstanceState, final SharedPreferences prefs ) {
         mapView = new MapView( this );
         try {
             mapView.onCreate(savedInstanceState);
@@ -469,8 +484,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         rlView.addView( mapView );
     }
 
-    private void setupButtons( final Network network ) {
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+    private void setupButtons( final Network network, final SharedPreferences prefs ) {
         final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
         final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
 

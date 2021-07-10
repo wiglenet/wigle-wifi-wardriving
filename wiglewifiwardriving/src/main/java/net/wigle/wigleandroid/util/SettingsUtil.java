@@ -121,6 +121,11 @@ public class SettingsUtil {
                 }
                 if ( pref.equals(ListFragment.PREF_DAYNIGHT_MODE) ) {
                     MainActivity.setTheme(prefs);
+                    try {
+                        MainActivity.getMainActivity().setNavTheme(prefs);
+                    } catch (NullPointerException npe) {
+                        //ALIBI: ignorable here.
+                    }
                 }
             }
             @Override

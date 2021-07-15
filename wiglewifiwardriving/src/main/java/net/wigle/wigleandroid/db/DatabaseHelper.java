@@ -405,6 +405,8 @@ public final class DatabaseHelper extends Thread {
             if ( ! done.get() ) { // ALIBI: no need to crash / error if this was a query post-terminate.
                 MainActivity.writeError(Thread.currentThread(), throwable, context);
                 throw new RuntimeException("DatabaseHelper throwable: " + throwable, throwable);
+            } else {
+                MainActivity.warn("DB error during shutdown - ignoring: ", throwable);
             }
         }
 

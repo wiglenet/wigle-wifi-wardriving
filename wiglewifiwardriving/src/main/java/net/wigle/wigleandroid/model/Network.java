@@ -263,7 +263,7 @@ public final class Network implements ClusterItem {
      */
     public static Integer frequencyMHzForWiFiChannel(final int channel, final WiFiBand band) {
         WiFiBand bandGuess = band;
-        //This isn't sustainable - in SDK 31 and up, android handles this for us, ubt we need to figure out how to get back to bands from previously incomplete records.
+        //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
         if (band == WiFiBand.UNDEFINED.UNDEFINED) {
             if (channel < 14) {
                 bandGuess = WiFiBand.WIFI_24_GHZ;

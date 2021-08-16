@@ -46,8 +46,8 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_WPA2 = 3;
     public static final int CRYPTO_WPA3 = 4;
 
-    public enum WiFiBand {
-        WIFI_24_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, UNDEFINED;
+    public enum NetworkBand {
+        WIFI_24_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_23_GHZ, UNDEFINED;
     }
     /**
      * convenience constructor
@@ -261,14 +261,16 @@ public final class Network implements ClusterItem {
      * @param band
      * @return
      */
-    public static Integer frequencyMHzForWiFiChannel(final int channel, final WiFiBand band) {
-        WiFiBand bandGuess = band;
+    public static Integer frequencyMHzForWiFiChannel(final int channel, final NetworkBand band) {
+        NetworkBand bandGuess = band;
         //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
-        if (band == WiFiBand.UNDEFINED.UNDEFINED) {
+        if (band == NetworkBand.UNDEFINED.UNDEFINED) {
             if (channel < 14) {
-                bandGuess = WiFiBand.WIFI_24_GHZ;
+                bandGuess = NetworkBand.WIFI_24_GHZ;
+            } else if (channel >= 237 && channel <= 255 ) {
+                bandGuess = NetworkBand.CELL_23_GHZ;
             } else {
-                bandGuess = WiFiBand.WIFI_5_GHZ;
+                bandGuess = NetworkBand.WIFI_5_GHZ;
             }
         }
         switch (bandGuess) {
@@ -299,6 +301,12 @@ public final class Network implements ClusterItem {
                     return 56160 + channel * 2160;
                 }
                 return null;
+            case CELL_23_GHZ:
+                //ALIBI: cell network for backwards compat.
+                if (channel > 236 && channel <= 255) {
+                    return 2312 + 5 * (channel - 237);
+                }
+                return null;
             default:
                 return null;
         }
@@ -314,6 +322,9 @@ public final class Network implements ClusterItem {
 
         if (frequencyMHz == 2484) {
             return 14;
+        } else if (frequencyMHz <= 2402) {
+            // ALIBI: for backwards compat with cells
+            return ((frequencyMHz - 2312) / 5) + 237;
         } else if (frequencyMHz < 2484) {
             return (frequencyMHz - 2407) / 5;
         } else if (frequencyMHz >= 4910 && frequencyMHz <= 4980) {

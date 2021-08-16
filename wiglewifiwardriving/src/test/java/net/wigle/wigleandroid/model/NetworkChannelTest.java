@@ -53,6 +53,14 @@ public class NetworkChannelTest {
     static final List<Integer> wiFi60GHzChannelNumbers = Arrays.asList(1, 2, 3, 4, 5,
             6);
 
+    static final List<Integer> cellChannels = Arrays.asList(237, 238, 239, 240, 241,
+            242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252,
+            253, 254, 255);
+
+    static final List<Integer> cellFrequencies = Arrays.asList(2312, 2317, 2322, 2327, 2332,
+            2337, 2342, 2347, 2352, 2357, 2362, 2367, 2372, 2377, 2382, 2387,
+            2392, 2397, 2402);
+
     //ALIBI: full spec ad/ay: the linux kernel impl doesn't support these yet. https://en.wikipedia.org/wiki/List_of_WLAN_channels#60_GHz_(802.11ad/ay)
     //static final List<Integer> wiFi60GHzCenterFrequencies = Arrays.asList(new Integer[] {58320, 60480, 62640, 64800, 66960,69120, 59400, 61560, 63720, 65880, 68040, 60480, 62640, 64800, 66960, 61560, 63720, 65880});
     //static final List<Integer> wiFi60GHzChannelNumbers = Arrays.asList(new Integer[] {1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 17, 18, 19, 20, 25, 26, 27});
@@ -169,7 +177,7 @@ public class NetworkChannelTest {
     public void test24GHzFreqs() {
         long startMillis = System.currentTimeMillis();
         for (int i = 0; i < wiFi24GHzChannelNumbers.size(); i++) {
-            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi24GHzChannelNumbers.get(i), Network.WiFiBand.WIFI_24_GHZ), wiFi24GHzCenterFrequencies.get(i));
+            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi24GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_24_GHZ), wiFi24GHzCenterFrequencies.get(i));
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("executed 2.4GHz chan->freq in "+totalMillis+"ms");
@@ -179,7 +187,7 @@ public class NetworkChannelTest {
     public void test5GHzFreqs() {
         long startMillis = System.currentTimeMillis();
         for (int i = 0; i < wiFi5GHzChannelNumbers.size(); i++) {
-            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi5GHzChannelNumbers.get(i), Network.WiFiBand.WIFI_5_GHZ), wiFi5GHzCenterFrequencies.get(i));
+            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi5GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_5_GHZ), wiFi5GHzCenterFrequencies.get(i));
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("executed 5GHz chan->freq in "+totalMillis+"ms");
@@ -189,7 +197,7 @@ public class NetworkChannelTest {
     public void test6GHzFreqs() {
         long startMillis = System.currentTimeMillis();
         for (int i = 0; i < wiFi6GHzChannelNumbers.size(); i++) {
-            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi6GHzChannelNumbers.get(i), Network.WiFiBand.WIFI_6_GHZ), wiFi6GHzCenterFrequencies.get(i));
+            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi6GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_6_GHZ), wiFi6GHzCenterFrequencies.get(i));
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("executed 6GHz chan->freq in "+totalMillis+"ms");
@@ -199,10 +207,25 @@ public class NetworkChannelTest {
     public void test60GHzFreqs() {
         long startMillis = System.currentTimeMillis();
         for (int i = 0; i < wiFi60GHzChannelNumbers.size(); i++) {
-            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi60GHzChannelNumbers.get(i), Network.WiFiBand.WIFI_60_GHZ), wiFi60GHzCenterFrequencies.get(i));
+            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi60GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_60_GHZ), wiFi60GHzCenterFrequencies.get(i));
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("executed 60GHz chan->freq in "+totalMillis+"ms");
+    }
+
+    // apparently this is worth saving from the old frequencies setup, for certain cell frequencies.
+    @Test
+    public void testCellChannelBackwardsCompat() {
+        for (int i = 0; i < cellChannels.size(); i++) {
+            Assert.assertEquals(cellChannels.get(i), Network.channelForWiFiFrequencyMhz(cellFrequencies.get(i)));
+        }
+    }
+
+    @Test
+    public void cellFreqBackwardsCompat() {
+        for (int i = 0; i < cellFrequencies.size(); i++) {
+            Assert.assertEquals(cellFrequencies.get(i),Network.frequencyMHzForWiFiChannel(cellChannels.get(i), Network.NetworkBand.CELL_24_GHZ));
+        }
     }
 
     @Test
@@ -263,6 +286,13 @@ public class NetworkChannelTest {
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("[OLD] executed 5GHz freq->chan in "+totalMillis+"ms");
+    }
+
+    @Test
+    public void testOldCellChannelBackwardsCompat() {
+        for (int i = 0; i < cellChannels.size(); i++) {
+            Assert.assertEquals(cellChannels.get(i),freqToChan.get(cellFrequencies.get(i)));
+        }
     }
 
 }

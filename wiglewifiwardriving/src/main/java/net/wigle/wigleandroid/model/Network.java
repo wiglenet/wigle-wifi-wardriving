@@ -323,7 +323,7 @@ public final class Network implements ClusterItem {
         } else if (frequencyMHz < 5925) {
             return (frequencyMHz - 5000) / 5;
         } else if (frequencyMHz == 5935) {
-            return 2; //WTF, linux. looks like 5GHz / 187 to me.
+            return 2;
         } else if (frequencyMHz <= 45000) { /* DMG band lower limit */
             /* see 802.11ax D6.1 27.3.22.2 */
             return (frequencyMHz - 5950) / 5;

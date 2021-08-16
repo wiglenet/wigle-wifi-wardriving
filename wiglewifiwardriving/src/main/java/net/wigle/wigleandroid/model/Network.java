@@ -47,7 +47,7 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_WPA3 = 4;
 
     public enum WiFiBand {
-        WIFI_24_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, WIFI_S1GHZ, UNDEFINED;
+        WIFI_24_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, UNDEFINED;
     }
     /**
      * convenience constructor
@@ -299,8 +299,6 @@ public final class Network implements ClusterItem {
                     return 56160 + channel * 2160;
                 }
                 return null;
-            case WIFI_S1GHZ:
-                return (int)((902000 + channel * 500)*0.001f);
             default:
                 return null;
         }

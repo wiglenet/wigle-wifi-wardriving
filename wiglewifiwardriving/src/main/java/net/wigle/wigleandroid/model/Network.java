@@ -271,13 +271,14 @@ public final class Network implements ClusterItem {
                 bandGuess = WiFiBand.WIFI_5_GHZ;
             }
         }
-        switch (band) {
+        switch (bandGuess) {
             case WIFI_24_GHZ:
                 if (channel == 14) {
                     return 2484;
                 } else if (channel < 14) {
                     return (2407 + channel * 5);
                 }
+                return null;
             case WIFI_5_GHZ:
                 if (channel >= 182 && channel <= 196) {
                     return 4000 + channel * 5;
@@ -292,10 +293,12 @@ public final class Network implements ClusterItem {
                 if (channel <= 233) {
                     return 5950 + channel * 5;
                 }
+                return null;
             case WIFI_60_GHZ:
                 if (channel < 7) {
                     return 56160 + channel * 2160;
                 }
+                return null;
             case WIFI_S1GHZ:
                 return 902000 + channel * 500;
             default:

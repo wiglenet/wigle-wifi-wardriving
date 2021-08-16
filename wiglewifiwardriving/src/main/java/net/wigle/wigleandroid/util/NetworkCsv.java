@@ -15,7 +15,7 @@ public class NetworkCsv {
         final NetworkType type = NetworkType.valueOf(parsed[10]);
         Integer frequency = Integer.parseInt(parsed[4]);
         if (NetworkType.WIFI.equals(type)) {
-            frequency = Network.frequencyForWiFiChannel(frequency);
+            frequency = Network.frequencyMHzForWiFiChannel(frequency, Network.WiFiBand.UNDEFINED);
             if (null == frequency) {
                 frequency = 0;
             }

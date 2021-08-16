@@ -300,7 +300,7 @@ public final class Network implements ClusterItem {
                 }
                 return null;
             case WIFI_S1GHZ:
-                return 902000 + channel * 500;
+                return (int)((902000 + channel * 500)*0.001f);
             default:
                 return null;
         }

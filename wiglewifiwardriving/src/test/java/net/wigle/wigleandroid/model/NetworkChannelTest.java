@@ -224,7 +224,7 @@ public class NetworkChannelTest {
     @Test
     public void cellFreqBackwardsCompat() {
         for (int i = 0; i < cellFrequencies.size(); i++) {
-            Assert.assertEquals(cellFrequencies.get(i),Network.frequencyMHzForWiFiChannel(cellChannels.get(i), Network.NetworkBand.CELL_24_GHZ));
+            Assert.assertEquals(cellFrequencies.get(i),Network.frequencyMHzForWiFiChannel(cellChannels.get(i), Network.NetworkBand.CELL_23_GHZ));
         }
     }
 

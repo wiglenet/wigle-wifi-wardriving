@@ -47,7 +47,7 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_WPA3 = 4;
 
     public enum NetworkBand {
-        WIFI_24_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_23_GHZ, UNDEFINED;
+        WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED;
     }
     /**
      * convenience constructor
@@ -266,15 +266,15 @@ public final class Network implements ClusterItem {
         //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
         if (band == NetworkBand.UNDEFINED.UNDEFINED) {
             if (channel < 14) {
-                bandGuess = NetworkBand.WIFI_24_GHZ;
+                bandGuess = NetworkBand.WIFI_2_4_GHZ;
             } else if (channel >= 237 && channel <= 255 ) {
-                bandGuess = NetworkBand.CELL_23_GHZ;
+                bandGuess = NetworkBand.CELL_2_3_GHZ;
             } else {
                 bandGuess = NetworkBand.WIFI_5_GHZ;
             }
         }
         switch (bandGuess) {
-            case WIFI_24_GHZ:
+            case WIFI_2_4_GHZ:
                 if (channel == 14) {
                     return 2484;
                 } else if (channel < 14) {
@@ -301,7 +301,7 @@ public final class Network implements ClusterItem {
                     return 56160 + channel * 2160;
                 }
                 return null;
-            case CELL_23_GHZ:
+            case CELL_2_3_GHZ:
                 //ALIBI: cell network for backwards compat.
                 if (channel > 236 && channel <= 255) {
                     return 2312 + 5 * (channel - 237);

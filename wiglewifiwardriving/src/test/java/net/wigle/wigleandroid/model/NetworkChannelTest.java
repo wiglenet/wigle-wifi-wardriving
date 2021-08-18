@@ -177,7 +177,7 @@ public class NetworkChannelTest {
     public void test24GHzFreqs() {
         long startMillis = System.currentTimeMillis();
         for (int i = 0; i < wiFi24GHzChannelNumbers.size(); i++) {
-            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi24GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_24_GHZ), wiFi24GHzCenterFrequencies.get(i));
+            Assert.assertEquals(Network.frequencyMHzForWiFiChannel(wiFi24GHzChannelNumbers.get(i), Network.NetworkBand.WIFI_2_4_GHZ), wiFi24GHzCenterFrequencies.get(i));
         }
         long totalMillis = System.currentTimeMillis()-startMillis;
         System.out.println("executed 2.4GHz chan->freq in "+totalMillis+"ms");
@@ -224,7 +224,7 @@ public class NetworkChannelTest {
     @Test
     public void cellFreqBackwardsCompat() {
         for (int i = 0; i < cellFrequencies.size(); i++) {
-            Assert.assertEquals(cellFrequencies.get(i),Network.frequencyMHzForWiFiChannel(cellChannels.get(i), Network.NetworkBand.CELL_23_GHZ));
+            Assert.assertEquals(cellFrequencies.get(i),Network.frequencyMHzForWiFiChannel(cellChannels.get(i), Network.NetworkBand.CELL_2_3_GHZ));
         }
     }
 

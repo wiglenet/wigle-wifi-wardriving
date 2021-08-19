@@ -140,7 +140,9 @@ public class KmlWriter extends AbstractBackgroundTask {
                         count++;
                     }
                 }
-                MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount+" from total count: "+totalNets+" (non-bt-networks: "+ networks.size()+" btnets:"+btNetworks.size()+")");
+                MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount
+                        + " from total count: "+totalNets+" (non-bt-networks: "+ networks.size()
+                        + " btnets:" + (btNetworks != null?btNetworks.size():"null")+")");
             }
             status = Status.WRITE_SUCCESS;
         }

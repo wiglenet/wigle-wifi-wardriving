@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid.model;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
@@ -11,6 +13,23 @@ import com.google.maps.android.clustering.ClusterItem;
  */
 @SuppressLint("UseSparseArrays")
 public final class Network implements ClusterItem {
+
+    public static final List<Integer> wiFi24GHzChannelNumbers = Arrays.asList(1, 2, 3, 4, 5,
+            6, 7, 8, 9, 10, 11, 12, 13, 14);
+    public static final List<Integer> wiFi5GHzChannelNumbers = Arrays.asList(7, 8, 9, 11, 12,
+            16, 32, 34, 36, 38, 40, 42, 44, 46, 48,
+            50, 52, 54, 56, 58, 60, 62, 64, 68, 96,
+            100, 102, 104, 106, 108, 110, 112, 114, 116, 118,
+            120, 122, 124, 126, 128, 132, 134, 136, 138, 140,
+            142, 144, 149, 151, 153, 155, 157, 159, 161, 163,
+            165, 167, 169, 171, 173, 175, 177/*UNUSED: , 180, 182, 183,
+            184, 187, 188, 189, 192, 196*/);
+    public static final List<Integer> wiFi6GHzChannelNumbers = Arrays.asList(1, 5, 9, 13, 17,
+            21, 25, 29, 33, 37, 41, 45, 49, 53, 57, 61,
+            65, 69, 73, 77, 81, 85, 89, 93);
+    public static final List<Integer> wiFi60GHzChannelNumbers = Arrays.asList(1, 2, 3, 4, 5,
+            6);
+
     private final String bssid;
     private String ssid;
     private final String capabilities;
@@ -265,13 +284,17 @@ public final class Network implements ClusterItem {
         NetworkBand bandGuess = band;
         //This isn't sustainable - in SDK 31 and up, android handles this for us, but we need to figure out how to get back to bands from previously incomplete records.
         if (band == NetworkBand.UNDEFINED.UNDEFINED) {
-            if (channel < 14) {
+            if (channel <= 14) {
                 bandGuess = NetworkBand.WIFI_2_4_GHZ;
             } else if (channel >= 237 && channel <= 255 ) {
                 bandGuess = NetworkBand.CELL_2_3_GHZ;
+            } else if (wiFi6GHzChannelNumbers.contains(channel)){
+                bandGuess = NetworkBand.WIFI_6_GHZ;
             } else {
                 bandGuess = NetworkBand.WIFI_5_GHZ;
             }
+            //ALIBI: 60GHz contains no channels not aliased by WiFi 2.4GHz.
+            //ALIBI: Since WiFi 5GHz has weird ambiguity/repurposed frequencies, it becomes a catch-all.
         }
         switch (bandGuess) {
             case WIFI_2_4_GHZ:

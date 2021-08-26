@@ -18,4 +18,5 @@
     <color name ="colorNavigationItemSelectedFg">#303030</color>
     <color name ="colorNavigationItemExitFg">#DD0000</color>
     <color name ="colorNavigationItemBorder">#AAB0B0B0</color>
+    <color name ="colorListSsidText">#EEEEEE</color>
 </resources>

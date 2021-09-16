@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="261"
-    android:versionName="2.61">
+    android:versionCode="262"
+    android:versionName="2.62">
 
     <supports-screens
         android:anyDensity="true"

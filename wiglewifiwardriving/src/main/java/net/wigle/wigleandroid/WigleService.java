@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,6 +25,8 @@ import net.wigle.wigleandroid.ui.UINumberFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -234,7 +237,15 @@ public final class WigleService extends Service {
 
                 if (null != notification) {
                     try {
-                        startForeground(NOTIFICATION_ID, notification);
+                        if (isServiceForeground()) {
+                            final NotificationManager notificationManager =
+                                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.notify(NOTIFICATION_ID, notification);
+                        }
+                        else {
+                            MainActivity.info("service startForeground");
+                            startForeground(NOTIFICATION_ID, notification);
+                        }
                     } catch (Exception ex) {
                         MainActivity.error("notification service error: ", ex);
                     }
@@ -245,6 +256,15 @@ public final class WigleService extends Service {
         } catch (Exception ex) {
             MainActivity.error("trapped notification exception out outer level - ",ex);
         }
+    }
+
+    private boolean isServiceForeground() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            return true;
+        }
+        final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
+        MainActivity.info("Service is foreground: " + isForeground);
+        return isForeground;
     }
 
     private Notification getNotification16(final String title, final Context context, final String text, final long when,

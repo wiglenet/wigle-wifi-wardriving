@@ -260,7 +260,8 @@ public final class WigleService extends Service {
 
     private boolean isServiceForeground() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return true;
+            // no such thing as foreground back then
+            return false;
         }
         final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
         MainActivity.info("Service is foreground: " + isForeground);

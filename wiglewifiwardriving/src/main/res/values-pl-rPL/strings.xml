@@ -254,7 +254,7 @@
     <string name="wifi_restart_2">sekund temu. Restartowanie WiFi.</string>
     <string name="use_wigle_tiles">Użyj kafelek WiGLE OSM</string>
     <string name="wigle_service">Usługa WiGLE Wifi</string>
-    <string name="disable_toast">Wyłączyć dymki toast</string>
+    <string name="disable_toast">Wyłącz dymki toast</string>
     <string name="menu_cluster_off">Grupowanie wyłączone</string>
     <string name="menu_cluster_on">Klastrowanie włączone</string>
     <string name="menu_traffic_off">Ruch wyłączony</string>

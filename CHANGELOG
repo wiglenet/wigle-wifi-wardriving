@@ -1,3 +1,6 @@
+* 2.64 (?)
+Fix Polish toast text (thanks olekstomek!)
+
 * 2.61 - 2.63 (09/19/2021)
 Fix for Android security update turning off GPS when screen is off
 Preferences for dark/light/follow display theme mode in SDK 28 and up devices

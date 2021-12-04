@@ -40,7 +40,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     private SharedPreferences prefs;
     private DateFormat dateFormat;
     private DateFormat timeFormat;
-
+    private int selectedPos = RecyclerView.NO_POSITION;
 
     public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, PolyRouteConfigurable configurable, RouteExportSelector routeSelector,
                               SharedPreferences prefs, DateFormat dateFormat, DateFormat timeFormat) {
@@ -139,19 +139,23 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull GpxRecyclerAdapter.ViewHolder holder, final int position) {
         if (!dataValid) {
             throw new IllegalStateException("Invalid cursor / dataValid flag onBindViewHolder");
         }
         if (!cursor.moveToPosition(position)) {
             throw new IllegalStateException("Cursor couldn't move to position position " + position);
         }
-        GpxListItem listItem = GpxListItem.fromCursor(cursor, dateFormat, timeFormat);
+        holder.itemView.setSelected(selectedPos == position);
+        final GpxListItem listItem = GpxListItem.fromCursor(cursor, dateFormat, timeFormat);
         final long clickedId = listItem.getRunId();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 configurable.clearCurrentRoute();
+                notifyItemChanged(selectedPos);
+                selectedPos = position; //.getLayoutPosition();
+                notifyItemChanged(selectedPos);
                 try {
                     //DEBUG: MainActivity.info("get route "+clickedId);
                     Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId);

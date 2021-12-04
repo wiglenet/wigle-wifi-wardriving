@@ -112,7 +112,6 @@
             android:layout_weight="5"
             />
     </LinearLayout>
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
@@ -133,25 +132,49 @@
             />
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/export_gpx_tools"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dip"
         android:visibility="gone"
-        android:baselineAligned="false"
-        >
-        <Button android:id="@+id/export_gpx_button"
-            android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/export_gpx_tools">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/export_gpx_button"
-            android:layout_weight="0"/>
-        <TextView
-            android:layout_width="wrap_content"
+            android:layout_marginBottom="4dip"
+            android:baselineAligned="false"
+            >
+            <Button android:id="@+id/export_gpx_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_gpx_button"
+                android:layout_weight="0"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/export_gpx"
+                android:layout_weight="5"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/export_gpx"
-            android:layout_weight="5"
-            />
+            android:layout_marginBottom="4dip"
+            android:baselineAligned="false"
+            >
+            <Button android:id="@+id/manage_gpx_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manage_gpx_button"
+                android:layout_weight="0"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manage_gpx"
+                android:layout_weight="5"
+                />
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:orientation="horizontal"

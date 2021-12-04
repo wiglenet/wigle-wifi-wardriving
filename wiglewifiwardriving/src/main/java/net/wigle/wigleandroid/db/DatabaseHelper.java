@@ -145,6 +145,8 @@ public final class DatabaseHelper extends Thread {
     private static final String LOCATED_NETS_COUNT_QUERY = "SELECT count(*)" +LOCATED_NETS_QUERY_STEM;
     public static final String LOCATED_NETS_QUERY = "SELECT bssid, bestlat, bestlon" +LOCATED_NETS_QUERY_STEM;
 
+    private static final String ROUTE_COUNT_QUERY = "SELECT count(*) FROM "+ROUTE_TABLE+" WHERE run_id = ?";
+
     private static final String CLEAR_DEFAULT_ROUTE = "DELETE FROM "+ROUTE_TABLE+" WHERE run_id = 0";
 
     private SQLiteDatabase db;
@@ -1223,6 +1225,25 @@ public final class DatabaseHelper extends Thread {
 
     public long getCurrentRoutePointCount() { return currentRoutePointCount.get(); }
 
+    public long getRoutePointCount(long routeId) {
+        try {
+            checkDB();
+            Cursor cursor = null;
+            try {
+                cursor = db.rawQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)});
+                cursor.moveToFirst();
+                final long count = cursor.getLong(0);
+                return count;
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
     public void getNetworkCountFromDB() throws DBException {
         networkCount.set( getCountFromDB( NETWORK_TABLE ) );
     }
@@ -1382,6 +1403,15 @@ public final class DatabaseHelper extends Thread {
         final String[] args = new String[]{String.valueOf(routeId)};
         return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = ?", args );
     }
+
+    public Cursor routeMetaIterator() throws DBException {
+        checkDB();
+        MainActivity.info( "routeMetaIterator" );
+        final String[] args = new String[]{};
+        //ALIBI: we'd love to parameterize min observations here, but SQLite rawQuery doesn't seem to respect ? parameterization in HAVING statements.
+        return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
+    }
+
     public Cursor currentRouteIterator() throws DBException {
         checkDB();
         MainActivity.info( "routeIterator" );

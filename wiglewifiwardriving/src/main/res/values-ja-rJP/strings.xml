@@ -428,4 +428,6 @@
     <string name="theme_light_label">ライト</string>
     <string name="theme_dark_label">ダーク</string>
     <string name="theme_follow_label">フォローシステム</string>
+    <string name="manage_gpx_button">保存されたルート</string>
+    <string name="manage_gpx">保存されたGPXルートを管理する</string>
 </resources>

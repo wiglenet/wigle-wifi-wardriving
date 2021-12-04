@@ -428,4 +428,6 @@
     <string name="theme_light_label">प्रकाश</string>
     <string name="theme_dark_label">डार्क</string>
     <string name="theme_follow_label">सिस्टम का पालन करें</string>
+    <string name="manage_gpx_button">सहेजे गए मार्ग</string>
+    <string name="manage_gpx">सहेजे गए GPX मार्ग प्रबंधित करें</string>
 </resources>

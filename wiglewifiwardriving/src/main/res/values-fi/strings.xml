@@ -429,4 +429,6 @@
     <string name="theme_light_label">Kevyt</string>
     <string name="theme_dark_label">Tumma</string>
     <string name="theme_follow_label">Seuraa järjestelmää</string>
+    <string name="manage_gpx_button">Tallennetut reitit</string>
+    <string name="manage_gpx">Hallinnoi tallennettuja GPX-reittejä</string>
 </resources>

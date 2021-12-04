@@ -429,4 +429,6 @@
     <string name="theme_light_label">라이트</string>
     <string name="theme_dark_label">다크</string>
     <string name="theme_follow_label">팔로우 시스템</string>
+    <string name="manage_gpx_button">저장된 경로</string>
+    <string name="manage_gpx">저장된 GPX 경로 관리</string>
 </resources>

@@ -429,4 +429,6 @@
     <string name="theme_light_label">אור</string>
     <string name="theme_dark_label">כהה</string>
     <string name="theme_follow_label">עקוב אחר המערכת</string>
+    <string name="manage_gpx_button">מסלולים שמורים</string>
+    <string name="manage_gpx">נהל מסלולי GPX שמורים</string>
 </resources>

@@ -429,4 +429,6 @@
     <string name="theme_light_label">Ljus</string>
     <string name="theme_dark_label">Mörkt</string>
     <string name="theme_follow_label">Följ systemet</string>
+    <string name="manage_gpx_button">Sparade rutter</string>
+    <string name="manage_gpx">Hantera sparade GPX-rutter</string>
 </resources>

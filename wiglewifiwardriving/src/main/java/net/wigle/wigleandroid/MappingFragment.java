@@ -1098,7 +1098,7 @@ public final class MappingFragment extends Fragment {
         }
     };
 
-    private int getRouteColorForMapType(final int mapType) {
+    public static int getRouteColorForMapType(final int mapType) {
         if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
                 && mapType != GoogleMap.MAP_TYPE_NONE) {
             return OVERLAY_LIGHT;

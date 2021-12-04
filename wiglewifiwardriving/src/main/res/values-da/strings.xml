@@ -429,4 +429,6 @@
     <string name="theme_light_label">Lys</string>
     <string name="theme_dark_label">Mørk</string>
     <string name="theme_follow_label">Følg systemet</string>
+    <string name="manage_gpx_button">Gemte ruter</string>
+    <string name="manage_gpx">Administrer gemte GPX-ruter</string>
 </resources>

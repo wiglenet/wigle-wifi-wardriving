@@ -7,6 +7,7 @@
     android:paddingTop="6dp"
     android:paddingBottom="6dp"
     android:orientation="horizontal"
+    android:background="@drawable/gpx_selector"
     >
     <TextView
         android:id="@+id/gpxItemLabel"

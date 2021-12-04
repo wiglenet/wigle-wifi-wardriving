@@ -423,12 +423,12 @@
     <string name="click_download">&#160;Tocca indicatore per sincronizzare con il dispositivo.</string>
     <string name="click_access">&#160;Tocca l\'indicatore per copiare.</string>
     <string name="plus_gps">+GPS:&#160;</string>
-    <string name="dl_failed">Download non riuscito: il risultato non è stato salvato.</string>
+    <string name="dl_failed">Download non riuscito: il risultato non è stato memorizzato.</string>
     <string name="not_proc">&#160;non processato.</string>
     <string name="theme_settings_label">Visualizza il tema</string>
     <string name="theme_light_label">Luce</string>
     <string name="theme_dark_label">Scura</string>
     <string name="theme_follow_label">Segui il sistema</string>
-    <string name="manage_gpx_button">Percorsi salvati</string>
-    <string name="manage_gpx">Gestisci le rotte GPX salvate</string>
+    <string name="manage_gpx_button">Percorsi memorizzati</string>
+    <string name="manage_gpx">Gestisci le rotte GPX memorizzato</string>
 </resources>

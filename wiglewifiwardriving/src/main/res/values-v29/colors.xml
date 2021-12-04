@@ -19,4 +19,7 @@
     <color name ="colorNavigationItemExitFg">#770000</color>
     <color name ="colorNavigationItemBorder">#AA030303</color>
     <color name ="colorListSsidText">#111111</color>
+    <color name="gpx_pressed_color">#B0B0B0</color>
+    <color name="gpx_selected_color">#B0B0B0</color>
+    <color name="gpx_focused_color">#1A1A1A</color>
 </resources>

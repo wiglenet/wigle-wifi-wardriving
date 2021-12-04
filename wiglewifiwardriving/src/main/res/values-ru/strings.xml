@@ -429,4 +429,6 @@
     <string name="theme_light_label">Легкий</string>
     <string name="theme_dark_label">Темный</string>
     <string name="theme_follow_label">Следить за системой</string>
+    <string name="manage_gpx_button">Сохраненные маршруты</string>
+    <string name="manage_gpx">Управление сохраненными маршрутами GPX</string>
 </resources>

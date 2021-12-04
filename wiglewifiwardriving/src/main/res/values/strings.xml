@@ -429,4 +429,6 @@
     <string name="theme_light_label">Light</string>
     <string name="theme_dark_label">Dark</string>
     <string name="theme_follow_label">Follow System</string>
+    <string name="manage_gpx_button">Saved Routes</string>
+    <string name="manage_gpx">Manage saved GPX routes</string>
 </resources>

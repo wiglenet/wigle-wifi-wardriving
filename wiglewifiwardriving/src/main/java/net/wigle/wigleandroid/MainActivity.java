@@ -189,6 +189,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
     private static final int ACTION_TTS_CODE = 3;
+    public static final int ACTION_GPX_MGMT = 4;
+
 
     static final String ERROR_REPORT_DO_EMAIL = "doEmail";
     public static final String ERROR_REPORT_DIALOG = "doDialog";
@@ -971,7 +973,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    static void createConfirmation(final FragmentActivity activity, final String message,
+    public static void createConfirmation(final FragmentActivity activity, final String message,
                                    final int tabPos, final int dialogId) {
         try {
             final FragmentManager fm = activity.getSupportFragmentManager();

@@ -429,4 +429,6 @@
     <string name="theme_light_label">الضوء</string>
     <string name="theme_dark_label">المظلم</string>
     <string name="theme_follow_label">اتبع النظام</string>
+    <string name="manage_gpx_button">الطرق المحفوظة</string>
+    <string name="manage_gpx">إدارة مسارات GPX المحفوظة</string>
 </resources>

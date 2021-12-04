@@ -429,4 +429,6 @@
     <string name="theme_light_label">Licht</string>
     <string name="theme_dark_label">Dunkler</string>
     <string name="theme_follow_label">System folgen</string>
+    <string name="manage_gpx_button">Gespeicherte Routen</string>
+    <string name="manage_gpx">Gespeicherte GPX-Routen verwalten</string>
 </resources>

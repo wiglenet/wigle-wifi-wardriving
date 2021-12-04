@@ -429,4 +429,6 @@
     <string name="theme_light_label">灯光模式</string>
     <string name="theme_dark_label">暗模式</string>
     <string name="theme_follow_label">追踪系统</string>
+    <string name="manage_gpx_button">保存的路线</string>
+    <string name="manage_gpx">管理保存的 GPX 路线</string>
 </resources>

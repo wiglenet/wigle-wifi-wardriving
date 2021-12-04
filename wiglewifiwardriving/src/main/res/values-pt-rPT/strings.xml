@@ -428,4 +428,6 @@
     <string name="theme_light_label">Luz</string>
     <string name="theme_dark_label">Escuro</string>
     <string name="theme_follow_label">Seguir sistema</string>
+    <string name="manage_gpx_button">Rotas salvas</string>
+    <string name="manage_gpx">Gerenciar rotas GPX salvas</string>
 </resources>

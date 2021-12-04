@@ -429,4 +429,6 @@
     <string name="theme_light_label">Fény</string>
     <string name="theme_dark_label">Sötét</string>
     <string name="theme_follow_label">Kövesse a rendszert</string>
+    <string name="manage_gpx_button">Mentett útvonalak</string>
+    <string name="manage_gpx">Mentett GPX-útvonalak kezelése</string>
 </resources>

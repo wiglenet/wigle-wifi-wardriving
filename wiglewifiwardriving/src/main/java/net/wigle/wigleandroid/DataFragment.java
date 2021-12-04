@@ -13,6 +13,7 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.MagicEightUtil;
 import net.wigle.wigleandroid.util.SearchUtil;
@@ -23,8 +24,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -45,23 +44,19 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static net.wigle.wigleandroid.ListFragment.PREF_LOG_ROUTES;
-import static net.wigle.wigleandroid.util.FileUtility.GPX_EXT;
+import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
+import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_FILE_PREFIX;
 
@@ -80,16 +75,10 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private static final int MAX_OUT_DIALOG = 127;
     private static final int DELETE_DIALOG = 128;
     private static final int EXPORT_M8B_DIALOG = 129;
-    private static final int EXPORT_GPX_DIALOG = 130;
 
     // constants for Magic (8) Ball export
     //private static final String M8B_SEP = "|";
     private static final int SLICE_BITS = 30;
-
-    private final static String GPX_HEADER_A = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?><gpx xmlns=\"http://www.topografix.com/GPX/1/1\" creator=\"";
-    private final static String GPX_HEADER_B ="\" version=\"1.1\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\"><trk>\n";
-    private final static String GPX_FOOTER = "</trkseg></trk></gpx>";
-
 
     private ProgressDialog pd = null;
     /** Called when the activity is first created. */
@@ -108,7 +97,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.data, container, false);
-
         setupQueryButtons( view );
         setupCsvButtons( view );
         setupKmlButtons(view);
@@ -210,6 +198,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 }
             }
         });
+
 
         final Button kmlExportButton = view.findViewById( R.id.kml_export_button );
         kmlExportButton.setOnClickListener( new OnClickListener() {
@@ -389,6 +378,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         } else {
                             MainActivity.error("unable to get fragment activity");
                         }
+                    }
+                });
+                final Button manageGpxButton = view.findViewById(R.id.manage_gpx_button);
+                manageGpxButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Intent gpxIntent = new Intent(a.getApplicationContext(), GpxManagementActivity.class);
+                        a.startActivityForResult(gpxIntent, ACTION_GPX_MGMT);
                     }
                 });
             }
@@ -728,7 +725,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     private boolean exportRouteGpxFile() {
         final long totalRoutePoints = ListFragment.lameStatic.dbHelper.getCurrentRoutePointCount();
         if (totalRoutePoints > 1) {
-            new AsyncGpxExportTask().execute(totalRoutePoints);
+            new AsyncGpxExportTask(this.getContext(), this.getActivity(), pd).execute(totalRoutePoints);
         } else {
             MainActivity.error("no points to create route");
             WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,
@@ -737,6 +734,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         }
         return true;
     }
+
     /**
      * Asynchronous execution wrapping m8b generation. half-redundant with the async query, half not
      */
@@ -994,168 +992,6 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 pd.setIndeterminate(false);
                 pd.setMessage(getString(R.string.calculating_m8b));
                 pd.setProgress(values[0]);
-            }
-        }
-    }
-    class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
-
-        File gpxDestFile;
-
-        @Override
-        protected String doInBackground(Long... routeLocs) {
-            // TODO: AS ABOVE there's a real case for refusing to export on devices that don't have SD...
-            // TODO: android R FS changes
-            final boolean hasSD = FileUtility.hasSD();
-
-            final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
-            final String name = df.format(new Date());
-            final String nameStr = "<name>" + name + "</name><trkseg>\n";
-
-            try {
-                if ( hasSD ) {
-                    final String basePath = FileUtility.getGpxPath();
-                    if (null == basePath) {
-                        MainActivity.error("Unable to determine external GPX path");
-                        return null;
-                    }
-                    final File path = new File( basePath );
-                    //noinspection ResultOfMethodCallIgnored
-                    path.mkdirs();
-                    if (!path.exists()) {
-                        MainActivity.info("Got '!exists': " + path);
-                    }
-                    String openString = basePath + name +  GPX_EXT;
-                    //DEBUG: MainActivity.info("Opening file: " + openString);
-                    gpxDestFile = new File( openString );
-
-                } else {
-                    final Activity a = getActivity();
-                    if (null != a) {
-                        gpxDestFile = new File(getActivity().getApplication().getFilesDir(),
-                                name + GPX_EXT);
-                    } else {
-                        MainActivity.error("set destination file due to null Activity in GPX export");
-                    }
-                }
-                FileWriter writer = new FileWriter(gpxDestFile, false);
-                writer.append(GPX_HEADER_A);
-                String creator = "WiGLE WiFi ";
-                try {
-                    final Activity a = getActivity();
-                    if (null != a) {
-                        final PackageManager pm = getActivity().getApplicationContext().getPackageManager();
-                        final PackageInfo pi = pm.getPackageInfo(getActivity().getApplicationContext().getPackageName(), 0);
-                        creator += pi.versionName;
-                    } else {
-                        MainActivity.error("unable to get packageManager due to null Activity in GPX export");
-                    }
-                } catch (Exception ex) {
-                    creator += "(unknown)";
-                }
-                writer.append(creator);
-                writer.append(GPX_HEADER_B);
-                writer.append(nameStr);
-                Cursor cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
-                long segmentCount = writeSegmentsWithCursor(writer, cursor, df, routeLocs[0]);
-                MainActivity.info("wrote "+segmentCount+" segments");
-                writer.append(GPX_FOOTER);
-                writer.flush();
-                writer.close();
-                return "completed export";
-            } catch (IOException | DBException | InterruptedException e) {
-                MainActivity.error("Error writing GPX", e);
-            }
-            return null;
-        }
-
-        protected long writeSegmentsWithCursor(final FileWriter writer, final Cursor cursor, final DateFormat dateFormat, final Long totalCount) throws IOException, InterruptedException {
-            long lineCount = 0;
-
-            for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-                MainActivity.info("export: "+lineCount + " / "+totalCount);
-                //if (wasInterrupted()) {
-                //    throw new InterruptedException("GPX export interrupted");
-                //}
-                final double lat = cursor.getDouble(0);
-                final double lon = cursor.getDouble(1);
-                final long time = cursor.getLong(2);
-
-                writer.append("<trkpt lat=\"").append(String.valueOf(lat)).append("\" lon=\"")
-                        .append(String.valueOf(lon)).append("\"><time>").append(
-                                dateFormat.format(new Date(time))).append("</time></trkpt>\n");
-                lineCount++;
-                if (totalCount == 0) {
-                    return totalCount;
-                }
-                if (lineCount == 0) {
-                    onProgressUpdate( 0 );
-                } else {
-                    final int percentDone = (int) (((lineCount) * 1000) / totalCount);
-                    publishProgress(percentDone);
-                }
-            }
-            return lineCount;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (null != result) { //launch task will exist with bg thread enqueued with null return
-                MainActivity.error("GPX POST EXECUTE: " + result);
-                if (pd.isShowing()) {
-                    pd.dismiss();
-                }
-                // fire share intent?
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE.gpx");
-                intent.setType("application/gpx");
-
-                //TODO: verify local-only storage case/gpx_paths.xml
-                final Context c = getContext();
-                if (null != c) {
-                    final Uri fileUri = FileProvider.getUriForFile(getContext(),
-                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                    ".gpxprovider", gpxDestFile);
-
-                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
-                } else {
-                    MainActivity.error("Unable to initiate GPX export - null context");
-                }
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            pd = new ProgressDialog(getContext());
-            pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            pd.setCancelable(false);
-            pd.setMessage(getString(R.string.gpx_preparing));
-            pd.setIndeterminate(true);
-            pd.show();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            if (values.length == 1) {
-                MainActivity.info("progress: "+values[0]);
-                if (values[0] > 0) {
-                    if (100 == values[0]) {
-                        if (pd.isShowing()) {
-                            pd.dismiss();
-                        }
-                        return;
-                    }
-                    pd.setMessage(getString(R.string.gpx_exporting));
-                    pd.setProgress(values[0]);
-                } else {
-                    pd.setIndeterminate(false);
-                    pd.setMessage(getString(R.string.gpx_preparing));
-                    pd.setProgress(values[0]);
-                }
-            } else {
-                MainActivity.warn("too many values for GPX progress update");
             }
         }
     }

@@ -15,7 +15,6 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.FileUtility;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;

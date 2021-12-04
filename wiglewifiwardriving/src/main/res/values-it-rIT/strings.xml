@@ -429,4 +429,6 @@
     <string name="theme_light_label">Luce</string>
     <string name="theme_dark_label">Scura</string>
     <string name="theme_follow_label">Segui il sistema</string>
+    <string name="manage_gpx_button">Percorsi salvati</string>
+    <string name="manage_gpx">Gestisci le rotte GPX salvate</string>
 </resources>

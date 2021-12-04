@@ -196,6 +196,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <activity
+            android:name=".GpxManagementActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize"
+            android:exported="false"
+            android:label="@string/manage_gpx"
+            android:launchMode="singleTask"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <!-- here at WiGLE, we give you ALL the file types! -->
         <provider
             android:name=".util.KmlFileProvider"
@@ -262,9 +273,12 @@
         </receiver>
         <receiver
             android:name=".listener.StartWigleAtBootReciever"
-            android:label="StartWigleAtBootReceiver">
+            android:label="StartWigleAtBootReceiver"
+            android:exported="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
         <service

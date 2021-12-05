@@ -13,7 +13,7 @@ This client provides geolocated detection and logging for WiFi, Bluetooth, and c
 ## Data Export
 The client offers numerous data export formats including:
 
-- CSV (curent run, full DB, previous runs for WiGLE.net uploaders)
+- CSV (current run, full DB, previous runs for WiGLE.net uploaders)
 - KML (current run and full DB, previous runs for WiGLE.net uploaders)
 - SQLite database (full DB)
 - GPX route data (current and previous routes)

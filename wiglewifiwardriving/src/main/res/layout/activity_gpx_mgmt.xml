@@ -8,10 +8,39 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp">
         <RelativeLayout
-            android:id="@+id/gpx_map_rl"
             android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent">
+            <RelativeLayout
+                android:id="@+id/gpx_map_rl"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:id="@+id/gpx_info"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:visibility="gone">
+                <TextView
+                    android:id="@+id/gpx_rundistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"
+                    android:paddingLeft="13dp"
+                    android:paddingRight="13dp"
+                    android:textColor="#FFFF"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:background="#AA333333"/>
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="0dp" />
+            </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
     <LinearLayout
         android:layout_weight="1"

@@ -1,9 +1,12 @@
 package net.wigle.wigleandroid;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,21 +27,28 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.PolylineRoute;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
+import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
+import static android.view.View.GONE;
 import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 
 public class GpxManagementActivity extends AppCompatActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
 
+    private NumberFormat numberFormat;
     private int DEFAULT_MAP_PADDING = 25;
     private GpxRecyclerAdapter adapter;
-    final DatabaseHelper dbHelper;
+    private final DatabaseHelper dbHelper;
     private MapView mapView;
+    private View infoView;
+    private TextView distanceText;
     private Polyline routePolyline;
     private final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
     private SharedPreferences prefs;
@@ -47,6 +57,17 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 
     public GpxManagementActivity() {
         this.dbHelper = MainActivity.getStaticState().dbHelper;
+        Locale locale = Locale.getDefault();
+        /*Configuration sysConfig = getResources().getConfiguration();
+        if (null != sysConfig) {
+            locale = sysConfig.locale;
+        }*/
+        if (null == locale) {
+            locale = Locale.US;
+        }
+        numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMaximumFractionDigits(1);
+
     }
 
     @Override
@@ -98,13 +119,14 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         mapView = new MapView( this );
         try {
             mapView.onCreate(savedInstanceState);
-        }
-        catch (NullPointerException ex) {
+        } catch (NullPointerException ex) {
             MainActivity.error("npe in mapView.onCreate: " + ex, ex);
         }
         MapsInitializer.initialize( this );
         final RelativeLayout rlView = findViewById( R.id.gpx_map_rl );
         rlView.addView( mapView );
+        infoView = findViewById(R.id.gpx_info);
+        distanceText = findViewById(R.id.gpx_rundistance);
     }
 
     @Override
@@ -123,6 +145,13 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
                     routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
                 }
             });
+            infoView.setVisibility(View.VISIBLE);
+            final String distString = UINumberFormat.metersToString(prefs,
+                    numberFormat, this, polyRoute.getDistanceMeters(), true);
+            distanceText.setText(distString);
+        } else {
+            infoView.setVisibility(GONE);
+            distanceText.setText("");
         }
     }
 

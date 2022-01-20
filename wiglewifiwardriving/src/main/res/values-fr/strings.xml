@@ -409,7 +409,7 @@
     <string name="export_gpx">Exporter la route actuelle en tant que fichier de route GPX</string>
     <string name="export_gpx_detail">Exporter la route en cours de journalisation en tant que fichier de description de route XML .GPX</string>
     <string name="gpx_failed">Impossible d\'exporter le fichier gpx.\n </string>
-    <string name="gpx_no_points">Le fichier d\'exportation de la route GPX serait vide.</string>
+    <string name="gpx_no_points">Le fichier d\'exportation de la route GPX est vide.</string>
     <string name="gpx_preparing">Préparation de l\'exportation GPX</string>
     <string name="gpx_exporting">Exporter un fichier GPX.</string>
     <string name="discovered">Ddécouverts</string>
@@ -418,7 +418,7 @@
     <string name="csv">CSV</string>
     <string name="kml">KML</string>
     <string name="downloaded">&#160;téléchargé.</string>
-    <string name="uploaded">&#160;téléchargé.</string>
+    <string name="uploaded">&#160;téléversé.</string>
     <string name="click_retry">&#160;Appuyez sur l\'indicateur pour réessayer.</string>
     <string name="click_download">&#160;Appuyez sur l\'indicateur pour synchroniser avec l\'appareil.</string>
     <string name="click_access">&#160;Appuyez sur l\'indicateur pour copier.</string>
@@ -429,6 +429,6 @@
     <string name="theme_light_label">Lumière</string>
     <string name="theme_dark_label">Sombre</string>
     <string name="theme_follow_label">Suivez système</string>
-    <string name="manage_gpx_button">Routes enregistrés</string>
+    <string name="manage_gpx_button">Routes enregistrées</string>
     <string name="manage_gpx">Gérer les routes GPX enregistrées</string>
 </resources>

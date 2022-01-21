@@ -22,8 +22,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
-import org.apache.commons.io.FilenameUtils;
-
 import java.io.File;
 
 import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
@@ -156,7 +154,7 @@ public class BackgroundGuiHandler extends Handler {
                                 final String filePath = msg.peekData().getString(FILEPATH);
                                 //MainActivity.debug("File: "+filePath+" ("+fileName+")");
                                 if (null != filePath) {
-                                    File file = FileUtility.getKmlDownloadFile(this.context, FilenameUtils.removeExtension(fileName), filePath);
+                                    File file = FileUtility.getKmlDownloadFile(this.context, removeFileExtension(fileName), filePath);
                                     if (file == null || !file.exists()) {
                                         showError(fm, msg, status);
                                         MainActivity.error("UNABLE to export file - no access to " + filePath + " - " + fileName);
@@ -310,5 +308,21 @@ public class BackgroundGuiHandler extends Handler {
 
             return ad;
         }
+    }
+
+    /**
+     * ALIBI: simple filename ext. remover for Android. commons.io versions without security vulns (2.7 and up) break out backward compat.
+     * @param fileName the input filename
+     * @return the fileName minus the extension
+     * @throws IllegalArgumentException
+     */
+    private static String removeFileExtension(final String fileName) throws IllegalArgumentException {
+        if (fileName == null || fileName.indexOf(0) >= 0) {
+            throw new IllegalArgumentException("Invalid file name.");
+        }
+        final int extensionPos = fileName.lastIndexOf('.');
+        final int lastSeparator = fileName.lastIndexOf('/');
+        int index =  lastSeparator > extensionPos ? -1 : extensionPos;
+        return fileName.substring(0, index);
     }
 }

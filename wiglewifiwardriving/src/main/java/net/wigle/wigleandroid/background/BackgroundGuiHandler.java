@@ -323,6 +323,9 @@ public class BackgroundGuiHandler extends Handler {
         final int extensionPos = fileName.lastIndexOf('.');
         final int lastSeparator = fileName.lastIndexOf('/');
         int index =  lastSeparator > extensionPos ? -1 : extensionPos;
+        if (index == -1) {
+            return fileName;
+        }
         return fileName.substring(0, index);
     }
 }

@@ -161,7 +161,8 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
             }
             // fire share intent?
             Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.putExtra(Intent.EXTRA_SUBJECT, "WiGLE.gpx");
+            final String fileName = (gpxDestFile != null && !gpxDestFile.getName().isEmpty()) ? gpxDestFile.getName() : "WiGLE.gpx";
+            intent.putExtra(Intent.EXTRA_SUBJECT, fileName);
             intent.setType("application/gpx");
 
             //TODO: verify local-only storage case/gpx_paths.xml

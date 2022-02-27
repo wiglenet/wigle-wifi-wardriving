@@ -1,5 +1,8 @@
-* 2.64 (?)
+* 2.64 (2/27/2022)
 Fix Polish toast text (thanks olekstomek!)
+French updates (thanks k4nfr3!)
+GPX browser and clearer filenames
+Library updates
 
 * 2.61 - 2.63 (09/19/2021)
 Fix for Android security update turning off GPS when screen is off

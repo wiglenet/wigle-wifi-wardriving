@@ -233,6 +233,7 @@
     <string name="language_pl">Polski (polština)</string>
     <string name="language_pt">Português (portugalština)</string>
     <string name="language_pt_rBR">Português Brasileiro (brazilská portugalština)</string>
+    <string name="language_ro_rRO">Română (rumunština)</string>
     <string name="language_ru">ру́сский (ruština)</string>
     <string name="language_sv">Svenska (švédština)</string>
     <string name="language_sw">Kiswahili (svahilština)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Sledujte systém</string>
     <string name="manage_gpx_button">Uložené trasy</string>
     <string name="manage_gpx">Spravujte uložené trasy GPX</string>
+    <string name="enable_map_theme">Spojte motiv mapy s aplikací</string>
 </resources>

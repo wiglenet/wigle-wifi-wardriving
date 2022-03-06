@@ -233,6 +233,7 @@
     <string name="language_pl">polski (polonês)</string>
     <string name="language_pt">português (português)</string>
     <string name="language_pt_rBR">português brasileiro</string>
+    <string name="language_ro_rRO">Română (Romeno)</string>
     <string name="language_ru">ру́сский (russo)</string>
     <string name="language_sv">svenska (sueco)</string>
     <string name="language_sw">Kiswahili (Suaíli)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Seguir sistema</string>
     <string name="manage_gpx_button">Rotas salvas</string>
     <string name="manage_gpx">Gerenciar rotas GPX salvas</string>
+    <string name="enable_map_theme">Combine o tema do mapa com o aplicativo</string>
 </resources>

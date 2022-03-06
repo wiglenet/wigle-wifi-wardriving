@@ -233,6 +233,7 @@
     <string name="language_pl">polski (Pools)</string>
     <string name="language_pt">português (Portugees)</string>
     <string name="language_pt_rBR">português brasileiro (Braziliaans-Portugees)</string>
+    <string name="language_ro_rRO">Română (Roemeense)</string>
     <string name="language_ru">ру́сский (Russisch)</string>
     <string name="language_sv">svenska (Zweeds)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Volg systeem</string>
     <string name="manage_gpx_button">Opgeslagen routes</string>
     <string name="manage_gpx">Beheer opgeslagen GPX-routes</string>
+    <string name="enable_map_theme">Match kaartthema met app</string>
 </resources>

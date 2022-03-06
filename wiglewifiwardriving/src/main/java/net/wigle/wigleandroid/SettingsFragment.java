@@ -491,9 +491,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
-
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , ListFragment.PREF_MAPS_FOLLOW_DAYNIGHT, false);
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
-                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ru", "sv",
+                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
                 "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
                 getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
@@ -502,9 +502,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
                 getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
                 getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
-                getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
-                getString(R.string.language_sw), getString(R.string.language_tr), getString(R.string.language_zh_cn),
-                getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
+                getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
+                getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
+                getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
         SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
 

@@ -1,7 +1,6 @@
 package net.wigle.wigleandroid;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -27,6 +26,7 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.PolylineRoute;
 import net.wigle.wigleandroid.ui.GpxRecyclerAdapter;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
@@ -58,16 +58,11 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     public GpxManagementActivity() {
         this.dbHelper = MainActivity.getStaticState().dbHelper;
         Locale locale = Locale.getDefault();
-        /*Configuration sysConfig = getResources().getConfiguration();
-        if (null != sysConfig) {
-            locale = sysConfig.locale;
-        }*/
         if (null == locale) {
             locale = Locale.US;
         }
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(1);
-
     }
 
     @Override
@@ -119,6 +114,12 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         mapView = new MapView( this );
         try {
             mapView.onCreate(savedInstanceState);
+            mapView.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(final GoogleMap googleMap) {
+                    ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json);
+                }
+            });
         } catch (NullPointerException ex) {
             MainActivity.error("npe in mapView.onCreate: " + ex, ex);
         }

@@ -212,7 +212,7 @@
     <string name="data_export_kml_db">Exportar base de dados para ficheiro KML?</string>
     <string name="data_backup_db">Fazer backup da base de dados num ficheiro diferente?</string>
     <string name="auto">Automático</string>
-    <string name="language_en">Inglês</string>
+    <string name="language_en">English (Inglês)</string>
     <string name="language_ar">العربية (árabe)</string>
     <string name="language_cs">čeština (checo)</string>
     <string name="language_da">dansk (dinamarquês)</string>
@@ -232,6 +232,7 @@
     <string name="language_pl">polski (polaco)</string>
     <string name="language_pt">português (português)</string>
     <string name="language_pt_rBR">português brasileiro (português do brasil)</string>
+    <string name="language_ro_rRO">Română (Romeno)</string>
     <string name="language_ru">ру́сский (russo)</string>
     <string name="language_sv">svenska (sueco)</string>
     <string name="language_sw">Kiswahili (Suaíli)</string>
@@ -430,4 +431,5 @@
     <string name="theme_follow_label">Seguir sistema</string>
     <string name="manage_gpx_button">Rotas salvas</string>
     <string name="manage_gpx">Gerenciar rotas GPX salvas</string>
+    <string name="enable_map_theme">Mostrar o mapa com o tema igual ao da aplicação.</string>
 </resources>

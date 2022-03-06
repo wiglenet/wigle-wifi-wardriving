@@ -233,7 +233,8 @@
     <string name="language_pl">polski (Polish)</string>
     <string name="language_pt">português (Portuguese)</string>
     <string name="language_pt_rBR">português brasileiro (Brazilian Portuguese)</string>
-    <string name="language_ru">ру́сский (Russian)</string>
+    <string name="language_ro_rRO">Română (rumensk)</string>
+    <string name="language_ru">ру́сский (russisk)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
     <string name="language_sv">svenska (Swedish)</string>
     <string name="language_tr">Türkçe (Turkish)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Følg System</string>
     <string name="manage_gpx_button">Lagrede ruter</string>
     <string name="manage_gpx">Administrer lagrede GPX-ruter</string>
+    <string name="enable_map_theme">Match karttemaet til appen</string>
 </resources>

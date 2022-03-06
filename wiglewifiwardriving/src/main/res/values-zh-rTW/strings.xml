@@ -233,6 +233,7 @@
     <string name="language_pl">polski (波蘭語言)</string>
     <string name="language_pt">português (葡萄牙語)</string>
     <string name="language_pt_rBR">português brasileiro (巴西葡萄牙語)</string>
+    <string name="language_ro_rRO">Română (羅馬尼亞語)</string>
     <string name="language_ru">ру́сский (俄語)</string>
     <string name="language_sw">Kiswahili (斯瓦希里語)</string>
     <string name="language_sv">svenska (瑞典語)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">追踪系統</string>
     <string name="manage_gpx_button">保存的路線</string>
     <string name="manage_gpx">管理保存的 GPX 路線</string>
+    <string name="enable_map_theme">將地圖主題與應用程序匹配</string>
 </resources>

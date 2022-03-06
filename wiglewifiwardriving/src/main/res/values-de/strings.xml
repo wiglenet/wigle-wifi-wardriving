@@ -432,5 +432,5 @@
     <string name="theme_follow_label">System folgen</string>
     <string name="manage_gpx_button">Gespeicherte Routen</string>
     <string name="manage_gpx">Gespeicherte GPX-Routen verwalten</string>
-    <string name="enable_map_theme">Passen Sie das Kartenthema an die App an</string>
+    <string name="enable_map_theme">Kartenstil wie App</string>
 </resources>

@@ -233,6 +233,7 @@
     <string name="language_pl">polski (פולנית)</string>
     <string name="language_pt">português (פורטוגזית)</string>
     <string name="language_pt_rBR">português brasileiro (פורטוגזית ברזילאית)</string>
+    <string name="language_ro_rRO">(רומנית) Română</string>
     <string name="language_ru">ру́сский (רוסית)</string>
     <string name="language_sv">svenska (שבדית)</string>
     <string name="language_sw">Kiswahili (סווהילי)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">עקוב אחר המערכת</string>
     <string name="manage_gpx_button">מסלולים שמורים</string>
     <string name="manage_gpx">נהל מסלולי GPX שמורים</string>
+    <string name="enable_map_theme">התאם את נושא המפה לאפליקציה</string>
 </resources>

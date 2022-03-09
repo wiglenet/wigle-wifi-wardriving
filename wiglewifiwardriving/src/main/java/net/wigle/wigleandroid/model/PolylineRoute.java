@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.model;
 
+import android.graphics.Color;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -43,11 +44,12 @@ public class PolylineRoute {
      * @param latitude latitude
      * @param longitude longitude
      * @param mapMode map mode dictates line color choice (google map mode id)
+     * @param nightMode specify night mode
      */
-    public void addLatLng(final float latitude, final float longitude, final int mapMode) {
+    public void addLatLng(final float latitude, final float longitude, final int mapMode, final boolean nightMode) {
         final LatLng newPoint = new LatLng(latitude, longitude);
         polyline.add(newPoint);
-        polyline.color(getRouteColorForMapType(mapMode));
+        polyline.color(getRouteColorForMapType(mapMode, nightMode));
         polyline.width(DEFAULT_ROUTE_WIDTH);
         polyline.zIndex(10000); //to overlay above traffic data
         if (latitude > northExtent) {

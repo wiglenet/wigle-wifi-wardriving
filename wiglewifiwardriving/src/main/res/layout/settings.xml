@@ -241,6 +241,10 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_route_logging" />
 
+    <CheckBox android:id="@+id/enable_map_theme"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_map_theme" />
 
     <TextView
         android:layout_width="fill_parent"

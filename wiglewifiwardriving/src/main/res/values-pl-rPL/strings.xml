@@ -233,6 +233,7 @@
     <string name="language_pl">polski</string>
     <string name="language_pt">português (portugalski)</string>
     <string name="language_pt_rBR">português brasileiro (portugalski brazylijski)</string>
+    <string name="language_ro_rRO">Română (rumuński)</string>
     <string name="language_ru">ру́сский (rosyjski)</string>
     <string name="language_sv">svenska (szwedzki)</string>
     <string name="language_sw">Kiswahili (Suahili)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">śledzić system</string>
     <string name="manage_gpx_button">Zapisane trasy</string>
     <string name="manage_gpx">Zarządzaj zapisanymi trasami GPX</string>
+    <string name="enable_map_theme">Dopasuj motyw map do motywu aplikacji</string>
 </resources>

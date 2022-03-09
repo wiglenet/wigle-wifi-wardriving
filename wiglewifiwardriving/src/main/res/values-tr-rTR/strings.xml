@@ -233,6 +233,7 @@
     <string name="language_pl">polski (Lehçe)</string>
     <string name="language_pt">português (Portekizce)</string>
     <string name="language_pt_rBR">português brasileiro (Brezilya Portekizcesi)</string>
+    <string name="language_ro_rRO">Română (Rumence)</string>
     <string name="language_ru">ру́сский (Rusça)</string>
     <string name="language_sv">svenska (İsveççe)</string>
     <string name="language_sw">Kiswahili (Svahili)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Sistemi takip et</string>
     <string name="manage_gpx_button">Kayıtlı Rotalar</string>
     <string name="manage_gpx">Kaydedilmiş GPX rotalarını yönetin</string>
+    <string name="enable_map_theme">Harita temasını uygulamayla eşleştirin</string>
 </resources>

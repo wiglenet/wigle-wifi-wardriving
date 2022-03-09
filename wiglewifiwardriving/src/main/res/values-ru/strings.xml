@@ -232,6 +232,7 @@
     <string name="language_pl">polski (польский)</string>
     <string name="language_pt">português (португальский)</string>
     <string name="language_pt_rBR">português brasileiro (бразильский португа́льский)</string>
+    <string name="language_ro_rRO">Română (румынский)</string>
     <string name="language_ru">Ру́сский</string>
     <string name="language_sv">svenska (шведский)</string>
     <string name="language_sw">Kiswahili (суахили)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Следить за системой</string>
     <string name="manage_gpx_button">Сохраненные маршруты</string>
     <string name="manage_gpx">Управление сохраненными маршрутами GPX</string>
+    <string name="enable_map_theme">Сопоставьте тему карты с приложением</string>
 </resources>

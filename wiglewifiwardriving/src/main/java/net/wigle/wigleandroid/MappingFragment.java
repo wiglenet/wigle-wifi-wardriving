@@ -28,8 +28,11 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -74,6 +77,7 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 
@@ -187,6 +191,15 @@ public final class MappingFragment extends Fragment {
         if (serviceAvailable == ConnectionResult.SUCCESS) {
             try {
                 mapView.onCreate(savedInstanceState);
+                final Activity a = getActivity();
+                final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
+                mapView.getMapAsync(new OnMapReadyCallback() {
+                    @Override
+                    public void onMapReady(final GoogleMap googleMap) {
+                        ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json);
+                    }
+                });
+
             }
             catch (final SecurityException ex) {
                 MainActivity.error("security exception oncreateview map: " + ex, ex);
@@ -430,6 +443,7 @@ public final class MappingFragment extends Fragment {
                     PolylineOptions pOptions = new PolylineOptions()
                                     .clickable(false);
                     final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                    final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
                     try {
                         Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
                         if (null == routeCursor) {
@@ -444,7 +458,7 @@ public final class MappingFragment extends Fragment {
                                 pOptions.add(
                                         new LatLng(lat, lon));
 
-                                pOptions.color(getRouteColorForMapType(mapMode));
+                                pOptions.color(getRouteColorForMapType(mapMode, nightMode));
                                 pOptions.width(ROUTE_WIDTH); //DEFAULT: 10.0
                                 pOptions.zIndex(10000); //to overlay on traffic data
                                 segmentCount++;
@@ -564,7 +578,8 @@ public final class MappingFragment extends Fragment {
                                     final List<LatLng> routePoints = routePolyline.getPoints();
                                     routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
                                     final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                                    routePolyline.setColor(getRouteColorForMapType(mapMode));
+                                    final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
+                                    routePolyline.setColor(getRouteColorForMapType(mapMode, nightMode));
 
                                     if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
                                         Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
@@ -1098,8 +1113,10 @@ public final class MappingFragment extends Fragment {
         }
     };
 
-    public static int getRouteColorForMapType(final int mapType) {
-        if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
+    public static int getRouteColorForMapType(final int mapType, final boolean nightMode) {
+        if (nightMode) {
+                return OVERLAY_LIGHT;
+        } else if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
                 && mapType != GoogleMap.MAP_TYPE_NONE) {
             return OVERLAY_LIGHT;
         }

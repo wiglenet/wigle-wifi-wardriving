@@ -112,27 +112,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_STARTTIME_CURRENT_SCAN = "timestampScanStart";
     public static final String PREF_DISTANCE_TOTAL = "distTotal";
     public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
-    public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
     public static final String PREF_PREV_LAT = "prevLat";
     public static final String PREF_PREV_LON = "prevLon";
     public static final String PREF_PREV_ZOOM = "prevZoom2";
     public static final String PREF_LIST_SORT = "listSort";
     public static final String PREF_SCAN_RUNNING = "scanRunning";
     public static final String PREF_METRIC = "metric";
-    public static final String PREF_MAP_LABEL = "mapLabel";
-    public static final String PREF_MAP_CLUSTER = "mapCluster";
-    public static final String PREF_MAP_TRAFFIC = "mapTraffic";
-    public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
     public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
     public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
-    public static final String PREF_MAP_TYPE = "mapType";
     public static final String PREF_BLOWED_UP = "blowedUp";
-    public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
-    public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
-    public static final String PREF_MAP_NO_TILE = "NONE";
-    public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
-    public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
-    public static final String PREF_MAP_ALL_TILE = "ALL";
     public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
     public static final String PREF_EXCLUDE_DISPLAY_ADDRS = "displayExcludeAddresses";
     public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
@@ -140,8 +128,23 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
     public static final String PREF_LOG_ROUTES = "logRoutes";
-    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
     public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
+
+    // map prefs
+    public static final String PREF_MAP_NO_TILE = "NONE";
+    public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
+    public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
+    public static final String PREF_MAP_ALL_TILE = "ALL";
+    public static final String PREF_MAP_TYPE = "mapType";
+    public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
+    public static final String PREF_MAP_LABEL = "mapLabel";
+    public static final String PREF_MAP_CLUSTER = "mapCluster";
+    public static final String PREF_MAP_TRAFFIC = "mapTraffic";
+    public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
+    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
+    public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
+    public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
+    public static final String PREF_MAPS_FOLLOW_DAYNIGHT = "mapThemeMatchDayNight";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

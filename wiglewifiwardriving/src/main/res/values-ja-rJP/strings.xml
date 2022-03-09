@@ -232,6 +232,7 @@
     <string name="language_pl">polski（ポーランド語）</string>
     <string name="language_pt">português（ポルトガル語）</string>
     <string name="language_pt_rBR">português brasileiro（ブラジルポルトガル語）</string>
+    <string name="language_ro_rRO">Română (ルーマニア語)</string>
     <string name="language_ru">ру́сский（ロシア語）</string>
     <string name="language_sv">svenska（スウェーデン語）</string>
     <string name="language_sw">Kiswahili (スワヒリ語)</string>
@@ -430,4 +431,5 @@
     <string name="theme_follow_label">フォローシステム</string>
     <string name="manage_gpx_button">保存されたルート</string>
     <string name="manage_gpx">保存されたGPXルートを管理する</string>
+    <string name="enable_map_theme">マップのテーマをアプリに一致させる</string>
 </resources>

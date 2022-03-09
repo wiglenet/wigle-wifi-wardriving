@@ -234,6 +234,7 @@
     <string name="language_pt">português (portugál)</string>
     <string name="language_pt_rBR">português brasileiro (brazil portugál)</string>
     <string name="language_ru">ру́сский (orosz)</string>
+    <string name="language_ro_rRO">Română (román)</string>
     <string name="language_sv">svenska (svéd)</string>
     <string name="language_sw">Kiswahili (szuahéli)</string>
     <string name="language_tr">Türkçe (zörök)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Kövesse a rendszert</string>
     <string name="manage_gpx_button">Mentett útvonalak</string>
     <string name="manage_gpx">Mentett GPX-útvonalak kezelése</string>
+    <string name="enable_map_theme">Párosítsa a térképtémát az alkalmazáshoz</string>
 </resources>

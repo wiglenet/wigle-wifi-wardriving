@@ -160,6 +160,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                     //DEBUG: MainActivity.info("get route "+clickedId);
                     Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId);
                     final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                    final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context ,prefs);
                     if (null == routeCursor) {
                         MainActivity.info("null route cursor; not mapping");
                     } else {
@@ -168,7 +169,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                             final float lat = routeCursor.getFloat(0);
                             final float lon = routeCursor.getFloat(1);
                             //final long time = routeCursor.getLong(2);
-                            newRoute.addLatLng(lat, lon, mapMode);
+                            newRoute.addLatLng(lat, lon, mapMode, nightMode);
                         }
                         MainActivity.info("Loaded route with " + newRoute.getSegments() + " segments");
                         configurable.configureMapForRoute(newRoute);

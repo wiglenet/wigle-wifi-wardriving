@@ -233,6 +233,7 @@
     <string name="language_pl">polski (puola)</string>
     <string name="language_pt">português (portugali)</string>
     <string name="language_pt_rBR">português brasileiro (brasilianportugali)</string>
+    <string name="language_ro_rRO">Română (romanialainen)</string>
     <string name="language_ru">ру́сский (venäjä)</string>
     <string name="language_sv">svenska (ruotsi)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
@@ -431,4 +432,5 @@
     <string name="theme_follow_label">Seuraa järjestelmää</string>
     <string name="manage_gpx_button">Tallennetut reitit</string>
     <string name="manage_gpx">Hallinnoi tallennettuja GPX-reittejä</string>
+    <string name="enable_map_theme">Yhdistä karttateema sovellukseen</string>
 </resources>

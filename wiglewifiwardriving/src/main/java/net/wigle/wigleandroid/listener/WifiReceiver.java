@@ -237,10 +237,27 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
                 somethingAdded |= added;
 
-                if ( location != null && (added || network.getLatLng() == null) ) {
-                    // set the LatLng for mapping
-                    final LatLng LatLng = new LatLng( location.getLatitude(), location.getLongitude() );
-                    network.setLatLng( LatLng );
+                if (location != null) {
+                    final LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    
+                    // Set the current location if the current network location value is null
+                    if (added || network.getLatLng() == null || network.getLowLatLng() == null) {
+                        network.setLatLng(currentLocation);
+                        network.setLatLng(currentLocation);
+                    } 
+                    
+                    // If the current signal level is lower, update the network low level and low geopoint
+                    if (result.level < network.getLowLevel()) {
+                        network.setLowLevel(result.level);
+                        network.setLowLatLng(currentLocation);
+                    }
+                    
+                    // If the current signal level is higher, update the network level and geopoint
+                    if (result.level > network.getLevel()) {
+                        network.setLevel(result.level);
+                        network.setLatLng(currentLocation);
+                    }
+
                     MainActivity.addNetworkToMap(network);
                 }
 
@@ -422,6 +439,11 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
             doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
         }
+    }
+
+    private void setNetworkLocationInfo()
+    {
+
     }
 
     /**

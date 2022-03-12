@@ -38,10 +38,14 @@ public final class Network implements ClusterItem {
     private NetworkType type;
 
     private int frequency;
-    private int level;
     private Integer channel;
-    private LatLng geoPoint;
     private boolean isNew;
+    
+    private int level;
+    private LatLng geoPoint;
+    
+    private int lowLevel;
+    private LatLng lowGeoPoint;
 
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
@@ -85,6 +89,7 @@ public final class Network implements ClusterItem {
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
+        this.lowLevel = level;
         this.type = type;
         if (this.type.equals(NetworkType.typeForCode("W"))) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
@@ -162,6 +167,10 @@ public final class Network implements ClusterItem {
         return level;
     }
 
+    public int getLowLevel() {
+        return lowLevel;
+    }
+
     public NetworkType getType() {
         return type;
     }
@@ -172,6 +181,10 @@ public final class Network implements ClusterItem {
 
     public void setLevel( final int level ) {
         this.level = level;
+    }
+
+    public void setLowLevel(final int level) {
+        this.lowLevel = lowLevel;
     }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
@@ -235,8 +248,16 @@ public final class Network implements ClusterItem {
         this.geoPoint = geoPoint;
     }
 
+    public void setLowLatLng(LatLng geoPoint) {
+        this.lowGeoPoint = geoPoint;
+    }
+
     public LatLng getLatLng() {
         return geoPoint;
+    }
+
+    public LatLng getLowLatLng() {
+        return lowGeoPoint;
     }
 
     public String getOui(final OUI oui) {

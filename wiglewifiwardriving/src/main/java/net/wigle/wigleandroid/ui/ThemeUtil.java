@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
 import net.wigle.wigleandroid.ListFragment;

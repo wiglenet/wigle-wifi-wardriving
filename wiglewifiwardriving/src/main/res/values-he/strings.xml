@@ -433,4 +433,5 @@
     <string name="manage_gpx_button">מסלולים שמורים</string>
     <string name="manage_gpx">נהל מסלולי GPX שמורים</string>
     <string name="enable_map_theme">התאם את נושא המפה לאפליקציה</string>
+    <string name="throttle">סריקת WiFi מוגבלת. השבת את מצערת הסריקה של WiFi תחת הגדרות מפתחים לביצועים טובים יותר.</string>
 </resources>

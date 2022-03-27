@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Rotas salvas</string>
     <string name="manage_gpx">Gerenciar rotas GPX salvas</string>
     <string name="enable_map_theme">Combine o tema do mapa com o aplicativo</string>
+    <string name="no_individual_nets_map">Desabilitar a exibição da rede do mapa</string>
+    <string name="filter_show_btle">Mostrar Bluetooth LE</string>
 </resources>

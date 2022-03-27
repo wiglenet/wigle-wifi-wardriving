@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Saved Routes</string>
     <string name="manage_gpx">Manage saved GPX routes</string>
     <string name="enable_map_theme">Match map theme to app</string>
+    <string name="no_individual_nets_map">Disable map net display</string>
+    <string name="filter_show_btle">Show Bluetooth LE</string>
 </resources>

@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Percorsi memorizzati</string>
     <string name="manage_gpx">Gestisci le rotte GPX memorizzato</string>
     <string name="enable_map_theme">Abbina il tema della mappa all\'app</string>
+    <string name="no_individual_nets_map">Disabilita la visualizzazione della rete della mappa</string>
+    <string name="filter_show_btle">Mostra Bluetooth LE</string>
 </resources>

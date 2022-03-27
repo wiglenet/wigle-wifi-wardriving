@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Routes enregistrées</string>
     <string name="manage_gpx">Gérer les routes GPX enregistrées</string>
     <string name="enable_map_theme">Faire correspondre le thème de la carte à l\'application</string>
+    <string name="no_individual_nets_map">Désactiver l\'affichage net de la carte</string>
+    <string name="filter_show_btle">Afficher Bluetooth LE</string>
 </resources>

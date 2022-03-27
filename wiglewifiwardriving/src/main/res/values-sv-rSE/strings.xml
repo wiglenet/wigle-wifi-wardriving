@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Sparade rutter</string>
     <string name="manage_gpx">Hantera sparade GPX-rutter</string>
     <string name="enable_map_theme">Matcha karttema till app</string>
+    <string name="no_individual_nets_map">Inaktivera kartnätsvisning</string>
+    <string name="filter_show_btle">Visa Bluetooth LE</string>
 </resources>

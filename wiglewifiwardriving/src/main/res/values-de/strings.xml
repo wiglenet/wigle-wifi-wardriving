@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Gespeicherte Routen</string>
     <string name="manage_gpx">Gespeicherte GPX-Routen verwalten</string>
     <string name="enable_map_theme">Kartenstil wie App</string>
+    <string name="no_individual_nets_map">Kartennetzanzeige deaktivieren</string>
+    <string name="filter_show_btle">Bluetooth LE anzeigen</string>
 </resources>

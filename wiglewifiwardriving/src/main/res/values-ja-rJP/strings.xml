@@ -432,4 +432,6 @@
     <string name="manage_gpx_button">保存されたルート</string>
     <string name="manage_gpx">保存されたGPXルートを管理する</string>
     <string name="enable_map_theme">マップのテーマをアプリに一致させる</string>
+    <string name="no_individual_nets_map">マップネット表示を無効にする</string>
+    <string name="filter_show_btle">BluetoothLEを表示する</string>
 </resources>

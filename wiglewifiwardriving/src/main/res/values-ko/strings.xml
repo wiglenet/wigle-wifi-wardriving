@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">저장된 경로</string>
     <string name="manage_gpx">저장된 GPX 경로 관리</string>
     <string name="enable_map_theme">앱에 지도 테마 일치</string>
+    <string name="no_individual_nets_map">지도 네트 표시 비활성화</string>
+    <string name="filter_show_btle">블루투스 LE 표시</string>
 </resources>

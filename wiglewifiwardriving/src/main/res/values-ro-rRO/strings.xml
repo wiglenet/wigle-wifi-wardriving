@@ -433,4 +433,6 @@
     <string name="manage_gpx_button">Trasee salvate</string>
     <string name="manage_gpx">Gestionați rutele GPX salvate</string>
     <string name="enable_map_theme">Potrivirea temei hărții cu aplicația</string>
+    <string name="no_individual_nets_map">Dezactivați afișarea rețelei hărții</string>
+    <string name="filter_show_btle">Afișați Bluetooth LE</string>
 </resources>

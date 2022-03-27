@@ -432,4 +432,6 @@
     <string name="manage_gpx_button">Rutas guardadas</string>
     <string name="manage_gpx">Administrar rutas GPX guardadas</string>
     <string name="enable_map_theme">Hacer coincidir el tema del mapa con el de la aplicación</string>
+    <string name="no_individual_nets_map">Deshabilitar la visualización de la red del mapa</string>
+    <string name="filter_show_btle">Mostrar Bluetooth LE</string>
 </resources>

@@ -432,4 +432,6 @@
     <string name="manage_gpx_button">Njia Zilizohifadhiwa</string>
     <string name="manage_gpx">Dhibiti njia za GPX zilizohifadhiwa</string>
     <string name="enable_map_theme">Linganisha mandhari ya ramani na programu</string>
+    <string name="no_individual_nets_map">Lemaza onyesho la wavu la ramani</string>
+    <string name="filter_show_btle">Onyesha Bluetooth LE</string>
 </resources>

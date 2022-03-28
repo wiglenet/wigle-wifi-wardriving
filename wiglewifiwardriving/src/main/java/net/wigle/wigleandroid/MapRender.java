@@ -241,9 +241,10 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     public boolean okForMapTab( final Network network ) {
+        final boolean hideNets = prefs.getBoolean( ListFragment.PREF_MAP_HIDE_NETS, false );
         final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false )
                 && ! isDbResult;
-        if (network.getPosition() != null) {
+        if (network.getPosition() != null && !hideNets) {
             if (!showNewDBOnly || network.isNew()) {
                 if (FilterMatcher.isOk(ssidMatcher,
                         null /*ALIBI: we *can* use the filter from the list filter view here ...*/,

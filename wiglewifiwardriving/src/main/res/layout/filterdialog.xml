@@ -67,6 +67,11 @@
         android:layout_height="wrap_content"
         android:text="@string/filter_show_bt" />
 
+	<CheckBox android:id="@+id/showbtle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/filter_show_btle" />
+
     <CheckBox android:id="@+id/enabled"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"

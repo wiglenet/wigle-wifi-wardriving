@@ -101,6 +101,8 @@ public class MapFilterActivity extends AppCompatActivity {
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_CELL, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.showbt,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BT, true );
+        MainActivity.prefBackedCheckBox( this, view, R.id.showbtle,
+                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BTLE, true );
         MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
     }

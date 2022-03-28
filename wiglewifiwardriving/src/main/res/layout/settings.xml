@@ -229,6 +229,11 @@
         android:layout_height="wrap_content"
         android:text="@string/circle_size_map" />
 
+    <CheckBox android:id="@+id/no_individual_nets_map"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/no_individual_nets_map" />
+
     <include layout="@layout/map_tile_prefs" />
 
     <CheckBox android:id="@+id/enable_route_map_display"

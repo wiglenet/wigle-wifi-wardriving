@@ -43,7 +43,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     private final GoogleMap map;
     private Matcher ssidMatcher;
     private final Set<Network> labeledNetworks = Collections.newSetFromMap(
-            new ConcurrentHashMap<Network,Boolean>());
+            new ConcurrentHashMap<>());
 
     private static final String MESSAGE_BSSID = "messageBssid";
     private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);

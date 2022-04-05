@@ -70,6 +70,8 @@ public class FilterActivity extends AppCompatActivity {
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
         MainActivity.prefBackedCheckBox(this, view, R.id.showbt,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_BT, true);
+        MainActivity.prefBackedCheckBox(this, view, R.id.showbtle,
+                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_BTLE, true);
 
         final Button filter_display_button = (Button) view.findViewById(R.id.display_filter_button);
         filter_display_button.setOnClickListener( new View.OnClickListener() {

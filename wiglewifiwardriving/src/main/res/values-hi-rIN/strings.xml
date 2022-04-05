@@ -433,4 +433,6 @@
     <string name="manage_gpx">सहेजे गए GPX मार्ग प्रबंधित करें</string>
     <string name="enable_map_theme">ऐप के लिए मैप थीम का मिलान करें</string>
     <string name="throttle">वाईफाई स्कैनिंग सीमित है। बेहतर प्रदर्शन के लिए डेवलपर सेटिंग्स के तहत वाईफाई स्कैन थ्रॉटल को अक्षम करें।</string>
+    <string name="no_individual_nets_map">मानचित्र शुद्ध प्रदर्शन अक्षम करें</string>
+    <string name="filter_show_btle">ब्लूटूथ ले दिखाएँ</string>
 </resources>

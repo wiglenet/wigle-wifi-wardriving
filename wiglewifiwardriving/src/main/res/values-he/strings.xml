@@ -434,4 +434,6 @@
     <string name="manage_gpx">נהל מסלולי GPX שמורים</string>
     <string name="enable_map_theme">התאם את נושא המפה לאפליקציה</string>
     <string name="throttle">סריקת WiFi מוגבלת. השבת את מצערת הסריקה של WiFi תחת הגדרות מפתחים לביצועים טובים יותר.</string>
+    <string name="no_individual_nets_map">השבת את תצוגת רשת המפה</string>
+    <string name="filter_show_btle">הצג Bluetooth LE</string>
 </resources>

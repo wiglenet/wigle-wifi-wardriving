@@ -434,4 +434,6 @@
     <string name="manage_gpx">Gérer les routes GPX enregistrées</string>
     <string name="enable_map_theme">Faire correspondre le thème de la carte à l\'application</string>
     <string name="throttle">La numérisation Wi-Fi est limitée. Désactivez WiFi Scan Throttle dans les paramètres du développeur pour de meilleures performances.</string>
+    <string name="no_individual_nets_map">Désactiver l\'affichage net de la carte</string>
+    <string name="filter_show_btle">Afficher Bluetooth LE</string>
 </resources>

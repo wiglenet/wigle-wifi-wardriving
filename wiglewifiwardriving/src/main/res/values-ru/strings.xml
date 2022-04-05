@@ -434,4 +434,6 @@
     <string name="manage_gpx">Управление сохраненными маршрутами GPX</string>
     <string name="enable_map_theme">Сопоставьте тему карты с приложением</string>
     <string name="throttle">Сканирование WiFi ограничено. Отключите дроссель сканирования WiFi в настройках разработчика для повышения производительности.</string>
+    <string name="no_individual_nets_map">Отключить отображение сети карты</string>
+    <string name="filter_show_btle">Показать Bluetooth LE</string>
 </resources>

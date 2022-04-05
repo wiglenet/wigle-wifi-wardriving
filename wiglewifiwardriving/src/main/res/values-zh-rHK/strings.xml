@@ -434,4 +434,6 @@
     <string name="manage_gpx">管理保存的 GPX 路線</string>
     <string name="enable_map_theme">將地圖主題與應用程序匹配</string>
     <string name="throttle">WiFi 掃描是有限的。在開發者設置下禁用 WiFi 掃描油門以獲得更好的性能。</string>
+    <string name="no_individual_nets_map">禁用地圖網絡顯示</string>
+    <string name="filter_show_btle">顯示藍牙 LE</string>
 </resources>

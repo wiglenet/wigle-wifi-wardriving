@@ -434,4 +434,6 @@
     <string name="manage_gpx">Hallinnoi tallennettuja GPX-reittejä</string>
     <string name="enable_map_theme">Yhdistä karttateema sovellukseen</string>
     <string name="throttle">WiFi-skannaus on rajoitettu. Poista WiFi Scan Throttle käytöstä kehittäjäasetuksista parantaaksesi suorituskykyä.</string>
+    <string name="no_individual_nets_map">Poista karttaverkon näyttö käytöstä</string>
+    <string name="filter_show_btle">Näytä Bluetooth LE</string>
 </resources>

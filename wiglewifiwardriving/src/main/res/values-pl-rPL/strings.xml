@@ -434,4 +434,6 @@
     <string name="manage_gpx">Zarządzaj zapisanymi trasami GPX</string>
     <string name="enable_map_theme">Dopasuj motyw map do motywu aplikacji</string>
     <string name="throttle">Skanowanie Wi-Fi jest ograniczone. Wyłącz funkcję WiFi Scan Throttle w ustawieniach programisty, aby uzyskać lepszą wydajność.</string>
+    <string name="no_individual_nets_map">Wyłącz wyświetlanie mapy netto</string>
+    <string name="filter_show_btle">Pokaż Bluetooth LE</string>
 </resources>

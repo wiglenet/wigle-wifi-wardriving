@@ -433,4 +433,6 @@
     <string name="manage_gpx">Administrar rutas GPX guardadas</string>
     <string name="enable_map_theme">Hacer coincidir el tema del mapa con el de la aplicación</string>
     <string name="throttle">El escaneo WiFi es limitado. Deshabilite WiFi Scan Throttle en Configuración de desarrollador para un mejor rendimiento.</string>
+    <string name="no_individual_nets_map">Deshabilitar la visualización de la red del mapa</string>
+    <string name="filter_show_btle">Mostrar Bluetooth LE</string>
 </resources>

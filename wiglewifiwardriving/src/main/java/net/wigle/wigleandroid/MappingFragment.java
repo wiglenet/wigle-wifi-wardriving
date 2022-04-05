@@ -86,7 +86,7 @@ import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIF
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
 
 /**
- * show a map!
+ * show a map depicting current position and configurable stumbling progress information.f
  */
 public final class MappingFragment extends Fragment {
 

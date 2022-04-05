@@ -141,6 +141,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAP_CLUSTER = "mapCluster";
     public static final String PREF_MAP_TRAFFIC = "mapTraffic";
     public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
+    public static final String PREF_MAP_HIDE_NETS = "hideNetsMap";
     public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
     public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
     public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
@@ -167,6 +168,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static final String PREF_MAPF_WPA = "mapfWpa";
     public static final String PREF_MAPF_CELL = "mapfCell";
     public static final String PREF_MAPF_BT = "mapfBt";
+    public static final String PREF_MAPF_BTLE = "mapfBtle";
     public static final String PREF_MAPF_ENABLED = "mapfEnabled";
     public static final String FILTER_PREF_PREFIX = "LA";
 

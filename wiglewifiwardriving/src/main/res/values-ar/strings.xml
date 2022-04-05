@@ -434,4 +434,6 @@
     <string name="manage_gpx">إدارة مسارات GPX المحفوظة</string>
     <string name="enable_map_theme">تطابق موضوع الخريطة مع التطبيق</string>
     <string name="throttle">مسح WiFi محدود. قم بتعطيل WiFi Scan Throttle ضمن إعدادات المطور للحصول على أداء أفضل.</string>
+    <string name="no_individual_nets_map">تعطيل عرض شبكة الخريطة</string>
+    <string name="filter_show_btle">عرض Bluetooth LE</string>
 </resources>

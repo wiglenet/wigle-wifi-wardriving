@@ -434,4 +434,6 @@
     <string name="manage_gpx">Administrer lagrede GPX-ruter</string>
     <string name="enable_map_theme">Match karttemaet til appen</string>
     <string name="throttle">WiFi-skanning er begrenset. Deaktiver WiFi Scan Throttle under utviklerinnstillinger for bedre ytelse.</string>
+    <string name="no_individual_nets_map">Deaktiver kartnettvisning</string>
+    <string name="filter_show_btle">Vis Bluetooth LE</string>
 </resources>

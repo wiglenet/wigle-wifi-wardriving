@@ -433,6 +433,7 @@
     <string name="manage_gpx_button">Uložené trasy</string>
     <string name="manage_gpx">Spravujte uložené trasy GPX</string>
     <string name="enable_map_theme">Spojte motiv mapy s aplikací</string>
+    <string name="throttle">Skenování WiFi je omezené. Pro lepší výkon deaktivujte WiFi Scan Throttle v Nastavení vývojáře.</string>
     <string name="no_individual_nets_map">Zakázat zobrazení mapy sítě</string>
     <string name="filter_show_btle">Zobrazit Bluetooth LE</string>
 </resources>

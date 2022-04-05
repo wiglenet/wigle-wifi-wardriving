@@ -7,12 +7,14 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -236,17 +238,22 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
             scanThrottleHelp.setText(R.string.pie_bad);
             scanThrottleHelp.setVisibility(View.VISIBLE);
-        }
-        else if (Build.VERSION.SDK_INT == 29) {
+        }  else if (Build.VERSION.SDK_INT == 29) {
             final StringBuilder builder = new StringBuilder(getString(R.string.q_bad));
-            builder.append("\n\n");
-            if (!MainActivity.isDevMode(getContext())) {
-                builder.append(getString(R.string.enable_developer));
-                builder.append("\n\n");
-            }
+            addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
             builder.append(getString(R.string.disable_throttle));
             scanThrottleHelp.setText(builder.toString());
             scanThrottleHelp.setVisibility(View.VISIBLE);
+        } else if (Build.VERSION.SDK_INT > 29) {
+            //ALIBI: starting in SDK 30, we can check the throttle via WiFiManager.isScanThrottleEnabled
+            final Context mainActivity = MainActivity.getMainActivity();
+            final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            if (wifiManager.isScanThrottleEnabled()) {
+                final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
+                addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
+                scanThrottleHelp.setText(builder.toString());
+                scanThrottleHelp.setVisibility(View.VISIBLE);
+            }
         }
 
         final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
@@ -704,4 +711,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         }
     }
 
+    private final static void addDevModeMesgIfApplicable(StringBuilder builder, final Context c, final String message) {
+        if (!MainActivity.isDevMode(c)) {
+            builder.append("\n\n");
+            builder.append(message);
+        }
+    }
 }

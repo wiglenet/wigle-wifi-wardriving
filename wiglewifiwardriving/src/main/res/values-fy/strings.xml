@@ -433,6 +433,7 @@
     <string name="manage_gpx_button">Opgeslagen routes</string>
     <string name="manage_gpx">Beheer opgeslagen GPX-routes</string>
     <string name="enable_map_theme">Match kaartthema met app</string>
+    <string name="throttle">WiFi-scannen is beperkt. Schakel WiFi Scan Throttle uit onder Ontwikkelaarsinstellingen voor betere prestaties.</string>
     <string name="no_individual_nets_map">Kaartnetweergave uitschakelen</string>
     <string name="filter_show_btle">Toon Bluetooth LE</string>
 </resources>

@@ -433,6 +433,7 @@
     <string name="manage_gpx_button">Mentett útvonalak</string>
     <string name="manage_gpx">Mentett GPX-útvonalak kezelése</string>
     <string name="enable_map_theme">Párosítsa a térképtémát az alkalmazáshoz</string>
+    <string name="throttle">A WiFi szkennelés korlátozott. A jobb teljesítmény érdekében kapcsolja ki a WiFi Scan Throttle funkciót a Fejlesztői beállítások alatt.</string>
     <string name="no_individual_nets_map">A térképháló megjelenítésének letiltása</string>
     <string name="filter_show_btle">Bluetooth LE megjelenítése</string>
 </resources>

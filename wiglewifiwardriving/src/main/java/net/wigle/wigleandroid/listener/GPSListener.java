@@ -7,6 +7,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.KalmanLatLong;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -59,10 +60,12 @@ public class GPSListener implements Listener, LocationListener {
     private LocationListener mapLocationListener;
     private int prevStatus = 0;
     private Location prevGpsLocation;
+    private final KalmanLatLong kalmanLatLong;
 
     public GPSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
+        this.kalmanLatLong = new KalmanLatLong(MACH_1_3_METERS_SEC);
     }
 
     public void setMapListener( LocationListener mapLocationListener ) {
@@ -113,7 +116,7 @@ public class GPSListener implements Listener, LocationListener {
     @Override
     public void onProviderEnabled( final String provider ) {
         MainActivity.info("provider enabled: " + provider);
-
+        kalmanLatLong.reset();
         if ( mapLocationListener != null ) {
             mapLocationListener.onProviderEnabled( provider );
         }
@@ -137,8 +140,7 @@ public class GPSListener implements Listener, LocationListener {
     }
 
     /** newLocation can be null */
-    private void updateLocationData( final Location newLocation ) {
-
+    private void updateLocationData(final Location newLocation ) {
         /**
          * ALIBI: the location manager call's a non-starter if permission hasn't been granted.
          */
@@ -151,7 +153,6 @@ public class GPSListener implements Listener, LocationListener {
                         != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
         final LocationManager locationManager = (LocationManager)
@@ -170,6 +171,17 @@ public class GPSListener implements Listener, LocationListener {
         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, NET_LOC_TIMEOUT_DEFAULT);
 
         boolean newOK = newLocation != null;
+        if (null != newLocation && kalmanLatLong.getAccuracy() < 0) {
+            kalmanLatLong.setState(newLocation.getLatitude(), newLocation.getLongitude(), newLocation.getAccuracy(), newLocation.getTime());
+        } else if (null != newLocation) {
+            kalmanLatLong.process(newLocation.getLatitude(), newLocation.getLongitude(), newLocation.getAccuracy(), newLocation.getTime());
+            MainActivity.error("KALMAN TEST: [lat: " + newLocation.getLatitude() + " v. (k):" +
+                    kalmanLatLong.getLat() + " lon: " + newLocation.getLongitude() + " v. (k):" +
+                    kalmanLatLong.getLng() + "], acc(k): " + kalmanLatLong.getAccuracy()+" location prov: "+ newLocation.getProvider());
+            //Testing: replace with smoothed
+            newLocation.setLatitude(kalmanLatLong.getLat());
+            newLocation.setLongitude(kalmanLatLong.getLng());
+        }
         final boolean locOK = locationOK( location, satCount, gpsTimeout, netLocTimeout );
         final long now = System.currentTimeMillis();
 
@@ -429,6 +441,11 @@ public class GPSListener implements Listener, LocationListener {
         return Collections.unmodifiableMap(cons);
     }
 
+    /**
+     * Provide string names for different GNSS constellations. Not i18n.
+     * @param constellationType
+     * @return the string matching the integer from the GnssStatus ints
+     */
     private String constellationToString(final int constellationType) {
         String con = "?";
         switch(constellationType) {
@@ -494,6 +511,7 @@ public class GPSListener implements Listener, LocationListener {
      */
     public static boolean realisticMovement(float distanceMeters, float timeDiffSecs, float lastAccuracyMeters, float currentAccuracyMeters) {
         if (distanceMeters == 0f) {
+            //ALIBI: small movements are likely to be noise.
             return false;
         }
 
@@ -514,5 +532,35 @@ public class GPSListener implements Listener, LocationListener {
             return false;
         }*/
         return true;
+    }
+
+
+    public static Location locationForKalman(final KalmanLatLong kalmanLatLong, final Location baseLocation) {
+        if (null != kalmanLatLong) {
+            Location location = new Location(baseLocation.getProvider());
+            location.setTime(baseLocation.getTime());
+            if (Build.VERSION.SDK_INT >= 17) {
+                location.setElapsedRealtimeNanos(baseLocation.getElapsedRealtimeNanos());
+            }
+            if (Build.VERSION.SDK_INT >= 29) {
+                location.setElapsedRealtimeUncertaintyNanos(baseLocation.getElapsedRealtimeUncertaintyNanos());
+            }
+            //TODO location.setFieldsMask(baseLocation.getFieldsMask());
+            location.setLatitude(kalmanLatLong.getLat());
+            location.setLongitude(kalmanLatLong.getLng());
+            location.setAltitude(baseLocation.getAltitude());
+            location.setSpeed(baseLocation.getSpeed());
+            location.setBearing(baseLocation.getBearing());
+            //TODO: translate kalman accuracy to meters?
+            //DNE location.setHorizontalAccuracyMeters(baesLocation.getHorizontalAccuracyMeters());
+            if (Build.VERSION.SDK_INT >= 26) {
+                location.setVerticalAccuracyMeters(baseLocation.getVerticalAccuracyMeters());
+                location.setSpeedAccuracyMetersPerSecond(baseLocation.getSpeedAccuracyMetersPerSecond());
+                location.setBearingAccuracyDegrees(baseLocation.getBearingAccuracyDegrees());
+            }
+            location.setExtras(new Bundle(baseLocation.getExtras()));
+            return location;
+        }
+        return null;
     }
 }

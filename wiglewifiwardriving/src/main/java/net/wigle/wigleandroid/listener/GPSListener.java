@@ -67,7 +67,7 @@ public class GPSListener implements Listener, LocationListener {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        this.kalmanLatLong = prefs.getBoolean(ListFragment.PREF_GPS_KALMAN_FILTER,false) ?
+        this.kalmanLatLong = prefs.getBoolean(ListFragment.PREF_GPS_KALMAN_FILTER,true) ?
                 new KalmanLatLong(GOLDILOCKS_METERS_SEC): null;
     }
 
@@ -181,9 +181,7 @@ public class GPSListener implements Listener, LocationListener {
         } else if (null != newLocation) {
             if (null != kalmanLatLong) {
                 kalmanLatLong.process(newLocation.getLatitude(), newLocation.getLongitude(), newLocation.getAccuracy(), newLocation.getTime());
-                MainActivity.error("KALMAN TEST: [lat: " + newLocation.getLatitude() + " v. (k):" +
-                        kalmanLatLong.getLat() + " lon: " + newLocation.getLongitude() + " v. (k):" +
-                        kalmanLatLong.getLng() + "], acc(k): " + kalmanLatLong.getAccuracy() + " location prov: " + newLocation.getProvider());
+                //DEBUG: MainActivity.error("KALMAN TEST: [lat: " + newLocation.getLatitude() + " v. (k):" +  kalmanLatLong.getLat() + " lon: " + newLocation.getLongitude() + " v. (k):" + kalmanLatLong.getLng() + "], acc(k): " + kalmanLatLong.getAccuracy() + " location prov: " + newLocation.getProvider());
                 //Testing: replace with smoothed
                 newLocation.setLatitude(kalmanLatLong.getLat());
                 newLocation.setLongitude(kalmanLatLong.getLng());

@@ -348,31 +348,6 @@
         android:layout_marginTop="2dip"
         android:layout_marginBottom="2dip"
         >
-        <Spinner android:id="@+id/gps_spinner"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:drawSelectorOnTop="true"
-            android:layout_weight="1"
-            android:prompt="@string/gps_text"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="@string/gps_text"
-            android:layout_weight="2"
-            android:layout_marginRight="6dip"
-            tools:ignore="RtlHardcoded"
-            android:layout_gravity="left"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dip"
-        android:layout_marginBottom="2dip"
-        >
         <Spinner android:id="@+id/reset_wifi_spinner"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -384,56 +359,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:text="@string/reset_wifi_text"
-            android:layout_weight="1"
-            android:layout_marginRight="6dip"
-            tools:ignore="RtlHardcoded"
-            android:layout_gravity="left"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dip"
-        android:layout_marginBottom="2dip"
-        >
-        <Spinner android:id="@+id/gps_timeout_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:drawSelectorOnTop="true"
-            android:layout_weight="0"
-            android:prompt="@string/settings_gps_timeout"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/settings_gps_timeout"
-            android:layout_weight="1"
-            android:layout_marginRight="6dip"
-            tools:ignore="RtlHardcoded"
-            android:layout_gravity="left"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dip"
-        android:layout_marginBottom="2dip"
-        >
-        <Spinner android:id="@+id/net_loc_timeout_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:drawSelectorOnTop="true"
-            android:layout_weight="0"
-            android:prompt="@string/settings_net_loc_timeout"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/settings_net_loc_timeout"
             android:layout_weight="1"
             android:layout_marginRight="6dip"
             tools:ignore="RtlHardcoded"
@@ -466,6 +391,91 @@
             />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_gps_head"
+        style="?android:attr/listSeparatorTextViewStyle"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/gps_spinner"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="1"
+            android:prompt="@string/gps_text"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="@string/gps_text"
+            android:layout_weight="2"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/gps_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_gps_timeout"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_gps_timeout"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="2dip"
+        >
+        <Spinner android:id="@+id/net_loc_timeout_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:drawSelectorOnTop="true"
+            android:layout_weight="0"
+            android:prompt="@string/settings_net_loc_timeout"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/settings_net_loc_timeout"
+            android:layout_weight="1"
+            android:layout_marginRight="6dip"
+            tools:ignore="RtlHardcoded"
+            android:layout_gravity="left"
+            />
+    </LinearLayout>
+    <CheckBox android:id="@+id/enable_kalman"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_kalman" />
+
     <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"
     android:text="@string/speech_button" android:layout_weight="1"
@@ -489,6 +499,5 @@
             android:layout_marginLeft="6dip"
             android:layout_marginStart="6dip"/>
     </LinearLayout>
-
 </LinearLayout>
 </ScrollView>

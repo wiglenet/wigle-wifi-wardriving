@@ -436,4 +436,6 @@
     <string name="throttle">WiFi-skanning är begränsad. Inaktivera WiFi Scan Throttle under utvecklarinställningar för bättre prestanda.</string>
     <string name="no_individual_nets_map">Inaktivera kartnätsvisning</string>
     <string name="filter_show_btle">Visa Bluetooth LE</string>
+    <string name="settings_gps_head">GPS-inställningar</string>
+    <string name="enable_kalman">Filtrera GPS-brus</string>
 </resources>

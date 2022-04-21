@@ -436,4 +436,6 @@
     <string name="throttle">La numérisation Wi-Fi est limitée. Désactivez WiFi Scan Throttle dans les paramètres du développeur pour de meilleures performances.</string>
     <string name="no_individual_nets_map">Désactiver l\'affichage net de la carte</string>
     <string name="filter_show_btle">Afficher Bluetooth LE</string>
+    <string name="settings_gps_head">Paramètres GPS</string>
+    <string name="enable_kalman">Filtrer le bruit GPS</string>
 </resources>

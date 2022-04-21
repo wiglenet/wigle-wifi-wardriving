@@ -436,4 +436,6 @@
     <string name="throttle">Skenování WiFi je omezené. Pro lepší výkon deaktivujte WiFi Scan Throttle v Nastavení vývojáře.</string>
     <string name="no_individual_nets_map">Zakázat zobrazení mapy sítě</string>
     <string name="filter_show_btle">Zobrazit Bluetooth LE</string>
+    <string name="settings_gps_head">Nastavení GPS</string>
+    <string name="enable_kalman">Filtrujte šum GPS</string>
 </resources>

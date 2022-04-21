@@ -436,4 +436,6 @@
     <string name="throttle">WiFi-skanning är begränsad. Inaktivera WiFi Scan Throttle under utvecklarinställningar för bättre prestanda.</string>
     <string name="no_individual_nets_map">Harita net görüntüsünü devre dışı bırak</string>
     <string name="filter_show_btle">Bluetooth LE\'yi göster</string>
+    <string name="settings_gps_head">GPS Ayarları</string>
+    <string name="enable_kalman">GPS gürültüsünü filtrele</string>
 </resources>

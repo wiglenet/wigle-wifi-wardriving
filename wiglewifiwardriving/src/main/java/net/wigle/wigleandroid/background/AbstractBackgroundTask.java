@@ -19,6 +19,7 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -78,19 +79,19 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         setName( name + "-" + getName() );
 
         try {
-            MainActivity.info( "setting background thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
+            Logging.info( "setting background thread priority (-20 highest, 19 lowest) to: " + THREAD_PRIORITY );
             Process.setThreadPriority( THREAD_PRIORITY );
 
             subRun();
         } catch ( InterruptedException ex ) {
-            MainActivity.info( name + " interrupted: " + ex );
+            Logging.info( name + " interrupted: " + ex );
         } catch ( final WiGLEAuthException waex) {
             //DEBUG: MainActivity.error("auth error", waex);
             Bundle errorBundle = new Bundle();
             errorBundle.putCharSequence("AUTH_ERROR", waex.getMessage());
             sendBundledMessage(BackgroundGuiHandler.AUTHENTICATION_ERROR, errorBundle);
         } catch ( final IOException ioex) {
-            MainActivity.error("connection error", ioex);
+            Logging.error("connection error", ioex);
             Bundle errorBundle = new Bundle();
             errorBundle.putString(BackgroundGuiHandler.ERROR, "IOException");
             errorBundle.putCharSequence("CONN_ERROR", ioex.getMessage());
@@ -221,11 +222,11 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     protected final Status validateUserPass(final String username, final String password) {
         Status status = null;
         if ( "".equals( username ) ) {
-            MainActivity.error( "username not defined" );
+            Logging.error( "username not defined" );
             status = Status.BAD_USERNAME;
         }
         else if ( "".equals( password ) && ! ListFragment.ANONYMOUS.equals( username.toLowerCase(Locale.US) ) ) {
-            MainActivity.error( "password not defined and username isn't 'anonymous'" );
+            Logging.error( "password not defined and username isn't 'anonymous'" );
             status = Status.BAD_PASSWORD;
         }
 

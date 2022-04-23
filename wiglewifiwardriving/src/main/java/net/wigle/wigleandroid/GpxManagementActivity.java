@@ -30,6 +30,7 @@ import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
@@ -80,7 +81,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 
     @Override
     public void onDestroy() {
-        MainActivity.info("NET: onDestroy");
+        Logging.info("NET: onDestroy");
         if (mapView != null) {
             mapView.onDestroy();
         }
@@ -91,7 +92,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 
     @Override
     public void onResume() {
-        MainActivity.info("NET: onResume");
+        Logging.info("NET: onResume");
         super.onResume();
         if (mapView != null) {
             mapView.onResume();
@@ -103,7 +104,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 
     @Override
     public void onPause() {
-        MainActivity.info("NET: onPause");
+        Logging.info("NET: onPause");
         super.onPause();
         if (mapView != null) {
             mapView.onPause();
@@ -121,7 +122,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
                 }
             });
         } catch (NullPointerException ex) {
-            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+            Logging.error("npe in mapView.onCreate: " + ex, ex);
         }
         MapsInitializer.initialize( this );
         final RelativeLayout rlView = findViewById( R.id.gpx_map_rl );
@@ -174,7 +175,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
             adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
             recyclerView.setAdapter(adapter);
         } catch (DBException dbex) {
-            MainActivity.error("Failed to setup list for GPX management: ", dbex);
+            Logging.error("Failed to setup list for GPX management: ", dbex);
         }
     }
 
@@ -183,14 +184,14 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         switch (dialogId) {
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile(exportRouteId)) {
-                    MainActivity.warn("Failed to export gpx.");
+                    Logging.warn("Failed to export gpx.");
                     WiGLEToast.showOverFragment(this, R.string.error_general,
                             getString(R.string.gpx_failed));
                 }
                 break;
             }
             default:
-                MainActivity.warn("Data unhandled dialogId: " + dialogId);
+                Logging.warn("Data unhandled dialogId: " + dialogId);
         }
     }
 
@@ -200,7 +201,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
             new AsyncGpxExportTask(this, this,
                     pd, runId).execute(totalRoutePoints);
         } else {
-            MainActivity.error("no points to create route");
+            Logging.error("no points to create route");
             WiGLEToast.showOverFragment(this, R.string.gpx_failed,
                     getString(R.string.gpx_no_points));
             //NO POINTS

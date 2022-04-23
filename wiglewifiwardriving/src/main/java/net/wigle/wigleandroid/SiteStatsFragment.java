@@ -22,6 +22,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONException;
@@ -66,7 +67,7 @@ public class SiteStatsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("SITESTATS: onCreate");
+        Logging.info("SITESTATS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -86,7 +87,7 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("SITESTATS: onCreateView. orientation: " + orientation);
+        Logging.info("SITESTATS: onCreateView. orientation: " + orientation);
         scrollView = (ScrollView) inflater.inflate(R.layout.sitestats, container, false);
         landscape = inflater.inflate(R.layout.sitestatslandscape, container, false);
         portrait = inflater.inflate(R.layout.sitestatsportrait, container, false);
@@ -148,14 +149,14 @@ public class SiteStatsFragment extends Fragment {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
             //unauthenticated call - should never trip
-            MainActivity.warn("Authentication error on site stats load (should not happen)", waex);
+            Logging.warn("Authentication error on site stats load (should not happen)", waex);
         }
     }
 
     private void handleSiteStats(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleSiteStats");
+        Logging.info("handleSiteStats");
         if (json == null) {
-            MainActivity.info("handleSiteStats null json, returning");
+            Logging.info("handleSiteStats null json, returning");
             return;
         }
 
@@ -167,9 +168,9 @@ public class SiteStatsFragment extends Fragment {
                 bundle.putLong(key, json.getLong(jsonKey));
             }
         } catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
+            Logging.error("json error: " + ex, ex);
         } catch (final Exception e) {
-            MainActivity.error("Statistics error: " + e, e);
+            Logging.error("Statistics error: " + e, e);
         }
 
         final Message message = new Message();
@@ -180,7 +181,7 @@ public class SiteStatsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "SITESTATS: onDestroy" );
+        Logging.info( "SITESTATS: onDestroy" );
         finishing.set( true );
 
         super.onDestroy();
@@ -188,32 +189,32 @@ public class SiteStatsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info("SITESTATS: onResume");
+        Logging.info("SITESTATS: onResume");
         super.onResume();
         getActivity().setTitle(R.string.site_stats_app_name);
     }
 
     @Override
     public void onStart() {
-        MainActivity.info( "SITESTATS: onStart" );
+        Logging.info( "SITESTATS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "SITESTATS: onPause" );
+        Logging.info( "SITESTATS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "SITESTATS: onStop" );
+        Logging.info( "SITESTATS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("SITESTATS: config changed");
+        Logging.info("SITESTATS: config changed");
         switchView();
         super.onConfigurationChanged( newConfig );
     }

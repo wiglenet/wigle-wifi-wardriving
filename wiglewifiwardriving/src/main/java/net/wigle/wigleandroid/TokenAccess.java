@@ -8,6 +8,8 @@ import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 
+import net.wigle.wigleandroid.util.Logging;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
@@ -73,7 +75,7 @@ public class TokenAccess {
                         return true;
                     }
                 } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-                    MainActivity.error("[TOKEN] Error trying to test token existence: ", e);
+                    Logging.error("[TOKEN] Error trying to test token existence: ", e);
                     return false;
                 }
             } else {
@@ -100,14 +102,14 @@ public class TokenAccess {
             BadPaddingException {
 
         if (apiToken == null) {
-            MainActivity.error("[TOKEN] ERROR: unreachable condition, apiToken NULL. APIv" + Build.VERSION.SDK_INT);
+            Logging.error("[TOKEN] ERROR: unreachable condition, apiToken NULL. APIv" + Build.VERSION.SDK_INT);
             return false;
         }
 
         final KeyStore keyStore = getKeyStore();
         final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
         if (null == key) {
-            MainActivity.warn("unable to retrieve KEYSTORE_WIGLE_CREDS_KEY_V2");
+            Logging.warn("unable to retrieve KEYSTORE_WIGLE_CREDS_KEY_V2");
             throw new InvalidKeyException("Unable to fetch key");
         }
         Cipher encrypt = Cipher.getInstance(AES_CIPHER);
@@ -116,7 +118,7 @@ public class TokenAccess {
         final byte[] input = apiToken.getBytes();
         final byte[] cypherToken = encrypt.doFinal(input);
         if (cypherToken == null) {
-            MainActivity.error("[TOKEN] ERROR: unreachable condition, cypherToken NULL. APIv" + Build.VERSION.SDK_INT);
+            Logging.error("[TOKEN] ERROR: unreachable condition, cypherToken NULL. APIv" + Build.VERSION.SDK_INT);
             return false;
         }
         final byte[] iv = encrypt.getIV();
@@ -130,7 +132,7 @@ public class TokenAccess {
         editor.putString(ListFragment.PREF_TOKEN_IV, Base64.encodeToString(iv, Base64.DEFAULT));
         editor.putInt(ListFragment.PREF_TOKEN_TAG_LENGTH, tagLength);
         editor.apply();
-        MainActivity.info("[TOKEN] setApiTokenVersion2 set token length: " + apiToken.length());
+        Logging.info("[TOKEN] setApiTokenVersion2 set token length: " + apiToken.length());
         return true;
     }
 
@@ -142,13 +144,13 @@ public class TokenAccess {
         try {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                 // GCMParameterSpec not in < 19 - prevent compiler warnings
-                MainActivity.warn("[TOKEN] getApiTokenVersion2 sdk not K+: " + Build.VERSION.SDK_INT);
+                Logging.warn("[TOKEN] getApiTokenVersion2 sdk not K+: " + Build.VERSION.SDK_INT);
                 return null;
             } else {
                 final KeyStore keyStore = getKeyStore();
                 final SecretKey key = (SecretKey) keyStore.getKey(KEYSTORE_WIGLE_CREDS_KEY_V2, null);
                 if (null == key ) {
-                    MainActivity.warn("Null key in getApiTokenVersion2");
+                    Logging.warn("Null key in getApiTokenVersion2");
                     return null;
                 }
                 final Cipher decrypt = Cipher.getInstance(AES_CIPHER);
@@ -160,11 +162,11 @@ public class TokenAccess {
                 decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));
                 final byte[] done = decrypt.doFinal(cypherToken);
                 final String token = new String(done, UTF8);
-                MainActivity.info("[TOKEN] aes decrypted token length: " + token.length());
+                Logging.info("[TOKEN] aes decrypted token length: " + token.length());
                 return token;
             }
         } catch (Exception ex) {
-            MainActivity.error("Failed to decrypt token with AES-GCM (v2 cipher): ", ex);
+            Logging.error("Failed to decrypt token with AES-GCM (v2 cipher): ", ex);
             return null;
         }
     }
@@ -222,19 +224,19 @@ public class TokenAccess {
                             return true;
                         } else {
                             // ALIBI: DEBUG should be unreachable.
-                            MainActivity.error("[TOKEN] ERROR: unreachable condition," +
+                            Logging.error("[TOKEN] ERROR: unreachable condition," +
                                     "cipherToken NULL.  APIv" +
                                     android.os.Build.VERSION.SDK_INT);
                         }
                     } else {
                         // ALIBI: DEBUG should be unreachable.
-                        MainActivity.error("[TOKEN] ERROR: unreachable condition," +
+                        Logging.error("[TOKEN] ERROR: unreachable condition," +
                                 "cipher NULL.  APIv" +
                                 android.os.Build.VERSION.SDK_INT);
                     }
                 } else {
                     // ALIBI: DEBUG should be unreachable.
-                    MainActivity.error("[TOKEN] ERROR: setApiToken for APIv" +
+                    Logging.error("[TOKEN] ERROR: setApiToken for APIv" +
                             android.os.Build.VERSION.SDK_INT +
                             ", privateKey Entry NULL. Key: " +
                             keyStr);
@@ -245,10 +247,10 @@ public class TokenAccess {
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
                     IOException | UnrecoverableEntryException | NoSuchPaddingException |
                     InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-                MainActivity.error("[TOKEN] Failed to set token: ",ex);
+                Logging.error("[TOKEN] Failed to set token: ",ex);
                 ex.printStackTrace();
             } catch (Exception e) {
-                MainActivity.error("[TOKEN] Other error - failed to set token: ",e);
+                Logging.error("[TOKEN] Other error - failed to set token: ",e);
                 e.printStackTrace();
             }
             return false;
@@ -284,7 +286,7 @@ public class TokenAccess {
                             keyStore.getEntry(KEYSTORE_WIGLE_CREDS_KEY_V0, null);
                     versionThreshold = Build.VERSION_CODES.JELLY_BEAN_MR2;
                 } else {
-                    MainActivity.warn("[TOKEN] Compatible build, but no key set: " +
+                    Logging.warn("[TOKEN] Compatible build, but no key set: " +
                             android.os.Build.VERSION.SDK_INT + " - returning plaintext.");
                     return prefs.getString(ListFragment.PREF_TOKEN, "");
                 }
@@ -306,18 +308,18 @@ public class TokenAccess {
                         String key = new String(c.doFinal(cypherText), UTF8);
                         return key;
                     } else {
-                        MainActivity.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
+                        Logging.error("[TOKEN] NULL encoded cyphertext on token decrypt.");
                         return null;
                     }
                 } else {
-                    MainActivity.error("[TOKEN] NULL Private Key on token decrypt.");
+                    Logging.error("[TOKEN] NULL Private Key on token decrypt.");
                     return null;
                 }
             } catch (CertificateException | NoSuchAlgorithmException | IOException |
                     KeyStoreException | UnrecoverableEntryException | NoSuchPaddingException |
                     InvalidKeyException | BadPaddingException | IllegalBlockSizeException |
                     InvalidAlgorithmParameterException ex) {
-                MainActivity.error("[TOKEN] Failed to get API Token: ", ex);
+                Logging.error("[TOKEN] Failed to get API Token: ", ex);
                 return null;
             }
         }
@@ -348,13 +350,13 @@ public class TokenAccess {
             try {
                 final KeyStore keyStore = getKeyStore();
                 if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V2)) {
-                    MainActivity.info("[TOKEN] Key present and up-to-date V2 AES - no change.");
+                    Logging.info("[TOKEN] Key present and up-to-date V2 AES - no change.");
                     return;
                 }
 
                 // get old token
                 final String token = getApiToken(prefs);
-                MainActivity.info("Got old token, length: " + (token == null ? null : token.length()));
+                Logging.info("Got old token, length: " + (token == null ? null : token.length()));
 
                 // set up aes key
                 KeyGenerator keyGenerator = KeyGenerator.getInstance(
@@ -370,7 +372,7 @@ public class TokenAccess {
                 if (token != null && !token.isEmpty()) setApiToken(prefs, token);
             }
             catch (Exception ex) {
-                MainActivity.error("Exception migrating to version 2: " + ex, ex);
+                Logging.error("Exception migrating to version 2: " + ex, ex);
             }
         }
     }
@@ -378,29 +380,29 @@ public class TokenAccess {
     private static boolean checkMigrateKeystoreVersion1(SharedPreferences prefs, Context context) {
         boolean initOnly = false;
         if (prefs.getString(ListFragment.PREF_TOKEN, "").isEmpty()) {
-            MainActivity.info("[TOKEN] No auth token stored - no preference migration possible.");
+            Logging.info("[TOKEN] No auth token stored - no preference migration possible.");
             initOnly = true;
         }
 
         if (android.os.Build.VERSION.SDK_INT <
                 android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
             // no reliable keystore here
-            MainActivity.info("[TOKEN] No KeyStore support - no preference migration possible.");
+            Logging.info("[TOKEN] No KeyStore support - no preference migration possible.");
             return false;
         } else {
             try {
-                MainActivity.info("[TOKEN] Using Android Keystore; check need for new key...");
+                Logging.info("[TOKEN] Using Android Keystore; check need for new key...");
                 final KeyStore keyStore = getKeyStore();
                 KeyPairGenerator kpg = KeyPairGenerator.getInstance(
                         KeyProperties.KEY_ALGORITHM_RSA, ANDROID_KEYSTORE);
 
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V1)) {
-                        MainActivity.info("[TOKEN] Key present and up-to-date M - no change.");
+                        Logging.info("[TOKEN] Key present and up-to-date M - no change.");
                         return false;
                     }
 
-                    MainActivity.info("[TOKEN] Initializing SDKv23 Key...");
+                    Logging.info("[TOKEN] Initializing SDKv23 Key...");
                     String token = "";
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
                         //ALIBI: fetch token with V0 key if it's stored that way
@@ -417,21 +419,21 @@ public class TokenAccess {
                     kpg.generateKeyPair();
 
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                        MainActivity.info("[TOKEN] Upgrading from v0->v1 token...");
+                        Logging.info("[TOKEN] Upgrading from v0->v1 token...");
                         if ((null == token) || token.isEmpty()) return false;
                         keyStore.deleteEntry(KEYSTORE_WIGLE_CREDS_KEY_V0);
                     } else {
                         token = prefs.getString(ListFragment.PREF_TOKEN, "");
                         //DEBUG: MainActivity.info("[TOKEN] +"+token+"+");
-                        MainActivity.info("[TOKEN] Encrypting token at v1...");
+                        Logging.info("[TOKEN] Encrypting token at v1...");
                         if (token.isEmpty()) {
-                            MainActivity.info("[TOKEN] ...no token, returning after init.");
+                            Logging.info("[TOKEN] ...no token, returning after init.");
                             return false;
                         }
                     }
                     if (!initOnly) {
                         if (TokenAccess.setApiToken(prefs, token)) {
-                            MainActivity.info("[TOKEN] ...token set at v1.");
+                            Logging.info("[TOKEN] ...token set at v1.");
                             return true;
                         } else {
                             /**
@@ -440,19 +442,19 @@ public class TokenAccess {
                              * This is vital here, since Marshmallow and up can backup/restore
                              * SharedPreferences, but NOT keystore entries
                              */
-                            MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
+                            Logging.error("[TOKEN] ...Failed token encryption; clearing.");
                             clearApiToken(prefs);
                         }
                     } else {
-                        MainActivity.error("[TOKEN] v1 Keystore initialized, but no token present.");
+                        Logging.error("[TOKEN] v1 Keystore initialized, but no token present.");
                     }
                 } else if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                     if (keyStore.containsAlias(KEYSTORE_WIGLE_CREDS_KEY_V0)) {
-                        MainActivity.info(
+                        Logging.info(
                                 "[TOKEN] Key present and up-to-date JB-MR2 - no action required.");
                         return false;
                     }
-                    MainActivity.info("[TOKEN] Initializing SDKv18 Key...");
+                    Logging.info("[TOKEN] Initializing SDKv18 Key...");
                     Calendar notBefore = Calendar.getInstance();
                     Calendar notAfter = Calendar.getInstance();
                     notAfter.add(Calendar.YEAR, 3);
@@ -474,14 +476,14 @@ public class TokenAccess {
 
                     String token = prefs.getString(ListFragment.PREF_TOKEN, "");
                     if (token.isEmpty()) {
-                        MainActivity.info("[TOKEN] ...no token, returning after init.");
+                        Logging.info("[TOKEN] ...no token, returning after init.");
                         return false;
                     }
-                    MainActivity.info("[TOKEN] Encrypting token at v0...");
+                    Logging.info("[TOKEN] Encrypting token at v0...");
 
                     if (!initOnly) {
                         if (TokenAccess.setApiToken(prefs, token)) {
-                            MainActivity.info("[TOKEN] ...token set at v0.");
+                            Logging.info("[TOKEN] ...token set at v0.");
                             return true;
                         } else {
                             /**
@@ -489,17 +491,17 @@ public class TokenAccess {
                              * this isn't optimal, but it beats the alternative.
                              * This may not be necessary in the pre-Marshmallow world.
                              */
-                            MainActivity.error("[TOKEN] ...Failed token encryption; clearing.");
+                            Logging.error("[TOKEN] ...Failed token encryption; clearing.");
                             clearApiToken(prefs);
                         }
                     } else {
-                        MainActivity.error("[TOKEN] v0 Keystore initialized, but no token present.");
+                        Logging.error("[TOKEN] v0 Keystore initialized, but no token present.");
                     }
                 }
             } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException |
                     IOException | NoSuchProviderException | InvalidAlgorithmParameterException |
                     ProviderException ex) {
-                MainActivity.error("Upgrade/init of token storage failed: ", ex);
+                Logging.error("Upgrade/init of token storage failed: ", ex);
                 ex.printStackTrace();
                 //TODO: should we clear here?
                 //clearApiToken(prefs);
@@ -509,7 +511,7 @@ public class TokenAccess {
                  * ALIBI: after production evidence of a ProviderException (runtime), adding belt to
                  * suspenders
                  */
-                MainActivity.error("Unexpected error in upgrade/init of token storage failed: ", e);
+                Logging.error("Unexpected error in upgrade/init of token storage failed: ", e);
                 e.printStackTrace();
                 return false;
             }

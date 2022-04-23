@@ -15,6 +15,7 @@ import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MagicEightUtil;
 import net.wigle.wigleandroid.util.SearchUtil;
 
@@ -164,7 +165,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation(fa,
                             DataFragment.this.getString(R.string.data_export_csv), R.id.nav_data, CSV_RUN_DIALOG);
                 } else {
-                    MainActivity.error("Null FragmentActivity setting up CSV run export button");
+                    Logging.error("Null FragmentActivity setting up CSV run export button");
                 }
             }
         });
@@ -178,7 +179,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation( fa,
                         DataFragment.this.getString(R.string.data_export_csv_db), R.id.nav_data, CSV_DB_DIALOG);
                 } else {
-                    MainActivity.error("Null FragmentActivity setting up CSV export button");
+                    Logging.error("Null FragmentActivity setting up CSV export button");
                 }
             }
         });
@@ -194,7 +195,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation( fa,
                         DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
                 } else {
-                    MainActivity.error("Null FragmentActivity setting up KML run export button");
+                    Logging.error("Null FragmentActivity setting up KML run export button");
                 }
             }
         });
@@ -209,7 +210,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation( fa,
                         DataFragment.this.getString(R.string.data_export_kml_db), R.id.nav_data, KML_DB_DIALOG);
                 } else {
-                    MainActivity.error("Null FragmentActivity setting up KML export button");
+                    Logging.error("Null FragmentActivity setting up KML export button");
                 }
             }
         });
@@ -225,7 +226,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation( fa,
                         DataFragment.this.getString(R.string.data_backup_db), R.id.nav_data, BACKUP_DIALOG);
                 } else {
-                    MainActivity.error("Null FragmentActivity setting up backup confirmation");
+                    Logging.error("Null FragmentActivity setting up backup confirmation");
                 }
             }
         });
@@ -257,7 +258,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             DataFragment.this.getString(R.string.data_import_observed),
                             R.id.nav_data, IMPORT_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
             }
         });
@@ -280,7 +281,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             try {
                                 mainActivity.getState().dbHelper.getNetworkCountFromDB();
                             } catch (DBException dbe) {
-                                MainActivity.warn("failed DB count update on import-observations", dbe);
+                                Logging.warn("failed DB count update on import-observations", dbe);
                             }
                             mainActivity.transferComplete();
                         }
@@ -289,7 +290,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         try {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
-            MainActivity.info("failed to authorize user on request");
+            Logging.info("failed to authorize user on request");
         }
     }
 
@@ -316,7 +317,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation(fa, getString(R.string.setting_zero_out),
                             R.id.nav_data, ZERO_OUT_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
             }
         });
@@ -337,7 +338,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation(fa, getString(R.string.setting_max_out),
                             R.id.nav_data, MAX_OUT_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
             }
         } );
@@ -352,7 +353,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation(fa, getString(R.string.delete_db_confirm),
                             R.id.nav_data, DELETE_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
             }
         } );
@@ -376,7 +377,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             MainActivity.createConfirmation(fa, getString(R.string.export_gpx_detail),
                                     R.id.nav_data, EXPORT_GPX_DIALOG);
                         } else {
-                            MainActivity.error("unable to get fragment activity");
+                            Logging.error("unable to get fragment activity");
                         }
                     }
                 });
@@ -402,7 +403,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     MainActivity.createConfirmation(fa, getString(R.string.export_m8b_detail),
                             R.id.nav_data, EXPORT_M8B_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
             }
         });
@@ -452,7 +453,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     BackupTask task = new BackupTask(DataFragment.this, ma);
                     task.execute();
                 } else {
-                    MainActivity.error("null mainActivity - can't create backup dialog.");
+                    Logging.error("null mainActivity - can't create backup dialog.");
                 }
                 break;
             }
@@ -469,7 +470,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         tv.setText(getString(R.string.setting_max_id) + " 0");
                     }
                 } else {
-                    MainActivity.error("Null editor - unable to update DB marker");
+                    Logging.error("Null editor - unable to update DB marker");
                 }
                 break;
             }
@@ -484,7 +485,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         tv.setText(getString(R.string.setting_max_id) + " " + maxDB);
                     }
                 } else {
-                    MainActivity.error("Null prefs/editor - unable to update DB marker");
+                    Logging.error("Null prefs/editor - unable to update DB marker");
                 }
 
                 break;
@@ -504,17 +505,17 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     try {
                         ListFragment.lameStatic.dbHelper.getNetworkCountFromDB();
                     } catch (DBException dbe) {
-                        MainActivity.warn("Failed to update network count on DB clear: ", dbe);
+                        Logging.warn("Failed to update network count on DB clear: ", dbe);
                     }
                 } else {
-                    MainActivity.error("Null editor - unable to update DB marker");
+                    Logging.error("Null editor - unable to update DB marker");
                 }
 
                 break;
             }
             case EXPORT_M8B_DIALOG: {
                 if (!exportM8bFile()) {
-                    MainActivity.warn("Failed to export m8b.");
+                    Logging.warn("Failed to export m8b.");
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
                             getString(R.string.m8b_failed));
                 }
@@ -522,14 +523,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             }
             case EXPORT_GPX_DIALOG: {
                 if (!exportRouteGpxFile()) {
-                    MainActivity.warn("Failed to export gpx.");
+                    Logging.warn("Failed to export gpx.");
                     WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
                             getString(R.string.gpx_failed));
                 }
                 break;
             }
             default:
-                MainActivity.warn("Data unhandled dialogId: " + dialogId);
+                Logging.warn("Data unhandled dialogId: " + dialogId);
         }
     }
 
@@ -559,7 +560,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         protected void onPostExecute( Integer result ) {
             mainActivity.transferComplete();
 
-            MainActivity.info("DB backup postExe");
+            Logging.info("DB backup postExe");
 
             final View view = fragment.getView();
             if (view != null) {
@@ -582,10 +583,10 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     //TODO: verify local-only storage case/gpx_paths.xml
                     final Context c = getContext();
                     if (null == c) {
-                        MainActivity.error("null context in DB backup postExec");
+                        Logging.error("null context in DB backup postExec");
                     } else {
                         final File backupFile = new File(dbResult.getSecond());
-                        MainActivity.info("backupfile: " + backupFile.getAbsolutePath()
+                        Logging.info("backupfile: " + backupFile.getAbsolutePath()
                                 + " exists: " + backupFile.exists() + " read: " + backupFile.canRead());
                         final Uri fileUri = FileProvider.getUriForFile(c,
                                 MainActivity.getMainActivity().getApplicationContext().getPackageName() +
@@ -598,7 +599,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     }
                 } else {
                     //TODO: show error
-                    MainActivity.error("null or empty DB result in DB backup postExec");
+                    Logging.error("null or empty DB result in DB backup postExec");
                 }
             }
 
@@ -615,7 +616,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         protected void onProgressUpdate(Integer... values) {
             if (pd != null) {
                 if (values.length == 1) {
-                    MainActivity.info("progress: " + values[0]);
+                    Logging.info("progress: " + values[0]);
                     try {
                         if (values[0] > 0) {
                             pd.setIndeterminate(false);
@@ -633,13 +634,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             pd.setProgress(values[0]);
                         }
                     } catch (IllegalStateException iex) {
-                        MainActivity.error("lost ability to update progress dialog - detatched fragment?", iex);
+                        Logging.error("lost ability to update progress dialog - detatched fragment?", iex);
                     }
                 } else {
-                    MainActivity.warn("too many values for DB Backup progress update");
+                    Logging.warn("too many values for DB Backup progress update");
                 }
             } else {
-                MainActivity.error("Progress dialog update failed - not defined");
+                Logging.error("Progress dialog update failed - not defined");
             }
         }
 
@@ -695,14 +696,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     @Override
     public void onResume() {
-        MainActivity.info( "resume data." );
+        Logging.info( "resume data." );
         super.onResume();
         try {
             final FragmentActivity fa = getActivity();
             if (null != fa) {
                 getActivity().setTitle(R.string.data_activity_name);
             } else {
-                MainActivity.error("Failed to set title on null activity onResume");
+                Logging.error("Failed to set title on null activity onResume");
             }
         } catch (NullPointerException npe) {
             //Nothing to do here.
@@ -727,7 +728,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         if (totalRoutePoints > 1) {
             new AsyncGpxExportTask(this.getContext(), this.getActivity(), pd).execute(totalRoutePoints);
         } else {
-            MainActivity.error("no points to create route");
+            Logging.error("no points to create route");
             WiGLEToast.showOverFragment(getActivity(), R.string.gpx_failed,
                     getString(R.string.gpx_no_points));
             //NO POINTS
@@ -773,13 +774,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         //noinspection ResultOfMethodCallIgnored
                         path.mkdirs();
                         if (!path.exists()) {
-                            MainActivity.info("Got '!exists': " + path);
+                            Logging.info("Got '!exists': " + path);
                         }
                         String openString = basePath + M8B_FILE_PREFIX +  M8B_EXT;
                         //DEBUG: MainActivity.info("Opening file: " + openString);
                         m8bDestFile = new File( openString );
                     } else {
-                        MainActivity.error("Unable to determine m8b output base path.");
+                        Logging.error("Unable to determine m8b output base path.");
                         return "ERROR";
                     }
                 } else {
@@ -794,7 +795,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 out = new FileOutputStream(m8bDestFile, false).getChannel();
 
             } catch (IOException ioex) {
-                MainActivity.error("Unable to open output: ", ioex);
+                Logging.error("Unable to open output: ", ioex);
                 return "ERROR";
             }
 
@@ -841,7 +842,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         }
                     } catch (IndexOutOfBoundsException ioobe) {
                         //ALIBI: seeing ArrayIndexOutOfBoundsException: length=3; index=-2 from geodesy.mgrs.fromUtm(mgrs.java:64)
-                        MainActivity.error("Bad UTM ", ioobe);
+                        Logging.error("Bad UTM ", ioobe);
                     }
 
                     rows++;
@@ -857,7 +858,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                  */
                 @Override
                 public void complete() {
-                    MainActivity.info("m8b source export complete...");
+                    Logging.info("m8b source export complete...");
 
                     // Tidy up the finished writer
                     if (null != out) {
@@ -916,12 +917,12 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                             out.close();
 
                         } catch (IOException ioex) {
-                            MainActivity.error("Failed to close m8b writer", ioex);
+                            Logging.error("Failed to close m8b writer", ioex);
                         }
                     }
 
                     final long duration = System.currentTimeMillis() - genStart;
-                    MainActivity.info("completed m8b generation. Generation time: "+((double)duration * 0.001d)+"s");
+                    Logging.info("completed m8b generation. Generation time: "+((double)duration * 0.001d)+"s");
 
                     publishProgress(100, 100); //ALIBI: will close the dialog in case fractions didn't work out.
 
@@ -942,7 +943,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
                     } else {
-                        MainActivity.error("Unable to link m8b provider - null context");
+                        Logging.error("Unable to link m8b provider - null context");
                     }
                 }
             });
@@ -953,7 +954,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         @Override
         protected void onPostExecute(String result) {
             if (null != result) { //launch task will exist with bg thread enqueued with null return
-                MainActivity.error("POST EXECUTE: " + result);
+                Logging.error("POST EXECUTE: " + result);
                 if (pd.isShowing()) {
                     pd.dismiss();
                 }

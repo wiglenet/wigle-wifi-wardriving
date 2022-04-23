@@ -1,9 +1,5 @@
 package net.wigle.wigleandroid.util;
 
-import android.annotation.SuppressLint;
-
-import net.wigle.wigleandroid.MainActivity;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,7 +56,7 @@ public class CsvUtil {
         try {
             return CSV_TIME_FORMAT.parse(timestamp).getTime();
         } catch (ParseException | NullPointerException e) {
-            MainActivity.error("Failed to parse CSV time: "+timestamp, e);
+            Logging.error("Failed to parse CSV time: "+timestamp, e);
         }
         return 0;
     }

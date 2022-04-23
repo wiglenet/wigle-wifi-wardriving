@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import net.wigle.wigleandroid.util.Logging;
+
 /**
  * Building a filter activity for the network list
  * Created by arkasha on 20170801.
@@ -33,7 +35,7 @@ public class FilterActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View view = findViewById(android.R.id.content);
-        MainActivity.info("Filter Fragment Selected");
+        Logging.info("Filter Fragment Selected");
         final EditText regex = (EditText) findViewById( R.id.edit_regex );
         final String regexKey = ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_REGEX;
         regex.setText( prefs.getString(regexKey, "") );

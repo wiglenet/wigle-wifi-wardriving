@@ -28,11 +28,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -80,6 +78,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
 
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
@@ -161,7 +160,7 @@ public final class MappingFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        MainActivity.info("MAP: onCreate");
+        Logging.info("MAP: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -202,7 +201,7 @@ public final class MappingFragment extends Fragment {
 
             }
             catch (final SecurityException ex) {
-                MainActivity.error("security exception oncreateview map: " + ex, ex);
+                Logging.error("security exception oncreateview map: " + ex, ex);
             }
         } else {
             WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
@@ -272,7 +271,7 @@ public final class MappingFragment extends Fragment {
                                 MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
                                 String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
                                 item.setTitle(name);
-                                MainActivity.info("on-my-location received - activating lock");
+                                Logging.info("on-my-location received - activating lock");
                             }
                         }
                         return false;
@@ -333,11 +332,11 @@ public final class MappingFragment extends Fragment {
                             ifAuthToken = "Basic " + encoded;
                         }
                     } catch (UnsupportedEncodingException ueex) {
-                        MainActivity.error("map tiles: unable to encode credentials for mine/others", ueex);
+                        Logging.error("map tiles: unable to encode credentials for mine/others", ueex);
                     } catch (UnsupportedOperationException uoex) {
-                        MainActivity.error("map tiles: unable to access credentials for mine/others", uoex);
+                        Logging.error("map tiles: unable to access credentials for mine/others", uoex);
                     } catch (Exception ex) {
-                        MainActivity.error("map tiles: unable to access credentials for mine/others", ex);
+                        Logging.error("map tiles: unable to access credentials for mine/others", ex);
                     }
                     final String authToken = ifAuthToken;
 
@@ -413,7 +412,7 @@ public final class MappingFragment extends Fragment {
                                     baos.write(byteChunk, 0, n);
                                 }
                             } catch (IOException e) {
-                                MainActivity.error("Failed while reading bytes from " +
+                                Logging.error("Failed while reading bytes from " +
                                         url.toExternalForm() + ": "+ e.getMessage());
                                 e.printStackTrace();
                             } finally {
@@ -421,7 +420,7 @@ public final class MappingFragment extends Fragment {
                                     try {
                                         is.close();
                                     } catch (IOException ioex) {
-                                        MainActivity.error("Failed while closing InputStream " +
+                                        Logging.error("Failed while closing InputStream " +
                                                 url.toExternalForm() + ": "+ ioex.getMessage());
                                         ioex.printStackTrace();
                                     }
@@ -447,7 +446,7 @@ public final class MappingFragment extends Fragment {
                     try {
                         Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
                         if (null == routeCursor) {
-                            MainActivity.info("null route cursor; not mapping");
+                            Logging.info("null route cursor; not mapping");
                         } else {
                             long segmentCount = 0;
 
@@ -463,18 +462,18 @@ public final class MappingFragment extends Fragment {
                                 pOptions.zIndex(10000); //to overlay on traffic data
                                 segmentCount++;
                             }
-                            MainActivity.info("Loaded route with " + segmentCount + " segments");
+                            Logging.info("Loaded route with " + segmentCount + " segments");
                             routePolyline = googleMap.addPolyline(pOptions);
 
                             routePolyline.setTag(ROUTE_LINE_TAG);
                         }
                     } catch (Exception e) {
-                        MainActivity.error("Unable to add route: ",e);
+                        Logging.error("Unable to add route: ",e);
                     }
                 }
             }
         });
-        MainActivity.info("done setupMapView.");
+        Logging.info("done setupMapView.");
     }
 
     public static LatLng getCenter( final Context context, final LatLng priorityCenter,
@@ -523,7 +522,7 @@ public final class MappingFragment extends Fragment {
             retval = locationManager.getLastKnownLocation( provider );
         }
         catch ( final IllegalArgumentException | SecurityException ex ) {
-            MainActivity.info("exception getting last known location: " + ex);
+            Logging.info("exception getting last known location: " + ex);
         }
         return retval;
     }
@@ -585,18 +584,18 @@ public final class MappingFragment extends Fragment {
                                         Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_COARSE, false);
                                         routePolyline.setPoints(Arrays.asList(simplified));
-                                        MainActivity.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
+                                        Logging.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
                                     } else if (routePoints.size() > 1) {
                                         Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_FINE, true);
                                         routePolyline.setPoints(Arrays.asList(simplified));
-                                        MainActivity.error("minor route simplification: "+routePoints.size()+"->"+simplified.length);
+                                        Logging.error("minor route simplification: "+routePoints.size()+"->"+simplified.length);
                                     } else {
                                         //DEBUG: MainActivity.error("route points: " + routePoints.size());
                                         routePolyline.setPoints(routePoints);
                                     }
                                 } else {
-                                    MainActivity.error("route polyline null - this shouldn't happen");
+                                    Logging.error("route polyline null - this shouldn't happen");
                                 }
                                 lastLocation = location;
                             } else {
@@ -604,7 +603,7 @@ public final class MappingFragment extends Fragment {
                             }
                         }
                     } catch (Exception ex) {
-                        MainActivity.error("Route point update failed: ",ex);
+                        Logging.error("Route point update failed: ",ex);
                     }
 
                     // set if location isn't null
@@ -641,7 +640,7 @@ public final class MappingFragment extends Fragment {
                 timer.postDelayed( this, period );
             }
             else {
-                MainActivity.info( "finishing mapping timer" );
+                Logging.info( "finishing mapping timer" );
             }
         }
     }
@@ -653,13 +652,13 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public void onDetach() {
-        MainActivity.info( "MAP: onDetach.");
+        Logging.info( "MAP: onDetach.");
         super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "MAP: destroy mapping." );
+        Logging.info( "MAP: destroy mapping." );
         finishing.set(true);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
@@ -673,7 +672,7 @@ public final class MappingFragment extends Fragment {
                 edit.putFloat(ListFragment.PREF_PREV_ZOOM, googleMap.getCameraPosition().zoom);
                 edit.apply();
             } else {
-                MainActivity.warn("failed saving map state - unable to get preferences.");
+                Logging.warn("failed saving map state - unable to get preferences.");
             }
             // save center
             state.oldCenter = googleMap.getCameraPosition().target;
@@ -684,7 +683,7 @@ public final class MappingFragment extends Fragment {
             mapView.onDestroy();
         } catch (NullPointerException ex) {
             // seen in the wild
-            MainActivity.info("exception in mapView.onDestroy: " + ex, ex);
+            Logging.info("exception in mapView.onDestroy: " + ex, ex);
         }
 
         super.onDestroy();
@@ -692,13 +691,13 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public void onPause() {
-        MainActivity.info("MAP: onPause");
+        Logging.info("MAP: onPause");
         super.onPause();
         try {
             mapView.onPause();
         }
         catch (final NullPointerException ex) {
-            MainActivity.error("npe on mapview pause: " + ex, ex);
+            Logging.error("npe on mapview pause: " + ex, ex);
         }
         if (mapRender != null) {
             // save memory
@@ -708,7 +707,7 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info( "MAP: onResume" );
+        Logging.info( "MAP: onResume" );
         if (mapRender != null) {
             mapRender.onResume();
         }
@@ -730,14 +729,14 @@ public final class MappingFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
-        MainActivity.info( "MAP: onSaveInstanceState" );
+        Logging.info( "MAP: onSaveInstanceState" );
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
 
     @Override
     public void onLowMemory() {
-        MainActivity.info( "MAP: onLowMemory" );
+        Logging.info( "MAP: onLowMemory" );
         super.onLowMemory();
         mapView.onLowMemory();
     }
@@ -763,7 +762,7 @@ public final class MappingFragment extends Fragment {
     /* Creates the menu items */
     @Override
     public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
-        MainActivity.info( "MAP: onCreateOptionsMenu" );
+        Logging.info( "MAP: onCreateOptionsMenu" );
         MenuItem item;
         final SharedPreferences prefs = getActivity().getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
@@ -941,7 +940,7 @@ public final class MappingFragment extends Fragment {
                                 WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
                                 break;
                             default:
-                                MainActivity.error("unhandled mapType: " + newMapType);
+                                Logging.error("unhandled mapType: " + newMapType);
                         }
                         Editor edit = prefs.edit();
                         edit.putInt(ListFragment.PREF_MAP_TYPE, newMapType);
@@ -973,7 +972,7 @@ public final class MappingFragment extends Fragment {
             final View view = inflater.inflate(R.layout.filterdialog, container);
             dialog.setTitle( "SSID Filter" );
 
-            MainActivity.info("make new dialog. prefix: " + prefix);
+            Logging.info("make new dialog. prefix: " + prefix);
             final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
             regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
@@ -1011,7 +1010,7 @@ public final class MappingFragment extends Fragment {
                     }
                     catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing filter dialog: " + ex );
+                        Logging.info( "exception dismissing filter dialog: " + ex );
                     }
                 }
             } );
@@ -1039,7 +1038,7 @@ public final class MappingFragment extends Fragment {
                     }
                     catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing filter dialog: " + ex );
+                        Logging.info( "exception dismissing filter dialog: " + ex );
                     }
                 }
             } );
@@ -1059,7 +1058,7 @@ public final class MappingFragment extends Fragment {
         final int cacheSize = MainActivity.getNetworkCache().size();
         if (cacheSize > (ListFragment.lameStatic.networkCache.maxSize() / 4)) {
             // don't load, there's already networks to show
-            MainActivity.info("cacheSize: " + cacheSize + ", skipping previous networks");
+            Logging.info("cacheSize: " + cacheSize + ", skipping previous networks");
             return;
         }
 
@@ -1081,7 +1080,7 @@ public final class MappingFragment extends Fragment {
                         networkCache.put( network.getBssid(), network );
 
                         if (networkCache.isFull()) {
-                            MainActivity.info("Cache is full, breaking out of query result handling");
+                            Logging.info("Cache is full, breaking out of query result handling");
                             return false;
                         }
                     }

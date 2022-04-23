@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * filter matchers
@@ -34,7 +35,7 @@ public final class FilterMatcher {
                 matcher = pattern.matcher( "" );
             }
             catch ( PatternSyntaxException ex ) {
-                MainActivity.error("regex pattern exception: " + ex);
+                Logging.error("regex pattern exception: " + ex);
             }
         }
 
@@ -65,7 +66,7 @@ public final class FilterMatcher {
                         return false;
                     }
                 } catch (IllegalArgumentException iaex) {
-                    MainActivity.warn("Matcher: IllegalArgument: " + network.getSsid() + "pattern: " + ssidMatcher.pattern());
+                    Logging.warn("Matcher: IllegalArgument: " + network.getSsid() + "pattern: " + ssidMatcher.pattern());
                     final boolean invert = prefs.getBoolean(prefix + ListFragment.PREF_MAPF_INVERT, false);
                     return !invert;
                 }
@@ -91,7 +92,7 @@ public final class FilterMatcher {
                         }
                         break;
                     default:
-                        MainActivity.error("unhandled crypto: " + network);
+                        Logging.error("unhandled crypto: " + network);
                 }
             } else if (NetworkType.BT.equals(network.getType())) {
                 if (!prefs.getBoolean(prefix + ListFragment.PREF_MAPF_BT, true)) {
@@ -116,7 +117,7 @@ public final class FilterMatcher {
                         return false;
                     }
                 } catch (IllegalArgumentException iaex) {
-                    MainActivity.warn("Matcher: IllegalArgument: " + network.getBssid() + "pattern: " + bssidMatcher.pattern());
+                    Logging.warn("Matcher: IllegalArgument: " + network.getBssid() + "pattern: " + bssidMatcher.pattern());
                     return true;
                 }
             }

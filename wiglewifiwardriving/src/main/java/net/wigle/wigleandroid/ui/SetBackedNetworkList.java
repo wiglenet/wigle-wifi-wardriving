@@ -2,8 +2,8 @@ package net.wigle.wigleandroid.ui;
 
 import androidx.annotation.NonNull;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
@@ -187,7 +187,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                     }
                     break;
                 default:
-                    MainActivity.error("unhandled addAll case: "+net.getType());
+                    Logging.error("unhandled addAll case: "+net.getType());
                     break;
             }
         }
@@ -203,7 +203,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public boolean addAll(int i, @NonNull Collection<? extends Network> collection) {
-        MainActivity.info("addAll w/ offset: "+i);
+        Logging.info("addAll w/ offset: "+i);
         Set<Network> added = addAllToSets(collection);
         for (Network net: collection) {
             int offset = i;
@@ -255,14 +255,14 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         try {
             return networks.get(i);
         } catch (IndexOutOfBoundsException iobex) {
-            MainActivity.error("failed SBNL.get - index out of bound (likely structure changed)");
+            Logging.error("failed SBNL.get - index out of bound (likely structure changed)");
             return null;
         }
     }
 
     @Override
     public Network set(int i, Network network) {
-        MainActivity.info("set-at index "+i);
+        Logging.info("set-at index "+i);
         if (null != network) {
             boolean newNet = false;
             switch (network.getType()) {
@@ -298,7 +298,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public void add(int i, Network network) {
-        MainActivity.info("add-at index "+i);
+        Logging.info("add-at index "+i);
         if (null != network) {
             boolean newNet = false;
             switch (network.getType()) {
@@ -509,7 +509,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         try {
             Collections.sort(networks, comparator);
         } catch (IllegalArgumentException iaex) {
-            MainActivity.warn("SBNL.sort: IllegalArgumentException", iaex);
+            Logging.warn("SBNL.sort: IllegalArgumentException", iaex);
             iaex.printStackTrace();
             //ALIBI: missing a sort isn't a critical error, since this list gets updated continually
         }

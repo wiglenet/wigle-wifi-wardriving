@@ -2,13 +2,14 @@ package net.wigle.wigleandroid;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.core.app.NavUtils;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class MapFilterActivity extends AppCompatActivity {
             }
         }
         View view = findViewById(android.R.id.content);
-        MainActivity.info("Filter Fragment Selected");
+        Logging.info("Filter Fragment Selected");
         final EditText regex = (EditText) findViewById( R.id.edit_regex );
         final String regexKey = MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_REGEX;
         regex.setText( prefs.getString(regexKey, "") );

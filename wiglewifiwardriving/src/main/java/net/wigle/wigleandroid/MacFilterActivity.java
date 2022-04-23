@@ -9,6 +9,8 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.util.Logging;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -36,7 +38,7 @@ public class MacFilterActivity extends AppCompatActivity {
         Intent intent = getIntent();
         filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
         filterKey = "";
-        MainActivity.info(filterType);
+        Logging.info(filterType);
         if (FilterActivity.INTENT_DISPLAY_FILTER.equals(filterType)) {
             filterKey = ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS;
         } else if (FilterActivity.INTENT_LOG_FILTER.equals(filterType)) {
@@ -101,12 +103,12 @@ public class MacFilterActivity extends AppCompatActivity {
             formatted += Character.toUpperCase(rawEntry.charAt(i));
         }
         if (!entries.contains(formatted)) {
-            MainActivity.info("Adding: " + formatted);
+            Logging.info("Adding: " + formatted);
             entries.add(formatted);
 
             Gson gson = new Gson();
             String serialized = gson.toJson(entries.toArray());
-            MainActivity.info(serialized);
+            Logging.info(serialized);
             final SharedPreferences.Editor editor = prefs.edit();
             editor.putString(filterKey,serialized);
             editor.apply();

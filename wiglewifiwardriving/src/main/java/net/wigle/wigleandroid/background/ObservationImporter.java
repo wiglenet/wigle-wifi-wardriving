@@ -15,6 +15,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.Logging;
 
 
 import java.io.BufferedReader;
@@ -53,7 +54,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
             status = Status.EXCEPTION;
             bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: " + e + " (from " + e.getCause()+")");
         } finally {
-            MainActivity.info("User observed download result: "+result);
+            Logging.info("User observed download result: "+result);
             sendBundledMessage(status.ordinal(), bundle);
         }
     }
@@ -77,16 +78,16 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                 if (fieldName.equals("success")) {
                     if (current.isBoolean()) {
                         if (current == JsonToken.VALUE_TRUE) {
-                            MainActivity.info("successful load");
+                            Logging.info("successful load");
                         } else {
-                            MainActivity.error("MyObserved success: false");
+                            Logging.error("MyObserved success: false");
                             status = Status.EXCEPTION;
                             bundle.putString(BackgroundGuiHandler.ERROR, "ERROR: success: false");
                         }
                     }
                 } else if (fieldName.equals("count")) {
                     total = jp.getIntValue();
-                    MainActivity.info("received " + total + " observations");
+                    Logging.info("received " + total + " observations");
                     if (total > 0) {
                         status = Status.SUCCESS;
                     }
@@ -109,7 +110,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
                                 network, location, newForRun);
 
                             if ((i % 1000) == 0) {
-                                MainActivity.info("lineCount: " + i + " of " + total);
+                                Logging.info("lineCount: " + i + " of " + total);
                             }
                             if (total == 0) {
                                 total = 1;
@@ -145,7 +146,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
             try {
                 listener.requestComplete(null, false);
             } catch (WiGLEAuthException waex) {
-                MainActivity.error("Unable to download data - authorization failed");
+                Logging.error("Unable to download data - authorization failed");
                 status = Status.BAD_LOGIN;
             }
         }

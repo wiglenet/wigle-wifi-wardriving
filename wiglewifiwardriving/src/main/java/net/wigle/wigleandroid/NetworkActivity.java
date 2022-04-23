@@ -62,6 +62,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.util.Logging;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -86,7 +87,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        MainActivity.info("NET: onCreate");
+        Logging.info("NET: onCreate");
         super.onCreate(savedInstanceState);
 
         if (ListFragment.lameStatic.oui == null) {
@@ -109,7 +110,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
-        MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
+        Logging.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
         final SimpleDateFormat format = NetworkListUtil.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
@@ -120,7 +121,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         tv.setText( bssid );
 
         if ( network == null ) {
-            MainActivity.info( "no network found in cache for bssid: " + bssid );
+            Logging.info( "no network found in cache for bssid: " + bssid );
         }
         else {
             // do gui work
@@ -196,7 +197,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                         try {
                             rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
                         } catch (SQLException sqex) {
-                            MainActivity.error("Unable to access Mxc Database: ",sqex);
+                            Logging.error("Unable to access Mxc Database: ",sqex);
                         }
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
@@ -216,7 +217,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                         }
                     }
                 } else {
-                    MainActivity.warn("unable to get operatorCode for "+bssid);
+                    Logging.warn("unable to get operatorCode for "+bssid);
                 }
             }
             setupMap(network, savedInstanceState, prefs );
@@ -228,7 +229,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onDestroy() {
-        MainActivity.info("NET: onDestroy");
+        Logging.info("NET: onDestroy");
         networkActivity = null;
         if (mapView != null) {
             mapView.onDestroy();
@@ -238,7 +239,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onResume() {
-        MainActivity.info("NET: onResume");
+        Logging.info("NET: onResume");
         super.onResume();
         if (mapView != null) {
             mapView.onResume();
@@ -250,7 +251,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onPause() {
-        MainActivity.info("NET: onPause");
+        Logging.info("NET: onPause");
         super.onPause();
         if (mapView != null) {
             mapView.onPause();
@@ -259,13 +260,13 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
-        MainActivity.info("NET: onSaveInstanceState");
+        Logging.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (mapView != null) {
             try {
                 mapView.onSaveInstanceState(outState);
             } catch (android.os.BadParcelableException bpe) {
-                MainActivity.error("Exception saving NetworkActivity instance state: ",bpe);
+                Logging.error("Exception saving NetworkActivity instance state: ",bpe);
                 //this is really low-severity, since we can restore all state anyway
             }
         }
@@ -273,7 +274,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onLowMemory() {
-        MainActivity.info("NET: onLowMemory");
+        Logging.info("NET: onLowMemory");
         super.onLowMemory();
         if (mapView != null) {
             mapView.onLowMemory();
@@ -329,7 +330,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
                                 googleMap.addMarker(new MarkerOptions().position(estCentroid));
                             }
-                            MainActivity.info("observation count: " + count);
+                            Logging.info("observation count: " + count);
                         }
                     });
                 }
@@ -395,7 +396,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 maxDist = res[0];
             }
         }
-        MainActivity.info("max dist: "+maxDist);
+        Logging.info("max dist: "+maxDist);
         if (maxDist < 135) {
             return 18;
         } else if (maxDist < 275) {
@@ -452,7 +453,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             });
         }
         catch (NullPointerException ex) {
-            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+            Logging.error("npe in mapView.onCreate: " + ex, ex);
         }
         MapsInitializer.initialize( this );
 
@@ -552,7 +553,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         int netId = -2;
 
         for ( final WifiConfiguration config : wifiManager.getConfiguredNetworks() ) {
-            MainActivity.info( "bssid: " + config.BSSID
+            Logging.info( "bssid: " + config.BSSID
                             + " ssid: " + config.SSID
                             + " status: " + config.status
                             + " id: " + config.networkId
@@ -583,7 +584,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 connectToNetwork( null );
                 break;
             default:
-                MainActivity.warn("Network unhandled dialogId: " + dialogId);
+                Logging.warn("Network unhandled dialogId: " + dialogId);
         }
     }
 
@@ -676,7 +677,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     }
                     catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing crypto dialog: " + ex );
+                        Logging.info( "exception dismissing crypto dialog: " + ex );
                     }
                 }
             } );
@@ -690,7 +691,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     }
                     catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing crypto dialog: " + ex );
+                        Logging.info( "exception dismissing crypto dialog: " + ex );
                     }
                 }
             } );

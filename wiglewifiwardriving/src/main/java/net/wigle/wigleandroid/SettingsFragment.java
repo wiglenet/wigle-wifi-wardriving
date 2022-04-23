@@ -49,6 +49,7 @@ import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
@@ -158,13 +159,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 break;
             }
             default:
-                MainActivity.warn("Settings unhandled dialogId: " + dialogId);
+                Logging.warn("Settings unhandled dialogId: " + dialogId);
         }
     }
 
     @Override
     public void onResume() {
-        MainActivity.info("resume settings.");
+        Logging.info("resume settings.");
 
         final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         // donate
@@ -173,7 +174,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             eraseDonate();
         }
         super.onResume();
-        MainActivity.info("Resume with allow: "+allowRefresh);
+        Logging.info("Resume with allow: "+allowRefresh);
         if (allowRefresh) {
             allowRefresh = false;
             final View view = getView();
@@ -193,7 +194,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     @Override
     public void onPause() {
         super.onPause();
-        MainActivity.info("Pause; setting allowRefresh");
+        Logging.info("Pause; setting allowRefresh");
         allowRefresh = true;
     }
 
@@ -312,7 +313,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     try {
                         task.startDownload(SettingsFragment.this);
                     } catch (WiGLEAuthException waex) {
-                        MainActivity.info("User authentication failed");
+                        Logging.info("User authentication failed");
                     }
                 }
             });
@@ -469,7 +470,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, true, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling bluetooth change: "+value);
+                Logging.info("Signaling bluetooth change: "+value);
                 if (value) {
                     MainActivity.getMainActivity().setupBluetooth();
                 } else {
@@ -480,7 +481,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling route mapping change: "+value);
+                Logging.info("Signaling route mapping change: "+value);
                 if (value) {
                     MainActivity.getMainActivity().startRouteMapping(prefs);
                 } else {
@@ -491,7 +492,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling route logging change: "+value);
+                Logging.info("Signaling route logging change: "+value);
                 if (value) {
                     MainActivity.getMainActivity().startRouteLogging(prefs);
                 } else {
@@ -567,7 +568,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 String versionName = activity.getApplicationContext().getPackageManager().getPackageInfo(activity.getApplicationContext().getPackageName(), 0).versionName;
                 appVersion.setText(appName+" v."+versionName);
             } catch (PackageManager.NameNotFoundException e) {
-                MainActivity.error("Unable to get version number: ",e);
+                Logging.error("Unable to get version number: ",e);
             }
         }
     }
@@ -637,7 +638,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 //DEBUG: MainActivity.info("deleting: " + cache.getAbsolutePath());
                 boolean deleted = cache.delete();
                 if (!deleted) {
-                    MainActivity.warn("failed to delete cache file: "+cache.getAbsolutePath());
+                    Logging.warn("failed to delete cache file: "+cache.getAbsolutePath());
                 }
             }
         }
@@ -698,9 +699,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             if (msg.what == MSG_USER_DONE) {
                 if ((null != bundle) && (bundle.containsKey("error"))) {
                     //ALIBI: not doing anything more here, since the toast will alert.
-                    MainActivity.info("Settings auth unsuccessful");
+                    Logging.info("Settings auth unsuccessful");
                 } else {
-                    MainActivity.info("Settings auth successful");
+                    Logging.info("Settings auth successful");
                     final SharedPreferences prefs = MainActivity.getMainActivity()
                             .getApplicationContext()
                             .getSharedPreferences(ListFragment.SHARED_PREFS, 0);

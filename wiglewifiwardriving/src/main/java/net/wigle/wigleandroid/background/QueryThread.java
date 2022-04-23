@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 public class QueryThread extends Thread {
     private final BlockingQueue<Request> queue = new LinkedBlockingQueue<>();
@@ -50,7 +50,7 @@ public class QueryThread extends Thread {
             queue.put( request );
         }
         catch ( InterruptedException ex ) {
-            MainActivity.info(getName() + " interrupted");
+            Logging.info(getName() + " interrupted");
         }
     }
 
@@ -75,10 +75,10 @@ public class QueryThread extends Thread {
                 }
             }
             catch ( InterruptedException ex ) {
-                MainActivity.info( getName() + " interrupted: " + ex);
+                Logging.info( getName() + " interrupted: " + ex);
             }
             catch ( IllegalStateException ex ) {
-                MainActivity.info( getName() + " illegal state ex: " + ex);
+                Logging.info( getName() + " illegal state ex: " + ex);
             }
             catch ( DBException ex ) {
                 dbHelper.deathDialog("query thread", ex);

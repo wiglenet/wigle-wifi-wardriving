@@ -7,6 +7,7 @@ import android.webkit.JavascriptInterface;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.TokenAccess;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * Created by arkasha on 1/8/18.
@@ -30,7 +31,7 @@ public class WiGLERegistrationInterface {
     @JavascriptInterface
     public void registrationComplete(final String userName, final String userId, final String token) {
 
-        MainActivity.info("Successful registration for "+userName+ " auth ID: "+userId);
+        Logging.info("Successful registration for "+userName+ " auth ID: "+userId);
         final SharedPreferences prefs = MainActivity.getMainActivity().
                 getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();

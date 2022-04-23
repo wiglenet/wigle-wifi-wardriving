@@ -14,13 +14,13 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 public class ThemeUtil {
     public static void setTheme(final SharedPreferences prefs) {
         if (Build.VERSION.SDK_INT > 28) {
             final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            MainActivity.info("set theme called: "+displayMode);
+            Logging.info("set theme called: "+displayMode);
             AppCompatDelegate.setDefaultNightMode(displayMode);
         } else {
             //Force night mode
@@ -45,7 +45,7 @@ public class ThemeUtil {
             try {
                 googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(c, mapNightThemeId));
             } catch (Resources.NotFoundException e) {
-                MainActivity.error("Unable to theme map: ", e);
+                Logging.error("Unable to theme map: ", e);
             }
         }
     }

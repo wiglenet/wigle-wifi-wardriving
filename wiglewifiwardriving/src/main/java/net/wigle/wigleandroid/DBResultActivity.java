@@ -47,6 +47,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -114,7 +115,7 @@ public class DBResultActivity extends AppCompatActivity {
         setupList();
 
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
-        MainActivity.info("queryArgs: " + queryArgs);
+        Logging.info("queryArgs: " + queryArgs);
         final TextView tv = (TextView) findViewById( R.id.dbstatus );
 
         if ( queryArgs != null ) {
@@ -186,7 +187,7 @@ public class DBResultActivity extends AppCompatActivity {
                         listAdapter.add(network);
                         if ( address == null && first ) {
                             final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
-                            MainActivity.info( "set center: " + center + " network: " + network.getSsid()
+                            Logging.info( "set center: " + center + " network: " + network.getSsid()
                                     + " point: " + network.getLatLng());
                             mapView.getMapAsync(new OnMapReadyCallback() {
                                 @Override
@@ -358,16 +359,16 @@ public class DBResultActivity extends AppCompatActivity {
             task.startDownload(getSupportFragmentManager().findFragmentById(R.id.net_list));
         } catch (WiGLEAuthException waex) {
             //unauthenticated call - should never trip
-            MainActivity.warn("Authentication error on news load (should not happen)", waex);
+            Logging.warn("Authentication error on news load (should not happen)", waex);
         }
 
     }
 
     private void handleNets(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleNets");
+        Logging.info("handleNets");
 
         if (json == null) {
-            MainActivity.info("handleNets null json, returning");
+            Logging.info("handleNets null json, returning");
             return;
         }
 
@@ -378,7 +379,7 @@ public class DBResultActivity extends AppCompatActivity {
             if (list == null || list.length() == 0) {
                 message.what = MSG_PARSE_FAILED;
                 handler.sendMessage(message);
-                MainActivity.error("empty results");
+                Logging.error("empty results");
             } else {
                 final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
                 for (int i = 0; i < list.length(); i++) {
@@ -398,11 +399,11 @@ public class DBResultActivity extends AppCompatActivity {
         } catch (final JSONException ex) {
             message.what = MSG_PARSE_FAILED;
             handler.sendMessage(message);
-            MainActivity.error("json error parsing:  " + json, ex);
+            Logging.error("json error parsing:  " + json, ex);
         } catch (final Exception e) {
             message.what = MSG_SEARCH_FAILED;
             handler.sendMessage(message);
-            MainActivity.error("search error: " + e, e);
+            Logging.error("search error: " + e, e);
         }
     }
 
@@ -510,7 +511,7 @@ public class DBResultActivity extends AppCompatActivity {
 
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
             // DEBUG:
-            MainActivity.info("handleMessage. results: " + results);
+            Logging.info("handleMessage. results: " + results);
 
             final TextView statusView = activityContext.findViewById(R.id.dbstatus);
 

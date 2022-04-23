@@ -47,6 +47,7 @@ import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONObject;
 
@@ -227,7 +228,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         else if (maxMemory > 100000000L) {
             cacheSize = 512;
         }
-        MainActivity.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
+        Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
     }
 
@@ -236,15 +237,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
 
-        MainActivity.info("setupUploadButton");
+        Logging.info("setupUploadButton");
         setupUploadButton(view);
-        MainActivity.info("setupList");
+        Logging.info("setupList");
         setupList(view);
-        MainActivity.info("setNetCountUI");
+        Logging.info("setNetCountUI");
         setNetCountUI(state, view);
-        MainActivity.info("setStatusUI");
+        Logging.info("setStatusUI");
         setStatusUI(view, null);
-        MainActivity.info("setupLocation");
+        Logging.info("setupLocation");
         setupLocation(view);
 
         return view;
@@ -265,7 +266,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             }
         } catch (Exception ex) {
             //this shouldn't be a critical failure if the view's not present.
-            MainActivity.warn("Failed to toggle bluetooth new total to "+on);
+            Logging.warn("Failed to toggle bluetooth new total to "+on);
         }
     }
 
@@ -327,7 +328,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     }
                 }
             } else {
-                MainActivity.error("Null activity context - can't set animation");
+                Logging.error("Null activity context - can't set animation");
             }
 
             final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
@@ -391,7 +392,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void onPause() {
-        MainActivity.info("LIST: paused.");
+        Logging.info("LIST: paused.");
         super.onPause();
         if (animating) {
             if (scanningAnimation != null) {
@@ -403,11 +404,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void onResume() {
-        MainActivity.info( "LIST: resumed.");
+        Logging.info( "LIST: resumed.");
         super.onResume();
         getActivity().setTitle(R.string.list_app_name);
         //ALIBI: default status can confuse users on resume
-        MainActivity.info("setNetCountUI");
+        Logging.info("setNetCountUI");
         setNetCountUI(MainActivity.getStaticState(), getView());
         setStatusUI(null);
         animating = false;
@@ -415,31 +416,31 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void onStart() {
-        MainActivity.info("LIST: start.");
+        Logging.info("LIST: start.");
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "LIST: stop.");
+        Logging.info( "LIST: stop.");
         super.onStop();
     }
 
     @Override
     public void onDestroyView() {
-        MainActivity.info( "LIST: onDestroyView.");
+        Logging.info( "LIST: onDestroyView.");
         super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "LIST: destroy.");
+        Logging.info( "LIST: destroy.");
         super.onDestroy();
     }
 
     @Override
     public void onDetach() {
-        MainActivity.info( "LIST: onDetach.");
+        Logging.info( "LIST: onDetach.");
         super.onDetach();
     }
 
@@ -497,7 +498,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             }
             case MENU_SORT: {
-                MainActivity.info("sort dialog");
+                Logging.info("sort dialog");
                 onCreateDialog( SORT_DIALOG );
                 return true;
             }
@@ -541,7 +542,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void handleScanChange(final MainActivity main, final View view ) {
         final boolean isScanning = main == null || main.isScanning();
-        MainActivity.info("list handleScanChange: isScanning now: " + isScanning );
+        Logging.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
             setStatusUI(view, getString(R.string.list_scanning_on));
         }
@@ -557,7 +558,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 dialogFragment = new SortDialog();
                 break;
             default:
-                MainActivity.error( "unhandled dialog: " + which );
+                Logging.error( "unhandled dialog: " + which );
         }
 
         if (dialogFragment != null) {
@@ -604,7 +605,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
                     // set pref
                     final int listSort = listSorts[position];
-                    MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
+                    Logging.info( PREF_LIST_SORT + " setting list sort: " + listSort );
                     editor.putInt( PREF_LIST_SORT, listSort );
                     editor.apply();
                 }
@@ -621,7 +622,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     }
                     catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing sort dialog: " + ex );
+                        Logging.info( "exception dismissing sort dialog: " + ex );
                     }
                 }
             } );
@@ -637,7 +638,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final MainActivity main = MainActivity.getMainActivity(this);
         final State state = MainActivity.getStaticState();
 
-        MainActivity.info( "LIST: on config change" );
+        Logging.info( "LIST: on config change" );
         MainActivity.setLocale( this.getActivity(), newConfig);
         super.onConfigurationChanged( newConfig );
         // getActivity().setContentView( R.layout.list );
@@ -678,7 +679,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
                     activity.startActivity(intent);
                 } else {
-                    MainActivity.error("Null network onItemClick - ignoring");
+                    Logging.error("Null network onItemClick - ignoring");
                 }
             }
         });
@@ -751,7 +752,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         catch ( IncompatibleClassChangeError ex ) {
             // yeah, saw this in the wild, who knows.
-            MainActivity.error( "wierd ex: " + ex, ex);
+            Logging.error( "wierd ex: " + ex, ex);
         }
     }
 
@@ -832,15 +833,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 uploadFile( state.dbHelper );
                 break;
             case QUICK_PAUSE_DIALOG:
-                MainActivity.info("quick pause callback");
+                Logging.info("quick pause callback");
                 toggleScan();
             default:
-                MainActivity.warn("ListFragment unhandled dialogId: " + dialogId);
+                Logging.warn("ListFragment unhandled dialogId: " + dialogId);
         }
     }
 
     public void uploadFile( final DatabaseHelper dbHelper ){
-        MainActivity.info( "upload file" );
+        Logging.info( "upload file" );
         final MainActivity main = MainActivity.getMainActivity(this);
         if (main == null) { return; }
         final State state = main.getState();
@@ -852,7 +853,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         try {
             state.observationUploader.startDownload(this);
         } catch (WiGLEAuthException waex) {
-            MainActivity.warn("Authentication failure on run upload");
+            Logging.warn("Authentication failure on run upload");
         }
     }
 
@@ -864,7 +865,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             throws WiGLEAuthException {
         final MainActivity main = MainActivity.getMainActivity( this );
         if (main == null) {
-            MainActivity.warn("No main for requestComplete");
+            Logging.warn("No main for requestComplete");
         }
         else {
             main.transferComplete();

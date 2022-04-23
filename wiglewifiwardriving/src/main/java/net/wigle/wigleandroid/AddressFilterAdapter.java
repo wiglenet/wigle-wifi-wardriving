@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.util.Logging;
+
 import java.util.ArrayList;
 
 /**
@@ -76,7 +78,7 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
                 if (position < list.size()) list.remove(position);
                 Gson gson = new Gson();
                 String serialized = gson.toJson(list.toArray());
-                MainActivity.info(serialized);
+                Logging.info(serialized);
                 final SharedPreferences.Editor editor = prefs.edit();
                 editor.putString(filterKey,serialized);
                 editor.apply();

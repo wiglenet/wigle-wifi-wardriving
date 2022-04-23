@@ -5,6 +5,7 @@ import net.wigle.wigleandroid.ProgressPanel;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -24,7 +25,6 @@ import androidx.fragment.app.FragmentManager;
 
 import java.io.File;
 
-import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.CSV_GZ_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
@@ -86,7 +86,7 @@ public class BackgroundGuiHandler extends Handler {
             }
 
             if ( msg.what >= Status.values().length || msg.what < 0 ) {
-                MainActivity.error( "msg.what: " + msg.what + " out of bounds on Status values");
+                Logging.error( "msg.what: " + msg.what + " out of bounds on Status values");
                 return;
             }
             final Status status = Status.values()[ msg.what ];
@@ -113,14 +113,14 @@ public class BackgroundGuiHandler extends Handler {
             // make sure we didn't lose this dialog this somewhere
             if ( pp != null ) {
                 try {
-                    MainActivity.info("fragment from pp: " + pp);
+                    Logging.info("fragment from pp: " + pp);
                     AbstractBackgroundTask.updateTransferringState(false, context);
                     pp.hide();
                     alertSettable.clearProgressDialog();
                 }
                 catch ( Exception ex ) {
                     // guess it wasn't there anyway
-                    MainActivity.info( "exception dismissing dialog/hiding progress: " + ex );
+                    Logging.info( "exception dismissing dialog/hiding progress: " + ex );
                 }
             }
             // Activity context
@@ -128,12 +128,12 @@ public class BackgroundGuiHandler extends Handler {
             final DialogFragment dialog = (DialogFragment) fm.findFragmentByTag(AbstractBackgroundTask.PROGRESS_TAG);
             if (dialog != null) {
                 try {
-                    MainActivity.info("fragment from dialog: " + dialog);
+                    Logging.info("fragment from dialog: " + dialog);
                     dialog.dismiss();
                 }
                 catch ( Exception ex ) {
                     // you can't dismiss what isn't there
-                    MainActivity.info( "exception dismissing fm dialog: " + ex );
+                    Logging.info( "exception dismissing fm dialog: " + ex );
                 }
             }
 
@@ -157,7 +157,7 @@ public class BackgroundGuiHandler extends Handler {
                                     File file = FileUtility.getKmlDownloadFile(this.context, removeFileExtension(fileName), filePath);
                                     if (file == null || !file.exists()) {
                                         showError(fm, msg, status);
-                                        MainActivity.error("UNABLE to export file - no access to " + filePath + " - " + fileName);
+                                        Logging.error("UNABLE to export file - no access to " + filePath + " - " + fileName);
                                         return;
                                     }
                                     Uri fileUri = FileProvider.getUriForFile(context,
@@ -171,15 +171,15 @@ public class BackgroundGuiHandler extends Handler {
                                     context.startActivity(Intent.createChooser(intent, context.getResources().getText(R.string.send_to)));
                                 } else {
                                     showError(fm, msg, status);
-                                    MainActivity.error("Null filePath - unable to share.");
+                                    Logging.error("Null filePath - unable to share.");
                                 }
                             } else {
                                 showError(fm, msg, status);
-                                MainActivity.error("null context - cannot generate intent to share KML");
+                                Logging.error("null context - cannot generate intent to share KML");
                             }
                         } catch (Exception ex) {
                             showError(fm, msg, status);
-                            MainActivity.error("Failed to send file intent: ", ex);
+                            Logging.error("Failed to send file intent: ", ex);
                         }
                     } else if (fileName.endsWith(CSV_GZ_EXT)) {
                         Intent intent = new Intent(Intent.ACTION_SEND);
@@ -189,7 +189,7 @@ public class BackgroundGuiHandler extends Handler {
                                 File file = FileUtility.getCsvGzFile(this.context, fileName);
                                 if (file == null || !file.exists()) {
                                     showError(fm, msg, status);
-                                    MainActivity.error("UNABLE to export CSV file - no access to " + fileName);
+                                    Logging.error("UNABLE to export CSV file - no access to " + fileName);
                                     return;
                                 }
                                 Uri fileUri = FileProvider.getUriForFile(context,
@@ -203,11 +203,11 @@ public class BackgroundGuiHandler extends Handler {
                                 context.startActivity(Intent.createChooser(intent, context.getResources().getText(R.string.send_to)));
                             } else {
                                 showError(fm, msg, status);
-                                MainActivity.error("null context - cannot generate intent to share CSV");
+                                Logging.error("null context - cannot generate intent to share CSV");
                             }
                         } catch (Exception ex) {
                             showError(fm, msg, status);
-                            MainActivity.error("Failed to send file intent: ", ex);
+                            Logging.error("Failed to send file intent: ", ex);
                         }
                     } else {
                         //Other file types get a default dialog
@@ -231,7 +231,7 @@ public class BackgroundGuiHandler extends Handler {
                 alertDialog.show(fm, "background-dialog");
             }
         } catch (IllegalStateException ex) {
-            MainActivity.warn("illegal state in background gui handler: ", ex);
+            Logging.warn("illegal state in background gui handler: ", ex);
         }
     }
     public static String composeDisplayMessage(Context context, String error, String filepath,
@@ -292,16 +292,16 @@ public class BackgroundGuiHandler extends Handler {
                         dialog.dismiss();
                     } catch ( Exception ex ) {
                         // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing alert dialog: " + ex );
+                        Logging.info( "exception dismissing alert dialog: " + ex );
                     }
 
                     if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
                             || status == Status.BAD_LOGIN.ordinal()) {
-                        MainActivity.info("dialog: start settings fragment");
+                        Logging.info("dialog: start settings fragment");
                         try {
                             MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
                         } catch (Exception ex) {
-                            MainActivity.info("failed to start settings fragment: " + ex, ex);
+                            Logging.info("failed to start settings fragment: " + ex, ex);
                         }
                     }
                 } });

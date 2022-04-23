@@ -27,6 +27,7 @@ import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -108,7 +109,7 @@ public class WifiReceiver extends BroadcastReceiver {
         this.ssidSpeaker.setListActivity( mainActivity );
         if (mainActivity != null) {
             prevScanPeriod = mainActivity.getLocationSetPeriod();
-            MainActivity.info("WifiReceiver setting prevScanPeriod: " + prevScanPeriod);
+            Logging.info("WifiReceiver setting prevScanPeriod: " + prevScanPeriod);
         }
     }
 
@@ -142,13 +143,13 @@ public class WifiReceiver extends BroadcastReceiver {
             results = wifiManager.getScanResults(); // return can be null!
         }
         catch (final SecurityException ex) {
-            MainActivity.info("security exception getting scan results: " + ex, ex);
+            Logging.info("security exception getting scan results: " + ex, ex);
         }
         catch (final Exception ex) {
             // ignore, happens on some vm's
-            MainActivity.info("exception getting scan results: " + ex, ex);
+            Logging.info("exception getting scan results: " + ex, ex);
         }
-        MainActivity.info("wifi receive, results: " + (results == null ? null : results.size()));
+        Logging.info("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -162,7 +163,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final long setPeriod = mainActivity.getLocationSetPeriod();
         if ( setPeriod != prevScanPeriod && mainActivity.isScanning() ) {
             // update our location scanning speed
-            MainActivity.info("setting location updates to: " + setPeriod);
+            Logging.info("setting location updates to: " + setPeriod);
             mainActivity.setLocationUpdates(setPeriod, 0f);
 
             prevScanPeriod = setPeriod;
@@ -188,7 +189,7 @@ public class WifiReceiver extends BroadcastReceiver {
         //    + " lastHaveLocationTime: " + lastHaveLocationTime);
         if (now - lastHaveLocationTime > 45000L) {
             // no location in a while, make sure we're subscribed to updates
-            MainActivity.info("no location for a while, setting location update period: " + setPeriod);
+            Logging.info("no location for a while, setting location update period: " + setPeriod);
             mainActivity.setLocationUpdates(setPeriod, 0f);
             // don't do this until another period has passed
             lastHaveLocationTime = now;
@@ -270,7 +271,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                         catch (final IndexOutOfBoundsException ex) {
                             // yes, this happened to someone
-                            MainActivity.info("WifiReceiver: index out of bounds: " + index + " ex: " + ex);
+                            Logging.info("WifiReceiver: index out of bounds: " + index + " ex: " + ex);
                         }
                     }
                 }
@@ -278,7 +279,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 if ( location != null  ) {
                     // if in fast mode, only add new-for-run stuff to the db queue
                     if ( fastMode && ! added ) {
-                        MainActivity.info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
+                        Logging.info( "in fast mode, not adding seen-this-run: " + network.getBssid() );
                     } else {
                         // loop for stress-testing
                         // for ( int i = 0; i < 10; i++ ) {
@@ -479,9 +480,9 @@ public class WifiReceiver extends BroadcastReceiver {
                     }
                 }*/
             } catch (SecurityException sex) {
-                MainActivity.warn("unable to scan cells due to permission issue: ", sex);
+                Logging.warn("unable to scan cells due to permission issue: ", sex);
             } catch (NullPointerException ex) {
-                MainActivity.warn("NPE on cell scan: ", ex);
+                Logging.warn("NPE on cell scan: ", ex);
             }
         }
         return networks;
@@ -498,11 +499,11 @@ public class WifiReceiver extends BroadcastReceiver {
     @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
         if (cellInfo == null) {
-            MainActivity.info("null cellInfo");
+            Logging.info("null cellInfo");
             // ignore
         } else {
             if (MainActivity.DEBUG_CELL_DATA) {
-                MainActivity.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
+                Logging.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
             }
             GsmOperator g = null;
             try {
@@ -528,7 +529,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         }
                         break;
                     default:
-                        MainActivity.warn("Unknown cell case: " + cellInfo.getClass().getSimpleName());
+                        Logging.warn("Unknown cell case: " + cellInfo.getClass().getSimpleName());
                         break;
                 }
             } catch (GsmOperatorException gsex) {
@@ -553,7 +554,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // ignore
         } else {
             if (MainActivity.DEBUG_CELL_DATA) {
-                MainActivity.info("NeighboringCellInfo:" +
+                Logging.info("NeighboringCellInfo:" +
                         "\n\tCID: " + cellInfo.getCid() +
                         "\n\tLAC: " + cellInfo.getLac() +
                         "\n\tType: " + cellInfo.getNetworkType() +
@@ -617,7 +618,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 //TODO: not sure if there's anything else we can do here
                 ssid = tele.getNetworkOperatorName();
             } catch ( Exception ex ) {
-                MainActivity.error("CDMA reflection exception: " + ex);
+                Logging.error("CDMA reflection exception: " + ex);
             }
         } else if ( cellLocation instanceof GsmCellLocation ) {
             GsmCellLocation gsmCellLocation = (GsmCellLocation) cellLocation;
@@ -640,7 +641,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 return null;
             }
         } else {
-            MainActivity.warn("Unhandled CellLocation type: "+cellLocation.getClass().getSimpleName());
+            Logging.warn("Unhandled CellLocation type: "+cellLocation.getClass().getSimpleName());
         }
 
         if ( bssid != null ) {
@@ -659,12 +660,12 @@ public class WifiReceiver extends BroadcastReceiver {
             }
 
             if (MainActivity.DEBUG_CELL_DATA) {
-                MainActivity.info("bssid: " + bssid);
-                MainActivity.info("strength: " + strength);
-                MainActivity.info("ssid: " + ssid);
-                MainActivity.info("capabilities: " + capabilities);
-                MainActivity.info("networkType: " + networkType);
-                MainActivity.info("location: " + location);
+                Logging.info("bssid: " + bssid);
+                Logging.info("strength: " + strength);
+                Logging.info("ssid: " + ssid);
+                Logging.info("capabilities: " + capabilities);
+                Logging.info("networkType: " + networkType);
+                Logging.info("location: " + location);
             }
 
             final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
@@ -769,7 +770,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         final String speak = builder.toString();
-        MainActivity.info( "speak: " + speak );
+        Logging.info( "speak: " + speak );
         if (! "".equals(speak)) {
             mainActivity.speak( builder.toString() );
         }
@@ -777,7 +778,7 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     public void setupWifiTimer( final boolean turnedWifiOn ) {
-        MainActivity.info( "create wifi timer" );
+        Logging.info( "create wifi timer" );
         if ( wifiTimer == null ) {
             wifiTimer = new Handler();
             final Runnable mUpdateTimeTask = new Runnable() {
@@ -800,7 +801,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         wifiTimer.postDelayed( this, period );
                     }
                     else {
-                        MainActivity.info( "finishing timer" );
+                        Logging.info( "finishing timer" );
                     }
                 }
             };
@@ -808,17 +809,17 @@ public class WifiReceiver extends BroadcastReceiver {
             wifiTimer.postDelayed( mUpdateTimeTask, 100 );
 
             if ( turnedWifiOn ) {
-                MainActivity.info( "not immediately running wifi scan, since it was just turned on"
+                Logging.info( "not immediately running wifi scan, since it was just turned on"
                         + " it will block for a few seconds and fail anyway");
             }
             else {
-                MainActivity.info( "start first wifi scan");
+                Logging.info( "start first wifi scan");
                 // starts scan, sends event when done
                 final boolean scanOK = doWifiScan();
                 if ( scanRequestTime <= 0 ) {
                     scanRequestTime = System.currentTimeMillis();
                 }
-                MainActivity.info( "startup finished. wifi scanOK: " + scanOK );
+                Logging.info( "startup finished. wifi scanOK: " + scanOK );
             }
         }
     }
@@ -876,7 +877,7 @@ public class WifiReceiver extends BroadcastReceiver {
                     success = wifiManager.startScan();
                 }
                 catch (Exception ex) {
-                    MainActivity.warn("exception starting scan: " + ex, ex);
+                    Logging.warn("exception starting scan: " + ex, ex);
                 }
                 if ( success ) {
                     scanInFlight = true;
@@ -889,13 +890,13 @@ public class WifiReceiver extends BroadcastReceiver {
                 lastScanResponseTime = now;
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
-                MainActivity.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
+                Logging.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
                 final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
                         ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
 
                 if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
-                    MainActivity.warn("Time since last scan: " + sinceLastScan + " milliseconds");
+                    Logging.warn("Time since last scan: " + sinceLastScan + " milliseconds");
                     if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
                         final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
                         if (!disableToast) {
@@ -908,7 +909,7 @@ public class WifiReceiver extends BroadcastReceiver {
                                 wifiManager.setWifiEnabled(true);
                             }
                         } catch (SecurityException ex) {
-                            MainActivity.info("exception resetting wifi: " + ex, ex);
+                            Logging.info("exception resetting wifi: " + ex, ex);
                         }
                         lastWifiUnjamTime = now;
                         if (prefs.getBoolean(ListFragment.PREF_SPEAK_WIFI_RESTART, true)) {
@@ -948,7 +949,7 @@ public class WifiReceiver extends BroadcastReceiver {
                         final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
                             + mainActivity.getString(R.string.battery_postfix);
                         WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
-                        MainActivity.warn("low battery, shutting down");
+                        Logging.warn("low battery, shutting down");
                         mainActivity.speak(text);
                         mainActivity.finishSoon(4000L, false);
                     }
@@ -976,7 +977,7 @@ public class WifiReceiver extends BroadcastReceiver {
             final int systemIdInt = cellIdentC.getSystemId();
 
             if ((Integer.MAX_VALUE == bssIdInt) || (Integer.MAX_VALUE == netIdInt) || (Integer.MAX_VALUE == systemIdInt)) {
-                MainActivity.info("Discarding CDMA cell with invalid ID");
+                Logging.info("Discarding CDMA cell with invalid ID");
                 return null;
             }
 
@@ -1003,7 +1004,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 res += "\n\tSSasu: " + asuLevel;
                 res += "\n\tEVDOdBm: " + cellStrengthC.getEvdoDbm();
                 res += "\n\tCDMAdBm: " + cellStrengthC.getCdmaDbm();
-                MainActivity.info(res);
+                Logging.info(res);
             }
             //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
             //  references http://niviuk.free.fr/cdma_band.php
@@ -1059,7 +1060,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 dbHelper.addObservation(network, location, newForRun);
             }
         } catch (SQLException sex) {
-            MainActivity.error("Error in add/update:", sex);
+            Logging.error("Error in add/update:", sex);
         }
         //ALIBI: allows us to run in conjunction with current-carrier detection
         return network;

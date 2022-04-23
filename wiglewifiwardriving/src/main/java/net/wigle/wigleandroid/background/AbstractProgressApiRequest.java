@@ -10,6 +10,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
                             } else if (json.has("credential_0")) {
                                 String message = "login failed for " +
                                         json.getString("credential_0");
-                                MainActivity.warn(message);
+                                Logging.warn(message);
                                 final Bundle bundle = new Bundle();
                                 sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
                             } else {
@@ -67,7 +68,7 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
                             final Bundle bundle = new Bundle();
                             sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
                         } catch (final Exception e) {
-                            MainActivity.error("Failed to log in " + e + " payload: " + json, e);
+                            Logging.error("Failed to log in " + e + " payload: " + json, e);
                             final Bundle bundle = new Bundle();
                             sendBundledMessage(Status.BAD_LOGIN.ordinal(), bundle);
                         }

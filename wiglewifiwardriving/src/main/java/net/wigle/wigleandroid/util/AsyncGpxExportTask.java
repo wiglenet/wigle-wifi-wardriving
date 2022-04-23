@@ -66,14 +66,14 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
             if ( hasSD ) {
                 final String basePath = FileUtility.getGpxPath();
                 if (null == basePath) {
-                    MainActivity.error("Unable to determine external GPX path");
+                    Logging.error("Unable to determine external GPX path");
                     return null;
                 }
                 final File path = new File( basePath );
                 //noinspection ResultOfMethodCallIgnored
                 path.mkdirs();
                 if (!path.exists()) {
-                    MainActivity.info("Got '!exists': " + path);
+                    Logging.info("Got '!exists': " + path);
                 }
                 String openString = basePath + name +  GPX_EXT;
                 //DEBUG: MainActivity.info("Opening file: " + openString);
@@ -84,7 +84,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                     gpxDestFile = new File(activity.getApplication().getFilesDir(),
                             name + GPX_EXT);
                 } else {
-                    MainActivity.error("set destination file due to null Activity in GPX export");
+                    Logging.error("set destination file due to null Activity in GPX export");
                 }
             }
             FileWriter writer = new FileWriter(gpxDestFile, false);
@@ -96,7 +96,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                     final PackageInfo pi = pm.getPackageInfo(activity.getApplicationContext().getPackageName(), 0);
                     creator += pi.versionName;
                 } else {
-                    MainActivity.error("unable to get packageManager due to null Activity in GPX export");
+                    Logging.error("unable to get packageManager due to null Activity in GPX export");
                 }
             } catch (Exception ex) {
                 creator += "(unknown)";
@@ -112,13 +112,13 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                 cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
             }
             long segmentCount = writeSegmentsWithCursor(writer, cursor, df, routeLocs[0]);
-            MainActivity.info("wrote "+segmentCount+" segments");
+            Logging.info("wrote "+segmentCount+" segments");
             writer.append(GPX_FOOTER);
             writer.flush();
             writer.close();
             return "completed export";
         } catch (IOException | DBException | InterruptedException e) {
-            MainActivity.error("Error writing GPX", e);
+            Logging.error("Error writing GPX", e);
         }
         return null;
     }
@@ -127,7 +127,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
         long lineCount = 0;
 
         for ( cursor.moveToFirst(); ! cursor.isAfterLast(); cursor.moveToNext() ) {
-            MainActivity.info("export: "+lineCount + " / "+totalCount);
+            Logging.info("export: "+lineCount + " / "+totalCount);
             //if (wasInterrupted()) {
             //    throw new InterruptedException("GPX export interrupted");
             //}
@@ -155,7 +155,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
     @Override
     protected void onPostExecute(String result) {
         if (null != result) { //launch task will exist with bg thread enqueued with null return
-            MainActivity.error("GPX POST EXECUTE: " + result);
+            Logging.error("GPX POST EXECUTE: " + result);
             if (pd.isShowing()) {
                 pd.dismiss();
             }
@@ -176,7 +176,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 activity.startActivity(Intent.createChooser(intent, activity.getResources().getText(R.string.send_to)));
             } else {
-                MainActivity.error("Unable to initiate GPX export - null context");
+                Logging.error("Unable to initiate GPX export - null context");
             }
         }
     }
@@ -194,7 +194,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
     @Override
     protected void onProgressUpdate(Integer... values) {
         if (values.length == 1) {
-            MainActivity.info("progress: "+values[0]);
+            Logging.info("progress: "+values[0]);
             if (values[0] > 0) {
                 if (100 == values[0]) {
                     if (pd.isShowing()) {
@@ -210,7 +210,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                 pd.setProgress(values[0]);
             }
         } else {
-            MainActivity.warn("too many values for GPX progress update");
+            Logging.warn("too many values for GPX progress update");
         }
     }
 }

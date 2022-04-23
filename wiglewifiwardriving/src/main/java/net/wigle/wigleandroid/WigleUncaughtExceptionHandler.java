@@ -1,11 +1,10 @@
 package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+
+import net.wigle.wigleandroid.util.Logging;
 
 public class WigleUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
     private final Context applicationContext;
@@ -19,7 +18,7 @@ public class WigleUncaughtExceptionHandler implements Thread.UncaughtExceptionHa
     @SuppressLint("ApplySharedPref")
     public void uncaughtException(Thread thread, Throwable throwable ) {
         String error = "Thread: " + thread + " throwable: " + throwable;
-        MainActivity.error( error );
+        Logging.error( error );
         throwable.printStackTrace();
 
         MainActivity.writeError( thread, throwable, applicationContext );

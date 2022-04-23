@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.QueryArgs;
 
@@ -82,7 +81,7 @@ public class SearchUtil {
                                 fail = context.getString(R.string.error_invalid_bssid);
                             } else {
                                 //DEBUG:
-                                MainActivity.info("text: "+text);
+                                Logging.info("text: "+text);
                                 okValue = true;
                             }
                         } else {
@@ -96,13 +95,13 @@ public class SearchUtil {
                                     && (text.charAt(text.length()-1) == ':')) {
                                 //remove trailing ':'s
                                 queryArgs.setBSSID(text.substring(0,text.length()-1));
-                                MainActivity.info("text: "+text);
+                                Logging.info("text: "+text);
                                 okValue = true;
                             } else if (text.length() < 8) {
                                 okValue = false;
                                 fail = context.getString(R.string.error_less_than_oui);
                             } else if (text.length() == 17) {
-                                MainActivity.info("text: "+text);
+                                Logging.info("text: "+text);
                                 okValue = true;
                             } else {
                                 okValue = false;
@@ -112,7 +111,7 @@ public class SearchUtil {
                         }
                         break;
                     default:
-                        MainActivity.error("setupButtons: bad id: " + id);
+                        Logging.error("setupButtons: bad id: " + id);
                 }
             } catch (Exception ex) {
                 fail = context.getString(R.string.problem_with_field) + " '" + field + "': " + ex.getMessage();

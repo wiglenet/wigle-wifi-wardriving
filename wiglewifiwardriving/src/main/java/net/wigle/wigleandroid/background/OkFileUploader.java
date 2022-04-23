@@ -2,10 +2,9 @@ package net.wigle.wigleandroid.background;
 
 import android.os.Handler;
 
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +82,7 @@ public class OkFileUploader {
             @Override
             public void onRequestProgress(long bytesWritten, long contentLength) {
                 int progress = (int)((bytesWritten*1000) / contentLength );
-                MainActivity.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
+                Logging.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
                 if ( handler != null && progress >= 0 ) {
                     //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
                     handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );

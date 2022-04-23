@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid.background;
 
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ public class CountingRequestBody extends RequestBody
         try {
             return delegate.contentLength();
         } catch (IOException e) {
-            MainActivity.error("Upload progress - content len error: ", e);
+            Logging.error("Upload progress - content len error: ", e);
         }
         return -1;
     }

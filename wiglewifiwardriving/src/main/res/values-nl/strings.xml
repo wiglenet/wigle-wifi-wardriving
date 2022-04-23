@@ -436,4 +436,6 @@
     <string name="throttle">WiFi-scannen is beperkt. Schakel WiFi Scan Throttle uit onder Ontwikkelaarsinstellingen voor betere prestaties.</string>
     <string name="no_individual_nets_map">Kaartnetweergave uitschakelen</string>
     <string name="filter_show_btle">Toon Bluetooth LE</string>
+    <string name="settings_gps_head">GPS-indstillinger</string>
+    <string name="enable_kalman">GPS-ruis filteren</string>
 </resources>

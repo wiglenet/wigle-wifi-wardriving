@@ -435,4 +435,6 @@
     <string name="throttle">Uchanganuzi wa WiFi ni mdogo. Zima Wifi Scan Throttle chini ya Mipangilio ya Wasanidi Programu kwa utendakazi bora.</string>
     <string name="no_individual_nets_map">Lemaza onyesho la wavu la ramani</string>
     <string name="filter_show_btle">Onyesha Bluetooth LE</string>
+    <string name="settings_gps_head">Mipangilio ya GPS</string>
+    <string name="enable_kalman">Chuja kelele ya GPS</string>
 </resources>

@@ -436,4 +436,6 @@
     <string name="throttle">A varredura WiFi é limitada. Desative o Acelerador de Varredura WiFi nas Configurações do Desenvolvedor para um melhor desempenho.</string>
     <string name="no_individual_nets_map">Desabilitar a exibição da rede do mapa</string>
     <string name="filter_show_btle">Mostrar Bluetooth LE</string>
+    <string name="settings_gps_head">Configurações de GPS</string>
+    <string name="enable_kalman">Filtrar ruído do GPS</string>
 </resources>

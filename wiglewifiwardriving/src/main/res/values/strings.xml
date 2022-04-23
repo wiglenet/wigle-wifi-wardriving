@@ -436,4 +436,6 @@
     <string name="throttle">WiFi scanning is limited. Disable "WiFi Scan Throttle" under Developer Settings for better performance.</string>
     <string name="no_individual_nets_map">Disable map net display</string>
     <string name="filter_show_btle">Show Bluetooth LE</string>
+    <string name="settings_gps_head">GPS Settings</string>
+    <string name="enable_kalman">Filter GPS noise</string>
 </resources>

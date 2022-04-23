@@ -435,4 +435,6 @@
     <string name="throttle">WiFiスキャンは制限されています。パフォーマンスを向上させるには、開発者設定でWiFiスキャンスロットルを無効にします。</string>
     <string name="no_individual_nets_map">マップネット表示を無効にする</string>
     <string name="filter_show_btle">BluetoothLEを表示する</string>
+    <string name="enable_kalman">GPSノイズをフィルターする</string>
+    <string name="settings_gps_head">GPS フィルタリング</string>
 </resources>

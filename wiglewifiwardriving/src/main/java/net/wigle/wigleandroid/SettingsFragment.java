@@ -557,6 +557,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
         SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
+
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, ListFragment.PREF_GPS_KALMAN_FILTER ,true);
+
         TextView appVersion = view.findViewById(R.id.app_version);
         final String appName = getString(R.string.app_name);
         if (null != appVersion) {

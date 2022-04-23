@@ -436,4 +436,6 @@
     <string name="throttle">WiFi 검색이 제한됩니다. 더 나은 성능을 위해 개발자 설정에서 WiFi 스캔 스로틀을 비활성화하십시오.</string>
     <string name="no_individual_nets_map">지도 네트 표시 비활성화</string>
     <string name="filter_show_btle">블루투스 LE 표시</string>
+    <string name="settings_gps_head">GPS 설정</string>
+    <string name="enable_kalman">GPS 노이즈 필터링</string>
 </resources>

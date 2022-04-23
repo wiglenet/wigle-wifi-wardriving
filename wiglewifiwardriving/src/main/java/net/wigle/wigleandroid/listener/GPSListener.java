@@ -7,6 +7,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.KalmanLatLong;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -25,7 +26,6 @@ import android.os.Bundle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 import androidx.core.content.ContextCompat;
 
@@ -44,6 +44,8 @@ public class GPSListener implements Listener, LocationListener {
     public static final float MACH_1_3_METERS_SEC = 445.9f; // compensate for use on vehicles up to the HB-88
     // ALIBI: excludes the snail-stumbling community until they work out weight/power supply problems
     public static final float SLOW_METERS_SEC = 0.025f;     // snails actually vary between 0.013m/s and 0.0028m/s
+    // ALIBI: maybe this is a happy medium for kalman filtering?
+    public static final float GOLDILOCKS_METERS_SEC = 3.0f;
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
@@ -59,10 +61,14 @@ public class GPSListener implements Listener, LocationListener {
     private LocationListener mapLocationListener;
     private int prevStatus = 0;
     private Location prevGpsLocation;
+    private final KalmanLatLong kalmanLatLong;
 
     public GPSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        this.kalmanLatLong = prefs.getBoolean(ListFragment.PREF_GPS_KALMAN_FILTER,true) ?
+                new KalmanLatLong(GOLDILOCKS_METERS_SEC): null;
     }
 
     public void setMapListener( LocationListener mapLocationListener ) {
@@ -113,7 +119,9 @@ public class GPSListener implements Listener, LocationListener {
     @Override
     public void onProviderEnabled( final String provider ) {
         MainActivity.info("provider enabled: " + provider);
-
+        if (null != kalmanLatLong) {
+            kalmanLatLong.reset();
+        }
         if ( mapLocationListener != null ) {
             mapLocationListener.onProviderEnabled( provider );
         }
@@ -137,8 +145,7 @@ public class GPSListener implements Listener, LocationListener {
     }
 
     /** newLocation can be null */
-    private void updateLocationData( final Location newLocation ) {
-
+    private void updateLocationData(final Location newLocation ) {
         /**
          * ALIBI: the location manager call's a non-starter if permission hasn't been granted.
          */
@@ -151,7 +158,6 @@ public class GPSListener implements Listener, LocationListener {
                         != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
 
         final LocationManager locationManager = (LocationManager)
@@ -170,6 +176,17 @@ public class GPSListener implements Listener, LocationListener {
         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, NET_LOC_TIMEOUT_DEFAULT);
 
         boolean newOK = newLocation != null;
+        if (null != newLocation && null != kalmanLatLong &&  kalmanLatLong.getAccuracy() < 0) {
+            kalmanLatLong.setState(newLocation.getLatitude(), newLocation.getLongitude(), newLocation.getAccuracy(), newLocation.getTime());
+        } else if (null != newLocation) {
+            if (null != kalmanLatLong) {
+                kalmanLatLong.process(newLocation.getLatitude(), newLocation.getLongitude(), newLocation.getAccuracy(), newLocation.getTime());
+                //DEBUG: MainActivity.error("KALMAN TEST: [lat: " + newLocation.getLatitude() + " v. (k):" +  kalmanLatLong.getLat() + " lon: " + newLocation.getLongitude() + " v. (k):" + kalmanLatLong.getLng() + "], acc(k): " + kalmanLatLong.getAccuracy() + " location prov: " + newLocation.getProvider());
+                //Testing: replace with smoothed
+                newLocation.setLatitude(kalmanLatLong.getLat());
+                newLocation.setLongitude(kalmanLatLong.getLng());
+            }
+        }
         final boolean locOK = locationOK( location, satCount, gpsTimeout, netLocTimeout );
         final long now = System.currentTimeMillis();
 
@@ -429,6 +446,11 @@ public class GPSListener implements Listener, LocationListener {
         return Collections.unmodifiableMap(cons);
     }
 
+    /**
+     * Provide string names for different GNSS constellations. Not i18n.
+     * @param constellationType
+     * @return the string matching the integer from the GnssStatus ints
+     */
     private String constellationToString(final int constellationType) {
         String con = "?";
         switch(constellationType) {
@@ -487,13 +509,14 @@ public class GPSListener implements Listener, LocationListener {
 
     /**
      * classify speed as realistic or unrealistic for distance calcs. mostly a stop-gap,
-     * Kalman filtering would be better. Disabled after practical testing problems.
+     * Disabled after practical testing problems.
      * @param distanceMeters meters travelled
      * @param timeDiffSecs time since previous measurement
      * @return true if the movement is realistically possible, false if it's obvious bunk
      */
     public static boolean realisticMovement(float distanceMeters, float timeDiffSecs, float lastAccuracyMeters, float currentAccuracyMeters) {
         if (distanceMeters == 0f) {
+            //ALIBI: small movements are likely to be noise.
             return false;
         }
 

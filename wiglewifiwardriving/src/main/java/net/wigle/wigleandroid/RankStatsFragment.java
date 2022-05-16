@@ -28,6 +28,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
@@ -102,7 +103,7 @@ public class RankStatsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("RANKSTATS: onCreate");
+        Logging.info("RANKSTATS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -124,7 +125,7 @@ public class RankStatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("RANKSTATS: onCreateView.a orientation: " + orientation);
+        Logging.info("RANKSTATS: onCreateView.a orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
         setupSwipeRefresh(rootView);
         setupListView(rootView);
@@ -140,7 +141,7 @@ public class RankStatsFragment extends Fragment {
             public void handleMessage(final Message msg) {
                 final Bundle bundle = msg.getData();
                 final boolean isCache = bundle.getBoolean(UserStatsFragment.KEY_IS_CACHE);
-                MainActivity.info("got user message, isCache: " + isCache);
+                Logging.info("got user message, isCache: " + isCache);
 
                 final SharedPreferences.Editor editor = prefs.edit();
                 editor.putLong( ListFragment.PREF_RANK, bundle.getLong(UserStatsFragment.KEY_RANK) );
@@ -171,12 +172,12 @@ public class RankStatsFragment extends Fragment {
 
     private void downloadRanks(final boolean isCache) {
         if (handler == null) {
-            MainActivity.error("downloadRanks: handler is null");
+            Logging.error("downloadRanks: handler is null");
             return;
         }
         final FragmentActivity fragmentActivity = getActivity();
         if (fragmentActivity == null) {
-            MainActivity.error("downloadRanks: fragmentActivity is null");
+            Logging.error("downloadRanks: fragmentActivity is null");
             return;
         }
         final boolean doMonthRanking = monthRanking.get();
@@ -215,7 +216,7 @@ public class RankStatsFragment extends Fragment {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
             //TODO: toast? *shouldn't* be authed, but a UserStats call may have been issued in error
-            MainActivity.info("Rank Stats Download Failed due to failed auth");
+            Logging.info("Rank Stats Download Failed due to failed auth");
         }
     }
 
@@ -285,9 +286,9 @@ public class RankStatsFragment extends Fragment {
     }
 
     private void handleRankStats(final JSONObject json, final Handler handler, final long selected) {
-        MainActivity.info("handleRankStats");
+        Logging.info("handleRankStats");
         if (json == null) {
-            MainActivity.info("handleRankStats null json, returning");
+            Logging.info("handleRankStats null json, returning");
             return;
         }
 
@@ -310,10 +311,10 @@ public class RankStatsFragment extends Fragment {
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
         } catch (final JSONException ex) {
             //TODO: better error for bundle
-            MainActivity.error("json error: " + ex, ex);
+            Logging.error("json error: " + ex, ex);
         } catch (final Exception e) {
             //TODO: better error for bundle
-            MainActivity.error("rank error: " + e, e);
+            Logging.error("rank error: " + e, e);
         }
 
         final Message message = new Message();
@@ -324,7 +325,7 @@ public class RankStatsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "RANKSTATS: onDestroy" );
+        Logging.info( "RANKSTATS: onDestroy" );
         finishing.set( true );
 
         super.onDestroy();
@@ -332,32 +333,32 @@ public class RankStatsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info("RANKSTATS: onResume");
+        Logging.info("RANKSTATS: onResume");
         super.onResume();
         getActivity().setTitle(R.string.rank_stats_app_name);
     }
 
     @Override
     public void onStart() {
-        MainActivity.info( "RANKSTATS: onStart" );
+        Logging.info( "RANKSTATS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "RANKSTATS: onPause" );
+        Logging.info( "RANKSTATS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "RANKSTATS: onStop" );
+        Logging.info( "RANKSTATS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("RANKSTATS: config changed");
+        Logging.info("RANKSTATS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 

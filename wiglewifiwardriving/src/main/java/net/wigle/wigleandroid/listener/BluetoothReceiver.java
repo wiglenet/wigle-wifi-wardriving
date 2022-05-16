@@ -31,6 +31,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
@@ -167,7 +168,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 public void onScanResult(int callbackType, ScanResult scanResult) {
                     final GPSListener gpsListener = mainActivity.getGPSListener();
                     //DEBUG:
-                    MainActivity.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
+                    Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
                     Location location = null;
                     if (gpsListener != null) {
                         final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
@@ -175,7 +176,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                         location = gpsListener.getLocation();
                     } else {
-                        MainActivity.warn("Null gpsListener in LE Single Scan Result");
+                        Logging.warn("Null gpsListener in LE Single Scan Result");
                     }
 
                     handleLeScanResult(scanResult, location, false);
@@ -191,7 +192,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     long diff = responseClockTime - lastLeBatchResponseTime.longValue();
                     lastLeBatchResponseTime.set(responseClockTime);
                     if (diff < MIN_LE_BATCH_GAP) {
-                        MainActivity.warn("Tried to update BTLE batch in improbably short time: "+diff);
+                        Logging.warn("Tried to update BTLE batch in improbably short time: "+diff);
                         return;
                     }
                     //MainActivity.info("LE Batch results: " + results);
@@ -226,7 +227,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     if (gpsListener != null) {
                         location = gpsListener.checkGetLocation(prefs);
                     } else {
-                        MainActivity.warn("Null gpsListener in LE Batch Scan Result");
+                        Logging.warn("Null gpsListener in LE Batch Scan Result");
                     }
 
                     for (final ScanResult scanResult : results) {
@@ -252,13 +253,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 public void onScanFailed(int errorCode) {
                     switch (errorCode) {
                         case SCAN_FAILED_ALREADY_STARTED:
-                            MainActivity.info("BluetoothLE Scan already started");
+                            Logging.info("BluetoothLE Scan already started");
                             break;
                         default:
                             if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
                                 listAdapter.clearBluetoothLe();
                             }
-                            MainActivity.error("Bluetooth LE scan error: " + errorCode);
+                            Logging.error("Bluetooth LE scan error: " + errorCode);
                             scanning.set(false);
                     }
                 }
@@ -300,7 +301,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
 
                     if (DEBUG_BLUETOOTH_DATA) {
-                        MainActivity.info("LE deviceName: " + ssid
+                        Logging.info("LE deviceName: " + ssid
                                         + "\n\taddress: " + bssid
                                         + "\n\tname: " + scanRecord.getDeviceName() + " (vs. " + device.getName() + ")"
                                         //+ "\n\tadName: " + adDeviceName
@@ -354,7 +355,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
                 }
             } catch (SecurityException se) {
-                MainActivity.warn("failing to perform BTLE scans: BT perms not granted", se);
+                Logging.warn("failing to perform BTLE scans: BT perms not granted", se);
             }
         }
     }
@@ -374,14 +375,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             lastDiscoveryAt = System.currentTimeMillis();
         } else {
             if (DEBUG_BLUETOOTH_DATA) {
-                MainActivity.info("skipping bluetooth scan; discover already in progress (last scan started "+(System.currentTimeMillis()-lastDiscoveryAt)+"ms ago)");
+                Logging.info("skipping bluetooth scan; discover already in progress (last scan started "+(System.currentTimeMillis()-lastDiscoveryAt)+"ms ago)");
             }
         }
 
         if (Build.VERSION.SDK_INT >= 21) {
             final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
             if (bluetoothLeScanner == null) {
-                MainActivity.info("bluetoothLeScanner is null");
+                Logging.info("bluetoothLeScanner is null");
             }  else {
                 if (scanning.compareAndSet(false, true)) {
                     final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
@@ -389,7 +390,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
                     //  this is effectively how often we update the display
                     scanSettingsBuilder.setReportDelay(15000);
-                    MainActivity.error("START BLE SCANs");
+                    Logging.error("START BLE SCANs");
                     bluetoothLeScanner.startScan(
                             Collections.<ScanFilter>emptyList(), scanSettingsBuilder.build(), scanCallback);
 
@@ -411,7 +412,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         if (DEBUG_BLUETOOTH_DATA) {
             if (adUuidNoScanUuid > 0 || scanUuidNoAdUuid > 0) {
-                MainActivity.error("AD but No Scan UUID: "+ adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
+                Logging.error("AD but No Scan UUID: "+ adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
             }
         }
     }
@@ -435,10 +436,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
                 if (bluetoothLeScanner != null) {
                     if (scanning.compareAndSet(true, false)) {
-                        MainActivity.error("STOPPING BLE SCANS");
+                        Logging.error("STOPPING BLE SCANS");
                         bluetoothLeScanner.stopScan(scanCallback);
                     } else {
-                        MainActivity.error("Scanner present, comp-and-set prevented stop-scan");
+                        Logging.error("Scanner present, comp-and-set prevented stop-scan");
                     }
                 }
             }
@@ -456,7 +457,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         if (m != null) {
             final SharedPreferences prefs = m.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             if (null == intent) {
-                MainActivity.error("null intent in Bluetooth onReceive");
+                Logging.error("null intent in Bluetooth onReceive");
                 return;
             }
             final String action = intent.getAction();
@@ -465,7 +466,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device == null) {
                     // as reported in bug feed
-                    MainActivity.error("onReceive with null device - discarding this instance");
+                    Logging.error("onReceive with null device - discarding this instance");
                     return;
                 }
                 latestBt.add(device.getAddress());
@@ -501,7 +502,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         log += "\n\ttype:" + device.getType();
                     }
 
-                    MainActivity.info(log);
+                    Logging.info(log);
                 }
 
                 final String capabilities = DEVICE_TYPE_LEGEND.get(type)
@@ -517,7 +518,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                     location = gpsListener.getLocation();
                 } else {
-                    MainActivity.warn("null gpsListener in BTR onReceive");
+                    Logging.warn("null gpsListener in BTR onReceive");
                 }
 
                 //ALIBI: shamelessly re-using frequency here for device type.
@@ -551,7 +552,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             try {
                 listAdapter.sort(NetworkListSorter.getSort(prefs));
             } catch (IllegalArgumentException ex) {
-                MainActivity.error("sort failed: ",ex);
+                Logging.error("sort failed: ",ex);
             }
         }
     }
@@ -577,7 +578,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      * @param turnedBtOn
      */
     public void setupBluetoothTimer( final boolean turnedBtOn ) {
-        MainActivity.info( "create Bluetooth timer" );
+        Logging.info( "create Bluetooth timer" );
         final MainActivity m = mainActivity.get();
         if ( bluetoothTimer == null) {
             bluetoothTimer = new Handler();
@@ -602,7 +603,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         bluetoothTimer.postDelayed( this, period );
                     }
                     else {
-                        MainActivity.info( "finishing timer" );
+                        Logging.info( "finishing timer" );
                     }
                 }
             };
@@ -610,18 +611,18 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             bluetoothTimer.postDelayed( mUpdateTimeTask, 100 );
 
             if ( turnedBtOn ) {
-                MainActivity.info( "not immediately running BT scan, since it was just turned on"
+                Logging.info( "not immediately running BT scan, since it was just turned on"
                         + " it will block for a few seconds and fail anyway");
             }
             else {
-                MainActivity.info( "start first bluetooth scan");
+                Logging.info( "start first bluetooth scan");
                 // starts scan, sends event when done
                 final boolean scanOK = doBluetoothScan();
 
                 if ( scanRequestTime <= 0 ) {
                     scanRequestTime = System.currentTimeMillis();
                 }
-                MainActivity.info( "startup finished. BT scanOK: " + scanOK );
+                Logging.info( "startup finished. BT scanOK: " + scanOK );
             }
         }
     }
@@ -636,7 +637,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         m.bluetoothScan();
                         //bluetoothManager.startScan();
                     } catch (Exception ex) {
-                        MainActivity.warn("exception starting bt scan: " + ex, ex);
+                        Logging.warn("exception starting bt scan: " + ex, ex);
                     }
                     if (success) {
                         scanInFlight = true;
@@ -677,7 +678,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         final String text = m.getString(R.string.battery_at) + " " + batteryLevel + " "
                                 + m.getString(R.string.battery_postfix);
                         WiGLEToast.showOverActivity(m, R.string.error_general, text);
-                        MainActivity.warn("low battery, shutting down");
+                        Logging.warn("low battery, shutting down");
                         m.speak(text);
                         m.finishSoon(4000L, false);
                     }
@@ -729,7 +730,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         if (newForRun && network != null) {
             //ALIBI: sanity check used in debugging
-            MainActivity.warn("runNetworks not working as expected (add -> true, but networkCache already contained)");
+            Logging.warn("runNetworks not working as expected (add -> true, but networkCache already contained)");
         }
 
         boolean deviceTypeUpdate = false;

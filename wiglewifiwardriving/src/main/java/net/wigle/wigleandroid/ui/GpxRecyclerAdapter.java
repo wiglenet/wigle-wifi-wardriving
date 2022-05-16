@@ -20,6 +20,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.PolylineRoute;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
@@ -162,7 +163,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                     final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
                     final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context ,prefs);
                     if (null == routeCursor) {
-                        MainActivity.info("null route cursor; not mapping");
+                        Logging.info("null route cursor; not mapping");
                     } else {
                         PolylineRoute newRoute = new PolylineRoute();
                         for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
@@ -171,24 +172,24 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
                             //final long time = routeCursor.getLong(2);
                             newRoute.addLatLng(lat, lon, mapMode, nightMode);
                         }
-                        MainActivity.info("Loaded route with " + newRoute.getSegments() + " segments");
+                        Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
                         configurable.configureMapForRoute(newRoute);
                     }
                 } catch (Exception e) {
-                    MainActivity.error("Unable to add route: ",e);
+                    Logging.error("Unable to add route: ",e);
                 }
             }
         });
         holder.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.info("share route "+clickedId);
+                Logging.info("share route "+clickedId);
                 routeSelector.setRouteToExport(clickedId);
                 if (null != context) {
                     MainActivity.createConfirmation(fragmentActivity,
                             context.getString(R.string.export_gpx_detail), R.id.nav_data, EXPORT_GPX_DIALOG);
                 } else {
-                    MainActivity.error("unable to get fragment activity");
+                    Logging.error("unable to get fragment activity");
                 }
 
             }

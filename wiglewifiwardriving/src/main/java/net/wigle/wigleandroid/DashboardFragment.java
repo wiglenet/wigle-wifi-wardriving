@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.listener.GPSListener;
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -41,7 +42,7 @@ public class DashboardFragment extends Fragment {
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
-    MainActivity.info("DASH: onCreate");
+    Logging.info("DASH: onCreate");
     super.onCreate( savedInstanceState );
     setHasOptionsMenu(true);
     Activity activity = getActivity();
@@ -51,7 +52,7 @@ public class DashboardFragment extends Fragment {
         // media volume
         getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
     } else {
-        MainActivity.error("Failed to set language - null activity in dash onCreate.");
+        Logging.error("Failed to set language - null activity in dash onCreate.");
     }
     finishing = new AtomicBoolean( false );
     Configuration sysConfig = getResources().getConfiguration();
@@ -73,7 +74,7 @@ public class DashboardFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final int orientation = getResources().getConfiguration().orientation;
-    MainActivity.info("DASH: onCreateView. orientation: " + orientation);
+    Logging.info("DASH: onCreateView. orientation: " + orientation);
     scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
     landscape = inflater.inflate(R.layout.dashlandscape, container, false);
     portrait = inflater.inflate(R.layout.dashportrait, container, false);
@@ -106,13 +107,13 @@ public class DashboardFragment extends Fragment {
                     updateUI(view);
                 }
             } catch (Exception e) {
-                MainActivity.error("failed to update dash UI: ",e);
+                Logging.error("failed to update dash UI: ",e);
             }
             final long period = 1000L;
             // info("wifitimer: " + period );
             timer.postDelayed( this, period );
         } else {
-          MainActivity.info( "finishing mapping timer" );
+          Logging.info( "finishing mapping timer" );
         }
     }
   };
@@ -299,7 +300,7 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onDestroy() {
-    MainActivity.info( "DASH: onDestroy" );
+    Logging.info( "DASH: onDestroy" );
     finishing.set( true );
 
     super.onDestroy();
@@ -307,7 +308,7 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onResume() {
-    MainActivity.info( "DASH: onResume" );
+    Logging.info( "DASH: onResume" );
     super.onResume();
     setupTimer();
     getActivity().setTitle(R.string.dashboard_app_name);
@@ -315,25 +316,25 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onStart() {
-    MainActivity.info( "DASH: onStart" );
+    Logging.info( "DASH: onStart" );
     super.onStart();
   }
 
   @Override
   public void onPause() {
-    MainActivity.info( "DASH: onPause" );
+    Logging.info( "DASH: onPause" );
     super.onPause();
   }
 
   @Override
   public void onStop() {
-    MainActivity.info( "DASH: onStop" );
+    Logging.info( "DASH: onStop" );
     super.onStop();
   }
 
   @Override
   public void onConfigurationChanged( final Configuration newConfig ) {
-    MainActivity.info( "DASH: config changed" );
+    Logging.info( "DASH: config changed" );
     switchView();
     super.onConfigurationChanged( newConfig );
   }

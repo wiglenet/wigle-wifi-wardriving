@@ -13,6 +13,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,7 +81,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             connectURL = new URL( urlString );
         }
         catch( Exception ex ) {
-            MainActivity.error( "MALFORMED URL: " + ex, ex );
+            Logging.error( "MALFORMED URL: " + ex, ex );
             return null;
         }
 
@@ -151,9 +152,9 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
 
         // connect
-        MainActivity.info( "about to connect" );
+        Logging.info( "about to connect" );
         conn.connect();
-        MainActivity.info( "connected" );
+        Logging.info( "connected" );
 
         return conn;
     }
@@ -167,13 +168,13 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         if (FileUtility.hasSD()) {
             file = new File(FileUtility.getSDPath() + outputFileName);
             if (!file.exists() || !file.canRead()) {
-                MainActivity.warn("External cache file doesn't exist or can't be read: " + file);
+                Logging.warn("External cache file doesn't exist or can't be read: " + file);
                 return null;
             }
         } else {
             file = new File(context.getCacheDir(), outputFileName);
             if (!file.exists() || !file.canRead()) {
-                MainActivity.warn("App-internal cache file doesn't exist or can't be read: " + file);
+                Logging.warn("App-internal cache file doesn't exist or can't be read: " + file);
                 return null;
             }
         }
@@ -192,14 +193,14 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             json = new JSONObject(result.toString());
         }
         catch (final Exception ex) {
-            MainActivity.error("Exception reading cache file: " + ex, ex);
+            Logging.error("Exception reading cache file: " + ex, ex);
         }
         finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (final IOException ex) {
-                    MainActivity.error("exception closing br: " + ex, ex);
+                    Logging.error("exception closing br: " + ex, ex);
                 }
             }
         }
@@ -220,7 +221,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             ObservationUploader.writeFos(fos, result);
         }
         catch (final IOException ex) {
-            MainActivity.error("exception caching result: " + ex, ex);
+            Logging.error("exception caching result: " + ex, ex);
         }
         finally {
             if (fos != null) {
@@ -228,7 +229,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                     fos.close();
                 }
                 catch (final IOException ex) {
-                    MainActivity.error("exception closing fos: " + ex, ex);
+                    Logging.error("exception closing fos: " + ex, ex);
                 }
             }
         }
@@ -253,13 +254,13 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
         final String username = prefs.getString(ListFragment.PREF_USERNAME, null);
         final String password = prefs.getString(ListFragment.PREF_PASSWORD, null);
-        MainActivity.info("authname: " + authname);
+        Logging.info("authname: " + authname);
         if (beAnonymous && requiresLogin) {
-            MainActivity.info("anonymous, not running ApiRequest: " + this);
+            Logging.info("anonymous, not running ApiRequest: " + this);
             return;
         }
         if (authname == null && username != null && password != null && doBasicLogin) {
-            MainActivity.info("No authname but have username, going to request token");
+            Logging.info("No authname but have username, going to request token");
             downloadTokenAndStart(fragment);
         } else {
             start();
@@ -322,7 +323,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             printout.flush();
             printout.close();
         } else if (ApiDownloader.REQUEST_GET.equals(connectionMethod)) {
-            MainActivity.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
+            Logging.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
         }
 
         // get response data
@@ -336,7 +337,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                 input.close();
             }
             catch (final Exception ex) {
-                MainActivity.warn("Exception closing downloader reader: " + ex, ex);
+                Logging.warn("Exception closing downloader reader: " + ex, ex);
             }
         }
     }
@@ -372,16 +373,16 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                             } else if (json.has("credential_0")) {
                                 String message = "login failed for " +
                                         json.getString("credential_0");
-                                MainActivity.warn(message);
+                                Logging.warn(message);
                                 throw new WiGLEAuthException(message);
                             } else {
                                 throw new WiGLEAuthException("Unable to log in.");
                             }
                         } catch (final JSONException ex) {
-                            MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                            Logging.warn("json exception: " + ex + " json: " + json, ex);
                             throw new WiGLEAuthException("Unable to log in.");
                         } catch (final Exception e) {
-                            MainActivity.warn("response exception: " + e + " json: " + json, e);
+                            Logging.warn("response exception: " + e + " json: " + json, e);
                             throw new WiGLEAuthException("Unable to log in.");
                         }
                     }

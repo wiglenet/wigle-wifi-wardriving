@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.LocationCsv;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.NetworkCsv;
 import net.wigle.wigleandroid.util.FileUtility;
 
@@ -76,10 +77,10 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                     } else if (!headerTwoChecked) {
                         if (line.contains(CSV_COLUMN_HEADERS)) {
                             //DEBUG:
-                            MainActivity.info("header validated - WiGLE CSV.");
+                            Logging.info("header validated - WiGLE CSV.");
                             headerTwoChecked = true;
                         } else {
-                            MainActivity.error("CSV header check failed: " + line);
+                            Logging.error("CSV header check failed: " + line);
                         }
                     } else {
                         try {
@@ -88,11 +89,11 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                             dbHelper.blockingAddExternalObservation(network, location, true);
                             addedNetworks++;
                         } catch (Exception ex) {
-                            MainActivity.error("Failed to insert external network.", ex);
+                            Logging.error("Failed to insert external network.", ex);
                         }
                     }
                 }
-                MainActivity.info("file " + outputFileName + " added " + addedNetworks + " networks to DB.");
+                Logging.info("file " + outputFileName + " added " + addedNetworks + " networks to DB.");
 
                 final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
                         FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT) + "\", added: "+addedNetworks+"}");
@@ -112,11 +113,11 @@ public class CsvDownloader extends AbstractProgressApiRequest {
         } catch (final JSONException ex) {
             bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
-            MainActivity.error("ex: " + ex + " result: " + result, ex);
+            Logging.error("ex: " + ex + " result: " + result, ex);
         } catch (final Exception e) {
             bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
-            MainActivity.error("ex: " + e + " result: " + result +" file: " +outputFileName , e);
+            Logging.error("ex: " + e + " result: " + result +" file: " +outputFileName , e);
         }
     }
 
@@ -155,12 +156,12 @@ public class CsvDownloader extends AbstractProgressApiRequest {
                 out.finish();
                 out.close();
                 boolean success = intermediate.delete();
-                MainActivity.info("deleted: ["+success+"] intermediate file "+outputIntermediate + " completed export to "+compressedFile);
+                Logging.info("deleted: ["+success+"] intermediate file "+outputIntermediate + " completed export to "+compressedFile);
             } else {
-                MainActivity.error("Unable to get file location for "+outputIntermediate);
+                Logging.error("Unable to get file location for "+outputIntermediate);
             }
         } else {
-            MainActivity.info("No compression requested; output "+outputIntermediate);
+            Logging.info("No compression requested; output "+outputIntermediate);
         }
 
     }

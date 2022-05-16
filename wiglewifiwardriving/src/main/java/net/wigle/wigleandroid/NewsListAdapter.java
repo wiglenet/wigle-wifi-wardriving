@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.model.NewsItem;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * the array adapter for a list of uploads.
@@ -36,7 +37,7 @@ public final class NewsListAdapter extends AbstractListAdapter<NewsItem> {
         }
         catch ( final IndexOutOfBoundsException ex ) {
             // yes, this happened to someone
-            MainActivity.info("index out of bounds: " + position + " ex: " + ex);
+            Logging.info("index out of bounds: " + position + " ex: " + ex);
             return row;
         }
 

@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * Display that magic WiGLE toast
@@ -50,7 +50,7 @@ public class WiGLEToast {
                 toast.setView(layout);
                 toast.show();
             } else {
-                MainActivity.info("toast disabled because 7.1.x bombs: " + messageString);
+                Logging.info("toast disabled because 7.1.x bombs: " + messageString);
             }
         }
     }

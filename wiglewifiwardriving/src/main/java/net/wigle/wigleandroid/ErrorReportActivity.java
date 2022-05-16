@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * display latest error stack, if any.
@@ -91,7 +92,7 @@ public class ErrorReportActivity extends AppCompatActivity {
                             }
                             catch ( Exception ex ) {
                                 // guess it wasn't there anyways
-                                MainActivity.info( "exception dismissing alert dialog: " + ex );
+                                Logging.info( "exception dismissing alert dialog: " + ex );
                             }
                         } });
 
@@ -101,7 +102,7 @@ public class ErrorReportActivity extends AppCompatActivity {
                         }
                     }
                     catch ( WindowManager.BadTokenException windowEx ) {
-                        MainActivity.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
+                        Logging.info("window probably gone when trying to display dialog. windowEx: " + windowEx, windowEx );
                     }
                 }
             };
@@ -112,7 +113,7 @@ public class ErrorReportActivity extends AppCompatActivity {
     }
 
     private void shutdownRestOfApp() {
-        MainActivity.info( "ErrorReportActivity: shutting down app" );
+        Logging.info( "ErrorReportActivity: shutting down app" );
         // shut down anything we can get a handle to
         final MainActivity mainActivity = MainActivity.getMainActivity();
         if ( mainActivity != null ) {
@@ -143,14 +144,14 @@ public class ErrorReportActivity extends AppCompatActivity {
                 return builder.toString();
             }
         } catch ( IOException ex ) {
-            MainActivity.error( "error reading stack file: " + ex, ex );
+            Logging.error( "error reading stack file: " + ex, ex );
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
                 }
                 catch (IOException ex) {
-                    MainActivity.error( "error closing stack file: " + ex, ex );
+                    Logging.error( "error closing stack file: " + ex, ex );
                 }
             }
         }
@@ -159,7 +160,7 @@ public class ErrorReportActivity extends AppCompatActivity {
     }
 
     private void setupEmail(final String stack, final String stackFile ) {
-        MainActivity.info( "ErrorReport onCreate" );
+        Logging.info( "ErrorReport onCreate" );
         final Intent emailIntent = new Intent( android.content.Intent.ACTION_SEND );
         emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"wiwiwa@wigle.net"} );
         emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "WigleWifi error report" );
@@ -174,9 +175,9 @@ public class ErrorReportActivity extends AppCompatActivity {
         try {
             startActivity(chooserIntent);
         } catch (final ActivityNotFoundException ex) {
-            MainActivity.warn("No email activity found: " + ex.getLocalizedMessage(), ex);
+            Logging.warn("No email activity found: " + ex.getLocalizedMessage(), ex);
         } catch (final RuntimeException re) {
-            MainActivity.warn("Runtime exception trying to send stack intent [stack: "+
+            Logging.warn("Runtime exception trying to send stack intent [stack: "+
                     (null!=stack?stack.length():"(none)")+" file:"+stackFile+"]; ", re);
         }
     }

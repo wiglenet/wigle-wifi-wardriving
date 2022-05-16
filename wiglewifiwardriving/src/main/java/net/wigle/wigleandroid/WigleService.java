@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,6 +20,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -49,7 +49,7 @@ public final class WigleService extends Service {
                 MainActivity.sleep( 15000L );
                 setupNotification();
             }
-            MainActivity.info("GuardThread done");
+            Logging.info("GuardThread done");
         }
     }
 
@@ -71,19 +71,19 @@ public final class WigleService extends Service {
 
     @Override
     public IBinder onBind( final Intent intent ) {
-        MainActivity.info( "service: onbind. intent: " + intent );
+        Logging.info( "service: onbind. intent: " + intent );
         return wigleServiceBinder;
     }
 
     @Override
     public void onRebind( final Intent intent ) {
-        MainActivity.info( "service: onRebind. intent: " + intent );
+        Logging.info( "service: onRebind. intent: " + intent );
         super.onRebind( intent );
     }
 
     @Override
     public boolean onUnbind( final Intent intent ) {
-        MainActivity.info( "service: onUnbind. intent: " + intent );
+        Logging.info( "service: onUnbind. intent: " + intent );
         shutdownNotification();
         stopSelf();
         return super.onUnbind( intent );
@@ -94,7 +94,7 @@ public final class WigleService extends Service {
      */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        MainActivity.info("service: onTaskRemoved.");
+        Logging.info("service: onTaskRemoved.");
         if (! done.get()) {
             final MainActivity mainActivity = MainActivity.getMainActivity();
             if (mainActivity != null) {
@@ -105,12 +105,12 @@ public final class WigleService extends Service {
         shutdownNotification();
         stopSelf();
         super.onTaskRemoved(rootIntent);
-        MainActivity.info("service: onTaskRemoved complete.");
+        Logging.info("service: onTaskRemoved complete.");
     }
 
     @Override
     public void onCreate() {
-        MainActivity.info( "service: onCreate" );
+        Logging.info( "service: onCreate" );
 
         setupNotification();
 
@@ -122,7 +122,7 @@ public final class WigleService extends Service {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "service: onDestroy" );
+        Logging.info( "service: onDestroy" );
         // Make sure our notification is gone.
         shutdownNotification();
         setDone();
@@ -132,7 +132,7 @@ public final class WigleService extends Service {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        MainActivity.info( "service: onLowMemory" );
+        Logging.info( "service: onLowMemory" );
     }
 
     //This is the old onStart method that will be called on the pre-2.0
@@ -141,14 +141,14 @@ public final class WigleService extends Service {
     @SuppressWarnings("deprecation")
     @Override
     public void onStart( Intent intent, int startId ) {
-        MainActivity.info( "service: onStart" );
+        Logging.info( "service: onStart" );
         handleCommand( intent );
         setupNotification();
     }
 
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
-        MainActivity.info( "service: onStartCommand" );
+        Logging.info( "service: onStartCommand" );
         handleCommand( intent );
         setupNotification();
         // We want this service to continue running until it is explicitly
@@ -157,7 +157,7 @@ public final class WigleService extends Service {
     }
 
     private void handleCommand( Intent intent ) {
-        MainActivity.info( "service: handleCommand: intent: " + intent );
+        Logging.info( "service: handleCommand: intent: " + intent );
         setupNotification();
     }
 
@@ -243,18 +243,18 @@ public final class WigleService extends Service {
                             notificationManager.notify(NOTIFICATION_ID, notification);
                         }
                         else {
-                            MainActivity.info("service startForeground");
+                            Logging.info("service startForeground");
                             startForeground(NOTIFICATION_ID, notification);
                         }
                     } catch (Exception ex) {
-                        MainActivity.error("notification service error: ", ex);
+                        Logging.error("notification service error: ", ex);
                     }
                 } else {
-                    MainActivity.info("null notification - skipping startForeground");
+                    Logging.info("null notification - skipping startForeground");
                 }
             }
         } catch (Exception ex) {
-            MainActivity.error("trapped notification exception out outer level - ",ex);
+            Logging.error("trapped notification exception out outer level - ",ex);
         }
     }
 
@@ -264,7 +264,7 @@ public final class WigleService extends Service {
             return false;
         }
         final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
-        MainActivity.info("Service is foreground: " + isForeground);
+        Logging.info("Service is foreground: " + isForeground);
         return isForeground;
     }
 
@@ -299,7 +299,7 @@ public final class WigleService extends Service {
             //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
             return builder.build();
         } catch (NullPointerException npe) {
-            MainActivity.error("NPE trying to build notification. " + npe.getMessage());
+            Logging.error("NPE trying to build notification. " + npe.getMessage());
             return null;
         }
 

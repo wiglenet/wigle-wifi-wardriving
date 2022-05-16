@@ -84,7 +84,7 @@ public class SettingsUtil {
         } else if (periods instanceof Integer[] ) {
             period = prefs.getInt( pref, (Integer) spinDefault);
         } else {
-            MainActivity.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
+            Logging.error("unhandled object type array: " + Arrays.toString(periods) + " class: " + periods.getClass());
         }
 
         if (period == null) {
@@ -114,7 +114,7 @@ public class SettingsUtil {
                 } else if (period instanceof Integer) {
                     editor.putInt(pref, (Integer)period);
                 } else {
-                    MainActivity.error("unhandled object type: " + period + " class: " + period.getClass());
+                    Logging.error("unhandled object type: " + period + " class: " + period.getClass());
                 }
                 editor.apply();
 
@@ -159,7 +159,7 @@ public class SettingsUtil {
                 termIndex = i;
             }
         }
-        MainActivity.info("current selection: "+term +": ("+termIndex+")");
+        Logging.info("current selection: "+term +": ("+termIndex+")");
         adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
         spinner.setAdapter( adapter );
         spinner.setSelection( termIndex );
@@ -168,7 +168,7 @@ public class SettingsUtil {
             public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
                 // set pref
                 final String period = terms[position];
-                MainActivity.info( pref + " setting map data: " + period );
+                Logging.info( pref + " setting map data: " + period );
                 editor.putString( pref, period );
                 editor.apply();
                 LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);

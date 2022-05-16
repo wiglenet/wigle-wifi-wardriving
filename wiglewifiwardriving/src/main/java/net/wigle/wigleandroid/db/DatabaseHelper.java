@@ -5,7 +5,7 @@ package net.wigle.wigleandroid.db;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
-import static net.wigle.wigleandroid.MainActivity.info;
+import static net.wigle.wigleandroid.util.Logging.info;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
 import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
@@ -36,6 +36,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.content.Context;
 import android.content.Intent;
@@ -287,7 +288,7 @@ public final class DatabaseHelper extends Thread {
             final Bundle bundle = msg.peekData();
             String error = "unknown";
             if ( bundle == null ) {
-                MainActivity.error("no bundle in msg: " + msg);
+                Logging.error("no bundle in msg: " + msg);
             }
             else {
                 error = bundle.getString( ERROR );
@@ -307,9 +308,9 @@ public final class DatabaseHelper extends Thread {
     @Override
     public void run() {
         try {
-            MainActivity.info( "starting db thread" );
+            Logging.info( "starting db thread" );
 
-            MainActivity.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
+            Logging.info( "setting db thread priority (-20 highest, 19 lowest) to: " + DB_PRIORITY );
             Process.setThreadPriority( DB_PRIORITY );
 
             try {
@@ -362,11 +363,11 @@ public final class DatabaseHelper extends Thread {
                                 countdown = 0;
                             }
                             catch ( SQLiteConstraintException ex ) {
-                                MainActivity.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
+                                Logging.warn("DB run loop constraint ex, countdown: " + countdown + " ex: " + ex );
                                 countdown--;
                             }
                             catch ( Exception ex ) {
-                                MainActivity.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
+                                Logging.warn("DB run loop ex, countdown: " + countdown + " ex: " + ex );
                                 countdown--;
                                 if ( countdown <= 0 ) {
                                     // give up
@@ -379,12 +380,12 @@ public final class DatabaseHelper extends Thread {
 
                     final long delay = System.currentTimeMillis() - startTime;
                     if ( delay > 1000L ) {
-                        MainActivity.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
+                        Logging.info( "db run loop took: " + delay + " ms. drainSize: " + drainSize );
                     }
                 }
                 catch ( final InterruptedException ex ) {
                     // no worries
-                    MainActivity.info("db queue take interrupted");
+                    Logging.info("db queue take interrupted");
                 }
                 catch ( IllegalStateException | SQLiteException | DBException ex ) {
                     if ( ! done.get() ) {
@@ -397,7 +398,7 @@ public final class DatabaseHelper extends Thread {
                             db.endTransaction();
                         }
                         catch ( Exception ex ) {
-                            MainActivity.error( "exception in db.endTransaction: " + ex, ex );
+                            Logging.error( "exception in db.endTransaction: " + ex, ex );
                         }
                     }
                 }
@@ -408,16 +409,16 @@ public final class DatabaseHelper extends Thread {
                 MainActivity.writeError(Thread.currentThread(), throwable, context);
                 throw new RuntimeException("DatabaseHelper throwable: " + throwable, throwable);
             } else {
-                MainActivity.warn("DB error during shutdown - ignoring: ", throwable);
+                Logging.warn("DB error during shutdown - ignoring: ", throwable);
             }
         }
 
-        MainActivity.info("db worker thread shutting down");
+        Logging.info("db worker thread shutting down");
     }
 
     public void deathDialog( String message, Exception ex ) {
         // send message to the handler that will get this dialog on the activity thread
-        MainActivity.error( "db exception. " + message + ": " + ex, ex );
+        Logging.error( "db exception. " + message + ": " + ex, ex );
         MainActivity.writeError(Thread.currentThread(), ex, context);
         final Bundle bundle = new Bundle();
         final String dialogMessage = MainActivity.getBaseErrorMessage( ex, true );
@@ -449,7 +450,7 @@ public final class DatabaseHelper extends Thread {
             doCreateLocation = true;
             doCreateRoute = true;
         }
-        MainActivity.info("opening: " + dbFilename );
+        Logging.info("opening: " + dbFilename );
 
         if ( hasSD ) {
             db = SQLiteDatabase.openOrCreateDatabase( dbFilename, null );
@@ -462,7 +463,7 @@ public final class DatabaseHelper extends Thread {
             db.rawQuery( "SELECT count(*) FROM "+NETWORK_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
-            MainActivity.info("exception selecting from network, try to create. ex: " + ex );
+            Logging.info("exception selecting from network, try to create. ex: " + ex );
             doCreateNetwork = true;
         }
 
@@ -470,7 +471,7 @@ public final class DatabaseHelper extends Thread {
             db.rawQuery( "SELECT count(*) FROM "+LOCATION_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
-            MainActivity.info("exception selecting from location, try to create. ex: " + ex );
+            Logging.info("exception selecting from location, try to create. ex: " + ex );
             doCreateLocation = true;
         }
 
@@ -478,12 +479,12 @@ public final class DatabaseHelper extends Thread {
             db.rawQuery( "SELECT max(run_id) FROM "+ROUTE_TABLE, null).close();
         }
         catch ( final SQLiteException ex ) {
-            MainActivity.info("exception selecting from route, try to create. ex: " + ex );
+            Logging.info("exception selecting from route, try to create. ex: " + ex );
             doCreateRoute = true;
         }
 
         if ( doCreateNetwork ) {
-            MainActivity.info( "creating network table" );
+            Logging.info( "creating network table" );
             try {
                 db.execSQL(NETWORK_CREATE);
                 if ( db.getVersion() == 0 ) {
@@ -500,12 +501,12 @@ public final class DatabaseHelper extends Thread {
                 }
             }
             catch ( final SQLiteException ex ) {
-                MainActivity.error( "sqlite exception: " + ex, ex );
+                Logging.error( "sqlite exception: " + ex, ex );
             }
         }
 
         if ( doCreateLocation ) {
-            MainActivity.info( "creating location table" );
+            Logging.info( "creating location table" );
             try {
                 db.execSQL(LOCATION_CREATE);
                 // new database, reset a marker, if any
@@ -514,12 +515,12 @@ public final class DatabaseHelper extends Thread {
                 edit.apply();
             }
             catch ( final SQLiteException ex ) {
-                MainActivity.error( "sqlite exception: " + ex, ex );
+                Logging.error( "sqlite exception: " + ex, ex );
             }
         }
 
         if ( doCreateRoute ) {
-            MainActivity.info( "creating route table" );
+            Logging.info( "creating route table" );
             try {
                 db.execSQL(ROUTE_CREATE);
                 // new database, start with route Zero
@@ -528,7 +529,7 @@ public final class DatabaseHelper extends Thread {
                 edit.apply();
             }
             catch ( final SQLiteException ex ) {
-                MainActivity.error( "sqlite exception: " + ex, ex );
+                Logging.error( "sqlite exception: " + ex, ex );
             }
         }
 
@@ -544,22 +545,22 @@ public final class DatabaseHelper extends Thread {
         // keep around the journal file, don't create and delete a ton of times
         db.rawQuery( "PRAGMA journal_mode = PERSIST", null).close();
 
-        MainActivity.info( "database version: " + db.getVersion() );
+        Logging.info( "database version: " + db.getVersion() );
         if ( db.getVersion() == 0 ) {
-            MainActivity.info("upgrading db from 0 to 1");
+            Logging.info("upgrading db from 0 to 1");
             try {
                 db.execSQL( "ALTER TABLE network ADD COLUMN type text not null default '" + NetworkType.WIFI.getCode() + "'" );
                 db.setVersion(1);
             }
             catch ( SQLiteException ex ) {
-                MainActivity.info("ex: " + ex, ex);
+                Logging.info("ex: " + ex, ex);
                 if ( "duplicate column name".equals( ex.toString() ) ) {
                     db.setVersion(1);
                 }
             }
         }
         else if ( db.getVersion() == 1 ) {
-            MainActivity.info("upgrading db from 1 to 2");
+            Logging.info("upgrading db from 1 to 2");
             try {
                 db.execSQL( "ALTER TABLE network ADD COLUMN bestlevel integer not null default 0" );
                 db.execSQL( "ALTER TABLE network ADD COLUMN bestlat double not null default 0");
@@ -567,18 +568,18 @@ public final class DatabaseHelper extends Thread {
                 db.setVersion(2);
             }
             catch ( SQLiteException ex ) {
-                MainActivity.info("ex: " + ex, ex);
+                Logging.info("ex: " + ex, ex);
                 if ( "duplicate column name".equals( ex.toString() ) ) {
                     db.setVersion(2);
                 }
             }
         } else if ( db.getVersion() == 2) {
-            MainActivity.info("upgrading db from 2 to 3");
+            Logging.info("upgrading db from 2 to 3");
             try {
                 db.execSQL( "ALTER TABLE "+LOCATION_TABLE+" ADD COLUMN external integer not null default 0" );
                 db.setVersion(3);
             } catch ( SQLiteException ex ) {
-                MainActivity.info("ex: " + ex, ex);
+                Logging.info("ex: " + ex, ex);
                 if ( "duplicate column name".equals( ex.toString() ) ) {
                     db.setVersion(3);
                 }
@@ -621,7 +622,7 @@ public final class DatabaseHelper extends Thread {
         // give time for db to finish any writes
         int countdown = 30;
         while ( this.isAlive() && countdown > 0 ) {
-            MainActivity.info( "db still alive. countdown: " + countdown );
+            Logging.info( "db still alive. countdown: " + countdown );
             MainActivity.sleep( 100L );
             countdown--;
             this.interrupt();
@@ -652,7 +653,7 @@ public final class DatabaseHelper extends Thread {
                 }
             }
             catch ( SQLiteException ex ) {
-                MainActivity.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
+                Logging.info( "db close exception, will try again. countdown: " + countdown + " ex: " + ex, ex );
                 MainActivity.sleep( 100L );
             }
             countdown--;
@@ -661,7 +662,7 @@ public final class DatabaseHelper extends Thread {
 
     public synchronized void checkDB() throws DBException {
         if ( db == null || ! db.isOpen() ) {
-            MainActivity.info( "re-opening db in checkDB" );
+            Logging.info( "re-opening db in checkDB" );
             try {
                 open();
             }
@@ -683,7 +684,7 @@ public final class DatabaseHelper extends Thread {
             return addObservation(network, network.getLevel(), location, newForRun, false, false);
         }
         catch (final IllegalMonitorStateException ex) {
-            MainActivity.error("exception adding network: " + ex, ex);
+            Logging.error("exception adding network: " + ex, ex);
         }
         return false;
     }
@@ -694,7 +695,7 @@ public final class DatabaseHelper extends Thread {
             return addObservation(network, network.getLevel(), location, newForRun, frequencyChanged, typeMorphed);
         }
         catch (final IllegalMonitorStateException ex) {
-            MainActivity.error("exception adding network: " + ex, ex);
+            Logging.error("exception adding network: " + ex, ex);
         }
         return false;
     }
@@ -707,9 +708,9 @@ public final class DatabaseHelper extends Thread {
         // data is lost if queue is full!
         boolean added = queue.offer( update );
         if ( ! added ) {
-            MainActivity.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
+            Logging.info( "queue full, not adding: " + network.getBssid() + " ssid: " + network.getSsid() );
             if ( System.currentTimeMillis() - prevQueueCullTime > QUEUE_CULL_TIMEOUT ) {
-                MainActivity.info("culling queue. size: " + queue.size() );
+                Logging.info("culling queue. size: " + queue.size() );
                 // go thru the queue, cull out anything not newForRun
                 for ( Iterator<DBUpdate> it = queue.iterator(); it.hasNext(); ) {
                     final DBUpdate val = it.next();
@@ -718,10 +719,10 @@ public final class DatabaseHelper extends Thread {
                         it.remove();
                     }
                 }
-                MainActivity.info("culled queue. size now: " + queue.size() );
+                Logging.info("culled queue. size now: " + queue.size() );
                 added = queue.offer( update );
                 if ( ! added ) {
-                    MainActivity.info( "queue still full, couldn't add: " + network.getBssid() );
+                    Logging.info( "queue still full, couldn't add: " + network.getBssid() );
                 }
                 prevQueueCullTime = System.currentTimeMillis();
             }
@@ -736,7 +737,7 @@ public final class DatabaseHelper extends Thread {
         if (insertNetwork == null || insertLocationExternal == null
                 || updateNetwork == null || updateNetworkMetadata == null) {
 
-            MainActivity.warn("A stored procedure is null, not adding observation");
+            Logging.warn("A stored procedure is null, not adding observation");
             return;
         }
         final Network network = update.network;
@@ -817,7 +818,7 @@ public final class DatabaseHelper extends Thread {
             }
             catch ( NoSuchElementException ex ) {
                 // weird error cropping up
-                MainActivity.info("the weird close-cursor exception: " + ex );
+                Logging.info("the weird close-cursor exception: " + ex );
             }
         }
 
@@ -886,7 +887,7 @@ public final class DatabaseHelper extends Thread {
             insertLocationExternal.bindLong( 8, update.external);
             if (db.isDbLockedByOtherThreads()) {
                 // this is kinda lame, make this better
-                MainActivity.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
+                Logging.error("db locked by another thread, waiting to loc insert. bssid: " + bssid
                         + " drainSize: " + drainSize);
                 MainActivity.sleep(1000L);
             }
@@ -912,7 +913,7 @@ public final class DatabaseHelper extends Thread {
                 updateNetwork.bindString( 4, bssid );
                 if ( db.isDbLockedByOtherThreads() ) {
                     // this is kinda lame, make this better
-                    MainActivity.error( "db locked by another thread, waiting to net update. bssid: " + bssid
+                    Logging.error( "db locked by another thread, waiting to net update. bssid: " + bssid
                             + " drainSize: " + drainSize );
                     MainActivity.sleep(1000L);
                 }
@@ -1039,7 +1040,7 @@ public final class DatabaseHelper extends Thread {
             boolean added = pending.offer( update );
             if ( ! added ) {
                 if ( System.currentTimeMillis() - prevPendingQueueCullTime > QUEUE_CULL_TIMEOUT ) {
-                    MainActivity.info("culling pending queue. size: " + pending.size() );
+                    Logging.info("culling pending queue. size: " + pending.size() );
                     // go thru the queue, cull out anything not newForRun
                     for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
                         final DBPending val = it.next();
@@ -1047,10 +1048,10 @@ public final class DatabaseHelper extends Thread {
                             it.remove();
                         }
                     }
-                    MainActivity.info("culled pending queue. size now: " + pending.size() );
+                    Logging.info("culled pending queue. size now: " + pending.size() );
                     added = pending.offer( update );
                     if ( ! added ) {
-                        MainActivity.info( "pending queue still full, couldn't add: " + network.getBssid() );
+                        Logging.info( "pending queue still full, couldn't add: " + network.getBssid() );
                         // go thru the queue, squash dups.
                         HashSet<String> bssids = new HashSet<>();
                         for ( Iterator<DBPending> it = pending.iterator(); it.hasNext(); ) {
@@ -1063,7 +1064,7 @@ public final class DatabaseHelper extends Thread {
 
                         added = pending.offer( update );
                         if ( ! added ) {
-                            MainActivity.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
+                            Logging.info( "pending queue still full post-dup-purge, couldn't add: " + network.getBssid() );
                         }
                     }
                     prevPendingQueueCullTime = System.currentTimeMillis();
@@ -1076,7 +1077,7 @@ public final class DatabaseHelper extends Thread {
     }
 
     public void clearPendingObservations() {
-        MainActivity.info("clearing pending observations");
+        Logging.info("clearing pending observations");
         pending.clear();
     }
 
@@ -1098,7 +1099,7 @@ public final class DatabaseHelper extends Thread {
             }
 
             final long d_time = MILLISECONDS.toSeconds( locWhen - lastLocWhen );
-            MainActivity.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
+            Logging.info( "moved " + accuracy + "m without a GPS fix, over " + d_time + "s" );
             // walk the locations and
             // lerp! y = y0 + (t - t0)((y1-y0)/(t1-t0))
             // y = y0 + (t - lastLocWhen)((y1-y0)/d_time);
@@ -1132,12 +1133,12 @@ public final class DatabaseHelper extends Thread {
                         pend.frequencyChanged, pend.typeMorphed) ) {
                     count++;
                 } else {
-                    MainActivity.info( "failed to add "+pend );
+                    Logging.info( "failed to add "+pend );
                 }
                 // XXX: altitude? worth it?
             }
             // return
-            MainActivity.info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
+            Logging.info( "recovered "+count+" location"+(count==1?"":"s")+" with the power of lerp");
         }
 
         lastLoc = null;
@@ -1147,7 +1148,7 @@ public final class DatabaseHelper extends Thread {
     private void logTime( final long start, final String string ) {
         long diff = System.currentTimeMillis() - start;
         if ( diff > 150L ) {
-            MainActivity.info( string + " in " + diff + " ms" );
+            Logging.info( string + " in " + diff + " ms" );
         }
     }
 
@@ -1161,7 +1162,7 @@ public final class DatabaseHelper extends Thread {
      */
     public void logRouteLocation (final Location location, final int wifiVisible, final int cellVisible, final int btVisible, final long runId) {
         if (location == null) {
-            MainActivity.error("Null location in logRouteLocation");
+            Logging.error("Null location in logRouteLocation");
             return;
         }
         final double accuracy = location.getAccuracy();
@@ -1260,7 +1261,7 @@ public final class DatabaseHelper extends Thread {
         long start = System.currentTimeMillis();
         final long count = getMaxIdFromDB( LOCATION_TABLE );
         long end = System.currentTimeMillis();
-        MainActivity.info( "loc count: " + count + " in: " + (end-start) + "ms" );
+        Logging.info( "loc count: " + count + " in: " + (end-start) + "ms" );
         locationCount.set( count );
         setupMaxidDebug( count );
     }
@@ -1276,13 +1277,13 @@ public final class DatabaseHelper extends Thread {
             if ( locCount > 0 ) {
                 // there is no preference set, yet there are locations, this is likely
                 // a developer testing a new install on an old db, so set the pref.
-                MainActivity.info( "setting db marker to: " + locCount );
+                Logging.info( "setting db marker to: " + locCount );
                 edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
             }
         }
         else if (maxid > locCount || (maxid == 0 && oldMaxDb == 0 && locCount > 10000)) {
             final long newMaxid = Math.max(0, locCount - 10000);
-            MainActivity.warn("db marker: " + maxid + " greater than location count: " + locCount
+            Logging.warn("db marker: " + maxid + " greater than location count: " + locCount
                     + ", setting to: " + newMaxid);
             edit.putLong( ListFragment.PREF_DB_MARKER, newMaxid );
         }
@@ -1378,35 +1379,35 @@ public final class DatabaseHelper extends Thread {
 
     public Cursor locationIterator( final long fromId ) throws DBException {
         checkDB();
-        MainActivity.info( "locationIterator fromId: " + fromId );
+        Logging.info( "locationIterator fromId: " + fromId );
         final String[] args = new String[]{ Long.toString( fromId ) };
         return db.rawQuery( "SELECT _id,bssid,level,lat,lon,altitude,accuracy,time FROM location WHERE _id > ? AND external = 0", args );
     }
 
     public Cursor networkIterator() throws DBException {
         checkDB();
-        MainActivity.info( "networkIterator" );
+        Logging.info( "networkIterator" );
         final String[] args = new String[]{};
         return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network", args );
     }
 
     public Cursor networkIterator(final NetworkFilter filter) throws DBException {
         checkDB();
-        MainActivity.info( "networkIterator (filtered)" );
+        Logging.info( "networkIterator (filtered)" );
         final String[] args = new String[]{};
         return db.rawQuery( "SELECT bssid,ssid,frequency,capabilities,lasttime,lastlat,lastlon,bestlevel,type FROM network WHERE "+filter.getFilter(), args );
     }
 
     public Cursor routeIterator(final long routeId) throws DBException {
         checkDB();
-        MainActivity.info( "routeIterator" );
+        Logging.info( "routeIterator" );
         final String[] args = new String[]{String.valueOf(routeId)};
         return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = ?", args );
     }
 
     public Cursor routeMetaIterator() throws DBException {
         checkDB();
-        MainActivity.info( "routeMetaIterator" );
+        Logging.info( "routeMetaIterator" );
         final String[] args = new String[]{};
         //ALIBI: we'd love to parameterize min observations here, but SQLite rawQuery doesn't seem to respect ? parameterization in HAVING statements.
         return db.rawQuery( "SELECT _id, run_id, MIN(time) AS starttime, MAX(time) AS endtime, count(_id) AS obs FROM route GROUP BY run_id HAVING obs >= 20 ORDER BY time DESC", args);
@@ -1414,7 +1415,7 @@ public final class DatabaseHelper extends Thread {
 
     public Cursor currentRouteIterator() throws DBException {
         checkDB();
-        MainActivity.info( "routeIterator" );
+        Logging.info( "routeIterator" );
         final String[] args = new String[]{};
         return db.rawQuery( "SELECT lat,lon,time FROM route WHERE run_id = (SELECT MAX(run_id) FROM route)", args );
     }
@@ -1427,7 +1428,7 @@ public final class DatabaseHelper extends Thread {
     }
 
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
-        MainActivity.info("currentRouteIterator");
+        Logging.info("currentRouteIterator");
         checkDB();
         if (prefs == null || !prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false)) {
             return null;
@@ -1481,7 +1482,7 @@ public final class DatabaseHelper extends Thread {
             result = new Pair<>(Boolean.TRUE, outputFile.getAbsolutePath());
         }
         catch ( IOException ex ) {
-            MainActivity.error("backup failure: " + ex, ex);
+            Logging.error("backup failure: " + ex, ex);
             result = new Pair<>(Boolean.FALSE, "ERROR: " + ex);
         }
 
@@ -1491,16 +1492,16 @@ public final class DatabaseHelper extends Thread {
     public int clearDatabase() {
         try {
             db.beginTransaction();
-            MainActivity.info( "deleting location table" );
+            Logging.info( "deleting location table" );
             db.execSQL(LOCATION_DELETE);
 
-            MainActivity.info( "deleting network table" );
+            Logging.info( "deleting network table" );
             db.execSQL(NETWORK_DELETE);
 
-            MainActivity.info( "deleting route table" );
+            Logging.info( "deleting route table" );
             db.execSQL(ROUTE_DELETE);
 
-            MainActivity.info( "creating network table" );
+            Logging.info( "creating network table" );
             db.execSQL(NETWORK_CREATE);
             if ( db.getVersion() == 0 ) {
                 // only diff to version 1 is the "type" column in network table
@@ -1510,13 +1511,13 @@ public final class DatabaseHelper extends Thread {
                 // only diff to version 2 is the "bestlevel", "bestlat", "bestlon" columns in network table
                 db.setVersion(2);
             }
-            MainActivity.info( "creating location table" );
+            Logging.info( "creating location table" );
             db.execSQL(LOCATION_CREATE);
             db.execSQL(ROUTE_CREATE);
             db.setTransactionSuccessful();
             //TODO: update list header count
         } catch ( final SQLiteException ex ) {
-            MainActivity.error( "sqlite exception: " + ex, ex );
+            Logging.error( "sqlite exception: " + ex, ex );
             return 0;
         } finally {
             db.endTransaction();

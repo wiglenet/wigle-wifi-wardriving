@@ -41,7 +41,6 @@ import androidx.annotation.NonNull;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -58,7 +57,6 @@ import android.telephony.TelephonyManager;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,6 +91,7 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.InsufficientSpaceException;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -164,7 +163,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @RequiresApi(24)
     private GnssStatus.Callback gnssStatusCallback = null;
 
-    static final Locale ORIG_LOCALE = Locale.getDefault();
+    static Locale ORIG_LOCALE = Locale.getDefault();
     // form auth
     public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
     // no auth
@@ -184,7 +183,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         // registration web view
     public static final String REG_URL = "https://wigle.net/register";
 
-    private static final String LOG_TAG = "wigle";
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
@@ -230,11 +228,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        info("MAIN onCreate. state:  " + state);
+        Logging.info("MAIN onCreate. state:  " + state);
         workAroundGoogleMapsBug();
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
@@ -267,7 +264,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         pieScanningSettings(prefs);
 
         if (stateFragment != null && stateFragment.getState() != null) {
-            info("MAIN: using retained stateFragment state");
+            Logging.info("MAIN: using retained stateFragment state");
             // pry an orientation change, which calls destroy, but we get this from retained fragment
             state = stateFragment.getState();
 
@@ -282,7 +279,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.observationUploader.setContext(this);
             }
         } else {
-            info("MAIN: creating new state");
+            Logging.info("MAIN: creating new state");
             state = new State();
             state.finishing = new AtomicBoolean(false);
             state.transferring = new AtomicBoolean(false);
@@ -320,8 +317,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         state.uiMode = getResources().getConfiguration().uiMode;
 
-        info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
-        info("android release: '" + Build.VERSION.RELEASE);
+        Logging.info("id: '" + id + "' inEmulator: " + state.inEmulator + " product: " + android.os.Build.PRODUCT);
+        Logging.info("android release: '" + Build.VERSION.RELEASE);
 
         if (state.numberFormat0 == null) {
             state.numberFormat0 = NumberFormat.getNumberInstance(Locale.US);
@@ -345,25 +342,25 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
 
-        info("setupService");
+        Logging.info("setupService");
         setupService();
-        info("checkStorage");
+        Logging.info("checkStorage");
         checkStorage();
-        info("setupDatabase");
+        Logging.info("setupDatabase");
         setupDatabase();
-        info("setupBattery");
+        Logging.info("setupBattery");
         setupBattery();
-        info("setupSound");
+        Logging.info("setupSound");
         setupSound();
-        info("setupActivationDialog");
+        Logging.info("setupActivationDialog");
         setupActivationDialog();
-        info("setupBluetooth");
+        Logging.info("setupBluetooth");
         setupBluetooth();
-        info("setupWifi");
+        Logging.info("setupWifi");
         setupWifi();
-        info("setupLocation"); // must be after setupWifi
+        Logging.info("setupLocation"); // must be after setupWifi
         setupLocation();
-        info("setup tabs");
+        Logging.info("setup tabs");
         if (savedInstanceState == null) {
             setupFragments();
         }
@@ -398,7 +395,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 dialog.show();
             }
         } catch (IOException ex) {
-            MainActivity.error("unable to implant mcc/mnc db", ex);
+            Logging.error("unable to implant mcc/mnc db", ex);
 
         }
         //}
@@ -408,7 +405,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         // show the list by default
         selectFragment(state.currentTab);
-        info("onCreate setup complete");
+        Logging.info("onCreate setup complete");
     }
 
     private void pieScanningSettings(final SharedPreferences prefs) {
@@ -442,23 +439,26 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         try {
             SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);
             if (!googleBug.contains("fixed")) {
-                info("working around google maps bug 154855417");
+                Logging.info("working around google maps bug 154855417");
                 File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
-                corruptedZoomTables.delete();
-                googleBug.edit().putBoolean("fixed", true).apply();
+                if (corruptedZoomTables.delete()) {
+                    googleBug.edit().putBoolean("fixed", true).apply();
+                } else {
+                    Logging.error("unable to work around corrupted ZoomTables.data error");
+                }
             }
             else {
-                info("already worked around google maps bug 154855417");
+                Logging.info("already worked around google maps bug 154855417");
             }
         } catch (Exception e) {
-            warn("Exception in workAroundGoogleMapsBug: " + e);
+            Logging.warn("Exception in workAroundGoogleMapsBug: " + e);
         }
     }
 
     @SuppressLint("ApplySharedPref")
     private void pieScanSet(final SharedPreferences prefs, final String key) {
         if (-1 == prefs.getLong(key, -1)) {
-            info("Setting 30 second scan for " + key + " due to broken Android Pie");
+            Logging.info("Setting 30 second scan for " + key + " due to broken Android Pie");
             prefs.edit().putLong(key, SCAN_P_DEFAULT).commit();
         }
     }
@@ -466,7 +466,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @SuppressLint("ApplySharedPref")
     private void qScanSet(final SharedPreferences prefs, final String key) {
         if (SCAN_P_DEFAULT == prefs.getLong(key, -1)) {
-            info("Removing 30 second scan for " + key + " due to less broken Android Q");
+            Logging.info("Removing 30 second scan for " + key + " due to less broken Android Q");
             prefs.edit().remove(key).commit();
         }
     }
@@ -486,7 +486,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 editor.apply();
             }
         } else {
-            MainActivity.info("Not able to upgrade key storage.");
+            Logging.info("Not able to upgrade key storage.");
         }
     }
 
@@ -519,7 +519,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     message = mainActivity.getString(R.string.allow_storage);
                 } */
 
-                MainActivity.info("no permission for " + permissionsNeeded);
+                Logging.info("no permission for " + permissionsNeeded);
 
                 // Fire off an async request to actually get the permission
                 // This will show the standard permission request dialog UI
@@ -548,7 +548,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                            @NonNull final int[] grantResults) {
         switch (requestCode) {
             case PERMISSIONS_REQUEST: {
-                info("location grant response permissions: " + Arrays.toString(permissions)
+                Logging.info("location grant response permissions: " + Arrays.toString(permissions)
                         + " grantResults: " + Arrays.toString(grantResults));
 
                 boolean restart = false;
@@ -557,19 +557,20 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permission)
                             && grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                         restart = true;
+                        break;
                     }
                 }
 
                 if (restart) {
                     // restart the app now that we can talk to the database
-                    info("Restarting to pick up storage permission");
+                    Logging.info("Restarting to pick up storage permission");
                     finishSoon(FINISH_TIME_MILLIS, true);
                 }
                 return;
             }
 
             default:
-                warn("Unhandled onRequestPermissionsResult code: " + requestCode);
+                Logging.warn("Unhandled onRequestPermissionsResult code: " + requestCode);
         }
     }
 
@@ -630,7 +631,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                         // close drawer when item is tapped
                         if (R.id.nav_stats == menuItem.getItemId()) {
-                            MainActivity.info("Nav stats clicked");
+                            Logging.info("Nav stats clicked");
                             showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked() );
                         } else {
                             if (R.id.nav_site_stats != menuItem.getItemId() &&
@@ -704,7 +705,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             if (null == frag) {
                 final String maybeName = getResources().getResourceName(itemId);
-                MainActivity.error("null fragment for: " + String.format("0x%08X", itemId) + " (" + maybeName + ")");
+                Logging.error("null fragment for: " + String.format("0x%08X", itemId) + " (" + maybeName + ")");
             }
 
             try {
@@ -713,16 +714,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         .commit();
             } catch (final NullPointerException | IllegalStateException ex) {
                 final String message = "exception in fragment switch: " + ex;
-                error(message, ex);
+                Logging.error(message, ex);
             }
 
             // Highlight the selected item, update the title, and close the drawer
             state.currentTab = itemId;
             setTitle(fragmentTitles.get(itemId));
         } catch (IllegalAccessException ex) {
-            MainActivity.error("Unable to get fragment for id: "+itemId, ex);
+            Logging.error("Unable to get fragment for id: "+itemId, ex);
         } catch (InstantiationException ex) {
-            MainActivity.error("Unable to make fragment for id: "+itemId, ex);
+            Logging.error("Unable to make fragment for id: "+itemId, ex);
         }
     }
 
@@ -740,7 +741,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        info("Creating ListFragment");
+        Logging.info("Creating ListFragment");
         ListFragment listFragment = new ListFragment();
         Bundle bundle = new Bundle();
         listFragment.setArguments(bundle);
@@ -788,9 +789,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     m.setAccessible(true);
                     m.invoke(menu, true);
                 } catch (NoSuchMethodException ex) {
-                    error("onMenuOpened no such method: " + ex, ex);
+                    Logging.error("onMenuOpened no such method: " + ex, ex);
                 } catch (Exception ex) {
-                    error("onMenuOpened ex: " + ex, ex);
+                    Logging.error("onMenuOpened ex: " + ex, ex);
                 }
             }
         }
@@ -831,11 +832,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         state.screenLocked = lockScreen;
         if (lockScreen) {
             if (!state.wakeLock.isHeld()) {
-                MainActivity.info("acquire wake lock");
+                Logging.info("acquire wake lock");
                 state.wakeLock.acquire();
             }
         } else if (state.wakeLock.isHeld()) {
-            MainActivity.info("release wake lock");
+            Logging.info("release wake lock");
             state.wakeLock.release();
         }
     }
@@ -923,7 +924,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         dialog.dismiss();
                         final Activity activity = getActivity();
                         if (activity == null) {
-                            info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
+                            Logging.info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
                         } else if (activity instanceof MainActivity) {
                             final MainActivity mainActivity = (MainActivity) activity;
                             if (mainActivity.getState() != null) {
@@ -932,7 +933,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                 FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
                                 final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+tabPos);
                                 if (fragment == null) {
-                                    MainActivity.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                    Logging.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
                                     //TODO: might behoove us to show an error here
                                 } else {
                                     ((DialogListener) fragment).handleDialog(dialogId);
@@ -943,7 +944,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }
                     } catch (Exception ex) {
                         // guess it wasn't there anyways
-                        MainActivity.info("exception handling fragment alert dialog: " + ex, ex);
+                        Logging.info("exception handling fragment alert dialog: " + ex, ex);
                     }
                 }
             });
@@ -964,7 +965,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         dialog.dismiss();
                     } catch (Exception ex) {
                         // guess it wasn't there anyways
-                        MainActivity.info("exception dismissing fragment alert dialog: " + ex, ex);
+                        Logging.info("exception dismissing fragment alert dialog: " + ex, ex);
                     }
                 }
             });
@@ -979,13 +980,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final FragmentManager fm = activity.getSupportFragmentManager();
             final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, tabPos, dialogId);
             final String tag = tabPos + "-" + dialogId + "-" + activity.getClass().getSimpleName();
-            info("tag: " + tag + " fm: " + fm);
+            Logging.info("tag: " + tag + " fm: " + fm);
             dialog.show(fm, tag);
         } catch (WindowManager.BadTokenException ex) {
-            MainActivity.info("exception showing dialog, view probably changed: " + ex, ex);
+            Logging.info("exception showing dialog, view probably changed: " + ex, ex);
         } catch (final IllegalStateException ex) {
             final String errorMessage = "Exception trying to show dialog: " + ex;
-            MainActivity.error(errorMessage, ex);
+            Logging.error(errorMessage, ex);
         }
     }
 
@@ -999,13 +1000,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, checkboxLabel,
                     persistPrefKey, persistPrefAgreeValue, persistPrefDisagreeValue, tabPos, dialogId);
             final String tag = tabPos + "-" + dialogId + "-" + activity.getClass().getSimpleName();
-            info("tag: " + tag + " fm: " + fm);
+            Logging.info("tag: " + tag + " fm: " + fm);
             dialog.show(fm, tag);
         } catch (WindowManager.BadTokenException ex) {
-            MainActivity.info("exception showing dialog, view probably changed: " + ex, ex);
+            Logging.info("exception showing dialog, view probably changed: " + ex, ex);
         } catch (final IllegalStateException ex) {
             final String errorMessage = "Exception trying to show dialog: " + ex;
-            MainActivity.error(errorMessage, ex);
+            Logging.error(errorMessage, ex);
         }
     }
 
@@ -1036,7 +1037,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                             final boolean def) {
         final CheckBox checkbox = (CheckBox) view.findViewById(id);
         if (checkbox == null) {
-            error("No checkbox for id: " + id);
+            Logging.error("No checkbox for id: " + id);
         } else {
             checkbox.setChecked(prefs.getBoolean(pref, def));
         }
@@ -1081,29 +1082,29 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (activity instanceof MainActivity) {
             return (MainActivity) activity;
         } else {
-            info("not main activity: " + activity);
+            Logging.info("not main activity: " + activity);
         }
         return null;
     }
 
     @Override
     public void onDestroy() {
-        MainActivity.info("MAIN: destroy.");
+        Logging.info("MAIN: destroy.");
         super.onDestroy();
 
         if (!state.uiRestart.get()) {
             try {
-                info("unregister batteryLevelReceiver");
+                Logging.info("unregister batteryLevelReceiver");
                 unregisterReceiver(batteryLevelReceiver);
             } catch (final IllegalArgumentException ex) {
-                info("batteryLevelReceiver not registered: " + ex);
+                Logging.info("batteryLevelReceiver not registered: " + ex);
             }
 
             try {
-                info("unregister wifiReceiver");
+                Logging.info("unregister wifiReceiver");
                 unregisterReceiver(state.wifiReceiver);
             } catch (final IllegalArgumentException ex) {
-                info("wifiReceiver not registered: " + ex);
+                Logging.info("wifiReceiver not registered: " + ex);
             }
 
             if (state.tts != null) state.tts.shutdown();
@@ -1113,10 +1114,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.cancelDiscovery();
             } try {
-                info("unregister bluetoothReceiver");
+                Logging.info("unregister bluetoothReceiver");
                 unregisterReceiver( state.bluetoothReceiver );
             } catch ( final IllegalArgumentException ex ) {
-                info( "bluetoothReceiver not registered: " + ex );
+                Logging.info( "bluetoothReceiver not registered: " + ex );
             }
             if (state.bluetoothReceiver != null) {
                 state.bluetoothReceiver.stopScanning();
@@ -1130,37 +1131,37 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
-        info("MAIN: onSaveInstanceState");
+        Logging.info("MAIN: onSaveInstanceState");
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onPause() {
-        MainActivity.info("MAIN: pause.");
+        Logging.info("MAIN: pause.");
         super.onPause();
 
         // deal with wake lock
         if (state.wakeLock.isHeld()) {
-            MainActivity.info("release wake lock");
+            Logging.info("release wake lock");
             state.wakeLock.release();
         }
     }
 
     @Override
     public void onResume() {
-        MainActivity.info("MAIN: resume.");
+        Logging.info("MAIN: resume.");
         super.onResume();
 
         // deal with wake lock
         if (!state.wakeLock.isHeld() && state.screenLocked) {
-            MainActivity.info("acquire wake lock");
+            Logging.info("acquire wake lock");
             state.wakeLock.acquire();
         }
 
         final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
-        info("GooglePlayServicesAvailable: " + serviceAvailable);
+        Logging.info("GooglePlayServicesAvailable: " + serviceAvailable);
         if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
-            error("service not available! " + serviceAvailable);
+            Logging.error("service not available! " + serviceAvailable);
             final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
             dialog.show();
             playServiceShown = true;
@@ -1176,19 +1177,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     @Override
     public void onPostResume() {
-        MainActivity.info("MAIN: post resume.");
+        Logging.info("MAIN: post resume.");
         super.onPostResume();
     }
 
     @Override
     public void onConfigurationChanged(final Configuration newConfig) {
-        MainActivity.info("MAIN: config changed");
+        Logging.info("MAIN: config changed");
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
         if (Build.VERSION.SDK_INT > 28) {
             if (newConfig.uiMode != state.uiMode) {
-                info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
+                Logging.info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
                 state.uiMode = newConfig.uiMode;
                 //DEBUG:
                 finishSoon(0, false, true);
@@ -1199,7 +1200,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @SuppressLint("ApplySharedPref")
     @Override
     public void onStart() {
-        MainActivity.info("MAIN: start.");
+        Logging.info("MAIN: start.");
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         if (prefs.getBoolean(ListFragment.PREF_BLOWED_UP, false)) {
             prefs.edit().putBoolean(ListFragment.PREF_BLOWED_UP, false).commit();
@@ -1215,13 +1216,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     @Override
     public void onStop() {
-        MainActivity.info("MAIN: stop.");
+        Logging.info("MAIN: stop.");
         super.onStop();
     }
 
     @Override
     public void onRestart() {
-        MainActivity.info("MAIN: restart.");
+        Logging.info("MAIN: restart.");
         super.onRestart();
     }
 
@@ -1249,15 +1250,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final String lang = prefs.getString(ListFragment.PREF_LANGUAGE, "");
         final String current = config.locale.getLanguage();
-        MainActivity.info("current lang: " + current + " new lang: " + lang);
+        Logging.info("current lang: " + current + " new lang: " + lang);
         Locale newLocale = null;
         if (!lang.isEmpty() && !current.equals(lang)) {
             if (lang.contains("-r")) {
                 String[] parts = lang.split("-r");
-                MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
+                Logging.info("\tlang: "+parts[0]+" country: "+parts[1]);
                 newLocale = new Locale(parts[0], parts[1]);
             } else {
-                MainActivity.info("\tlang: "+lang + " current: "+current);
+                Logging.info("\tlang: "+lang + " current: "+current);
                 newLocale = new Locale(lang);
             }
         } else if (lang.isEmpty() && ORIG_LOCALE != null && !ORIG_LOCALE.getLanguage().isEmpty()
@@ -1268,7 +1269,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (newLocale != null) {
             Locale.setDefault(newLocale);
             config.locale = newLocale;
-            MainActivity.info("setting locale: " + newLocale);
+            Logging.info("setting locale: " + newLocale);
             context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
             //ALIBI: loop protection
             if (MainActivity.getMainActivity() != null &&
@@ -1287,12 +1288,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     checkTTSIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
                     mainActivity.startActivityForResult(checkTTSIntent, ACTION_TTS_CODE);
                 } catch (ActivityNotFoundException e) {
-                    error("TTS check not available in your device." + e.fillInStackTrace());
+                    Logging.error("TTS check not available in your device." + e.fillInStackTrace());
                     //TODO: does make sense to disable the TTS pref here, or is this recoverable?
                 }
             }
         } else {
-            MainActivity.error("could not launch TTS check due to pre-instantiation state");
+            Logging.error("could not launch TTS check due to pre-instantiation state");
         }
     }
 
@@ -1309,13 +1310,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (lang.isEmpty()) {
             lang = current;
         }
-        MainActivity.info("current lang: " + current + " new lang: " + lang);
+        Logging.info("current lang: " + current + " new lang: " + lang);
         if (lang.contains("-r")) {
             String[] parts = lang.split("-r");
-            MainActivity.info("\tlang: "+parts[0]+" country: "+parts[1]);
+            Logging.info("\tlang: "+parts[0]+" country: "+parts[1]);
             return new Locale(parts[0], parts[1]);
         } else {
-            MainActivity.info("\tlang: "+lang);
+            Logging.info("\tlang: "+lang);
             return new Locale(lang);
         }
     }
@@ -1329,7 +1330,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private MediaPlayer createMediaPlayer(final int soundId) {
         final MediaPlayer sound = createMp(getApplicationContext(), soundId);
         if (sound == null) {
-            info("sound null from media player");
+            Logging.info("sound null from media player");
             return null;
         }
         // try to figure out why sounds stops after a while
@@ -1347,7 +1348,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     default:
                         whatString = "not defined";
                 }
-                info("media player error \"" + whatString + "\" what: " + what
+                Logging.info("media player error \"" + whatString + "\" what: " + what
                         + " extra: " + extra + " mp: " + mp);
                 return false;
             }
@@ -1380,7 +1381,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         // see if it exists already
         if (!f.exists()) {
-            info("causing " + openString + " to be made");
+            Logging.info("causing " + openString + " to be made");
             // make it happen:
             if (!f.createNewFile()) {
                 throw new IOException("Could not create file: " + openString);
@@ -1434,7 +1435,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 } else if (resid == R.raw.newpop) {
                     sounduri = resToFile(context, resid, "newpop.wav");
                 } else {
-                    info("unknown raw sound id:" + resid);
+                    Logging.info("unknown raw sound id:" + resid);
                     return null;
                 }
                 mp = MediaPlayer.create(context, sounduri);
@@ -1443,16 +1444,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             return mp;
         } catch (IOException ex) {
-            error("ioe create failed: " + ex, ex);
+            Logging.error("ioe create failed: " + ex, ex);
             // fall through
         } catch (IllegalArgumentException ex) {
-            error("iae create failed: " + ex, ex);
+            Logging.error("iae create failed: " + ex, ex);
             // fall through
         } catch (SecurityException ex) {
-            error("se create failed: " + ex, ex);
+            Logging.error("se create failed: " + ex, ex);
             // fall through
         } catch (Resources.NotFoundException ex) {
-            error("rnfe create failed(" + resid + "): " + ex, ex);
+            Logging.error("rnfe create failed(" + resid + "): " + ex, ex);
         }
         return null;
     }
@@ -1475,37 +1476,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    public static void info(final String value) {
-        Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value);
-        saveLog(value);
-    }
-
-    public static void warn(final String value) {
-        Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value);
-        saveLog(value);
-    }
-
-    public static void error(final String value) {
-        Log.e(LOG_TAG, Thread.currentThread().getName() + "] " + value);
-        saveLog(value);
-    }
-
-    public static void info(final String value, final Throwable t) {
-        Log.i(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
-        saveLog(value);
-    }
-
-    public static void warn(final String value, final Throwable t) {
-        Log.w(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
-        saveLog(value);
-    }
-
-    public static void error(final String value, final Throwable t) {
-        Log.e(LOG_TAG, Thread.currentThread().getName() + "] " + value, t);
-        saveLog(value);
-    }
-
-    private static void saveLog(final String value) {
+    /**
+     * force-incremental-save log.
+     * ALIBI: exposed for Logging core.
+     * TOOD: is there a cleaner way to handle this in modern Android?
+     * @param value the value to log.
+     */
+    public static void saveLog(final String value) {
         final State state = getStaticState();
         if (state == null) return;
         final int pointer = state.logPointer++ % state.logs.length;
@@ -1566,13 +1543,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static void writeError(final Thread thread, final Throwable throwable, final Context context, final String detail) {
         try {
             final String error = "Thread: " + thread + " throwable: " + throwable;
-            error(error, throwable);
+            Logging.error(error, throwable);
             final File stackPath = FileUtility.getErrorStackPath(context);
             if (stackPath.exists() && stackPath.canWrite()) {
                 //noinspection ResultOfMethodCallIgnored
                 stackPath.mkdirs();
                 final File file = new File(stackPath, FileUtility.ERROR_STACK_FILE_PREFIX + "_" + System.currentTimeMillis() + ".txt");
-                error("Writing stackfile to: " + file.getAbsolutePath());
+                Logging.error("Writing stackfile to: " + file.getAbsolutePath());
                 if (!file.exists()) {
                     if (!file.createNewFile()) {
                         throw new IOException("Cannot create file: " + file);
@@ -1648,7 +1625,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }
                     } catch (Throwable er) {
                         // ohwell
-                        error("error getting logs for error: " + er, er);
+                        Logging.error("error getting logs for error: " + er, er);
                     }
                 }
                 finally {
@@ -1657,13 +1634,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         if (fos != null) fos.close();
                     }
                     catch (final Exception ex) {
-                        error("error closing fos: " + ex, ex);
+                        Logging.error("error closing fos: " + ex, ex);
                     }
                 }
 
             }
         } catch (final Exception ex) {
-            error("error logging error: " + ex, ex);
+            Logging.error("error logging error: " + ex, ex);
             ex.printStackTrace();
         }
     }
@@ -1671,7 +1648,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static void handleErrorError(FileOutputStream fos, Throwable er) throws IOException {
         // ohwell
         final String errorMessage = "error getting data for error: " + er;
-        error(errorMessage, er);
+        Logging.error(errorMessage, er);
         fos.write((errorMessage + "\n\n").getBytes(ENCODING));
         er.printStackTrace(new PrintStream(fos));
     }
@@ -1734,7 +1711,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 tele.listen(state.phoneState, PhoneStateListener.LISTEN_SERVICE_STATE
                         | PhoneStateListener.LISTEN_CALL_STATE | PhoneStateListener.LISTEN_SIGNAL_STRENGTHS | signal_strengths);
             } catch (SecurityException ex) {
-                info("cannot get call state, will play audio over any telephone calls: " + ex);
+                Logging.info("cannot get call state, will play audio over any telephone calls: " + ex);
             }
         }
         if (MainActivity.getMainActivity() != null &&
@@ -1745,7 +1722,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     /**
-     * Instantiate both both BSSID matchers - inital load
+     * Instantiate both both BSSID matchers - initial load
      * @param prefs the preferences instance for which to get matchers
      */
     private void setupFilters(final SharedPreferences prefs) {
@@ -1814,7 +1791,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
             sb.append(")");
             //TODO: debug
-            MainActivity.info("building regex from: "+sb.toString());
+            Logging.info("building regex from: "+sb.toString());
             Pattern pattern = Pattern.compile( sb.toString(), Pattern.CASE_INSENSITIVE );
             matcher = pattern.matcher( "" );
         }
@@ -1862,11 +1839,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // play sound on something new
                 state.soundNewPop.start();
             } else {
-                MainActivity.info("soundNewPop is playing or null");
+                Logging.info("soundNewPop is playing or null");
             }
         } catch (IllegalStateException ex) {
             // ohwell, likely already playing
-            MainActivity.info("exception trying to play sound: " + ex);
+            Logging.info("exception trying to play sound: " + ex);
         }
     }
 
@@ -1876,11 +1853,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // play sound on something new
                 state.soundPop.start();
             } else {
-                MainActivity.info("soundPop is playing or null");
+                Logging.info("soundPop is playing or null");
             }
         } catch (IllegalStateException ex) {
             // ohwell, likely already playing
-            MainActivity.info("exception trying to play sound: " + ex);
+            Logging.info("exception trying to play sound: " + ex);
         }
     }
 
@@ -1973,7 +1950,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         edit.apply();
 
         if (state.wifiReceiver == null) {
-            MainActivity.info("new wifiReceiver");
+            Logging.info("new wifiReceiver");
             // wifi scan listener
             // this receiver is the main workhorse of the entire app
             state.wifiReceiver = new WifiReceiver(this, state.dbHelper, getApplicationContext());
@@ -1984,7 +1961,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         setupWifiReceiverIntent();
 
         if (state.wifiLock == null && wifiManager != null) {
-            MainActivity.info("lock wifi radio on");
+            Logging.info("lock wifi radio on");
             // lock the radio on (only works in 28 (P) and lower)
             state.wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_SCAN_ONLY, ListFragment.WIFI_LOCK_NAME);
             state.wifiLock.acquire();
@@ -1998,10 +1975,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (requestCode == ACTION_WIFI_CODE) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                info("wifi turned on");
+                Logging.info("wifi turned on");
             }
             else {
-                info("wifi NOT turned on, resultCode: " + resultCode);
+                Logging.info("wifi NOT turned on, resultCode: " + resultCode);
             }
         } else if (requestCode == ACTION_TTS_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
@@ -2014,23 +1991,23 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     ResolveInfo resolveInfo = pm.resolveActivity( installTTSIntent, PackageManager.MATCH_DEFAULT_ONLY );
 
                     if( resolveInfo == null ) {
-                        error("ACTION_TTS_CALLBACK: resolve ACTION_INSTALL_TTS_DATA via package mgr.");
+                        Logging.error("ACTION_TTS_CALLBACK: resolve ACTION_INSTALL_TTS_DATA via package mgr.");
                     } else {
                         startActivity(installTTSIntent);
                     }
                 } catch (Exception e) {
-                    error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA",e);
+                    Logging.error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA",e);
                 }
             }
         } else {
-            info("MainActivity: Unhandled requestCode: " + requestCode
+            Logging.info("MainActivity: Unhandled requestCode: " + requestCode
                     + " resultCode: " + resultCode);
         }
     }
 
     private void setupWifiReceiverIntent() {
         // register
-        MainActivity.info("register BroadcastReceiver");
+        Logging.info("register BroadcastReceiver");
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(state.wifiReceiver, intentFilter);
@@ -2040,14 +2017,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         try {
             final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
             if (bt == null) {
-                info("No bluetooth adapter");
+                Logging.info("No bluetooth adapter");
                 return false;
             }
             if (!bt.isEnabled()) {
                 return true;
             }
         } catch (java.lang.SecurityException sex) {
-            MainActivity.warn("bt activation security exception");
+            Logging.warn("bt activation security exception");
         }
         return false;
     }
@@ -2056,7 +2033,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         try {
             final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
             if (bt == null) {
-                info("No bluetooth adapter");
+                Logging.info("No bluetooth adapter");
                 return;
             }
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -2066,7 +2043,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 //  BluetoothAdapter.STATE_TURNING_OFF also a possible match
                 if (bt.getState() == BluetoothAdapter.STATE_OFF ||
                         bt.getState() == BluetoothAdapter.STATE_TURNING_OFF) {
-                    info("Enable bluetooth");
+                    Logging.info("Enable bluetooth");
                     edit.putBoolean(ListFragment.PREF_BT_WAS_OFF, true);
                     bt.enable();
                 } else {
@@ -2074,7 +2051,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
                 edit.apply();
                 if (state.bluetoothReceiver == null) {
-                    MainActivity.info("new bluetoothReceiver");
+                    Logging.info("new bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
                     boolean hasLeSupport = true;
                     if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -2087,17 +2064,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                             hasLeSupport);
                     state.bluetoothReceiver.setupBluetoothTimer(true);
                 }
-                info("register bluetooth BroadcastReceiver");
+                Logging.info("register bluetooth BroadcastReceiver");
                 final IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
                 intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
                 registerReceiver(state.bluetoothReceiver, intentFilter);
             }
         } catch (SecurityException se) {
-            info("Security exception attempting to access bluetooth adapter", se);
+            Logging.info("Security exception attempting to access bluetooth adapter", se);
         } catch (Exception e) {
             //ALIBI: there's a lot of wonkiness in real-world BT adapters
             //  seeing them go null during this block after null check passes,
-            MainActivity.error("failure initializing bluetooth: ",e);
+            Logging.error("failure initializing bluetooth: ",e);
         }
     }
 
@@ -2113,12 +2090,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
         try {
-            info("unregister bluetoothReceiver");
+            Logging.info("unregister bluetoothReceiver");
             unregisterReceiver( state.bluetoothReceiver );
             state.bluetoothReceiver = null;
         } catch ( final IllegalArgumentException ex ) {
             //ALIBI: it's fine to call and fail here.
-            info( "bluetoothReceiver not registered: " + ex );
+            Logging.info( "bluetoothReceiver not registered: " + ex );
         }
 
         final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
@@ -2133,17 +2110,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             //WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
 
             // turn it off now that we're done
-            MainActivity.info("turning bluetooth back off");
+            Logging.info("turning bluetooth back off");
             try {
                 final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
                 if (bt == null) {
-                    info("No bluetooth adapter");
+                    Logging.info("No bluetooth adapter");
                 } else if (bt.isEnabled()) {
-                    info("Disable bluetooth");
+                    Logging.info("Disable bluetooth");
                     bt.disable();
                 }
             } catch (Exception ex) {
-                MainActivity.error("exception turning bluetooth back off: " + ex, ex);
+                Logging.error("exception turning bluetooth back off: " + ex, ex);
             }
         }
     }
@@ -2167,7 +2144,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void setTransferring() {
-        info("setTransferring");
+        Logging.info("setTransferring");
         state.transferring.set(true);
     }
 
@@ -2193,14 +2170,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.serviceConnection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(final ComponentName name, final IBinder iBinder) {
-                    MainActivity.info(name + " service connected");
+                    Logging.info(name + " service connected");
                     final WigleService.WigleServiceBinder binder = (WigleService.WigleServiceBinder) iBinder;
                     state.wigleService = binder.getService();
                 }
 
                 @Override
                 public void onServiceDisconnected(final ComponentName name) {
-                    MainActivity.info(name + " service disconnected");
+                    Logging.info(name + " service disconnected");
                 }
             };
 
@@ -2209,7 +2186,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final Intent serviceIntent = new Intent(getApplicationContext(), WigleService.class);
             final boolean bound = getApplicationContext().bindService(serviceIntent, state.serviceConnection,
                     Context.BIND_AUTO_CREATE | Context.BIND_IMPORTANT);
-            MainActivity.info("service bound: " + bound);
+            Logging.info("service bound: " + bound);
         }
     }
 
@@ -2230,11 +2207,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 try {
                     startActivity(myIntent);
                 } catch (Exception ex) {
-                    error("exception trying to start location activity: " + ex, ex);
+                    Logging.error("exception trying to start location activity: " + ex, ex);
                 }
             }
         } catch (final SecurityException ex) {
-            info("Security exception in setupLocation: " + ex);
+            Logging.info("Security exception in setupLocation: " + ex);
             return;
         }
 
@@ -2256,7 +2233,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void handleScanChange(final boolean isScanning) {
         final boolean oldIsScanning = isScanning();
         if (isScanning == oldIsScanning) {
-            info("main handleScanChange: no difference, returning");
+            Logging.info("main handleScanChange: no difference, returning");
             return;
         }
 
@@ -2284,13 +2261,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 return (ListFragment) f;
             }
         } catch (Exception ex) {
-            MainActivity.error("Unable to get listfragment: ",ex);
+            Logging.error("Unable to get listfragment: ",ex);
         }
         return null;
     }
 
     private void internalHandleScanChange(final boolean isScanning) {
-        info("main internalHandleScanChange: isScanning now: " + isScanning);
+        Logging.info("main internalHandleScanChange: isScanning now: " + isScanning);
         ListFragment listFragment = getListFragmentIfCurrent();
 
         if (isScanning) {
@@ -2320,7 +2297,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     state.wifiLock.release();
                 } catch (SecurityException ex) {
                     // a case where we have a leftover lock from another run?
-                    MainActivity.info("exception releasing wifilock: " + ex);
+                    Logging.info("exception releasing wifilock: " + ex);
                 }
             }
         }
@@ -2337,7 +2314,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         try {
             internalSetLocationUpdates(updateIntervalMillis, updateMeters);
         } catch (final SecurityException ex) {
-            error("Security exception in setLocationUpdates: " + ex, ex);
+            Logging.error("Security exception in setLocationUpdates: " + ex, ex);
         }
     }
 
@@ -2362,7 +2339,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         try {
             locationManager.addGpsStatusListener(state.gpsListener);
         } catch (final SecurityException ex) {
-            info("Security exception adding status listener: " + ex, ex);
+            Logging.info("Security exception adding status listener: " + ex, ex);
         }
 
         if (Build.VERSION.SDK_INT >= 24) {
@@ -2388,7 +2365,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 locationManager.registerGnssStatusCallback(gnssStatusCallback);
             }
             catch (final Exception ex) {
-                error("Error registering for gnss: " + ex, ex);
+                Logging.error("Error registering for gnss: " + ex, ex);
             }
         }
 
@@ -2398,23 +2375,23 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final List<String> providers = locationManager.getAllProviders();
         if (providers != null) {
             for (String provider : providers) {
-                MainActivity.info("available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis);
+                Logging.info("available provider: " + provider + " updateIntervalMillis: " + updateIntervalMillis);
                 if (!useNetworkLoc && LocationManager.NETWORK_PROVIDER.equals(provider)) {
                     // skip!
                     continue;
                 }
                 if (!"passive".equals(provider) && updateIntervalMillis > 0L) {
-                    MainActivity.info("using provider: " + provider);
+                    Logging.info("using provider: " + provider);
                     try {
                         locationManager.requestLocationUpdates(provider, updateIntervalMillis, updateMeters, state.gpsListener);
                     } catch (final SecurityException ex) {
-                        info("Security exception adding status listener: " + ex, ex);
+                        Logging.info("Security exception adding status listener: " + ex, ex);
                     }
                 }
             }
 
             if (updateIntervalMillis <= 0L) {
-                info("removing location listener: " + state.gpsListener);
+                Logging.info("removing location listener: " + state.gpsListener);
                 try {
                     locationManager.removeUpdates(state.gpsListener);
                     if (Build.VERSION.SDK_INT >= 24) {
@@ -2423,7 +2400,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }
                     }
                 } catch (final SecurityException ex) {
-                    info("Security exception removing status listener: " + ex, ex);
+                    Logging.info("Security exception removing status listener: " + ex, ex);
                 }
             }
         }
@@ -2467,7 +2444,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public void transferComplete() {
         state.transferring.set(false);
-        MainActivity.info("transfer complete");
+        Logging.info("transfer complete");
         // start a scan to get the ball rolling again if this is non-stop mode
         scheduleScan();
         state.observationUploader = null;
@@ -2526,7 +2503,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void finishSoon(final long finishTimeMillis, final boolean restart, final boolean uiOnly) {
-        MainActivity.info("Will finish in " + finishTimeMillis + "ms");
+        Logging.info("Will finish in " + finishTimeMillis + "ms");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -2536,11 +2513,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
                     if (state.finishing.get()) {
-                        MainActivity.info("finishSoon: finish already called");
+                        Logging.info("finishSoon: finish already called");
                     } else {
-                        MainActivity.info("finishSoon: calling finish now");
+                        Logging.info("finishSoon: calling finish now");
                         if (uiOnly) {
-                            info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
+                            Logging.info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
                             state.uiRestart.set(true);
                             MainActivity.super.recreate();
                             /*new Handler().postDelayed(new Runnable() {
@@ -2563,7 +2540,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }, 10L);
                     }
                 } else {
-                    warn("Intent generation failed during finishSoon thread");
+                    Logging.warn("Intent generation failed during finishSoon thread");
                 }
             }
         }, finishTimeMillis);
@@ -2574,15 +2551,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     @Override
     public void finish() {
-        info("MAIN: finish.");
+        Logging.info("MAIN: finish.");
         if (!state.uiRestart.get()) {
             if (state.wifiReceiver != null) {
-                info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
+                Logging.info("MAIN: finish. networks: " + state.wifiReceiver.getRunNetworkCount());
             }
 
             final boolean wasFinishing = state.finishing.getAndSet(true);
             if (wasFinishing) {
-                info("MAIN: finish called twice!");
+                Logging.info("MAIN: finish called twice!");
             }
 
             // interrupt this just in case
@@ -2610,11 +2587,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         }
                     }
                 } catch (final SecurityException ex) {
-                    error("SecurityException on finish: " + ex, ex);
+                    Logging.error("SecurityException on finish: " + ex, ex);
                 } catch (final IllegalStateException ise) {
-                    error("ISE turning off GPS: ", ise);
+                    Logging.error("ISE turning off GPS: ", ise);
                 } catch (final NullPointerException npe) {
-                    error("NPE turning off GPS: ", npe);
+                    Logging.error("NPE turning off GPS: ", npe);
                 }
             }
 
@@ -2625,7 +2602,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 // have to use the app context to bind to the service, cuz we're in tabs
                 getApplicationContext().unbindService(state.serviceConnection);
             } catch (final IllegalArgumentException ex) {
-                MainActivity.info("serviceConnection not registered: " + ex, ex);
+                Logging.info("serviceConnection not registered: " + ex, ex);
             }
 
             // release the lock before turning wifi off
@@ -2633,7 +2610,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 try {
                     state.wifiLock.release();
                 } catch (Exception ex) {
-                    MainActivity.error("exception releasing wifi lock: " + ex, ex);
+                    Logging.error("exception releasing wifi lock: " + ex, ex);
                 }
             }
 
@@ -2660,7 +2637,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.soundNewPop != null) {
                 state.soundNewPop.release();
             }
-            info("MAIN: finish complete.");
+            Logging.info("MAIN: finish complete.");
         }
         super.finish();
     }
@@ -2668,7 +2645,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            MainActivity.info("onKeyDown: not quitting app on back");
+            Logging.info("onKeyDown: not quitting app on back");
             selectFragment(R.id.nav_list);
             return true;
         }
@@ -2695,15 +2672,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * pure-background upload method fo intent-based uploads
      */
     public void backgroundUploadFile(){
-        MainActivity.info( "background upload file" );
+        Logging.info( "background upload file" );
         final State state = getState();
         setTransferring();
         state.observationUploader = new ObservationUploader(this,
                 ListFragment.lameStatic.dbHelper, null, false, false, false);
         try {
             state.observationUploader.startDownload(null);
-        } catch (WiGLEAuthException waex) {
-            MainActivity.warn("Authentication failure on background run upload");
+        } catch (WiGLEAuthException x) {
+            Logging.warn("Authentication failure on background run upload");
         }
     }
 
@@ -2768,7 +2745,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 try {
                     state.dbHelper.clearDefaultRoute();
                 } catch (DBException dbe) {
-                    MainActivity.warn("unable to clear default route on start-viz: ", dbe);
+                    Logging.warn("unable to clear default route on start-viz: ", dbe);
                 }
             }
         }
@@ -2786,7 +2763,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 try {
                     state.dbHelper.clearDefaultRoute();
                 } catch (DBException dbe) {
-                    MainActivity.warn("unable to clear default route on end-viz: ", dbe);
+                    Logging.warn("unable to clear default route on end-viz: ", dbe);
                 }
             }
         }
@@ -2800,17 +2777,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS && state != null && state.tts != null) {
             Locale locale = getLocale(getApplicationContext(), getApplicationContext().getResources().getConfiguration());
-            info("LOCALE: "+locale);
+            Logging.info("LOCALE: "+locale);
             if(state.tts.isLanguageAvailable(locale)==TextToSpeech.LANG_AVAILABLE) {
                 state.tts.setLanguage(locale);
             } else {
-                info("preferred locale: [" +locale+"] not available on device.");
+                Logging.info("preferred locale: [" +locale+"] not available on device.");
             }
             state.ttsChecked = true;
         } else if (status == TextToSpeech.SUCCESS) {
-            info("TTS init successful, but state or TTS engine was null");
+            Logging.info("TTS init successful, but state or TTS engine was null");
         } else if (status == TextToSpeech.ERROR) {
-            error("TTS init failed: "+status);
+            Logging.error("TTS init failed: "+status);
         }
     }
 }

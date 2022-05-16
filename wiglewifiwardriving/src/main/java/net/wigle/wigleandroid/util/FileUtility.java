@@ -5,8 +5,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 
-import net.wigle.wigleandroid.MainActivity;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -58,7 +56,7 @@ public class FileUtility {
             }
         } catch (Exception ex) {
             // if we can't determine free space, be optimistic. Possibly because of missing permission?
-            MainActivity.error("Unable to determine free space: ",ex);
+            Logging.error("Unable to determine free space: ",ex);
             return Long.MAX_VALUE;
         }
     }
@@ -105,7 +103,7 @@ public class FileUtility {
             return false;
         }
         File sdCard = new File(safeFilePath(Environment.getExternalStorageDirectory()) + "/");
-        MainActivity.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
+        Logging.info("exists: " + sdCard.exists() + " dir: " + sdCard.isDirectory()
                 + " read: " + sdCard.canRead() + " write: " + sdCard.canWrite()
                 + " path: " + sdCard.getAbsolutePath());
 
@@ -138,7 +136,7 @@ public class FileUtility {
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             final String openString = filepath + filename;
-            MainActivity.info("openString: " + openString);
+            Logging.info("openString: " + openString);
             final File file = new File(openString);
             if (!file.exists()) {
                 if (!file.createNewFile()) {
@@ -148,14 +146,14 @@ public class FileUtility {
             return new FileOutputStream(file);
         } else if (internalCacheArea) {
             File file = File.createTempFile(filename, null, context.getCacheDir());
-            MainActivity.info("creating file: " + file.getCanonicalPath());
+            Logging.info("creating file: " + file.getCanonicalPath());
             return new FileOutputStream(file);
         }
 
         //TODO: dedupe w/ KmlDownloader.writeSharefile()
         if (filename.endsWith(KML_EXT)) return createFileInSubdir(context, filename, KML_DIR);
         if (filename.endsWith(SQL_EXT)) return createFileInSubdir(context, filename, SQLITE_BACKUPS_DIR);
-        MainActivity.info("saving as: "+filename);
+        Logging.info("saving as: "+filename);
 
         return context.openFileOutput(filename, Context.MODE_PRIVATE);
     }
@@ -259,7 +257,7 @@ public class FileUtility {
             File dir = new File(context.getFilesDir(), KML_DIR);
             File file = new File(dir, fileName + KML_EXT);
             if (!file.exists()) {
-                MainActivity.error("file does not exist: " + file.getAbsolutePath());
+                Logging.error("file does not exist: " + file.getAbsolutePath());
                 return null;
             } else {
                 //DEBUG: MainActivity.info(file.getAbsolutePath());
@@ -276,7 +274,7 @@ public class FileUtility {
             file = new File(context.getFilesDir(), fileName);
         }
         if (!file.exists()) {
-            MainActivity.error("file does not exist: " + file.getAbsolutePath());
+            Logging.error("file does not exist: " + file.getAbsolutePath());
             return null;
         } else {
             //DEBUG: MainActivity.info(file.getAbsolutePath());
@@ -293,11 +291,11 @@ public class FileUtility {
         try {
             File fileDir = getErrorStackPath(context);
             if (!fileDir.canRead() || !fileDir.isDirectory()) {
-                MainActivity.error("file is not readable or not a directory. fileDir: " + fileDir);
+                Logging.error("file is not readable or not a directory. fileDir: " + fileDir);
             } else {
                 String[] files = fileDir.list();
                 if (files == null) {
-                    MainActivity.error("no files in dir: " + fileDir);
+                    Logging.error("no files in dir: " + fileDir);
                 } else {
                     String latestFilename = null;
                     for (String filename : files) {
@@ -307,13 +305,13 @@ public class FileUtility {
                             }
                         }
                     }
-                    MainActivity.info("latest filename: " + latestFilename);
+                    Logging.info("latest filename: " + latestFilename);
 
                     return safeFilePath(fileDir) + "/" + latestFilename;
                 }
             }
         } catch (Exception ex) {
-            MainActivity.error( "error finding stack file: " + ex, ex );
+            Logging.error( "error finding stack file: " + ex, ex );
         }
         return null;
     }
@@ -328,7 +326,7 @@ public class FileUtility {
         try {
             retval = file.getCanonicalPath();
         } catch (Exception ex) {
-            MainActivity.error("Failed to get filepath", ex);
+            Logging.error("Failed to get filepath", ex);
         }
 
         if (retval == null) {
@@ -342,15 +340,15 @@ public class FileUtility {
      * @param directory the directory to enumerate
      */
     public static void printDirContents(final File directory) {
-        MainActivity.info("Listing for: "+directory.toString());
+        Logging.info("Listing for: "+directory.toString());
         File[] files = directory.listFiles();
         if (files != null) {
-            MainActivity.info("\t# files: " + files.length);
+            Logging.info("\t# files: " + files.length);
             for (File file : files) {
-                MainActivity.info("\t\t" + file.getName() + "\t" + file.getAbsoluteFile());
+                Logging.info("\t\t" + file.getName() + "\t" + file.getAbsoluteFile());
             }
         } else {
-            MainActivity.error("Null file listing for "+directory.toString());
+            Logging.error("Null file listing for "+directory.toString());
         }
     }
 

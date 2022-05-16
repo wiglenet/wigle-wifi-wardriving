@@ -33,6 +33,7 @@ import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.Upload;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONArray;
@@ -134,7 +135,7 @@ public class UploadsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("UPLOADS: onCreate");
+        Logging.info("UPLOADS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -156,7 +157,7 @@ public class UploadsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("UPLOADS: onCreateView. orientation: " + orientation);
+        Logging.info("UPLOADS: onCreateView. orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.uploads, container, false);
         setupSwipeRefresh(rootView);
         setupListView(rootView);
@@ -191,7 +192,7 @@ public class UploadsFragment extends Fragment {
 
     private void downloadUploads(final int page) {
         if (handler == null) {
-            MainActivity.error("downloadUploads handler is null");
+            Logging.error("downloadUploads handler is null");
         }
         if (busy.compareAndSet(false, true)) {
             final int pageStart = page * ROW_COUNT;
@@ -212,10 +213,10 @@ public class UploadsFragment extends Fragment {
             try {
                 task.startDownload(this);
             } catch (WiGLEAuthException waex) {
-                MainActivity.info("Transactions Download Failed due to failed auth");
+                Logging.info("Transactions Download Failed due to failed auth");
             }
         } else {
-            MainActivity.error("preventing download because previous is still in progress.");
+            Logging.error("preventing download because previous is still in progress.");
         }
     }
 
@@ -307,7 +308,7 @@ public class UploadsFragment extends Fragment {
         //MainActivity.info("handleUploads");
 
         if (json == null) {
-            MainActivity.info("handleUploads null json, returning");
+            Logging.info("handleUploads null json, returning");
             return;
         }
 
@@ -357,9 +358,9 @@ public class UploadsFragment extends Fragment {
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
             bundle.putString(KEY_QUEUE_DEPTH, json.getString(KEY_QUEUE_DEPTH));
         } catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
+            Logging.error("json error: " + ex, ex);
         } catch (final Exception e) {
-            MainActivity.error("uploads error: " + e, e);
+            Logging.error("uploads error: " + e, e);
         }
 
         final Message message = new Message();
@@ -371,7 +372,7 @@ public class UploadsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "UPLOADS: onDestroy" );
+        Logging.info( "UPLOADS: onDestroy" );
         finishing.set( true );
 
         super.onDestroy();
@@ -379,7 +380,7 @@ public class UploadsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info("UPLOADS: onResume");
+        Logging.info("UPLOADS: onResume");
         super.onResume();
         busy.set(false);
         final Activity a = getActivity();
@@ -390,25 +391,25 @@ public class UploadsFragment extends Fragment {
 
     @Override
     public void onStart() {
-        MainActivity.info( "UPLOADS: onStart" );
+        Logging.info( "UPLOADS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "UPLOADS: onPause" );
+        Logging.info( "UPLOADS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "UPLOADS: onStop" );
+        Logging.info( "UPLOADS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("UPLOADS: config changed");
+        Logging.info("UPLOADS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 

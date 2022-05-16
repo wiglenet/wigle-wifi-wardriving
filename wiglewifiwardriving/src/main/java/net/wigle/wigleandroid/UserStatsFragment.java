@@ -25,6 +25,7 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 
 import org.json.JSONException;
@@ -101,7 +102,7 @@ public class UserStatsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("USERSTATS: onCreate");
+        Logging.info("USERSTATS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -121,7 +122,7 @@ public class UserStatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("USERSTATS: onCreateView. orientation: " + orientation);
+        Logging.info("USERSTATS: onCreateView. orientation: " + orientation);
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.userstats, container, false);
 
         final Handler handler = new UserDownloadHandler(scrollView, numberFormat, getActivity().getPackageName(),
@@ -139,7 +140,7 @@ public class UserStatsFragment extends Fragment {
         try {
             task.startDownload(fragment);
         } catch (WiGLEAuthException waex) {
-            MainActivity.info("User Stats Download Failed due to failed auth");
+            Logging.info("User Stats Download Failed due to failed auth");
         }
     }
 
@@ -151,9 +152,9 @@ public class UserStatsFragment extends Fragment {
 
         @Override
         public void requestComplete(final JSONObject json, final boolean isCache) {
-            MainActivity.info("handleUserStats");
+            Logging.info("handleUserStats");
             if (json == null) {
-                MainActivity.info("handleUserStats null json, returning");
+                Logging.info("handleUserStats null json, returning");
                 return;
             }
             // MainActivity.info("user stats: " + json);
@@ -162,11 +163,11 @@ public class UserStatsFragment extends Fragment {
             bundle.putBoolean(KEY_IS_CACHE, isCache);
             try {
                 if (!json.getBoolean("success")) {
-                    MainActivity.info("handleUserStats json success is false");
+                    Logging.info("handleUserStats json success is false");
                     bundle.putString("error", "Unable to load user statistics.");
                 } else {
                     if (json.isNull("statistics")) {
-                        MainActivity.info("handleUserStats json stats null, returning");
+                        Logging.info("handleUserStats json stats null, returning");
                         bundle.putString("error", "Unable to load user statistics.");
                     } else {
                         final JSONObject stats = json.getJSONObject("statistics");
@@ -185,9 +186,9 @@ public class UserStatsFragment extends Fragment {
                     }
                 }
             } catch (final JSONException ex) {
-                MainActivity.error("json error: " + ex, ex);
+                Logging.error("json error: " + ex, ex);
             } catch (final Exception e) {
-                MainActivity.error("user stats error: " + e, e);
+                Logging.error("user stats error: " + e, e);
             }
 
             final Message message = new Message();
@@ -209,7 +210,7 @@ public class UserStatsFragment extends Fragment {
             final Bundle bundle = msg.getData();
             if (msg.what == MSG_USER_DONE) {
                 if (bundle.containsKey("error")) {
-                    MainActivity.info("handleMessage error loading user stats. TODO: show warning");
+                    Logging.info("handleMessage error loading user stats. TODO: show warning");
                 } else {
                     TextView tv;
 
@@ -268,7 +269,7 @@ public class UserStatsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "STATS: onDestroy" );
+        Logging.info( "STATS: onDestroy" );
         finishing.set( true );
 
         super.onDestroy();
@@ -276,7 +277,7 @@ public class UserStatsFragment extends Fragment {
 
     @Override
     public void onResume() {
-        MainActivity.info("STATS: onResume");
+        Logging.info("STATS: onResume");
         super.onResume();
         Activity a = getActivity();
         if (null != a) {
@@ -286,25 +287,25 @@ public class UserStatsFragment extends Fragment {
 
     @Override
     public void onStart() {
-        MainActivity.info( "STATS: onStart" );
+        Logging.info( "STATS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "STATS: onPause" );
+        Logging.info( "STATS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "STATS: onStop" );
+        Logging.info( "STATS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("STATS: config changed");
+        Logging.info("STATS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 

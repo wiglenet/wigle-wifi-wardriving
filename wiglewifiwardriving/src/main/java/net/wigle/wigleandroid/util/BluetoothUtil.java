@@ -1,7 +1,5 @@
 package net.wigle.wigleandroid.util;
 
-import net.wigle.wigleandroid.MainActivity;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -111,7 +109,7 @@ public class BluetoothUtil {
                         break;
                 }
             } catch (Exception ex) {
-                MainActivity.error("Error parsing advertised BLE data: ", ex);
+                Logging.error("Error parsing advertised BLE data: ", ex);
             }
 
         }

@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.background;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,6 +22,7 @@ import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -101,7 +101,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 doRun();
             }
         } catch ( final InterruptedException ex ) {
-            MainActivity.info( "file upload interrupted" );
+            Logging.info( "file upload interrupted" );
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             throw waex;
@@ -151,7 +151,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                         ListFragment.SHARED_PREFS, 0);
             } else {
                 prefs = null;
-                MainActivity.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
+                Logging.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
             }
         } else {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
@@ -161,9 +161,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
             final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
             final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
-            MainActivity.info("authName: " + authName);
+            Logging.info("authName: " + authName);
             if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
-                MainActivity.info("No authName, going to request token");
+                Logging.info("No authName, going to request token");
                 downloadTokenAndStart(fragment);
             } else {
                 start();
@@ -211,7 +211,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     ! "bobzilla".equals(userName) ) {
                 return Status.EMPTY_FILE;
             }
-            MainActivity.info("preparing upload...");
+            Logging.info("preparing upload...");
 
             // show on the UI
             sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
@@ -221,10 +221,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
 
-            MainActivity.info("authName: " + authName);
+            Logging.info("authName: " + authName);
 
             if (beAnonymous) {
-                MainActivity.info("anonymous upload");
+                Logging.info("anonymous upload");
             }
 
             final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath,
@@ -239,7 +239,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
 
             //TODO: any reason to parse this JSON object? all we care about are two strings.
-            MainActivity.info(response);
+            Logging.info(response);
             if ( response != null && response.indexOf("\"success\":true") > 0 ) {
                 status = Status.SUCCESS;
 
@@ -258,32 +258,32 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 } else {
                     error = "response: " + response;
                 }
-                MainActivity.error( error );
+                Logging.error( error );
                 bundle.putString( BackgroundGuiHandler.ERROR, error );
                 status = Status.FAIL;
             }
         } catch ( final InterruptedException ex ) {
-            MainActivity.info("ObservationUploader interrupted");
+            Logging.info("ObservationUploader interrupted");
             throw ex;
 
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
-            MainActivity.error( "connection problem: " + ex, ex );
+            Logging.error( "connection problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
         } catch (final SSLException ex) {
-            MainActivity.error( "security problem: " + ex, ex );
+            Logging.error( "security problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_secure_wigle_conn) );
         } catch ( final IOException ex ) {
             ex.printStackTrace();
-            MainActivity.error( "io problem: " + ex, ex );
+            Logging.error( "io problem: " + ex, ex );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
+            Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
@@ -296,7 +296,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final ConnectivityManager connMgr =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (null == connMgr) {
-            MainActivity.error("null ConnectivityManager trying to determine connection info");
+            Logging.error("null ConnectivityManager trying to determine connection info");
             return false;
         }
         final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -334,18 +334,18 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
         }
         catch ( InterruptedException ex ) {
-            MainActivity.info("justWriteFile interrupted: " + ex);
+            Logging.info("justWriteFile interrupted: " + ex);
         }
         catch ( IOException ex ) {
             ex.printStackTrace();
-            MainActivity.error( "io problem: " + ex, ex );
+            Logging.error( "io problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         }
         catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
+            Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
@@ -378,7 +378,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             // max id at startup
             maxId = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
         }
-        MainActivity.info( "Writing file starting with observation id: " + maxId);
+        Logging.info( "Writing file starting with observation id: " + maxId);
         final Cursor cursor = dbHelper.locationIterator( maxId );
 
         //noinspection TryFinallyCanBeTryWithResources
@@ -472,7 +472,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 netMillis += System.currentTimeMillis() - netStart;
                 if ( network == null ) {
                     // weird condition, skipping
-                    MainActivity.error("network not in database: " + bssid );
+                    Logging.error("network not in database: " + bssid );
                     continue;
                 }
 
@@ -519,7 +519,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     charBuffer.append( NEWLINE );
                 }
                 catch ( BufferOverflowException ex ) {
-                    MainActivity.info("buffer overflow: " + ex, ex );
+                    Logging.info("buffer overflow: " + ex, ex );
                     // double the buffer
                     charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
                     byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
@@ -538,7 +538,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     encoder.flush( byteBuffer );
                 }
                 catch ( IllegalStateException ex ) {
-                    MainActivity.error("exception flushing: " + ex, ex);
+                    Logging.error("exception flushing: " + ex, ex);
                     continue;
                 }
                 // byteBuffer = encoder.encode( charBuffer );  (old way)
@@ -569,7 +569,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
         }
 
-        MainActivity.info("wrote file in: " + (System.currentTimeMillis() - start) +
+        Logging.info("wrote file in: " + (System.currentTimeMillis() - start) +
                 "ms. fileWriteMillis: " + fileWriteMillis + " netmillis: " + netMillis );
 
         return maxId;
@@ -659,7 +659,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             String openString = filePath + filename;
-            MainActivity.info("Opening file: " + openString);
+            Logging.info("Opening file: " + openString);
             file = new File( openString );
             if ( ! file.exists() ) {
                 if (!file.createNewFile()) {

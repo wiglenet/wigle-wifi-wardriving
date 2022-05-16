@@ -22,6 +22,7 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -234,7 +235,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
                 mClusterManager.addItem(network);
             }
         }
-        MainActivity.info("MapRender cached: " + cached + " added: " + added);
+        Logging.info("MapRender cached: " + cached + " added: " + added);
         networkCount.getAndAdd(added);
 
         mClusterManager.cluster();
@@ -293,7 +294,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     public void clear() {
-        MainActivity.info("MapRender: clear");
+        Logging.info("MapRender: clear");
         labeledNetworks.clear();
         networkCount.set(0);
         mClusterManager.clearItems();
@@ -301,7 +302,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     public void reCluster() {
-        MainActivity.info("MapRender: reCluster");
+        Logging.info("MapRender: reCluster");
         clear();
         if (!isDbResult) {
             addLatestNetworks();

@@ -17,6 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,7 +29,7 @@ public class SearchFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("SEARCH: onCreate");
+        Logging.info("SEARCH: onCreate");
         super.onCreate(savedInstanceState);
         //setHasOptionsMenu(true);
         // set language
@@ -43,7 +44,7 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("SEARCH: onCreateView. orientation: " + orientation);
+        Logging.info("SEARCH: onCreateView. orientation: " + orientation);
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.search_nets, container, false);
 
 
@@ -77,7 +78,7 @@ public class SearchFragment extends Fragment {
                 rb.setText(getText(R.string.search_wigle) + " " + getText(R.string.must_login));
                 rb.setEnabled(false);
             } else {
-                MainActivity.info("unable to get RB");
+                Logging.info("unable to get RB");
             }
         } else {
             if ((ListFragment.lameStatic.queryArgs != null) && (ListFragment.lameStatic.queryArgs.searchWiGLE())) {

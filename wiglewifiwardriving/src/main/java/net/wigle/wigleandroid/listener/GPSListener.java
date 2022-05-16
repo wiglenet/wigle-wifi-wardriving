@@ -8,6 +8,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.KalmanLatLong;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -82,7 +83,7 @@ public class GPSListener implements Listener, LocationListener {
     @Override
     public void onGpsStatusChanged( final int event ) {
         if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
-            MainActivity.info("GPS STOPPED");
+            Logging.info("GPS STOPPED");
             // this event lies, on one device it gets called when the
             // network provider is disabled :(  so we do nothing...
             // listActivity.setLocationUpdates();
@@ -92,7 +93,7 @@ public class GPSListener implements Listener, LocationListener {
     }
 
     public void handleScanStop() {
-        MainActivity.info("GPSListener: handleScanStop");
+        Logging.info("GPSListener: handleScanStop");
         gpsStatus = null;
         location = null;
     }
@@ -109,7 +110,7 @@ public class GPSListener implements Listener, LocationListener {
 
     @Override
     public void onProviderDisabled( final String provider ) {
-        MainActivity.info("provider disabled: " + provider);
+        Logging.info("provider disabled: " + provider);
 
         if ( mapLocationListener != null ) {
             mapLocationListener.onProviderDisabled( provider );
@@ -118,7 +119,7 @@ public class GPSListener implements Listener, LocationListener {
 
     @Override
     public void onProviderEnabled( final String provider ) {
-        MainActivity.info("provider enabled: " + provider);
+        Logging.info("provider enabled: " + provider);
         if (null != kalmanLatLong) {
             kalmanLatLong.reset();
         }
@@ -131,7 +132,7 @@ public class GPSListener implements Listener, LocationListener {
     public void onStatusChanged( final String provider, final int status, final Bundle extras ) {
         final boolean isgps = "gps".equals(provider);
         if (!isgps || status != prevStatus) {
-            MainActivity.info("provider status changed: " + provider + " status: " + status);
+            Logging.info("provider status changed: " + provider + " status: " + status);
             if (isgps) prevStatus = status;
         }
 
@@ -146,8 +147,8 @@ public class GPSListener implements Listener, LocationListener {
 
     /** newLocation can be null */
     private void updateLocationData(final Location newLocation ) {
-        /**
-         * ALIBI: the location manager call's a non-starter if permission hasn't been granted.
+        /*
+          ALIBI: the location manager call's a non-starter if permission hasn't been granted.
          */
         if ( Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
@@ -167,7 +168,7 @@ public class GPSListener implements Listener, LocationListener {
         try {
             gpsStatus = locationManager.getGpsStatus(gpsStatus);
         } catch (NullPointerException npe) {
-            MainActivity.error("NPE trying to call getGPSStatus");
+            Logging.error("NPE trying to call getGPSStatus");
             return;
         }
         final int satCount = getSatCount();
@@ -229,7 +230,7 @@ public class GPSListener implements Listener, LocationListener {
             }
             else if ( location != null ) {
                 // transition to null
-                MainActivity.info( "nulling location: " + location );
+                Logging.info( "nulling location: " + location );
                 location = null;
                 wasProviderChange = true;
                 // make sure we're registered for updates
@@ -270,11 +271,11 @@ public class GPSListener implements Listener, LocationListener {
                 }
                 if ( dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
                     if (dist > LERP_MAX_THRESHOLD_METERS) {
-                        MainActivity.warn("Diff is too large, not lerping. " + dist + " meters");
+                        Logging.warn("Diff is too large, not lerping. " + dist + " meters");
                         dbHelper.clearPendingObservations();
                     }
                     else if (!location.equals(prevGpsLocation)) {
-                        MainActivity.info("lerping for " + dist + " meters");
+                        Logging.info("lerping for " + dist + " meters");
                         dbHelper.recoverLocations(location);
                     }
                 }
@@ -289,7 +290,7 @@ public class GPSListener implements Listener, LocationListener {
             if ( prevGpsLocation != null ) {
                 if (null != dbHelper) {
                     dbHelper.lastLocation(prevGpsLocation);
-                    MainActivity.info("set last location for lerping");
+                    Logging.info("set last location for lerping");
                 }
             }
         }
@@ -302,7 +303,7 @@ public class GPSListener implements Listener, LocationListener {
             if ( (previousSpeed == 0f && currentSpeed > 0f)
                     || (previousSpeed < 5f && currentSpeed >= 5f)) {
                 // moving faster now than before, schedule a scan because the timing config pry changed
-                MainActivity.info("Going faster, scheduling scan");
+                Logging.info("Going faster, scheduling scan");
                 mainActivity.scheduleScan();
                 scanScheduled = true;
             }
@@ -315,7 +316,7 @@ public class GPSListener implements Listener, LocationListener {
         // MainActivity.info("sat count: " + satCount);
 
         if ( wasProviderChange ) {
-            MainActivity.info( "wasProviderChange: satCount: " + satCount
+            Logging.info( "wasProviderChange: satCount: " + satCount
                     + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
                     + (newOK ? " newProvider: " + newLocation.getProvider() : "")
                     + (locOK ? " locProvider: " + location.getProvider() : "")
@@ -339,7 +340,7 @@ public class GPSListener implements Listener, LocationListener {
 
             if ( ! scanScheduled ) {
                 // get the ball rolling
-                MainActivity.info("Location provider change, scheduling scan");
+                Logging.info("Location provider change, scheduling scan");
                 mainActivity.scheduleScan();
             }
         }
@@ -350,14 +351,14 @@ public class GPSListener implements Listener, LocationListener {
                 dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
                         ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
             } catch (Exception ex) {
-                MainActivity.error("filed to log route update: ", ex);
+                Logging.error("filed to log route update: ", ex);
             }
         } else if (showRoute && null != location) {
             try {
                 dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
                         ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, 0L);
             } catch (Exception ex) {
-                MainActivity.error("filed to log default route update for viz: ", ex);
+                Logging.error("filed to log default route update for viz: ", ex);
             }
         }
         // update the UI
@@ -395,13 +396,13 @@ public class GPSListener implements Listener, LocationListener {
             boolean gpsLost = satCountLowTime != null && (now - satCountLowTime) > gpsTimeout;
             gpsLost |= now - lastLocationTime > gpsTimeout;
             gpsLost |= horribleGps(location);
-            if (gpsLost) MainActivity.info("gps gpsLost");
+            if (gpsLost) Logging.info("gps gpsLost");
             retval = ! gpsLost;
         }
         else if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
             boolean gpsLost = now - lastNetworkLocationTime > networkLocationTimeout;
             gpsLost |= horribleGps(location);
-            if (gpsLost) MainActivity.info("network gpsLost");
+            if (gpsLost) Logging.info("network gpsLost");
             retval = ! gpsLost;
         }
 
@@ -448,7 +449,7 @@ public class GPSListener implements Listener, LocationListener {
 
     /**
      * Provide string names for different GNSS constellations. Not i18n.
-     * @param constellationType
+     * @param constellationType the GnssStatus type
      * @return the string matching the integer from the GnssStatus ints
      */
     private String constellationToString(final int constellationType) {

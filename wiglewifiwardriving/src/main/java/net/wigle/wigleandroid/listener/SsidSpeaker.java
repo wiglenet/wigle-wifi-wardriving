@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 public final class SsidSpeaker {
     private static final String EMPTY = "";
@@ -33,7 +34,7 @@ public final class SsidSpeaker {
         for ( final String ssid : toSay ) {
             ssidSpeakBuilder.append( ssid ).append( ", " );
         }
-        MainActivity.info( "speak: " + ssidSpeakBuilder.toString() );
+        Logging.info( "speak: " + ssidSpeakBuilder.toString() );
         mainActivity.speak( ssidSpeakBuilder.toString() );
         toSay.clear();
     }

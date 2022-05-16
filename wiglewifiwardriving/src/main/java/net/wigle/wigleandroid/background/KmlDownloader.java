@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.background;
 
-import android.content.Context;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
 
@@ -8,6 +7,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +52,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             throw waex;
         } catch (final JSONException ex) {
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
-            MainActivity.error("ex: " + ex + " result: " + result, ex);
+            Logging.error("ex: " + ex + " result: " + result, ex);
         }
     }
 
@@ -76,7 +76,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             // the app files directory might have been enough here, but helps with provider_paths
 
             //see if KML dir exists
-            MainActivity.info("local storage DL...");
+            Logging.info("local storage DL...");
 
             File kmlPath = new File(FileUtility.getKmlPath(context));
             if (!kmlPath.exists()) {

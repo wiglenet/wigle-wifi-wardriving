@@ -9,6 +9,7 @@ import android.telephony.CellIdentityWcdma;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.InsufficientSpaceException;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,9 +57,9 @@ public class GsmOperator {
         if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
+                    Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
                 } else {
-                    MainActivity.info("Discarding GSM cell with invalid ID");
+                    Logging.info("Discarding GSM cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid GSM Cell Identity values: "+getOperatorKeyString());
@@ -88,16 +89,16 @@ public class GsmOperator {
                 //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
             }
 
-            MainActivity.info(res);
+            Logging.info(res);
         }
 
 
         if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
+                    Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
                 } else {
-                    MainActivity.info("Discarding LTE cell with invalid ID");
+                    Logging.info("Discarding LTE cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid LTE Cell Identity values "+getOperatorKeyString());
@@ -123,15 +124,15 @@ public class GsmOperator {
                     "\n\toperator: " + getOperatorString() +
                     "\n\tUARFCN:" + fcn;
 
-            MainActivity.info(res);
+            Logging.info(res);
         }
 
         if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc, mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
+                    Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
                 } else {
-                    MainActivity.info("Discarding WCDMA cell with invalid ID");
+                    Logging.info("Discarding WCDMA cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid WCDMA Cell Identity values "+getOperatorKeyString());
@@ -263,15 +264,15 @@ public class GsmOperator {
                     operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
                 } catch (SQLiteDatabaseCorruptException sqldbex) {
                     // this case seems isolated to LG android 4.4 devices
-                    MainActivity.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
+                    Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
                     try {
                         //recopy the MccMnc DB file to see whether we can recover.
                         s.mxcDbHelper.implantMxcDatabase();
                         //TODO: too aggressive? operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
                     } catch (InsufficientSpaceException sex) {
-                        MainActivity.error("GSMOp implant failed: ",sex);
+                        Logging.error("GSMOp implant failed: ",sex);
                     } catch (Exception ex) {
-                        MainActivity.warn("Mxc DB recopy failed", ex);
+                        Logging.warn("Mxc DB recopy failed", ex);
                     }
                 }
                 if (operator != null) {

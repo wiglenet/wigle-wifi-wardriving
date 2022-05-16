@@ -3,8 +3,8 @@ package net.wigle.wigleandroid.ui;
 import android.content.SharedPreferences;
 
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.util.Comparator;
 
@@ -62,7 +62,7 @@ public class NetworkListSorter {
      */
     public static Comparator<Network> getSort(final SharedPreferences prefs) {
         if (prefs == null) {
-            MainActivity.warn("null preferences; returning default comparator");
+            Logging.warn("null preferences; returning default comparator");
             return signalCompare;
         }
 
@@ -79,7 +79,7 @@ public class NetworkListSorter {
             case SSID_COMPARE:
                 return ssidCompare;
             default:
-                MainActivity.warn("fell through to default comparator");
+                Logging.warn("fell through to default comparator");
                 return signalCompare;
         }
     }

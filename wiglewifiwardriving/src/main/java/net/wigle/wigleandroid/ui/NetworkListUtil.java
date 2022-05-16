@@ -9,9 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.provider.Settings;
-import android.util.TypedValue;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -23,11 +21,10 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.R.color;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -130,7 +127,7 @@ public class NetworkListUtil {
                     context.getResources(), vectorResourceId, null);
         }
         if (vectorDrawable == null) {
-            MainActivity.error("Requested vector resource was not found");
+            Logging.error("Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();
         }
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * the array adapter for a list of usersO.
@@ -46,7 +47,7 @@ public final class RankListAdapter extends AbstractListAdapter<RankUser> {
         }
         catch ( final IndexOutOfBoundsException ex ) {
             // yes, this happened to someone
-            MainActivity.info("index out of bounds: " + position + " ex: " + ex);
+            Logging.info("index out of bounds: " + position + " ex: " + ex);
             return row;
         }
 

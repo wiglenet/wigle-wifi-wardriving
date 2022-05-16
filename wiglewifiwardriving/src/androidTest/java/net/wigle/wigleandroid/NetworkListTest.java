@@ -15,6 +15,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.ui.NetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,23 +108,23 @@ public class NetworkListTest {
             setAdapter.addBluetoothLe(net);
         }
         long end = System.currentTimeMillis();
-        MainActivity.info(" Added to Set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Added to Set-backed in ("+(end-start)+"ms)");
         start = System.currentTimeMillis();
         setAdapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Sorted set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Sorted set-backed in ("+(end-start)+"ms)");
         start = System.currentTimeMillis();
         for (Network net: btcLarge) {
             setAdapter.enqueueBluetooth(net);
         }
         setAdapter.batchUpdateBt(false, false, true);
         end = System.currentTimeMillis();
-        MainActivity.info(" Batch-added BTC to set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Batch-added BTC to set-backed in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         setAdapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Re-sorted set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Re-sorted set-backed in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         for (Network net: btleSmall) {
@@ -131,12 +132,12 @@ public class NetworkListTest {
         }
         setAdapter.batchUpdateBt(true, true, false);
         end = System.currentTimeMillis();
-        MainActivity.info(" Destructively batch-added BTLE small to set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Destructively batch-added BTLE small to set-backed in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         setAdapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Re-sorted set-backed in ("+(end-start)+"ms)");
+        Logging.info(" Re-sorted set-backed in ("+(end-start)+"ms)");
     }
 
     @Test
@@ -148,23 +149,23 @@ public class NetworkListTest {
             adapter.addBluetoothLe(net);
         }
         long end = System.currentTimeMillis();
-        MainActivity.info(" Added to old in ("+(end-start)+"ms)");
+        Logging.info(" Added to old in ("+(end-start)+"ms)");
         start = System.currentTimeMillis();
         adapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Sorted old in ("+(end-start)+"ms)");
+        Logging.info(" Sorted old in ("+(end-start)+"ms)");
         start = System.currentTimeMillis();
         for (Network net: btcLarge) {
             adapter.enqueueBluetooth(net);
         }
         adapter.batchUpdateBt(false, false, true);
         end = System.currentTimeMillis();
-        MainActivity.info(" Batch-added BTC to old in ("+(end-start)+"ms)");
+        Logging.info(" Batch-added BTC to old in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         adapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Re-sorted old in ("+(end-start)+"ms)");
+        Logging.info(" Re-sorted old in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         for (Network net: btleSmall) {
@@ -172,12 +173,12 @@ public class NetworkListTest {
         }
         adapter.batchUpdateBt(true, true, false);
         end = System.currentTimeMillis();
-        MainActivity.info(" Destructively batch-added BTLE small to old in ("+(end-start)+"ms)");
+        Logging.info(" Destructively batch-added BTLE small to old in ("+(end-start)+"ms)");
 
         start = System.currentTimeMillis();
         adapter.sort(NetworkListSorter.signalCompare);
         end = System.currentTimeMillis();
-        MainActivity.info(" Re-sorted old in ("+(end-start)+"ms)");
+        Logging.info(" Re-sorted old in ("+(end-start)+"ms)");
     }
 
     //ALIBI: dup from unit tests because of no-sharing in tests

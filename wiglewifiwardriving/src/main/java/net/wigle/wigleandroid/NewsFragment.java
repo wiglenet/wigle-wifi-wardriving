@@ -22,6 +22,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.NewsItem;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,7 +62,7 @@ public class NewsFragment extends Fragment {
     /** Called when the activity is first created. */
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
-        MainActivity.info("NEWS: onCreate");
+        Logging.info("NEWS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
@@ -80,7 +81,7 @@ public class NewsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
-        MainActivity.info("NEWS: onCreateView. orientation: " + orientation);
+        Logging.info("NEWS: onCreateView. orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.news, container, false);
         setupListView(rootView);
 
@@ -100,7 +101,7 @@ public class NewsFragment extends Fragment {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
             //unauthenticated call - should never trip
-            MainActivity.warn("Authentication error on news load (should not happen)", waex);
+            Logging.warn("Authentication error on news load (should not happen)", waex);
         }
 
         return rootView;
@@ -150,10 +151,10 @@ public class NewsFragment extends Fragment {
     }
 
     private void handleNews(final JSONObject json, final Handler handler) {
-        MainActivity.info("handleNews");
+        Logging.info("handleNews");
 
         if (json == null) {
-            MainActivity.info("handleNews null json, returning");
+            Logging.info("handleNews null json, returning");
             return;
         }
 
@@ -178,9 +179,9 @@ public class NewsFragment extends Fragment {
             }
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
         } catch (final JSONException ex) {
-            MainActivity.error("json error: " + ex, ex);
+            Logging.error("json error: " + ex, ex);
         } catch (final Exception e) {
-            MainActivity.error("news error: " + e, e);
+            Logging.error("news error: " + e, e);
         }
 
         final Message message = new Message();
@@ -191,38 +192,38 @@ public class NewsFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "NEWS: onDestroy" );
+        Logging.info( "NEWS: onDestroy" );
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
-        MainActivity.info("NEWS: onResume");
+        Logging.info("NEWS: onResume");
         super.onResume();
         getActivity().setTitle(R.string.news_app_name);
     }
 
     @Override
     public void onStart() {
-        MainActivity.info( "NEWS: onStart" );
+        Logging.info( "NEWS: onStart" );
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        MainActivity.info( "NEWS: onPause" );
+        Logging.info( "NEWS: onPause" );
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "NEWS: onStop" );
+        Logging.info( "NEWS: onStop" );
         super.onStop();
     }
 
     @Override
     public void onConfigurationChanged( final Configuration newConfig ) {
-        MainActivity.info("NEWS: config changed");
+        Logging.info("NEWS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 

@@ -14,6 +14,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -83,7 +84,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
                 long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
-                MainActivity.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
+                Logging.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
             } else {
                 long count = 0;
                 long btFailCount = 0L;
@@ -120,7 +121,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                     if (found > 0) {
                         count++;
                     } else {
-                        MainActivity.warn("unfound cell: ["+network+"]");
+                        Logging.warn("unfound cell: ["+network+"]");
                     }
                 }
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
@@ -132,21 +133,21 @@ public class KmlWriter extends AbstractBackgroundTask {
                         final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                         if (0L == found) {
                             btFailCount++;
-                            MainActivity.error("unfound BT network: [" + network + "]");
+                            Logging.error("unfound BT network: [" + network + "]");
                         }
                         cursor.close();
                         cursor = null;
                         count++;
                     }
                 }
-                MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount
+                Logging.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount
                         + " from total count: "+totalNets+" (non-bt-networks: "+ networks.size()
                         + " btnets:" + (btNetworks != null?btNetworks.size():"null")+")");
             }
             status = Status.WRITE_SUCCESS;
         }
         catch ( final InterruptedException ex ) {
-            MainActivity.info("Writing Kml Interrupted: " + ex);
+            Logging.info("Writing Kml Interrupted: " + ex);
         }
         catch ( DBException ex ) {
             dbHelper.deathDialog("Writing Kml", ex);
@@ -154,7 +155,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
         catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
+            Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
@@ -172,7 +173,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         //WARNING: ignored if no SD, so this is ok, but misleading...
         bundle.putString( BackgroundGuiHandler.FILEPATH, FileUtility.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        MainActivity.info( "done with kml export" );
+        Logging.info( "done with kml export" );
 
         // status is null on interrupted
         if ( status != null ) {
@@ -296,12 +297,12 @@ public class KmlWriter extends AbstractBackgroundTask {
                 ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
                 ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
             } else {
-                MainActivity.warn("unknown network type "+type+"for network: "+bssid);
+                Logging.warn("unknown network type "+type+"for network: "+bssid);
             }
 
             lineCount++;
             if ( (lineCount % 1000) == 0 ) {
-                MainActivity.info("lineCount: " + lineCount + " of " + totalCount );
+                Logging.info("lineCount: " + lineCount + " of " + totalCount );
             }
 
             // update UI

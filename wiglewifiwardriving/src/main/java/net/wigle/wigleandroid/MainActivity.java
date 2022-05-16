@@ -371,6 +371,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             SharedPreferences mySPrefs = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = mySPrefs.edit();
             editor.remove(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED);
+            if (!isImperialUnitsLocale()) {
+                editor.putBoolean(ListFragment.PREF_METRIC, true);
+            }
             editor.apply();
         }
 
@@ -1244,6 +1247,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final Context context = activity.getBaseContext();
         final Configuration config = context.getResources().getConfiguration();
         setLocale(context, config);
+    }
+
+    /**
+     * ALIBI LocaleData.getMeasurementSystem requires API 28 and up
+     * @return true if you're in USA, Liberia, or Burma
+     */
+    public static boolean isImperialUnitsLocale() {
+        final Locale locale = Locale.getDefault();
+        final String countryCode = locale.getCountry();
+        if ("US".equals(countryCode) || "LR".equals(countryCode) || "MM".equals(countryCode)) {
+            return true;
+        }
+        return false;
     }
 
     public static void setLocale(final Context context, final Configuration config) {

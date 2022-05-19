@@ -144,8 +144,15 @@ public final class MappingFragment extends Fragment {
     private static final String NOT_MINE_TILE_TRAILER = "&notmine=1";
 
     // parameters for polyline simplification package: https://github.com/hgoebl/simplify-java
+    // ALIBI: we could tighten these parameters significantly, but it results in wonky over-
+    //   simplifications leading up to the present position (since there are no "subsequent" values
+    //   to offset the algo's propensity to over-optimize the "end" cap.)
+    // Values chosen not to overburden most modern Android phones capabilities.
     // assume we need to undertake drastic route line complexity if we exceed this many segments
-    private static final int POLYLINE_PERF_THRESHOLD = 2500;
+    private static final int POLYLINE_PERF_THRESHOLD_COARSE = 15000;
+    // perform minor route line complexity simplification if we exceed this many segments
+    private static final int POLYLINE_PERF_THRESHOLD_FINE = 5000;
+
     // when performing drastic polyline simplification (Radial-Distance), this is our "tolerance value"
     private static final float POLYLINE_TOLERANCE_COARSE = 20.0f;
     // when performing minor polyline simplification (Douglas-Peucker), this is our "tolerance value"
@@ -580,12 +587,12 @@ public final class MappingFragment extends Fragment {
                                     final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
                                     routePolyline.setColor(getRouteColorForMapType(mapMode, nightMode));
 
-                                    if (routePoints.size() > POLYLINE_PERF_THRESHOLD) {
+                                    if (routePoints.size() > POLYLINE_PERF_THRESHOLD_COARSE) {
                                         Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_COARSE, false);
                                         routePolyline.setPoints(Arrays.asList(simplified));
                                         Logging.error("major route simplification: "+routePoints.size()+"->"+simplified.length);
-                                    } else if (routePoints.size() > 1) {
+                                    } else if (routePoints.size() > POLYLINE_PERF_THRESHOLD_FINE) {
                                         Simplify<LatLng> simplify = new Simplify<>(new LatLng[0], latLngPointExtractor);
                                         LatLng[] simplified = simplify.simplify(routePoints.toArray(new LatLng[0]), POLYLINE_TOLERANCE_FINE, true);
                                         routePolyline.setPoints(Arrays.asList(simplified));

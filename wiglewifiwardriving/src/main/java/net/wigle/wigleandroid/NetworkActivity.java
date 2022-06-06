@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -222,8 +223,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             }
             setupMap(network, savedInstanceState, prefs );
             // kick off the query now that we have our map
-            setupQuery();
             setupButtons(network, prefs);
+            setupQuery();
         }
     }
 
@@ -338,10 +339,11 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         };
 
         final String sql = "SELECT level,lat,lon FROM "
-                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() +
-                "' ORDER BY _id DESC limit " + obsMap.maxSize();
+                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = ?" +
+                " ORDER BY _id DESC limit ?" ;
 
-        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+        final QueryThread.Request request = new QueryThread.Request( sql,
+                new String[]{network.getBssid(), obsMap.maxSize()+""}, new QueryThread.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 observations++;

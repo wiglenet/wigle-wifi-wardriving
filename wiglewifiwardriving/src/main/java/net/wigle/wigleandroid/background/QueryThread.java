@@ -22,9 +22,13 @@ public class QueryThread extends Thread {
     }
     public static class Request {
         private final String sql;
+        private final String[] args;
         private final ResultHandler handler;
 
         public Request( final String sql, final ResultHandler handler ) {
+            this(sql, null, handler);
+        }
+        public Request( final String sql, final String[] args, final ResultHandler handler ) {
             if ( sql == null ) {
                 throw new IllegalArgumentException( "sql is null" );
             }
@@ -32,6 +36,7 @@ public class QueryThread extends Thread {
                 throw new IllegalArgumentException( "handler is null" );
             }
             this.sql = sql;
+            this.args = args;
             this.handler = handler;
         }
     }
@@ -64,7 +69,7 @@ public class QueryThread extends Thread {
                 if ( request != null ) {
                     final SQLiteDatabase db = dbHelper.getDB();
                     if ( db != null ) {
-                        cursor = db.rawQuery( request.sql, null );
+                        cursor = db.rawQuery( request.sql, request.args );
                         while ( cursor.moveToNext() ) {
                             if (!request.handler.handleRow( cursor )) {
                                 break;

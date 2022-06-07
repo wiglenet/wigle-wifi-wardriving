@@ -1070,10 +1070,11 @@ public final class MappingFragment extends Fragment {
         }
 
         final String sql = "SELECT bssid FROM "
-                + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT "
-                + (ListFragment.lameStatic.networkCache.maxSize() * 2);
+                + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT ?";
 
-        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+        final QueryThread.Request request = new QueryThread.Request( sql,
+                new String[]{(ListFragment.lameStatic.networkCache.maxSize() * 2)+""},
+                new QueryThread.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 final String bssid = cursor.getString(0);

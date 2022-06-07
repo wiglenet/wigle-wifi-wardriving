@@ -219,29 +219,37 @@ public class DBResultActivity extends AppCompatActivity {
         final String ssid = queryArgs.getSSID();
         final String bssid = queryArgs.getBSSID();
         boolean limit = false;
+        List<String> params = new ArrayList<>();
         if ( ssid != null && ! "".equals(ssid) ) {
-            sql += " AND ssid like " + DatabaseUtils.sqlEscapeString(ssid);
+            sql += " AND ssid like ?"; // + DatabaseUtils.sqlEscapeString(ssid);
+            params.add(ssid);
             limit = true;
         }
         if ( bssid != null && ! "".equals(bssid) ) {
-            sql += " AND bssid like " + DatabaseUtils.sqlEscapeString(bssid);
+            sql += " AND bssid like ?"; // + DatabaseUtils.sqlEscapeString(bssid);
+            params.add(bssid);
             limit = true;
         }
         if ( address != null ) {
+            sql += " AND lastlat > ? AND lastlat < ? AND lastlon > ? AND lastlon < ?";
             final double lat = address.getLatitude();
             final double lon = address.getLongitude();
-            sql += " AND lastlat > '" + (lat - LOCAL_RANGE) + "' AND lastlat < '" + (lat + LOCAL_RANGE) + "'";
-            sql += " AND lastlon > '" + (lon - LOCAL_RANGE) + "' AND lastlon < '" + (lon + LOCAL_RANGE) + "'";
+            params.add((lat - LOCAL_RANGE)+"");
+            params.add((lat + LOCAL_RANGE)+"");
+            params.add((lon - LOCAL_RANGE)+"");
+            params.add((lon + LOCAL_RANGE)+"");
         }
         if ( limit ) {
-            sql += " LIMIT " + LIMIT;
+            sql += " LIMIT ?"; // + LIMIT;
+            params.add(LIMIT+"");
         }
 
         final TreeMap<Float,String> top = new TreeMap<>();
         final float[] results = new float[1];
         final long[] count = new long[1];
 
-        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
+        final QueryThread.Request request = new QueryThread.Request( sql, params.toArray(new String[0]),
+                new QueryThread.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 final String bssid = cursor.getString(0);

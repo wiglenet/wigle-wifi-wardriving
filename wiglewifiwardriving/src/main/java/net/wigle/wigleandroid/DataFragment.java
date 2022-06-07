@@ -810,7 +810,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             // write intermediate file
             // ALIBI: redundant thread, but this gets us queue, progress
             final QueryThread.Request request = new QueryThread.Request(
-                    DatabaseHelper.LOCATED_NETS_QUERY, new QueryThread.ResultHandler() {
+                    DatabaseHelper.LOCATED_NETS_QUERY, null, new QueryThread.ResultHandler() {
 
                 int non_utm=0;
                 int rows = 0;

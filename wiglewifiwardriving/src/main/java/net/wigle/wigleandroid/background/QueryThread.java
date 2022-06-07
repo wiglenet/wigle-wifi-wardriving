@@ -25,9 +25,6 @@ public class QueryThread extends Thread {
         private final String[] args;
         private final ResultHandler handler;
 
-        public Request( final String sql, final ResultHandler handler ) {
-            this(sql, null, handler);
-        }
         public Request( final String sql, final String[] args, final ResultHandler handler ) {
             if ( sql == null ) {
                 throw new IllegalArgumentException( "sql is null" );

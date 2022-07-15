@@ -9,7 +9,7 @@ import java.util.Properties;
 
 public final class OUI {
     private final Properties properties = new Properties();
-    private final boolean propertiesAvailable = false;
+    private boolean propertiesAvailable = false;
 
     public OUI(final AssetManager assetManager) {
         try {

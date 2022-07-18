@@ -55,7 +55,10 @@ public class Logging {
         MainActivity.saveLog(value);
     }
 
-    private static void enableDebugLogging() {
+    /**
+     * Enable debug-log-level logging via the Logging class
+     */
+    public static void enableDebugLogging() {
         debugLogging = true;
     }
 }

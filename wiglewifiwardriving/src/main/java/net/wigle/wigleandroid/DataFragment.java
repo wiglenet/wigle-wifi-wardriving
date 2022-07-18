@@ -598,11 +598,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         startActivity(Intent.createChooser(intent, getResources().getText(R.string.send_to)));
                     }
                 } else {
-                    //TODO: show error
                     Logging.error("null or empty DB result in DB backup postExec");
+                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general,
+                            getString(R.string.error_general));
                 }
             }
-
         }
 
         public void progress( int progress ) {

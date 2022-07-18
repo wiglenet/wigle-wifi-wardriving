@@ -14,11 +14,11 @@ public final class OUI {
     public OUI(final AssetManager assetManager) {
         try {
             final InputStream ouiStream = assetManager.open("oui.properties");
-            Logging.info("Oui stream: " + stream);
+            Logging.info("Oui stream: " + ouiStream);
 
             InputStreamReader ouiStreamReader = new InputStreamReader(ouiStream, "UTF-8");
             properties.load(ouiStreamReader);
-            Logging.info("Oui properites loaded successful");
+            Logging.info("Oui properties loaded successful");
 
             propertiesAvailable = true;
         

@@ -479,8 +479,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 countStats.lineCount++;
                 String ssid = network.getSsid();
                 if (ssid.contains(COMMA)) {
-                    // comma isn't a legal ssid character, but just in case
-                    ssid = ssid.replaceAll( COMMA, "_" );
+                    // When the ssid is containing a comma, we must wrap the ssid with
+                    // quotes to ensure the output CSV format is valid
+                    ssid = String.format("\"%s\"", ssid);
                 }
                 // ListActivity.debug("writing network: " + ssid );
 

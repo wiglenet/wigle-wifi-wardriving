@@ -1,5 +1,12 @@
 package net.wigle.wigleandroid;
 
+// TODO: Shared between ListFragment
+import static net.wigle.wigleandroid.ListFragment.PREF_QUICK_PAUSE;
+import static net.wigle.wigleandroid.ListFragment.QUICK_SCAN_DO_NOTHING;
+import static net.wigle.wigleandroid.ListFragment.QUICK_SCAN_PAUSE;
+import static net.wigle.wigleandroid.ListFragment.QUICK_SCAN_UNSET;
+import static net.wigle.wigleandroid.ListFragment.SHARED_PREFS;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -16,7 +23,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -38,6 +47,9 @@ public class DashboardFragment extends Fragment {
   private ScrollView scrollView;
   private View landscape;
   private View portrait;
+
+  // TODO: Shared between ListFragment
+  private static final int QUICK_PAUSE_DIALOG = 102;
 
   /** Called when the activity is first created. */
   @Override
@@ -124,17 +136,20 @@ public class DashboardFragment extends Fragment {
   }
 
   private void updateUI( final View view ) {
+      final Activity currentActivity = getActivity();
+      final boolean scanning = currentActivity != null && MainActivity.isScanning(currentActivity);
+      scanUIReload(scanning, view);
 
-        View topBar =  view.findViewById( R.id.dash_status_bar );
-        final Activity currentActivity = getActivity();
-        final boolean scanning = currentActivity != null && MainActivity.isScanning(currentActivity);
-        if (scanning) {
-            topBar.setVisibility(View.GONE);
-        } else {
-            topBar.setVisibility(View.VISIBLE);
-            TextView dashScanstatus = view.findViewById(R.id.dash_scanstatus);
-            dashScanstatus.setText(getString(R.string.dash_scan_off));
-        }
+//        //View topBar =  view.findViewById( R.id.dash_status_bar );
+//        final Activity currentActivity = getActivity();
+//        final boolean scanning = currentActivity != null && MainActivity.isScanning(currentActivity);
+//        if (scanning) {
+//            //topBar.setVisibility(View.GONE);
+//        } else {
+//            //topBar.setVisibility(View.VISIBLE);
+//            //TextView dashScanstatus = view.findViewById(R.id.dash_scanstatus);
+//            //dashScanstatus.setText(getString(R.string.dash_scan_off));
+//        }
 
         TextView tv = view.findViewById( R.id.runnets );
         tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " ");
@@ -155,7 +170,7 @@ public class DashboardFragment extends Fragment {
         tv.setText( ListFragment.lameStatic.newCells + " ");
 
         if (null != currentActivity) {
-            final SharedPreferences prefs = currentActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = currentActivity.getSharedPreferences(SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
             tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload(prefs) );
 
@@ -298,6 +313,53 @@ public class DashboardFragment extends Fragment {
       tv.setText(durString );
   }
 
+  private void toggleScan() {
+      final MainActivity mainActivity = MainActivity.getMainActivity();
+      if (mainActivity == null) {
+          Logging.error("Can not access the MainActivity.");
+          return;
+      }
+
+      final View currentView = getView();
+      if (currentView == null) {
+          Logging.error("Can not access the current view.");
+          return;
+      }
+
+      final boolean scanStatusUpdated = !mainActivity.isScanning();
+      mainActivity.handleScanChange(scanStatusUpdated);
+      scanUIReload(scanStatusUpdated, currentView);
+  }
+
+  private void scanUIReload(final boolean isScanning, final View view) {
+      Button scanToggleButton = (Button)view.findViewById(R.id.dashboard_scan_toggle);
+      if (scanToggleButton == null) {
+          Logging.error("Can not access the required UI element.");
+          return;
+      }
+
+      // TODO: i18n implementation
+      final String textToUpdate = isScanning
+              ? "Pause scanning..."
+              : "Resume scanning...";
+
+      scanToggleButton.setText(textToUpdate);
+  }
+
+    public void makeQuickPausePrefDialog(final MainActivity main) {
+        final String dialogText = getString(R.string.quick_pause_text);
+        final String checkboxText = getString(R.string.quick_pause_decision);
+        MainActivity.createCheckboxConfirmation(
+                DashboardFragment.this.getActivity(),
+                dialogText,
+                checkboxText,
+                PREF_QUICK_PAUSE,
+                QUICK_SCAN_PAUSE,
+                QUICK_SCAN_DO_NOTHING,
+                R.id.nav_list,
+                QUICK_PAUSE_DIALOG);
+    }
+
   @Override
   public void onDestroy() {
     Logging.info( "DASH: onDestroy" );
@@ -317,6 +379,44 @@ public class DashboardFragment extends Fragment {
   @Override
   public void onStart() {
     Logging.info( "DASH: onStart" );
+
+    final MainActivity mainActivity = MainActivity.getMainActivity();
+    final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
+    final View view = getView();
+    if (mainActivity != null && view != null) {
+        //Initialize the scan toggle button
+        final Button scanButton = (Button)view.findViewById(R.id.dashboard_scan_toggle);
+        scanButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleScan();
+                // TODO: Add confirmation dialog
+//                String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+//                makeQuickPausePrefDialog(mainActivity);
+//
+//                if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
+//                    Logging.info("Dashboard scan toggle: do nothing.");
+//                    prefs.edit()
+//                    return;
+//                }
+//
+//                if (QUICK_SCAN_PAUSE.equals(quickPausePref) && mainActivity.isScanning()) {
+//                    Logging.info("Dashboard scan toggle: pause.");
+//                    toggleScan();
+//                    return;
+//                }
+//
+//                if (!mainActivity.isScanning()) {
+//                    Logging.info("Dashboard scan toggle: resume.");
+//                    toggleScan();
+//                    return;
+//                }
+            }
+        });
+    } else {
+        Logging.error("Can not access view or main activity in order to initialize UI elements.");
+    }
+
     super.onStart();
   }
 

@@ -37,6 +37,7 @@ import net.wigle.wigleandroid.util.Logging;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {
@@ -356,7 +357,7 @@ public class DashboardFragment extends Fragment {
                 PREF_QUICK_PAUSE,
                 QUICK_SCAN_PAUSE,
                 QUICK_SCAN_DO_NOTHING,
-                R.id.nav_list,
+                R.id.nav_dash,
                 QUICK_PAUSE_DIALOG);
     }
 
@@ -452,15 +453,13 @@ public class DashboardFragment extends Fragment {
   }
 
   private String timeString(final long duration) {
-    //TODO: better to just use TimeUnit?
-    int seconds = (int) (duration / 1000) % 60 ;
-    int minutes = (int) ((duration / (1000*60)) % 60);
-    int hours   = (int) ((duration / (1000*60*60)) % 24);
-    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
-    if (hours > 0) {
-      durString = String.format("%d", hours) + ":" + durString;
-    }
-    return " " +durString;
+    int seconds = (int)TimeUnit.MILLISECONDS.toSeconds(duration);
+    int minutes = (int)TimeUnit.MILLISECONDS.toMinutes(duration);
+    int hours = (int)TimeUnit.MILLISECONDS.toHours(duration);
+
+    return hours > 0
+            ? String.format(" %d:%02d:%02d", hours, minutes, seconds)
+            : String.format(" %02d:%02d", minutes, seconds);
   }
 
 }

@@ -55,6 +55,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     return cellNets.contains(o);
                 default:
                     return false;
@@ -111,6 +112,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -142,6 +144,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     found = cellNets.remove(o);
                     break;
                 default:
@@ -182,6 +185,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     if (cellNets.add(net)) {
                         added.add(net);
                     }
@@ -279,6 +283,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -315,6 +320,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -345,6 +351,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     cellNets.remove(n);
                 default:
                     break;

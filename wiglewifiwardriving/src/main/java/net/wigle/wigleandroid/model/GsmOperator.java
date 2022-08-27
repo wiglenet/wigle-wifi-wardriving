@@ -115,7 +115,7 @@ public class GsmOperator {
 
         fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
         if (MainActivity.DEBUG_CELL_DATA) {
-            String res = "LTE Cell: " +
+            String res = "NR Cell: " +
                     "\n\tNCI: " + cellId +
                     "\n\tPCI: " + cellIdentN.getPci() +
                     "\n\tTAC: " + xac +
@@ -132,16 +132,15 @@ public class GsmOperator {
             Logging.info(res);
         }
 
-
         if (!validCellId(this.cellId, "NR") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentN.getNrarfcn());
+                    Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
                 } else {
-                    Logging.info("Discarding LTE cell with invalid ID");
+                    Logging.info("Discarding NR cell with invalid ID");
                 }
             }
-            throw new GsmOperatorException("invalid LTE Cell Identity values "+getOperatorKeyString());
+            throw new GsmOperatorException("invalid NR Cell Identity values "+getOperatorKeyString());
         }
     }
 

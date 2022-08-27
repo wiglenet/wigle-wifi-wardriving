@@ -12,6 +12,7 @@ import java.util.Set;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -222,7 +223,7 @@ public class KmlWriter extends AbstractBackgroundTask {
             } else if (NetworkType.BT.equals(type)) {
                 style = "blue";
 
-            } else if (NetworkType.CDMA.equals(type) || NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type)) {
+            } else if (NetworkType.isCellType(type)) {
                 style = "pink";
             } else {
                 style = "zeroConfidence";
@@ -262,8 +263,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
                 ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
 
-            } else if (type.equals(NetworkType.CDMA) || type.equals(NetworkType.LTE) ||
-                    type.equals(NetworkType.GSM) || type.equals(NetworkType.WCDMA)) {
+            } else if (NetworkType.isCellType(type)) {
                 ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
                 fos.write(ssidFiltered);
                 ObservationUploader.writeFos(fos, "]]></name>\n");
@@ -280,7 +280,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                 ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
                 ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
 
-            } else if (type.equals(NetworkType.BT) || type.equals(NetworkType.BLE)) {
+            } else if (NetworkType.isBtType(type)) {
                 ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
                 fos.write(ssidFiltered);
                 ObservationUploader.writeFos(fos, "]]></name>\n");

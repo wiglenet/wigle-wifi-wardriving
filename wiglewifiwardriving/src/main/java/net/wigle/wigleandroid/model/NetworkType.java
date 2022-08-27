@@ -34,4 +34,41 @@ public enum NetworkType {
     public static NetworkType typeForCode(final String code) {
         return types.get(code);
     }
+
+    public static boolean isCellType (NetworkType type) {
+        if (NetworkType.CDMA.equals(type) || NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type) || NetworkType.NR.equals(type)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isGsmLike (NetworkType type) {
+        if (NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type) || NetworkType.NR.equals(type)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isBtType (NetworkType type) {
+        if (NetworkType.BT.equals(type) || NetworkType.BLE.equals(type)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static final String channelCodeTypeForNetworkType(NetworkType type) {
+        switch (type) {
+            case GSM:
+                return "ARFCN"  ;
+            case LTE:
+                return "EARFCN";
+            case WCDMA:
+                return "UARFCN";
+            case NR:
+                return "NRARFCN";
+            default:
+                return null;
+        }
+    }
+
 }

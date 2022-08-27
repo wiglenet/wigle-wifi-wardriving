@@ -96,6 +96,8 @@ public final class Network implements ClusterItem {
 
             } else if (NetworkType.WCDMA.equals(type)) {
 
+            } else if (NetworkType.NR.equals(type)) {
+
             } else {
                 channel = 0;
             }*/

@@ -9,6 +9,7 @@ public enum NetworkType {
     CDMA("C"),
     LTE("L"),
     WCDMA("D"),
+    NR("N"),
     BT("B"),
     BLE("E"),
     NFC("N");

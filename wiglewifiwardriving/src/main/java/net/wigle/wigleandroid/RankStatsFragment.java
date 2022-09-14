@@ -28,6 +28,7 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.RankUser;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 
@@ -215,8 +216,8 @@ public class RankStatsFragment extends Fragment {
         try {
             task.startDownload(this);
         } catch (WiGLEAuthException waex) {
-            //TODO: toast? *shouldn't* be authed, but a UserStats call may have been issued in error
             Logging.info("Rank Stats Download Failed due to failed auth");
+            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, getString(R.string.error_general));
         }
     }
 

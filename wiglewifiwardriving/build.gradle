@@ -4,6 +4,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
 
 android {
+    namespace "net.wigle.wigleandroid"
     compileSdkVersion 30
 
     defaultConfig {
@@ -21,15 +22,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/MANIFEST.MF'
+        resources {
+            excludes += ['META-INF/ASL2.0', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/LICENSE.txt', 'META-INF/MANIFEST.MF']
+        }
     }
+
 }
 
 configurations {
@@ -59,7 +57,7 @@ dependencies {
     implementation "com.google.android.material:material:1.3.0"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.appcompat:appcompat:1.2.0"
-    implementation "com.google.android.gms:play-services-maps:17.0.0"
+    implementation "com.google.android.gms:play-services-maps:17.0.1"
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.slf4j:slf4j-android:1.7.19'

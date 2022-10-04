@@ -1,3 +1,9 @@
+* 2.65 (10/04/2022)
+Various polish/time/log/toast improvements (thanks Krzysztofz01!)
+Defaulting distance units
+Route points updates
+Optional map styling
+
 * 2.64 (2/27/2022)
 Fix Polish toast text (thanks olekstomek!)
 French updates (thanks k4nfr3!)

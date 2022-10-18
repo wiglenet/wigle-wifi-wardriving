@@ -353,9 +353,9 @@ public class DashboardFragment extends Fragment {
   }
 
   private String timeString(final long duration) {
-    long seconds = TimeUnit.MILLISECONDS.toSeconds(duration);
-    long minutes = TimeUnit.MILLISECONDS.toMinutes(duration);
-    long hours = TimeUnit.MILLISECONDS.toHours(duration);
+    final long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+    final long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+    final long hours = TimeUnit.MILLISECONDS.toHours(duration);
     
     Locale defaultLocale = Locale.getDefault();
     

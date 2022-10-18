@@ -295,7 +295,7 @@
     <string name="tab_rank">Ranglista</string>
     <string name="uploads_app_name">WiGLE.net feltöltések</string>
     <string name="tab_uploads">Feltöltések</string>
-    <string name="queue_depth">Fájlfeldolgozási várólánc mélysége</string>
+    <string name="queue_depth">WiGLE sor: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net hírek</string>
     <string name="tab_news">Hírek</string>
     <string name="bytes">Bájt</string>

@@ -295,7 +295,7 @@
     <string name="tab_rank">التصنيف العالمي</string>
     <string name="uploads_app_name">WiGLE.net التحميلات</string>
     <string name="tab_uploads">تحميل</string>
-    <string name="queue_depth">معالجة ملف قائمة الانتظار العمق</string>
+    <string name="queue_depth">قائمة انتظار WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">أخبار WiGLE.net</string>
     <string name="tab_news">أخبار</string>
     <string name="bytes">بايت</string>

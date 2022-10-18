@@ -295,7 +295,7 @@
     <string name="tab_rank">순위</string>
     <string name="uploads_app_name">WiGLE.net 업로드</string>
     <string name="tab_uploads">업로드</string>
-    <string name="queue_depth">파일 처리 대기열 깊이</string>
+    <string name="queue_depth">WiGLE 대기열: %1$s 트라이: %2$s 지역: %3$s</string>
     <string name="news_app_name">WiGLE.net 뉴스</string>
     <string name="tab_news">뉴스</string>
     <string name="bytes">바이트</string>

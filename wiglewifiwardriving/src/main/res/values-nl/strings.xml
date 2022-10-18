@@ -295,7 +295,7 @@
     <string name="tab_rank">Rankings</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Upload</string>
-    <string name="queue_depth">Wachtrijdiepte bestandsverwerking</string>
+    <string name="queue_depth">WiGLE-wachtrij: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Nieuws</string>
     <string name="tab_news">Nieuws</string>
     <string name="bytes">Bytes</string>

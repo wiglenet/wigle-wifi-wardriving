@@ -295,7 +295,7 @@
     <string name="tab_rank">排名</string>
     <string name="uploads_app_name">WiGLE.net上传</string>
     <string name="tab_uploads">上传</string>
-    <string name="queue_depth">文件处理队列深度</string>
+    <string name="queue_depth">WiGLE 队列: %1$s 三: %2$s 地理: %3$s</string>
     <string name="news_app_name">WiGLE.net新闻</string>
     <string name="tab_news">新闻</string>
     <string name="bytes">字节</string>

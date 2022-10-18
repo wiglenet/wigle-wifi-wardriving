@@ -295,7 +295,7 @@
     <string name="tab_rank">Graduatorie</string>
     <string name="uploads_app_name">Caricati in WiGLE.net</string>
     <string name="tab_uploads">Caricati</string>
-    <string name="queue_depth">Avanzamento nella coda dei file</string>
+    <string name="queue_depth">Coda WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">Novità WiGLE.net</string>
     <string name="tab_news">Novità</string>
     <string name="bytes">Byte</string>

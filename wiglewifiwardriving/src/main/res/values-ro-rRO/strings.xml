@@ -295,7 +295,7 @@
     <string name="tab_rank">Clasamente</string>
     <string name="uploads_app_name">Încărcări WiGLE.net</string>
     <string name="tab_uploads">Încărcări</string>
-    <string name="queue_depth">Adâncimea cozii de procesare a fișierelor</string>
+    <string name="queue_depth">Coada WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">Știri WiGLE.net</string>
     <string name="tab_news">Știri</string>
     <string name="bytes">octeți</string>

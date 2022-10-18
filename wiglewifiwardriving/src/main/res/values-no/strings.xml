@@ -296,7 +296,7 @@
     <string name="tab_rank">Rangeringer</string>
     <string name="uploads_app_name">WiGLE.net opplastinger</string>
     <string name="tab_uploads">Opplastinger</string>
-    <string name="queue_depth">Filbehandlings kødybde</string>
+    <string name="queue_depth">WiGLE-kø: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net nyheter</string>
     <string name="tab_news">Nyheter</string>
     <string name="bytes">Bytes</string>

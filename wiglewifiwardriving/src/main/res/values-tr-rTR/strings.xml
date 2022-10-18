@@ -295,7 +295,7 @@
     <string name="tab_rank">Sıralamalar</string>
     <string name="uploads_app_name">WiGLE.net Yüklemeleri</string>
     <string name="tab_uploads">Yüklemeler</string>
-    <string name="queue_depth">Dosya İşleme Sırası Derinliği</string>
+    <string name="queue_depth">WiGLE kuyruğu: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Haberleri</string>
     <string name="tab_news">Haberler</string>
     <string name="bytes">Bayt</string>

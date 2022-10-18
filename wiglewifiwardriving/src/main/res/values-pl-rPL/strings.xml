@@ -295,7 +295,7 @@
     <string name="tab_rank">Rankingi</string>
     <string name="uploads_app_name">Przesyłanie WiGLE.net</string>
     <string name="tab_uploads">Przesłane</string>
-    <string name="queue_depth">Głębokość kolejki przetwarzania plików</string>
+    <string name="queue_depth">Kolejka WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">Wiadomości WiGLE.net</string>
     <string name="tab_news">Aktualności</string>
     <string name="bytes">Bajty</string>

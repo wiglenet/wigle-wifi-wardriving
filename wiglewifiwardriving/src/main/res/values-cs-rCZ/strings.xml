@@ -295,7 +295,7 @@
     <string name="tab_rank">Žebříčky</string>
     <string name="uploads_app_name">WiGLE.net Uploady</string>
     <string name="tab_uploads">Uploady</string>
-    <string name="queue_depth">Hloubka fronty pro zpracování souborů</string>
+    <string name="queue_depth">Fronta WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Zprávy</string>
     <string name="tab_news">Zprávy</string>
     <string name="bytes">Byty</string>

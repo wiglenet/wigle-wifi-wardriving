@@ -28,6 +28,7 @@ import net.wigle.wigleandroid.util.Logging;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {

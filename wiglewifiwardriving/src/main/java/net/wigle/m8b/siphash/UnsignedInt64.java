@@ -12,14 +12,14 @@ class UnsignedInt64 {
     }
     
     public static long binToIntOffset(byte[] b, int off) {
-        return ((long) b[off    ])       |
-               ((long) b[off + 1]) << 8  |
-               ((long) b[off + 2]) << 16 |
-               ((long) b[off + 3]) << 24 |
-               ((long) b[off + 4]) << 32 |
-               ((long) b[off + 5]) << 40 |
-               ((long) b[off + 6]) << 48 |
-               ((long) b[off + 7]) << 56;
+        return (((long) b[off    ]) & 0xff)     |
+               (((long) b[off + 1]) & 0xff) << 8  |
+               (((long) b[off + 2]) & 0xff) << 16 |
+               (((long) b[off + 3]) & 0xff) << 24 |
+               (((long) b[off + 4]) & 0xff) << 32 |
+               (((long) b[off + 5]) & 0xff) << 40 |
+               (((long) b[off + 6]) & 0xff) << 48 |
+               (((long) b[off + 7]) & 0xff) << 56;
     }
     
     public static void intToBin(long l, byte[] b) {

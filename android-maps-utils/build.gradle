@@ -5,11 +5,12 @@ apply plugin: 'signing'
 group = 'com.google.maps.android'
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:17.0.1'
 }
 
 
 android {
+    namespace "com.google.maps.android"
     compileSdkVersion 30
 
     defaultConfig {
@@ -30,13 +31,6 @@ android {
             java.srcDirs = ['tests/src']
         }
     }
-
-    // This enables long timeouts required on slow environments, e.g. Travis
-    adbOptions {
-        timeOutInMs 10 * 60 * 1000  // 10 minutes
-        installOptions "-d","-t"
-    }
-
 }
 
 task instrumentTest(dependsOn: connectedCheck)

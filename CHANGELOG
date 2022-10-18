@@ -1,3 +1,11 @@
+* 2.65 - 2.67 (10/10/2022)
+German language fixes (thanks rumpelyann!)
+Various polish/log/toast improvements (thanks Krzysztofz01!)
+Magic 8 Ball bugfix
+Defaulting distance units
+Route points updates
+Optional map styling
+
 * 2.64 (2/27/2022)
 Fix Polish toast text (thanks olekstomek!)
 French updates (thanks k4nfr3!)

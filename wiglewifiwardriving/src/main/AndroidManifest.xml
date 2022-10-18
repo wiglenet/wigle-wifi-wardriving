@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.wigle.wigleandroid"
     android:installLocation="auto"
-    android:versionCode="264"
-    android:versionName="2.64">
+    android:versionCode="267"
+    android:versionName="2.67">
 
     <supports-screens
         android:anyDensity="true"
@@ -74,6 +73,7 @@
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize|uiMode"
             android:label="@string/list_app_name"
+            android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,6 +83,7 @@
         <activity
             android:name=".ActivateActivity"
             android:label="@string/title_activity_activate"
+            android:exported="true"
             android:parentActivityName=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <!--  android:exported="false" TODO: do we care if someone else triggers this activity? -->
@@ -137,6 +138,7 @@
         <activity
             android:name=".RegistrationActivity"
             android:parentActivityName=".MainActivity"
+            android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|locale|screenSize" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -253,17 +255,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/csvgz_paths" />
         </provider>
-        <receiver android:name=".listener.TerminationReceiver" >
+        <receiver android:name=".listener.TerminationReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.END" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".listener.UploadReceiver" >
+        <receiver android:name=".listener.UploadReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.UPLOAD" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".listener.ScanControlReceiver" >
+        <receiver android:name=".listener.ScanControlReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="net.wigle.wigleandroid.SCAN" />
             </intent-filter>

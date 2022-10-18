@@ -401,7 +401,7 @@
     <string name="rank_all_time">Рейтинг за всё время</string>
     <string name="rank_month">Месячный рейтинг</string>
     <string name="rank_stats_app_name">Рейтинги WiGLE.net</string>
-    <string name="queue_depth">Глубина очереди обработки файлов</string>
+    <string name="queue_depth">Очередь WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="prevmonthcount_title">сетей Wi-Fi обнаружено в прошлом месяце</string>
     <string name="all_time_title">Обнаружено Wi-Fi за всё время</string>
     <string name="bytes">Байт</string>

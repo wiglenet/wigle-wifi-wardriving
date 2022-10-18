@@ -294,7 +294,7 @@
     <string name="tab_rank">ランキング</string>
     <string name="uploads_app_name">WiGLE.net アップロード</string>
     <string name="tab_uploads">アップロード</string>
-    <string name="queue_depth">ファイル処理キューの深さ</string>
+    <string name="queue_depth">WiGLE キュー: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net ニュース</string>
     <string name="tab_news">ニュース</string>
     <string name="bytes">バイト</string>

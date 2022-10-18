@@ -294,7 +294,7 @@
     <string name="tab_rank">Clasificaciones</string>
     <string name="uploads_app_name">Cargas de WiGLE.net</string>
     <string name="tab_uploads">Cargas</string>
-    <string name="queue_depth">Profundidad de la fila de procesamiento de archivos</string>
+    <string name="queue_depth">Cola WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">Noticias de WiGLE.net</string>
     <string name="tab_news">Noticias</string>
     <string name="bytes">Bytes</string>

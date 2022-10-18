@@ -62,6 +62,8 @@ public class UploadsFragment extends Fragment {
      {
        "success":true,
        "processingQueueDepth":1,
+       "trilaterationQueueDepth":507,
+       "geoQueueDepth":10,
        "results":[
          {
            "transid":"20170101-00928",
@@ -95,6 +97,8 @@ public class UploadsFragment extends Fragment {
     private static final String KEY_TOTAL_BT_GPS = "btDiscoveredGps";
     private static final String KEY_TOTAL_CELL_GPS = "genDiscoveredGps";
     private static final String KEY_QUEUE_DEPTH = "processingQueueDepth";
+    private static final String KEY_TRI_QUEUE_DEPTH = "trilaterationQueueDepth";
+    private static final String KEY_GEO_QUEUE_DEPTH = "geoQueueDepth";
     private static final String KEY_TRANSID = "transid";
     private static final String KEY_STATUS = "status";
     private static final String KEY_PERCENT_DONE = "percentDone";
@@ -280,8 +284,8 @@ public class UploadsFragment extends Fragment {
             if (msg.what == MSG_RANKING_DONE && results != null && uploadsListAdapter != null && lockListAdapter.compareAndSet(false, true)) {
                 try {
                     TextView tv = view.findViewById(R.id.queue_depth);
-                    final String queueDepthTitle = resources.getString(R.string.queue_depth);
-                    tv.setText(queueDepthTitle + ": " + bundle.getString(KEY_QUEUE_DEPTH));
+                    final String queueDepthTitle = resources.getString(R.string.queue_depth, bundle.getString(KEY_QUEUE_DEPTH), bundle.getString(KEY_TRI_QUEUE_DEPTH), bundle.getString(KEY_GEO_QUEUE_DEPTH));
+                    tv.setText(queueDepthTitle);
                     uploadsListAdapter.clear();
                     for (final Parcelable result : results) {
                         if (result instanceof Bundle) {
@@ -357,6 +361,8 @@ public class UploadsFragment extends Fragment {
             //TODO: remaining elements in filesOnDevice are likely failed uploads - we can offer the option to retry
             bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
             bundle.putString(KEY_QUEUE_DEPTH, json.getString(KEY_QUEUE_DEPTH));
+            bundle.putString(KEY_TRI_QUEUE_DEPTH, json.getString(KEY_TRI_QUEUE_DEPTH));
+            bundle.putString(KEY_GEO_QUEUE_DEPTH, json.getString(KEY_GEO_QUEUE_DEPTH));
         } catch (final JSONException ex) {
             Logging.error("json error: " + ex, ex);
         } catch (final Exception e) {

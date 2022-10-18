@@ -294,7 +294,7 @@
     <string name="tab_rank">Seli</string>
     <string name="uploads_app_name">Upakiaji wa WiGLE.net</string>
     <string name="tab_uploads">Upakiaji</string>
-    <string name="queue_depth">Faili Inachakata Kina cha Foleni</string>
+    <string name="queue_depth">Foleni ya WiGLE: %1$s Tatu: %2$s Geo: %3$s</string>
     <string name="news_app_name">Habari za WiGLE.net</string>
     <string name="tab_news">Habari</string>
     <string name="bytes">Baiti</string>

@@ -295,7 +295,7 @@
     <string name="tab_rank">דירוגים</string>
     <string name="uploads_app_name">העלאות של WiGLE.net</string>
     <string name="tab_uploads">העלאות</string>
-    <string name="queue_depth">עומק תור עיבוד הקובץ</string>
+    <string name="queue_depth">תור WiGLE: %1$s Tri: %2$s גיאוגרפי: %3$s</string>
     <string name="news_app_name">חדשות WiGLE.net</string>
     <string name="tab_news">חֲדָשׁוֹת</string>
     <string name="bytes">בתים</string>

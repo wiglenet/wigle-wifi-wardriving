@@ -294,7 +294,7 @@
     <string name="tab_rank">रैंकिंग</string>
     <string name="uploads_app_name">WiGLE.net अपलोड</string>
     <string name="tab_uploads">अपलोड</string>
-    <string name="queue_depth">फ़ाइल प्रोसेसिंग कतार गहराई</string>
+    <string name="queue_depth">WiGLE कतार: %1$s त्रि: %2$s भू: %3$s</string>
     <string name="news_app_name">WiGLE.net समाचार</string>
     <string name="tab_news">समाचार</string>
     <string name="bytes">बाइट्स</string>

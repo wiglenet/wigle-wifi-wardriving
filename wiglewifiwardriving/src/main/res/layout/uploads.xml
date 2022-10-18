@@ -6,12 +6,19 @@
     android:layout_height="wrap_content"
     android:padding="4dp"
     >
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        style="@style/InvertedBackground">
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/queue_depth"
-        android:textSize="18sp"
+        style="@style/InvertedText"
+        android:textSize="16sp"
         />
+    </LinearLayout>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/uploads_swipe_container"
         android:layout_width="match_parent"

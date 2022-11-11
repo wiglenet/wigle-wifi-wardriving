@@ -163,7 +163,6 @@ public final class MappingFragment extends Fragment {
     private static final int OVERLAY_LIGHT = Color.parseColor("#F4D03F");
 
 
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -183,7 +182,7 @@ public final class MappingFragment extends Fragment {
             locale = Locale.US;
         }
         numberFormat = NumberFormat.getNumberInstance(locale);
-        numberFormat.setMaximumFractionDigits(1);
+        numberFormat.setMaximumFractionDigits(2);
         // media volume
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 

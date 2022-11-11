@@ -74,8 +74,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private static final int UPLOAD_DIALOG = 101;
     private static final int QUICK_PAUSE_DIALOG = 102;
 
-    public static final float MIN_DISTANCE_ACCURACY = 32f;
-
     // preferences
     public static final String SHARED_PREFS = "WiglePrefs";
     public static final String PREF_USERNAME = "username";

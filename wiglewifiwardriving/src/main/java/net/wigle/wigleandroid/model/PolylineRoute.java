@@ -11,7 +11,7 @@ import net.wigle.wigleandroid.MainActivity;
 import static net.wigle.wigleandroid.MappingFragment.getRouteColorForMapType;
 
 /**
- * A utility class to manage routes for internal represntation and map rendering
+ * A utility class to manage routes for internal representation and map rendering
  */
 public class PolylineRoute {
     public static final float DEFAULT_ROUTE_WIDTH = 15.0f; //TODO: dedup with MappingFragment

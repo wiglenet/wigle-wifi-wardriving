@@ -5,12 +5,26 @@ apply plugin: 'de.undercouch.download'
 
 android {
     namespace "net.wigle.wigleandroid"
-    compileSdkVersion 30
-
+    compileSdkVersion 31
+    flavorDimensions "version"
+    productFlavors {
+        legacy {
+            dimension "version"
+            minSdkVersion 14
+            versionCode 1401  // Min API level 14, v01
+            applicationIdSuffix ".legacy"
+            versionNameSuffix "-legacy"
+        }
+        current {
+            dimension "version"
+            minSdkVersion 19
+            versionCode 1901  // Min API level 19, v01
+        }
+    }
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion 19
+        targetSdkVersion 31
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -51,23 +65,28 @@ ext {
 
 dependencies {
     implementation project(':android-maps-utils')
-    implementation "androidx.core:core:1.3.2"
-    implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.2.0"
-    implementation "com.google.android.material:material:1.3.0"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.2.0"
-    implementation "com.google.android.gms:play-services-maps:17.0.1"
+    implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
+    legacyImplementation "androidx.core:core:1.3.2"
+    legacyImplementation "androidx.appcompat:appcompat:1.2.0"
+    legacyImplementation "com.google.android.material:material:1.3.0"
+    legacyImplementation "androidx.appcompat:appcompat:1.2.0"
+    legacyImplementation "com.google.android.gms:play-services-maps:17.0.1"
+    currentImplementation "androidx.core:core:1.6.0"
+    currentImplementation "androidx.appcompat:appcompat:1.4.2"
+    currentImplementation "com.google.android.material:material:1.6.0"
+    currentImplementation "androidx.appcompat:appcompat:1.3.0"
+    currentImplementation "com.google.android.gms:play-services-maps:18.1.0"
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.slf4j:slf4j-android:1.7.19'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.10.8'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
-    //TODO: MinAPI issue: implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.2.0'
+    currentImplementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
     testImplementation 'junit:junit:4.13'
     testImplementation 'androidx.test:core:1.3.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'

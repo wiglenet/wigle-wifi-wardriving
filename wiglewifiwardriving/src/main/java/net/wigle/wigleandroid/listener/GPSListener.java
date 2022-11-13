@@ -27,13 +27,14 @@ import android.os.Bundle;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.core.content.ContextCompat;
 
 public class GPSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
-    public static final float LERP_MIN_THRESHOLD_METERS = 1.0f;
+    public static final float LERP_MIN_THRESHOLD_METERS = 20.0f;
     public static final float LERP_MAX_THRESHOLD_METERS = 200f;
 
     public static final float MIN_ROUTE_LOCATION_DIFF_METERS = 3.8f;
@@ -47,6 +48,8 @@ public class GPSListener implements Listener, LocationListener {
     public static final float SLOW_METERS_SEC = 0.025f;     // snails actually vary between 0.013m/s and 0.0028m/s
     // ALIBI: maybe this is a happy medium for kalman filtering?
     public static final float GOLDILOCKS_METERS_SEC = 3.0f;
+
+    private final AtomicLong currentDistPointCount = new AtomicLong(0L);
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
@@ -254,35 +257,41 @@ public class GPSListener implements Listener, LocationListener {
                 location = newLocation;
             }
         }
-
-        if ( location != null && GPS_PROVIDER.equals( location.getProvider() )
-                && location.getAccuracy() <= ListFragment.MIN_DISTANCE_ACCURACY ) {
-            if ( prevGpsLocation != null ) {
-                float dist = location.distanceTo( prevGpsLocation );
-                //MainActivity.info( "dist: " + dist );
-                if (realisticMovement(dist, (float)(location.getTime()-prevGpsLocation.getTime())*0.001f,
-                    prevGpsLocation.getAccuracy(), location.getAccuracy())) {
-                    final Editor edit = prefs.edit();
-                    edit.putFloat( ListFragment.PREF_DISTANCE_RUN,
-                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f ) );
-                    edit.putFloat( ListFragment.PREF_DISTANCE_TOTAL,
-                            dist + prefs.getFloat( ListFragment.PREF_DISTANCE_TOTAL, 0f ) );
-                    edit.apply();
-                }
-                if ( dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
-                    if (dist > LERP_MAX_THRESHOLD_METERS) {
-                        Logging.warn("Diff is too large, not lerping. " + dist + " meters");
-                        dbHelper.clearPendingObservations();
+        if (location != null && location.getTime() != 0L &&
+                location.getAccuracy()  < MIN_ROUTE_LOCATION_PRECISION_METERS &&
+                location.getAccuracy()  > 0.0d) {
+            if (prevGpsLocation != null) {
+                float dist = prevGpsLocation.distanceTo(location);
+                if ((dist > MIN_ROUTE_LOCATION_DIFF_METERS &&
+                        (location.getTime() - prevGpsLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
+                )) {
+                    if (realisticMovement(dist, (float) (location.getTime() - prevGpsLocation.getTime()) * 0.001f,
+                            prevGpsLocation.getAccuracy(), location.getAccuracy())) {
+                        final Editor edit = prefs.edit();
+                        edit.putFloat(ListFragment.PREF_DISTANCE_RUN,
+                                dist + prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f));
+                        edit.putFloat(ListFragment.PREF_DISTANCE_TOTAL,
+                                dist + prefs.getFloat(ListFragment.PREF_DISTANCE_TOTAL, 0f));
+                        edit.apply();
+                        long distPoints = currentDistPointCount.incrementAndGet();
+                        //DEBUG: Logging.info("dist points: "+distPoints+" vs. route points: "+ dbHelper.getCurrentRoutePointCount());
                     }
-                    else if (!location.equals(prevGpsLocation)) {
-                        Logging.info("lerping for " + dist + " meters");
-                        dbHelper.recoverLocations(location);
+                    if (dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
+                        if (dist > LERP_MAX_THRESHOLD_METERS) {
+                            Logging.warn("Diff is too large, not lerping. " + dist + " meters");
+                            dbHelper.clearPendingObservations();
+                        } else if (!location.equals(prevGpsLocation)) {
+                            Logging.info("lerping for " + dist + " meters");
+                            dbHelper.recoverLocations(location);
+                        }
                     }
+                    // set for next time; only update if this was a distance calc-event.
+                    prevGpsLocation = location;
                 }
+            } else {
+                // initialize previous location
+                prevGpsLocation = location;
             }
-
-            // set for next time
-            prevGpsLocation = location;
         }
 
         // do lerp if need be
@@ -351,7 +360,7 @@ public class GPSListener implements Listener, LocationListener {
                 dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
                         ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
             } catch (Exception ex) {
-                Logging.error("filed to log route update: ", ex);
+                Logging.error("failed to log route update: ", ex);
             }
         } else if (showRoute && null != location) {
             try {

@@ -179,6 +179,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static final String CSV_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/csv/";
     public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
     public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
+    public static final String WIGLE_BASE_URL = "https://wigle.net";
 
         // registration web view
     public static final String REG_URL = "https://wigle.net/register";

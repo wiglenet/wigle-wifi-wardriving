@@ -14,7 +14,16 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         >
-
+        <ImageView
+            android:id="@+id/badgeImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:paddingRight="60dp"
+            android:paddingLeft="60dp"/>
         <LinearLayout
             android:id="@+id/linearlayout2"
             android:orientation="horizontal"
@@ -28,7 +37,6 @@
                 android:textSize="24sp"
                 android:paddingRight="6dp"
                 />
-
             <TextView
                 android:id="@+id/rank"
                 android:layout_width="wrap_content"
@@ -37,7 +45,6 @@
                 style="@style/UploadColor"
                 android:textSize="24sp"
                 android:paddingRight="5dip"/>
-
             <TextView
                 android:id="@+id/prevRank"
                 android:layout_width="wrap_content"

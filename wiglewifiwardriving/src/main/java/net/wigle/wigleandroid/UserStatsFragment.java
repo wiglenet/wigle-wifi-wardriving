@@ -1,11 +1,16 @@
 package net.wigle.wigleandroid;
 
+import static net.wigle.wigleandroid.MainActivity.WIGLE_BASE_URL;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +22,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -31,6 +37,7 @@ import net.wigle.wigleandroid.util.MenuUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -68,6 +75,8 @@ public class UserStatsFragment extends Fragment {
       user: "arkasha"
      }
      */
+    public static final String KEY_BADGE_IMAGE_URL = "imageBadgeUrl";
+    public static final String KEY_STATISTICS = "statistics";
     public static final String KEY_RANK = "rank";
     private static final String KEY_PREV_RANK = "prevRank";
     public static final String KEY_MONTH_RANK = "monthRank";
@@ -166,11 +175,11 @@ public class UserStatsFragment extends Fragment {
                     Logging.info("handleUserStats json success is false");
                     bundle.putString("error", "Unable to load user statistics.");
                 } else {
-                    if (json.isNull("statistics")) {
+                    if (json.isNull(KEY_STATISTICS)) {
                         Logging.info("handleUserStats json stats null, returning");
                         bundle.putString("error", "Unable to load user statistics.");
                     } else {
-                        final JSONObject stats = json.getJSONObject("statistics");
+                        final JSONObject stats = json.getJSONObject(KEY_STATISTICS);
                         for (final String key : ALL_USER_KEYS) {
                             final JSONObject lookupJson = (KEY_RANK.equals(key) || KEY_MONTH_RANK.equals(key)) ? json : stats;
                             if (!lookupJson.has(key)) continue;
@@ -183,6 +192,12 @@ public class UserStatsFragment extends Fragment {
                                     bundle.putLong(key, lookupJson.getLong(key));
                             }
                         }
+                    }
+                    if (json.isNull(KEY_BADGE_IMAGE_URL)) {
+                        Logging.info("handleUserStats json badge url null;");
+                    } else {
+                        final String imageBadgeUrl = json.getString(KEY_BADGE_IMAGE_URL);
+                        bundle.putString(KEY_BADGE_IMAGE_URL, WIGLE_BASE_URL+imageBadgeUrl);
                     }
                 }
             } catch (final JSONException ex) {
@@ -241,6 +256,10 @@ public class UserStatsFragment extends Fragment {
                             default:
                                 tv.setText(numberFormat.format(bundle.getLong(key)));
                         }
+                    }
+                    final String badgeImageURL = bundle.getString(KEY_BADGE_IMAGE_URL);
+                    if (null != badgeImageURL && !badgeImageURL.isEmpty()) {
+                        new DownloadBadgeImageTask((ImageView) view.findViewById(R.id.badgeImage)).execute(badgeImageURL);
                     }
                 }
             }
@@ -345,4 +364,26 @@ public class UserStatsFragment extends Fragment {
         return false;
     }
 
+    private static class DownloadBadgeImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView badgeImage;
+
+        public DownloadBadgeImageTask(ImageView image) {
+            this.badgeImage = image;
+        }
+        protected Bitmap doInBackground(String... urls) {
+            String badgeUrl = urls[0];
+            Bitmap badge = null;
+            try {
+                InputStream in = new java.net.URL(badgeUrl).openStream();
+                badge = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Logging.error("Failed to download bage image ", e);
+            }
+            return badge;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            badgeImage.setImageBitmap(result);
+        }
+    }
 }

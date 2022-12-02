@@ -170,7 +170,7 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         // have the gps listener to a self-check, in case it isn't getting updates anymore
-        final GPSListener gpsListener = mainActivity.getGPSListener();
+        final GNSSListener gpsListener = mainActivity.getGPSListener();
         Location location = null;
         if (gpsListener != null) {
             location = gpsListener.checkGetLocation(prefs);
@@ -835,7 +835,7 @@ public class WifiReceiver extends BroadcastReceiver {
         long defaultRate = MainActivity.SCAN_DEFAULT;
         // if over 5 mph
         Location location = null;
-        final GPSListener gpsListener = mainActivity.getGPSListener();
+        final GNSSListener gpsListener = mainActivity.getGPSListener();
         if (gpsListener != null) {
             location = gpsListener.getLocation();
         }

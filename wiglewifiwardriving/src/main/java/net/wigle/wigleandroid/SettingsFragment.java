@@ -14,6 +14,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import android.os.Message;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -46,7 +49,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
-import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -466,7 +469,19 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.no_individual_nets_map, ListFragment.PREF_MAP_HIDE_NETS, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
+        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT, false, new PrefCheckboxListener() {
+            @Override
+            public void preferenceSet(boolean value) {
+                if (Build.VERSION.SDK_INT >= 29) {
+                    if (value) {
+                        if (!Settings.canDrawOverlays(getContext())) {
+                            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:net.wigle.wigleandroid"));
+                            startActivityForResult(intent, 0);
+                        }
+                    }
+                }
+            }
+        });
         MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, true, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
@@ -542,16 +557,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
 
-        final Long[] timeoutPeriods = new Long[]{GPSListener.GPS_TIMEOUT_DEFAULT, 30000L, GPSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
+        final Long[] timeoutPeriods = new Long[]{GNSSListener.GPS_TIMEOUT_DEFAULT, 30000L, GNSSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
         final String[] timeoutName = new String[]{ "15" + sec, "30" + sec,"1" + min,"5" + min,
                 "30" + min,"60" + min};
         // gps timeout spinner
         SettingsUtil.doSpinner( R.id.gps_timeout_spinner, view, ListFragment.PREF_GPS_TIMEOUT,
-                GPSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+                GNSSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // net loc timeout spinner
         SettingsUtil.doSpinner( R.id.net_loc_timeout_spinner, view, ListFragment.PREF_NET_LOC_TIMEOUT,
-                GPSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+                GNSSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // prefs setting for tap-to-pause scan indicator
         final String[] pauseOptions = new String[] {ListFragment.QUICK_SCAN_UNSET, ListFragment.QUICK_SCAN_PAUSE, ListFragment.QUICK_SCAN_DO_NOTHING};

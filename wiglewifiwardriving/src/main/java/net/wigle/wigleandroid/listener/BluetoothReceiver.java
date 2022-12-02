@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid.listener;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -13,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -46,6 +48,8 @@ import java.util.regex.Matcher;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
 
+import androidx.core.app.ActivityCompat;
+
 /**
  * Central classic BT broadcast receiver and BTLE scanner.
  * Created by bobzilla on 12/20/15
@@ -57,6 +61,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final static long MIN_LE_BATCH_GAP = 50;
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
+
     //TODO: i18n
     static {
         Map<Integer, String> initMap = new HashMap<>();
@@ -161,18 +166,18 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         if (Build.VERSION.SDK_INT >= 21 && hasLeSupport) {
             scanCallback = new ScanCallback() {
-                final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+                final SharedPreferences prefs = mainActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                 private int empties = 0;
 
                 @Override
                 public void onScanResult(int callbackType, ScanResult scanResult) {
-                    final GPSListener gpsListener = mainActivity.getGPSListener();
+                    final GNSSListener gpsListener = mainActivity.getGPSListener();
                     //DEBUG:
                     Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
                     Location location = null;
                     if (gpsListener != null) {
-                        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-                        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+                        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+                        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
                         location = gpsListener.getLocation();
                     } else {
@@ -192,11 +197,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     long diff = responseClockTime - lastLeBatchResponseTime.longValue();
                     lastLeBatchResponseTime.set(responseClockTime);
                     if (diff < MIN_LE_BATCH_GAP) {
-                        Logging.warn("Tried to update BTLE batch in improbably short time: "+diff);
+                        Logging.warn("Tried to update BTLE batch in improbably short time: " + diff);
                         return;
                     }
                     //MainActivity.info("LE Batch results: " + results);
-                    final GPSListener gpsListener = mainActivity.getGPSListener();
+                    final GNSSListener gpsListener = mainActivity.getGPSListener();
 
                     Location location = null;
 
@@ -215,7 +220,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         empties = 0;
                     }
 
-                    if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) && forceLeListReset ) {
+                    if ((listAdapter != null) && prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true) && forceLeListReset) {
                         listAdapter.clearBluetoothLe();
                     }
 
@@ -256,7 +261,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             Logging.info("BluetoothLE Scan already started");
                             break;
                         default:
-                            if ((listAdapter != null) && prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true ) ) {
+                            if ((listAdapter != null) && prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true)) {
                                 listAdapter.clearBluetoothLe();
                             }
                             Logging.error("Bluetooth LE scan error: " + errorCode);
@@ -370,34 +375,44 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         }
 
         // classic BT scan - basically "Always Be Discovering" times between discovery runs will be MAX(wifi delay) since this is called from wifi receiver
-        if (!bluetoothAdapter.isDiscovering()) {
-            bluetoothAdapter.startDiscovery();
-            lastDiscoveryAt = System.currentTimeMillis();
-        } else {
-            if (DEBUG_BLUETOOTH_DATA) {
-                Logging.info("skipping bluetooth scan; discover already in progress (last scan started "+(System.currentTimeMillis()-lastDiscoveryAt)+"ms ago)");
+        try {
+            if (!bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.startDiscovery();
+                lastDiscoveryAt = System.currentTimeMillis();
+            } else {
+                if (DEBUG_BLUETOOTH_DATA) {
+                    Logging.info("skipping bluetooth scan; discover already in progress (last scan started " + (System.currentTimeMillis() - lastDiscoveryAt) + "ms ago)");
+                }
             }
+        } catch (SecurityException se) {
+            Logging.error("No permission for bluetoothAdapter.startDiscovery/isDiscovering", se);
         }
-
         if (Build.VERSION.SDK_INT >= 21) {
             final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
             if (bluetoothLeScanner == null) {
                 Logging.info("bluetoothLeScanner is null");
-            }  else {
+            } else {
                 if (scanning.compareAndSet(false, true)) {
                     final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
                     scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
                     //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
                     //  this is effectively how often we update the display
                     scanSettingsBuilder.setReportDelay(15000);
-                    Logging.error("START BLE SCANs");
-                    bluetoothLeScanner.startScan(
-                            Collections.<ScanFilter>emptyList(), scanSettingsBuilder.build(), scanCallback);
-
+                    try {
+                        Logging.info("START BLE SCANs");
+                        bluetoothLeScanner.startScan(
+                                Collections.<ScanFilter>emptyList(), scanSettingsBuilder.build(), scanCallback);
+                    } catch (SecurityException se) {
+                        Logging.error("No permission for bluetoothScanner.startScan", se);
+                    }
                 } else {
                     //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
                     //DEBUG: MainActivity.error("FLUSH BLE SCANs");
-                    bluetoothLeScanner.flushPendingScanResults(scanCallback);
+                    try {
+                        bluetoothLeScanner.flushPendingScanResults(scanCallback);
+                    } catch (SecurityException se) {
+                        Logging.error("No permission for bluetoothScanner.flushPendingScanResults", se);
+                    }
                 }
             }
         }
@@ -412,7 +427,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         if (DEBUG_BLUETOOTH_DATA) {
             if (adUuidNoScanUuid > 0 || scanUuidNoAdUuid > 0) {
-                Logging.error("AD but No Scan UUID: "+ adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
+                Logging.error("AD but No Scan UUID: " + adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
             }
         }
     }
@@ -420,8 +435,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public void stopScanning() {
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
-            bluetoothAdapter.cancelDiscovery();
-
+            try {
+                bluetoothAdapter.cancelDiscovery();
+            } catch (SecurityException se) {
+                Logging.error("No permission for bluetoothAdapter.cancelDiscovery", se);
+            }
             if (mainActivity.get() != null) {
                 final SharedPreferences prefs = mainActivity.get().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
                 final boolean showCurrent = prefs.getBoolean(ListFragment.PREF_SHOW_CURRENT, true);
@@ -436,8 +454,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
                 if (bluetoothLeScanner != null) {
                     if (scanning.compareAndSet(true, false)) {
-                        Logging.error("STOPPING BLE SCANS");
-                        bluetoothLeScanner.stopScan(scanCallback);
+                        Logging.info("STOPPING BLE SCANS");
+                        try {
+                            bluetoothLeScanner.stopScan(scanCallback);
+                        } catch (SecurityException se) {
+                            Logging.error("No permission for bluetoothAdapter.stopScan", se);
+                        }
+
                     } else {
                         Logging.error("Scanner present, comp-and-set prevented stop-scan");
                     }
@@ -474,57 +497,55 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
 
                 final String bssid = device.getAddress();
-                final String ssid = device.getName();
+                try {
+                    final String ssid = device.getName();
 
-                int type;
+                    int type;
 
-                if (btClass == null && device != null) {
-                    type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
-                            device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
-                } else {
-                    type = btClass.getDeviceClass();
-                }
+                    if (btClass == null && device != null) {
+                        type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
+                                device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
+                    } else {
+                        type = btClass.getDeviceClass();
+                    }
+                    if (DEBUG_BLUETOOTH_DATA) {
+                        String log = "BT deviceName: " + device.getName()
+                                + "\n\taddress: " + bssid
+                                + "\n\tname: " + ssid
+                                + "\n\tRSSI dBM: " + rssi
+                                + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
+                                + "(" + type + ")"
+                                + "\n\tbondState: " + device.getBondState();
 
-                if (DEBUG_BLUETOOTH_DATA) {
-                    String log = "BT deviceName: " + device.getName()
-                            + "\n\taddress: " + bssid
-                            + "\n\tname: " + ssid
-                            + "\n\tRSSI dBM: " + rssi
-                            + "\n\tclass: " + DEVICE_TYPE_LEGEND.get(type)
-                            + "(" + type + ")"
-                            + "\n\tbondState: " + device.getBondState();
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                            log += "\n\tuuids: " + device.getUuids();
+                        }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-                        log += "\n\tuuids: " + device.getUuids();
+                        Logging.info(log);
+                    }
+                    final String capabilities = DEVICE_TYPE_LEGEND.get(type)
+                        /*+ " (" + device.getBluetoothClass().getMajorDeviceClass()
+                        + ":" +device.getBluetoothClass().getDeviceClass() + ")"*/
+                            + ";" + device.getBondState();
+                    final GNSSListener gpsListener = m.getGPSListener();
+
+                    Location location = null;
+                    if (gpsListener != null) {
+                        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+                        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
+                        gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
+                        location = gpsListener.getLocation();
+                    } else {
+                        Logging.warn("null gpsListener in BTR onReceive");
                     }
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        log += "\n\ttype:" + device.getType();
-                    }
-
-                    Logging.info(log);
+                    //ALIBI: shamelessly re-using frequency here for device type.
+                    final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
+                    sort(prefs);
+                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
+                } catch (SecurityException se) {
+                    Logging.error("No permission for device inspection", se);
                 }
-
-                final String capabilities = DEVICE_TYPE_LEGEND.get(type)
-                    /*+ " (" + device.getBluetoothClass().getMajorDeviceClass()
-                    + ":" +device.getBluetoothClass().getDeviceClass() + ")"*/
-                        + ";" + device.getBondState();
-                final GPSListener gpsListener = m.getGPSListener();
-
-                Location location = null;
-                if (gpsListener != null) {
-                    final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-                    final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
-                    gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                    location = gpsListener.getLocation();
-                } else {
-                    Logging.warn("null gpsListener in BTR onReceive");
-                }
-
-                //ALIBI: shamelessly re-using frequency here for device type.
-                final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
-                sort(prefs);
-                if (listAdapter != null) listAdapter.notifyDataSetChanged();
 
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(intent.getAction())) {
                 //DEBUG: MainActivity.error("Previous BT "+prevBt.size()+ " Latest BT "+latestBt.size());
@@ -696,7 +717,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
             // if over 5 mph
             Location location = null;
-            final GPSListener gpsListener = m.getGPSListener();
+            final GNSSListener gpsListener = m.getGPSListener();
             if (gpsListener != null) {
                 location = gpsListener.getLocation();
             }

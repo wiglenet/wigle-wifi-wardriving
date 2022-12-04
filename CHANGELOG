@@ -1,3 +1,8 @@
+* 2.68 (2022)
+minimum SDK update to satisfy Google's new requirements
+GNSSStatus LocationManager changes
+Fixes for start-on-boot in Android 10+ (requires manual pefs config update)
+
 * 2.65 - 2.67 (10/10/2022)
 German language fixes (thanks rumpelyann!)
 Various polish/log/toast improvements (thanks Krzysztofz01!)

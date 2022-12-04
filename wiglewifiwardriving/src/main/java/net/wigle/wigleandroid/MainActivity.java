@@ -2351,8 +2351,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (gnssStatusCallback != null) {
                     locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                 }
+            } else {
+                locationManager.removeGpsStatusListener(state.GNSSListener);
             }
-            locationManager.removeGpsStatusListener(state.GNSSListener);
         }
 
         // create a new listener to try and get around the gps stopping bug

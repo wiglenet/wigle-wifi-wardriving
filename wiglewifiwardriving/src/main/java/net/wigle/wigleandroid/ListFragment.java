@@ -696,7 +696,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void setLocationUI( final MainActivity main, final View view ) {
         final State state = main.getState();
-        if ( state.gpsListener == null ) {
+        if ( state.GNSSListener == null ) {
             return;
         }
         if ( view == null ) {
@@ -705,9 +705,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         try {
             TextView tv = view.findViewById( R.id.LocationTextView06 );
-            tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
+            tv.setText( getString(R.string.list_short_sats) + " " + state.GNSSListener.getSatCount() );
 
-            final Location location = state.gpsListener.getLocation();
+            final Location location = state.GNSSListener.getLocation();
 
             tv = view.findViewById( R.id.LocationTextView01 );
             String latText;

@@ -30,8 +30,9 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.location.LocationManagerCompat;
 
-public class GPSListener implements Listener, LocationListener {
+public class GNSSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
     public static final float LERP_MIN_THRESHOLD_METERS = 20.0f;
@@ -67,7 +68,7 @@ public class GPSListener implements Listener, LocationListener {
     private Location prevGpsLocation;
     private final KalmanLatLong kalmanLatLong;
 
-    public GPSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
+    public GNSSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -97,13 +98,14 @@ public class GPSListener implements Listener, LocationListener {
 
     public void handleScanStop() {
         Logging.info("GPSListener: handleScanStop");
+        gnssStatus = null;
         gpsStatus = null;
         location = null;
     }
 
     @Override
     public void onLocationChanged( final Location newLocation ) {
-        // MainActivity.info("GPS onLocationChanged: " + newLocation);
+        // Logging.info("GPS onLocationChanged: " + newLocation);
         updateLocationData( newLocation );
 
         if ( mapLocationListener != null ) {
@@ -169,7 +171,12 @@ public class GPSListener implements Listener, LocationListener {
 
         // see if we have new data
         try {
-            gpsStatus = locationManager.getGpsStatus(gpsStatus);
+            if ( Build.VERSION.SDK_INT < 24 ) {
+                gpsStatus = locationManager.getGpsStatus(gpsStatus);
+            } else {
+                //ALIBI: do nothing - we're updating gnssStatus externally
+                //Logging.error("updateLocationData called, version >= 24. ("+location+")");
+            }
         } catch (NullPointerException npe) {
             Logging.error("NPE trying to call getGPSStatus");
             return;
@@ -511,8 +518,8 @@ public class GPSListener implements Listener, LocationListener {
      * @return the location is valid
      */
     public Location checkGetLocation(final SharedPreferences prefs) {
-        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPSListener.GPS_TIMEOUT_DEFAULT);
-        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GPSListener.NET_LOC_TIMEOUT_DEFAULT);
+        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
         checkLocationOK(gpsTimeout, netLocTimeout);
         return getLocation();
     }

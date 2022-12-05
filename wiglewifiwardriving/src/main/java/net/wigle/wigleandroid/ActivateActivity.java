@@ -48,11 +48,6 @@ public class ActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activate);
 
-        //TODO: figure out what checks (if any) make manual setup necessary with AppCompat theme
-        //if (Build.VERSION.SDK_INT >= 11) {
-        //    getActionBar().setDisplayHomeAsUpEnabled(true);
-        //}
-
         Uri data = getIntent().getData();
         //DEBUG Log.i(LOG_TAG, "intent data: "+data+" matches: "+
         //        ActivateActivity.barcodeIntent.equals(data.toString()));

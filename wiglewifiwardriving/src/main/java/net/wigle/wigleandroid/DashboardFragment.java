@@ -21,7 +21,7 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.Logging;
 
@@ -201,7 +201,7 @@ public class DashboardFragment extends Fragment {
                     String conKeyString = null;
                     String conValString = null;
                     if (MainActivity.getMainActivity() != null && MainActivity.getMainActivity().getGPSListener() != null) {
-                        final GPSListener listener = MainActivity.getMainActivity().getGPSListener();
+                        final GNSSListener listener = MainActivity.getMainActivity().getGPSListener();
                         satString = "("+listener.getSatCount()+")";
                         conKeyString = MainActivity.join("\n", listener.getConstellations().keySet());
                         conValString = MainActivity.join("\n", listener.getConstellations().values());

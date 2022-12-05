@@ -37,10 +37,13 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -79,7 +82,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.db.MxcDatabaseHelper;
 import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.BluetoothReceiver;
-import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
@@ -131,7 +134,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         MediaPlayer soundPop;
         MediaPlayer soundNewPop;
         WifiLock wifiLock;
-        GPSListener gpsListener;
+        GNSSListener GNSSListener;
         WifiReceiver wifiReceiver;
         BluetoothReceiver bluetoothReceiver;
         NumberFormat numberFormat0;
@@ -181,7 +184,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
     public static final String WIGLE_BASE_URL = "https://wigle.net";
 
-        // registration web view
+    // registration web view
     public static final String REG_URL = "https://wigle.net/register";
 
     public static final String ENCODING = "ISO-8859-1";
@@ -270,8 +273,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state = stateFragment.getState();
 
             // tell those that need it that we have a new context
-            if (state.gpsListener != null) {
-                state.gpsListener.setMainActivity(this);
+            if (state.GNSSListener != null) {
+                state.GNSSListener.setMainActivity(this);
             }
             if (state.wifiReceiver != null) {
                 state.wifiReceiver.setMainActivity(this);
@@ -388,11 +391,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     .setTitle(R.string.no_internal_space_title)
                     .setCancelable(true)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
 
             final Dialog dialog = iseDlgBuilder.create();
             if (!isFinishing()) {
@@ -421,8 +424,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             for (final String key : keys) {
                 pieScanSet(prefs, key);
             }
-        }
-        else if (Build.VERSION.SDK_INT == 29) {
+        } else if (Build.VERSION.SDK_INT == 29) {
             // see if all configs are at the P
             for (final String key : keys) {
                 if (prefs.getLong(key, -1) != SCAN_P_DEFAULT) {
@@ -450,8 +452,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 } else {
                     Logging.error("unable to work around corrupted ZoomTables.data error");
                 }
-            }
-            else {
+            } else {
                 Logging.info("already worked around google maps bug 154855417");
             }
         } catch (Exception e) {
@@ -504,9 +505,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (!addPermission(permissionsList, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 permissionsNeeded.add(mainActivity.getString(R.string.cell_permission));
             }
-            addPermission(permissionsList, Manifest.permission.WRITE_EXTERNAL_STORAGE);
             addPermission(permissionsList, Manifest.permission.BLUETOOTH);
-
+            addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
+            addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied
@@ -550,6 +552,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onRequestPermissionsResult(final int requestCode, @NonNull final String permissions[],
                                            @NonNull final int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSIONS_REQUEST: {
                 Logging.info("location grant response permissions: " + Arrays.toString(permissions)
@@ -636,12 +639,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         // close drawer when item is tapped
                         if (R.id.nav_stats == menuItem.getItemId()) {
                             Logging.info("Nav stats clicked");
-                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked() );
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
                         } else {
                             if (R.id.nav_site_stats != menuItem.getItemId() &&
                                     R.id.nav_user_stats != menuItem.getItemId() &&
-                                    R.id.nav_rank != menuItem.getItemId() )
-                            showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
+                                    R.id.nav_rank != menuItem.getItemId())
+                                showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
                             mDrawerLayout.closeDrawers();
                             selectFragment(menuItem.getItemId());
                         }
@@ -657,18 +660,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         //TODO:
         int menuSubColor = 0xE0777777;
         MenuItem uStats = navigationView.getMenu().findItem(R.id.nav_user_stats);
-        SpannableString spanString = new SpannableString("    "+uStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
+        SpannableString spanString = new SpannableString("    " + uStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
         uStats.setTitle(spanString);
 
         MenuItem sStats = navigationView.getMenu().findItem(R.id.nav_site_stats);
-        spanString = new SpannableString("    "+sStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
+        spanString = new SpannableString("    " + sStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
         sStats.setTitle(spanString);
 
         MenuItem rStats = navigationView.getMenu().findItem(R.id.nav_rank);
-        spanString = new SpannableString("    "+rStats.getTitle().toString());
-        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0,     spanString.length(), 0);
+        spanString = new SpannableString("    " + rStats.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(menuSubColor), 0, spanString.length(), 0);
         rStats.setTitle(spanString);
 
         navigationView.getMenu().getItem(0).setCheckable(true);
@@ -714,7 +717,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             try {
                 fragmentManager.beginTransaction()
-                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX+itemId)
+                        .replace(R.id.tabcontent, frag, FRAGMENT_TAG_PREFIX + itemId)
                         .commit();
             } catch (final NullPointerException | IllegalStateException ex) {
                 final String message = "exception in fragment switch: " + ex;
@@ -725,9 +728,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.currentTab = itemId;
             setTitle(fragmentTitles.get(itemId));
         } catch (IllegalAccessException ex) {
-            Logging.error("Unable to get fragment for id: "+itemId, ex);
+            Logging.error("Unable to get fragment for id: " + itemId, ex);
         } catch (InstantiationException ex) {
-            Logging.error("Unable to make fragment for id: "+itemId, ex);
+            Logging.error("Unable to make fragment for id: " + itemId, ex);
         }
     }
 
@@ -750,12 +753,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Bundle bundle = new Bundle();
         listFragment.setArguments(bundle);
 
-        transaction.add(R.id.tabcontent, listFragment, FRAGMENT_TAG_PREFIX+R.id.nav_list);
+        transaction.add(R.id.tabcontent, listFragment, FRAGMENT_TAG_PREFIX + R.id.nav_list);
         transaction.commit();
     }
 
     private static Class classForFragmentNavId(final int navId) {
-        switch(navId) {
+        switch (navId) {
             case R.id.nav_list:
                 return ListFragment.class;
             case R.id.nav_dash:
@@ -815,13 +818,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static boolean isHighDefinition() {
-        if (Build.VERSION.SDK_INT >= 17) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-            int dpi = metrics.densityDpi;
-            if (dpi >= 240) {
-                return true;
-            }
+        DisplayMetrics metrics = new DisplayMetrics();
+        MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int dpi = metrics.densityDpi;
+        if (dpi >= 240) {
+            return true;
         }
         return false;
     }
@@ -891,7 +892,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setCancelable(true);
             builder.setTitle("Confirmation"); //TODO: literal string
-            final String checkboxLabel = getArguments().containsKey("checkboxLabel") ? getArguments().getString("checkboxLabel"): null;
+            final String checkboxLabel = getArguments().containsKey("checkboxLabel") ? getArguments().getString("checkboxLabel") : null;
             if (null != checkboxLabel) {
                 View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
                 CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
@@ -899,16 +900,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 builder.setView(checkBoxView);
             }
             final String persistPrefKey = getArguments().containsKey("persistPref") ?
-                    getArguments().getString("persistPref"): null;
+                    getArguments().getString("persistPref") : null;
             final String persistPrefAgreeValue = getArguments().containsKey("persistPrefAgreeValue") ?
-                    getArguments().getString("persistPrefAgreeValue"): null;
+                    getArguments().getString("persistPrefAgreeValue") : null;
             final String persistPrefDisagreeValue = getArguments().containsKey("persistPrefDisagreeValue") ?
-                    getArguments().getString("persistPrefDisagreeValue"): null;
+                    getArguments().getString("persistPrefDisagreeValue") : null;
 
             builder.setMessage(getArguments().getString("message"));
             final int tabPos = getArguments().getInt("tabPos");
             final int dialogId = getArguments().getInt("dialogId");
-            final SharedPreferences prefs = activity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
 
 
             final AlertDialog ad = builder.create();
@@ -935,7 +936,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                 final String maybeName = getResources().getResourceName(tabPos);
                                 //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
                                 FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
-                                final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+tabPos);
+                                final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + tabPos);
                                 if (fragment == null) {
                                     Logging.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
                                     //TODO: might behoove us to show an error here
@@ -979,7 +980,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static void createConfirmation(final FragmentActivity activity, final String message,
-                                   final int tabPos, final int dialogId) {
+                                          final int tabPos, final int dialogId) {
         try {
             final FragmentManager fm = activity.getSupportFragmentManager();
             final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, tabPos, dialogId);
@@ -998,7 +999,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                            final String checkboxLabel, final String persistPrefKey,
                                            final String persistPrefAgreeValue,
                                            final String persistPrefDisagreeValue,
-                                   final int tabPos, final int dialogId) {
+                                           final int tabPos, final int dialogId) {
         try {
             final FragmentManager fm = activity.getSupportFragmentManager();
             final ConfirmationDialog dialog = ConfirmationDialog.newInstance(message, checkboxLabel,
@@ -1115,13 +1116,16 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             //TODO: redundant with endBluetooth?
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
-                bluetoothAdapter.cancelDiscovery();
-            } try {
+            try {
+                if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                    bluetoothAdapter.cancelDiscovery();
+                }
                 Logging.info("unregister bluetoothReceiver");
-                unregisterReceiver( state.bluetoothReceiver );
-            } catch ( final IllegalArgumentException ex ) {
-                Logging.info( "bluetoothReceiver not registered: " + ex );
+                unregisterReceiver(state.bluetoothReceiver);
+            } catch (final IllegalArgumentException ex) {
+                Logging.info("bluetoothReceiver not registered: " + ex);
+            } catch (final SecurityException ex) {
+                Logging.info("bluetoothReceiver access: " + ex);
             }
             if (state.bluetoothReceiver != null) {
                 state.bluetoothReceiver.stopScanning();
@@ -1193,7 +1197,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         mDrawerToggle.onConfigurationChanged(newConfig);
         if (Build.VERSION.SDK_INT > 28) {
             if (newConfig.uiMode != state.uiMode) {
-                Logging.info("uiMode change - "+state.uiMode+"->"+newConfig.uiMode);
+                Logging.info("uiMode change - " + state.uiMode + "->" + newConfig.uiMode);
                 state.uiMode = newConfig.uiMode;
                 //DEBUG:
                 finishSoon(0, false, true);
@@ -1210,7 +1214,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             prefs.edit().putBoolean(ListFragment.PREF_BLOWED_UP, false).commit();
             // activate the email intent
             final Intent intent = new Intent(this, ErrorReportActivity.class);
-            intent.putExtra( MainActivity.ERROR_REPORT_DO_EMAIL, true );
+            intent.putExtra(MainActivity.ERROR_REPORT_DO_EMAIL, true);
             startActivity(intent);
         }
 
@@ -1272,10 +1276,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (!lang.isEmpty() && !current.equals(lang)) {
             if (lang.contains("-r")) {
                 String[] parts = lang.split("-r");
-                Logging.info("\tlang: "+parts[0]+" country: "+parts[1]);
+                Logging.info("\tlang: " + parts[0] + " country: " + parts[1]);
                 newLocale = new Locale(parts[0], parts[1]);
             } else {
-                Logging.info("\tlang: "+lang + " current: "+current);
+                Logging.info("\tlang: " + lang + " current: " + current);
                 newLocale = new Locale(lang);
             }
         } else if (lang.isEmpty() && ORIG_LOCALE != null && !ORIG_LOCALE.getLanguage().isEmpty()
@@ -1330,10 +1334,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("current lang: " + current + " new lang: " + lang);
         if (lang.contains("-r")) {
             String[] parts = lang.split("-r");
-            Logging.info("\tlang: "+parts[0]+" country: "+parts[1]);
+            Logging.info("\tlang: " + parts[0] + " country: " + parts[1]);
             return new Locale(parts[0], parts[1]);
         } else {
-            Logging.info("\tlang: "+lang);
+            Logging.info("\tlang: " + lang);
             return new Locale(lang);
         }
     }
@@ -1524,7 +1528,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
                 f.addNetwork(network);
             }
@@ -1535,7 +1539,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
                 f.updateNetwork(network);
             }
@@ -1546,7 +1550,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
         if (getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+R.id.nav_map);
+            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
                 f.reCluster();
             }
@@ -1644,13 +1648,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         // ohwell
                         Logging.error("error getting logs for error: " + er, er);
                     }
-                }
-                finally {
+                } finally {
                     // can't try-with-resources and support api 14
                     try {
                         if (fos != null) fos.close();
-                    }
-                    catch (final Exception ex) {
+                    } catch (final Exception ex) {
                         Logging.error("error closing fos: " + ex, ex);
                     }
                 }
@@ -1699,13 +1701,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static boolean isDevMode(final Context context) {
-        if(Build.VERSION.SDK_INT == 16) {
-            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
-                    android.provider.Settings.Secure.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
-        } else if (Build.VERSION.SDK_INT >= 17) {
-            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
-                    android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED , 0) != 0;
-        } else return false;
+        return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
     }
 
     private void setupSound() {
@@ -1787,14 +1784,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * @param addressKey the preferences key of the matching settings for which to build the matcher
      * @return a Matcher instance corresponding to the current user settings from preferences
      */
-    private Matcher generateBssidFilterMatcher( final SharedPreferences prefs,  final String addressKey) {
+    private Matcher generateBssidFilterMatcher(final SharedPreferences prefs, final String addressKey) {
         Gson gson = new Gson();
         Matcher matcher = null;
         String[] values = gson.fromJson(prefs.getString(addressKey, "[]"), String[].class);
-        if(values.length>0) {
+        if (values.length > 0) {
             StringBuilder sb = new StringBuilder("^(");
             boolean first = true;
-            for (String value: values) {
+            for (String value : values) {
 
                 if (first) {
                     first = false;
@@ -1808,9 +1805,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
             sb.append(")");
             //TODO: debug
-            Logging.info("building regex from: "+sb.toString());
-            Pattern pattern = Pattern.compile( sb.toString(), Pattern.CASE_INSENSITIVE );
-            matcher = pattern.matcher( "" );
+            Logging.info("building regex from: " + sb.toString());
+            Pattern pattern = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
+            matcher = pattern.matcher("");
         }
 
         return matcher;
@@ -1824,8 +1821,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return batteryLevelReceiver;
     }
 
-    public GPSListener getGPSListener() {
-        return state.gpsListener;
+    public GNSSListener getGPSListener() {
+        return state.GNSSListener;
     }
 
     public PhoneState getPhoneState() {
@@ -1881,7 +1878,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private void setupActivationDialog() {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
-        final SharedPreferences prefs = getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final boolean useBt = prefs.getBoolean(ListFragment.PREF_SCAN_BT, true);
         final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
         int pieBadCount = prefs.getInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, 0);
@@ -1896,8 +1893,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (pieBadCount < 5) activationMessages = getString(R.string.pie_bad);
                 editor.putInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, pieBadCount + 1);
 
-            }
-            else if (Build.VERSION.SDK_INT == 29) {
+            } else if (Build.VERSION.SDK_INT == 29) {
                 if (qBadCount < 5) activationMessages = getString(R.string.q_bad);
                 editor.putInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, qBadCount + 1);
             }
@@ -1951,8 +1947,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (Build.VERSION.SDK_INT >= 29) {
                 final Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
                 startActivityForResult(panelIntent, ACTION_WIFI_CODE);
-            }
-            else {
+            } else {
                 // open wifi setting pages after a few seconds
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -1993,8 +1988,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Logging.info("wifi turned on");
-            }
-            else {
+            } else {
                 Logging.info("wifi NOT turned on, resultCode: " + resultCode);
             }
         } else if (requestCode == ACTION_TTS_CODE) {
@@ -2005,15 +1999,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     PackageManager pm = getPackageManager();
                     Intent installTTSIntent = new Intent();
                     installTTSIntent.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
-                    ResolveInfo resolveInfo = pm.resolveActivity( installTTSIntent, PackageManager.MATCH_DEFAULT_ONLY );
+                    ResolveInfo resolveInfo = pm.resolveActivity(installTTSIntent, PackageManager.MATCH_DEFAULT_ONLY);
 
-                    if( resolveInfo == null ) {
+                    if (resolveInfo == null) {
                         Logging.error("ACTION_TTS_CALLBACK: resolve ACTION_INSTALL_TTS_DATA via package mgr.");
                     } else {
                         startActivity(installTTSIntent);
                     }
                 } catch (Exception e) {
-                    Logging.error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA",e);
+                    Logging.error("ACTION_TTS_CALLBACK: failed to issue ACTION_INSTALL_TTS_DATA", e);
                 }
             }
         } else {
@@ -2086,12 +2080,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
                 registerReceiver(state.bluetoothReceiver, intentFilter);
             }
-        } catch (SecurityException se) {
-            Logging.info("Security exception attempting to access bluetooth adapter", se);
+        } catch (SecurityException e) {
+            Logging.error("exception initializing bluetooth: ", e);
         } catch (Exception e) {
             //ALIBI: there's a lot of wonkiness in real-world BT adapters
             //  seeing them go null during this block after null check passes,
-            Logging.error("failure initializing bluetooth: ",e);
+            Logging.error("failure initializing bluetooth: ", e);
         }
     }
 
@@ -2102,27 +2096,31 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter != null) {
+            try {
             if (bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.cancelDiscovery();
+            }
+            } catch (final SecurityException ex) {
+                Logging.info("bluetoothReceiver access: " + ex);
             }
         }
         try {
             Logging.info("unregister bluetoothReceiver");
-            unregisterReceiver( state.bluetoothReceiver );
+            unregisterReceiver(state.bluetoothReceiver);
             state.bluetoothReceiver = null;
-        } catch ( final IllegalArgumentException ex ) {
+        } catch (final IllegalArgumentException ex) {
             //ALIBI: it's fine to call and fail here.
-            Logging.info( "bluetoothReceiver not registered: " + ex );
+            Logging.info("bluetoothReceiver not registered: " + ex);
         }
 
-        final boolean btWasOff = prefs.getBoolean( ListFragment.PREF_BT_WAS_OFF, false );
+        final boolean btWasOff = prefs.getBoolean(ListFragment.PREF_BT_WAS_OFF, false);
         //ALIBI: this pref seems to be persisting across runs, shutting down BT on exit when it was active on start.
         Editor removeBtPref = prefs.edit();
         removeBtPref.remove(ListFragment.PREF_BT_WAS_OFF);
         removeBtPref.apply();
 
         // don't call on emulator, it crashes it
-        if ( btWasOff && ! state.inEmulator ) {
+        if (btWasOff && !state.inEmulator) {
             // ALIBI: we disabled this for WiFi since we had weird errors with root window disposal. Uncomment if we get that resolved?
             //WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.turning_bt_off));
 
@@ -2136,6 +2134,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("Disable bluetooth");
                     bt.disable();
                 }
+            } catch (final SecurityException ex) {
+                Logging.info("bluetoothReceiver access: " + ex);
             } catch (Exception ex) {
                 Logging.error("exception turning bluetooth back off: " + ex, ex);
             }
@@ -2212,6 +2212,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         try {
             // check if there is a gps
+            LocationManagerCompat.hasProvider(locationManager, GPS_PROVIDER);
+            Logging.info("GNSS HW: "+LocationManagerCompat.getGnssHardwareModelName(locationManager)+" year: "+LocationManagerCompat.getGnssYearOfHardware(locationManager)+ " enabled: "+ LocationManagerCompat.isLocationEnabled(locationManager));
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
             if (locProvider == null) {
@@ -2232,7 +2234,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
 
-        if (state.gpsListener == null) {
+        if (state.GNSSListener == null) {
             // force a listener to be created
             final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
@@ -2308,7 +2310,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
             // turn off location updates
             this.setLocationUpdates(0L, 0f);
-            state.gpsListener.handleScanStop();
+            state.GNSSListener.handleScanStop();
             if (state.wifiLock.isHeld()) {
                 try {
                     state.wifiLock.release();
@@ -2339,25 +2341,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             throws SecurityException {
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if (state.gpsListener != null) {
+        if (state.GNSSListener != null) {
             // remove any old requests
-            locationManager.removeUpdates(state.gpsListener);
+            locationManager.removeUpdates(state.GNSSListener);
             if (Build.VERSION.SDK_INT >= 24) {
                 if (gnssStatusCallback != null) {
                     locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                 }
+            } else {
+                locationManager.removeGpsStatusListener(state.GNSSListener);
             }
-            locationManager.removeGpsStatusListener(state.gpsListener);
         }
 
         // create a new listener to try and get around the gps stopping bug
-        state.gpsListener = new GPSListener(this, state.dbHelper);
-        state.gpsListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
-        try {
-            locationManager.addGpsStatusListener(state.gpsListener);
-        } catch (final SecurityException ex) {
-            Logging.info("Security exception adding status listener: " + ex, ex);
-        }
+        state.GNSSListener = new GNSSListener(this, state.dbHelper);
+        state.GNSSListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
 
         if (Build.VERSION.SDK_INT >= 24) {
             try {
@@ -2368,6 +2366,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                     @Override
                     public void onStopped() {
+                        state.GNSSListener.handleScanStop();
                     }
 
                     @Override
@@ -2376,14 +2375,22 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                     @Override
                     public void onSatelliteStatusChanged(GnssStatus status) {
-                        state.gpsListener.onGnssStatusChanged(status);
+                        state.GNSSListener.onGnssStatusChanged(status);
                     }
                 };
                 locationManager.registerGnssStatusCallback(gnssStatusCallback);
-            }
-            catch (final Exception ex) {
+            } catch (final Exception ex) {
                 Logging.error("Error registering for gnss: " + ex, ex);
             }
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= 24) {
+                locationManager.registerGnssStatusCallback(gnssStatusCallback);
+            } else {
+                //addGpsStatusListener(state.gpsListener);
+            }
+        } catch (final SecurityException ex) {
+            Logging.info("Security exception adding status listener: " + ex, ex);
         }
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -2400,7 +2407,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (!"passive".equals(provider) && updateIntervalMillis > 0L) {
                     Logging.info("using provider: " + provider);
                     try {
-                        locationManager.requestLocationUpdates(provider, updateIntervalMillis, updateMeters, state.gpsListener);
+                        locationManager.requestLocationUpdates(provider, updateIntervalMillis, updateMeters, state.GNSSListener);
                     } catch (final SecurityException ex) {
                         Logging.info("Security exception adding status listener: " + ex, ex);
                     }
@@ -2408,9 +2415,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
 
             if (updateIntervalMillis <= 0L) {
-                Logging.info("removing location listener: " + state.gpsListener);
+                Logging.info("removing location listener: " + state.GNSSListener);
                 try {
-                    locationManager.removeUpdates(state.gpsListener);
+                    locationManager.removeUpdates(state.GNSSListener);
                     if (Build.VERSION.SDK_INT >= 24) {
                         if (gnssStatusCallback != null) {
                             locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
@@ -2585,20 +2592,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 observationUploader.setInterrupted();
             }
 
-            if (state.gpsListener != null) {
+            if (state.GNSSListener != null) {
                 // save our location for later runs
-                state.gpsListener.saveLocation();
+                state.GNSSListener.saveLocation();
             }
 
             // close the db. not in destroy, because it'll still write after that.
             if (state.dbHelper != null) state.dbHelper.close();
 
             final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            if (state.gpsListener != null && locationManager != null) {
+            if (state.GNSSListener != null && locationManager != null) {
                 try {
-                    locationManager.removeGpsStatusListener(state.gpsListener);
-                    locationManager.removeUpdates(state.gpsListener);
-                    if (Build.VERSION.SDK_INT >= 24) {
+                    if (Build.VERSION.SDK_INT < 24) {
+                        locationManager.removeGpsStatusListener(state.GNSSListener);
+                        locationManager.removeUpdates(state.GNSSListener);
+                    }else if (Build.VERSION.SDK_INT >= 24) {
                         if (gnssStatusCallback != null) {
                             locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                         }

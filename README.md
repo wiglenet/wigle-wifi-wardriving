@@ -1,14 +1,17 @@
 # WiGLE Wireless Wardriving
 
-Nethugging client for Android, from [wigle.net](https://wigle.net).
+Nethugging client for Android, from [wigle.net](https://wigle.net). 
 
 This client provides geolocated detection and logging for WiFi, Bluetooth, and cellular signals using Android devices.
 
+As of December 2022, this application supports Android SDK versions 19 (KitKat) and up. For older versions, see the [2.67 release tag](https://github.com/wiglenet/wigle-wifi-wardriving/releases/tag/2.67) to build your own copy or side-load [the compiled artifact](https://github.com/wiglenet/wigle-wifi-wardriving/blob/2.67/dist/release/wiglewifiwardriving-release.apk). 
+
 ## Features
-- View and map local RF signals
+- View and map local RF signals including WiFi, Blueooth, and Cell
 - Accumulate a database of wireless signal observations
 - Search and export observed data
 - Integrate with a [WiGLE.net account](https://wigle.net) for competition, statistics, and online aggregation and visualization
+- See your standings and accomplishments per the WiGLE.net server
 
 ## Data Export
 The client offers numerous data export formats including:
@@ -30,7 +33,13 @@ Currently Android versions from KitKat (Android 4.4.3 / API 19) to Android 12 (A
 We receive various bug reports from forks/ports of Android to non-standard devices, but cannot address or test all possible variations. While we do our best to support the widest range of devices possible, the best way to get support for your device is to help us debug or to submit a pull request!
 
 ## Contributing
-You can submit fixes and changes for inclusion by forking this repository, working in a branch, and issuing a pull request.
+You can submit fixes and changes for inclusion by forking this repository, working in a branch, and issuing a pull request. Langauge help and translations are VERY welcome.
+
+We don't have a lot of contribution guidelines, but please:
+
+- Make sure to test your changes
+- Make sure that exporting data is the result of a direct, intentional user action, or via the Android Broadcast Intent system - don't send data off-device without user permission!
+- Please be mindful of the need for multi-language support if adding text to the UI. Google translate is enough to get people started, but please add an attempt!
 
 ## Where to get it
 Available on [Google Play](https://play.google.com/store/apps/details?id=net.wigle.wigleandroid&hl=en)

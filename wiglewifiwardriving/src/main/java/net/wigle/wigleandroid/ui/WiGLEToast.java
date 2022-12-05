@@ -45,6 +45,7 @@ public class WiGLEToast {
                 text.setText(messageString);
 
                 Toast toast = new Toast(context.getApplicationContext());
+                //ALIBI: logs errors in Toast, but works
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.setDuration(toastLength);
                 toast.setView(layout);

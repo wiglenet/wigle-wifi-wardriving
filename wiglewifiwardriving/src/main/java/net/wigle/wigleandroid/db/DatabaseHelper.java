@@ -6,9 +6,9 @@ package net.wigle.wigleandroid.db;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.wigle.wigleandroid.MainActivity.ERROR_REPORT_DIALOG;
 import static net.wigle.wigleandroid.util.Logging.info;
-import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
-import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
-import static net.wigle.wigleandroid.listener.GPSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
+import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_METERS;
+import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_DIFF_TIME;
+import static net.wigle.wigleandroid.listener.GNSSListener.MIN_ROUTE_LOCATION_PRECISION_METERS;
 import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.hasSD;
 

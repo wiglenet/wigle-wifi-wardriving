@@ -26,7 +26,10 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
+import static android.os.Build.VERSION.SDK_INT;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -173,7 +176,8 @@ public final class WigleService extends Service {
                 final String title = context.getString(R.string.wigle_service);
 
                 final Intent notificationIntent = new Intent(this, MainActivity.class);
-                final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+                final int flags = SDK_INT >= Build.VERSION_CODES.S?(FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE): FLAG_UPDATE_CURRENT;
+                final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags);
                 final long dbNets = ListFragment.lameStatic.dbNets;
                 String text = context.getString(R.string.list_waiting_gps);
 
@@ -217,18 +221,18 @@ public final class WigleService extends Service {
                 Notification notification = null;
 
                 if (null != ma) {
-                    final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     final Intent scanSharedIntent = new Intent();
                     scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
                     scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
-                    final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
                     final Intent uploadSharedIntent = new Intent();
                     uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
-                    final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    if (SDK_INT >= Build.VERSION_CODES.O) {
                         notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else {
                         notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
@@ -259,7 +263,7 @@ public final class WigleService extends Service {
     }
 
     private boolean isServiceForeground() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (SDK_INT < Build.VERSION_CODES.Q) {
             // no such thing as foreground back then
             return false;
         }
@@ -282,7 +286,7 @@ public final class WigleService extends Service {
         builder.setContentText(text);
         builder.setWhen(when);
         builder.setLargeIcon(largeIcon);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setSmallIcon(R.drawable.wiglewifi_small_white);
         } else {
             builder.setSmallIcon(R.drawable.wiglewifi_small);
@@ -311,7 +315,7 @@ public final class WigleService extends Service {
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
                                            final PendingIntent uploadIntent) {
         // new notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager == null) return null;
@@ -337,7 +341,7 @@ public final class WigleService extends Service {
             builder.setColorized(true);
             //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
             // WiGLE Blue: builder.setColor(6005486);
-            if (Build.VERSION.SDK_INT < 29) {
+            if (SDK_INT < 29) {
                 //Classic charcoal:
                 builder.setColor(1973790);
             }

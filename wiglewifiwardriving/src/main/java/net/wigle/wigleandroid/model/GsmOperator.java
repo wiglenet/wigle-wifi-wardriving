@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Build;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
+import android.telephony.CellIdentityNr;
 import android.telephony.CellIdentityWcdma;
 
 import net.wigle.wigleandroid.MainActivity;
@@ -21,7 +22,7 @@ public class GsmOperator {
     private String mcc;
     private String mnc;
     private int xac;
-    private int cellId;
+    private long cellId;
     private final int fcn;
 
     private static Map<String, Map<String,String>> OPERATOR_CACHE;
@@ -54,7 +55,7 @@ public class GsmOperator {
                 res += "\n\tBSIC: " + cellIdentG.getBsic();
             }
         }
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "GSM") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
                     Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
@@ -93,7 +94,7 @@ public class GsmOperator {
         }
 
 
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "LTE") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
                     Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
@@ -102,6 +103,44 @@ public class GsmOperator {
                 }
             }
             throw new GsmOperatorException("invalid LTE Cell Identity values "+getOperatorKeyString());
+        }
+    }
+
+    @TargetApi(android.os.Build.VERSION_CODES.Q)
+    public GsmOperator(final CellIdentityNr cellIdentN) throws GsmOperatorException{
+        cellId = cellIdentN.getNci();
+        xac = cellIdentN.getTac();
+        mcc = cellIdentN.getMccString();
+        mnc = cellIdentN.getMncString();
+
+        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
+        if (MainActivity.DEBUG_CELL_DATA) {
+            String res = "NR Cell: " +
+                    "\n\tNCI: " + cellId +
+                    "\n\tPCI: " + cellIdentN.getPci() +
+                    "\n\tTAC: " + xac +
+                    "\n\tMCC: " + mcc +
+                    "\n\tMNC: " + mnc +
+                    "\n\tNetwork Key: " + getOperatorKeyString() +
+                    "\n\toperator: " + getOperatorString() +
+                    "\n\tNRARFCN:" + fcn;
+
+            if (Build.VERSION.SDK_INT >= 28) {
+                //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
+            }
+
+            Logging.info(res);
+        }
+
+        if (!validCellId(this.cellId, "NR") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+            if (MainActivity.DEBUG_CELL_DATA) {
+                if (android.os.Build.VERSION.SDK_INT >= 24) {
+                    Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
+                } else {
+                    Logging.info("Discarding NR cell with invalid ID");
+                }
+            }
+            throw new GsmOperatorException("invalid NR Cell Identity values "+getOperatorKeyString());
         }
     }
 
@@ -127,7 +166,7 @@ public class GsmOperator {
             Logging.info(res);
         }
 
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc, mnc)) {
+        if (!validCellId(this.cellId, "WCDMA") || !validXac(xac) || !validMccMnc(mcc, mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
                     Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
@@ -153,9 +192,18 @@ public class GsmOperator {
         return fcn;
     }
 
-    private boolean validCellId(final int cellId) {
-        if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
-            return true;
+    private boolean validCellId(final long cellId, final String type) {
+        switch (type) {
+            case "LTE":
+            case "WCDMA":
+            case "GSM":
+                if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
+                    return true;
+                }
+            case "NR":
+                if ((cellId > 0) && (cellId < Long.MAX_VALUE)) {
+                    return true;
+                }
         }
         return false;
     }

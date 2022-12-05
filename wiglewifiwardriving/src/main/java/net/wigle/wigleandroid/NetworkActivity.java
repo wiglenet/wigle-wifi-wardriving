@@ -175,16 +175,13 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 tv.setText( getString(R.string.na) );
             } else {
                 final String[] cellCapabilities = network.getCapabilities().split(";");
-                tv.setText(cellCapabilities[0]+" "+channelCodeTypeForNetworkType(network.getType())+" "+chan);
+                tv.setText(cellCapabilities[0]+" "+NetworkType.channelCodeTypeForNetworkType(network.getType())+" "+chan);
             }
 
             tv = findViewById( R.id.na_cap );
             tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
 
-            if ( NetworkType.GSM.equals(network.getType()) ||
-                    NetworkType.LTE.equals(network.getType()) ||
-                    NetworkType.WCDMA.equals(network.getType())) { // cell net types  with advanced data
-
+            if ( NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
 
@@ -738,18 +735,5 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
         }
         return false;
-    }
-
-    private static final String channelCodeTypeForNetworkType(NetworkType type) {
-        switch (type) {
-            case GSM:
-                return "ARFCN"  ;
-            case LTE:
-                return "EARFCN";
-            case WCDMA:
-                return "UARFCN";
-            default:
-                return null;
-        }
     }
 }

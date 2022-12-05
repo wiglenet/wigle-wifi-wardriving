@@ -85,6 +85,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
                 case GSM:
                 case WCDMA:
                 case LTE:
+                case NR:
                     addCell(network);
                     break;
                 case BT:

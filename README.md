@@ -11,7 +11,7 @@ As of December 2022, this application supports Android SDK versions 19 (KitKat) 
 - Accumulate a database of wireless signal observations
 - Search and export observed data
 - Integrate with a [WiGLE.net account](https://wigle.net) for competition, statistics, and online aggregation and visualization
-- See your standings and accomplisments per the WiGLE.net server
+- See your standings and accomplishments per the WiGLE.net server
 
 ## Data Export
 The client offers numerous data export formats including:

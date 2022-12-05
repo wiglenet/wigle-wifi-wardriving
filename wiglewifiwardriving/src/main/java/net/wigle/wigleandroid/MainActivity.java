@@ -817,13 +817,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static boolean isHighDefinition() {
-        if (Build.VERSION.SDK_INT >= 19) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-            int dpi = metrics.densityDpi;
-            if (dpi >= 240) {
-                return true;
-            }
+        DisplayMetrics metrics = new DisplayMetrics();
+        MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        int dpi = metrics.densityDpi;
+        if (dpi >= 240) {
+            return true;
         }
         return false;
     }
@@ -1702,10 +1700,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static boolean isDevMode(final Context context) {
-        if (Build.VERSION.SDK_INT >= 19) {
-            return android.provider.Settings.Secure.getInt(context.getContentResolver(),
-                    android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
-        } else return false;
+        return android.provider.Settings.Secure.getInt(context.getContentResolver(),
+                android.provider.Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) != 0;
     }
 
     private void setupSound() {

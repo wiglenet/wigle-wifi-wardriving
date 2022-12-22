@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.listener;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -14,7 +13,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -47,8 +45,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
-
-import androidx.core.app.ActivityCompat;
 
 /**
  * Central classic BT broadcast receiver and BTLE scanner.
@@ -179,7 +175,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
                         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                        location = gpsListener.getLocation();
+                        location = gpsListener.getCurrentLocation();
                     } else {
                         Logging.warn("Null gpsListener in LE Single Scan Result");
                     }
@@ -534,7 +530,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
                         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
                         gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                        location = gpsListener.getLocation();
+                        location = gpsListener.getCurrentLocation();
                     } else {
                         Logging.warn("null gpsListener in BTR onReceive");
                     }
@@ -719,7 +715,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             Location location = null;
             final GNSSListener gpsListener = m.getGPSListener();
             if (gpsListener != null) {
-                location = gpsListener.getLocation();
+                location = gpsListener.getCurrentLocation();
             }
             if (location != null && location.getSpeed() >= 2.2352f) {
                 scanPref = ListFragment.PREF_OG_BT_SCAN_PERIOD_FAST;

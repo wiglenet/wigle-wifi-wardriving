@@ -177,7 +177,7 @@ public final class DatabaseHelper extends Thread {
     public enum NetworkFilter {
         WIFI("type = 'W'"),
         BT("type IN ('B','E')"),
-        CELL("type IN ('G','C','L','D')");
+        CELL("type IN ('G','C','L','D','N')");
 
         final String filter;
 

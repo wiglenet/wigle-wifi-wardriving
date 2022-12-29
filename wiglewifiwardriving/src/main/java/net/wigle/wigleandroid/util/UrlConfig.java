@@ -1,5 +1,8 @@
 package net.wigle.wigleandroid.util;
 
+/**
+ * Utility class that holds the WiGLE URLs used throughout the app
+ */
 public class UrlConfig {
     public static final String CSV_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/csv/";
     // form auth

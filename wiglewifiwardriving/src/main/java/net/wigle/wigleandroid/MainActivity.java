@@ -40,6 +40,7 @@ import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.RequiresApi;
@@ -1070,11 +1071,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.wakeLock.acquire();
         }
 
-        final int serviceAvailable = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getApplicationContext());
-        Logging.info("GooglePlayServicesAvailable: " + serviceAvailable);
+        final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext());
+        Logging.info("GoogleApiAvailability: " + serviceAvailable);
         if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
-            Logging.error("service not available! " + serviceAvailable);
-            final Dialog dialog = GooglePlayServicesUtil.getErrorDialog(serviceAvailable, this, 0);
+            Logging.error("GoogleApiAvailability not available! " + serviceAvailable);
+            final Dialog dialog =GoogleApiAvailability.getInstance().getErrorDialog(this, serviceAvailable, 0);
             dialog.show();
             playServiceShown = true;
         }

@@ -984,17 +984,17 @@ public final class MappingFragment extends Fragment {
             regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
 
             final CheckBox invert = MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-                    prefix + ListFragment.PREF_MAPF_INVERT, false );
+                    prefix + ListFragment.PREF_MAPF_INVERT, false ,prefs);
             final CheckBox open = MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-                    prefix + ListFragment.PREF_MAPF_OPEN, true );
+                    prefix + ListFragment.PREF_MAPF_OPEN, true, prefs );
             final CheckBox wep = MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-                    prefix + ListFragment.PREF_MAPF_WEP, true );
+                    prefix + ListFragment.PREF_MAPF_WEP, true, prefs );
             final CheckBox wpa = MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-                    prefix + ListFragment.PREF_MAPF_WPA, true );
+                    prefix + ListFragment.PREF_MAPF_WPA, true, prefs );
             final CheckBox cell = MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-                    prefix + ListFragment.PREF_MAPF_CELL, true );
+                    prefix + ListFragment.PREF_MAPF_CELL, true, prefs );
             final CheckBox enabled = MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-                    prefix + ListFragment.PREF_MAPF_ENABLED, true );
+                    prefix + ListFragment.PREF_MAPF_ENABLED, true, prefs );
 
             Button ok = (Button) view.findViewById( R.id.ok_button );
             ok.setOnClickListener( new OnClickListener() {
@@ -1028,17 +1028,17 @@ public final class MappingFragment extends Fragment {
                     try {
                         regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
                         MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
-                                prefix + ListFragment.PREF_MAPF_INVERT, false );
+                                prefix + ListFragment.PREF_MAPF_INVERT, false, prefs );
                         MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
-                                prefix + ListFragment.PREF_MAPF_OPEN, true );
+                                prefix + ListFragment.PREF_MAPF_OPEN, true, prefs );
                         MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
-                                prefix + ListFragment.PREF_MAPF_WEP, true );
+                                prefix + ListFragment.PREF_MAPF_WEP, true, prefs );
                         MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
-                                prefix + ListFragment.PREF_MAPF_WPA, true );
+                                prefix + ListFragment.PREF_MAPF_WPA, true, prefs );
                         MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
-                                prefix + ListFragment.PREF_MAPF_CELL, true );
+                                prefix + ListFragment.PREF_MAPF_CELL, true, prefs );
                         MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
-                                prefix + ListFragment.PREF_MAPF_ENABLED, true );
+                                prefix + ListFragment.PREF_MAPF_ENABLED, true, prefs );
 
                         dialog.dismiss();
                     }

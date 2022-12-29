@@ -41,6 +41,7 @@ import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.telephony.CellIdentityCdma;
 import android.telephony.CellIdentityNr;
 import android.telephony.CellInfo;
@@ -130,8 +131,8 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * the massive core receive handler for WiFi scan callback
-     * @param context
-     * @param intent
+     * @param context context of the onreceive
+     * @param intent the intent for the receive
      */
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -430,17 +431,16 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * trigger for cell collection and logging
-     * @param location
-     * @return
+     * @param location the current Location
+     * @return a map of IDs::Network records
      */
     private Map<String,Network> recordCellInfo(final Location location) {
         TelephonyManager tele = (TelephonyManager) mainActivity.getSystemService( Context.TELEPHONY_SERVICE );
         Map<String,Network> networks = new HashMap<>();
         if ( tele != null ) {
             try {
-                CellLocation currentCell = null;
                 //DEBUG: MainActivity.info("SIM State: "+tele.getSimState() + "("+getNetworkTypeName()+")");
-                currentCell = tele.getCellLocation();
+                CellLocation currentCell = tele.getCellLocation();
                 if (currentCell != null) {
                     Network currentNetwork = handleSingleCellLocation(currentCell, tele, location);
                     if (currentNetwork != null) {
@@ -449,26 +449,23 @@ public class WifiReceiver extends BroadcastReceiver {
                     }
                 }
 
-                if (Build.VERSION.SDK_INT >= 17) { // we can survey cells
-                    List<CellInfo> infos = tele.getAllCellInfo();
-                    if (null != infos) {
-                        for (final CellInfo cell : infos) {
-                            Network network = handleSingleCellInfo(cell, tele, location);
-                            if (null != network) {
-                                if (networks.containsKey(network.getBssid())) {
-                                    //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
-                                    Network n = networks.get(network.getBssid());
-                                    //TODO merge to improve data instead of replace?
-                                    networks.put(network.getBssid(), network);
-                                } else {
-                                    networks.put(network.getBssid(), network);
-                                }
+                // we can survey cells
+                List<CellInfo> infos = tele.getAllCellInfo();
+                if (null != infos) {
+                    for (final CellInfo cell : infos) {
+                        Network network = handleSingleCellInfo(cell, tele, location);
+                        if (null != network) {
+                            if (networks.containsKey(network.getBssid())) {
+                                //DEBUG: MainActivity.info("matching network already in map: " + network.getBssid());
+                                Network n = networks.get(network.getBssid());
+                                //TODO merge to improve data instead of replace?
+                                networks.put(network.getBssid(), network);
+                            } else {
+                                networks.put(network.getBssid(), network);
                             }
                         }
-                        ListFragment.lameStatic.currCells = infos.size();
                     }
-                } else {
-                    //TODO: handle multiple SIMs in early revs?
+                    ListFragment.lameStatic.currCells = infos.size();
                 }
                 //ALIBI: haven't been able to find a circumstance where there's anything but garbage in these.
                 //  should be an alternative to getAllCellInfo above for older phones, but oly dBm looks valid
@@ -494,12 +491,7 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * Translate a CellInfo record to Network record / sorts by type and capabilities to correct update methods
      * (new implementation)
-     * @param cellInfo
-     * @param tele
-     * @param location
-     * @return
      */
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     private Network handleSingleCellInfo(final CellInfo cellInfo, final TelephonyManager tele, final Location location) {
         if (cellInfo == null) {
             Logging.info("null cellInfo");
@@ -523,14 +515,12 @@ public class WifiReceiver extends BroadcastReceiver {
                         CellSignalStrengthLte cellStrengthL = ((CellInfoLte) (cellInfo)).getCellSignalStrength();
                         return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "LTE",
                                 cellStrengthL.getDbm(), NetworkType.typeForCode("L"), location);
-                    case "CellInfoWcdma":
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) { //WHYYYYYY?
-                            g = new GsmOperator(((CellInfoWcdma) (cellInfo)).getCellIdentity());
-                            CellSignalStrengthWcdma cellStrengthW = ((CellInfoWcdma) (cellInfo)).getCellSignalStrength();
-                            return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "WCDMA",
-                                    cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
-                        }
-                        break;
+                    case "CellInfoWcdma": {
+                        g = new GsmOperator(((CellInfoWcdma) (cellInfo)).getCellIdentity());
+                        CellSignalStrengthWcdma cellStrengthW = ((CellInfoWcdma) (cellInfo)).getCellSignalStrength();
+                        return addOrUpdateCell(g.getOperatorKeyString(), g.getOperatorString(), g.getXfcn(), "WCDMA",
+                                cellStrengthW.getDbm(), NetworkType.typeForCode("D"), location);
+                    }
                     case "CellInfoNr":
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
                             g = new GsmOperator((CellIdentityNr) ((CellInfoNr) (cellInfo)).getCellIdentity());
@@ -553,10 +543,6 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * no test environment to implement this, but the handleCellInfo methods should work to complete it.
      * NeighboringCellInfos never appear in practical testing
-     * @param cellInfo
-     * @param tele
-     * @param location
-     * @return
      */
     @Deprecated
     private Network handleSingleNeighboringCellInfo(final NeighboringCellInfo cellInfo, final TelephonyManager tele, final Location location) {
@@ -602,10 +588,6 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * Translate and categorize a CellLocation record for update and logging
      * (old/compat implementation)
-     * @param cellLocation
-     * @param tele
-     * @param location
-     * @return
      */
     private Network handleSingleCellLocation(final CellLocation cellLocation,
                                              final TelephonyManager tele, final Location location) {
@@ -638,9 +620,10 @@ public class WifiReceiver extends BroadcastReceiver {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     try {
+                        //TODO: 1/2: when cell gets its own listener, make this async (Strict)
                         ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
                     } catch (SQLException sex) {
-                        ssid = tele.getNetworkOperatorName();
+                        Logging.error("failed to get op for "+tele.getNetworkOperator());
                     }
                 } else {
                     ssid = tele.getNetworkOperatorName();
@@ -708,8 +691,6 @@ public class WifiReceiver extends BroadcastReceiver {
      * This was named RSSI - but I think it's more accurately dBm. Also worth noting that ALL the
      * SignalStrength changes we've received in PhoneState for GSM networks have been resulting in
      * "99" -> -113 in every measurable case on all hardware in testing.
-     * @param strength
-     * @return
      */
     @Deprecated
     private int gsmDBmMagicDecoderRing( int strength ) {
@@ -732,10 +713,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * Voice announcement method for scan
-     * @param preQueueSize
-     * @param newWifiCount
-     * @param newCellCount
-     * @param now
      */
     private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -837,7 +814,6 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * get the scan period based on preferences and current speed
-     * @return
      */
     public long getScanPeriod() {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
@@ -865,12 +841,7 @@ public class WifiReceiver extends BroadcastReceiver {
      * Schedule the next WiFi scan
      */
     public void scheduleScan() {
-        wifiTimer.post(new Runnable() {
-            @Override
-            public void run() {
-                doWifiScan();
-            }
-        });
+        wifiTimer.post(this::doWifiScan);
     }
 
     /**
@@ -973,70 +944,55 @@ public class WifiReceiver extends BroadcastReceiver {
 
     /**
      * CDMA entrypoint to update and logging
-     * @param cellInfo
-     * @param tele
-     * @param location
-     * @return
      */
     private Network handleSingleCdmaInfo(final CellInfoCdma cellInfo, final TelephonyManager tele, final Location location) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            CellIdentityCdma cellIdentC = cellInfo.getCellIdentity();
-            CellSignalStrengthCdma cellStrengthC = ((CellInfoCdma) (cellInfo)).getCellSignalStrength();
+        CellIdentityCdma cellIdentC = cellInfo.getCellIdentity();
+        CellSignalStrengthCdma cellStrengthC = cellInfo.getCellSignalStrength();
 
-            final int bssIdInt = cellIdentC.getBasestationId();
-            final int netIdInt = cellIdentC.getNetworkId();
-            final int systemIdInt = cellIdentC.getSystemId();
+        final int bssIdInt = cellIdentC.getBasestationId();
+        final int netIdInt = cellIdentC.getNetworkId();
+        final int systemIdInt = cellIdentC.getSystemId();
 
-            if ((Integer.MAX_VALUE == bssIdInt) || (Integer.MAX_VALUE == netIdInt) || (Integer.MAX_VALUE == systemIdInt)) {
-                Logging.info("Discarding CDMA cell with invalid ID");
-                return null;
-            }
-
-            final String networkKey = systemIdInt + "_" + netIdInt + "_" + bssIdInt;
-            final int dBmLevel = cellStrengthC.getDbm();
-            if (MainActivity.DEBUG_CELL_DATA) {
-
-                String res = "CDMA Cell:" +
-                        "\n\tBSSID:" + bssIdInt +
-                        "\n\tNet ID:" + netIdInt +
-                        "\n\tSystem ID:" + systemIdInt +
-                        "\n\tNetwork Key: " + networkKey;
-
-                res += "\n\tLat: " + new Double(cellIdentC.getLatitude()) / 4.0d / 60.0d / 60.0d;
-                res += "\n\tLon: " + new Double(cellIdentC.getLongitude()) / 4.0d / 60.0d / 60.0d;
-                res += "\n\tSignal: " + cellStrengthC.getCdmaLevel();
-
-                int rssi = cellStrengthC.getEvdoDbm() != 0 ? cellStrengthC.getEvdoDbm() : cellStrengthC.getCdmaDbm();
-                res += "\n\tRSSI: " + rssi;
-
-                final int asuLevel = cellStrengthC.getAsuLevel();
-
-                res += "\n\tSSdBm: " + dBmLevel;
-                res += "\n\tSSasu: " + asuLevel;
-                res += "\n\tEVDOdBm: " + cellStrengthC.getEvdoDbm();
-                res += "\n\tCDMAdBm: " + cellStrengthC.getCdmaDbm();
-                Logging.info(res);
-            }
-            //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
-            //  references http://niviuk.free.fr/cdma_band.php
-            return addOrUpdateCell(networkKey,
-                    /*TODO: can we improve on this?*/ tele.getNetworkOperator(),
-                    0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
-
+        if ((Integer.MAX_VALUE == bssIdInt) || (Integer.MAX_VALUE == netIdInt) || (Integer.MAX_VALUE == systemIdInt)) {
+            Logging.info("Discarding CDMA cell with invalid ID");
+            return null;
         }
-        return null;
+
+        final String networkKey = systemIdInt + "_" + netIdInt + "_" + bssIdInt;
+        final int dBmLevel = cellStrengthC.getDbm();
+        if (MainActivity.DEBUG_CELL_DATA) {
+
+            String res = "CDMA Cell:" +
+                    "\n\tBSSID:" + bssIdInt +
+                    "\n\tNet ID:" + netIdInt +
+                    "\n\tSystem ID:" + systemIdInt +
+                    "\n\tNetwork Key: " + networkKey;
+
+            res += "\n\tLat: " + new Double(cellIdentC.getLatitude()) / 4.0d / 60.0d / 60.0d;
+            res += "\n\tLon: " + new Double(cellIdentC.getLongitude()) / 4.0d / 60.0d / 60.0d;
+            res += "\n\tSignal: " + cellStrengthC.getCdmaLevel();
+
+            int rssi = cellStrengthC.getEvdoDbm() != 0 ? cellStrengthC.getEvdoDbm() : cellStrengthC.getCdmaDbm();
+            res += "\n\tRSSI: " + rssi;
+
+            final int asuLevel = cellStrengthC.getAsuLevel();
+
+            res += "\n\tSSdBm: " + dBmLevel;
+            res += "\n\tSSasu: " + asuLevel;
+            res += "\n\tEVDOdBm: " + cellStrengthC.getEvdoDbm();
+            res += "\n\tCDMAdBm: " + cellStrengthC.getCdmaDbm();
+            Logging.info(res);
+        }
+        //TODO: don't see any way to get CDMA channel from current CellInfoCDMA/CellIdentityCdma
+        //  references http://niviuk.free.fr/cdma_band.php
+        return addOrUpdateCell(networkKey,
+                /*TODO: can we improve on this?*/ tele.getNetworkOperator(),
+                0, "CDMA", dBmLevel, NetworkType.typeForCode("C"), location);
+
     }
 
     /**
      * Cell update and logging
-     * @param bssid
-     * @param operator
-     * @param frequency
-     * @param networkTypeName
-     * @param strength
-     * @param type
-     * @param location
-     * @return
      */
     private Network addOrUpdateCell(final String bssid, final String operator,
                                     final int frequency, final String networkTypeName,
@@ -1051,6 +1007,7 @@ public class WifiReceiver extends BroadcastReceiver {
         Network network = networkCache.get( bssid );
 
         try {
+            //TODO: 2/2: when cell gets its own listener, make this async (Strict)
             final String operatorName = GsmOperator.getOperatorName(operator);
 
             if ( network == null ) {

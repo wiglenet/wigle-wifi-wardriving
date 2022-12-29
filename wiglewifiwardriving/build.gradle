@@ -63,7 +63,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.14.9'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'

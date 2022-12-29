@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -16,12 +18,24 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.util.Logging;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class ThemeUtil {
     public static void setTheme(final SharedPreferences prefs) {
         if (Build.VERSION.SDK_INT > 28) {
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            Logging.info("set theme called: "+displayMode);
-            AppCompatDelegate.setDefaultNightMode(displayMode);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+            executor.execute(() -> {
+                final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+                Logging.info("set theme called: " + displayMode);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AppCompatDelegate.setDefaultNightMode(displayMode);
+                    }
+                });
+            });
         } else {
             //Force night mode
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -30,13 +44,25 @@ public class ThemeUtil {
 
     public static void setNavTheme(final Window w, final Context c, final SharedPreferences prefs) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
-            final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
-                    (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                            nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-                w.setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            }
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
+                    final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
+                                    (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
+                                            nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
+                                w.setNavigationBarColor(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                            }
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -56,11 +82,9 @@ public class ThemeUtil {
             if (mapsMatchMode) {
                 final int displayMode = prefs.getInt(ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES);
                 final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
-                if (AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
+                return AppCompatDelegate.MODE_NIGHT_YES == displayMode ||
                         (AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM == displayMode &&
-                                nightModeFlags == Configuration.UI_MODE_NIGHT_YES)) {
-                    return true;
-                }
+                                nightModeFlags == Configuration.UI_MODE_NIGHT_YES);
             }
         }
         return false;

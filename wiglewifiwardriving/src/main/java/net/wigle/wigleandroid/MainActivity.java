@@ -26,7 +26,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnErrorListener;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -34,6 +33,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
@@ -68,8 +68,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -93,7 +91,6 @@ import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InstallUtility;
-import net.wigle.wigleandroid.util.InsufficientSpaceException;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
@@ -116,6 +113,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -236,8 +235,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logging.info("MAIN onCreate. state:  " + state);
+        //DEBUG: StrictMode.enableDefaults();
         workAroundGoogleMapsBug();
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
 
         ThemeUtil.setTheme(prefs);
         ThemeUtil.setNavTheme(this.getWindow(), this, prefs);
@@ -351,19 +351,19 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("checkStorage");
         checkStorage();
         Logging.info("setupDatabase");
-        setupDatabase();
+        setupDatabase(prefs);
         Logging.info("setupBattery");
         setupBattery();
         Logging.info("setupSound");
         setupSound();
         Logging.info("setupActivationDialog");
-        setupActivationDialog();
+        setupActivationDialog(prefs);
         Logging.info("setupBluetooth");
-        setupBluetooth();
+        setupBluetooth(prefs);
         Logging.info("setupWifi");
-        setupWifi();
+        setupWifi(prefs);
         Logging.info("setupLocation"); // must be after setupWifi
-        setupLocation();
+        setupLocation(prefs);
         Logging.info("setup tabs");
         if (savedInstanceState == null) {
             setupFragments();
@@ -383,32 +383,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         //TODO: if we can determine whether DB needs updating, we can avoid copying every time
         //if (!state.mxcDbHelper.isPresent()) {
-        try {
-            state.mxcDbHelper.implantMxcDatabase();
-        } catch (InsufficientSpaceException isex) {
-            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
-            iseDlgBuilder.setMessage(R.string.no_mxc_space_message)
-                    .setTitle(R.string.no_internal_space_title)
-                    .setCancelable(true)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-
-            final Dialog dialog = iseDlgBuilder.create();
-            if (!isFinishing()) {
-                dialog.show();
-            }
-        } catch (IOException ex) {
-            Logging.error("unable to implant mcc/mnc db", ex);
-
-        }
+        state.mxcDbHelper.implantMxcDatabase(this, isFinishing());
         //}
 
         // rksh 20160202 - api/authuser secure preferences storage
-        checkInitKeystore();
+        checkInitKeystore(prefs);
 
         // show the list by default
         selectFragment(state.currentTab);
@@ -442,22 +421,29 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * works around the ZoomTable Array Index OOB bugs. 80% of violations in pre-release report are this.
      */
     private void workAroundGoogleMapsBug() {
-        try {
-            SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);
-            if (!googleBug.contains("fixed")) {
-                Logging.info("working around google maps bug 154855417");
-                File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
-                if (corruptedZoomTables.delete()) {
-                    googleBug.edit().putBoolean("fixed", true).apply();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        //DEBUG: Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(() -> {
+            try {
+                SharedPreferences googleBug = getSharedPreferences("google_bug_154855417", Context.MODE_PRIVATE);
+                if (!googleBug.contains("fixed")) {
+                    Logging.info("working around google maps bug 154855417");
+                    File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
+                    if (corruptedZoomTables.delete()) {
+                        googleBug.edit().putBoolean("fixed", true).apply();
+                    } else {
+                        Logging.error("unable to work around corrupted ZoomTables.data error");
+                    }
                 } else {
-                    Logging.error("unable to work around corrupted ZoomTables.data error");
+                    Logging.info("already worked around google maps bug 154855417");
                 }
-            } else {
-                Logging.info("already worked around google maps bug 154855417");
+            } catch (Exception e) {
+                Logging.warn("Exception in workAroundGoogleMapsBug: " + e);
             }
-        } catch (Exception e) {
-            Logging.warn("Exception in workAroundGoogleMapsBug: " + e);
-        }
+            /*DEBUG: handler.post(() -> {
+                WiGLEToast.showOverActivity(this, R.string.app_name, "ZoomTables cleanup complete", Toast.LENGTH_LONG);
+            });*/
+        });
     }
 
     @SuppressLint("ApplySharedPref")
@@ -479,9 +465,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     /**
      * migration method for viable APIs to switch to encrypted AUTH_TOKENs
      */
-    private void checkInitKeystore() {
-        final SharedPreferences prefs = getApplicationContext().
-                getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+    private void checkInitKeystore(final SharedPreferences prefs) {
         if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
             // successful migration should remove the password value
             if (!prefs.getString(ListFragment.PREF_PASSWORD,
@@ -583,7 +567,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private void setupMenuDrawer() {
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
@@ -618,38 +602,35 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
 
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        // set item as selected to persist highlight
+                menuItem -> {
+                    // set item as selected to persist highlight
 
-                        menuItem.setCheckable(true);
-                        if (menuItem.getItemId() == R.id.nav_stats) {
-                            menuItem.setChecked(!menuItem.isChecked());
-                        } else {
-                            menuItem.setChecked(true);
+                    menuItem.setCheckable(true);
+                    if (menuItem.getItemId() == R.id.nav_stats) {
+                        menuItem.setChecked(!menuItem.isChecked());
+                    } else {
+                        menuItem.setChecked(true);
 
-                            if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
-                                MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
-                                mPreviousMenuItem.setChecked(false);
-                            }
+                        if (state.previousTab != menuItem.getItemId() && state.previousTab != 0) {
+                            MenuItem mPreviousMenuItem = navigationView.getMenu().findItem(state.previousTab);
+                            mPreviousMenuItem.setChecked(false);
                         }
-                        state.previousTab = menuItem.getItemId();
-
-                        // close drawer when item is tapped
-                        if (R.id.nav_stats == menuItem.getItemId()) {
-                            Logging.info("Nav stats clicked");
-                            showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
-                        } else {
-                            if (R.id.nav_site_stats != menuItem.getItemId() &&
-                                    R.id.nav_user_stats != menuItem.getItemId() &&
-                                    R.id.nav_rank != menuItem.getItemId())
-                                showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
-                            mDrawerLayout.closeDrawers();
-                            selectFragment(menuItem.getItemId());
-                        }
-                        return true;
                     }
+                    state.previousTab = menuItem.getItemId();
+
+                    // close drawer when item is tapped
+                    if (R.id.nav_stats == menuItem.getItemId()) {
+                        Logging.info("Nav stats clicked");
+                        showSubmenu(navigationView.getMenu(), R.id.stats_group, menuItem.isChecked());
+                    } else {
+                        if (R.id.nav_site_stats != menuItem.getItemId() &&
+                                R.id.nav_user_stats != menuItem.getItemId() &&
+                                R.id.nav_rank != menuItem.getItemId())
+                            showSubmenu(navigationView.getMenu(), R.id.stats_group, false);
+                        mDrawerLayout.closeDrawers();
+                        selectFragment(menuItem.getItemId());
+                    }
+                    return true;
                 });
         final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -709,11 +690,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
 
             //fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX+itemId);
-
-            if (null == frag) {
-                final String maybeName = getResources().getResourceName(itemId);
-                Logging.error("null fragment for: " + String.format("0x%08X", itemId) + " (" + maybeName + ")");
-            }
 
             try {
                 fragmentManager.beginTransaction()
@@ -821,10 +797,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         DisplayMetrics metrics = new DisplayMetrics();
         MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         int dpi = metrics.densityDpi;
-        if (dpi >= 240) {
-            return true;
-        }
-        return false;
+        return dpi >= 240;
     }
 
     static boolean isScreenLocked(Fragment fragment) {
@@ -895,7 +868,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final String checkboxLabel = getArguments().containsKey("checkboxLabel") ? getArguments().getString("checkboxLabel") : null;
             if (null != checkboxLabel) {
                 View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
-                CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+                CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
                 checkBox.setText(checkboxLabel);
                 builder.setView(checkBoxView);
             }
@@ -909,69 +882,63 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             builder.setMessage(getArguments().getString("message"));
             final int tabPos = getArguments().getInt("tabPos");
             final int dialogId = getArguments().getInt("dialogId");
-            final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-
+            final SharedPreferences prefs = null !=
+                    activity?activity.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE): null;
 
             final AlertDialog ad = builder.create();
             // ok
-            ad.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog, final int which) {
-                    try {
-                        if (null != persistPrefKey) {
-                            CheckBox checkBox = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.checkbox);
-                            if (checkBox.isChecked()) {
-                                final SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString(persistPrefKey, persistPrefAgreeValue);
-                                editor.apply();
-                            }
+            ad.setButton(DialogInterface.BUTTON_POSITIVE, activity.getString(R.string.ok), (dialog, which) -> {
+                try {
+                    if (null != persistPrefKey) {
+                        CheckBox checkBox = ((AlertDialog) dialog).findViewById(R.id.checkbox);
+                        if (checkBox.isChecked()) {
+                            final Editor editor = prefs.edit();
+                            editor.putString(persistPrefKey, persistPrefAgreeValue);
+                            editor.apply();
                         }
-                        dialog.dismiss();
-                        final Activity activity = getActivity();
-                        if (activity == null) {
-                            Logging.info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
-                        } else if (activity instanceof MainActivity) {
-                            final MainActivity mainActivity = (MainActivity) activity;
-                            if (mainActivity.getState() != null) {
-                                final String maybeName = getResources().getResourceName(tabPos);
-                                //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
-                                FragmentManager fragmentManager = ((MainActivity) activity).getSupportFragmentManager();
-                                final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + tabPos);
-                                if (fragment == null) {
-                                    Logging.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
-                                    //TODO: might behoove us to show an error here
-                                } else {
-                                    ((DialogListener) fragment).handleDialog(dialogId);
-                                }
-                            }
-                        } else {
-                            ((DialogListener) activity).handleDialog(dialogId);
-                        }
-                    } catch (Exception ex) {
-                        // guess it wasn't there anyways
-                        Logging.info("exception handling fragment alert dialog: " + ex, ex);
                     }
+                    dialog.dismiss();
+                    final Activity activity1 = getActivity();
+                    if (activity1 == null) {
+                        Logging.info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
+                    } else if (activity1 instanceof MainActivity) {
+                        final MainActivity mainActivity = (MainActivity) activity1;
+                        if (mainActivity.getState() != null) {
+                            final String maybeName = getResources().getResourceName(tabPos);
+                            //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                            FragmentManager fragmentManager = ((MainActivity) activity1).getSupportFragmentManager();
+                            final Fragment fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + tabPos);
+                            if (fragment == null) {
+                                Logging.error("null fragment for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
+                                //TODO: might behoove us to show an error here
+                            } else {
+                                ((DialogListener) fragment).handleDialog(dialogId);
+                            }
+                        }
+                    } else {
+                        ((DialogListener) activity1).handleDialog(dialogId);
+                    }
+                } catch (Exception ex) {
+                    // guess it wasn't there anyways
+                    Logging.info("exception handling fragment alert dialog: " + ex, ex);
                 }
             });
 
             // cancel
-            ad.setButton(DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(final DialogInterface dialog, final int which) {
-                    try {
-                        if (null != persistPrefKey) {
-                            CheckBox checkBox = (CheckBox) ((AlertDialog) dialog).findViewById(R.id.checkbox);
-                            if (checkBox.isChecked()) {
-                                final SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString(persistPrefKey, persistPrefDisagreeValue);
-                                editor.apply();
-                            }
+            ad.setButton(DialogInterface.BUTTON_NEGATIVE, activity.getString(R.string.cancel), (dialog, which) -> {
+                try {
+                    if (null != persistPrefKey) {
+                        CheckBox checkBox = ((AlertDialog) dialog).findViewById(R.id.checkbox);
+                        if (checkBox.isChecked() && prefs != null) {
+                            final Editor editor = prefs.edit();
+                            editor.putString(persistPrefKey, persistPrefDisagreeValue);
+                            editor.apply();
                         }
-                        dialog.dismiss();
-                    } catch (Exception ex) {
-                        // guess it wasn't there anyways
-                        Logging.info("exception dismissing fragment alert dialog: " + ex, ex);
                     }
+                    dialog.dismiss();
+                } catch (Exception ex) {
+                    // guess it wasn't there anyways
+                    Logging.info("exception dismissing fragment alert dialog: ", ex);
                 }
             });
 
@@ -1015,32 +982,30 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    private void setupDatabase() {
+    private void setupDatabase(final SharedPreferences prefs) {
         // could be set by nonconfig retain
         if (state.dbHelper == null) {
-            state.dbHelper = new DatabaseHelper(getApplicationContext());
+            state.dbHelper = new DatabaseHelper(getApplicationContext(), prefs);
             //state.dbHelper.checkDB();
             state.dbHelper.start();
             ListFragment.lameStatic.dbHelper = state.dbHelper;
         }
         if (state.mxcDbHelper == null) {
-            state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext());
-            //state.mxcDbHelper.start();
+            state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext(), prefs);
         }
     }
 
+    //TODO: refactor these out of MainActivity
     public static CheckBox prefSetCheckBox(final Context context, final View view, final int id,
-                                           final String pref, final boolean def) {
-
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final CheckBox checkbox = (CheckBox) view.findViewById(id);
+                                           final String pref, final boolean def, final SharedPreferences prefs) {
+        final CheckBox checkbox = view.findViewById(id);
         checkbox.setChecked(prefs.getBoolean(pref, def));
         return checkbox;
     }
 
     private static CheckBox prefSetCheckBox(final SharedPreferences prefs, final View view, final int id, final String pref,
                                             final boolean def) {
-        final CheckBox checkbox = (CheckBox) view.findViewById(id);
+        final CheckBox checkbox = view.findViewById(id);
         if (checkbox == null) {
             Logging.error("No checkbox for id: " + id);
         } else {
@@ -1056,17 +1021,14 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
                                               final String pref, final boolean def, final PrefCheckboxListener listener) {
-        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         final Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
-        checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
-                editor.putBoolean(pref, isChecked);
-                editor.apply();
-                if (null != listener) {
-                    listener.preferenceSet(isChecked);
-                }
+        checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            editor.putBoolean(pref, isChecked);
+            editor.apply();
+            if (null != listener) {
+                listener.preferenceSet(isChecked);
             }
         });
 
@@ -1116,10 +1078,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             //TODO: redundant with endBluetooth?
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            try {
-                if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
                     bluetoothAdapter.cancelDiscovery();
-                }
+            }
+            try {
                 Logging.info("unregister bluetoothReceiver");
                 unregisterReceiver(state.bluetoothReceiver);
             } catch (final IllegalArgumentException ex) {
@@ -1138,7 +1100,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         Logging.info("MAIN: onSaveInstanceState");
         super.onSaveInstanceState(outState);
     }
@@ -1190,7 +1152,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     @Override
-    public void onConfigurationChanged(final Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig) {
         Logging.info("MAIN: config changed");
         setLocale(this, newConfig);
         super.onConfigurationChanged(newConfig);
@@ -1209,7 +1171,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onStart() {
         Logging.info("MAIN: start.");
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         if (prefs.getBoolean(ListFragment.PREF_BLOWED_UP, false)) {
             prefs.edit().putBoolean(ListFragment.PREF_BLOWED_UP, false).commit();
             // activate the email intent
@@ -1217,9 +1179,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             intent.putExtra(MainActivity.ERROR_REPORT_DO_EMAIL, true);
             startActivity(intent);
         }
-
         super.onStart();
-
     }
 
     @Override
@@ -1261,14 +1221,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static boolean isImperialUnitsLocale() {
         final Locale locale = Locale.getDefault();
         final String countryCode = locale.getCountry();
-        if ("US".equals(countryCode) || "LR".equals(countryCode) || "MM".equals(countryCode)) {
-            return true;
-        }
-        return false;
+        return "US".equals(countryCode) || "LR".equals(countryCode) || "MM".equals(countryCode);
     }
 
     public static void setLocale(final Context context, final Configuration config) {
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         final String lang = prefs.getString(ListFragment.PREF_LANGUAGE, "");
         final String current = config.locale.getLanguage();
         Logging.info("current lang: " + current + " new lang: " + lang);
@@ -1325,7 +1282,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * @return the Locale according to device and configuration
      */
     public static Locale getLocale(final Context context, final Configuration config) {
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         final String current = config.locale.getLanguage();
         String lang = prefs.getString(ListFragment.PREF_LANGUAGE, current);
         if (lang.isEmpty()) {
@@ -1355,24 +1312,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return null;
         }
         // try to figure out why sounds stops after a while
-        sound.setOnErrorListener(new OnErrorListener() {
-            @Override
-            public boolean onError(final MediaPlayer mp, final int what, final int extra) {
-                String whatString;
-                switch (what) {
-                    case MediaPlayer.MEDIA_ERROR_UNKNOWN:
-                        whatString = "error unknown";
-                        break;
-                    case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-                        whatString = "server died";
-                        break;
-                    default:
-                        whatString = "not defined";
-                }
-                Logging.info("media player error \"" + whatString + "\" what: " + what
-                        + " extra: " + extra + " mp: " + mp);
-                return false;
+        sound.setOnErrorListener((mp, what, extra) -> {
+            String whatString;
+            switch (what) {
+                case MediaPlayer.MEDIA_ERROR_UNKNOWN:
+                    whatString = "error unknown";
+                    break;
+                case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
+                    whatString = "server died";
+                    break;
+                default:
+                    whatString = "not defined";
             }
+            Logging.info("media player error \"" + whatString + "\" what: " + what
+                    + " extra: " + extra + " mp: " + mp);
+            return false;
         });
 
         return sound;
@@ -1485,7 +1439,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             // always be quiet when the phone is active
             return true;
         }
-        return getSharedPreferences(ListFragment.SHARED_PREFS, 0)
+        return getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE)
                 .getBoolean(ListFragment.PREF_MUTED, true);
     }
 
@@ -1526,7 +1480,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static void addNetworkToMap(final Network network) {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
-        if (getStaticState().currentTab == R.id.nav_map) {
+        if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
@@ -1537,7 +1491,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static void updateNetworkOnMap(final Network network) {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
-        if (getStaticState().currentTab == R.id.nav_map) {
+        if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
@@ -1548,7 +1502,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static void reclusterMap() {
         final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
-        if (getStaticState().currentTab == R.id.nav_map) {
+        if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
             // Map is visible, give it the new network
             final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
             if (f != null) {
@@ -1730,7 +1684,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
         if (MainActivity.getMainActivity() != null &&
                 MainActivity.getMainActivity().state != null &&
-                MainActivity.getMainActivity().state.ttsChecked == false) {
+                !MainActivity.getMainActivity().state.ttsChecked) {
             ttsCheckIntent();
         }
     }
@@ -1753,7 +1707,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      */
     public void updateAddressFilter(final String addressKey) {
         if (null != state) {
-            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
             if (ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS.equals(addressKey)) {
                 state.bssidDisplayExclusions = generateBssidFilterMatcher(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
             } else if (ListFragment.PREF_EXCLUDE_LOG_ADDRS.equals(addressKey)) {
@@ -1804,8 +1758,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             }
             sb.append(")");
-            //TODO: debug
-            Logging.info("building regex from: " + sb.toString());
+            //DEBUG: Logging.info("building regex from: " + sb.toString());
             Pattern pattern = Pattern.compile(sb.toString(), Pattern.CASE_INSENSITIVE);
             matcher = pattern.matcher("");
         }
@@ -1843,7 +1796,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static boolean isScanning(final Context context) {
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         return prefs.getBoolean(ListFragment.PREF_SCAN_RUNNING, true);
     }
 
@@ -1875,10 +1828,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    private void setupActivationDialog() {
+    private void setupActivationDialog(final SharedPreferences prefs) {
         final boolean willActivateBt = canBtBeActivated();
         final boolean willActivateWifi = canWifiBeActivated();
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final boolean useBt = prefs.getBoolean(ListFragment.PREF_SCAN_BT, true);
         final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
         int pieBadCount = prefs.getInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, 0);
@@ -1926,17 +1878,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return !wifiManager.isWifiEnabled() && !state.inEmulator;
     }
 
-    private void setupWifi() {
-        // warn about turning off network notification
-        final String notifOn = Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON);
-        if ("1".equals(notifOn) && state.wifiReceiver == null) {
-            WiGLEToast.showOverActivity(this, R.string.app_name, getString(R.string.best_results));
-        }
-
+    private void setupWifi(final SharedPreferences prefs) {
         final WifiManager wifiManager = (WifiManager) this.getApplicationContext().
                 getSystemService(Context.WIFI_SERVICE);
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
         final Editor edit = prefs.edit();
 
         // keep track of for later
@@ -1949,13 +1893,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 startActivityForResult(panelIntent, ACTION_WIFI_CODE);
             } else {
                 // open wifi setting pages after a few seconds
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
-                                getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
-                        startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                    }
+                new Handler().postDelayed(() -> {
+                    WiGLEToast.showOverActivity(MainActivity.this, R.string.app_name,
+                            getString(R.string.turn_on_wifi), Toast.LENGTH_LONG);
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                 }, 3000);
             }
         }
@@ -2040,14 +1981,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return false;
     }
 
-    public void setupBluetooth() {
+    public void setupBluetooth(final SharedPreferences prefs) {
         try {
             final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
             if (bt == null) {
                 Logging.info("No bluetooth adapter");
                 return;
             }
-            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             final Editor edit = prefs.edit();
             if (prefs.getBoolean(ListFragment.PREF_SCAN_BT, true)) {
                 //NB: almost certainly getting specious 'false' answers to isEnabled.
@@ -2064,10 +2004,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (state.bluetoothReceiver == null) {
                     Logging.info("new bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
-                    boolean hasLeSupport = true;
-                    if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-                        hasLeSupport = false;
-                    }
+                    boolean hasLeSupport = getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
 
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
@@ -2207,12 +2144,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    private void setupLocation() {
+    private void setupLocation(final SharedPreferences prefs) {
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
             // check if there is a gps
-            LocationManagerCompat.hasProvider(locationManager, GPS_PROVIDER);
             Logging.info("GNSS HW: "+LocationManagerCompat.getGnssHardwareModelName(locationManager)+" year: "+LocationManagerCompat.getGnssYearOfHardware(locationManager)+ " enabled: "+ LocationManagerCompat.isLocationEnabled(locationManager));
             final LocationProvider locProvider = locationManager.getProvider(GPS_PROVIDER);
 
@@ -2236,7 +2172,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (state.GNSSListener == null) {
             // force a listener to be created
-            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
             boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
             if (logRoutes) {
                 startRouteLogging(prefs);
@@ -2256,7 +2191,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             return;
         }
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         final Editor edit = prefs.edit();
         if (isScanning) {
             edit.putLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
@@ -2388,7 +2323,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.error("Failed to setup GPS - SDK < 24");
         }
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         final boolean useNetworkLoc = prefs.getBoolean(ListFragment.PREF_USE_NETWORK_LOC, false);
 
         final List<String> providers = locationManager.getAllProviders();
@@ -2417,7 +2352,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                         if (gnssStatusCallback != null) {
                             locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                         }
+                    } else {
+                        locationManager.removeGpsStatusListener(state.GNSSListener);
                     }
+                    locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
                     Logging.info("Security exception removing status listener: " + ex, ex);
                 }
@@ -2434,13 +2372,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         for (final A i : iterable) {
             if (i == null) continue;
             if (sb.length() > 0) sb.append(delimiter);
-            sb.append(i.toString());
+            sb.append(i);
         }
         return sb.toString();
     }
 
     public long getLocationSetPeriod() {
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
         long setPeriod = prefs.getLong(ListFragment.GPS_SCAN_PERIOD, MainActivity.LOCATION_UPDATE_INTERVAL);
         if (setPeriod == 0) {
             if (state.wifiReceiver == null) {
@@ -2523,44 +2461,36 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public void finishSoon(final long finishTimeMillis, final boolean restart, final boolean uiOnly) {
         Logging.info("Will finish in " + finishTimeMillis + "ms");
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final Intent i = getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                if (i != null) {
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        new Handler().postDelayed(() -> {
+            final Intent i = getBaseContext().getPackageManager()
+                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
+            if (i != null) {
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                    if (state.finishing.get()) {
-                        Logging.info("finishSoon: finish already called");
-                    } else {
-                        Logging.info("finishSoon: calling finish now");
-                        if (uiOnly) {
-                            Logging.info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
-                            state.uiRestart.set(true);
-                            MainActivity.super.recreate();
-                            /*new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startActivity(i);
-                                }
-                            }, 10L);*/
-                        } else {
-                            finish();
-                        }
-                    }
-
-                    if (restart) {
-                        new Handler().postDelayed(new Runnable() {
+                if (state.finishing.get()) {
+                    Logging.info("finishSoon: finish already called");
+                } else {
+                    Logging.info("finishSoon: calling finish now");
+                    if (uiOnly) {
+                        Logging.info("UI-only termination (ui restart: "+state.uiRestart.get()+")");
+                        state.uiRestart.set(true);
+                        MainActivity.super.recreate();
+                        /*new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 startActivity(i);
                             }
-                        }, 10L);
+                        }, 10L);*/
+                    } else {
+                        finish();
                     }
-                } else {
-                    Logging.warn("Intent generation failed during finishSoon thread");
                 }
+
+                if (restart) {
+                    new Handler().postDelayed(() -> startActivity(i), 10L);
+                }
+            } else {
+                Logging.warn("Intent generation failed during finishSoon thread");
             }
         }, finishTimeMillis);
     }
@@ -2594,19 +2524,17 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             // close the db. not in destroy, because it'll still write after that.
             if (state.dbHelper != null) state.dbHelper.close();
+            if (state.mxcDbHelper != null) state.mxcDbHelper.close();
 
             final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (state.GNSSListener != null && locationManager != null) {
                 try {
-                    if (Build.VERSION.SDK_INT < 24) {
-                        locationManager.removeGpsStatusListener(state.GNSSListener);
-                        locationManager.removeUpdates(state.GNSSListener);
-                    } else if (Build.VERSION.SDK_INT >= 24) {
+                    if (Build.VERSION.SDK_INT >= 24) {
                         if (gnssStatusCallback != null) {
                             locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                         }
-                        locationManager.removeUpdates(state.GNSSListener);
                     }
+                    locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
                     Logging.error("SecurityException on finish: " + ex, ex);
                 } catch (final IllegalStateException ise) {
@@ -2635,7 +2563,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             }
 
-            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
             endBluetooth(prefs);
 
             TelephonyManager tele = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -2686,7 +2614,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void doUpload() {
         selectFragment(R.id.nav_list);
         ListFragment listFragment = getListFragmentIfCurrent();
-        listFragment.makeUploadDialog(this);
+        if (null != listFragment) {
+            listFragment.makeUploadDialog(this);
+        }
     }
 
     /**
@@ -2705,31 +2635,31 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    public boolean checkStorage() {
-        boolean safe;
-        boolean external = FileUtility.hasSD();
-        if (external) {
-            safe = FileUtility.checkExternalStorageDangerZone();
-        } else {
-            safe = FileUtility.checkInternalStorageDangerZone();
-        }
-        if (!safe) {
-            AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
-            iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
-                    .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
-                    .setCancelable(true)
-            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+    public void checkStorage() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(() -> {
+            boolean safe;
+            boolean external = FileUtility.hasSD();
+            if (external) {
+                safe = FileUtility.checkExternalStorageDangerZone();
+            } else {
+                safe = FileUtility.checkInternalStorageDangerZone();
+            }
+            handler.post(() -> {
+                if (!safe) {
+                    AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+                    iseDlgBuilder.setMessage(external?R.string.no_external_space_message:R.string.no_internal_space_message)
+                            .setTitle(external?R.string.no_external_space_title:R.string.no_internal_space_title)
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+                    final Dialog dialog = iseDlgBuilder.create();
+                    if (!isFinishing()) {
+                        dialog.show();
+                    }
                 }
             });
-            final Dialog dialog = iseDlgBuilder.create();
-            if (!isFinishing()) {
-                dialog.show();
-            }
-        }
-        return safe;
+        });
     }
 
     /**

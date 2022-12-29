@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -253,9 +255,9 @@ public final class DatabaseHelper extends Thread {
         }
     }
 
-    public DatabaseHelper( final Context context ) {
+    public DatabaseHelper( final Context context, final SharedPreferences prefs ) {
         this.context = context.getApplicationContext();
-        this.prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        this.prefs = prefs;
         setName("dbworker-" + getName());
         this.deathHandler = new DeathHandler();
 
@@ -855,7 +857,7 @@ public final class DatabaseHelper extends Thread {
                 && location.getAltitude() == 0 && location.getAccuracy() == 0
                 && update.level == 0;
 
-        /**
+        /*
          * ALIBI: +/-infinite lat/long, 0 timestamp data (even with high accuracy) is gigo
          */
         final boolean likelyJunk = Double.isInfinite(location.getLatitude()) ||
@@ -1165,30 +1167,33 @@ public final class DatabaseHelper extends Thread {
             Logging.error("Null location in logRouteLocation");
             return;
         }
-        final double accuracy = location.getAccuracy();
-        if (insertRoute != null && location.getTime() != 0L &&
-                accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
-                accuracy > 0.0d && //ALIBI: should never happen?
-                (lastLoggedLocation == null ||
-                        ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
-                                (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
-                        )) )) {
-            insertRoute.bindLong(1, runId);
-            insertRoute.bindLong(2, wifiVisible);
-            insertRoute.bindLong(3, cellVisible);
-            insertRoute.bindLong(4, btVisible);
-            insertRoute.bindDouble(5, location.getLatitude());
-            insertRoute.bindDouble(6, location.getLongitude());
-            insertRoute.bindDouble(7, location.getAltitude());
-            insertRoute.bindDouble(8, location.getAccuracy());
-            insertRoute.bindLong(9, location.getTime());
-            long start = System.currentTimeMillis();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            final double accuracy = location.getAccuracy();
+            if (insertRoute != null && location.getTime() != 0L &&
+                    accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
+                    accuracy > 0.0d && //ALIBI: should never happen?
+                    (lastLoggedLocation == null ||
+                            ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
+                                    (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
+                            )) )) {
+                insertRoute.bindLong(1, runId);
+                insertRoute.bindLong(2, wifiVisible);
+                insertRoute.bindLong(3, cellVisible);
+                insertRoute.bindLong(4, btVisible);
+                insertRoute.bindDouble(5, location.getLatitude());
+                insertRoute.bindDouble(6, location.getLongitude());
+                insertRoute.bindDouble(7, location.getAltitude());
+                insertRoute.bindDouble(8, location.getAccuracy());
+                insertRoute.bindLong(9, location.getTime());
+                long start = System.currentTimeMillis();
 
-            insertRoute.execute();
-            lastLoggedLocation = location;
-            currentRoutePointCount.incrementAndGet();
-            logTime(start, "db route point added");
-        }
+                insertRoute.execute();
+                lastLoggedLocation = location;
+                currentRoutePointCount.incrementAndGet();
+                logTime(start, "db route point added");
+            }
+        });
     }
 
     public boolean isFastMode() {
@@ -1292,46 +1297,36 @@ public final class DatabaseHelper extends Thread {
 
     private long getCountFromDB( final String table ) throws DBException {
         checkDB();
-        Cursor cursor = null;
+        Cursor cursor = db.rawQuery("select count(*) FROM " + table, null);
         try {
-            cursor = db.rawQuery("select count(*) FROM " + table, null);
             cursor.moveToFirst();
             final long count = cursor.getLong(0);
             return count;
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            cursor.close();
         }
     }
 
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
-        Cursor cursor = null;
+        Cursor cursor = db.rawQuery("select MAX(_id) FROM " + table, null);
         try {
-            cursor = db.rawQuery( "select MAX(_id) FROM " + table, null );
             cursor.moveToFirst();
-            final long count = cursor.getLong( 0 );
+            final long count = cursor.getLong(0);
             return count;
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            cursor.close();
         }
     }
 
     public long getNetsWithLocCountFromDB() throws DBException {
         checkDB();
-        Cursor cursor = null;
+        Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
         try {
-            cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
             cursor.moveToFirst();
-            final long count = cursor.getLong( 0 );
-            return count;
+            return cursor.getLong(0);
         } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+            cursor.close();
         }
     }
 
@@ -1339,7 +1334,8 @@ public final class DatabaseHelper extends Thread {
         // check cache
         Network retval = MainActivity.getNetworkCache().get( bssid );
         if ( retval == null ) {
-            Cursor cursor = null;
+            Cursor cursor;
+            cursor = null;
             try {
                 checkDB();
                 final String[] args = new String[]{ bssid };

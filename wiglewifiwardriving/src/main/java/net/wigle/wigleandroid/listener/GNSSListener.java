@@ -279,7 +279,7 @@ public class GNSSListener implements Listener, LocationListener {
                         edit.putFloat(ListFragment.PREF_DISTANCE_TOTAL,
                                 dist + prefs.getFloat(ListFragment.PREF_DISTANCE_TOTAL, 0f));
                         edit.apply();
-                        long distPoints = currentDistPointCount.incrementAndGet();
+                        //DEBUG: long distPoints = currentDistPointCount.incrementAndGet();
                         //DEBUG: Logging.info("dist points: "+distPoints+" vs. route points: "+ dbHelper.getCurrentRoutePointCount());
                     }
                     if (dist > LERP_MIN_THRESHOLD_METERS && dbHelper != null) {
@@ -366,15 +366,19 @@ public class GNSSListener implements Listener, LocationListener {
         if (logRoutes && null != currentLocation) {
             final long routeId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
             try {
-                dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
-                        ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
+                if (null != dbHelper) {
+                    dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
+                            ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
+                }
             } catch (Exception ex) {
                 Logging.error("failed to log route update: ", ex);
             }
         } else if (showRoute && null != currentLocation) {
             try {
-                dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
-                        ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, 0L);
+                if (null != dbHelper) {
+                    dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
+                            ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, 0L);
+                }
             } catch (Exception ex) {
                 Logging.error("filed to log default route update for viz: ", ex);
             }

@@ -487,7 +487,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             public void preferenceSet(boolean value) {
                 Logging.info("Signaling bluetooth change: "+value);
                 if (value) {
-                    MainActivity.getMainActivity().setupBluetooth();
+                    MainActivity.getMainActivity().setupBluetooth(prefs);
                 } else {
                     MainActivity.getMainActivity().endBluetooth(prefs);
                 }

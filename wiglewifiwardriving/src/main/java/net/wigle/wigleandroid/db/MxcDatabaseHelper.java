@@ -1,14 +1,20 @@
 package net.wigle.wigleandroid.db;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Handler;
+import android.os.Looper;
 
 import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.InsufficientSpaceException;
@@ -19,6 +25,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static net.wigle.wigleandroid.util.FileUtility.EST_MXC_DB_SIZE;
 import static net.wigle.wigleandroid.util.FileUtility.SQL_EXT;
@@ -40,11 +48,11 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
     // query for the whole record
     private static final String RECORD_FOR_MCC_MNC = "SELECT * FROM wigle_mcc_mnc WHERE mcc = ? and mnc = ? LIMIT 1";
 
-    public MxcDatabaseHelper(Context context) {
+    public MxcDatabaseHelper(Context context, final SharedPreferences prefs) {
         super(context, MXC_DB_NAME, null, MXC_DATABASE_VERSION);
         this.context = context;
         hasSD = FileUtility.hasSD();
-        prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        this.prefs = prefs;
     }
 
     private File getMxcFile() {
@@ -65,52 +73,73 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
         return mxcFile != null && mxcFile.exists() && mxcFile.canRead();
     }
 
-    public void implantMxcDatabase() throws InsufficientSpaceException, IOException {
+    public void implantMxcDatabase(final Context context, final Boolean isFinishing){
         Logging.info("installing mmc/mnc database...");
-        InputStream assetInputData = null;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(() -> {
+            int installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
+            long freeAppSpaceBytes = FileUtility.getFreeInternalBytes();
+            //ALIBI: ugly, but can't use the assetManager to get size without decompressing
+            if (freeAppSpaceBytes <= EST_MXC_DB_SIZE) {
+                handler.post(() -> {
+                    AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(context);
+                    iseDlgBuilder.setMessage(R.string.no_mxc_space_message)
+                            .setTitle(R.string.no_internal_space_title)
+                            .setCancelable(true)
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
 
-        int installCount = prefs.getInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, 0);
-
-        long freeAppSpaceBytes = FileUtility.getFreeInternalBytes();
-        //ALIBI: ugly, but can't use the assetManager to get size without decompressing
-        if (freeAppSpaceBytes <= EST_MXC_DB_SIZE) {
-            throw new InsufficientSpaceException("Unable to implant MxC database: not enough space (" + freeAppSpaceBytes + "b, " + EST_MXC_DB_SIZE + "b needed)");
-        }
-
-        OutputStream mxcOutput = null;
-        try {
-            if (isPresent()) {
-                installCount = 0;
+                    final Dialog dialog = iseDlgBuilder.create();
+                    if (!isFinishing) {
+                        dialog.show();
+                    }
+                });
             }
-            else if (installCount < MAX_INSTALL_TRIES) {
-                assetInputData = context.getAssets().open(MXC_DB_NAME);
-                final File outputFile = getMxcFile();
-                Logging.info("Installing mxc file at: " + outputFile);
-                mxcOutput = new FileOutputStream(outputFile);
 
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = assetInputData.read(buffer)) > 0) {
-                    mxcOutput.write(buffer, 0, length);
+            InputStream assetInputData = null;
+
+            OutputStream mxcOutput = null;
+            try {
+                if (isPresent()) {
+                    installCount = 0;
+                } else if (installCount < MAX_INSTALL_TRIES) {
+                    assetInputData = context.getAssets().open(MXC_DB_NAME);
+                    final File outputFile = getMxcFile();
+                    Logging.info("Installing mxc file at: " + outputFile);
+                    mxcOutput = new FileOutputStream(outputFile);
+
+                    byte[] buffer = new byte[1024];
+                    int length;
+                    while ((length = assetInputData.read(buffer)) > 0) {
+                        mxcOutput.write(buffer, 0, length);
+                    }
+                } else {
+                    Logging.error("stopped trying to implant Mxc DB: reached max tries.");
                 }
-            } else {
-                Logging.error("stopped trying to implant Mxc DB: reached max tries.");
+            } catch (IOException ioe) {
+                Logging.warn("Exception installing mxc: " + ioe);
+            } finally {
+                try {
+                    if (null != assetInputData) {
+                        assetInputData.close();
+                    }
+                    if (null != mxcOutput) {
+                        mxcOutput.flush();
+                        mxcOutput.close();
+                    }
+                } catch (IOException nioe){
+                    Logging.error("hopeless Mxc DB implant error: ", nioe);
+                }
+                final SharedPreferences.Editor editDone = prefs.edit();
+                editDone.putInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, installCount+1);
+                editDone.apply();
             }
-        } catch (IOException ioe) {
-            Logging.warn("Exception installing mxc: " + ioe);
-            throw ioe;
-        } finally {
-            if (null != assetInputData) {
-                assetInputData.close();
-            }
-            if (null != mxcOutput) {
-                mxcOutput.flush();
-                mxcOutput.close();
-            }
-            final SharedPreferences.Editor editDone = prefs.edit();
-            editDone.putInt(ListFragment.PREF_MXC_REINSTALL_ATTEMPTED, installCount+1);
-            editDone.apply();
-        }
+        });
     }
 
     @Override

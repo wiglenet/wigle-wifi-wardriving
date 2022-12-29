@@ -17,6 +17,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +55,8 @@ import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -283,20 +287,37 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (view == null) {
             return;
         }
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
         TextView tv = (TextView) view.findViewById( R.id.stats_run );
         long netCount = state.wifiReceiver.getRunNetworkCount();
         if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
-        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount) );
-        tv = (TextView) view.findViewById( R.id.stats_wifi );
-        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewWifiCount()) );
+        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNewWifiCount();
+            handler.post(() -> {
+                TextView text = (TextView) view.findViewById( R.id.stats_wifi );
+                text.setText( ""+UINumberFormat.counterFormat(count) );
+            });
+        });
         tv = (TextView) view.findViewById( R.id.stats_cell );
-        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells)  );
-        tv = (TextView) view.findViewById( R.id.stats_bt );
-        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewBtCount())  );
-        tv = (TextView) view.findViewById( R.id.stats_dbnets );
-        tv.setText(""+state.dbHelper.getNetworkCount());
+        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells));
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNewBtCount();
+            handler.post(() -> {
+                TextView text = (TextView) view.findViewById( R.id.stats_bt );
+                text.setText( ""+UINumberFormat.counterFormat(count) );
+            });
+        });
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNetworkCount();
+            handler.post(() -> {
+                TextView text = (TextView) view.findViewById( R.id.stats_dbnets );
+                text.setText(""+count);
+            });
+        });
     }
 
     public void setStatusUI( String status ) {

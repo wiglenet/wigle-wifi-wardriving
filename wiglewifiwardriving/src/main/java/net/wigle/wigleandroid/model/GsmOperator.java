@@ -9,7 +9,6 @@ import android.telephony.CellIdentityNr;
 import android.telephony.CellIdentityWcdma;
 
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.util.InsufficientSpaceException;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class GsmOperator {
     private String mcc;
     private String mnc;
     private int xac;
-    private long cellId;
+    private final long cellId;
     private final int fcn;
 
     private static Map<String, Map<String,String>> OPERATOR_CACHE;
@@ -31,7 +30,6 @@ public class GsmOperator {
     }
 
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     public GsmOperator(final CellIdentityGsm cellIdentG) throws GsmOperatorException {
         cellId = cellIdentG.getCid();
         xac = cellIdentG.getLac();
@@ -144,7 +142,6 @@ public class GsmOperator {
         }
     }
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
     public GsmOperator(final CellIdentityWcdma cellIdentW) throws GsmOperatorException {
         cellId = cellIdentW.getCid();
         xac = cellIdentW.getLac();
@@ -259,8 +256,6 @@ public class GsmOperator {
 
     /**
      * Map the 5-6 digit operator PLMN code against the database of operator names
-     * @param operatorCode
-     * @return
      */
     public static String getOperatorName(final String operatorCode) {
         //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
@@ -284,7 +279,7 @@ public class GsmOperator {
             }
 
             MainActivity.State s = MainActivity.getMainActivity().getState();
-            if (null != s) {
+            if (null != s && null != s.mxcDbHelper) {
                 operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
                 mccMap.put(mnc, operator);
                 return operator;
@@ -313,15 +308,8 @@ public class GsmOperator {
                 } catch (SQLiteDatabaseCorruptException sqldbex) {
                     // this case seems isolated to LG android 4.4 devices
                     Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
-                    try {
-                        //recopy the MccMnc DB file to see whether we can recover.
-                        s.mxcDbHelper.implantMxcDatabase();
-                        //TODO: too aggressive? operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
-                    } catch (InsufficientSpaceException sex) {
-                        Logging.error("GSMOp implant failed: ",sex);
-                    } catch (Exception ex) {
-                        Logging.warn("Mxc DB recopy failed", ex);
-                    }
+                    //attempt to recopy the MccMnc DB file to see whether we can recover.
+                    s.mxcDbHelper.implantMxcDatabase(MainActivity.getMainActivity(), false);
                 }
                 if (operator != null) {
                     //DEBUG: MainActivity.info("matched operator L2: "+operator+" ("+mcc+":"+mnc+")");

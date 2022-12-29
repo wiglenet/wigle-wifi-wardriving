@@ -3,10 +3,10 @@ package net.wigle.wigleandroid.ui;
 import android.app.Activity;
 import android.os.Build;
 import androidx.fragment.app.FragmentActivity;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +36,7 @@ public class WiGLEToast {
             if (Build.VERSION.SDK_INT != 25) {
                 LayoutInflater inflater = context.getLayoutInflater();
                 View layout = inflater.inflate(R.layout.wigle_detail_toast,
-                        (ViewGroup) context.findViewById(R.id.custom_toast_container));
+                        context.findViewById(R.id.custom_toast_container));
 
                 TextView title = layout.findViewById(R.id.toast_title_text);
                 title.setText(titleId);
@@ -44,7 +44,7 @@ public class WiGLEToast {
                 TextView text = layout.findViewById(R.id.toast_message_text);
                 text.setText(messageString);
 
-                Toast toast = new Toast(context.getApplicationContext());
+                Toast toast = new Toast(context);
                 //ALIBI: logs errors in Toast, but works
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.setDuration(toastLength);

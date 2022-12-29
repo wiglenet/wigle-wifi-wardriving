@@ -24,6 +24,7 @@ import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -137,7 +138,7 @@ public class SiteStatsFragment extends Fragment {
         final Handler handler = new SiteDownloadHandler(view, numberFormat, getActivity().getPackageName(),
                 getResources());
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "site-stats-cache.json", MainActivity.SITE_STATS_URL, false, false, false,
+                "site-stats-cache.json", UrlConfig.SITE_STATS_URL, false, false, false,
                 ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override

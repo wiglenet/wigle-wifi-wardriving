@@ -31,6 +31,7 @@ import net.wigle.wigleandroid.model.RankUser;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -201,7 +202,7 @@ public class RankStatsFragment extends Fragment {
 
         final String cacheName = (doMonthRanking ? "month" : "all") + top;
 
-        final String monthUrl = MainActivity.RANK_STATS_URL + "?pagestart=" + pageStart
+        final String monthUrl = UrlConfig.RANK_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,

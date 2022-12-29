@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -14,6 +13,7 @@ import net.wigle.wigleandroid.util.LocationCsv;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.NetworkCsv;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +42,7 @@ public class CsvDownloader extends AbstractProgressApiRequest {
 
     public CsvDownloader(final FragmentActivity context, final DatabaseHelper dbHelper,
                          final String transid, final ApiListener listener) {
-        super(context, dbHelper, "CsvDL", transid+CSV_EXT, MainActivity.CSV_TRANSID_URL_STEM+transid, false,
+        super(context, dbHelper, "CsvDL", transid+CSV_EXT, UrlConfig.CSV_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 

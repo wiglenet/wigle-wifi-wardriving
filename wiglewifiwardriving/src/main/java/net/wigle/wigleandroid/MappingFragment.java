@@ -75,6 +75,7 @@ import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -983,17 +984,17 @@ public final class MappingFragment extends Fragment {
             final EditText regex = (EditText) view.findViewById( R.id.edit_regex );
             regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
 
-            final CheckBox invert = MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
+            final CheckBox invert = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showinvert,
                     prefix + ListFragment.PREF_MAPF_INVERT, false ,prefs);
-            final CheckBox open = MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
+            final CheckBox open = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showopen,
                     prefix + ListFragment.PREF_MAPF_OPEN, true, prefs );
-            final CheckBox wep = MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
+            final CheckBox wep = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showwep,
                     prefix + ListFragment.PREF_MAPF_WEP, true, prefs );
-            final CheckBox wpa = MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
+            final CheckBox wpa = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showwpa,
                     prefix + ListFragment.PREF_MAPF_WPA, true, prefs );
-            final CheckBox cell = MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
+            final CheckBox cell = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showcell,
                     prefix + ListFragment.PREF_MAPF_CELL, true, prefs );
-            final CheckBox enabled = MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
+            final CheckBox enabled = PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.enabled,
                     prefix + ListFragment.PREF_MAPF_ENABLED, true, prefs );
 
             Button ok = (Button) view.findViewById( R.id.ok_button );
@@ -1027,17 +1028,17 @@ public final class MappingFragment extends Fragment {
                 public void onClick( final View buttonView ) {
                     try {
                         regex.setText( prefs.getString( prefix + ListFragment.PREF_MAPF_REGEX, "") );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.showinvert,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showinvert,
                                 prefix + ListFragment.PREF_MAPF_INVERT, false, prefs );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.showopen,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showopen,
                                 prefix + ListFragment.PREF_MAPF_OPEN, true, prefs );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.showwep,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showwep,
                                 prefix + ListFragment.PREF_MAPF_WEP, true, prefs );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.showwpa,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showwpa,
                                 prefix + ListFragment.PREF_MAPF_WPA, true, prefs );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.showcell,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.showcell,
                                 prefix + ListFragment.PREF_MAPF_CELL, true, prefs );
-                        MainActivity.prefSetCheckBox( activity, view, R.id.enabled,
+                        PrefsBackedCheckbox.prefSetCheckBox( activity, view, R.id.enabled,
                                 prefix + ListFragment.PREF_MAPF_ENABLED, true, prefs );
 
                         dialog.dismiss();

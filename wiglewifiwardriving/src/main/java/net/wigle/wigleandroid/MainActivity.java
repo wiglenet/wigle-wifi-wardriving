@@ -82,7 +82,6 @@ import net.wigle.wigleandroid.listener.BatteryLevelReceiver;
 import net.wigle.wigleandroid.listener.BluetoothReceiver;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PhoneState;
-import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -166,26 +165,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private GnssStatus.Callback gnssStatusCallback = null;
 
     static Locale ORIG_LOCALE = Locale.getDefault();
-    // form auth
-    public static final String TOKEN_URL = "https://api.wigle.net/api/v2/activate";
-    // no auth
-    public static final String SITE_STATS_URL = "https://api.wigle.net/api/v2/stats/site";
-    public static final String RANK_STATS_URL = "https://api.wigle.net/api/v2/stats/standings";
-    public static final String NEWS_URL = "https://api.wigle.net/api/v2/news/latest";
-    // api token auth
-    public static final String UPLOADS_STATS_URL = "https://api.wigle.net/api/v2/file/transactions";
-    public static final String USER_STATS_URL = "https://api.wigle.net/api/v2/stats/user";
-    public static final String OBSERVED_URL = "https://api.wigle.net/api/v2/network/mine";
-    public static final String FILE_POST_URL = "https://api.wigle.net/api/v2/file/upload";
-    public static final String KML_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/kml/";
-    public static final String CSV_TRANSID_URL_STEM = "https://api.wigle.net/api/v2/file/csv/";
-    public static final String SEARCH_WIFI_URL = "https://api.wigle.net/api/v2/network/search";
-    public static final String SEARCH_CELL_URL = "https://api.wigle.net/api/v2/cell/search";
-    public static final String WIGLE_BASE_URL = "https://wigle.net";
-
-    // registration web view
-    public static final String REG_URL = "https://wigle.net/register";
-
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
     private static final int ACTION_WIFI_CODE = 2;
@@ -346,30 +325,31 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         }
 
-        Logging.info("setupService");
+        Logging.info("\tsetupService");
         setupService();
-        Logging.info("checkStorage");
+        Logging.info("\tcheckStorage");
         checkStorage();
-        Logging.info("setupDatabase");
+        Logging.info("\tsetupDatabase");
         setupDatabase(prefs);
-        Logging.info("setupBattery");
+        Logging.info("\tsetupBattery");
         setupBattery();
-        Logging.info("setupSound");
+        Logging.info("\tsetupSound");
         setupSound();
-        Logging.info("setupActivationDialog");
+        Logging.info("\tsetupActivationDialog");
         setupActivationDialog(prefs);
-        Logging.info("setupBluetooth");
+        Logging.info("\tsetupBluetooth");
         setupBluetooth(prefs);
-        Logging.info("setupWifi");
+        Logging.info("\tsetupWifi");
         setupWifi(prefs);
-        Logging.info("setupLocation"); // must be after setupWifi
+        Logging.info("\tsetupLocation"); // must be after setupWifi
         setupLocation(prefs);
-        Logging.info("setup tabs");
+        Logging.info("\tsetup tabs");
         if (savedInstanceState == null) {
             setupFragments();
         }
         setupFilters(prefs);
 
+        Logging.info("\tfirst install check");
         // ALIBI: don't inherit MxC implant failures from backups.
         if (InstallUtility.isFirstInstall(this)) {
             SharedPreferences mySPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -381,11 +361,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             editor.apply();
         }
 
+        Logging.info("\tcell data check");
         //TODO: if we can determine whether DB needs updating, we can avoid copying every time
         //if (!state.mxcDbHelper.isPresent()) {
         state.mxcDbHelper.implantMxcDatabase(this, isFinishing());
         //}
 
+        Logging.info("\tkeystore check");
         // rksh 20160202 - api/authuser secure preferences storage
         checkInitKeystore(prefs);
 
@@ -993,46 +975,6 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.mxcDbHelper == null) {
             state.mxcDbHelper = new MxcDatabaseHelper(getApplicationContext(), prefs);
         }
-    }
-
-    //TODO: refactor these out of MainActivity
-    public static CheckBox prefSetCheckBox(final Context context, final View view, final int id,
-                                           final String pref, final boolean def, final SharedPreferences prefs) {
-        final CheckBox checkbox = view.findViewById(id);
-        checkbox.setChecked(prefs.getBoolean(pref, def));
-        return checkbox;
-    }
-
-    private static CheckBox prefSetCheckBox(final SharedPreferences prefs, final View view, final int id, final String pref,
-                                            final boolean def) {
-        final CheckBox checkbox = view.findViewById(id);
-        if (checkbox == null) {
-            Logging.error("No checkbox for id: " + id);
-        } else {
-            checkbox.setChecked(prefs.getBoolean(pref, def));
-        }
-        return checkbox;
-    }
-
-    public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
-                                              final String pref, final boolean def) {
-        return prefBackedCheckBox(activity, view, id, pref, def, null);
-    }
-
-    public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
-                                              final String pref, final boolean def, final PrefCheckboxListener listener) {
-        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
-        final Editor editor = prefs.edit();
-        final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
-        checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            editor.putBoolean(pref, isChecked);
-            editor.apply();
-            if (null != listener) {
-                listener.preferenceSet(isChecked);
-            }
-        });
-
-        return checkbox;
     }
 
     public static State getStaticState() {

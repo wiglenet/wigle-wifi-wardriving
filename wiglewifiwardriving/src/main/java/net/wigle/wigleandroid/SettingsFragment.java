@@ -51,9 +51,11 @@ import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.SettingsUtil;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
 
@@ -310,7 +312,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 @Override
                 public void onClick(View view) {
                     final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                            "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                            "user-stats-cache.json", UrlConfig.USER_STATS_URL, false, true, true,
                             ApiDownloader.REQUEST_GET,
                             apiListener);
                     try {
@@ -461,15 +463,15 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         SettingsUtil.doScanSpinner( R.id.gps_spinner, ListFragment.GPS_SCAN_PERIOD,
                 MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, getContext() );
 
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, ListFragment.PREF_METRIC, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.no_individual_nets_map, ListFragment.PREF_MAP_HIDE_NETS, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT, false, new PrefCheckboxListener() {
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, ListFragment.PREF_METRIC, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.no_individual_nets_map, ListFragment.PREF_MAP_HIDE_NETS, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT, false, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
                 if (Build.VERSION.SDK_INT >= 29) {
@@ -482,7 +484,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, true, new PrefCheckboxListener() {
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, true, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
                 Logging.info("Signaling bluetooth change: "+value);
@@ -493,7 +495,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
                 Logging.info("Signaling route mapping change: "+value);
@@ -504,7 +506,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
             @Override
             public void preferenceSet(boolean value) {
                 Logging.info("Signaling route logging change: "+value);
@@ -515,7 +517,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , ListFragment.PREF_MAPS_FOLLOW_DAYNIGHT, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , ListFragment.PREF_MAPS_FOLLOW_DAYNIGHT, false);
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
                 "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
                 "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
@@ -574,7 +576,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
 
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, ListFragment.PREF_GPS_KALMAN_FILTER ,true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, ListFragment.PREF_GPS_KALMAN_FILTER ,true);
 
         TextView appVersion = view.findViewById(R.id.app_version);
         final String appName = getString(R.string.app_name);

@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,7 +80,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     public ObservationUploader(final FragmentActivity context,
                                final DatabaseHelper dbHelper, final ApiListener listener,
                                boolean justWriteFile, boolean writeEntireDb, boolean writeRun) {
-        super(context, dbHelper, "ApiUL", null, MainActivity.FILE_POST_URL, false,
+        super(context, dbHelper, "ApiUL", null, UrlConfig.FILE_POST_URL, false,
                 true, false, false,
                 AbstractApiRequest.REQUEST_POST, listener, true);
         this.justWriteFile = justWriteFile;
@@ -227,7 +228,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 Logging.info("anonymous upload");
             }
 
-            final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath,
+            final String response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
                     "file", params, authName, token, getHandler());
 
             if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
@@ -90,21 +91,21 @@ public class MapFilterActivity extends AppCompatActivity {
                 2001L, yearValueBase.toArray(new Long[0]),
                 yearLabelBase.toArray(new String[0]), MapFilterActivity.this );
 
-        MainActivity.prefBackedCheckBox(this , view, R.id.showinvert,
+        PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showopen,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwep,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_WEP, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwpa,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_WPA, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_CELL, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showbt,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbt,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BT, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showbtle,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtle,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BTLE, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
     }
 }

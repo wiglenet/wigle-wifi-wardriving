@@ -11,6 +11,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import net.wigle.wigleandroid.background.WiGLERegistrationInterface;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 /**
  * Created by arkasha on 1/8/18.
@@ -39,7 +40,7 @@ public class RegistrationActivity extends AppCompatActivity {
         }
         regWebView.addJavascriptInterface(new WiGLERegistrationInterface(this),
                 "WiGLEWiFi");
-        regWebView.loadUrl(MainActivity.REG_URL);
+        regWebView.loadUrl(UrlConfig.REG_URL);
     }
 
     /**

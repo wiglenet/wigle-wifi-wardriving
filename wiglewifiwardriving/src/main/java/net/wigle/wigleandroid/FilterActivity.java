@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.util.Logging;
 
 /**
@@ -58,21 +59,21 @@ public class FilterActivity extends AppCompatActivity {
             }
         });
 
-        MainActivity.prefBackedCheckBox(this , view, R.id.showinvert,
+        PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showopen,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwep,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WEP, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwpa,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WPA, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_CELL, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
-        MainActivity.prefBackedCheckBox(this, view, R.id.showbt,
+        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbt,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_BT, true);
-        MainActivity.prefBackedCheckBox(this, view, R.id.showbtle,
+        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbtle,
                 ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_BTLE, true);
 
         final Button filter_display_button = (Button) view.findViewById(R.id.display_filter_button);

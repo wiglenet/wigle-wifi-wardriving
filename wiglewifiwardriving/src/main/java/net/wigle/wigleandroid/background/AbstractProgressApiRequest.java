@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,7 +37,7 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
      */
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
+                null, UrlConfig.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache)

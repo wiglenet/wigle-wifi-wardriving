@@ -48,6 +48,7 @@ import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -354,7 +355,7 @@ public class DBResultActivity extends AppCompatActivity {
                 this);
 
         final ApiDownloader task = new ApiDownloader(activity, ListFragment.lameStatic.dbHelper,
-                "search-cache-"+queryParams+".json", MainActivity.SEARCH_WIFI_URL+"?"+queryParams,
+                "search-cache-"+queryParams+".json", UrlConfig.SEARCH_WIFI_URL+"?"+queryParams,
                 false, true, true,
                 ApiDownloader.REQUEST_GET,
                 new ApiListener() {

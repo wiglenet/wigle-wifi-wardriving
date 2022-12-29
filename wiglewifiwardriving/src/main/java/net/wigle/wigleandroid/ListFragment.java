@@ -707,7 +707,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             TextView tv = view.findViewById( R.id.LocationTextView06 );
             tv.setText( getString(R.string.list_short_sats) + " " + state.GNSSListener.getSatCount() );
 
-            final Location location = state.GNSSListener.getLocation();
+            final Location location = state.GNSSListener.getCurrentLocation();
 
             tv = view.findViewById( R.id.LocationTextView01 );
             String latText;

@@ -54,7 +54,6 @@ import android.telephony.CellSignalStrength;
 import android.telephony.CellSignalStrengthCdma;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthLte;
-import android.telephony.CellSignalStrengthNr;
 import android.telephony.CellSignalStrengthWcdma;
 import android.telephony.NeighboringCellInfo;
 import android.telephony.TelephonyManager;
@@ -742,7 +741,7 @@ public class WifiReceiver extends BroadcastReceiver {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
         StringBuilder builder = new StringBuilder();
 
-        if ( mainActivity.getGPSListener().getLocation() == null && prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true ) ) {
+        if ( mainActivity.getGPSListener().getCurrentLocation() == null && prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_no_gps_fix)).append(", ");
         }
 
@@ -849,7 +848,7 @@ public class WifiReceiver extends BroadcastReceiver {
         Location location = null;
         final GNSSListener gpsListener = mainActivity.getGPSListener();
         if (gpsListener != null) {
-            location = gpsListener.getLocation();
+            location = gpsListener.getCurrentLocation();
         }
         if ( location != null && location.getSpeed() >= 2.2352f ) {
             scanPref = ListFragment.PREF_SCAN_PERIOD_FAST;

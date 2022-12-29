@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.location.LocationManagerCompat;
 
 public class GNSSListener implements Listener, LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
@@ -54,7 +53,8 @@ public class GNSSListener implements Listener, LocationListener {
 
     private MainActivity mainActivity;
     private final DatabaseHelper dbHelper;
-    private Location location;
+    private Location currentLocation;
+    private Location prevLocation;
     private Location networkLocation;
     private GpsStatus gpsStatus;
     private GnssStatus gnssStatus;
@@ -65,7 +65,6 @@ public class GNSSListener implements Listener, LocationListener {
     private float previousSpeed = 0f;
     private LocationListener mapLocationListener;
     private int prevStatus = 0;
-    private Location prevGpsLocation;
     private final KalmanLatLong kalmanLatLong;
 
     public GNSSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
@@ -100,7 +99,7 @@ public class GNSSListener implements Listener, LocationListener {
         Logging.info("GPSListener: handleScanStop");
         gnssStatus = null;
         gpsStatus = null;
-        location = null;
+        currentLocation = null;
     }
 
     @Override
@@ -151,7 +150,7 @@ public class GNSSListener implements Listener, LocationListener {
     }
 
     /** newLocation can be null */
-    private void updateLocationData(final Location newLocation ) {
+    private synchronized void updateLocationData(final Location newLocation ) {
         /*
           ALIBI: the location manager call's a non-starter if permission hasn't been granted.
          */
@@ -198,7 +197,7 @@ public class GNSSListener implements Listener, LocationListener {
                 newLocation.setLongitude(kalmanLatLong.getLng());
             }
         }
-        final boolean locOK = locationOK( location, satCount, gpsTimeout, netLocTimeout );
+        final boolean locOK = locationOK(currentLocation, satCount, gpsTimeout, netLocTimeout );
         final long now = System.currentTimeMillis();
 
         if ( newOK ) {
@@ -228,52 +227,52 @@ public class GNSSListener implements Listener, LocationListener {
             if ( newOK ) {
                 wasProviderChange = true;
                 //noinspection RedundantIfStatement
-                if ( location != null && ! location.getProvider().equals( newLocation.getProvider() ) ) {
+                if ( currentLocation != null && ! currentLocation.getProvider().equals( newLocation.getProvider() ) ) {
                     wasProviderChange = false;
                 }
 
-                location = newLocation;
+                currentLocation = newLocation;
             }
             else if ( netLocOK ) {
-                location = networkLocation;
+                currentLocation = networkLocation;
                 wasProviderChange = true;
             }
-            else if ( location != null ) {
+            else if ( currentLocation != null ) {
                 // transition to null
-                Logging.info( "nulling location: " + location );
-                location = null;
+                Logging.info( "nulling location: " + currentLocation);
+                currentLocation = null;
                 wasProviderChange = true;
                 // make sure we're registered for updates
                 mainActivity.setLocationUpdates();
             }
         }
         else if ( newOK && GPS_PROVIDER.equals( newLocation.getProvider() ) ) {
-            if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
+            if ( NETWORK_PROVIDER.equals( currentLocation.getProvider() ) ) {
                 // this is an upgrade from network to gps
                 wasProviderChange = true;
             }
-            location = newLocation;
+            currentLocation = newLocation;
             if ( wasProviderChange ) {
                 // save it in prefs
                 saveLocation();
             }
         }
         else if ( newOK && NETWORK_PROVIDER.equals( newLocation.getProvider() ) ) {
-            if ( NETWORK_PROVIDER.equals( location.getProvider() ) ) {
+            if ( NETWORK_PROVIDER.equals( currentLocation.getProvider() ) ) {
                 // just a new network provided location over an old one
-                location = newLocation;
+                currentLocation = newLocation;
             }
         }
-        if (location != null && location.getTime() != 0L &&
-                location.getAccuracy()  < MIN_ROUTE_LOCATION_PRECISION_METERS &&
-                location.getAccuracy()  > 0.0d) {
-            if (prevGpsLocation != null) {
-                float dist = prevGpsLocation.distanceTo(location);
+        if (currentLocation != null && currentLocation.getTime() != 0L &&
+                currentLocation.getAccuracy()  < MIN_ROUTE_LOCATION_PRECISION_METERS &&
+                currentLocation.getAccuracy()  > 0.0d) {
+            if (prevLocation != null && prevLocation.getTime() < currentLocation.getTime()) {
+                float dist = prevLocation.distanceTo(currentLocation);
                 if ((dist > MIN_ROUTE_LOCATION_DIFF_METERS &&
-                        (location.getTime() - prevGpsLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
+                        (currentLocation.getTime() - prevLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
                 )) {
-                    if (realisticMovement(dist, (float) (location.getTime() - prevGpsLocation.getTime()) * 0.001f,
-                            prevGpsLocation.getAccuracy(), location.getAccuracy())) {
+                    if (realisticMovement(dist, (float) (currentLocation.getTime() - prevLocation.getTime()) * 0.001f,
+                            prevLocation.getAccuracy(), currentLocation.getAccuracy())) {
                         final Editor edit = prefs.edit();
                         edit.putFloat(ListFragment.PREF_DISTANCE_RUN,
                                 dist + prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f));
@@ -287,35 +286,38 @@ public class GNSSListener implements Listener, LocationListener {
                         if (dist > LERP_MAX_THRESHOLD_METERS) {
                             Logging.warn("Diff is too large, not lerping. " + dist + " meters");
                             dbHelper.clearPendingObservations();
-                        } else if (!location.equals(prevGpsLocation)) {
+                        } else if (!currentLocation.equals(prevLocation)) {
                             Logging.info("lerping for " + dist + " meters");
-                            dbHelper.recoverLocations(location);
+                            dbHelper.recoverLocations(currentLocation);
                         }
                     }
                     // set for next time; only update if this was a distance calc-event.
-                    prevGpsLocation = location;
+                    prevLocation = currentLocation;
                 }
-            } else {
+            } else if (prevLocation == null ||  prevLocation.getTime() < currentLocation.getTime()) {
                 // initialize previous location
-                prevGpsLocation = location;
+                prevLocation = currentLocation;
+            } else if (prevLocation != null){
+                Logging.warn("Location timestamp ("+ currentLocation.getTime()+") <= previous location timestamp ("+ prevLocation.getTime()+")");
+                //ALIBI: we're ignoring this rather than trying to slot it in only because we'd need an in-memory or DB route otherwise.
             }
         }
 
         // do lerp if need be
-        if ( location == null ) {
-            if ( prevGpsLocation != null ) {
+        if ( currentLocation == null ) {
+            if ( prevLocation != null ) {
                 if (null != dbHelper) {
-                    dbHelper.lastLocation(prevGpsLocation);
+                    dbHelper.lastLocation(prevLocation);
                     Logging.info("set last location for lerping");
                 }
             }
         }
 
         // for maps. so lame!
-        ListFragment.lameStatic.location = location;
+        ListFragment.lameStatic.location = currentLocation;
         boolean scanScheduled = false;
-        if ( location != null ) {
-            final float currentSpeed = location.getSpeed();
+        if ( currentLocation != null ) {
+            final float currentSpeed = currentLocation.getSpeed();
             if ( (previousSpeed == 0f && currentSpeed > 0f)
                     || (previousSpeed < 5f && currentSpeed >= 5f)) {
                 // moving faster now than before, schedule a scan because the timing config pry changed
@@ -335,13 +337,13 @@ public class GNSSListener implements Listener, LocationListener {
             Logging.info( "wasProviderChange: satCount: " + satCount
                     + " newOK: " + newOK + " locOK: " + locOK + " netLocOK: " + netLocOK
                     + (newOK ? " newProvider: " + newLocation.getProvider() : "")
-                    + (locOK ? " locProvider: " + location.getProvider() : "")
+                    + (locOK ? " locProvider: " + currentLocation.getProvider() : "")
                     + " newLocation: " + newLocation );
 
             final boolean disableToast = prefs.getBoolean( ListFragment.PREF_DISABLE_TOAST, false );
             if (!disableToast) {
-                final String announce = location == null ? mainActivity.getString(R.string.lost_location)
-                        : mainActivity.getString(R.string.have_location) + " \"" + location.getProvider() + "\"";
+                final String announce = currentLocation == null ? mainActivity.getString(R.string.lost_location)
+                        : mainActivity.getString(R.string.have_location) + " \"" + currentLocation.getProvider() + "\"";
                 WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
             }
 
@@ -349,8 +351,8 @@ public class GNSSListener implements Listener, LocationListener {
             if ( speechGPS ) {
                 // no quotes or the voice pauses
 
-                final String speakAnnounce = location == null ? mainActivity.getString(R.string.lost_location)
-                        : mainActivity.getString(R.string.have_location) + " " + location.getProvider() + ".";
+                final String speakAnnounce = currentLocation == null ? mainActivity.getString(R.string.lost_location)
+                        : mainActivity.getString(R.string.have_location) + " " + currentLocation.getProvider() + ".";
                 mainActivity.speak( speakAnnounce );
             }
 
@@ -361,17 +363,17 @@ public class GNSSListener implements Listener, LocationListener {
             }
         }
 
-        if (logRoutes && null != location) {
+        if (logRoutes && null != currentLocation) {
             final long routeId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
             try {
-                dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
+                dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
                         ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, routeId);
             } catch (Exception ex) {
                 Logging.error("failed to log route update: ", ex);
             }
-        } else if (showRoute && null != location) {
+        } else if (showRoute && null != currentLocation) {
             try {
-                dbHelper.logRouteLocation(location, ListFragment.lameStatic.currNets,
+                dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
                         ListFragment.lameStatic.currCells, ListFragment.lameStatic.currBt, 0L);
             } catch (Exception ex) {
                 Logging.error("filed to log default route update for viz: ", ex);
@@ -383,7 +385,7 @@ public class GNSSListener implements Listener, LocationListener {
     }
 
     public void checkLocationOK(final long gpsTimeout, final long netLocsTimeout) {
-        if ( ! locationOK( location, getSatCount(), gpsTimeout, netLocsTimeout) ) {
+        if ( ! locationOK(currentLocation, getSatCount(), gpsTimeout, netLocsTimeout) ) {
             // do a self-check
             //DEBUG: MainActivity.info("checkLocationOK was false");
             updateLocationData(null);
@@ -498,18 +500,18 @@ public class GNSSListener implements Listener, LocationListener {
 
     public void saveLocation() {
         // save our location for use on later runs
-        if ( this.location != null ) {
+        if ( this.currentLocation != null ) {
             final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
             final Editor edit = prefs.edit();
             // there is no putDouble
-            edit.putFloat( ListFragment.PREF_PREV_LAT, (float) location.getLatitude() );
-            edit.putFloat( ListFragment.PREF_PREV_LON, (float) location.getLongitude() );
+            edit.putFloat( ListFragment.PREF_PREV_LAT, (float) currentLocation.getLatitude() );
+            edit.putFloat( ListFragment.PREF_PREV_LON, (float) currentLocation.getLongitude() );
             edit.apply();
         }
     }
 
-    public Location getLocation() {
-        return location;
+    public Location getCurrentLocation() {
+        return currentLocation;
     }
 
     /**
@@ -521,7 +523,7 @@ public class GNSSListener implements Listener, LocationListener {
         final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
         final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
         checkLocationOK(gpsTimeout, netLocTimeout);
-        return getLocation();
+        return getCurrentLocation();
     }
 
     /**

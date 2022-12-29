@@ -2379,18 +2379,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     }
                 };
                 locationManager.registerGnssStatusCallback(gnssStatusCallback);
+            } catch (final SecurityException ex) {
+                Logging.info("Security exception adding status listener: " + ex, ex);
             } catch (final Exception ex) {
                 Logging.error("Error registering for gnss: " + ex, ex);
             }
-        }
-        try {
-            if (Build.VERSION.SDK_INT >= 24) {
-                locationManager.registerGnssStatusCallback(gnssStatusCallback);
-            } else {
-                //addGpsStatusListener(state.gpsListener);
-            }
-        } catch (final SecurityException ex) {
-            Logging.info("Security exception adding status listener: " + ex, ex);
+        } else {
+            Logging.error("Failed to setup GPS - SDK < 24");
         }
 
         final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
@@ -2606,10 +2601,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     if (Build.VERSION.SDK_INT < 24) {
                         locationManager.removeGpsStatusListener(state.GNSSListener);
                         locationManager.removeUpdates(state.GNSSListener);
-                    }else if (Build.VERSION.SDK_INT >= 24) {
+                    } else if (Build.VERSION.SDK_INT >= 24) {
                         if (gnssStatusCallback != null) {
                             locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                         }
+                        locationManager.removeUpdates(state.GNSSListener);
                     }
                 } catch (final SecurityException ex) {
                     Logging.error("SecurityException on finish: " + ex, ex);

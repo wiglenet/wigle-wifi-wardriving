@@ -426,7 +426,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 if (!googleBug.contains("fixed")) {
                     Logging.info("working around google maps bug 154855417");
                     File corruptedZoomTables = new File(getFilesDir(), "ZoomTables.data");
-                    if (corruptedZoomTables.delete()) {
+                    if (corruptedZoomTables.exists() && corruptedZoomTables.delete()) {
+                        googleBug.edit().putBoolean("fixed", true).apply();
+                    } else if (!corruptedZoomTables.exists()) {
                         googleBug.edit().putBoolean("fixed", true).apply();
                     } else {
                         Logging.error("unable to work around corrupted ZoomTables.data error");

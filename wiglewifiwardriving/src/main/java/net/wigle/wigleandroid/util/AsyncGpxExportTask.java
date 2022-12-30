@@ -116,6 +116,7 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
             writer.append(GPX_FOOTER);
             writer.flush();
             writer.close();
+            cursor.close();
             return "completed export";
         } catch (IOException | DBException | InterruptedException e) {
             Logging.error("Error writing GPX", e);

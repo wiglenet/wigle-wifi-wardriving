@@ -212,20 +212,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logging.info("MAIN onCreate. state:  " + state);
-        /* //DEBUG:
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectLeakedClosableObjects()
-                .penaltyLog()
-                .build());
-        try {
-            Class.forName("dalvik.system.CloseGuard")
-                    .getMethod("setEnabled", boolean.class)
-                    .invoke(null, true);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-        //END DEBUG */
-        StrictMode.enableDefaults();
+        //DEBUG:
+        /*StrictMode.setThreadPolicy(
+                new StrictMode.ThreadPolicy.Builder()
+                        .detectDiskReads()
+                        .detectDiskWrites()
+                        .detectNetwork()
+                        .penaltyLog()
+                        .build());
+        StrictMode.setVmPolicy(
+                new StrictMode.VmPolicy.Builder()
+                        .detectLeakedClosableObjects()
+                        .detectLeakedSqlLiteObjects()
+                        .penaltyLog()
+                        .build());*/
+        //END DEBUG
         final int THREAD_ID = 31973;
         TrafficStats.setThreadStatsTag(THREAD_ID);
         workAroundGoogleMapsBug();
@@ -593,14 +594,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         };
         // Set the drawer toggle as the DrawerListener
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         final NavigationView navigationView = findViewById(R.id.left_drawer);
         navigationView.getMenu().setGroupVisible(R.id.stats_group, false);
 
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> {
                     // set item as selected to persist highlight
-
                     menuItem.setCheckable(true);
                     if (menuItem.getItemId() == R.id.nav_stats) {
                         menuItem.setChecked(!menuItem.isChecked());
@@ -1628,38 +1628,43 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final boolean alertVersions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
         int pieBadCount = prefs.getInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, 0);
         int qBadCount = prefs.getInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, 0);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+        executor.execute(() -> {
+            if ((willActivateBt && useBt) || willActivateWifi || alertVersions) {
+                String activationMessages = "";
 
-        if ((willActivateBt && useBt) || willActivateWifi || alertVersions) {
+                SharedPreferences.Editor editor = prefs.edit();
+                if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
+                    if (pieBadCount < 5) activationMessages = getString(R.string.pie_bad);
+                    editor.putInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, pieBadCount + 1);
 
-            String activationMessages = "";
+                } else if (Build.VERSION.SDK_INT == 29) {
+                    if (qBadCount < 5) activationMessages = getString(R.string.q_bad);
+                    editor.putInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, qBadCount + 1);
+                }
+                editor.apply();
 
-            SharedPreferences.Editor editor = prefs.edit();
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
-                if (pieBadCount < 5) activationMessages = getString(R.string.pie_bad);
-                editor.putInt(ListFragment.PREF_PIE_BAD_TOAST_COUNT, pieBadCount + 1);
+                if (willActivateBt && useBt) {
+                    if (activationMessages.length() > 0) activationMessages += "\n";
+                    activationMessages += getString(R.string.turn_on_bt);
+                    if (willActivateWifi) {
+                        activationMessages += "\n";
+                    }
+                }
 
-            } else if (Build.VERSION.SDK_INT == 29) {
-                if (qBadCount < 5) activationMessages = getString(R.string.q_bad);
-                editor.putInt(ListFragment.PREF_Q_BAD_TOAST_COUNT, qBadCount + 1);
-            }
-            editor.apply();
-
-            if (willActivateBt && useBt) {
-                if (activationMessages.length() > 0) activationMessages += "\n";
-                activationMessages += getString(R.string.turn_on_bt);
                 if (willActivateWifi) {
-                    activationMessages += "\n";
+                    activationMessages += getString(R.string.turn_on_wifi);
+                }
+                // tell user, cuz this takes a little while
+                if (!activationMessages.isEmpty()) {
+                    String finalActivationMessages = activationMessages;
+                    handler.post(() -> {
+                        WiGLEToast.showOverActivity(this, R.string.app_name, finalActivationMessages, Toast.LENGTH_LONG);
+                    });
                 }
             }
-
-            if (willActivateWifi) {
-                activationMessages += getString(R.string.turn_on_wifi);
-            }
-            // tell user, cuz this takes a little while
-            if (!activationMessages.isEmpty()) {
-                WiGLEToast.showOverActivity(this, R.string.app_name, activationMessages, Toast.LENGTH_LONG);
-            }
-        }
+        });
     }
 
     private boolean canWifiBeActivated() {

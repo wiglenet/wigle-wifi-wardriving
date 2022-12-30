@@ -649,6 +649,9 @@ public final class DatabaseHelper extends Thread {
                     if ( insertRoute != null ) {
                         insertRoute.close();
                     }
+                    if ( updateNetworkType != null ) {
+                        updateNetworkType.close();
+                    }
                     if ( db.isOpen() ) {
                         db.close();
                     }
@@ -1424,15 +1427,15 @@ public final class DatabaseHelper extends Thread {
     }
 
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
-        Logging.info("currentRouteIterator");
-        checkDB();
-        if (prefs == null || !prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false)) {
-            return null;
-        }
-        boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
-        final long visibleRouteId = logRoutes?prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L):0L;
-        final String[] args = new String[]{String.valueOf(visibleRouteId)};
-        return db.rawQuery( "SELECT lat,lon FROM route WHERE run_id = ?", args );
+            Logging.info("currentRouteIterator");
+            checkDB();
+            if (prefs == null || !prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false)) {
+                return null;
+            }
+            boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
+            final long visibleRouteId = logRoutes ? prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L) : 0L;
+            final String[] args = new String[]{String.valueOf(visibleRouteId)};
+            return db.rawQuery("SELECT lat,lon FROM route WHERE run_id = ?", args);
     }
 
     public Cursor getSingleNetwork( final String bssid ) throws DBException {

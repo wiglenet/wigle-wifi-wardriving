@@ -444,8 +444,8 @@ public final class MappingFragment extends Fragment {
                                 .clickable(false);
                 final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
                 final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
-                try {
-                    Cursor routeCursor = ListFragment.lameStatic.dbHelper.getCurrentVisibleRouteIterator(prefs);
+                try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
+                        .getCurrentVisibleRouteIterator(prefs)) {
                     if (null == routeCursor) {
                         Logging.info("null route cursor; not mapping");
                     } else {

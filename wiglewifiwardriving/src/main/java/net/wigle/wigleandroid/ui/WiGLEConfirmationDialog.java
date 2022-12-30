@@ -109,7 +109,7 @@ public class WiGLEConfirmationDialog extends DialogFragment {
                     Logging.info("activity is null in dialog. tabPos: " + tabPos + " dialogId: " + dialogId);
                 } else if (activity1 instanceof MainActivity) {
                     final MainActivity mainActivity = (MainActivity) activity1;
-                    if (mainActivity.getState() != null) {
+                    if (mainActivity.getState() != null && tabPos != 0) {
                         final String maybeName = getResources().getResourceName(tabPos);
                         //DEBUG: MainActivity.info("Attempting lookup for: " + String.format("0x%08X", tabPos) + " (" + maybeName + ")");
                         FragmentManager fragmentManager = ((MainActivity) activity1).getSupportFragmentManager();

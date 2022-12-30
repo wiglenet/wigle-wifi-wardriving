@@ -98,6 +98,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
         final Cursor oldCursor = cursor;
         if (oldCursor != null && dataSetObserver != null) {
             oldCursor.unregisterDataSetObserver(dataSetObserver);
+            oldCursor.close();
         }
         cursor = newCursor;
         if (cursor != null) {

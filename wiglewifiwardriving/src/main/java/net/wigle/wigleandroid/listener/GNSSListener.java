@@ -9,6 +9,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.KalmanLatLong;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,6 +24,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.Collections;
 import java.util.Map;
@@ -70,8 +73,8 @@ public class GNSSListener implements Listener, LocationListener {
     public GNSSListener(final MainActivity mainActivity, final DatabaseHelper dbHelper) {
         this.mainActivity = mainActivity;
         this.dbHelper = dbHelper;
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        this.kalmanLatLong = prefs.getBoolean(ListFragment.PREF_GPS_KALMAN_FILTER,true) ?
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+        this.kalmanLatLong = prefs.getBoolean(PreferenceKeys.PREF_GPS_KALMAN_FILTER,true) ?
                 new KalmanLatLong(GOLDILOCKS_METERS_SEC): null;
     }
 
@@ -163,7 +166,7 @@ public class GNSSListener implements Listener, LocationListener {
                         != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
 
         final LocationManager locationManager = (LocationManager)
                 mainActivity.getSystemService(Context.LOCATION_SERVICE);
@@ -182,8 +185,8 @@ public class GNSSListener implements Listener, LocationListener {
         }
         final int satCount = getSatCount();
 
-        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GPS_TIMEOUT_DEFAULT);
-        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, NET_LOC_TIMEOUT_DEFAULT);
+        final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GPS_TIMEOUT_DEFAULT);
+        final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, NET_LOC_TIMEOUT_DEFAULT);
 
         boolean newOK = newLocation != null;
         if (null != newLocation && null != kalmanLatLong &&  kalmanLatLong.getAccuracy() < 0) {
@@ -217,8 +220,8 @@ public class GNSSListener implements Listener, LocationListener {
             newOK = true;
         }
 
-        final boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
-        final boolean showRoute = prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false);
+        final boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
+        final boolean showRoute = prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
 
         final boolean netLocOK = locationOK( networkLocation, satCount, gpsTimeout, netLocTimeout );
 
@@ -274,10 +277,10 @@ public class GNSSListener implements Listener, LocationListener {
                     if (realisticMovement(dist, (float) (currentLocation.getTime() - prevLocation.getTime()) * 0.001f,
                             prevLocation.getAccuracy(), currentLocation.getAccuracy())) {
                         final Editor edit = prefs.edit();
-                        edit.putFloat(ListFragment.PREF_DISTANCE_RUN,
-                                dist + prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f));
-                        edit.putFloat(ListFragment.PREF_DISTANCE_TOTAL,
-                                dist + prefs.getFloat(ListFragment.PREF_DISTANCE_TOTAL, 0f));
+                        edit.putFloat(PreferenceKeys.PREF_DISTANCE_RUN,
+                                dist + prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f));
+                        edit.putFloat(PreferenceKeys.PREF_DISTANCE_TOTAL,
+                                dist + prefs.getFloat(PreferenceKeys.PREF_DISTANCE_TOTAL, 0f));
                         edit.apply();
                         //DEBUG: long distPoints = currentDistPointCount.incrementAndGet();
                         //DEBUG: Logging.info("dist points: "+distPoints+" vs. route points: "+ dbHelper.getCurrentRoutePointCount());
@@ -340,14 +343,15 @@ public class GNSSListener implements Listener, LocationListener {
                     + (locOK ? " locProvider: " + currentLocation.getProvider() : "")
                     + " newLocation: " + newLocation );
 
-            final boolean disableToast = prefs.getBoolean( ListFragment.PREF_DISABLE_TOAST, false );
+            final boolean disableToast = prefs.getBoolean( PreferenceKeys.PREF_DISABLE_TOAST, false );
             if (!disableToast) {
                 final String announce = currentLocation == null ? mainActivity.getString(R.string.lost_location)
                         : mainActivity.getString(R.string.have_location) + " \"" + currentLocation.getProvider() + "\"";
-                WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce);
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> WiGLEToast.showOverActivity(mainActivity, R.string.gps_status, announce));
             }
 
-            final boolean speechGPS = prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true );
+            final boolean speechGPS = prefs.getBoolean( PreferenceKeys.PREF_SPEECH_GPS, true );
             if ( speechGPS ) {
                 // no quotes or the voice pauses
 
@@ -364,7 +368,7 @@ public class GNSSListener implements Listener, LocationListener {
         }
 
         if (logRoutes && null != currentLocation) {
-            final long routeId = prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L);
+            final long routeId = prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L);
             try {
                 if (null != dbHelper) {
                     dbHelper.logRouteLocation(currentLocation, ListFragment.lameStatic.currNets,
@@ -505,11 +509,11 @@ public class GNSSListener implements Listener, LocationListener {
     public void saveLocation() {
         // save our location for use on later runs
         if ( this.currentLocation != null ) {
-            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
             final Editor edit = prefs.edit();
             // there is no putDouble
-            edit.putFloat( ListFragment.PREF_PREV_LAT, (float) currentLocation.getLatitude() );
-            edit.putFloat( ListFragment.PREF_PREV_LON, (float) currentLocation.getLongitude() );
+            edit.putFloat( PreferenceKeys.PREF_PREV_LAT, (float) currentLocation.getLatitude() );
+            edit.putFloat( PreferenceKeys.PREF_PREV_LON, (float) currentLocation.getLongitude() );
             edit.apply();
         }
     }
@@ -524,8 +528,8 @@ public class GNSSListener implements Listener, LocationListener {
      * @return the location is valid
      */
     public Location checkGetLocation(final SharedPreferences prefs) {
-        final long gpsTimeout = prefs.getLong(ListFragment.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
-        final long netLocTimeout = prefs.getLong(ListFragment.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
+        final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+        final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
         checkLocationOK(gpsTimeout, netLocTimeout);
         return getCurrentLocation();
     }

@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.ErrorReportActivity;
-import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
@@ -39,6 +38,7 @@ import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.Pair;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import android.content.Context;
 import android.content.Intent;
@@ -513,7 +513,7 @@ public final class DatabaseHelper extends Thread {
                 db.execSQL(LOCATION_CREATE);
                 // new database, reset a marker, if any
                 final Editor edit = prefs.edit();
-                edit.putLong( ListFragment.PREF_DB_MARKER, 0L );
+                edit.putLong( PreferenceKeys.PREF_DB_MARKER, 0L );
                 edit.apply();
             }
             catch ( final SQLiteException ex ) {
@@ -527,7 +527,7 @@ public final class DatabaseHelper extends Thread {
                 db.execSQL(ROUTE_CREATE);
                 // new database, start with route Zero
                 final Editor edit = prefs.edit();
-                edit.putLong( ListFragment.PREF_ROUTE_DB_RUN, 0L );
+                edit.putLong( PreferenceKeys.PREF_ROUTE_DB_RUN, 0L );
                 edit.apply();
             }
             catch ( final SQLiteException ex ) {
@@ -1272,25 +1272,25 @@ public final class DatabaseHelper extends Thread {
     }
 
     private void setupMaxidDebug( final long locCount ) {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final long maxid = prefs.getLong( ListFragment.PREF_DB_MARKER, -1L );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+        final long maxid = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, -1L );
         final Editor edit = prefs.edit();
-        final long oldMaxDb = prefs.getLong( ListFragment.PREF_MAX_DB, locCount );
-        edit.putLong( ListFragment.PREF_MAX_DB, locCount );
+        final long oldMaxDb = prefs.getLong( PreferenceKeys.PREF_MAX_DB, locCount );
+        edit.putLong( PreferenceKeys.PREF_MAX_DB, locCount );
 
         if ( maxid == -1L ) {
             if ( locCount > 0 ) {
                 // there is no preference set, yet there are locations, this is likely
                 // a developer testing a new install on an old db, so set the pref.
                 Logging.info( "setting db marker to: " + locCount );
-                edit.putLong( ListFragment.PREF_DB_MARKER, locCount );
+                edit.putLong( PreferenceKeys.PREF_DB_MARKER, locCount );
             }
         }
         else if (maxid > locCount || (maxid == 0 && oldMaxDb == 0 && locCount > 10000)) {
             final long newMaxid = Math.max(0, locCount - 10000);
             Logging.warn("db marker: " + maxid + " greater than location count: " + locCount
                     + ", setting to: " + newMaxid);
-            edit.putLong( ListFragment.PREF_DB_MARKER, newMaxid );
+            edit.putLong( PreferenceKeys.PREF_DB_MARKER, newMaxid );
         }
         edit.apply();
     }
@@ -1426,11 +1426,11 @@ public final class DatabaseHelper extends Thread {
     public Cursor getCurrentVisibleRouteIterator(SharedPreferences prefs) throws DBException{
         Logging.info("currentRouteIterator");
         checkDB();
-        if (prefs == null || !prefs.getBoolean(ListFragment.PREF_VISUALIZE_ROUTE, false)) {
+        if (prefs == null || !prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false)) {
             return null;
         }
-        boolean logRoutes = prefs.getBoolean(ListFragment.PREF_LOG_ROUTES, false);
-        final long visibleRouteId = logRoutes?prefs.getLong(ListFragment.PREF_ROUTE_DB_RUN, 0L):0L;
+        boolean logRoutes = prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false);
+        final long visibleRouteId = logRoutes?prefs.getLong(PreferenceKeys.PREF_ROUTE_DB_RUN, 0L):0L;
         final String[] args = new String[]{String.valueOf(visibleRouteId)};
         return db.rawQuery( "SELECT lat,lon FROM route WHERE run_id = ?", args );
     }

@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 /**
  * Utility class for SharedPreferences-backed checkboxes.
@@ -39,7 +40,7 @@ public class PrefsBackedCheckbox {
 
     public static CheckBox prefBackedCheckBox(final Activity activity, final View view, final int id,
                                               final String pref, final boolean def, final PrefCheckboxListener listener) {
-        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, Context.MODE_PRIVATE);
+        final SharedPreferences prefs = activity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
         final SharedPreferences.Editor editor = prefs.edit();
         final CheckBox checkbox = prefSetCheckBox(prefs, view, id, pref, def);
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> {

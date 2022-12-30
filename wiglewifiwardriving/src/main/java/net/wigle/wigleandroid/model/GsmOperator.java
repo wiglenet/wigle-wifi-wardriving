@@ -65,7 +65,6 @@ public class GsmOperator {
         }
     }
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     public GsmOperator(final CellIdentityLte cellIdentL) throws GsmOperatorException{
         cellId = cellIdentL.getCi();
         xac = cellIdentL.getTac();

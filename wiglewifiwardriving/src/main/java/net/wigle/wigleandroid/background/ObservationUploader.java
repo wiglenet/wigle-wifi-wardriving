@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
@@ -23,6 +22,7 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 import java.io.File;
@@ -149,7 +149,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             Activity a = fragment.getActivity();
             if (a != null) {
                 prefs = fragment.getActivity().getSharedPreferences(
-                        ListFragment.SHARED_PREFS, 0);
+                        PreferenceKeys.SHARED_PREFS, 0);
             } else {
                 prefs = null;
                 Logging.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
@@ -158,14 +158,16 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
-            final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-            final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
-            final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
+            final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+            final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
+            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
+            final String userPass = prefs.getString(PreferenceKeys.PREF_PASSWORD, null);
             Logging.info("authName: " + authName);
             if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
                 Logging.info("No authName, going to request token");
-                downloadTokenAndStart(fragment);
+                if (null != fragment) {
+                    downloadTokenAndStart(fragment);
+                }
             } else {
                 start();
             }
@@ -174,7 +176,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * upload guts. lifted from FileUploaderTask
-     * @param bundle
      * @return the Status of the upload
      * @throws InterruptedException if the upload is interrupted
      */
@@ -195,16 +196,16 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             final Map<String,String> params = new HashMap<>();
 
-            final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-            if ( prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
+            final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+            if ( prefs.getBoolean(PreferenceKeys.PREF_DONATE, false) ) {
                 params.put("donate","on");
             }
-            final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+            final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             if (!beAnonymous && null == authName) {
                 return Status.BAD_LOGIN;
             }
-            final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
+            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
 
             // don't upload empty files
@@ -231,10 +232,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             final String response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
                     "file", params, authName, token, getHandler());
 
-            if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
+            if ( ! prefs.getBoolean(PreferenceKeys.PREF_DONATE, false) ) {
                 if ( response != null && response.indexOf("donate=Y") > 0 ) {
                     final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean( ListFragment.PREF_DONATE, true );
+                    editor.putBoolean( PreferenceKeys.PREF_DONATE, true );
                     editor.apply();
                 }
             }
@@ -246,9 +247,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
                 // save in the prefs
                 final SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong( ListFragment.PREF_DB_MARKER, maxId );
-                editor.putLong( ListFragment.PREF_MAX_DB, maxId );
-                editor.putLong( ListFragment.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
+                editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
+                editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
                 editor.apply();
             } else if ( response != null && response.indexOf("File upload failed.") > 0 ) {
                 status = Status.FAIL;
@@ -320,18 +321,11 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final Bundle bundle = new Bundle();
 
         try {
-            OutputStream fos = null;
-            try {
-                fos = getOutputStream( context, bundle, new Object[2] );
-                writeFile( fos, bundle, countStats );
+            try (OutputStream fos = getOutputStream(context, bundle, new Object[2])) {
+                writeFile(fos, bundle, countStats);
                 // show on the UI
                 status = Status.WRITE_SUCCESS;
-                sendBundledMessage( status.ordinal(), bundle );
-            }
-            finally {
-                if ( fos != null ) {
-                    fos.close();
-                }
+                sendBundledMessage(status.ordinal(), bundle);
             }
         }
         catch ( InterruptedException ex ) {
@@ -357,32 +351,24 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (directly lifted from FileUploadTask)
-     * @param fos
-     * @param bundle
-     * @param countStats
-     * @return
-     * @throws IOException
-     * @throws PackageManager.NameNotFoundException
-     * @throws InterruptedException
-     * @throws DBException
      */
     private long writeFile( final OutputStream fos, final Bundle bundle,
                             final ObservationUploader.CountStats countStats ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException, DBException {
 
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
         if ( writeEntireDb ) {
             maxId = 0;
         }
         else if ( writeRun ) {
             // max id at startup
-            maxId = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
+            maxId = prefs.getLong( PreferenceKeys.PREF_MAX_DB, 0L );
         }
         Logging.info( "Writing file starting with observation id: " + maxId);
         final Cursor cursor = dbHelper.locationIterator( maxId );
 
-        //noinspection TryFinallyCanBeTryWithResources
+        //noinspection
         try {
             return writeFileWithCursor( fos, bundle, countStats, cursor );
         } finally {
@@ -395,22 +381,14 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (lifted directly from FileUploaderTask)
-     * @param fos
-     * @param bundle
-     * @param countStats
-     * @param cursor
-     * @return
-     * @throws IOException
-     * @throws PackageManager.NameNotFoundException
-     * @throws InterruptedException
      */
     private long writeFileWithCursor( final OutputStream fos, final Bundle bundle,
                                       final ObservationUploader.CountStats countStats,
                                       final Cursor cursor ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException {
 
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
 
         final long start = System.currentTimeMillis();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -578,9 +556,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (lifted directly from FileUploaderTask)
-     * @param fos
-     * @param data
-     * @throws IOException
      */
     public static void writeFos( final OutputStream fos, final String data ) throws IOException {
         if ( data != null ) {
@@ -591,11 +566,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
      */
     private void singleCopyNumberFormat( final NumberFormat numberFormat,
                                          final StringBuffer stringBuffer,
@@ -609,11 +579,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
      */
     private void singleCopyNumberFormat( final NumberFormat numberFormat,
                                          final StringBuffer stringBuffer,
@@ -628,11 +593,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     /**
      * Copy a date according to format into a position in a string
      * (lifted directly from FileUploaderTask)
-     * @param dateFormat the DateFormat to use
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp the position at which to insert
-     * @param date the date
      */
     private void singleCopyDateFormat(final DateFormat dateFormat, final StringBuffer stringBuffer,
                                       final CharBuffer charBuffer, final FieldPosition fp,

@@ -35,6 +35,7 @@ import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
@@ -229,7 +230,7 @@ public class UploadsFragment extends Fragment {
         final Activity a = getActivity();
         SharedPreferences prefs;
         if (null != a) {
-            prefs = a.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (listAdapter == null) {
                 listAdapter = new UploadsListAdapter(getActivity(), R.layout.uploadrow, prefs, this);
             } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {

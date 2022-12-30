@@ -22,6 +22,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.PolylineRoute;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
@@ -35,12 +36,12 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     private Cursor cursor;
     private boolean dataValid;
     private int rowIdColumn;
-    private DataSetObserver dataSetObserver;
-    private PolyRouteConfigurable configurable;
-    private RouteExportSelector routeSelector;
-    private SharedPreferences prefs;
-    private DateFormat dateFormat;
-    private DateFormat timeFormat;
+    private final DataSetObserver dataSetObserver;
+    private final PolyRouteConfigurable configurable;
+    private final RouteExportSelector routeSelector;
+    private final SharedPreferences prefs;
+    private final DateFormat dateFormat;
+    private final DateFormat timeFormat;
     private int selectedPos = RecyclerView.NO_POSITION;
 
     public GpxRecyclerAdapter(Context context, FragmentActivity fragmentActivity, Cursor cursor, PolyRouteConfigurable configurable, RouteExportSelector routeSelector,
@@ -67,8 +68,8 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
 
         public ViewHolder(View view) {
             super(view);
-            textView = (TextView) view.findViewById(R.id.gpxItemLabel);
-            shareButton = (ImageButton) view.findViewById(R.id.share_route);
+            textView = view.findViewById(R.id.gpxItemLabel);
+            shareButton = view.findViewById(R.id.share_route);
         }
 
         public TextView getTextView() {
@@ -135,8 +136,7 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
     public GpxRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.gpx_recycler_element, parent, false);
-        ViewHolder handler = new ViewHolder(itemView);
-        return handler;
+        return new ViewHolder(itemView);
     }
 
     @Override
@@ -150,49 +150,42 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
         holder.itemView.setSelected(selectedPos == position);
         final GpxListItem listItem = GpxListItem.fromCursor(cursor, dateFormat, timeFormat);
         final long clickedId = listItem.getRunId();
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                configurable.clearCurrentRoute();
-                notifyItemChanged(selectedPos);
-                selectedPos = position; //.getLayoutPosition();
-                notifyItemChanged(selectedPos);
-                try {
-                    //DEBUG: MainActivity.info("get route "+clickedId);
-                    Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId);
-                    final int mapMode = prefs.getInt(ListFragment.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                    final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context ,prefs);
-                    if (null == routeCursor) {
-                        Logging.info("null route cursor; not mapping");
-                    } else {
-                        PolylineRoute newRoute = new PolylineRoute();
-                        for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-                            final float lat = routeCursor.getFloat(0);
-                            final float lon = routeCursor.getFloat(1);
-                            //final long time = routeCursor.getLong(2);
-                            newRoute.addLatLng(lat, lon, mapMode, nightMode);
-                        }
-                        Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
-                        configurable.configureMapForRoute(newRoute);
+        holder.itemView.setOnClickListener(v -> {
+            configurable.clearCurrentRoute();
+            notifyItemChanged(selectedPos);
+            selectedPos = position; //.getLayoutPosition();
+            notifyItemChanged(selectedPos);
+            //DEBUG: MainActivity.info("get route "+clickedId);
+            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
+                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
+                if (null == routeCursor) {
+                    Logging.info("null route cursor; not mapping");
+                } else {
+                    PolylineRoute newRoute = new PolylineRoute();
+                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+                        final float lat = routeCursor.getFloat(0);
+                        final float lon = routeCursor.getFloat(1);
+                        //final long time = routeCursor.getLong(2);
+                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
                     }
-                } catch (Exception e) {
-                    Logging.error("Unable to add route: ",e);
+                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
+                    configurable.configureMapForRoute(newRoute);
                 }
+            } catch (Exception e) {
+                Logging.error("Unable to add route: ",e);
             }
         });
-        holder.shareButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Logging.info("share route "+clickedId);
-                routeSelector.setRouteToExport(clickedId);
-                if (null != context) {
-                    MainActivity.createConfirmation(fragmentActivity,
-                            context.getString(R.string.export_gpx_detail), R.id.nav_data, EXPORT_GPX_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
-
+        holder.shareButton.setOnClickListener(v -> {
+            Logging.info("share route "+clickedId);
+            routeSelector.setRouteToExport(clickedId);
+            if (null != context) {
+                WiGLEConfirmationDialog.createConfirmation(fragmentActivity,
+                        context.getString(R.string.export_gpx_detail), R.id.nav_data, EXPORT_GPX_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
+
         });
         holder.textView.setText(listItem.getName());
     }

@@ -16,12 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.CsvDownloader;
 import net.wigle.wigleandroid.background.KmlDownloader;
 import net.wigle.wigleandroid.model.Upload;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,8 +89,8 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     + numberFormat.format(upload.getFileSize()));
 
             final String status = upload.getStatus();
-            final String userId = prefs.getString(ListFragment.PREF_AUTHNAME, "");
-            final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+            final String userId = prefs.getString(PreferenceKeys.PREF_AUTHNAME, "");
+            final boolean isAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
 
             final ImageButton ib = row.findViewById(R.id.csv_status_button);
             final TextView statusTv = row.findViewById(R.id.upload_status);
@@ -99,11 +99,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 if (upload.getDownloadedToLocal()) {
                     message += context.getString(R.string.downloaded) + context.getString(R.string.click_access);
                     final String fileName = transId + FileUtility.CSV_GZ_EXT;
-                    ib.setOnClickListener(new View.OnClickListener() {
-                        public void onClick(View v) {
-                            handleCsvShare(transId, fileName, fragment);
-                        }
-                    });
+                    ib.setOnClickListener(v -> handleCsvShare(transId, fileName, fragment));
                     ib.setImageResource(R.drawable.ic_ulstatus_dl);
                 } else if (upload.getUploadedFromLocal()) {
                     final String fName = upload.getFileName();
@@ -112,79 +108,52 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
                         ib.setImageResource(R.drawable.ic_ulstatus_uled);
                         if (fName.contains("_")) {
-                            ib.setOnClickListener(new View.OnClickListener() {
-                                public void onClick(View v) {
-                                    handleCsvShare(transId, fileName, fragment);
-                                }
-                            });
+                            ib.setOnClickListener(v -> handleCsvShare(transId, fileName, fragment));
                         } else {
                             Logging.error("non-importable file: " + fName);
                         }
                     } else {
                         message += context.getString(R.string.not_proc) + context.getString(R.string.click_access);
                         ib.setImageResource(R.drawable.ic_ulstatus_queued);
-                        ib.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View v) {
-                                handleCsvShare(transId, fileName, fragment);
-                            }
-                        });
+                        ib.setOnClickListener(v -> handleCsvShare(transId, fileName, fragment));
                     }
                 } else {
                     if ("Completed".equals(status)) {
                         message += context.getString(R.string.uploaded) + context.getString(R.string.click_download);
                         ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
-                        ib.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View v) {
-                                //disable buttons
-                                disableListButtons = true;
-                                notifyDataSetChanged();
-                                Logging.info("Downloading transId CSV: " + transId);
-                                final CsvDownloader task = new CsvDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
-                                        new ApiListener() {
-                                            @Override
-                                            public void requestComplete(final JSONObject json, final boolean isCache) {
-                                                UploadsListAdapter.handleCsvDownload(transId, json);
-                                                upload.setDownloadedToLocal(true);
-                                                disableListButtons = false;
-                                                Activity activity = fragment.getActivity();
-                                                if (null != activity) {
-                                                    activity.runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            //re-enable buttons
-                                                            notifyDataSetChanged();
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        });
-                                try {
-                                    task.startDownload(fragment);
-                                } catch (Exception waex) {
-                                    Logging.warn("Error on CSV download for transId " +
-                                            transId, waex);
-                                    disableListButtons = false;
-                                    Activity activity = fragment.getActivity();
-                                    if (null != activity) {
-                                        activity.runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                //re-enable buttons
-                                                notifyDataSetChanged();
-                                            }
-                                        });
-                                    }
+                        ib.setOnClickListener(v -> {
+                            //disable buttons
+                            disableListButtons = true;
+                            notifyDataSetChanged();
+                            Logging.info("Downloading transId CSV: " + transId);
+                            final CsvDownloader task = new CsvDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
+                                    (json, isCache) -> {
+                                        UploadsListAdapter.handleCsvDownload(transId, json);
+                                        upload.setDownloadedToLocal(true);
+                                        disableListButtons = false;
+                                        Activity activity = fragment.getActivity();
+                                        if (null != activity) {
+                                            //re-enable buttons
+                                            activity.runOnUiThread(this::notifyDataSetChanged);
+                                        }
+                                    });
+                            try {
+                                task.startDownload(fragment);
+                            } catch (Exception waex) {
+                                Logging.warn("Error on CSV download for transId " +
+                                        transId, waex);
+                                disableListButtons = false;
+                                Activity activity = fragment.getActivity();
+                                if (null != activity) {
+                                    //re-enable buttons
+                                    activity.runOnUiThread(this::notifyDataSetChanged);
                                 }
                             }
                         });
                     } else {
                         message += context.getString(R.string.not_proc);
                         ib.setImageResource(R.drawable.ic_ulstatus_queuenotlocal);
-                        ib.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View v) {
-                                Logging.error("not available yet - nothing to do for " + transId);
-                            }
-                        });
+                        ib.setOnClickListener(v -> Logging.error("not available yet - nothing to do for " + transId));
                     }
                 }
                 if (disableListButtons) {
@@ -207,46 +176,31 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             ImageButton view = row.findViewById(R.id.view_upload);
             if (!userId.isEmpty() && (!isAnonymous) && ("Completed".equals(status))) {
                 share.setVisibility(View.VISIBLE);
-                share.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        Logging.info("Sharing transId: " + transId);
-                        //disable buttons
-                        disableListButtons = true;
-                        notifyDataSetChanged();
-                        final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
-                                new ApiListener() {
-                                    @Override
-                                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                                        UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_SEND);
-                                        disableListButtons = false;
-                                        Activity activity = fragment.getActivity();
-                                        if (null != activity) {
-                                            activity.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    //re-enable buttons
-                                                    notifyDataSetChanged();
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                        try {
-                            task.startDownload(fragment);
-                        } catch (Exception e) {
-                            Logging.warn("Error on KML download for transId " +
-                                    transId, e);
-                            disableListButtons = false;
-                            Activity activity = fragment.getActivity();
-                            if (null != activity) {
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //re-enable buttons
-                                        notifyDataSetChanged();
-                                    }
-                                });
-                            }
+                share.setOnClickListener(v -> {
+                    Logging.info("Sharing transId: " + transId);
+                    //disable buttons
+                    disableListButtons = true;
+                    notifyDataSetChanged();
+                    final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
+                            (json, isCache) -> {
+                                UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_SEND);
+                                disableListButtons = false;
+                                Activity activity = fragment.getActivity();
+                                if (null != activity) {
+                                    //re-enable buttons
+                                    activity.runOnUiThread(this::notifyDataSetChanged);
+                                }
+                            });
+                    try {
+                        task.startDownload(fragment);
+                    } catch (Exception e) {
+                        Logging.warn("Error on KML download for transId " +
+                                transId, e);
+                        disableListButtons = false;
+                        Activity activity = fragment.getActivity();
+                        if (null != activity) {
+                            //re-enable buttons
+                            activity.runOnUiThread(this::notifyDataSetChanged);
                         }
                     }
                 });
@@ -258,46 +212,31 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
 
 
                 view.setVisibility(View.VISIBLE);
-                view.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        Logging.info("Viewing transId: " + transId);
-                        //disable buttons
-                        disableListButtons = true;
-                        notifyDataSetChanged();
-                        final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
-                                new ApiListener() {
-                                    @Override
-                                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                                        UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_VIEW);
-                                        disableListButtons = false;
-                                        Activity activity = fragment.getActivity();
-                                        if (null != activity) {
-                                            activity.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    //re-enable buttons
-                                                    notifyDataSetChanged();
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-                        try {
-                            task.startDownload(fragment);
-                        } catch (Exception e) {
-                            Logging.warn("Authentication error on KML download for transId " +
-                                    transId, e);
-                            disableListButtons = false;
-                            Activity activity = fragment.getActivity();
-                            if (null != activity) {
-                                activity.runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        //re-enable buttons
-                                        notifyDataSetChanged();
-                                    }
-                                });
-                            }
+                view.setOnClickListener(v -> {
+                    Logging.info("Viewing transId: " + transId);
+                    //disable buttons
+                    disableListButtons = true;
+                    notifyDataSetChanged();
+                    final KmlDownloader task = new KmlDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper, transId,
+                            (json, isCache) -> {
+                                UploadsListAdapter.handleKmlDownload(transId, json, fragment, Intent.ACTION_VIEW);
+                                disableListButtons = false;
+                                Activity activity = fragment.getActivity();
+                                if (null != activity) {
+                                    //re-enable buttons
+                                    activity.runOnUiThread(this::notifyDataSetChanged);
+                                }
+                            });
+                    try {
+                        task.startDownload(fragment);
+                    } catch (Exception e) {
+                        Logging.warn("Authentication error on KML download for transId " +
+                                transId, e);
+                        disableListButtons = false;
+                        Activity activity = fragment.getActivity();
+                        if (null != activity) {
+                            //re-enable buttons
+                            activity.runOnUiThread(this::notifyDataSetChanged);
                         }
                     }
                 });

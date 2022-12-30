@@ -23,6 +23,7 @@ import com.google.maps.android.ui.IconGenerator;
 
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +97,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         }
 
         private boolean showDefaultIcon(final Network network) {
-            final boolean showLabel = prefs.getBoolean( ListFragment.PREF_MAP_LABEL, true );
+            final boolean showLabel = prefs.getBoolean( PreferenceKeys.PREF_MAP_LABEL, true );
             if (showLabel) {
                 final LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
                 if (bounds == null || network.getLatLng() == null) return false;
@@ -133,7 +134,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
 
         @Override
         protected boolean shouldRenderAsCluster(Cluster<Network> cluster) {
-            return (prefs.getBoolean( ListFragment.PREF_MAP_CLUSTER, true ) && cluster.getSize() > 4)
+            return (prefs.getBoolean( PreferenceKeys.PREF_MAP_CLUSTER, true ) && cluster.getSize() > 4)
                     || cluster.getSize() >= 100;
         }
 
@@ -155,7 +156,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
             }
             else if (network.isNew()) {
                 // handle case where network was not added before because it is not new
-                final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false );
+                final boolean showNewDBOnly = prefs.getBoolean( PreferenceKeys.PREF_MAP_ONLY_NEWDB, false );
                 if (showNewDBOnly) {
                     mClusterManager.addItem(network);
                     mClusterManager.cluster();
@@ -201,7 +202,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     public MapRender(final Context context, final GoogleMap map, final boolean isDbResult) {
         this.map = map;
         this.isDbResult = isDbResult;
-        prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, MappingFragment.MAP_DIALOG_PREFIX );
         mClusterManager = new ClusterManager<>(context, map);
         networkRenderer = new NetworkRenderer(context, map, mClusterManager);
@@ -242,8 +243,8 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
     }
 
     public boolean okForMapTab( final Network network ) {
-        final boolean hideNets = prefs.getBoolean( ListFragment.PREF_MAP_HIDE_NETS, false );
-        final boolean showNewDBOnly = prefs.getBoolean( ListFragment.PREF_MAP_ONLY_NEWDB, false )
+        final boolean hideNets = prefs.getBoolean( PreferenceKeys.PREF_MAP_HIDE_NETS, false );
+        final boolean showNewDBOnly = prefs.getBoolean( PreferenceKeys.PREF_MAP_ONLY_NEWDB, false )
                 && ! isDbResult;
         if (network.getPosition() != null && !hideNets) {
             if (!showNewDBOnly || network.isNew()) {

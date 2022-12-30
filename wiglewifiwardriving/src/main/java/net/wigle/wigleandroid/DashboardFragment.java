@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -155,16 +157,16 @@ public class DashboardFragment extends Fragment {
         tv.setText( ListFragment.lameStatic.newCells + " ");
 
         if (null != currentActivity) {
-            final SharedPreferences prefs = currentActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
             tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload(prefs) );
 
-            updateDist(view, prefs, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
-            updateTime(view, prefs, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN);
-            updateTimeTare(view, prefs, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
-                    ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
-            updateDist(view, prefs, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
-            updateDist(view, prefs, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
+            updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
+            updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
+            updateTimeTare(view, prefs, R.id.scan_dur, PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN,
+                    PreferenceKeys.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
+            updateDist(view, prefs, R.id.totaldist, PreferenceKeys.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
+            updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
         tv = view.findViewById( R.id.queuesize );
         tv.setText( getString(R.string.dash_db_queue) + " " + wholeNumberFormat.format(ListFragment.lameStatic.preQueueSize) );
@@ -260,8 +262,8 @@ public class DashboardFragment extends Fragment {
 
   private String newNetsSinceUpload(final SharedPreferences prefs) {
       long newSinceUpload = 0;
-      final long marker = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
-      final long uploaded = prefs.getLong( ListFragment.PREF_NETS_UPLOADED, 0L );
+      final long marker = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
+      final long uploaded = prefs.getLong( PreferenceKeys.PREF_NETS_UPLOADED, 0L );
       // marker is set but no uploaded, a migration situation, so return zero
       if (marker == 0 || uploaded != 0) {
           newSinceUpload = ListFragment.lameStatic.dbNets - uploaded;
@@ -289,9 +291,9 @@ public class DashboardFragment extends Fragment {
 
   private void updateTimeTare(final View view, final SharedPreferences prefs, final int id, final String prefCumulative,
                               final String prefCurrent, final boolean isScanning) {
-      long cumulative = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+      long cumulative = prefs.getLong(PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
       if (isScanning) {
-        cumulative += System.currentTimeMillis() - prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+        cumulative += System.currentTimeMillis() - prefs.getLong(PreferenceKeys.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
       }
       final String durString = timeString(cumulative);
       final TextView tv = view.findViewById( id );
@@ -333,7 +335,7 @@ public class DashboardFragment extends Fragment {
   }
 
   @Override
-  public void onConfigurationChanged( final Configuration newConfig ) {
+  public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
     Logging.info( "DASH: config changed" );
     switchView();
     super.onConfigurationChanged( newConfig );
@@ -341,13 +343,13 @@ public class DashboardFragment extends Fragment {
 
   /* Creates the menu items */
   @Override
-  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+  public void onCreateOptionsMenu (@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
   }
 
   /* Handles item selections */
   @Override
-  public boolean onOptionsItemSelected( final MenuItem item ) {
+  public boolean onOptionsItemSelected(@NonNull final MenuItem item ) {
       return false;
   }
 

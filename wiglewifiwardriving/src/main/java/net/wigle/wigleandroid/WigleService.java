@@ -21,6 +21,7 @@ import androidx.core.app.NotificationCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -182,7 +183,7 @@ public final class WigleService extends Service {
                 String text = context.getString(R.string.list_waiting_gps);
 
                 String distString = "";
-                SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
                     Locale locale = null;
                     Configuration sysConfig = getResources().getConfiguration();
@@ -195,7 +196,7 @@ public final class WigleService extends Service {
                     NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
                     numberFormat.setMaximumFractionDigits(1);
 
-                    final float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
+                    final float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
                     distString = " ("+UINumberFormat.metersToString(prefs, numberFormat, this, dist, true) + ")";
                 }
                 if (dbNets > 0) {

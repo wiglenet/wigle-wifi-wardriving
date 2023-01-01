@@ -927,9 +927,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         Logging.info("GoogleApiAvailability: " + serviceAvailable);
         if (serviceAvailable != ConnectionResult.SUCCESS && !playServiceShown) {
             Logging.error("GoogleApiAvailability not available! " + serviceAvailable);
-            final Dialog dialog =GoogleApiAvailability.getInstance().getErrorDialog(this, serviceAvailable, 0);
-            dialog.show();
-            playServiceShown = true;
+            final Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, serviceAvailable, 0);
+            if (null != dialog) {
+                dialog.show();
+                playServiceShown = true;
+            }
         }
     }
 
@@ -1423,29 +1425,26 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static Iterable<String> getLogLines() {
         final State state = getStaticState();
-        return new Iterable<String>() {
-            @Override
-            public Iterator<String> iterator() {
-                // Collections.emptyIterator() requires api 19, but this works.
-                if (state == null) return Collections.<String>emptySet().iterator();
+        return () -> {
+            // Collections.emptyIterator() requires api 19, but this works.
+            if (state == null) return Collections.<String>emptySet().iterator();
 
-                return new Iterator<String>() {
-                    int currentPointer = state.logPointer;
-                    final int maxPointer = currentPointer + state.logs.length;
+            return new Iterator<String>() {
+                int currentPointer = state.logPointer;
+                final int maxPointer = currentPointer + state.logs.length;
 
-                    @Override
-                    public boolean hasNext() {
-                        return state.logs[currentPointer % state.logs.length] != null && currentPointer < maxPointer;
-                    }
+                @Override
+                public boolean hasNext() {
+                    return state.logs[currentPointer % state.logs.length] != null && currentPointer < maxPointer;
+                }
 
-                    @Override
-                    public String next() {
-                        final String retval = state.logs[currentPointer % state.logs.length];
-                        currentPointer++;
-                        return retval;
-                    }
-                };
-            }
+                @Override
+                public String next() {
+                    final String retval = state.logs[currentPointer % state.logs.length];
+                    currentPointer++;
+                    return retval;
+                }
+            };
         };
     }
 
@@ -1809,7 +1808,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
                     state.bluetoothReceiver = new BluetoothReceiver(this, state.dbHelper,
-                            hasLeSupport);
+                            hasLeSupport, prefs);
                     state.bluetoothReceiver.setupBluetoothTimer(true);
                 }
                 Logging.info("\tregister bluetooth BroadcastReceiver");
@@ -2252,6 +2251,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void finishSoon() {
+        this.state.wigleService = null;
         finishSoon(FINISH_TIME_MILLIS, false, false);
     }
 

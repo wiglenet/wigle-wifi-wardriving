@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
@@ -129,6 +128,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     private SetNetworkListAdapter listAdapter;
     private final ScanCallback scanCallback;
+    private final SharedPreferences prefs;
 
     private Handler bluetoothTimer;
     private long scanRequestTime = Long.MIN_VALUE;
@@ -158,14 +158,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBtle = new HashSet<>();
 
-    public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport) {
+    public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
         this.mainActivity = new WeakReference<>(mainActivity);
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
+        this.prefs = prefs;
 
         if (Build.VERSION.SDK_INT >= 21 && hasLeSupport) {
             scanCallback = new ScanCallback() {
-                final SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 private int empties = 0;
 
                 @Override
@@ -350,8 +350,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     final String capabilities = DEVICE_TYPE_LEGEND.get(
                             bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
                     if (mainActivity.get() != null) {
-                        final SharedPreferences prefs = mainActivity.get()
-                                .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                         //ALIBI: shamelessly re-using frequency here for device type.
                         final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                                 scanResult.getRssi(),
@@ -423,12 +421,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             MainActivity.info("\tpareid device: "+device.getAddress()+" - "+device.getName() + device.getBluetoothClass());
             //BluetoothClass bluetoothClass = device.getBluetoothClass();
         }*/
-
-        if (DEBUG_BLUETOOTH_DATA) {
-            if (adUuidNoScanUuid > 0 || scanUuidNoAdUuid > 0) {
-                Logging.error("AD but No Scan UUID: " + adUuidNoScanUuid + " Scan but No Ad UUID: " + scanUuidNoAdUuid);
-            }
-        }
     }
 
     public void stopScanning() {
@@ -440,7 +432,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 Logging.error("No permission for bluetoothAdapter.cancelDiscovery", se);
             }
             if (mainActivity.get() != null) {
-                final SharedPreferences prefs = mainActivity.get().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
                 if (listAdapter != null && showCurrent) {
                     listAdapter.clearBluetoothLe();
@@ -475,7 +466,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
         final MainActivity m = mainActivity.get();
         if (m != null) {
-            final SharedPreferences prefs = m.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (null == intent) {
                 Logging.error("null intent in Bluetooth onReceive");
                 return;
@@ -499,7 +489,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     int type;
 
-                    if (btClass == null && device != null) {
+                    if (btClass == null) {
                         type = (isMiscOrUncategorized(device.getBluetoothClass().getDeviceClass())) ?
                                 device.getBluetoothClass().getMajorDeviceClass() : device.getBluetoothClass().getDeviceClass();
                     } else {
@@ -650,17 +640,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     } catch (Exception ex) {
                         Logging.warn("exception starting bt scan: " + ex, ex);
                     }
-                    if (success) {
-                        scanInFlight = true;
-                    }
                 }
 
                 final long now = System.currentTimeMillis();
                 if (lastScanResponseTime < 0) {
                     // use now, since we made a request
                     lastScanResponseTime = now;
-                } else {
-                    // are we seeing jams?
                 }
             } else {
                 // scanning is off. since we're the only timer, update the UI
@@ -674,7 +659,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
             // battery kill
             if ( ! m.isTransferring() ) {
-                final SharedPreferences prefs = m.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
                 long batteryKill = prefs.getLong(
                         PreferenceKeys.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
 
@@ -703,7 +687,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     public long getScanPeriod() {
         final MainActivity m = mainActivity.get();
         if (null != m) {
-            final SharedPreferences prefs = m.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             String scanPref = PreferenceKeys.PREF_OG_BT_SCAN_PERIOD;
             long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
             // if over 5 mph

@@ -27,7 +27,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -197,7 +196,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (view == null) {
             return;
         }
-        final ExecutorService executor = Executors.newSingleThreadExecutor();
+        final ExecutorService executor = Executors.newFixedThreadPool(3);
+        //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
         TextView tv = view.findViewById( R.id.stats_run );
         long netCount = state.wifiReceiver.getRunNetworkCount();

@@ -1734,7 +1734,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } else if (requestCode == ACTION_TTS_CODE) {
             if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
-                state.tts = new TextToSpeech(this, this);
+                state.tts = new TextToSpeech(getApplicationContext(), this);
             } else {
                 try {
                     PackageManager pm = getPackageManager();

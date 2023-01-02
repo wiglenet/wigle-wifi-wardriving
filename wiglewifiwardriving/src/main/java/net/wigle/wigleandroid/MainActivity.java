@@ -873,10 +873,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             //TODO: redundant with endBluetooth?
             final BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-            if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
-                    bluetoothAdapter.cancelDiscovery();
-            }
             try {
+                if (bluetoothAdapter != null && bluetoothAdapter.isDiscovering()) {
+                    bluetoothAdapter.cancelDiscovery();
+                }
                 Logging.info("unregister bluetoothReceiver");
                 unregisterReceiver(state.bluetoothReceiver);
             } catch (final IllegalArgumentException ex) {
@@ -886,12 +886,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
             if (state.bluetoothReceiver != null) {
                 state.bluetoothReceiver.stopScanning();
+                state.bluetoothReceiver.close();
             }
             finishSoon(DESTROY_FINISH_MILLIS, false);
         } else {
             state.uiRestart.set(false);
         }
-
+        mainActivity = null;
     }
 
     @Override

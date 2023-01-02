@@ -127,7 +127,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
 
     private SetNetworkListAdapter listAdapter;
-    private final ScanCallback scanCallback;
+    private ScanCallback scanCallback;
     private final SharedPreferences prefs;
 
     private Handler bluetoothTimer;
@@ -457,6 +457,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 }
             }
         }
+    }
+
+    public void close() {
+        this.listAdapter = null;
+        this.scanCallback = null;
     }
 
     /**

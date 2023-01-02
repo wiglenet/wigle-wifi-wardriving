@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,7 +41,7 @@ public final class WigleService extends Service {
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
     // Binder given to clients
-    private final IBinder wigleServiceBinder = new WigleServiceBinder();
+    private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
 
     private class GuardThread extends Thread {
         GuardThread() {
@@ -61,10 +62,17 @@ public final class WigleService extends Service {
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
-    class WigleServiceBinder extends Binder {
+    static class WigleServiceBinder extends Binder {
+        //ALIBI: using WeakRef instead of WiGLEService.this because it leaks.
+        // see https://stackoverflow.com/questions/3243215/how-to-use-weakreference-in-java-and-android-development
+        WeakReference<WigleService> service;
+        public WigleServiceBinder(final WigleService wigleService) {
+            this.service = new WeakReference<>(wigleService);
+        }
+
         WigleService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return WigleService.this;
+            return service.get();
         }
     }
 
@@ -218,7 +226,7 @@ public final class WigleService extends Service {
                 pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
                 pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
 
-                MainActivity ma = MainActivity.getMainActivity();
+                final MainActivity ma = MainActivity.getMainActivity();
                 Notification notification = null;
 
                 if (null != ma) {

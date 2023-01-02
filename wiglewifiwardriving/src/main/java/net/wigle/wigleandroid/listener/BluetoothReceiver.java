@@ -118,7 +118,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         DEVICE_TYPE_LEGEND = Collections.unmodifiableMap(initMap);
     }
 
-    private final WeakReference<MainActivity> mainActivity;
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
     //TODO: this is pretty redundant with the central network list,
@@ -126,13 +125,12 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> unsafeRunNetworks = new HashSet<>();
     private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
 
-    private SetNetworkListAdapter listAdapter;
+    private WeakReference<SetNetworkListAdapter> listAdapter;
     private ScanCallback scanCallback;
     private final SharedPreferences prefs;
 
     private Handler bluetoothTimer;
     private long scanRequestTime = Long.MIN_VALUE;
-    private boolean scanInFlight = false;
     private long lastScanResponseTime = Long.MIN_VALUE;
 
     //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
@@ -146,20 +144,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     // scan state
     private long lastDiscoveryAt = 0;
 
-    private final long adUuidNoScanUuid = 0;
-    private final long scanUuidNoAdUuid = 0;
-
     // prev/current sets of BSSIDs for each scan. ~ redundant w/ sets in SetBackedNetworkList in current-only mode...
     //ALIBI: both need to be synchronized since BTLE scan results can mutate/remove a BSSID from prev
-    private Set<String> latestBt = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> latestBt = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBt = Collections.synchronizedSet(new HashSet<>());
 
     //ALIBI: only current synchronized since prev only ever gets copied and counted
-    private Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
+    private final Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBtle = new HashSet<>();
 
-    public BluetoothReceiver(final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
-        this.mainActivity = new WeakReference<>(mainActivity);
+    public BluetoothReceiver(/*TODO:*/final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
         this.prefs = prefs;
@@ -187,7 +181,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
-                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
+                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
                 }
 
                 @Override
@@ -220,7 +214,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     }
 
                     if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true) && forceLeListReset) {
-                        listAdapter.clearBluetoothLe();
+                        listAdapter.get().clearBluetoothLe();
                     }
 
                     if (results.isEmpty()) {
@@ -244,13 +238,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
 
                     if (listAdapter != null) {
-                        listAdapter.batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
+                        listAdapter.get().batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
                                 true, false);
                     }
                     ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                     ListFragment.lameStatic.runBt = runNetworks.size();
                     sort(prefs);
-                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
+                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
                 }
 
                 @Override
@@ -261,7 +255,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             break;
                         default:
                             if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
-                                listAdapter.clearBluetoothLe();
+                                listAdapter.get().clearBluetoothLe();
                             }
                             Logging.error("Bluetooth LE scan error: " + errorCode);
                             scanning.set(false);
@@ -349,7 +343,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     final String capabilities = DEVICE_TYPE_LEGEND.get(
                             bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
-                    if (mainActivity.get() != null) {
+                    if (MainActivity.getMainActivity() != null) {
                         //ALIBI: shamelessly re-using frequency here for device type.
                         final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
                                 scanResult.getRssi(),
@@ -431,13 +425,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             } catch (SecurityException se) {
                 Logging.error("No permission for bluetoothAdapter.cancelDiscovery", se);
             }
-            if (mainActivity.get() != null) {
+            //if (mainActivity.get() != null) {
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
                 if (listAdapter != null && showCurrent) {
-                    listAdapter.clearBluetoothLe();
-                    listAdapter.clearBluetooth();
+                    listAdapter.get().clearBluetoothLe();
+                    listAdapter.get().clearBluetooth();
                 }
-            }
+            //}
 
 
             if (Build.VERSION.SDK_INT >= 21) {
@@ -469,7 +463,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      */
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        final MainActivity m = mainActivity.get();
+        final MainActivity m = MainActivity.getMainActivity();
         if (m != null) {
             if (null == intent) {
                 Logging.error("null intent in Bluetooth onReceive");
@@ -531,7 +525,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     //ALIBI: shamelessly re-using frequency here for device type.
                     final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
                     sort(prefs);
-                    if (listAdapter != null) listAdapter.notifyDataSetChanged();
+                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
                 } catch (SecurityException se) {
                     Logging.error("No permission for device inspection", se);
                 }
@@ -544,11 +538,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
 
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
-                if (listAdapter != null) listAdapter.batchUpdateBt(showCurrent, false, true);
+                if (listAdapter != null) listAdapter.get().batchUpdateBt(showCurrent, false, true);
                 ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                 ListFragment.lameStatic.runBt = runNetworks.size();
                 sort(prefs);
-                if (listAdapter != null) listAdapter.notifyDataSetChanged();
+                if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
             }
         }
     }
@@ -559,7 +553,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private void sort(final SharedPreferences prefs) {
         if (listAdapter != null) {
             try {
-                listAdapter.sort(NetworkListSorter.getSort(prefs));
+                listAdapter.get().sort(NetworkListSorter.getSort(prefs));
             } catch (IllegalArgumentException ex) {
                 Logging.error("sort failed: ",ex);
             }
@@ -570,7 +564,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      * Set display list adapter
      */
     public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
-        this.listAdapter = listAdapter;
+        this.listAdapter = new WeakReference<>(listAdapter);
     }
 
     /**
@@ -585,7 +579,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
      */
     public void setupBluetoothTimer( final boolean turnedBtOn ) {
         Logging.info( "create Bluetooth timer" );
-        final MainActivity m = mainActivity.get();
+        final MainActivity m = MainActivity.getMainActivity();
         if ( bluetoothTimer == null) {
             bluetoothTimer = new Handler();
             final Runnable mUpdateTimeTask = new Runnable() {
@@ -635,9 +629,10 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     public boolean doBluetoothScan() {
         boolean success = false;
-        final MainActivity m = mainActivity.get();
+        final MainActivity m = MainActivity.getMainActivity();
         if (null != m) {
             if (m.isScanning()) {
+                boolean scanInFlight = false;
                 if (!scanInFlight) {
                     try {
                         m.bluetoothScan();
@@ -690,7 +685,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     }
 
     public long getScanPeriod() {
-        final MainActivity m = mainActivity.get();
+        final MainActivity m = MainActivity.getMainActivity();
         if (null != m) {
             String scanPref = PreferenceKeys.PREF_OG_BT_SCAN_PERIOD;
             long defaultRate = MainActivity.OG_BT_SCAN_DEFAULT;
@@ -780,7 +775,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
         }
 
-        final MainActivity m = mainActivity.get();
+        final MainActivity m = MainActivity.getMainActivity();
         final boolean ssidSpeak = prefs.getBoolean(PreferenceKeys.PREF_SPEAK_SSID, false)
                 && null != m && !m.isMuted();
 
@@ -806,21 +801,21 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             //Update display
             if (listAdapter != null) {
                 if (btTypeUpdate) {
-                    listAdapter.morphBluetoothToLe(network);
+                    listAdapter.get().morphBluetoothToLe(network);
                 }
                 if (showCurrent || newForRun) {
                     if (FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, network)) {
                         if (batch) {
                             if (NetworkType.BT.equals(network.getType())) {
-                                listAdapter.enqueueBluetooth(network);
+                                listAdapter.get().enqueueBluetooth(network);
                             } else if (NetworkType.BLE.equals(network.getType())) {
-                                listAdapter.enqueueBluetoothLe(network);
+                                listAdapter.get().enqueueBluetoothLe(network);
                             }
                         } else {
                             if (NetworkType.BT.equals(network.getType())) {
-                                listAdapter.addBluetooth(network);
+                                listAdapter.get().addBluetooth(network);
                             } else if (NetworkType.BLE.equals(network.getType())) {
-                                listAdapter.addBluetoothLe(network);
+                                listAdapter.get().addBluetoothLe(network);
                             }
                         }
                     }

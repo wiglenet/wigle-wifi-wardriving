@@ -1808,7 +1808,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
-                    state.bluetoothReceiver = new BluetoothReceiver(this, state.dbHelper,
+                    state.bluetoothReceiver = new BluetoothReceiver(state.dbHelper,
                             hasLeSupport, prefs);
                     state.bluetoothReceiver.setupBluetoothTimer(true);
                 }

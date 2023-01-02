@@ -153,7 +153,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBtle = new HashSet<>();
 
-    public BluetoothReceiver(/*TODO:*/final MainActivity mainActivity, final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
+    public BluetoothReceiver(final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
         this.prefs = prefs;
@@ -164,17 +164,19 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                 @Override
                 public void onScanResult(int callbackType, ScanResult scanResult) {
-                    final GNSSListener gpsListener = mainActivity.getGPSListener();
-                    //DEBUG:
-                    Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
+                    final MainActivity m = MainActivity.getMainActivity();
                     Location location = null;
-                    if (gpsListener != null) {
-                        final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
-                        final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
-                        gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                        location = gpsListener.getCurrentLocation();
-                    } else {
-                        Logging.warn("Null gpsListener in LE Single Scan Result");
+                    if (m != null) {
+                        final GNSSListener gpsListener = MainActivity.getMainActivity().getGPSListener();
+                        //DEBUG: Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
+                        if (gpsListener != null) {
+                            final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+                            final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
+                            gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
+                            location = gpsListener.getCurrentLocation();
+                        } else {
+                            Logging.warn("Null gpsListener in LE Single Scan Result");
+                        }
                     }
 
                     handleLeScanResult(scanResult, location, false);
@@ -194,10 +196,16 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         return;
                     }
                     //MainActivity.info("LE Batch results: " + results);
-                    final GNSSListener gpsListener = mainActivity.getGPSListener();
-
+                    final MainActivity m = MainActivity.getMainActivity();
                     Location location = null;
-
+                    if (m != null) {
+                        final GNSSListener gpsListener = m.getGPSListener();
+                        if (gpsListener != null) {
+                            location = gpsListener.checkGetLocation(prefs);
+                        } else {
+                            Logging.warn("Null gpsListener in LE Batch Scan Result");
+                        }
+                    }
                     boolean forceLeListReset = false;
                     if (results.isEmpty()) {
                         empties++;
@@ -221,13 +229,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                         //ALIBI: if this was an empty scan result, not further processing is required.
                         return;
                     }
-
-                    if (gpsListener != null) {
-                        location = gpsListener.checkGetLocation(prefs);
-                    } else {
-                        Logging.warn("Null gpsListener in LE Batch Scan Result");
-                    }
-
                     for (final ScanResult scanResult : results) {
                         handleLeScanResult(scanResult, location, true);
                     }
@@ -345,7 +346,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                             bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
                     if (MainActivity.getMainActivity() != null) {
                         //ALIBI: shamelessly re-using frequency here for device type.
-                        final Network network = addOrUpdateBt(bssid, ssid, type, capabilities,
+                        addOrUpdateBt(bssid, ssid, type, capabilities,
                                 scanResult.getRssi(),
                                 NetworkType.BLE, location, prefs, batch);
                     }

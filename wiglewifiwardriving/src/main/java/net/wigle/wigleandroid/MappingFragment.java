@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import static com.google.android.gms.maps.GoogleMap.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -259,10 +261,10 @@ public final class MappingFragment extends Fragment {
             if (null != prefs) {
                 final boolean showTraffic = prefs.getBoolean(PreferenceKeys.PREF_MAP_TRAFFIC, true);
                 googleMap.setTrafficEnabled(showTraffic);
-                final int mapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                final int mapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
                 googleMap.setMapType(mapType);
             } else {
-                googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                googleMap.setMapType(MAP_TYPE_NORMAL);
             }
             final Activity a1 = getActivity();
             if (null != a1) {
@@ -272,7 +274,7 @@ public final class MappingFragment extends Fragment {
             // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
             googleMap.setIndoorEnabled(false);
 
-            googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+            googleMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
                     if (!state.locked) {
@@ -290,7 +292,7 @@ public final class MappingFragment extends Fragment {
             });
 
             googleMap.setOnCameraMoveStartedListener(reason -> {
-                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                if (reason == OnCameraMoveStartedListener.REASON_GESTURE) {
                     if (state.locked) {
                         state.locked = false;
                         if (menu != null) {
@@ -299,10 +301,10 @@ public final class MappingFragment extends Fragment {
                             item.setTitle(name);
                         }
                     }
-                } else if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_API_ANIMATION) {
+                } else if (reason == OnCameraMoveStartedListener.REASON_API_ANIMATION) {
                     //DEBUG: MainActivity.info("Camera moved due to user tap");
                     //TODO: should we combine this case with REASON_GESTURE?
-                } else if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION) {
+                } else if (reason == OnCameraMoveStartedListener.REASON_DEVELOPER_ANIMATION) {
                     //MainActivity.info("Camera moved due to app directive");
                 }
             });
@@ -442,7 +444,7 @@ public final class MappingFragment extends Fragment {
 
                 PolylineOptions pOptions = new PolylineOptions()
                                 .clickable(false);
-                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
                 final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
                 try (Cursor routeCursor = ListFragment.lameStatic.dbHelper
                         .getCurrentVisibleRouteIterator(prefs)) {
@@ -573,7 +575,7 @@ public final class MappingFragment extends Fragment {
                                 if (routePolyline != null) {
                                     final List<LatLng> routePoints = routePolyline.getPoints();
                                     routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
-                                    final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                                    final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
                                     final boolean nightMode = ThemeUtil.shouldUseMapNightMode(getContext(), prefs);
                                     routePolyline.setColor(getRouteColorForMapType(mapMode, nightMode));
 
@@ -913,23 +915,23 @@ public final class MappingFragment extends Fragment {
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
                         public void onMapReady(@NonNull final GoogleMap googleMap) {
-                            int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+                            int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
                             final Activity a = getActivity();
                             switch (newMapType) {
-                                case GoogleMap.MAP_TYPE_NORMAL:
-                                    newMapType = GoogleMap.MAP_TYPE_SATELLITE;
+                                case MAP_TYPE_NORMAL:
+                                    newMapType = MAP_TYPE_SATELLITE;
                                     WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
                                     break;
-                                case GoogleMap.MAP_TYPE_SATELLITE:
-                                    newMapType = GoogleMap.MAP_TYPE_HYBRID;
+                                case MAP_TYPE_SATELLITE:
+                                    newMapType = MAP_TYPE_HYBRID;
                                     WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
                                     break;
-                                case GoogleMap.MAP_TYPE_HYBRID:
-                                    newMapType = GoogleMap.MAP_TYPE_TERRAIN;
+                                case MAP_TYPE_HYBRID:
+                                    newMapType = MAP_TYPE_TERRAIN;
                                     WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
                                     break;
-                                case GoogleMap.MAP_TYPE_TERRAIN:
-                                    newMapType = GoogleMap.MAP_TYPE_NORMAL;
+                                case MAP_TYPE_TERRAIN:
+                                    newMapType = MAP_TYPE_NORMAL;
                                     WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
                                     break;
                                 default:
@@ -1104,8 +1106,8 @@ public final class MappingFragment extends Fragment {
     public static int getRouteColorForMapType(final int mapType, final boolean nightMode) {
         if (nightMode) {
                 return OVERLAY_LIGHT;
-        } else if (mapType != GoogleMap.MAP_TYPE_NORMAL && mapType != GoogleMap.MAP_TYPE_TERRAIN
-                && mapType != GoogleMap.MAP_TYPE_NONE) {
+        } else if (mapType != MAP_TYPE_NORMAL && mapType != MAP_TYPE_TERRAIN
+                && mapType != MAP_TYPE_NONE) {
             return OVERLAY_LIGHT;
         }
         return OVERLAY_DARK;

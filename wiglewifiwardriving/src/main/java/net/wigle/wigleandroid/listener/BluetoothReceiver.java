@@ -426,13 +426,11 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             } catch (SecurityException se) {
                 Logging.error("No permission for bluetoothAdapter.cancelDiscovery", se);
             }
-            //if (mainActivity.get() != null) {
-                final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
-                if (listAdapter != null && showCurrent) {
-                    listAdapter.get().clearBluetoothLe();
-                    listAdapter.get().clearBluetooth();
-                }
-            //}
+            final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
+            if (listAdapter != null && showCurrent) {
+                listAdapter.get().clearBluetoothLe();
+                listAdapter.get().clearBluetooth();
+            }
 
 
             if (Build.VERSION.SDK_INT >= 21) {

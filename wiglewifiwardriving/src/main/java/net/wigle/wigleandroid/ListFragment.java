@@ -511,7 +511,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             TextView text = view.findViewById( R.id.text );
             text.setText( getString(R.string.sort_spin_label) );
 
-            final FragmentActivity a = getActivity();
             final SharedPreferences prefs = getActivity().getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
             final Editor editor = prefs.edit();
 
@@ -569,7 +568,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final State state = MainActivity.getStaticState();
 
         Logging.info( "LIST: on config change" );
-        final FragmentActivity a= this.getActivity();
+        final FragmentActivity a = this.getActivity();
         if (null != a) {
             MainActivity.setLocale( a, newConfig);
         }

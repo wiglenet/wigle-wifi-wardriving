@@ -167,7 +167,7 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                     final MainActivity m = MainActivity.getMainActivity();
                     Location location = null;
                     if (m != null) {
-                        final GNSSListener gpsListener = MainActivity.getMainActivity().getGPSListener();
+                        final GNSSListener gpsListener = m.getGPSListener();
                         //DEBUG: Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
                         if (gpsListener != null) {
                             final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);

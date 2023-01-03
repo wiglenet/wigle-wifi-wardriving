@@ -121,7 +121,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     public void handleDialog(final int dialogId) {
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             final Editor editor = prefs.edit();
             final View view = getView();
 
@@ -182,7 +182,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             // donate
             final boolean isDonate = prefs.getBoolean(PreferenceKeys.PREF_DONATE, false);
             if (isDonate) {
@@ -577,7 +577,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private void updateRegister(final View view) {
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             final String username = prefs.getString(PreferenceKeys.PREF_USERNAME, "");
             final boolean isAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
             if (view != null) {

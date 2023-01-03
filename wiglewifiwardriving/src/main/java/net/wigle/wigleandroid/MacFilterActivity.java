@@ -14,6 +14,7 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import br.com.sapereaude.maskedEditText.MaskedEditText;
 
@@ -23,9 +24,8 @@ import br.com.sapereaude.maskedEditText.MaskedEditText;
 
 public class MacFilterActivity extends AppCompatActivity {
 
-    private String filterType;
     private String filterKey;
-    ArrayList<String> listItems=new ArrayList<>();
+    List<String> listItems=new ArrayList<>();
     AddressFilterAdapter filtersAdapter;
 
 
@@ -37,7 +37,7 @@ public class MacFilterActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
+        String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
         filterKey = "";
         Logging.info(filterType);
         if (FilterActivity.INTENT_DISPLAY_FILTER.equals(filterType)) {
@@ -52,7 +52,7 @@ public class MacFilterActivity extends AppCompatActivity {
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
         if(values.length>0) {
-            listItems = new ArrayList<>(Arrays.asList(values));
+            listItems = Arrays.asList(values);
         }
 
         ListView lv = findViewById(R.id.addr_filter_list_view);
@@ -96,7 +96,7 @@ public class MacFilterActivity extends AppCompatActivity {
      * @param filterKey the preferences key
      * @return true if we've successfully updated preferences, false on existing or fail
      */
-    public static boolean addEntry(ArrayList<String> entries, SharedPreferences prefs,
+    public static boolean addEntry(List<String> entries, SharedPreferences prefs,
                                    final String rawEntry, final String filterKey) {
         String formatted = "";
         for (int i = 0; i < rawEntry.length(); i++) {

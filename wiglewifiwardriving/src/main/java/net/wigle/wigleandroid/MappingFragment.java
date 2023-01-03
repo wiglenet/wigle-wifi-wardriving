@@ -243,7 +243,7 @@ public final class MappingFragment extends Fragment {
 
         // conditionally replace the tile source
         final Activity a = getActivity();
-        final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+        final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
         final boolean visualizeRoute = prefs != null && prefs.getBoolean(PreferenceKeys.PREF_VISUALIZE_ROUTE, false);
         rlView.addView(mapView);
         // guard against not having google play services
@@ -763,7 +763,7 @@ public final class MappingFragment extends Fragment {
         MenuItem item;
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             final boolean showNewDBOnly = prefs.getBoolean(PreferenceKeys.PREF_MAP_ONLY_NEWDB, false);
             final boolean showLabel = prefs.getBoolean(PreferenceKeys.PREF_MAP_LABEL, true);
             final boolean showCluster = prefs.getBoolean(PreferenceKeys.PREF_MAP_CLUSTER, true);
@@ -823,7 +823,7 @@ public final class MappingFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull final MenuItem item ) {
         final Activity a = getActivity();
         if (null != a) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             switch (item.getItemId()) {
                 case MENU_ZOOM_IN: {
                     mapView.getMapAsync(googleMap -> {

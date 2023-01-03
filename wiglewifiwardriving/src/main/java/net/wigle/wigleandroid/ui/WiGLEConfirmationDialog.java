@@ -71,19 +71,16 @@ public class WiGLEConfirmationDialog extends DialogFragment {
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setCancelable(true);
         builder.setTitle("Confirmation"); //TODO: literal string
-        final String checkboxLabel = getArguments().containsKey("checkboxLabel") ? getArguments().getString("checkboxLabel") : null;
+        final String checkboxLabel = getArguments().getString("checkboxLabel");
         if (null != checkboxLabel) {
             View checkBoxView = View.inflate(activity, R.layout.checkbox, null);
             CheckBox checkBox = checkBoxView.findViewById(R.id.checkbox);
             checkBox.setText(checkboxLabel);
             builder.setView(checkBoxView);
         }
-        final String persistPrefKey = getArguments().containsKey("persistPref") ?
-                getArguments().getString("persistPref") : null;
-        final String persistPrefAgreeValue = getArguments().containsKey("persistPrefAgreeValue") ?
-                getArguments().getString("persistPrefAgreeValue") : null;
-        final String persistPrefDisagreeValue = getArguments().containsKey("persistPrefDisagreeValue") ?
-                getArguments().getString("persistPrefDisagreeValue") : null;
+        final String persistPrefKey = getArguments().getString("persistPref");
+        final String persistPrefAgreeValue = getArguments().getString("persistPrefAgreeValue");
+        final String persistPrefDisagreeValue = getArguments().getString("persistPrefDisagreeValue");
 
         builder.setMessage(getArguments().getString("message"));
         final int tabPos = getArguments().getInt("tabPos");

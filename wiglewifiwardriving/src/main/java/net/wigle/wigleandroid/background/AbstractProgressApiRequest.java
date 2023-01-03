@@ -45,8 +45,7 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
                             final String token = json.getString("token");
                             final Context c = fragment.getContext();
                             if (null != c) {
-                                final SharedPreferences prefs = fragment.getContext()
-                                        .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                final SharedPreferences prefs = c.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor edit = prefs.edit();
                                 edit.putString(PreferenceKeys.PREF_AUTHNAME, authname);
                                 edit.apply();

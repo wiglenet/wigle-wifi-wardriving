@@ -2120,7 +2120,20 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 Logging.error("Error registering for gnss: " + ex, ex);
             }
         } else {
-            Logging.error("Failed to setup GPS - SDK < 24");
+            Logging.error("Failed to setup GPS - SDK < 24 ("+Build.VERSION.SDK_INT+")");
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
+                iseDlgBuilder.setMessage(R.string.gps_old_message)
+                        .setTitle(getString(R.string.gps_old_title))
+                        .setCancelable(true)
+                        .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
+                final Dialog dialog = iseDlgBuilder.create();
+                if (!isFinishing()) {
+                    dialog.show();
+                }
+            });
+
         }
 
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);

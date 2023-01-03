@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.NewsItem;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +90,7 @@ public class NewsFragment extends Fragment {
                 getActivity().getPackageName(), getResources());
         handler.setNewsListAdapter(listAdapter);
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "news-cache.json", MainActivity.NEWS_URL, false, false, false,
+                "news-cache.json", UrlConfig.NEWS_URL, false, false, false,
                 ApiDownloader.REQUEST_GET,
                 new ApiListener() {
                     @Override

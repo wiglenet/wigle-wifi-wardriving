@@ -12,11 +12,13 @@ import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.Pair;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MagicEightUtil;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import android.annotation.SuppressLint;
@@ -50,12 +52,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static net.wigle.wigleandroid.ListFragment.PREF_LOG_ROUTES;
 import static net.wigle.wigleandroid.MainActivity.ACTION_GPX_MGMT;
 import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 import static net.wigle.wigleandroid.util.FileUtility.M8B_EXT;
@@ -111,31 +113,23 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupQueryButtons( final View view ) {
         Button button = view.findViewById( R.id.search_button );
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View buttonView) {
+        button.setOnClickListener(buttonView -> {
 
-                final String fail = SearchUtil.setupQuery(view, getActivity(), true);
-                if (null != ListFragment.lameStatic.queryArgs) {
-                    ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
-                }
-                if (fail != null) {
-                    WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
-                } else {
-                    // start db result activity
-                    final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
-                    startActivity(settingsIntent);
-                }
+            final String fail = SearchUtil.setupQuery(view, getActivity(), true);
+            if (null != ListFragment.lameStatic.queryArgs) {
+                ListFragment.lameStatic.queryArgs.setSearchWiGLE(false);
+            }
+            if (fail != null) {
+                WiGLEToast.showOverFragment(getActivity(), R.string.error_general, fail);
+            } else {
+                // start db result activity
+                final Intent settingsIntent = new Intent(getActivity(), DBResultActivity.class);
+                startActivity(settingsIntent);
             }
         });
 
         button = view.findViewById( R.id.reset_button );
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View buttonView) {
-                SearchUtil.clearWiFiBtFields(view);
-            }
-        });
+        button.setOnClickListener(buttonView -> SearchUtil.clearWiFiBtFields(view));
 
     }
 
@@ -157,30 +151,24 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         // actually need this Activity context, for dialogs
 
         final Button csvRunExportButton = view.findViewById( R.id.csv_run_export_button );
-        csvRunExportButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    MainActivity.createConfirmation(fa,
-                            DataFragment.this.getString(R.string.data_export_csv), R.id.nav_data, CSV_RUN_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up CSV run export button");
-                }
+        csvRunExportButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation(fa,
+                        DataFragment.this.getString(R.string.data_export_csv), R.id.nav_data, CSV_RUN_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up CSV run export button");
             }
         });
 
         final Button csvExportButton = view.findViewById( R.id.csv_export_button );
-        csvExportButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    MainActivity.createConfirmation( fa,
-                        DataFragment.this.getString(R.string.data_export_csv_db), R.id.nav_data, CSV_DB_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up CSV export button");
-                }
+        csvExportButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation( fa,
+                    DataFragment.this.getString(R.string.data_export_csv_db), R.id.nav_data, CSV_DB_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up CSV export button");
             }
         });
     }
@@ -192,7 +180,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             public void onClick( final View buttonView ) {
                 final FragmentActivity fa = getActivity();
                 if (fa != null) {
-                    MainActivity.createConfirmation( fa,
+                    WiGLEConfirmationDialog.createConfirmation( fa,
                         DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
                 } else {
                     Logging.error("Null FragmentActivity setting up KML run export button");
@@ -202,32 +190,26 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
 
         final Button kmlExportButton = view.findViewById( R.id.kml_export_button );
-        kmlExportButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    MainActivity.createConfirmation( fa,
-                        DataFragment.this.getString(R.string.data_export_kml_db), R.id.nav_data, KML_DB_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up KML export button");
-                }
+        kmlExportButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation( fa,
+                    DataFragment.this.getString(R.string.data_export_kml_db), R.id.nav_data, KML_DB_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up KML export button");
             }
         });
     }
 
     private void setupBackupDbButton( final View view ) {
         final Button dbBackupButton = view.findViewById( R.id.backup_db_button );
-        dbBackupButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    MainActivity.createConfirmation( fa,
-                        DataFragment.this.getString(R.string.data_backup_db), R.id.nav_data, BACKUP_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up backup confirmation");
-                }
+        dbBackupButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation( fa,
+                    DataFragment.this.getString(R.string.data_backup_db), R.id.nav_data, BACKUP_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up backup confirmation");
             }
         });
     }
@@ -237,11 +219,11 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         SharedPreferences prefs = null;
         Activity a = getActivity();
         if (null != a) {
-            prefs = a.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
         String authname = null;
         if (prefs != null) {
-            authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
         }
 
         if (null == authname) {
@@ -249,17 +231,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         } else if (MainActivity.getMainActivity().isTransferring()) {
                 importObservedButton.setEnabled(false);
         }
-        importObservedButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View buttonView) {
-                final FragmentActivity fa = getActivity();
-                if (null != fa) {
-                    MainActivity.createConfirmation(fa,
-                            DataFragment.this.getString(R.string.data_import_observed),
-                            R.id.nav_data, IMPORT_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
+        importObservedButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (null != fa) {
+                WiGLEConfirmationDialog.createConfirmation(fa,
+                        DataFragment.this.getString(R.string.data_import_observed),
+                        R.id.nav_data, IMPORT_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
         });
     }
@@ -274,17 +253,14 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
         final ObservationImporter task = new ObservationImporter(getActivity(),
                 ListFragment.lameStatic.dbHelper,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(JSONObject object, boolean cached) {
-                        if (mainActivity != null) {
-                            try {
-                                mainActivity.getState().dbHelper.getNetworkCountFromDB();
-                            } catch (DBException dbe) {
-                                Logging.warn("failed DB count update on import-observations", dbe);
-                            }
-                            mainActivity.transferComplete();
+                (object, cached) -> {
+                    if (mainActivity != null) {
+                        try {
+                            mainActivity.getState().dbHelper.getNetworkCountFromDB();
+                        } catch (DBException dbe) {
+                            Logging.warn("failed DB count update on import-observations", dbe);
                         }
+                        mainActivity.transferComplete();
                     }
                 });
         try {
@@ -299,95 +275,80 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         SharedPreferences prefs = null;
         final Activity a = getActivity();
         if (null != a) {
-            prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
 
         // db marker reset button and text
         final TextView tv = view.findViewById(R.id.reset_maxid_text);
         if (null != prefs) {
-            tv.setText(getString(R.string.setting_high_up) + " " + prefs.getLong(ListFragment.PREF_DB_MARKER, 0L));
+            tv.setText(getString(R.string.setting_high_up) + " " + prefs.getLong(PreferenceKeys.PREF_DB_MARKER, 0L));
         }
 
         final Button resetMaxidButton = view.findViewById(R.id.reset_maxid_button);
-        resetMaxidButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (null != fa) {
-                    MainActivity.createConfirmation(fa, getString(R.string.setting_zero_out),
-                            R.id.nav_data, ZERO_OUT_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
+        resetMaxidButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (null != fa) {
+                WiGLEConfirmationDialog.createConfirmation(fa, getString(R.string.setting_zero_out),
+                        R.id.nav_data, ZERO_OUT_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
         });
 
         // db marker maxout button and text
         if (null != prefs) {
             final TextView maxtv = view.findViewById(R.id.maxout_maxid_text);
-            final long maxDB = prefs.getLong(ListFragment.PREF_MAX_DB, 0L);
+            final long maxDB = prefs.getLong(PreferenceKeys.PREF_MAX_DB, 0L);
             maxtv.setText(getString(R.string.setting_max_start) + " " + maxDB);
         }
 
         final Button maxoutMaxidButton = view.findViewById(R.id.maxout_maxid_button);
-        maxoutMaxidButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (null != fa) {
-                    MainActivity.createConfirmation(fa, getString(R.string.setting_max_out),
-                            R.id.nav_data, MAX_OUT_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
+        maxoutMaxidButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (null != fa) {
+                WiGLEConfirmationDialog.createConfirmation(fa, getString(R.string.setting_max_out),
+                        R.id.nav_data, MAX_OUT_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
-        } );
+        });
 
         //ALIBI: not technically a marker button, but clearly belongs with them visually/logically
         final Button deleteDbButton = view.findViewById(R.id.clear_db);
-        deleteDbButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (null != fa) {
-                    MainActivity.createConfirmation(fa, getString(R.string.delete_db_confirm),
-                            R.id.nav_data, DELETE_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
+        deleteDbButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (null != fa) {
+                WiGLEConfirmationDialog.createConfirmation(fa, getString(R.string.delete_db_confirm),
+                        R.id.nav_data, DELETE_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
-        } );
+        });
 
     }
 
     private void setupGpxExport( final View view ) {
         final Activity a = getActivity();
         if (a != null) {
-            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             //ONLY ENABLE IF WE ARE LOGGING
-            if (prefs.getBoolean(PREF_LOG_ROUTES, false)) {
+            if (prefs.getBoolean(PreferenceKeys.PREF_LOG_ROUTES, false)) {
                 final View exportGpxTools = view.findViewById(R.id.export_gpx_tools);
                 exportGpxTools.setVisibility(View.VISIBLE);
                 final Button exportGpxButton = view.findViewById(R.id.export_gpx_button);
-                exportGpxButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(final View buttonView) {
-                        final FragmentActivity fa = getActivity();
-                        if (null != fa) {
-                            MainActivity.createConfirmation(fa, getString(R.string.export_gpx_detail),
-                                    R.id.nav_data, EXPORT_GPX_DIALOG);
-                        } else {
-                            Logging.error("unable to get fragment activity");
-                        }
+                exportGpxButton.setOnClickListener(buttonView -> {
+                    final FragmentActivity fa = getActivity();
+                    if (null != fa) {
+                        WiGLEConfirmationDialog.createConfirmation(fa, getString(R.string.export_gpx_detail),
+                                R.id.nav_data, EXPORT_GPX_DIALOG);
+                    } else {
+                        Logging.error("unable to get fragment activity");
                     }
                 });
                 final Button manageGpxButton = view.findViewById(R.id.manage_gpx_button);
-                manageGpxButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final Intent gpxIntent = new Intent(a.getApplicationContext(), GpxManagementActivity.class);
-                        a.startActivityForResult(gpxIntent, ACTION_GPX_MGMT);
-                    }
+                manageGpxButton.setOnClickListener(v -> {
+                    final Intent gpxIntent = new Intent(a.getApplicationContext(), GpxManagementActivity.class);
+                    a.startActivityForResult(gpxIntent, ACTION_GPX_MGMT);
                 });
             }
         }
@@ -395,16 +356,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupM8bExport( final View view ) {
         final Button exportM8bButton = view.findViewById(R.id.export_m8b_button);
-        exportM8bButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View buttonView) {
-                final FragmentActivity fa = getActivity();
-                if (null != fa) {
-                    MainActivity.createConfirmation(fa, getString(R.string.export_m8b_detail),
-                            R.id.nav_data, EXPORT_M8B_DIALOG);
-                } else {
-                    Logging.error("unable to get fragment activity");
-                }
+        exportM8bButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (null != fa) {
+                WiGLEConfirmationDialog.createConfirmation(fa, getString(R.string.export_m8b_detail),
+                        R.id.nav_data, EXPORT_M8B_DIALOG);
+            } else {
+                Logging.error("unable to get fragment activity");
             }
         });
     }
@@ -414,7 +372,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
     public void handleDialog(final int dialogId) {
         SharedPreferences prefs = null;
         if (getActivity() != null) {
-            prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
         SharedPreferences.Editor editor = null;
         if (null != prefs) {
@@ -463,7 +421,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             }
             case ZERO_OUT_DIALOG: {
                 if (null != editor) {
-                    editor.putLong(ListFragment.PREF_DB_MARKER, 0L);
+                    editor.putLong(PreferenceKeys.PREF_DB_MARKER, 0L);
                     editor.apply();
                     if (view != null) {
                         final TextView tv = view.findViewById(R.id.reset_maxid_text);
@@ -476,8 +434,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
             }
             case MAX_OUT_DIALOG: {
                 if (prefs != null && editor != null) {
-                    final long maxDB = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
-                    editor.putLong( ListFragment.PREF_DB_MARKER, maxDB );
+                    final long maxDB = prefs.getLong( PreferenceKeys.PREF_MAX_DB, 0L );
+                    editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxDB );
                     editor.apply();
                     if (view != null) {
                         // set the text on the other button
@@ -495,8 +453,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 ListFragment.lameStatic.dbHelper.clearDatabase();
                 //update markers
                 if (null != editor) {
-                    editor.putLong(ListFragment.PREF_DB_MARKER, 0L);
-                    editor.putLong(ListFragment.PREF_DB_MARKER, 0L);
+                    editor.putLong(PreferenceKeys.PREF_DB_MARKER, 0L);
+                    editor.putLong(PreferenceKeys.PREF_DB_MARKER, 0L);
                     editor.apply();
                     if (view != null) {
                         final TextView tv = view.findViewById(R.id.reset_maxid_text);
@@ -863,7 +821,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                     // Tidy up the finished writer
                     if (null != out) {
                         try {
-                            Charset utf8  = Charset.forName("UTF-8");
+                            Charset utf8  = StandardCharsets.UTF_8;
 
                             ByteBuffer bb = ByteBuffer.allocate(4096).order(ByteOrder.LITTLE_ENDIAN); // screw you, java
 

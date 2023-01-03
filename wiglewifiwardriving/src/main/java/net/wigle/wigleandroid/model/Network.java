@@ -66,7 +66,7 @@ public final class Network implements ClusterItem {
     public static final int CRYPTO_WPA3 = 4;
 
     public enum NetworkBand {
-        WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED;
+        WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED
     }
     /**
      * convenience constructor

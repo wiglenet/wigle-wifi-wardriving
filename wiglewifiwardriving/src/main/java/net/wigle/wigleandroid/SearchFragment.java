@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SearchUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -66,8 +67,8 @@ public class SearchFragment extends Fragment {
 
         final Activity a = getActivity();
         final SharedPreferences prefs = (null != a)?a.getApplicationContext().
-                getSharedPreferences(ListFragment.SHARED_PREFS, 0):null;
-        if ((null == prefs || prefs.getString(ListFragment.PREF_AUTHNAME, "").isEmpty()) || !TokenAccess.hasApiToken(prefs)) {
+                getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+        if ((null == prefs || prefs.getString(PreferenceKeys.PREF_AUTHNAME, "").isEmpty()) || !TokenAccess.hasApiToken(prefs)) {
             RadioButton rb = scrollView.findViewById(R.id.radio_search_local);
             if (null != rb) {
                 rb.setChecked(true);

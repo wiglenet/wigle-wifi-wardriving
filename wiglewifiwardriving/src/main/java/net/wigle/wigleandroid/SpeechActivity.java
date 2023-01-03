@@ -9,12 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
+
+import java.util.Objects;
 
 public class SpeechActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
@@ -40,25 +41,25 @@ public class SpeechActivity extends AppCompatActivity {
         // force media volume controls
         this.setVolumeControlStream( AudioManager.STREAM_MUSIC );
 
-        final SharedPreferences prefs = this.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        doTtsCheckbox( prefs, R.id.speech_gps, ListFragment.PREF_SPEECH_GPS );
-        doTtsCheckbox( prefs, R.id.speech_run, ListFragment.PREF_SPEAK_RUN );
-        doTtsCheckbox( prefs, R.id.speech_new_wifi, ListFragment.PREF_SPEAK_NEW_WIFI );
-        doTtsCheckbox( prefs, R.id.speech_new_cell, ListFragment.PREF_SPEAK_NEW_CELL );
-        doTtsCheckbox( prefs, R.id.speech_queue, ListFragment.PREF_SPEAK_QUEUE );
-        doTtsCheckbox( prefs, R.id.speech_miles, ListFragment.PREF_SPEAK_MILES );
-        doTtsCheckbox( prefs, R.id.speech_time, ListFragment.PREF_SPEAK_TIME );
-        doTtsCheckbox( prefs, R.id.speech_battery, ListFragment.PREF_SPEAK_BATTERY );
-        doTtsCheckbox( prefs, R.id.speech_ssid, ListFragment.PREF_SPEAK_SSID, false );
-        doTtsCheckbox( prefs, R.id.speech_wifi_restart, ListFragment.PREF_SPEAK_WIFI_RESTART );
+        final SharedPreferences prefs = this.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        doTtsCheckbox( prefs, R.id.speech_gps, PreferenceKeys.PREF_SPEECH_GPS );
+        doTtsCheckbox( prefs, R.id.speech_run, PreferenceKeys.PREF_SPEAK_RUN );
+        doTtsCheckbox( prefs, R.id.speech_new_wifi, PreferenceKeys.PREF_SPEAK_NEW_WIFI );
+        doTtsCheckbox( prefs, R.id.speech_new_cell, PreferenceKeys.PREF_SPEAK_NEW_CELL );
+        doTtsCheckbox( prefs, R.id.speech_queue, PreferenceKeys.PREF_SPEAK_QUEUE );
+        doTtsCheckbox( prefs, R.id.speech_miles, PreferenceKeys.PREF_SPEAK_MILES );
+        doTtsCheckbox( prefs, R.id.speech_time, PreferenceKeys.PREF_SPEAK_TIME );
+        doTtsCheckbox( prefs, R.id.speech_battery, PreferenceKeys.PREF_SPEAK_BATTERY );
+        doTtsCheckbox( prefs, R.id.speech_ssid, PreferenceKeys.PREF_SPEAK_SSID, false );
+        doTtsCheckbox( prefs, R.id.speech_wifi_restart, PreferenceKeys.PREF_SPEAK_WIFI_RESTART );
 
         // speech spinner
         Spinner spinner = findViewById(R.id.speak_spinner );
         //TODO: this may no longer be necessary
-        if (MainActivity.getMainActivity() == null || MainActivity.getStaticState().tts == null) {
+        if (MainActivity.getMainActivity() == null || Objects.requireNonNull(MainActivity.getStaticState()).tts == null) {
             // no text to speech :(
             spinner.setEnabled( false );
-            final TextView speakText = (TextView) findViewById(R.id.speak_text );
+            final TextView speakText = findViewById(R.id.speak_text );
             speakText.setText(getString(R.string.no_tts));
         }
 
@@ -69,7 +70,7 @@ public class SpeechActivity extends AppCompatActivity {
         final Long[] speechPeriods = new Long[]{ 10L,15L,30L,60L,120L,300L,600L,900L,1800L,0L };
         final String[] speechName = new String[]{ "10" + sec,"15" + sec,"30" + sec,
                 "1" + min,"2" + min,"5" + min,"10" + min,"15" + min,"30" + min, off };
-        SettingsUtil.doSpinner((Spinner)findViewById(R.id.speak_spinner), ListFragment.PREF_SPEECH_PERIOD,
+        SettingsUtil.doSpinner(findViewById(R.id.speak_spinner), PreferenceKeys.PREF_SPEECH_PERIOD,
                 MainActivity.DEFAULT_SPEECH_PERIOD, speechPeriods, speechName, this);
     }
 
@@ -86,17 +87,14 @@ public class SpeechActivity extends AppCompatActivity {
     private void doTtsCheckbox(final SharedPreferences prefs, final int id, final String pref, final boolean defaultVal ) {
         final CheckBox box = findViewById( id );
         box.setChecked( prefs.getBoolean( pref, defaultVal ) );
-        box.setOnCheckedChangeListener( new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                final Editor editor = prefs.edit();
-                editor.putBoolean( pref, isChecked );
-                editor.apply();
-                if (!isChecked) {
-                    MainActivity m = MainActivity.getMainActivity();
-                    if (null != m && !m.isFinishing()) {
-                        m.interruptSpeak();
-                    }
+        box.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            final Editor editor = prefs.edit();
+            editor.putBoolean( pref, isChecked );
+            editor.apply();
+            if (!isChecked) {
+                MainActivity m = MainActivity.getMainActivity();
+                if (null != m && !m.isFinishing()) {
+                    m.interruptSpeak();
                 }
             }
         });

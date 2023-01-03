@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.core.view.MenuItemCompat;
@@ -31,6 +34,8 @@ import net.wigle.wigleandroid.model.RankUser;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -108,8 +113,10 @@ public class RankStatsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
-        MainActivity.setLocale(getActivity());
-
+        final Activity a = getActivity();
+        if (null != a) {
+            MainActivity.setLocale(a);
+        }
         // media volume
         getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -131,43 +138,43 @@ public class RankStatsFragment extends Fragment {
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
-        handler = new RankDownloadHandler(rootView, numberFormat,
-                getActivity().getPackageName(), getResources(), monthRanking);
-        handler.setRankListAdapter(listAdapter);
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final Activity a = getActivity();
+        if (null != a) {
+            handler = new RankDownloadHandler(rootView, numberFormat,
+                    getActivity().getPackageName(), getResources(), monthRanking);
+            handler.setRankListAdapter(listAdapter);
+            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
 
-        //TODO: we should only perform user DL if there's a user set
-        UserStatsFragment.executeUserDownload(this, new UserStatsFragment.UserDownloadApiListener(new Handler() {
-            @Override
-            public void handleMessage(final Message msg) {
-                final Bundle bundle = msg.getData();
-                final boolean isCache = bundle.getBoolean(UserStatsFragment.KEY_IS_CACHE);
-                Logging.info("got user message, isCache: " + isCache);
+            //TODO: we should only perform user DL if there's a user set
+            UserStatsFragment.executeUserDownload(this, new UserStatsFragment.UserDownloadApiListener(new Handler() {
+                @Override
+                public void handleMessage(final Message msg) {
+                    final Bundle bundle = msg.getData();
+                    final boolean isCache = bundle.getBoolean(UserStatsFragment.KEY_IS_CACHE);
+                    Logging.info("got user message, isCache: " + isCache);
 
-                final SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong( ListFragment.PREF_RANK, bundle.getLong(UserStatsFragment.KEY_RANK) );
-                editor.putLong( ListFragment.PREF_MONTH_RANK, bundle.getLong(UserStatsFragment.KEY_MONTH_RANK) );
-                editor.apply();
-                downloadRanks(isCache);
-            }
-        }));
+                    final SharedPreferences.Editor editor = prefs.edit();
+                    editor.putLong(ListFragment.PREF_RANK, bundle.getLong(UserStatsFragment.KEY_RANK));
+                    editor.putLong(ListFragment.PREF_MONTH_RANK, bundle.getLong(UserStatsFragment.KEY_MONTH_RANK));
+                    editor.apply();
+                    downloadRanks(isCache);
+                }
+            }));
+        }
 
         return rootView;
     }
 
     private void setupSwipeRefresh(final LinearLayout rootView) {
         // Lookup the swipe container view
-        final SwipeRefreshLayout swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.rank_swipe_container);
+        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
 
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                downloadRanks(false);
-            }
+        swipeContainer.setOnRefreshListener(() -> {
+            // Your code to refresh the list here.
+            // Make sure you call swipeContainer.setRefreshing(false)
+            // once the network request has completed successfully.
+            downloadRanks(false);
         });
     }
 
@@ -189,7 +196,7 @@ public class RankStatsFragment extends Fragment {
         if (userCentric.get()) {
             top = "";
             final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
-            final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             final long userRank = prefs.getLong(userRankKey, 0);
             final long startRank = userRank - 50;
             pageStart = startRank > 0 ? startRank : 0;
@@ -201,17 +208,12 @@ public class RankStatsFragment extends Fragment {
 
         final String cacheName = (doMonthRanking ? "month" : "all") + top;
 
-        final String monthUrl = MainActivity.RANK_STATS_URL + "?pagestart=" + pageStart
+        final String monthUrl = UrlConfig.RANK_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
         final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
                 "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
                 ApiDownloader.REQUEST_GET,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleRankStats(json, handler, finalSelected);
-                    }
-                });
+                (json, isCache1) -> handleRankStats(json, handler, finalSelected));
         task.setCacheOnly(isCache);
         try {
             task.startDownload(this);
@@ -222,17 +224,18 @@ public class RankStatsFragment extends Fragment {
     }
 
     private void setupListView(final View view) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        if (listAdapter == null) {
-            listAdapter = new RankListAdapter(getActivity(), R.layout.rankrow);
-        } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
-            listAdapter.clear();
+        final Activity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            if (listAdapter == null) {
+                listAdapter = new RankListAdapter(getActivity(), R.layout.rankrow);
+            } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {
+                listAdapter.clear();
+            }
+            // always set our current list adapter
+            final ListView listView = view.findViewById(R.id.rank_list_view);
+            listView.setAdapter(listAdapter);
         }
-
-        // always set our current list adapter
-        final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
-        listView.setAdapter(listAdapter);
-
     }
 
     private final static class RankDownloadHandler extends DownloadHandler {
@@ -256,7 +259,7 @@ public class RankStatsFragment extends Fragment {
             final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
             // MainActivity.info("handleMessage. results: " + results);
             if (msg.what == MSG_RANKING_DONE && results != null && rankListAdapter != null) {
-                TextView tv = (TextView) view.findViewById(R.id.rankstats_type);
+                TextView tv = view.findViewById(R.id.rankstats_type);
                 final boolean doMonthRanking = monthRanking.get();
                 tv.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
                 final String rankDiffKey = doMonthRanking ? KEY_PREV_MONTH_RANK : KEY_PREV_RANK;
@@ -275,11 +278,11 @@ public class RankStatsFragment extends Fragment {
                         rankListAdapter.add(rankUser);
                     }
                 }
-                final ListView listView = (ListView) view.findViewById(R.id.rank_list_view);
+                final ListView listView = view.findViewById(R.id.rank_list_view);
                 listView.setSelectionFromTop((int)selected, 20);
 
                 final SwipeRefreshLayout swipeRefreshLayout =
-                        (SwipeRefreshLayout) view.findViewById(R.id.rank_swipe_container);
+                        view.findViewById(R.id.rank_swipe_container);
                 swipeRefreshLayout.setRefreshing(false);
             }
             //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
@@ -336,7 +339,10 @@ public class RankStatsFragment extends Fragment {
     public void onResume() {
         Logging.info("RANKSTATS: onResume");
         super.onResume();
-        getActivity().setTitle(R.string.rank_stats_app_name);
+        final Activity a = getActivity();
+        if (null != a) {
+            a.setTitle(R.string.rank_stats_app_name);
+        }
     }
 
     @Override
@@ -358,24 +364,24 @@ public class RankStatsFragment extends Fragment {
     }
 
     @Override
-    public void onConfigurationChanged( final Configuration newConfig ) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
         Logging.info("RANKSTATS: config changed");
         super.onConfigurationChanged( newConfig );
     }
 
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
         item.setIcon( android.R.drawable.ic_menu_myplaces );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
         item.setIcon(android.R.drawable.ic_menu_myplaces);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
         item.setIcon( R.drawable.wiglewifi_small_black_white );
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        MenuItemCompat.setShowAsAction(item, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(0, MENU_SITE_STATS, 0, getString(R.string.site_stats_app_name));
         item.setIcon(R.drawable.wiglewifi_small_black_white);
@@ -399,27 +405,29 @@ public class RankStatsFragment extends Fragment {
 
     /* Handles item selections */
     @Override
-    public boolean onOptionsItemSelected( final MenuItem item ) {
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
-
-        switch ( item.getItemId() ) {
-            case MENU_USER_STATS:
-                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
-                return true;
-            case MENU_SITE_STATS:
-                MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
-                return true;
-            case MENU_RANK_SWAP:
-                monthRanking.set(!monthRanking.get());
-                item.setTitle(getRankSwapString());
-                downloadRanks(false);
-                return true;
-            case MENU_USER_CENTRIC_SWAP:
-                userCentric.set(!userCentric.get());
-                item.setTitle(getUserCentricSwapString());
-                downloadRanks(false);
-                return true;
+        final Activity a = getActivity();
+        if (null != a) {
+            NavigationView navigationView = a.findViewById(R.id.left_drawer);
+            switch ( item.getItemId() ) {
+                case MENU_USER_STATS:
+                    MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);
+                    return true;
+                case MENU_SITE_STATS:
+                    MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
+                    return true;
+                case MENU_RANK_SWAP:
+                    monthRanking.set(!monthRanking.get());
+                    item.setTitle(getRankSwapString());
+                    downloadRanks(false);
+                    return true;
+                case MENU_USER_CENTRIC_SWAP:
+                    userCentric.set(!userCentric.get());
+                    item.setTitle(getUserCentricSwapString());
+                    downloadRanks(false);
+                    return true;
+            }
         }
         return false;
     }

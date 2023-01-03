@@ -16,12 +16,12 @@ import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,12 +31,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -64,6 +61,7 @@ import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -105,7 +103,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         setContentView(R.layout.network);
         networkActivity = this;
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         ThemeUtil.setNavTheme(getWindow(), this, prefs);
 
         final Intent intent = getIntent();
@@ -242,7 +240,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         if (mapView != null) {
             mapView.onResume();
         } else {
-            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             setupMap( network, null, prefs);
         }
     }
@@ -257,7 +255,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         Logging.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
         if (mapView != null) {
@@ -299,7 +297,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     final int zoomLevel = computeZoom(obsMap, estCentroid);
                     mapView.getMapAsync(new OnMapReadyCallback() {
                         @Override
-                        public void onMapReady(final GoogleMap googleMap) {
+                        public void onMapReady(@NonNull final GoogleMap googleMap) {
                             int count = 0;
                             int maxDistMeters = 0;
                             for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
@@ -321,7 +319,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                                 count++;
                             }
                             // if we got a good centroid, display it and center on it
-                            if (null != estCentroid && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+                            if (estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
                                 //TODO: improve zoom based on obs distances?
                                 final CameraPosition cameraPosition = new CameraPosition.Builder()
                                         .target(estCentroid).zoom(zoomLevel).build();
@@ -360,7 +358,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         ListFragment.lameStatic.dbHelper.addToQueue( request );
     }
 
-    private final LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
+    private LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
         double latSum = 0.0;
         double lonSum = 0.0;
         double weightSum = 0.0;
@@ -386,7 +384,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         return new LatLng(trilateratedLatitude, trilateratedLongitude);
     }
 
-    private final int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
+    private int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
         float maxDist = 0f;
         for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
             float[] res = new float[3];
@@ -422,12 +420,10 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     /**
      * optimistic signal weighting
-     * @param signal
-     * @return
      */
     public static float cleanSignal(Float signal) {
         float signalMemo = signal;
-        if (signal == null || signal == 0f) {
+        if (signal == 0f) {
             return 100f;
         } else if (signal >= -200 && signal < 0) {
             signalMemo += 200f;
@@ -444,12 +440,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         mapView = new MapView( this );
         try {
             mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(final GoogleMap googleMap) {
-                    ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json);
-                }
-            });
+            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
         }
         catch (NullPointerException ex) {
             Logging.error("npe in mapView.onCreate: " + ex, ex);
@@ -457,21 +448,18 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         MapsInitializer.initialize( this );
 
         if ((network != null) && (network.getLatLng() != null)) {
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(final GoogleMap googleMap) {
-                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            mapView.getMapAsync(googleMap -> {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                    googleMap.addCircle(new CircleOptions()
-                            .center(network.getLatLng())
-                            .radius(5)
-                            .fillColor(Color.argb(128, 240, 240, 240))
-                            .strokeColor(Color.argb(200, 255, 32, 32))
-                            .strokeWidth(3f)
-                            .zIndex(100));
-                }
+                googleMap.addCircle(new CircleOptions()
+                        .center(network.getLatLng())
+                        .radius(5)
+                        .fillColor(Color.argb(128, 240, 240, 240))
+                        .strokeColor(Color.argb(200, 255, 32, 32))
+                        .strokeWidth(3f)
+                        .zIndex(100));
             });
         }
 
@@ -480,8 +468,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     }
 
     private void setupButtons( final Network network, final SharedPreferences prefs ) {
-        final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
-        final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+        final ArrayList<String> hideAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
+        final ArrayList<String> blockAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
 
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             final View filterRowView = findViewById(R.id.filter_row);
@@ -506,36 +494,33 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             }
 
 
-            hideMacButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a display-exclude row fot MAC
+            hideMacButton.setOnClickListener(buttonView -> {
+                // add a display-exclude row fot MAC
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                            prefs, network.getBssid().replace(":",""), PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
                     hideMacButton.setEnabled(false);
                 }
             });
 
-            hideOuiButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a display-exclude row fot OUI
+            hideOuiButton.setOnClickListener(buttonView -> {
+                // add a display-exclude row fot OUI
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":","").substring(0,6),
-                            ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
-                    hideOuiButton.setEnabled(false);
+                            prefs, network.getBssid().replace(":", "").substring(0, 6),
+                            PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
                 }
+                hideOuiButton.setEnabled(false);
             });
 
-            disableLogMacButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a log-exclude row fot OUI
+            disableLogMacButton.setOnClickListener(buttonView -> {
+                // add a log-exclude row fot OUI
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(blockAddresses,
-                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+                            prefs, network.getBssid().replace(":", ""), PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
                     //TODO: should this also delete existing records?
-                    disableLogMacButton.setEnabled(false);
                 }
+                disableLogMacButton.setEnabled(false);
             });
         }
     }
@@ -543,7 +528,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private ArrayList<String> addressListForPref(final SharedPreferences prefs, final String key) {
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(key, "[]"), String[].class);
-        return new ArrayList<String>(Arrays.asList(values));
+        return new ArrayList<>(Arrays.asList(values));
     }
 
     private int getExistingSsid( final String ssid ) {
@@ -630,13 +615,16 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             final Dialog dialog = getDialog();
             View view = inflater.inflate(R.layout.cryptodialog, container);
-            dialog.setTitle(getArguments().getString("ssid"));
+            final Bundle args = getArguments();
+            if (null != dialog) {
+                dialog.setTitle(args != null ? args.getString("ssid") : "");
+            }
 
             TextView text = view.findViewById( R.id.security );
-            text.setText(getArguments().getString("capabilities"));
+            text.setText(args != null?args.getString("capabilities"):"");
 
             text = view.findViewById( R.id.signal );
-            text.setText(getArguments().getString("level"));
+            text.setText(args != null?args.getString("level"):"");
 
             final Button ok = view.findViewById( R.id.ok_button );
 
@@ -651,49 +639,46 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             });
 
             final CheckBox showpass = view.findViewById( R.id.showpass );
-            showpass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                    if ( isChecked ) {
-                        password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
-                        password.setTransformationMethod( null );
-                    }
-                    else {
-                        password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
-                        password.setTransformationMethod(
-                                android.text.method.PasswordTransformationMethod.getInstance() );
-                    }
+            showpass.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if ( isChecked ) {
+                    password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
+                    password.setTransformationMethod( null );
+                }
+                else {
+                    password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
+                    password.setTransformationMethod(
+                            android.text.method.PasswordTransformationMethod.getInstance() );
                 }
             });
 
-            ok.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    try {
-                        final NetworkActivity networkActivity = (NetworkActivity) getActivity();
-                        networkActivity.connectToNetwork( password.getText().toString() );
+            ok.setOnClickListener(buttonView -> {
+                try {
+                    final NetworkActivity networkActivity = (NetworkActivity) getActivity();
+                    if (networkActivity != null && password.getText() != null) {
+                        networkActivity.connectToNetwork(password.getText().toString());
+                    }
+                    if (null != dialog) {
                         dialog.dismiss();
                     }
-                    catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        Logging.info( "exception dismissing crypto dialog: " + ex );
-                    }
                 }
-            } );
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing crypto dialog: " + ex );
+                }
+            });
 
             Button cancel = view.findViewById( R.id.cancel_button );
-            cancel.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    try {
+            cancel.setOnClickListener(buttonView -> {
+                try {
+                    if (null != dialog) {
                         dialog.dismiss();
                     }
-                    catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        Logging.info( "exception dismissing crypto dialog: " + ex );
-                    }
                 }
-            } );
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing crypto dialog: " + ex );
+                }
+            });
 
             return view;
         }

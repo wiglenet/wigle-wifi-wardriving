@@ -35,6 +35,8 @@ import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -200,7 +202,7 @@ public class UploadsFragment extends Fragment {
         }
         if (busy.compareAndSet(false, true)) {
             final int pageStart = page * ROW_COUNT;
-            final String downloadUrl = MainActivity.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
+            final String downloadUrl = UrlConfig.UPLOADS_STATS_URL + "?pagestart=" + pageStart + "&pageend=" + (pageStart + ROW_COUNT);
             final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper, null,
                     /*page == 0 ? "uploads-cache.json" : "uploads-cache-p" + page + ".json",*/
                     //ALIBI: cachefiles are too problematic with infinite scroll
@@ -228,7 +230,7 @@ public class UploadsFragment extends Fragment {
         final Activity a = getActivity();
         SharedPreferences prefs;
         if (null != a) {
-            prefs = a.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (listAdapter == null) {
                 listAdapter = new UploadsListAdapter(getActivity(), R.layout.uploadrow, prefs, this);
             } else if (!listAdapter.isEmpty() && !TokenAccess.hasApiToken(prefs)) {

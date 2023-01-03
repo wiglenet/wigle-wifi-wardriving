@@ -28,8 +28,8 @@ import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.util.CellNetworkLegend;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -156,7 +156,7 @@ public class WifiReceiver extends BroadcastReceiver {
         Logging.info("wifi receive, results: " + (results == null ? null : results.size()));
 
         long nonstopScanRequestTime = Long.MIN_VALUE;
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         final long period = getScanPeriod();
         if ( period == 0 ) {
             // treat as "continuous", so request scan in here
@@ -199,7 +199,7 @@ public class WifiReceiver extends BroadcastReceiver {
             lastHaveLocationTime = now;
         }
 
-        final boolean showCurrent = prefs.getBoolean( ListFragment.PREF_SHOW_CURRENT, true );
+        final boolean showCurrent = prefs.getBoolean( PreferenceKeys.PREF_SHOW_CURRENT, true );
         if ( showCurrent && listAdapter != null ) {
             listAdapter.clearWifiAndCell();
         }
@@ -211,13 +211,13 @@ public class WifiReceiver extends BroadcastReceiver {
         int resultSize = 0;
         int newWifiForRun = 0;
 
-        final boolean ssidSpeak = prefs.getBoolean( ListFragment.PREF_SPEAK_SSID, false )
+        final boolean ssidSpeak = prefs.getBoolean( PreferenceKeys.PREF_SPEAK_SSID, false )
                 && ! mainActivity.isMuted();
 
         //TODO: should we memoize the ssidMatcher in the MainActivity state as well?
-        final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, ListFragment.FILTER_PREF_PREFIX );
-        final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS );
-        final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( ListFragment.PREF_EXCLUDE_LOG_ADDRS );
+        final Matcher ssidMatcher = FilterMatcher.getSsidFilterMatcher( prefs, PreferenceKeys.FILTER_PREF_PREFIX );
+        final Matcher bssidMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS );
+        final Matcher bssidDbMatcher = mainActivity.getBssidFilterMatcher( PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS );
 
         // can be null on shutdown
         if ( results != null ) {
@@ -251,7 +251,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
                 // if we're showing current, or this was just added, put on the list
                 if ( showCurrent || added ) {
-                    if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, network ) ) {
+                    if ( FilterMatcher.isOk( ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, network ) ) {
                         if (listAdapter != null) {
                             listAdapter.addWiFi( network );
                         }
@@ -318,8 +318,8 @@ public class WifiReceiver extends BroadcastReceiver {
         prevNewNetCount = newWifiCount;
 
         if ( ! mainActivity.isMuted() ) {
-            final boolean playRun = prefs.getBoolean( ListFragment.PREF_FOUND_SOUND, true );
-            final boolean playNew = prefs.getBoolean( ListFragment.PREF_FOUND_NEW_SOUND, true );
+            final boolean playRun = prefs.getBoolean( PreferenceKeys.PREF_FOUND_SOUND, true );
+            final boolean playNew = prefs.getBoolean( PreferenceKeys.PREF_FOUND_NEW_SOUND, true );
             if ( newNetDiff > 0 && playNew ) {
                 mainActivity.playNewNetSound();
             }
@@ -343,7 +343,7 @@ public class WifiReceiver extends BroadcastReceiver {
                 final Network cellNetwork = cellNetworks.get(key);
                 if (cellNetwork != null) {
                     resultSize++;
-                    if (showCurrent && listAdapter != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, ListFragment.FILTER_PREF_PREFIX, cellNetwork)) {
+                    if (showCurrent && listAdapter != null && FilterMatcher.isOk(ssidMatcher, bssidMatcher, prefs, PreferenceKeys.FILTER_PREF_PREFIX, cellNetwork)) {
                         listAdapter.addCell(cellNetwork);
                     }
                     if (runNetworks.size() > preCellForRun) {
@@ -423,7 +423,7 @@ public class WifiReceiver extends BroadcastReceiver {
             ssidSpeaker.speak();
         }
 
-        final long speechPeriod = prefs.getLong( ListFragment.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
+        final long speechPeriod = prefs.getLong( PreferenceKeys.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
         if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
             doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
         }
@@ -500,7 +500,7 @@ public class WifiReceiver extends BroadcastReceiver {
             if (MainActivity.DEBUG_CELL_DATA) {
                 Logging.info("cell: " + cellInfo + " class: " + cellInfo.getClass().getCanonicalName());
             }
-            GsmOperator g = null;
+            GsmOperator g;
             try {
                 switch (cellInfo.getClass().getSimpleName()) {
                     case "CellInfoCdma":
@@ -715,37 +715,37 @@ public class WifiReceiver extends BroadcastReceiver {
      * Voice announcement method for scan
      */
     private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         StringBuilder builder = new StringBuilder();
 
-        if ( mainActivity.getGPSListener().getCurrentLocation() == null && prefs.getBoolean( ListFragment.PREF_SPEECH_GPS, true ) ) {
+        if ( mainActivity.getGPSListener().getCurrentLocation() == null && prefs.getBoolean( PreferenceKeys.PREF_SPEECH_GPS, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_no_gps_fix)).append(", ");
         }
 
         // run, new, queue, miles, time, battery
-        if ( prefs.getBoolean( ListFragment.PREF_SPEAK_RUN, true ) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_RUN, true ) ) {
             builder.append(mainActivity.getString(R.string.run)).append(" ")
                     .append(runNetworks.size()).append( ", " );
         }
-        if ( prefs.getBoolean( ListFragment.PREF_SPEAK_NEW_WIFI, true ) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_WIFI, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_new_wifi)).append(" ")
                     .append(newWifiCount).append( ", " );
         }
-        if ( prefs.getBoolean( ListFragment.PREF_SPEAK_NEW_CELL, true ) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_CELL, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_new_cell)).append(" ")
                     .append(newCellCount).append( ", " );
         }
-        if ( preQueueSize > 0 && prefs.getBoolean( ListFragment.PREF_SPEAK_QUEUE, true ) ) {
+        if ( preQueueSize > 0 && prefs.getBoolean( PreferenceKeys.PREF_SPEAK_QUEUE, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_queue)).append(" ")
                     .append(preQueueSize).append( ", " );
         }
-        if ( prefs.getBoolean( ListFragment.PREF_SPEAK_MILES, true ) ) {
-            final float dist = prefs.getFloat( ListFragment.PREF_DISTANCE_RUN, 0f );
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_MILES, true ) ) {
+            final float dist = prefs.getFloat( PreferenceKeys.PREF_DISTANCE_RUN, 0f );
             final String distString = UINumberFormat.metersToString(prefs, numberFormat1, mainActivity, dist, false );
             builder.append(mainActivity.getString(R.string.tts_from)).append(" ")
                     .append(distString).append( ", " );
         }
-        if ( prefs.getBoolean( ListFragment.PREF_SPEAK_TIME, true ) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_TIME, true ) ) {
             String time = timeFormat.format( new Date() );
             // time is hard to say.
             time = time.replace(" 00", " " + mainActivity.getString(R.string.tts_o_clock));
@@ -753,7 +753,7 @@ public class WifiReceiver extends BroadcastReceiver {
             builder.append( time ).append( ", " );
         }
         final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
-        if ( batteryLevel >= 0 && prefs.getBoolean( ListFragment.PREF_SPEAK_BATTERY, true ) ) {
+        if ( batteryLevel >= 0 && prefs.getBoolean( PreferenceKeys.PREF_SPEAK_BATTERY, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_battery)).append(" ").append(batteryLevel).append(" ").append(mainActivity.getString(R.string.tts_percent)).append(", ");
         }
 
@@ -816,9 +816,9 @@ public class WifiReceiver extends BroadcastReceiver {
      * get the scan period based on preferences and current speed
      */
     public long getScanPeriod() {
-        final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+        final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
 
-        String scanPref = ListFragment.PREF_SCAN_PERIOD;
+        String scanPref = PreferenceKeys.PREF_SCAN_PERIOD;
         long defaultRate = MainActivity.SCAN_DEFAULT;
         // if over 5 mph
         Location location = null;
@@ -827,11 +827,11 @@ public class WifiReceiver extends BroadcastReceiver {
             location = gpsListener.getCurrentLocation();
         }
         if ( location != null && location.getSpeed() >= 2.2352f ) {
-            scanPref = ListFragment.PREF_SCAN_PERIOD_FAST;
+            scanPref = PreferenceKeys.PREF_SCAN_PERIOD_FAST;
             defaultRate = MainActivity.SCAN_FAST_DEFAULT;
         }
         else if ( location == null || location.getSpeed() < 0.1f ) {
-            scanPref = ListFragment.PREF_SCAN_PERIOD_STILL;
+            scanPref = PreferenceKeys.PREF_SCAN_PERIOD_STILL;
             defaultRate = MainActivity.SCAN_STILL_DEFAULT;
         }
         return prefs.getLong( scanPref, defaultRate );
@@ -873,16 +873,17 @@ public class WifiReceiver extends BroadcastReceiver {
             } else {
                 final long sinceLastScan = now - lastScanResponseTime;
                 Logging.info("startScan returned " + success + ". last response seconds ago: " + sinceLastScan/1000d);
-                final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+                final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
                 final long resetWifiPeriod = prefs.getLong(
-                        ListFragment.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
+                        PreferenceKeys.PREF_RESET_WIFI_PERIOD, MainActivity.DEFAULT_RESET_WIFI_PERIOD );
 
                 if ( resetWifiPeriod > 0 && sinceLastScan > resetWifiPeriod ) {
                     Logging.warn("Time since last scan: " + sinceLastScan + " milliseconds");
                     if ( now - lastWifiUnjamTime > resetWifiPeriod ) {
-                        final boolean disableToast = prefs.getBoolean(ListFragment.PREF_DISABLE_TOAST, false);
+                        final boolean disableToast = prefs.getBoolean(PreferenceKeys.PREF_DISABLE_TOAST, false);
                         if (!disableToast) {
-                            WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed));
+                            Handler handler = new Handler(Looper.getMainLooper());
+                            handler.post(() -> WiGLEToast.showOverActivity(mainActivity, R.string.error_general, mainActivity.getString(R.string.wifi_jammed)));
                         }
                         scanInFlight = false;
                         try {
@@ -894,7 +895,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             Logging.info("exception resetting wifi: " + ex, ex);
                         }
                         lastWifiUnjamTime = now;
-                        if (prefs.getBoolean(ListFragment.PREF_SPEAK_WIFI_RESTART, true)) {
+                        if (prefs.getBoolean(PreferenceKeys.PREF_SPEAK_WIFI_RESTART, true)) {
                             mainActivity.speak(mainActivity.getString(R.string.wifi_restart_1) + " "
                                     + (sinceLastScan / 1000L) + " " + mainActivity.getString(R.string.wifi_restart_2));
                         }
@@ -915,9 +916,9 @@ public class WifiReceiver extends BroadcastReceiver {
 
         // battery kill
         if ( ! mainActivity.isTransferring() ) {
-            final SharedPreferences prefs = mainActivity.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
+            final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
             long batteryKill = prefs.getLong(
-                    ListFragment.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
+                    PreferenceKeys.PREF_BATTERY_KILL_PERCENT, MainActivity.DEFAULT_BATTERY_KILL_PERCENT);
 
             if ( mainActivity.getBatteryLevelReceiver() != null ) {
                 final int batteryLevel = mainActivity.getBatteryLevelReceiver().getBatteryLevel();
@@ -930,7 +931,9 @@ public class WifiReceiver extends BroadcastReceiver {
                     if (null != mainActivity) {
                         final String text = mainActivity.getString(R.string.battery_at) + " " + batteryLevel + " "
                             + mainActivity.getString(R.string.battery_postfix);
-                        WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text);
+
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(() -> WiGLEToast.showOverActivity(mainActivity, R.string.error_general, text));
                         Logging.warn("low battery, shutting down");
                         mainActivity.speak(text);
                         mainActivity.finishSoon(4000L, false);

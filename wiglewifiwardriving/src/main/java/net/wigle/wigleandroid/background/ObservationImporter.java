@@ -11,11 +11,11 @@ import com.fasterxml.jackson.databind.MappingJsonFactory;
 
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 
 import java.io.BufferedReader;
@@ -31,7 +31,7 @@ public class ObservationImporter extends AbstractProgressApiRequest {
 
     public ObservationImporter(final FragmentActivity context,
                                final DatabaseHelper dbHelper, final ApiListener listener) {
-        super(context, dbHelper, "HttpDL", "observed-cache.json", MainActivity.OBSERVED_URL, false,
+        super(context, dbHelper, "HttpDL", "observed-cache.json", UrlConfig.OBSERVED_URL, false,
                 true, true, false,
                 AbstractApiRequest.REQUEST_GET, listener, true);
     }

@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
 import androidx.fragment.app.FragmentActivity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -20,6 +19,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -132,9 +132,9 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     }
 
     public static void updateTransferringState(final boolean transferring, final FragmentActivity context) {
-        Button uploadButton = (Button) context.findViewById(R.id.upload_button);
+        Button uploadButton = context.findViewById(R.id.upload_button);
         if (null != uploadButton) uploadButton.setEnabled(!transferring);
-        Button importObservedButton = (Button) context.findViewById(R.id.import_observed_button);
+        Button importObservedButton = context.findViewById(R.id.import_observed_button);
         if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
         if (transferring) {
             MainActivity.getMainActivity().setTransferring();
@@ -144,20 +144,18 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     }
 
     private void activateProgressPanel(final FragmentActivity context) {
-        final LinearLayout progressLayout = (LinearLayout) context.findViewById(R.id.inline_status_bar);
-        final TextView progressLabel = (TextView) context.findViewById(R.id.inline_progress_status);
-        final ProgressBar progressBar = (ProgressBar) context.findViewById(R.id.inline_status_progress);
-        final Button taskCancelButton = (Button) context.findViewById(R.id.inline_status_cancel);
+        final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
+        final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
+        final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
+        final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
 
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
             pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
             pp.show();
-            taskCancelButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    latestTask.setInterrupted();
-                    clearProgressDialog();
-                    updateTransferringState(false, context);
-                }
+            taskCancelButton.setOnClickListener(v -> {
+                latestTask.setInterrupted();
+                clearProgressDialog();
+                updateTransferringState(false, context);
             });
             //ALIBI: this will get replaced as soon as the progress is set for the first time
             progressBar.setIndeterminate(true);
@@ -178,8 +176,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     }
 
     protected final boolean validAuth() {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        if ( (!prefs.getString(ListFragment.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        if ( (!prefs.getString(PreferenceKeys.PREF_AUTHNAME,"").isEmpty()) && (TokenAccess.hasApiToken(prefs))) {
             return true;
         }
         return false;
@@ -188,29 +186,29 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
 
 
     protected final String getUsername() {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        String username = prefs.getString( ListFragment.PREF_USERNAME, "" );
-        if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        String username = prefs.getString( PreferenceKeys.PREF_USERNAME, "" );
+        if ( prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
             username = ListFragment.ANONYMOUS;
         }
         return username;
     }
 
     protected final String getPassword() {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        String password = prefs.getString( ListFragment.PREF_PASSWORD, "" );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        String password = prefs.getString( PreferenceKeys.PREF_PASSWORD, "" );
 
-        if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
             password = "";
         }
         return password;
     }
 
     protected final String getToken() {
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
         String token = TokenAccess.getApiToken(prefs);
 
-        if ( prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false) ) {
+        if ( prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
             token = "";
         }
         return token;

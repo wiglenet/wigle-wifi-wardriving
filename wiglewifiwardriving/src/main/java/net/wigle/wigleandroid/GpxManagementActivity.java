@@ -15,10 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 
@@ -32,6 +30,7 @@ import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.AsyncGpxExportTask;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PolyRouteConfigurable;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.RouteExportSelector;
 
 import java.text.DateFormat;
@@ -43,9 +42,8 @@ import static net.wigle.wigleandroid.util.AsyncGpxExportTask.EXPORT_GPX_DIALOG;
 
 public class GpxManagementActivity extends AppCompatActivity implements PolyRouteConfigurable, RouteExportSelector, DialogListener {
 
-    private NumberFormat numberFormat;
-    private int DEFAULT_MAP_PADDING = 25;
-    private GpxRecyclerAdapter adapter;
+    private final NumberFormat numberFormat;
+    private final int DEFAULT_MAP_PADDING = 25;
     private final DatabaseHelper dbHelper;
     private MapView mapView;
     private View infoView;
@@ -59,9 +57,6 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     public GpxManagementActivity() {
         this.dbHelper = MainActivity.getStaticState().dbHelper;
         Locale locale = Locale.getDefault();
-        if (null == locale) {
-            locale = Locale.US;
-        }
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(1);
     }
@@ -74,8 +69,8 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        setupMap(null, prefs);
+        prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+        setupMap(prefs);
         setupList();
     }
 
@@ -97,8 +92,8 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         if (mapView != null) {
             mapView.onResume();
         } else {
-            final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            setupMap( null, prefs);
+            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            setupMap(prefs);
         }
     }
 
@@ -111,16 +106,11 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
         }
     }
 
-    private void setupMap(final Bundle savedInstanceState, final SharedPreferences prefs ) {
+    private void setupMap(final SharedPreferences prefs) {
         mapView = new MapView( this );
         try {
-            mapView.onCreate(savedInstanceState);
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(final GoogleMap googleMap) {
-                    ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json);
-                }
-            });
+            mapView.onCreate(null);
+            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
         } catch (NullPointerException ex) {
             Logging.error("npe in mapView.onCreate: " + ex, ex);
         }
@@ -134,18 +124,15 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     @Override
     public void configureMapForRoute(final PolylineRoute polyRoute) {
         if ((polyRoute != null)) {
-            mapView.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(final GoogleMap googleMap) {
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    builder.include(polyRoute.getNEExtent());
-                    builder.include(polyRoute.getSWExtent());
-                    LatLngBounds bounds = builder.build();
-                    final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_MAP_PADDING);
-                    googleMap.animateCamera(cu);
-                    routePolyline = googleMap.addPolyline(polyRoute.getPolyline());
-                    routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
-                }
+            mapView.getMapAsync(googleMap -> {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(polyRoute.getNEExtent());
+                builder.include(polyRoute.getSWExtent());
+                LatLngBounds bounds = builder.build();
+                final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_MAP_PADDING);
+                googleMap.animateCamera(cu);
+                routePolyline = googleMap.addPolyline(polyRoute.getPolyline());
+                routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
             });
             infoView.setVisibility(View.VISIBLE);
             final String distString = UINumberFormat.metersToString(prefs,
@@ -172,7 +159,7 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
             Cursor cursor = dbHelper.routeMetaIterator();
             final DateFormat itemDateFormat = android.text.format.DateFormat.getDateFormat(this.getApplicationContext());
             final DateFormat itemTimeFormat = android.text.format.DateFormat.getTimeFormat(this.getApplicationContext());
-            adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
+            GpxRecyclerAdapter adapter = new GpxRecyclerAdapter(this, this, cursor, this, this, prefs, itemDateFormat, itemTimeFormat);
             recyclerView.setAdapter(adapter);
         } catch (DBException dbex) {
             Logging.error("Failed to setup list for GPX management: ", dbex);

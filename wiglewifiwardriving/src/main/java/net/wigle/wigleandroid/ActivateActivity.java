@@ -21,13 +21,14 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 /**
  * fetch wigle authentication tokens by scanning a barcode
- * @Author: rksh
+ * @author rksh
  */
 public class ActivateActivity extends Activity {
 
@@ -123,7 +124,7 @@ public class ActivateActivity extends Activity {
                     }
 
                     @Override
-                    public void receiveDetections(Detector.Detections<Barcode> detections) {
+                    public void receiveDetections(@NonNull Detector.Detections<Barcode> detections) {
                         final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                         if (barcodes.size() > 0) {
                             Log.i(LOG_TAG, "CAMERA received detections");
@@ -132,11 +133,11 @@ public class ActivateActivity extends Activity {
                                 Log.i(LOG_TAG, item.displayValue + " matched.");
                                 String[] tokens = item.displayValue.split(":");
                                 final SharedPreferences prefs = MainActivity.getMainActivity().
-                                        getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                        getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                                 final SharedPreferences.Editor editor = prefs.edit();
-                                editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
-                                editor.putString(ListFragment.PREF_AUTHNAME, tokens[1]);
-                                editor.putBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+                                editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
+                                editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
+                                editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
                                 editor.apply();
                                 TokenAccess.setApiToken(prefs, tokens[2]);
                                 finish();

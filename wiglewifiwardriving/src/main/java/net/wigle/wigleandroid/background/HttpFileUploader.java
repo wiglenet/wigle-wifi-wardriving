@@ -11,9 +11,9 @@ import java.nio.CharBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -27,7 +27,6 @@ import android.os.Handler;
  */
 @Deprecated
 final class HttpFileUploader {
-    public static final String ENCODING = "UTF-8";
     public static final String LINE_END = "\r\n";
     public static final String TWO_HYPHENS = "--";
 
@@ -53,7 +52,7 @@ final class HttpFileUploader {
                                  final Handler handler, final long filesize)
                                 throws IOException {
 
-        String retval = null;
+        String retval;
         HttpURLConnection conn = null;
 
         try {
@@ -103,7 +102,7 @@ final class HttpFileUploader {
             header.append( LINE_END );
 
             Logging.info( "About to write headers, length: " + header.length() );
-            CharsetEncoder enc = Charset.forName( ENCODING ).newEncoder();
+            CharsetEncoder enc = StandardCharsets.UTF_8.newEncoder();
             CharBuffer cbuff = CharBuffer.allocate( 1024 );
             ByteBuffer bbuff = ByteBuffer.allocate( 1024 );
             writeString( wbc, header.toString(), enc, cbuff, bbuff );
@@ -156,7 +155,7 @@ final class HttpFileUploader {
             final byte[] buffer = new byte[1024];
 
             while( ( ch = is.read( buffer ) ) != -1 ) {
-                b.append( new String( buffer, 0, ch, ENCODING ) );
+                b.append( new String( buffer, 0, ch, StandardCharsets.UTF_8 ) );
             }
             retval = b.toString();
             // MainActivity.info( "Response: " + retval );

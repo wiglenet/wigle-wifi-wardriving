@@ -3,16 +3,14 @@ package net.wigle.wigleandroid.ui;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.text.NumberFormat;
 
 public class UINumberFormat {
     /**
      * format the topbar counters
-     * @param input
-     * @return
      */
     public static String counterFormat(long input) {
         if (input > 9999999999L) {
@@ -30,7 +28,7 @@ public class UINumberFormat {
 
     public static String metersToString(final SharedPreferences prefs, final NumberFormat numberFormat, final Context context, final float meters,
                                         final boolean useShort ) {
-        final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
+        final boolean metric = prefs.getBoolean( PreferenceKeys.PREF_METRIC, false );
         String retval;
         if ( meters > 3000f ) {
             if ( metric ) {

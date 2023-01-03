@@ -17,7 +17,6 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.util.FileUtility;
-import net.wigle.wigleandroid.util.InsufficientSpaceException;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
@@ -70,7 +69,7 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
     private boolean isPresent() {
         final File mxcFile = getMxcFile();
-        return mxcFile != null && mxcFile.exists() && mxcFile.canRead();
+        return mxcFile.exists() && mxcFile.canRead();
     }
 
     public void implantMxcDatabase(final Context context, final Boolean isFinishing){
@@ -154,7 +153,6 @@ public class MxcDatabaseHelper extends SQLiteOpenHelper {
 
     public MccMncRecord networkRecordForMccMnc(final String mcc, final String mnc) throws SQLException {
         Cursor cursor = null;
-
         // ALIBI: old, incompatible DB implementation
         if (android.os.Build.VERSION.SDK_INT <= 19) {
             return null;

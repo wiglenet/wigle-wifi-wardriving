@@ -15,6 +15,7 @@ import com.google.gson.Gson;
 import net.wigle.wigleandroid.util.Logging;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * It seems obvious that you'd want to implement all this junk in every mobile phone app that has a list.
@@ -24,14 +25,14 @@ import java.util.ArrayList;
 public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
 
     //enough to make a list and update prefs from it.
-    private ArrayList<String> list = new ArrayList<String>();
+    private List<String> list = new ArrayList<String>();
     private Context context;
     private final SharedPreferences prefs;
     private final String filterKey;
 
 
 
-    public AddressFilterAdapter(ArrayList<String> list, Context context, final SharedPreferences prefs, final String filterKey) {
+    public AddressFilterAdapter(List<String> list, Context context, final SharedPreferences prefs, final String filterKey) {
         this.list = list;
         this.context = context;
         this.prefs = prefs;

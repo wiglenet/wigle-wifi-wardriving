@@ -24,13 +24,13 @@ import java.util.Arrays;
 public class SettingsUtil {
     public static String[] getMapModes(final boolean isAuthed) {
         if (isAuthed) {
-            return new String[]{ListFragment.PREF_MAP_NO_TILE,
-                    ListFragment.PREF_MAP_ONLYMINE_TILE, ListFragment.PREF_MAP_NOTMINE_TILE,
-                    ListFragment.PREF_MAP_ALL_TILE};
+            return new String[]{PreferenceKeys.PREF_MAP_NO_TILE,
+                    PreferenceKeys.PREF_MAP_ONLYMINE_TILE, PreferenceKeys.PREF_MAP_NOTMINE_TILE,
+                    PreferenceKeys.PREF_MAP_ALL_TILE};
 
         }
-        return new String[]{ListFragment.PREF_MAP_NO_TILE,
-                ListFragment.PREF_MAP_ALL_TILE};
+        return new String[]{PreferenceKeys.PREF_MAP_NO_TILE,
+                PreferenceKeys.PREF_MAP_ALL_TILE};
     }
 
     public static String[] getMapModeNames(final boolean isAuthed, final Context context) {
@@ -59,7 +59,7 @@ public class SettingsUtil {
 
     public static <V> void doSpinner(final int id, final View view, final String pref, final V spinDefault,
                                final V[] periods, final String[] periodName, final Context context) {
-        doSpinner((Spinner)view.findViewById(id), pref, spinDefault, periods, periodName, context);
+        doSpinner(view.findViewById(id), pref, spinDefault, periods, periodName, context);
     }
 
     public static <V> void doSpinner( final Spinner spinner, final String pref, final V spinDefault, final V[] periods,
@@ -70,7 +70,7 @@ public class SettingsUtil {
                     + " periodName: " + Arrays.toString(periodName));
         }
 
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -118,10 +118,10 @@ public class SettingsUtil {
                 }
                 editor.apply();
 
-                if ( pref.equals(ListFragment.PREF_LANGUAGE) ) {
+                if ( pref.equals(PreferenceKeys.PREF_LANGUAGE) ) {
                     MainActivity.setLocale( context, context.getResources().getConfiguration() );
                 }
-                if ( pref.equals(ListFragment.PREF_DAYNIGHT_MODE) ) {
+                if ( pref.equals(PreferenceKeys.PREF_DAYNIGHT_MODE) ) {
                     ThemeUtil.setTheme(prefs);
                     try {
                         ThemeUtil.setNavTheme(((Activity) v.getContext()).getWindow(), context, prefs);
@@ -143,8 +143,8 @@ public class SettingsUtil {
                     + " periodName: " + Arrays.toString(termNames));
         }
 
-        Spinner spinner = (Spinner)view.findViewById(spinnerId);
-        final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        Spinner spinner = view.findViewById(spinnerId);
+        final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -171,9 +171,9 @@ public class SettingsUtil {
                 Logging.info( pref + " setting map data: " + period );
                 editor.putString( pref, period );
                 editor.apply();
-                LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+                LinearLayout mainLayout = view.findViewById(R.id.show_map_discovered_since);
 
-                if (ListFragment.PREF_MAP_NO_TILE.equals(period)) {
+                if (PreferenceKeys.PREF_MAP_NO_TILE.equals(period)) {
                     mainLayout.setVisibility(View.GONE);
                 } else {
                     mainLayout.setVisibility(View.VISIBLE);

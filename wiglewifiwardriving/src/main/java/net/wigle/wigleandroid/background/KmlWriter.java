@@ -79,11 +79,14 @@ public class KmlWriter extends AbstractBackgroundTask {
             if ( this.networks == null ) {
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.WIFI);
                 long wifiCount = writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle);
+                cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.CELL);
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                cursor.close();
                 long cellCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount, dbHelper.getNetworkCount(), bundle);
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
                 ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                cursor.close();
                 long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
                 Logging.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
             } else {
@@ -96,7 +99,6 @@ public class KmlWriter extends AbstractBackgroundTask {
                 for (String network : networks) {
                     // DEBUG: MainActivity.info( "network: " + network );
                     cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.WIFI);
-
                     final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                     // ALIBI: assume this was a cell net, if it didn't match for WiFi - avoid full second iteration
                     if (0L == found) {

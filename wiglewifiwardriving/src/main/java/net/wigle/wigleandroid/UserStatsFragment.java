@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid;
 
-import static net.wigle.wigleandroid.MainActivity.WIGLE_BASE_URL;
+import static net.wigle.wigleandroid.util.UrlConfig.WIGLE_BASE_URL;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -33,6 +33,7 @@ import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -143,7 +144,7 @@ public class UserStatsFragment extends Fragment {
 
     public static void executeUserDownload(final Fragment fragment, final ApiListener apiListener) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
+                "user-stats-cache.json", UrlConfig.USER_STATS_URL, false, true, true,
                 ApiDownloader.REQUEST_GET,
                 apiListener);
         try {

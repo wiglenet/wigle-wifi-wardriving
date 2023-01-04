@@ -438,4 +438,6 @@
     <string name="filter_show_btle">Vis Bluetooth LE</string>
     <string name="enable_kalman">"Filtrer GPS-støj "</string>
     <string name="settings_gps_head">GPS instillinger</string>
+    <string name="gps_old_message">Denne enhed understøttes ikke længere via appbutikken på grund af Googles politikker. Sikkerhedskopier dine data og sideindlæs WiGLE v. 2.67 .apk (eller lavere) fra https://github.com/wiglenet/wigle-wifi-wardriving/ . Beklager ulejligheden!</string>
+    <string name="gps_old_title">Kan ikke initialisere GPS</string>
 </resources>

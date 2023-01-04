@@ -438,4 +438,6 @@
     <string name="filter_show_btle">Bluetooth LE megjelenítése</string>
     <string name="settings_gps_head">GPS beállítások</string>
     <string name="enable_kalman">GPS-zaj szűrése</string>
+    <string name="gps_old_message">Ezt az eszközt a Google irányelvei miatt már nem támogatja az App Store. Kérjük, készítsen biztonsági másolatot adatairól, és töltse be oldalra a WiGLE v. 2.67 .apk (vagy régebbi) verzióját a https://github.com/wiglenet/wigle-wifi-wardriving/ webhelyről. Elnézést a kellemetlenségért!</string>
+    <string name="gps_old_title">Nem sikerült inicializálni a GPS-t</string>
 </resources>

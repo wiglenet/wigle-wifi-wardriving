@@ -438,4 +438,6 @@
     <string name="filter_show_btle">Bluetooth LE\'yi göster</string>
     <string name="settings_gps_head">GPS Ayarları</string>
     <string name="enable_kalman">GPS gürültüsünü filtrele</string>
+    <string name="gps_old_message">Bu cihaz, Google politikaları nedeniyle artık uygulama mağazası aracılığıyla desteklenmemektedir. Lütfen verilerinizi yedekleyin ve https://github.com/wiglenet/wigle-wifi-wardriving/ adresinden WiGLE v. 2.67 .apk\'yi (veya daha düşük) yandan yükleyin. Rahatsızlıktan dolayı özür dileriz!</string>
+    <string name="gps_old_title">GPS başlatılamıyor</string>
 </resources>

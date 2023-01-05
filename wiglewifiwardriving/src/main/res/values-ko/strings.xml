@@ -438,4 +438,6 @@
     <string name="filter_show_btle">블루투스 LE 표시</string>
     <string name="settings_gps_head">GPS 설정</string>
     <string name="enable_kalman">GPS 노이즈 필터링</string>
+    <string name="gps_old_message">이 기기는 Google 정책으로 인해 더 이상 앱 스토어를 통해 지원되지 않습니다. 데이터를 백업하고 https://github.com/wiglenet/wigle-wifi-wardriving/에서 WiGLE v. 2.67 .apk(또는 그 이하)를 사이드로드하십시오. 불편을 드려 죄송합니다!</string>
+    <string name="gps_old_title">GPS를 초기화할 수 없습니다.</string>
 </resources>

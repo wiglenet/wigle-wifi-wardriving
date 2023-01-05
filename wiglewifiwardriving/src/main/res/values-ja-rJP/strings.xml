@@ -437,4 +437,6 @@
     <string name="filter_show_btle">BluetoothLEを表示する</string>
     <string name="enable_kalman">GPSノイズをフィルターする</string>
     <string name="settings_gps_head">GPS フィルタリング</string>
+    <string name="gps_old_message">Google のポリシーにより、このデバイスは App Store でサポートされなくなりました。データをバックアップし、https://github.com/wiglenet/wigle-wifi-wardriving/ から WiGLE v. 2.67 .apk (またはそれ以下) をサイドロードしてください。ご不便おかけしてすみません！</string>
+    <string name="gps_old_title">GPS を初期化できません</string>
 </resources>

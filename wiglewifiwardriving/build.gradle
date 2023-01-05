@@ -8,7 +8,7 @@ android {
     compileSdkVersion 31
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
-        minSdkVersion 19
+        minSdkVersion 24
         targetSdkVersion 31
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true

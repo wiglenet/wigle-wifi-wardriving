@@ -438,4 +438,6 @@
     <string name="settings_gps_head">GPS-Einstellungen</string>
     <string name="enable_kalman">GPS-Rauschen filtern</string>
     <string name="queue_depth">WiGLE-Warteschlange: %1$s Tri: %2$s Geo: %3$s</string>
+    <string name="gps_old_message">Dieses Gerät wird aufgrund der Richtlinien von Google nicht mehr über den App Store unterstützt. Bitte sichern Sie Ihre Daten und laden Sie die WiGLE v. 2.67 .apk (oder niedriger) von https://github.com/wiglenet/wigle-wifi-wardriving/ herunter. Entschuldigung für die Unannehmlichkeiten!</string>
+    <string name="gps_old_title">GPS kann nicht initialisiert werden</string>
 </resources>

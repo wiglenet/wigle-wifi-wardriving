@@ -438,4 +438,6 @@
     <string name="filter_show_btle">Zobrazit Bluetooth LE</string>
     <string name="settings_gps_head">Nastavení GPS</string>
     <string name="enable_kalman">Filtrujte šum GPS</string>
+    <string name="gps_old_message">Toto zařízení již není podporováno prostřednictvím obchodu s aplikacemi kvůli zásadám společnosti Google. Zálohujte si prosím svá data a stáhněte si WiGLE v. 2.67 .apk (nebo nižší) z https://github.com/wiglenet/wigle-wifi-wardriving/ . Omluvám se za nepříjemnost!</string>
+    <string name="gps_old_title">Nelze inicializovat GPS</string>
 </resources>

@@ -329,18 +329,9 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
 
         // get response data
-        final BufferedReader input = new BufferedReader(
-                new InputStreamReader( HttpFileUploader.getInputStream( conn ), StandardCharsets.UTF_8.toString()) );
-        try {
+        try (BufferedReader input = new BufferedReader(
+                new InputStreamReader( HttpFileUploader.getInputStream( conn ), StandardCharsets.UTF_8.toString()) )){
             return getResultString(input, preserveNewlines);
-        }
-        finally {
-            try {
-                input.close();
-            }
-            catch (final Exception ex) {
-                Logging.warn("Exception closing downloader reader: " + ex, ex);
-            }
         }
     }
 

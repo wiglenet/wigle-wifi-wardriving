@@ -87,37 +87,38 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
                     Logging.error("set destination file due to null Activity in GPX export");
                 }
             }
-            FileWriter writer = new FileWriter(gpxDestFile, false);
-            writer.append(GPX_HEADER_A);
-            String creator = "WiGLE WiFi ";
-            try {
-                if (null != activity) {
-                    final PackageManager pm = activity.getApplicationContext().getPackageManager();
-                    final PackageInfo pi = pm.getPackageInfo(activity.getApplicationContext().getPackageName(), 0);
-                    creator += pi.versionName;
-                } else {
-                    Logging.error("unable to get packageManager due to null Activity in GPX export");
+            try (FileWriter writer = new FileWriter(gpxDestFile, false)) {
+                writer.append(GPX_HEADER_A);
+                String creator = "WiGLE WiFi ";
+                try {
+                    if (null != activity) {
+                        final PackageManager pm = activity.getApplicationContext().getPackageManager();
+                        final PackageInfo pi = pm.getPackageInfo(activity.getApplicationContext().getPackageName(), 0);
+                        creator += pi.versionName;
+                    } else {
+                        Logging.error("unable to get packageManager due to null Activity in GPX export");
+                    }
+                } catch (Exception ex) {
+                    creator += "(unknown)";
                 }
-            } catch (Exception ex) {
-                creator += "(unknown)";
-            }
-            writer.append(creator);
-            writer.append(GPX_HEADER_B);
-            writer.append(nameStr);
+                writer.append(creator);
+                writer.append(GPX_HEADER_B);
+                writer.append(nameStr);
 
-            Cursor cursor;
-            if (routeId == -1) {
-                cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
-            } else {
-                cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
+                Cursor cursor;
+                if (routeId == -1) {
+                    cursor = ListFragment.lameStatic.dbHelper.currentRouteIterator();
+                } else {
+                    cursor = ListFragment.lameStatic.dbHelper.routeIterator(routeId);
+                }
+                long segmentCount = writeSegmentsWithCursor(writer, cursor, df, routeLocs[0]);
+                Logging.info("wrote " + segmentCount + " segments");
+                writer.append(GPX_FOOTER);
+                writer.flush();
+                writer.close();
+                cursor.close();
+                return "completed export";
             }
-            long segmentCount = writeSegmentsWithCursor(writer, cursor, df, routeLocs[0]);
-            Logging.info("wrote "+segmentCount+" segments");
-            writer.append(GPX_FOOTER);
-            writer.flush();
-            writer.close();
-            cursor.close();
-            return "completed export";
         } catch (IOException | DBException | InterruptedException e) {
             Logging.error("Error writing GPX", e);
         }

@@ -24,8 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -59,52 +58,55 @@ public class CsvDownloader extends AbstractProgressApiRequest {
             sendBundledMessage( Status.PARSING.ordinal(), bundle );
             final File compressed = FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT);
             if (null != compressed) {
-                GZIPInputStream in = new GZIPInputStream(new FileInputStream(compressed));
-                Reader decoder = new InputStreamReader(in, Charset.forName("UTF-8"));
-                BufferedReader br = new BufferedReader(decoder);
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                        new GZIPInputStream(new FileInputStream(compressed)), StandardCharsets.UTF_8))) {
+                    String line;
+                    boolean headerOneChecked = false;
+                    boolean headerTwoChecked = false;
+                    //TODO: losing newlines here somehow? \n\r v. \n?
+                    int addedNetworks = 0;
+                    while((line =br.readLine())!=null)
 
-                String line;
-                boolean headerOneChecked = false;
-                boolean headerTwoChecked = false;
-                //TODO: losing newlines here somehow? \n\r v. \n?
-                int addedNetworks = 0;
-                while ((line = br.readLine()) != null) {
-                    if (!headerOneChecked) {
-                        //TODO: version checks belong here
-                        //DEBUG: MainActivity.info("Giving Header One a pass");
-                        //DEBUG: MainActivity.error(line);
-                        headerOneChecked = true;
-                    } else if (!headerTwoChecked) {
-                        if (line.contains(CSV_COLUMN_HEADERS)) {
-                            //DEBUG:
-                            Logging.info("header validated - WiGLE CSV.");
-                            headerTwoChecked = true;
+                    {
+                        if (!headerOneChecked) {
+                            //TODO: version checks belong here
+                            //DEBUG: MainActivity.info("Giving Header One a pass");
+                            //DEBUG: MainActivity.error(line);
+                            headerOneChecked = true;
+                        } else if (!headerTwoChecked) {
+                            if (line.contains(CSV_COLUMN_HEADERS)) {
+                                //DEBUG:
+                                Logging.info("header validated - WiGLE CSV.");
+                                headerTwoChecked = true;
+                            } else {
+                                Logging.error("CSV header check failed: " + line);
+                            }
                         } else {
-                            Logging.error("CSV header check failed: " + line);
-                        }
-                    } else {
-                        try {
-                            Network network = NetworkCsv.fromWiGLEWirelessCsvLine(line);
-                            Location location = LocationCsv.fromWiGLEWirelessCsvLine(line);
-                            dbHelper.blockingAddExternalObservation(network, location, true);
-                            addedNetworks++;
-                        } catch (Exception ex) {
-                            Logging.error("Failed to insert external network.", ex);
+                            try {
+                                Network network = NetworkCsv.fromWiGLEWirelessCsvLine(line);
+                                Location location = LocationCsv.fromWiGLEWirelessCsvLine(line);
+                                dbHelper.blockingAddExternalObservation(network, location, true);
+                                addedNetworks++;
+                            } catch (Exception ex) {
+                                Logging.error("Failed to insert external network.", ex);
+                            }
                         }
                     }
-                }
-                Logging.info("file " + outputFileName + " added " + addedNetworks + " networks to DB.");
+                    Logging.info("file "+outputFileName +" added "+addedNetworks +" networks to DB.");
 
-                final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
-                        FileUtility.getCsvGzFile(context, outputFileName+FileUtility.GZ_EXT) + "\", added: "+addedNetworks+"}");
-                //ALIBI: HACK: adding the new count into the filename to avoid completely re-writing the result dialog.
-                bundle.putString( BackgroundGuiHandler.FILENAME, outputFileName+"\n +"+addedNetworks );
-                sendBundledMessage(Status.SUCCESS.ordinal(), bundle);
-                listener.requestComplete(json, false);
+                    final JSONObject json = new JSONObject("{success: " + true + ", file:\"" +
+                            FileUtility.getCsvGzFile(context, outputFileName + FileUtility.GZ_EXT) + "\", added: " + addedNetworks + "}");
+                    //ALIBI: HACK: adding the new count into the filename to avoid completely re-writing the result dialog.
+                    bundle.putString(BackgroundGuiHandler.FILENAME,outputFileName+"\n +"+addedNetworks );
+
+                    sendBundledMessage(Status.SUCCESS.ordinal(),bundle);
+                    listener.requestComplete(json,false);
+                }
             } else {
                 bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.dl_failed));
                 sendBundledMessage( Status.FAIL.ordinal(), bundle );
             }
+
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.status_login_fail));

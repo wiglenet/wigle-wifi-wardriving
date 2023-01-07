@@ -38,7 +38,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -175,16 +174,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupKmlButtons( final View view ) {
         final Button kmlRunExportButton = view.findViewById( R.id.kml_run_export_button );
-        kmlRunExportButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    WiGLEConfirmationDialog.createConfirmation( fa,
-                        DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up KML run export button");
-                }
+        kmlRunExportButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation( fa,
+                    DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up KML run export button");
             }
         });
 
@@ -275,7 +271,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         SharedPreferences prefs = null;
         final Activity a = getActivity();
         if (null != a) {
-            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
 
         // db marker reset button and text
@@ -659,7 +655,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         try {
             final FragmentActivity fa = getActivity();
             if (null != fa) {
-                getActivity().setTitle(R.string.data_activity_name);
+                fa.setTitle(R.string.data_activity_name);
             } else {
                 Logging.error("Failed to set title on null activity onResume");
             }

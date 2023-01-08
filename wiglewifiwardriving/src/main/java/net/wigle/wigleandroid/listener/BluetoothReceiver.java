@@ -771,7 +771,12 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
 
-            updater.get().handleLeScanResult(scanResult, location, false);
+            if (null != updater) {
+                final LeScanUpdater updt = updater.get();
+                if (null != updt) {
+                    updt.handleLeScanResult(scanResult, location, false);
+                }
+            }
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
             ListFragment.lameStatic.runBt = runNetworks.size();
             if (listAdapter != null) {
@@ -829,8 +834,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 //ALIBI: if this was an empty scan result, not further processing is required.
                 return;
             }
-            for (final ScanResult scanResult : results) {
-                updater.get().handleLeScanResult(scanResult, location, true);
+            if (null != updater) {
+                final LeScanUpdater updt = updater.get();
+                if (null != updt) {
+                    for (final ScanResult scanResult : results) {
+                        updt.handleLeScanResult(scanResult, location, true);
+                    }
+                }
             }
             //DEBUG:Logging.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.get().size());
             prevBtle = new HashSet<>(latestBtle);

@@ -18,7 +18,8 @@ import java.util.concurrent.Executors;
  * @author arkasha
  */
 public class PooledQueryExecutor {
-    private static final ExecutorService executor = Executors.newFixedThreadPool(3);
+    //ALIBI: unclear whether we need more than one thread a time for anything.
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public interface ResultHandler {
         boolean handleRow( Cursor cursor );

@@ -404,7 +404,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 prevBt = Collections.synchronizedSet(new HashSet(latestBt));
                 latestBt.clear();
 
-                ListFragment.lameStatic.currBt = (null != scanCallback) ? scanCallback.getPrevBtLeSize():0 + prevBt.size();
+                ListFragment.lameStatic.currBt = ((null != scanCallback) ? scanCallback.getPrevBtLeSize() : (0 + prevBt.size()));
 
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
                 if (listAdapter != null) {

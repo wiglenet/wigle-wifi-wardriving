@@ -9,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.location.Address;
 import android.location.Location;
 import android.media.AudioManager;
@@ -39,7 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.DownloadHandler;
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -249,8 +248,8 @@ public class DBResultActivity extends AppCompatActivity {
         final float[] results = new float[1];
         final long[] count = new long[1];
 
-        final QueryThread.Request request = new QueryThread.Request( sql, params.toArray(new String[0]),
-                new QueryThread.ResultHandler() {
+        final PooledQueryExecutor.Request request = new PooledQueryExecutor.Request( sql, params.toArray(new String[0]),
+                new PooledQueryExecutor.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 final String bssid = cursor.getString(0);
@@ -302,10 +301,10 @@ public class DBResultActivity extends AppCompatActivity {
                     handler.sendEmptyMessage(MSG_QUERY_EMPTY);
                 }
             }
-        });
+        }, ListFragment.lameStatic.dbHelper);
 
         // queue it up
-        ListFragment.lameStatic.dbHelper.addToQueue( request );
+        PooledQueryExecutor.enqueue( request );
     }
 
     private void setupWiGLEQuery(final QueryArgs queryArgs, final AppCompatActivity activity, final View view) {

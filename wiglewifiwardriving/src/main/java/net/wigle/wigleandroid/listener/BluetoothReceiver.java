@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -47,7 +46,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
 import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
-import static net.wigle.wigleandroid.MainActivity.getMainActivity;
 
 /**
  * Central classic BT broadcast receiver and BTLE scanner.
@@ -134,8 +132,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     private long scanRequestTime = Long.MIN_VALUE;
     private long lastScanResponseTime = Long.MIN_VALUE;
 
-    //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
-    private final AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
     private final long constructionTime = System.currentTimeMillis();
 
     // refresh threshold - probably should either make these configurable
@@ -159,6 +155,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         this.prefs = prefs;
 
         if (hasLeSupport) {
+            //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
+            AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
             scanCallback = new LeScanCallback(dbHelper, listAdapter, prefs, runNetworks, latestBtle,
                     latestBt, lastLeBatchResponseTime, scanning, this);
         } else {
@@ -247,32 +245,30 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         } catch (SecurityException se) {
             Logging.error("No permission for bluetoothAdapter.startDiscovery/isDiscovering", se);
         }
-        if (Build.VERSION.SDK_INT >= 21) {
-            final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-            if (bluetoothLeScanner == null) {
-                Logging.info("bluetoothLeScanner is null");
+        final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        if (bluetoothLeScanner == null) {
+            Logging.info("bluetoothLeScanner is null");
+        } else {
+            if (scanning.compareAndSet(false, true)) {
+                final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
+                scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
+                //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
+                //  this is effectively how often we update the display
+                scanSettingsBuilder.setReportDelay(15000);
+                try {
+                    Logging.info("START BLE SCANs");
+                    bluetoothLeScanner.startScan(
+                            Collections.emptyList(), scanSettingsBuilder.build(), scanCallback);
+                } catch (SecurityException se) {
+                    Logging.error("No permission for bluetoothScanner.startScan", se);
+                }
             } else {
-                if (scanning.compareAndSet(false, true)) {
-                    final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
-                    scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
-                    //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
-                    //  this is effectively how often we update the display
-                    scanSettingsBuilder.setReportDelay(15000);
-                    try {
-                        Logging.info("START BLE SCANs");
-                        bluetoothLeScanner.startScan(
-                                Collections.emptyList(), scanSettingsBuilder.build(), scanCallback);
-                    } catch (SecurityException se) {
-                        Logging.error("No permission for bluetoothScanner.startScan", se);
-                    }
-                } else {
-                    //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
-                    //DEBUG: MainActivity.error("FLUSH BLE SCANs");
-                    try {
-                        bluetoothLeScanner.flushPendingScanResults(scanCallback);
-                    } catch (SecurityException se) {
-                        Logging.error("No permission for bluetoothScanner.flushPendingScanResults", se);
-                    }
+                //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
+                //DEBUG: MainActivity.error("FLUSH BLE SCANs");
+                try {
+                    bluetoothLeScanner.flushPendingScanResults(scanCallback);
+                } catch (SecurityException se) {
+                    Logging.error("No permission for bluetoothScanner.flushPendingScanResults", se);
                 }
             }
         }
@@ -296,25 +292,26 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             }
             final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
             if (listAdapter != null && showCurrent) {
-                listAdapter.get().clearBluetoothLe();
-                listAdapter.get().clearBluetooth();
+                SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    l.clearBluetoothLe();
+                    l.clearBluetooth();
+                }
             }
 
 
-            if (Build.VERSION.SDK_INT >= 21) {
-                final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-                if (bluetoothLeScanner != null) {
-                    if (scanning.compareAndSet(true, false)) {
-                        Logging.info("STOPPING BLE SCANS");
-                        try {
-                            bluetoothLeScanner.stopScan(scanCallback);
-                        } catch (SecurityException se) {
-                            Logging.error("No permission for bluetoothAdapter.stopScan", se);
-                        }
-
-                    } else {
-                        Logging.error("Scanner present, comp-and-set prevented stop-scan");
+            final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            if (bluetoothLeScanner != null) {
+                if (scanning.compareAndSet(true, false)) {
+                    Logging.info("STOPPING BLE SCANS");
+                    try {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    } catch (SecurityException se) {
+                        Logging.error("No permission for bluetoothAdapter.stopScan", se);
                     }
+
+                } else {
+                    Logging.error("Scanner present, comp-and-set prevented stop-scan");
                 }
             }
         }
@@ -391,8 +388,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
                     //ALIBI: shamelessly re-using frequency here for device type.
                     final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
-                    sort(prefs, listAdapter);
-                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
+                    if (listAdapter != null) {
+                        SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            sort(prefs, l);
+                            l.notifyDataSetChanged();
+                        }
+                    }
                 } catch (SecurityException se) {
                     Logging.error("No permission for device inspection", se);
                 }
@@ -405,11 +407,16 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 ListFragment.lameStatic.currBt = (null != scanCallback) ? scanCallback.getPrevBtLeSize():0 + prevBt.size();
 
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
-                if (listAdapter != null) listAdapter.get().batchUpdateBt(showCurrent, false, true);
+                if (listAdapter != null) {
+                    SetNetworkListAdapter l = listAdapter.get();
+                    if (null != l) {
+                        l.batchUpdateBt(showCurrent, false, true);
+                        sort(prefs, l);
+                        l.notifyDataSetChanged();
+                    }
+                }
                 ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                 ListFragment.lameStatic.runBt = runNetworks.size();
-                sort(prefs, listAdapter);
-                if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
             }
         }
     }
@@ -417,10 +424,10 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     /**
      * TODO: DRY this up with the sort in WifiReceiver?
      */
-    private static void sort(final SharedPreferences prefs, final WeakReference<SetNetworkListAdapter> listAdapter) {
+    private static void sort(final SharedPreferences prefs, final SetNetworkListAdapter listAdapter) {
         if (listAdapter != null) {
             try {
-                listAdapter.get().sort(NetworkListSorter.getSort(prefs));
+                listAdapter.sort(NetworkListSorter.getSort(prefs));
             } catch (IllegalArgumentException ex) {
                 Logging.error("sort failed: ",ex);
             }
@@ -720,9 +727,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         private final DatabaseHelper dbHelper;
         private final WeakReference<SetNetworkListAdapter> listAdapter;
         private final SharedPreferences prefs;
-        private final WeakReference<Set<String>> runNetworks;
+        private final Set<String> runNetworks;
         private final Set<String> latestBtle;
-        private final WeakReference<Set<String>> latestBt;
+        private final Set<String> latestBt;
         private Set<String> prevBtle;
         private final AtomicLong lastLeBatchResponseTime;
         private final AtomicBoolean scanning;
@@ -737,9 +744,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             this.dbHelper = dbHelper;
             this.listAdapter = listAdapter;
             this.prefs = prefs;
-            this.runNetworks = new WeakReference<>(runNetworks);
+            this.runNetworks = runNetworks;
             this.latestBtle = latestBtle;
-            this.latestBt = new WeakReference<>(latestBt);
+            this.latestBt = latestBt;
             this.prevBtle = new HashSet<>();
             this.lastLeBatchResponseTime = lastLeBatchResponseTime;
             this.scanning = scanning;
@@ -766,9 +773,14 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
             updater.get().handleLeScanResult(scanResult, location, false);
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
-            ListFragment.lameStatic.runBt = runNetworks.get().size();
-            sort(prefs, listAdapter);
-            if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
+            ListFragment.lameStatic.runBt = runNetworks.size();
+            if (listAdapter != null) {
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    sort(prefs, l);
+                    l.notifyDataSetChanged();
+                }
+            }
         }
 
         @Override
@@ -807,7 +819,10 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             }
 
             if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true) && forceLeListReset) {
-                listAdapter.get().clearBluetoothLe();
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    l.clearBluetoothLe();
+                }
             }
 
             if (results.isEmpty()) {
@@ -821,16 +836,24 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             prevBtle = new HashSet<>(latestBtle);
             latestBtle.clear();
 
-            ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.get().size();
+            ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
 
             if (listAdapter != null) {
-                listAdapter.get().batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
-                        true, false);
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    l.batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
+                            true, false);
+                }
             }
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
-            ListFragment.lameStatic.runBt = runNetworks.get().size();
-            sort(prefs, listAdapter);
-            if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
+            ListFragment.lameStatic.runBt = runNetworks.size();
+            if (listAdapter != null) {
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    sort(prefs, l);
+                    l.notifyDataSetChanged();
+                }
+            }
         }
 
         @Override
@@ -840,22 +863,24 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     Logging.info("BluetoothLE Scan already started");
                     break;
                 case SCAN_FAILED_FEATURE_UNSUPPORTED:
-                    Logging.info("BluetoothLE Scan: UNSUPPORTED");
-                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
-                        listAdapter.get().clearBluetoothLe();
-                    }
-                    break;
                 case SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
-                    Logging.info("BluetoothLE Scan: App Registration Failed");
+                    Logging.info("BluetoothLE Scan: failed: " +
+                            (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED?"Scanning not supported":"Unable to register"));
                     if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
-                        listAdapter.get().clearBluetoothLe();
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        }
                     }
                     break;
                 default:
                     //ALIBI: catch-all - as of API 33, this subsumes:
                     //   SCAN_FAILED_OUT_OF_HARDWARE_RESOURCESl SCAN_FAILED_SCANNING_TOO_FREQUENTLY
                     if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
-                        listAdapter.get().clearBluetoothLe();
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        }
                     }
                     Logging.error("Bluetooth LE scan error: " + errorCode);
                     scanning.set(false);

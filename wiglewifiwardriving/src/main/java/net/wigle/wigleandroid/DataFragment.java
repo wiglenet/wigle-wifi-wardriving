@@ -6,7 +6,7 @@ import net.wigle.m8b.siphash.SipKey;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
@@ -763,8 +763,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             // write intermediate file
             // ALIBI: redundant thread, but this gets us queue, progress
-            final QueryThread.Request request = new QueryThread.Request(
-                    DatabaseHelper.LOCATED_NETS_QUERY, null, new QueryThread.ResultHandler() {
+            final PooledQueryExecutor.Request request = new PooledQueryExecutor.Request(
+                    DatabaseHelper.LOCATED_NETS_QUERY, null, new PooledQueryExecutor.ResultHandler() {
 
                 int non_utm=0;
                 int rows = 0;
@@ -900,8 +900,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         Logging.error("Unable to link m8b provider - null context");
                     }
                 }
-            });
-            ListFragment.lameStatic.dbHelper.addToQueue( request );
+            }, ListFragment.lameStatic.dbHelper);
+            PooledQueryExecutor.enqueue( request );
             return null;
         }
 

@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
@@ -119,6 +120,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
+
     //TODO: this is pretty redundant with the central network list,
     // but they all seem to be getting out of sync, which is annoying AF
     private final Set<String> unsafeRunNetworks = new HashSet<>();
@@ -157,8 +159,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         if (hasLeSupport) {
             //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
             AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
+            AtomicInteger btLeEmpties = new AtomicInteger(0);
             scanCallback = new LeScanCallback(dbHelper, listAdapter, prefs, runNetworks, latestBtle,
-                    latestBt, lastLeBatchResponseTime, scanning, this);
+                    latestBt, lastLeBatchResponseTime, scanning, this, btLeEmpties);
         } else {
             scanCallback = null;
         }
@@ -734,13 +737,13 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         private final AtomicLong lastLeBatchResponseTime;
         private final AtomicBoolean scanning;
         private final WeakReference<LeScanUpdater> updater;
+        private final AtomicInteger empties;
 
         public LeScanCallback(DatabaseHelper dbHelper,
                               WeakReference<SetNetworkListAdapter> listAdapter, SharedPreferences prefs,
                               Set<String> runNetworks, Set<String> latestBtle,
                               Set<String> latestBt, AtomicLong lastLeBatchResponseTime,
-                              AtomicBoolean scanning, LeScanUpdater updater
-            ) {
+                              AtomicBoolean scanning, LeScanUpdater updater, final AtomicInteger empties) {
             this.dbHelper = dbHelper;
             this.listAdapter = listAdapter;
             this.prefs = prefs;
@@ -751,8 +754,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             this.lastLeBatchResponseTime = lastLeBatchResponseTime;
             this.scanning = scanning;
             this.updater = new WeakReference<>(updater);
+            this.empties = empties;
         }
-        private int empties = 0;
 
         @Override
         public void onScanResult(int callbackType, ScanResult scanResult) {
@@ -771,11 +774,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 }
             }
 
-            if (null != updater) {
-                final LeScanUpdater updt = updater.get();
-                if (null != updt) {
-                    updt.handleLeScanResult(scanResult, location, false);
-                }
+            final LeScanUpdater updt = updater.get();
+            if (null != updt) {
+                updt.handleLeScanResult(scanResult, location, false);
             }
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
             ListFragment.lameStatic.runBt = runNetworks.size();
@@ -808,38 +809,33 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     Logging.warn("Null gpsListener in LE Batch Scan Result");
                 }
             }
-            boolean forceLeListReset = false;
             if (results.isEmpty()) {
-                empties++;
+                final int emptyCnt = empties.addAndGet(1);
                 //DEBUG: MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
                 //ALIBI: if it's been too long with no nets seen, we'll force-clear
-                if (EMPTY_LE_THRESHOLD < empties) {
-                    forceLeListReset = true;
-                    empties = 0;
+                if (EMPTY_LE_THRESHOLD < emptyCnt) {
+                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        } else {
+                            Logging.error("Failed to clear BLE due to null listAdapter de-weak-ref");
+                        }
+                    }
+                    empties.set(0);
                     prevBtle = new HashSet<>(latestBtle);
                     latestBtle.clear();
                 }
-            } else {
-                empties = 0;
-            }
-
-            if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true) && forceLeListReset) {
-                final SetNetworkListAdapter l = listAdapter.get();
-                if (null != l) {
-                    l.clearBluetoothLe();
-                }
-            }
-
-            if (results.isEmpty()) {
                 //ALIBI: if this was an empty scan result, not further processing is required.
                 return;
+            } else {
+                empties.set(0);
             }
-            if (null != updater) {
-                final LeScanUpdater updt = updater.get();
-                if (null != updt) {
-                    for (final ScanResult scanResult : results) {
-                        updt.handleLeScanResult(scanResult, location, true);
-                    }
+
+            final LeScanUpdater updt = updater.get();
+            if (null != updt) {
+                for (final ScanResult scanResult : results) {
+                    updt.handleLeScanResult(scanResult, location, true);
                 }
             }
             //DEBUG:Logging.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.get().size());

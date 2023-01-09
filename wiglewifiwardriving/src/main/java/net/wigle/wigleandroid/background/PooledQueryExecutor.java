@@ -18,7 +18,7 @@ import java.util.concurrent.Executors;
  * @author arkasha
  */
 public class PooledQueryExecutor {
-    //ALIBI: unclear whether we need more than one thread a time for anything.
+    //ALIBI: unclear whether we need more than one thread a time for anything -
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public interface ResultHandler {
@@ -84,9 +84,9 @@ public class PooledQueryExecutor {
         executor.execute(request);
     }
 
-    public static void shutdown() {
+    public static void shutdownNow() {
         if (executor != null) {
-            executor.shutdown();
+            executor.shutdownNow();
         }
     }
 

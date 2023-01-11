@@ -1,5 +1,10 @@
 package net.wigle.wigleandroid.listener;
 
+import static android.bluetooth.le.ScanSettings.CALLBACK_TYPE_ALL_MATCHES;
+import static android.bluetooth.le.ScanSettings.MATCH_MODE_AGGRESSIVE;
+//import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY; battery drain
+import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_POWER;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -55,8 +60,10 @@ import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
 public final class BluetoothReceiver extends BroadcastReceiver implements LeScanUpdater {
 
     // if a batch scan arrives within <x> millis of the previous batch, maybe that's too close
-    // currently seeing double-callbacks on motorola+8.1 devices
-    private final static long MIN_LE_BATCH_GAP = 50;
+    // Common on Android 8.1+ devices
+    // Apparently a feature used for ranging/distance
+    private final static long MIN_LE_BATCH_GAP_MILLIS = 250; // ALIBI: must be lower than LE_REPORT_DELAY_MILLIS
+    private final static long LE_REPORT_DELAY_MILLIS = 15000; // ALIBI: experimental - should this be settable?
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
 
@@ -148,7 +155,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     private final Set<String> latestBt = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBt = Collections.synchronizedSet(new HashSet<>());
 
-    //ALIBI: only current synchronized since prev only ever gets copied and counted
     private final Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
 
     public BluetoothReceiver(final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
@@ -158,10 +164,9 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
 
         if (hasLeSupport) {
             //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
-            AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
             AtomicInteger btLeEmpties = new AtomicInteger(0);
-            scanCallback = new LeScanCallback(dbHelper, listAdapter, prefs, runNetworks, latestBtle,
-                    latestBt, lastLeBatchResponseTime, scanning, this, btLeEmpties);
+            scanCallback = new LeScanCallback(dbHelper, prefs, runNetworks, latestBtle,
+                    latestBt, new AtomicLong(System.currentTimeMillis()), scanning, this, btLeEmpties);
         } else {
             scanCallback = null;
         }
@@ -253,15 +258,15 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             Logging.info("bluetoothLeScanner is null");
         } else {
             if (scanning.compareAndSet(false, true)) {
-                final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
-                scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
-                //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
-                //  this is effectively how often we update the display
-                scanSettingsBuilder.setReportDelay(15000);
                 try {
                     Logging.info("START BLE SCANs");
-                    bluetoothLeScanner.startScan(
-                            Collections.emptyList(), scanSettingsBuilder.build(), scanCallback);
+                    bluetoothLeScanner.startScan(Collections.emptyList(),
+                            new ScanSettings.Builder()
+                                .setCallbackType(CALLBACK_TYPE_ALL_MATCHES)
+                                .setMatchMode(MATCH_MODE_AGGRESSIVE)
+                                .setReportDelay(LE_REPORT_DELAY_MILLIS)
+                                .setScanMode(SCAN_MODE_LOW_POWER).build(),
+                            scanCallback);
                 } catch (SecurityException se) {
                     Logging.error("No permission for bluetoothScanner.startScan", se);
                 }
@@ -438,13 +443,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
     }
 
     /**
-     * Set display list adapter
-     */
-    public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
-        this.listAdapter = new WeakReference<>(listAdapter);
-    }
-
-    /**
      * get the number of BT networks seen this run
      */
     public int getRunNetworkCount() {
@@ -513,7 +511,6 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 if (!scanInFlight) {
                     try {
                         m.bluetoothScan();
-                        //bluetoothManager.startScan();
                     } catch (Exception ex) {
                         Logging.warn("exception starting bt scan: " + ex, ex);
                     }
@@ -726,9 +723,16 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         return type == 0 || type == 7936;
     }
 
+    public void setListAdapter(SetNetworkListAdapter listAdapter) {
+        this.listAdapter = new WeakReference<>(listAdapter);
+        if (scanCallback != null) {
+            scanCallback.setListAdapter(listAdapter);
+        }
+    }
+
     private static final class LeScanCallback extends ScanCallback {
         private final DatabaseHelper dbHelper;
-        private final WeakReference<SetNetworkListAdapter> listAdapter;
+        private WeakReference<SetNetworkListAdapter> listAdapter;
         private final SharedPreferences prefs;
         private final Set<String> runNetworks;
         private final Set<String> latestBtle;
@@ -740,17 +744,15 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         private final AtomicInteger empties;
 
         public LeScanCallback(DatabaseHelper dbHelper,
-                              WeakReference<SetNetworkListAdapter> listAdapter, SharedPreferences prefs,
+                              SharedPreferences prefs,
                               Set<String> runNetworks, Set<String> latestBtle,
                               Set<String> latestBt, AtomicLong lastLeBatchResponseTime,
                               AtomicBoolean scanning, LeScanUpdater updater, final AtomicInteger empties) {
             this.dbHelper = dbHelper;
-            this.listAdapter = listAdapter;
             this.prefs = prefs;
             this.runNetworks = runNetworks;
             this.latestBtle = latestBtle;
             this.latestBt = latestBt;
-            this.prevBtle = new HashSet<>();
             this.lastLeBatchResponseTime = lastLeBatchResponseTime;
             this.scanning = scanning;
             this.updater = new WeakReference<>(updater);
@@ -794,11 +796,11 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             long responseClockTime = System.currentTimeMillis();
             long diff = responseClockTime - lastLeBatchResponseTime.longValue();
             lastLeBatchResponseTime.set(responseClockTime);
-            if (diff < MIN_LE_BATCH_GAP) {
-                Logging.warn("Tried to update BTLE batch in improbably short time: " + diff);
+            if (diff < MIN_LE_BATCH_GAP_MILLIS) {
+                Logging.info("Tried to update BTLE batch in improbably short time: " + diff + " ("+results.size()+" results)");
                 return;
             }
-            //MainActivity.info("LE Batch results: " + results);
+            //DEBUG: Logging.error("LE Batch results: " + results.size());
             final MainActivity m = MainActivity.getMainActivity();
             Location location = null;
             if (m != null) {
@@ -811,7 +813,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             }
             if (results.isEmpty()) {
                 final int emptyCnt = empties.addAndGet(1);
-                //DEBUG: MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
+                //DEBUG: Logging.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
                 //ALIBI: if it's been too long with no nets seen, we'll force-clear
                 if (EMPTY_LE_THRESHOLD < emptyCnt) {
                     if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
@@ -838,27 +840,25 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                     updt.handleLeScanResult(scanResult, location, true);
                 }
             }
-            //DEBUG:Logging.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.get().size());
+            //DEBUG: Logging.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
             prevBtle = new HashSet<>(latestBtle);
             latestBtle.clear();
 
             ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
-
-            if (listAdapter != null) {
-                final SetNetworkListAdapter l = listAdapter.get();
-                if (null != l) {
-                    l.batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
-                            true, false);
-                }
-            }
             ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
             ListFragment.lameStatic.runBt = runNetworks.size();
             if (listAdapter != null) {
                 final SetNetworkListAdapter l = listAdapter.get();
                 if (null != l) {
+                    l.batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
+                            true, false);
                     sort(prefs, l);
                     l.notifyDataSetChanged();
+                } else {
+                    Logging.error("Null set network list adapter in updateLe ScanCallback");
                 }
+            } else {
+                Logging.error("Null set network list adapter weakref in updateLe ScanCallback");
             }
         }
 
@@ -894,7 +894,12 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
         }
 
         public int getPrevBtLeSize() {
-            return prevBtle.size();
+            if (null != prevBtle)  return prevBtle.size();
+            return 0;
+        }
+
+        public void setListAdapter(SetNetworkListAdapter listAdapter) {
+            this.listAdapter = new WeakReference<>(listAdapter);
         }
     }
 }

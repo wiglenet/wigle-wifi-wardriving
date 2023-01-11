@@ -259,7 +259,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         try {
             return networks.get(i);
         } catch (IndexOutOfBoundsException iobex) {
-            Logging.error("failed SBNL.get - index out of bound (likely structure changed)");
+            Logging.error("failed SBNL.get - index out of bound (likely structure changed) index: "+i);
             return null;
         }
     }
@@ -473,11 +473,15 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         if (showCurrent) {
             //ALIBI: if we're in current-only, strip last from networks and sets, add new to set, add revamped set to networks
             if (updateLe) {
+                //DEBUG: final int initialSize = networks.size();
                 networks.removeAll(leNets);
+                //DEBUG: final int postRemoveSize = networks.size();
                 //TODO: 1/2: faster to clear and re-add all?
                 leNets.retainAll(nextLeNets);
                 leNets.addAll(nextLeNets);
                 networks.addAll(leNets);
+                //DEBUG: final int finalSize = networks.size();
+                //DEBUG: Logging.error(initialSize+" -> "+postRemoveSize+" -> "+ finalSize + " (prev le: "+ leNets.size()+" new le: "+nextLeNets.size()+")");
             }
             if (updateClassic) {
                 networks.removeAll(btNets);

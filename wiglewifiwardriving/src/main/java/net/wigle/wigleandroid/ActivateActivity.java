@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import androidx.annotation.NonNull;
@@ -63,10 +62,6 @@ public class ActivateActivity extends Activity {
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
         cameraView = findViewById(R.id.camera_view);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            Log.e(LOG_TAG, "Attempt to initialize camera capture with a pre-SDKv23 client");
-            return;
-        }
         barcodeDetector =
                 new BarcodeDetector.Builder(this)
                         .setBarcodeFormats(Barcode.QR_CODE)

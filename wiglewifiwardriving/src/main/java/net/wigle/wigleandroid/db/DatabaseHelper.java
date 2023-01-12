@@ -31,7 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.wigle.wigleandroid.DataFragment.BackupTask;
 import net.wigle.wigleandroid.ErrorReportActivity;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.background.QueryThread;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -50,7 +49,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -137,11 +135,8 @@ public final class DatabaseHelper extends Thread {
     private static final String NETWORK_DELETE = "drop table " + NETWORK_TABLE;
     private static final String ROUTE_DELETE = "drop table " + ROUTE_TABLE;
 
-    private static final String LOCATED_NETS_QUERY_STEM = (Build.VERSION.SDK_INT > 19)?
-                " FROM " + DatabaseHelper.NETWORK_TABLE
-            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0":
-                " FROM " + DatabaseHelper.NETWORK_TABLE
-            + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND bssid NOT LIKE '%_%' ESCAPE '_'";
+    private static final String LOCATED_NETS_QUERY_STEM = " FROM " + DatabaseHelper.NETWORK_TABLE
+        + " WHERE bestlat != 0.0 AND bestlon != 0.0 AND instr(bssid, '_') <= 0";
 
     //ALIBI: Sqlite types are dynamic, so usual warnings about doubles and zero == should be moot
 
@@ -169,7 +164,6 @@ public final class DatabaseHelper extends Thread {
     private final AtomicLong newWifiCount = new AtomicLong();
     private final AtomicLong newCellCount = new AtomicLong();
     private final AtomicLong newBtCount = new AtomicLong();
-    private final QueryThread queryThread;
 
     private Location lastLoc = null;
     private long lastLocWhen = 0L;
@@ -214,10 +208,6 @@ public final class DatabaseHelper extends Thread {
         public final boolean typeMorphed;
         public final int external;
 
-        public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun ) {
-            this(network, level, location, newForRun, false, false);
-        }
-
         public DBUpdate( final Network network, final int level, final Location location, final boolean newForRun, final boolean frequencyChanged, final boolean typeMorphed ) {
             this(network, level, location, newForRun, false, false, 0);
         }
@@ -242,9 +232,6 @@ public final class DatabaseHelper extends Thread {
         public final boolean frequencyChanged;
         public final boolean typeMorphed;
 
-        public DBPending( final Network network, final int level, final boolean newForRun ) {
-            this(network, level, newForRun, false, false);
-        }
         public DBPending( final Network network, final int level, final boolean newForRun, boolean frequencyChanged, boolean typeMorphed) {
             this.network = network;
             this.level = level;
@@ -260,18 +247,11 @@ public final class DatabaseHelper extends Thread {
         this.prefs = prefs;
         setName("dbworker-" + getName());
         this.deathHandler = new DeathHandler();
-
-        queryThread = new QueryThread( this );
-        queryThread.start();
     }
 
     public SQLiteDatabase getDB() throws DBException {
         checkDB();
         return db;
-    }
-
-    public void addToQueue( QueryThread.Request request ) {
-        queryThread.addToQueue( request );
     }
 
     private static class DeathHandler extends Handler {
@@ -616,9 +596,7 @@ public final class DatabaseHelper extends Thread {
      */
     public void close() {
         done.set( true );
-        if (queryThread != null) {
-            queryThread.setDone();
-        }
+
         // interrupt the take, if any
         this.interrupt();
         // give time for db to finish any writes
@@ -1200,11 +1178,8 @@ public final class DatabaseHelper extends Thread {
     }
 
     public boolean isFastMode() {
-        boolean fastMode = false;
-        if ( (queue.size() * 100) / MAX_QUEUE > 75 ) {
-            // queue is filling up, go to fast mode, only write new networks or big changes
-            fastMode = true;
-        }
+        boolean fastMode = (queue.size() * 100) / MAX_QUEUE > 75;
+        // queue is filling up, go to fast mode, only write new networks or big changes
         return fastMode;
     }
 
@@ -1237,16 +1212,9 @@ public final class DatabaseHelper extends Thread {
     public long getRoutePointCount(long routeId) {
         try {
             checkDB();
-            Cursor cursor = null;
-            try {
-                cursor = db.rawQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)});
+            try (Cursor cursor = db.rawQuery(ROUTE_COUNT_QUERY, new String[]{String.valueOf(routeId)})) {
                 cursor.moveToFirst();
-                final long count = cursor.getLong(0);
-                return count;
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
-                }
+                return cursor.getLong(0);
             }
         } catch (Exception e) {
             return 0L;
@@ -1300,36 +1268,27 @@ public final class DatabaseHelper extends Thread {
 
     private long getCountFromDB( final String table ) throws DBException {
         checkDB();
-        Cursor cursor = db.rawQuery("select count(*) FROM " + table, null);
-        try {
+        try (Cursor cursor = db.rawQuery("select count(*) FROM " + table, null)) {
             cursor.moveToFirst();
             final long count = cursor.getLong(0);
             return count;
-        } finally {
-            cursor.close();
         }
     }
 
     private long getMaxIdFromDB( final String table ) throws DBException {
         checkDB();
-        Cursor cursor = db.rawQuery("select MAX(_id) FROM " + table, null);
-        try {
+        try (Cursor cursor = db.rawQuery("select MAX(_id) FROM " + table, null)) {
             cursor.moveToFirst();
             final long count = cursor.getLong(0);
             return count;
-        } finally {
-            cursor.close();
         }
     }
 
     public long getNetsWithLocCountFromDB() throws DBException {
         checkDB();
-        Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null);
-        try {
+        try (Cursor cursor = db.rawQuery(LOCATED_NETS_COUNT_QUERY, null)) {
             cursor.moveToFirst();
             return cursor.getLong(0);
-        } finally {
-            cursor.close();
         }
     }
 

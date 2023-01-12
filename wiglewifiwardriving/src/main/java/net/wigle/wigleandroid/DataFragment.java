@@ -6,7 +6,7 @@ import net.wigle.m8b.siphash.SipKey;
 import net.wigle.wigleandroid.background.ApiListener;
 import net.wigle.wigleandroid.background.ObservationImporter;
 import net.wigle.wigleandroid.background.ObservationUploader;
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.background.TransferListener;
 import net.wigle.wigleandroid.background.KmlWriter;
 import net.wigle.wigleandroid.db.DBException;
@@ -38,7 +38,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -175,16 +174,13 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
     private void setupKmlButtons( final View view ) {
         final Button kmlRunExportButton = view.findViewById( R.id.kml_run_export_button );
-        kmlRunExportButton.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View buttonView ) {
-                final FragmentActivity fa = getActivity();
-                if (fa != null) {
-                    WiGLEConfirmationDialog.createConfirmation( fa,
-                        DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
-                } else {
-                    Logging.error("Null FragmentActivity setting up KML run export button");
-                }
+        kmlRunExportButton.setOnClickListener(buttonView -> {
+            final FragmentActivity fa = getActivity();
+            if (fa != null) {
+                WiGLEConfirmationDialog.createConfirmation( fa,
+                    DataFragment.this.getString(R.string.data_export_kml_run), R.id.nav_data, KML_RUN_DIALOG);
+            } else {
+                Logging.error("Null FragmentActivity setting up KML run export button");
             }
         });
 
@@ -275,7 +271,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         SharedPreferences prefs = null;
         final Activity a = getActivity();
         if (null != a) {
-            prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
 
         // db marker reset button and text
@@ -659,7 +655,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         try {
             final FragmentActivity fa = getActivity();
             if (null != fa) {
-                getActivity().setTitle(R.string.data_activity_name);
+                fa.setTitle(R.string.data_activity_name);
             } else {
                 Logging.error("Failed to set title on null activity onResume");
             }
@@ -767,8 +763,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
             // write intermediate file
             // ALIBI: redundant thread, but this gets us queue, progress
-            final QueryThread.Request request = new QueryThread.Request(
-                    DatabaseHelper.LOCATED_NETS_QUERY, null, new QueryThread.ResultHandler() {
+            final PooledQueryExecutor.Request request = new PooledQueryExecutor.Request(
+                    DatabaseHelper.LOCATED_NETS_QUERY, null, new PooledQueryExecutor.ResultHandler() {
 
                 int non_utm=0;
                 int rows = 0;
@@ -904,8 +900,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         Logging.error("Unable to link m8b provider - null context");
                     }
                 }
-            });
-            ListFragment.lameStatic.dbHelper.addToQueue( request );
+            }, ListFragment.lameStatic.dbHelper);
+            PooledQueryExecutor.enqueue( request );
             return null;
         }
 

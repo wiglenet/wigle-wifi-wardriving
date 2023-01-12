@@ -51,7 +51,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.MccMncRecord;
@@ -121,8 +121,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
         if ( network == null ) {
             Logging.info( "no network found in cache for bssid: " + bssid );
-        }
-        else {
+        } else {
             // do gui work
             tv = findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
@@ -286,8 +285,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 final TextView tv = findViewById( R.id.na_observe );
                 if ( msg.what == MSG_OBS_UPDATE ) {
                     tv.setText( " " + Integer.toString( observations ) + "...");
-                }
-                else if ( msg.what == MSG_OBS_DONE ) {
+                } else if ( msg.what == MSG_OBS_DONE ) {
                     tv.setText( " " + Integer.toString( observations ) );
                     // ALIBI:  assumes all observations belong to one "cluster" w/ a single centroid.
                     // we could check and perform multi-cluster here
@@ -337,8 +335,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = ?" +
                 " ORDER BY _id DESC limit ?" ;
 
-        final QueryThread.Request request = new QueryThread.Request( sql,
-                new String[]{network.getBssid(), obsMap.maxSize()+""}, new QueryThread.ResultHandler() {
+        PooledQueryExecutor.enqueue( new PooledQueryExecutor.Request( sql,
+                new String[]{network.getBssid(), obsMap.maxSize()+""}, new PooledQueryExecutor.ResultHandler() {
             @Override
             public boolean handleRow( final Cursor cursor ) {
                 observations++;
@@ -354,8 +352,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             public void complete() {
                 handler.sendEmptyMessage( MSG_OBS_DONE );
             }
-        });
-        ListFragment.lameStatic.dbHelper.addToQueue( request );
+        }, ListFragment.lameStatic.dbHelper ));
+        //ListFragment.lameStatic.dbHelper.addToQueue( request );
     }
 
     private LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {

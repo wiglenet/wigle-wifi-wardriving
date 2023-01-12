@@ -130,30 +130,19 @@ public class ErrorReportActivity extends AppCompatActivity {
     private String getLatestStack(final String filePath) {
         StringBuilder builder = new StringBuilder( "No Error Report found" );
         if (filePath == null) return builder.toString();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader( new InputStreamReader( new FileInputStream( filePath ), "UTF-8") );
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader( new FileInputStream( filePath ), "UTF-8") )) {
             String line = reader.readLine();
             builder.setLength( 0 );
             while ( line != null ) {
                 builder.append( line ).append( "\n" );
                 line = reader.readLine();
             }
-
             if (stack == null || stack.length() > MAX_STACK_TRANSACTION_SIZE) {
                 return builder.toString();
             }
         } catch ( IOException ex ) {
             Logging.error( "error reading stack file: " + ex, ex );
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                }
-                catch (IOException ex) {
-                    Logging.error( "error closing stack file: " + ex, ex );
-                }
-            }
         }
 
         return builder.toString();

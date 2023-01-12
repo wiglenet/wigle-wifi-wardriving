@@ -73,7 +73,7 @@ import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 
 import net.wigle.wigleandroid.background.AbstractApiRequest;
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
@@ -1045,50 +1045,50 @@ public final class MappingFragment extends Fragment {
     }
 
     private void setupQuery() {
-        final int cacheSize = MainActivity.getNetworkCache().size();
-        if (cacheSize > (ListFragment.lameStatic.networkCache.maxSize() / 4)) {
-            // don't load, there's already networks to show
-            Logging.info("cacheSize: " + cacheSize + ", skipping previous networks");
-            return;
-        }
+        if (ListFragment.lameStatic.dbHelper != null) {
+            final int cacheSize = MainActivity.getNetworkCache().size();
+            if (cacheSize > (ListFragment.lameStatic.networkCache.maxSize() / 4)) {
+                // don't load, there's already networks to show
+                Logging.info("cacheSize: " + cacheSize + ", skipping previous networks");
+                return;
+            }
 
-        final String sql = "SELECT bssid FROM "
-                + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT ?";
+            final String sql = "SELECT bssid FROM "
+                    + DatabaseHelper.LOCATION_TABLE + " ORDER BY _id DESC LIMIT ?";
 
-        final QueryThread.Request request = new QueryThread.Request( sql,
+            final PooledQueryExecutor.Request request = new PooledQueryExecutor.Request( sql,
                 new String[]{(ListFragment.lameStatic.networkCache.maxSize() * 2)+""},
-                new QueryThread.ResultHandler() {
-            @Override
-            public boolean handleRow( final Cursor cursor ) {
-                final String bssid = cursor.getString(0);
-                final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
+                new PooledQueryExecutor.ResultHandler() {
+                @Override
+                public boolean handleRow( final Cursor cursor ) {
+                    final String bssid = cursor.getString(0);
+                    final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
 
-                Network network = networkCache.get( bssid );
-                // MainActivity.info("RAW bssid: " + bssid);
-                if ( network == null ) {
-                    network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
-                    if ( network != null ) {
-                        networkCache.put( network.getBssid(), network );
+                    Network network = networkCache.get( bssid );
+                    // MainActivity.info("RAW bssid: " + bssid);
+                    if ( network == null ) {
+                        network = ListFragment.lameStatic.dbHelper.getNetwork( bssid );
+                        if ( network != null ) {
+                            networkCache.put( network.getBssid(), network );
 
-                        if (networkCache.isFull()) {
-                            Logging.info("Cache is full, breaking out of query result handling");
-                            return false;
+                            if (networkCache.isFull()) {
+                                Logging.info("Cache is full, breaking out of query result handling");
+                                return false;
+                            }
                         }
                     }
+                    return true;
                 }
-                return true;
-            }
 
-            @Override
-            public void complete() {
-                if ( mapView != null ) {
-                    // force a redraw
-                    mapView.postInvalidate();
+                @Override
+                public void complete() {
+                    if ( mapView != null ) {
+                        // force a redraw
+                        mapView.postInvalidate();
+                    }
                 }
-            }
-        });
-        if (ListFragment.lameStatic.dbHelper != null) {
-            ListFragment.lameStatic.dbHelper.addToQueue( request );
+            }, ListFragment.lameStatic.dbHelper);
+            PooledQueryExecutor.enqueue(request);
         }
     }
     private static final PointExtractor<LatLng> latLngPointExtractor = new PointExtractor<LatLng>() {

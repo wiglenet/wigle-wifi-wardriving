@@ -1,5 +1,10 @@
 package net.wigle.wigleandroid.listener;
 
+import static android.bluetooth.le.ScanSettings.CALLBACK_TYPE_ALL_MATCHES;
+import static android.bluetooth.le.ScanSettings.MATCH_MODE_AGGRESSIVE;
+//import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_LATENCY; battery drain
+import static android.bluetooth.le.ScanSettings.SCAN_MODE_LOW_POWER;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
@@ -14,7 +19,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.BatteryManager;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -43,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 
@@ -52,11 +57,13 @@ import static net.wigle.wigleandroid.MainActivity.DEBUG_BLUETOOTH_DATA;
  * Central classic BT broadcast receiver and BTLE scanner.
  * Created by bobzilla on 12/20/15
  */
-public final class BluetoothReceiver extends BroadcastReceiver {
+public final class BluetoothReceiver extends BroadcastReceiver implements LeScanUpdater {
 
     // if a batch scan arrives within <x> millis of the previous batch, maybe that's too close
-    // currently seeing double-callbacks on motorola+8.1 devices
-    private final static long MIN_LE_BATCH_GAP = 50;
+    // Common on Android 8.1+ devices
+    // Apparently a feature used for ranging/distance
+    private final static long MIN_LE_BATCH_GAP_MILLIS = 250; // ALIBI: must be lower than LE_REPORT_DELAY_MILLIS
+    private final static long LE_REPORT_DELAY_MILLIS = 15000; // ALIBI: experimental - should this be settable?
 
     private static final Map<Integer, String> DEVICE_TYPE_LEGEND;
 
@@ -120,21 +127,20 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
     private final DatabaseHelper dbHelper;
     private final AtomicBoolean scanning = new AtomicBoolean(false);
+
     //TODO: this is pretty redundant with the central network list,
     // but they all seem to be getting out of sync, which is annoying AF
     private final Set<String> unsafeRunNetworks = new HashSet<>();
     private final Set<String> runNetworks = Collections.synchronizedSet(unsafeRunNetworks);
 
     private WeakReference<SetNetworkListAdapter> listAdapter;
-    private ScanCallback scanCallback;
+    private LeScanCallback scanCallback;
     private final SharedPreferences prefs;
 
     private Handler bluetoothTimer;
     private long scanRequestTime = Long.MIN_VALUE;
     private long lastScanResponseTime = Long.MIN_VALUE;
 
-    //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
-    private final AtomicLong lastLeBatchResponseTime = new AtomicLong(Long.MIN_VALUE);
     private final long constructionTime = System.currentTimeMillis();
 
     // refresh threshold - probably should either make these configurable
@@ -149,211 +155,79 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     private final Set<String> latestBt = Collections.synchronizedSet(new HashSet<>());
     private Set<String> prevBt = Collections.synchronizedSet(new HashSet<>());
 
-    //ALIBI: only current synchronized since prev only ever gets copied and counted
     private final Set<String> latestBtle = Collections.synchronizedSet(new HashSet<>());
-    private Set<String> prevBtle = new HashSet<>();
 
     public BluetoothReceiver(final DatabaseHelper dbHelper, final boolean hasLeSupport, final SharedPreferences prefs) {
         this.dbHelper = dbHelper;
         ListFragment.lameStatic.runBtNetworks = runNetworks;
         this.prefs = prefs;
 
-        if (Build.VERSION.SDK_INT >= 21 && hasLeSupport) {
-            scanCallback = new ScanCallback() {
-                private int empties = 0;
-
-                @Override
-                public void onScanResult(int callbackType, ScanResult scanResult) {
-                    final MainActivity m = MainActivity.getMainActivity();
-                    Location location = null;
-                    if (m != null) {
-                        final GNSSListener gpsListener = m.getGPSListener();
-                        //DEBUG: Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
-                        if (gpsListener != null) {
-                            final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
-                            final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
-                            gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
-                            location = gpsListener.getCurrentLocation();
-                        } else {
-                            Logging.warn("Null gpsListener in LE Single Scan Result");
-                        }
-                    }
-
-                    handleLeScanResult(scanResult, location, false);
-                    ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
-                    ListFragment.lameStatic.runBt = runNetworks.size();
-                    sort(prefs);
-                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
-                }
-
-                @Override
-                public void onBatchScanResults(List<ScanResult> results) {
-                    long responseClockTime = System.currentTimeMillis();
-                    long diff = responseClockTime - lastLeBatchResponseTime.longValue();
-                    lastLeBatchResponseTime.set(responseClockTime);
-                    if (diff < MIN_LE_BATCH_GAP) {
-                        Logging.warn("Tried to update BTLE batch in improbably short time: " + diff);
-                        return;
-                    }
-                    //MainActivity.info("LE Batch results: " + results);
-                    final MainActivity m = MainActivity.getMainActivity();
-                    Location location = null;
-                    if (m != null) {
-                        final GNSSListener gpsListener = m.getGPSListener();
-                        if (gpsListener != null) {
-                            location = gpsListener.checkGetLocation(prefs);
-                        } else {
-                            Logging.warn("Null gpsListener in LE Batch Scan Result");
-                        }
-                    }
-                    boolean forceLeListReset = false;
-                    if (results.isEmpty()) {
-                        empties++;
-                        //DEBUG: MainActivity.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
-                        //ALIBI: if it's been too long with no nets seen, we'll force-clear
-                        if (EMPTY_LE_THRESHOLD < empties) {
-                            forceLeListReset = true;
-                            empties = 0;
-                            prevBtle = new HashSet<>(latestBtle);
-                            latestBtle.clear();
-                        }
-                    } else {
-                        empties = 0;
-                    }
-
-                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true) && forceLeListReset) {
-                        listAdapter.get().clearBluetoothLe();
-                    }
-
-                    if (results.isEmpty()) {
-                        //ALIBI: if this was an empty scan result, not further processing is required.
-                        return;
-                    }
-                    for (final ScanResult scanResult : results) {
-                        handleLeScanResult(scanResult, location, true);
-                    }
-                    //DEBUG: MainActivity.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
-                    prevBtle = new HashSet<>(latestBtle);
-                    latestBtle.clear();
-
-                    ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
-
-                    if (listAdapter != null) {
-                        listAdapter.get().batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
-                                true, false);
-                    }
-                    ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
-                    ListFragment.lameStatic.runBt = runNetworks.size();
-                    sort(prefs);
-                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
-                }
-
-                @Override
-                public void onScanFailed(int errorCode) {
-                    switch (errorCode) {
-                        case SCAN_FAILED_ALREADY_STARTED:
-                            Logging.info("BluetoothLE Scan already started");
-                            break;
-                        default:
-                            if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
-                                listAdapter.get().clearBluetoothLe();
-                            }
-                            Logging.error("Bluetooth LE scan error: " + errorCode);
-                            scanning.set(false);
-                    }
-                }
-            };
+        if (hasLeSupport) {
+            //ALIBI: seeing same-count (redundant) batch returns in rapid succession triggering pointless churn
+            AtomicInteger btLeEmpties = new AtomicInteger(0);
+            scanCallback = new LeScanCallback(dbHelper, prefs, runNetworks, latestBtle,
+                    latestBt, new AtomicLong(System.currentTimeMillis()), scanning, this, btLeEmpties);
         } else {
             scanCallback = null;
         }
     }
 
-    private void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            //DEBUG: MainActivity.info("LE scanResult: " + scanResult);
-            try {
-                final ScanRecord scanRecord = scanResult.getScanRecord();
-                if (scanRecord != null) {
-                    final BluetoothDevice device = scanResult.getDevice();
-                    //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
-                    //final String adDeviceName = (adData != null) ? adData.getName(): null;
+    public void handleLeScanResult(final ScanResult scanResult, Location location, final boolean batch) {
+        //DEBUG: MainActivity.info("LE scanResult: " + scanResult);
+        try {
+            final ScanRecord scanRecord = scanResult.getScanRecord();
+            if (scanRecord != null) {
+                final BluetoothDevice device = scanResult.getDevice();
+                //BluetoothUtil.BleAdvertisedData adData = BluetoothUtil.parseAdvertisedData(scanRecord.getBytes());
+                //final String adDeviceName = (adData != null) ? adData.getName(): null;
 
-                    final String bssid = device.getAddress();
+                final String bssid = device.getAddress();
 
-                    latestBtle.add(bssid);
-                    prevBt.remove(bssid);
-                    latestBt.remove(bssid);
+                latestBtle.add(bssid);
+                prevBt.remove(bssid);
+                latestBt.remove(bssid);
 
-                    final String ssid =
-                            (null == scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
-                                    ? device.getName()
-                                    : scanRecord.getDeviceName();
+                final String ssid =
+                        (null == scanRecord.getDeviceName() || scanRecord.getDeviceName().isEmpty())
+                                ? device.getName()
+                                : scanRecord.getDeviceName();
 
-                    // This is questionable - of Major class being known when specific class seems thin
-                    final BluetoothClass bluetoothClass = device.getBluetoothClass();
-                    int type = BluetoothClass.Device.Major.UNCATEGORIZED;
-                    if (bluetoothClass != null) {
-                        final int deviceClass = bluetoothClass.getDeviceClass();
-                        type = (deviceClass == 0 || deviceClass == BluetoothClass.Device.Major.UNCATEGORIZED)
-                                ? bluetoothClass.getMajorDeviceClass()
-                                : deviceClass;
-                    }
-
-                    if (DEBUG_BLUETOOTH_DATA) {
-                        Logging.info("LE deviceName: " + ssid
-                                        + "\n\taddress: " + bssid
-                                        + "\n\tname: " + scanRecord.getDeviceName() + " (vs. " + device.getName() + ")"
-                                        //+ "\n\tadName: " + adDeviceName
-                                        + "\n\tclass:"
-                                        + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
-                                        + "(" + bluetoothClass + ")"
-                                        + "\n\ttype:" + device.getType()
-                                        + "\n\tRSSI:" + scanResult.getRssi()
-                                //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
-                                //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
-                        );
-
-
-                        /*final int scanCount = ((scanRecord != null) && (scanRecord.getServiceUuids() != null)) ? scanRecord.getServiceUuids().size() : 0;
-                        final int adCount = ((adData != null) && (adData.getUuids() != null)) ? adData.getUuids().size() : 0;
-
-                        if (adCount > 0 || scanCount > 0){
-                            final List<java.util.UUID> adUuids = adData.getUuids();
-                            final List<ParcelUuid> srUuids = scanRecord.getServiceUuids();
-                            if (scanCount > adCount) {
-                                for (ParcelUuid uuid: srUuids) {
-                                    if (! adUuids.contains(uuid.getUuid())) {
-                                        MainActivity.error("\n\t\tSR: "+uuid.toString());
-                                    }
-                                }
-                                scanUuidNoAdUuid++;
-                            } else if (adCount > scanCount) {
-                                for (UUID uuid: adUuids) {
-                                    if (! srUuids.contains(new ParcelUuid(uuid))) {
-                                        MainActivity.error("\n\t\tAD: "+uuid.toString());
-                                    }
-                                }
-                                adUuidNoScanUuid++;
-                            } else if (scanCount > 0) {
-                                for (ParcelUuid uuid: srUuids) {
-                                    MainActivity.info("\n\t\t==: "+uuid.toString());
-                                }
-                            }
-                        }*/
-                    }
-
-                    final String capabilities = DEVICE_TYPE_LEGEND.get(
-                            bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
-                    if (MainActivity.getMainActivity() != null) {
-                        //ALIBI: shamelessly re-using frequency here for device type.
-                        addOrUpdateBt(bssid, ssid, type, capabilities,
-                                scanResult.getRssi(),
-                                NetworkType.BLE, location, prefs, batch);
-                    }
+                // This is questionable - of Major class being known when specific class seems thin
+                final BluetoothClass bluetoothClass = device.getBluetoothClass();
+                int type = BluetoothClass.Device.Major.UNCATEGORIZED;
+                if (bluetoothClass != null) {
+                    final int deviceClass = bluetoothClass.getDeviceClass();
+                    type = (deviceClass == 0 || deviceClass == BluetoothClass.Device.Major.UNCATEGORIZED)
+                            ? bluetoothClass.getMajorDeviceClass()
+                            : deviceClass;
                 }
-            } catch (SecurityException se) {
-                Logging.warn("failing to perform BTLE scans: BT perms not granted", se);
+
+                if (DEBUG_BLUETOOTH_DATA) {
+                    Logging.info("LE deviceName: " + ssid
+                                    + "\n\taddress: " + bssid
+                                    + "\n\tname: " + scanRecord.getDeviceName() + " (vs. " + device.getName() + ")"
+                                    //+ "\n\tadName: " + adDeviceName
+                                    + "\n\tclass:"
+                                    + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
+                                    + "(" + bluetoothClass + ")"
+                                    + "\n\ttype:" + device.getType()
+                                    + "\n\tRSSI:" + scanResult.getRssi()
+                            //+ "\n\tTX power:" + scanRecord.getTxPowerLevel() //THIS IS ALWAYS GARBAGE
+                            //+ "\n\tbytes: " + Arrays.toString(scanRecord.getBytes())
+                    );
+                }
+
+                final String capabilities = DEVICE_TYPE_LEGEND.get(
+                        bluetoothClass == null ? null : bluetoothClass.getDeviceClass());
+                if (MainActivity.getMainActivity() != null) {
+                    //ALIBI: shamelessly re-using frequency here for device type.
+                    addOrUpdateBt(bssid, ssid, type, capabilities,
+                            scanResult.getRssi(),
+                            NetworkType.BLE, location, prefs, batch);
+                }
             }
+        } catch (SecurityException se) {
+            Logging.warn("failing to perform BTLE scans: BT perms not granted", se);
         }
     }
 
@@ -379,32 +253,30 @@ public final class BluetoothReceiver extends BroadcastReceiver {
         } catch (SecurityException se) {
             Logging.error("No permission for bluetoothAdapter.startDiscovery/isDiscovering", se);
         }
-        if (Build.VERSION.SDK_INT >= 21) {
-            final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-            if (bluetoothLeScanner == null) {
-                Logging.info("bluetoothLeScanner is null");
+        final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+        if (bluetoothLeScanner == null) {
+            Logging.info("bluetoothLeScanner is null");
+        } else {
+            if (scanning.compareAndSet(false, true)) {
+                try {
+                    Logging.info("START BLE SCANs");
+                    bluetoothLeScanner.startScan(Collections.emptyList(),
+                            new ScanSettings.Builder()
+                                .setCallbackType(CALLBACK_TYPE_ALL_MATCHES)
+                                .setMatchMode(MATCH_MODE_AGGRESSIVE)
+                                .setReportDelay(LE_REPORT_DELAY_MILLIS)
+                                .setScanMode(SCAN_MODE_LOW_POWER).build(),
+                            scanCallback);
+                } catch (SecurityException se) {
+                    Logging.error("No permission for bluetoothScanner.startScan", se);
+                }
             } else {
-                if (scanning.compareAndSet(false, true)) {
-                    final ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
-                    scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_POWER);
-                    //TODO: make settable? NOTE: unset, you'll never get batch results, even with LOWER_POWER above
-                    //  this is effectively how often we update the display
-                    scanSettingsBuilder.setReportDelay(15000);
-                    try {
-                        Logging.info("START BLE SCANs");
-                        bluetoothLeScanner.startScan(
-                                Collections.emptyList(), scanSettingsBuilder.build(), scanCallback);
-                    } catch (SecurityException se) {
-                        Logging.error("No permission for bluetoothScanner.startScan", se);
-                    }
-                } else {
-                    //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
-                    //DEBUG: MainActivity.error("FLUSH BLE SCANs");
-                    try {
-                        bluetoothLeScanner.flushPendingScanResults(scanCallback);
-                    } catch (SecurityException se) {
-                        Logging.error("No permission for bluetoothScanner.flushPendingScanResults", se);
-                    }
+                //ALIBI: tried a no-op here, but not the source of the pairs of batch callbacks
+                //DEBUG: MainActivity.error("FLUSH BLE SCANs");
+                try {
+                    bluetoothLeScanner.flushPendingScanResults(scanCallback);
+                } catch (SecurityException se) {
+                    Logging.error("No permission for bluetoothScanner.flushPendingScanResults", se);
                 }
             }
         }
@@ -428,25 +300,26 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             }
             final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
             if (listAdapter != null && showCurrent) {
-                listAdapter.get().clearBluetoothLe();
-                listAdapter.get().clearBluetooth();
+                SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    l.clearBluetoothLe();
+                    l.clearBluetooth();
+                }
             }
 
 
-            if (Build.VERSION.SDK_INT >= 21) {
-                final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-                if (bluetoothLeScanner != null) {
-                    if (scanning.compareAndSet(true, false)) {
-                        Logging.info("STOPPING BLE SCANS");
-                        try {
-                            bluetoothLeScanner.stopScan(scanCallback);
-                        } catch (SecurityException se) {
-                            Logging.error("No permission for bluetoothAdapter.stopScan", se);
-                        }
-
-                    } else {
-                        Logging.error("Scanner present, comp-and-set prevented stop-scan");
+            final BluetoothLeScanner bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+            if (bluetoothLeScanner != null) {
+                if (scanning.compareAndSet(true, false)) {
+                    Logging.info("STOPPING BLE SCANS");
+                    try {
+                        bluetoothLeScanner.stopScan(scanCallback);
+                    } catch (SecurityException se) {
+                        Logging.error("No permission for bluetoothAdapter.stopScan", se);
                     }
+
+                } else {
+                    Logging.error("Scanner present, comp-and-set prevented stop-scan");
                 }
             }
         }
@@ -523,8 +396,13 @@ public final class BluetoothReceiver extends BroadcastReceiver {
 
                     //ALIBI: shamelessly re-using frequency here for device type.
                     final Network network = addOrUpdateBt(bssid, ssid, type, capabilities, rssi, NetworkType.BT, location, prefs, false);
-                    sort(prefs);
-                    if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
+                    if (listAdapter != null) {
+                        SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            sort(prefs, l);
+                            l.notifyDataSetChanged();
+                        }
+                    }
                 } catch (SecurityException se) {
                     Logging.error("No permission for device inspection", se);
                 }
@@ -534,14 +412,19 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 prevBt = Collections.synchronizedSet(new HashSet(latestBt));
                 latestBt.clear();
 
-                ListFragment.lameStatic.currBt = prevBtle.size() + prevBt.size();
+                ListFragment.lameStatic.currBt = ((null != scanCallback) ? scanCallback.getPrevBtLeSize() : (0 + prevBt.size()));
 
                 final boolean showCurrent = prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true);
-                if (listAdapter != null) listAdapter.get().batchUpdateBt(showCurrent, false, true);
+                if (listAdapter != null) {
+                    SetNetworkListAdapter l = listAdapter.get();
+                    if (null != l) {
+                        l.batchUpdateBt(showCurrent, false, true);
+                        sort(prefs, l);
+                        l.notifyDataSetChanged();
+                    }
+                }
                 ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
                 ListFragment.lameStatic.runBt = runNetworks.size();
-                sort(prefs);
-                if (listAdapter != null) listAdapter.get().notifyDataSetChanged();
             }
         }
     }
@@ -549,21 +432,14 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     /**
      * TODO: DRY this up with the sort in WifiReceiver?
      */
-    private void sort(final SharedPreferences prefs) {
+    private static void sort(final SharedPreferences prefs, final SetNetworkListAdapter listAdapter) {
         if (listAdapter != null) {
             try {
-                listAdapter.get().sort(NetworkListSorter.getSort(prefs));
+                listAdapter.sort(NetworkListSorter.getSort(prefs));
             } catch (IllegalArgumentException ex) {
                 Logging.error("sort failed: ",ex);
             }
         }
-    }
-
-    /**
-     * Set display list adapter
-     */
-    public void setListAdapter( final SetNetworkListAdapter listAdapter ) {
-        this.listAdapter = new WeakReference<>(listAdapter);
     }
 
     /**
@@ -635,7 +511,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 if (!scanInFlight) {
                     try {
                         m.bluetoothScan();
-                        //bluetoothManager.startScan();
                     } catch (Exception ex) {
                         Logging.warn("exception starting bt scan: " + ex, ex);
                     }
@@ -664,7 +539,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
                 if ( m.getBatteryLevelReceiver() != null ) {
                     final int batteryLevel = m.getBatteryLevelReceiver().getBatteryLevel();
                     final int batteryStatus = m.getBatteryLevelReceiver().getBatteryStatus();
-                    // MainActivity.info("batteryStatus: " + batteryStatus);
                     // give some time since starting up to change this configuration
                     if ( batteryKill > 0 && batteryLevel > 0 && batteryLevel <= batteryKill
                         && batteryStatus != BatteryManager.BATTERY_STATUS_CHARGING
@@ -771,7 +645,6 @@ public final class BluetoothReceiver extends BroadcastReceiver {
             if (null != ssid) {
                 network.setSsid(ssid);
             }
-
         }
 
         final MainActivity m = MainActivity.getMainActivity();
@@ -846,8 +719,187 @@ public final class BluetoothReceiver extends BroadcastReceiver {
     }
 
     // check standard BT types undefined
-    private boolean isMiscOrUncategorized(final int type) {
+    private static boolean isMiscOrUncategorized(final int type) {
         return type == 0 || type == 7936;
     }
 
+    public void setListAdapter(SetNetworkListAdapter listAdapter) {
+        this.listAdapter = new WeakReference<>(listAdapter);
+        if (scanCallback != null) {
+            scanCallback.setListAdapter(listAdapter);
+        }
+    }
+
+    private static final class LeScanCallback extends ScanCallback {
+        private final DatabaseHelper dbHelper;
+        private WeakReference<SetNetworkListAdapter> listAdapter;
+        private final SharedPreferences prefs;
+        private final Set<String> runNetworks;
+        private final Set<String> latestBtle;
+        private final Set<String> latestBt;
+        private Set<String> prevBtle;
+        private final AtomicLong lastLeBatchResponseTime;
+        private final AtomicBoolean scanning;
+        private final WeakReference<LeScanUpdater> updater;
+        private final AtomicInteger empties;
+
+        public LeScanCallback(DatabaseHelper dbHelper,
+                              SharedPreferences prefs,
+                              Set<String> runNetworks, Set<String> latestBtle,
+                              Set<String> latestBt, AtomicLong lastLeBatchResponseTime,
+                              AtomicBoolean scanning, LeScanUpdater updater, final AtomicInteger empties) {
+            this.dbHelper = dbHelper;
+            this.prefs = prefs;
+            this.runNetworks = runNetworks;
+            this.latestBtle = latestBtle;
+            this.latestBt = latestBt;
+            this.lastLeBatchResponseTime = lastLeBatchResponseTime;
+            this.scanning = scanning;
+            this.updater = new WeakReference<>(updater);
+            this.empties = empties;
+        }
+
+        @Override
+        public void onScanResult(int callbackType, ScanResult scanResult) {
+            final MainActivity m = MainActivity.getMainActivity();
+            Location location = null;
+            if (m != null) {
+                final GNSSListener gpsListener = m.getGPSListener();
+                //DEBUG: Logging.info("LE scanResult: " + scanResult + " callbackType: " + callbackType);
+                if (gpsListener != null) {
+                    final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GNSSListener.GPS_TIMEOUT_DEFAULT);
+                    final long netLocTimeout = prefs.getLong(PreferenceKeys.PREF_NET_LOC_TIMEOUT, GNSSListener.NET_LOC_TIMEOUT_DEFAULT);
+                    gpsListener.checkLocationOK(gpsTimeout, netLocTimeout);
+                    location = gpsListener.getCurrentLocation();
+                } else {
+                    Logging.warn("Null gpsListener in LE Single Scan Result");
+                }
+            }
+
+            final LeScanUpdater updt = updater.get();
+            if (null != updt) {
+                updt.handleLeScanResult(scanResult, location, false);
+            }
+            ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
+            ListFragment.lameStatic.runBt = runNetworks.size();
+            if (listAdapter != null) {
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    sort(prefs, l);
+                    l.notifyDataSetChanged();
+                }
+            }
+        }
+
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            long responseClockTime = System.currentTimeMillis();
+            long diff = responseClockTime - lastLeBatchResponseTime.longValue();
+            lastLeBatchResponseTime.set(responseClockTime);
+            if (diff < MIN_LE_BATCH_GAP_MILLIS) {
+                Logging.info("Tried to update BTLE batch in improbably short time: " + diff + " ("+results.size()+" results)");
+                return;
+            }
+            //DEBUG: Logging.error("LE Batch results: " + results.size());
+            final MainActivity m = MainActivity.getMainActivity();
+            Location location = null;
+            if (m != null) {
+                final GNSSListener gpsListener = m.getGPSListener();
+                if (gpsListener != null) {
+                    location = gpsListener.checkGetLocation(prefs);
+                } else {
+                    Logging.warn("Null gpsListener in LE Batch Scan Result");
+                }
+            }
+            if (results.isEmpty()) {
+                final int emptyCnt = empties.addAndGet(1);
+                //DEBUG: Logging.info("empty scan result ("+empties+"/"+EMPTY_LE_THRESHOLD+")");
+                //ALIBI: if it's been too long with no nets seen, we'll force-clear
+                if (EMPTY_LE_THRESHOLD < emptyCnt) {
+                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        } else {
+                            Logging.error("Failed to clear BLE due to null listAdapter de-weak-ref");
+                        }
+                    }
+                    empties.set(0);
+                    prevBtle = new HashSet<>(latestBtle);
+                    latestBtle.clear();
+                }
+                //ALIBI: if this was an empty scan result, not further processing is required.
+                return;
+            } else {
+                empties.set(0);
+            }
+
+            final LeScanUpdater updt = updater.get();
+            if (null != updt) {
+                for (final ScanResult scanResult : results) {
+                    updt.handleLeScanResult(scanResult, location, true);
+                }
+            }
+            //DEBUG: Logging.error("Previous BTLE: "+prevBtle.size()+ " Latest BTLE: "+latestBtle.size());
+            prevBtle = new HashSet<>(latestBtle);
+            latestBtle.clear();
+
+            ListFragment.lameStatic.currBt = prevBtle.size() + latestBt.size();
+            ListFragment.lameStatic.newBt = dbHelper.getNewBtCount();
+            ListFragment.lameStatic.runBt = runNetworks.size();
+            if (listAdapter != null) {
+                final SetNetworkListAdapter l = listAdapter.get();
+                if (null != l) {
+                    l.batchUpdateBt(prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true),
+                            true, false);
+                    sort(prefs, l);
+                    l.notifyDataSetChanged();
+                } else {
+                    Logging.error("Null set network list adapter in updateLe ScanCallback");
+                }
+            } else {
+                Logging.error("Null set network list adapter weakref in updateLe ScanCallback");
+            }
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            switch (errorCode) {
+                case SCAN_FAILED_ALREADY_STARTED:
+                    Logging.info("BluetoothLE Scan already started");
+                    break;
+                case SCAN_FAILED_FEATURE_UNSUPPORTED:
+                case SCAN_FAILED_APPLICATION_REGISTRATION_FAILED:
+                    Logging.info("BluetoothLE Scan: failed: " +
+                            (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED?"Scanning not supported":"Unable to register"));
+                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        }
+                    }
+                    break;
+                default:
+                    //ALIBI: catch-all - as of API 33, this subsumes:
+                    //   SCAN_FAILED_OUT_OF_HARDWARE_RESOURCESl SCAN_FAILED_SCANNING_TOO_FREQUENTLY
+                    if ((listAdapter != null) && prefs.getBoolean(PreferenceKeys.PREF_SHOW_CURRENT, true)) {
+                        final SetNetworkListAdapter l = listAdapter.get();
+                        if (null != l) {
+                            l.clearBluetoothLe();
+                        }
+                    }
+                    Logging.error("Bluetooth LE scan error: " + errorCode);
+                    scanning.set(false);
+            }
+        }
+
+        public int getPrevBtLeSize() {
+            if (null != prevBtle)  return prevBtle.size();
+            return 0;
+        }
+
+        public void setListAdapter(SetNetworkListAdapter listAdapter) {
+            this.listAdapter = new WeakReference<>(listAdapter);
+        }
+    }
 }

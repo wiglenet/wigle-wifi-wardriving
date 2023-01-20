@@ -137,6 +137,14 @@ public final class Network implements ClusterItem {
         }
     }
 
+    public String getTitle() {
+        return ssid;
+    }
+
+    public String getSnippet() {
+        return bssid;
+    }
+
     public String getBssid() {
         return bssid;
     }

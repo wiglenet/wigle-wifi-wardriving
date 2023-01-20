@@ -146,6 +146,10 @@ public class TokenAccess {
 
                 final byte[] cypherToken = Base64.decode(prefs.getString(PreferenceKeys.PREF_TOKEN, ""), Base64.DEFAULT);
                 final byte[] iv = Base64.decode(prefs.getString(PreferenceKeys.PREF_TOKEN_IV, ""), Base64.DEFAULT);
+                if (iv.length == 0) {
+                    Logging.warn("IV is zero length, cannot decrypt token");
+                    return null;
+                }
                 final int tagLength = prefs.getInt(PreferenceKeys.PREF_TOKEN_TAG_LENGTH, 128);
 
                 decrypt.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(tagLength, iv));

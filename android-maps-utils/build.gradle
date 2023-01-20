@@ -5,17 +5,17 @@ apply plugin: 'signing'
 group = 'com.google.maps.android'
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-maps:17.0.1'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 }
 
 
 android {
     namespace "com.google.maps.android"
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion 24
+        targetSdkVersion 31
     }
 
     resourcePrefix 'amu_'

@@ -195,6 +195,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public static final boolean DEBUG_CELL_DATA = false;
     public static final boolean DEBUG_BLUETOOTH_DATA = false;
 
+    public static final boolean ENABLE_DEBUG_LOGGING = false;
+
     private static MainActivity mainActivity;
     private BatteryLevelReceiver batteryLevelReceiver;
     private boolean playServiceShown = false;
@@ -208,6 +210,12 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (ENABLE_DEBUG_LOGGING) {
+            Logging.enableDebugLogging();
+            Logging.info("Debug log-level is enabled.");
+        }
+
         Logging.info("MAIN onCreate. state:  " + state);
         //DEBUG:
         /*StrictMode.setThreadPolicy(

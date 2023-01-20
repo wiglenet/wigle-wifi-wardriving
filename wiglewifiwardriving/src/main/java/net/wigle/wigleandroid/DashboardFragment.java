@@ -30,6 +30,7 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {
@@ -354,14 +355,15 @@ public class DashboardFragment extends Fragment {
   }
 
   private String timeString(final long duration) {
-      int seconds = (int) (duration / 1000) % 60 ;
-      int minutes = (int) ((duration / (1000*60)) % 60);
-      int hours   = (int) ((duration / (1000*60*60)) % 24);
-      String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
-      if (hours > 0) {
-          durString = String.format("%d", hours) + ":" + durString;
-      }
-      return " " +durString;
+    final long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+    final long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+    final long hours = TimeUnit.MILLISECONDS.toHours(duration);
+    
+    Locale defaultLocale = Locale.getDefault();
+    
+    return hours > 0
+      ? String.format(defaultLocale," %d:%02d:%02d", hours, minutes, seconds)
+      : String.format(defaultLocale, " %02d:%02d", minutes, seconds);
   }
 
 }

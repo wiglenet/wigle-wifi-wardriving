@@ -67,12 +67,12 @@ dependencies {
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'androidx.test:core:1.3.0'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.5.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
-    androidTestImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
 import groovy.json.JsonSlurper

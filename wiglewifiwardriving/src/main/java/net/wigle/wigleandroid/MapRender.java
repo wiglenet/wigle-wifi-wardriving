@@ -6,13 +6,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
+import com.google.android.gms.maps.GoogleMap.OnCameraMoveListener;
+import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -25,6 +26,7 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -48,6 +50,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
             new ConcurrentHashMap<>());
 
     private static final String MESSAGE_BSSID = "messageBssid";
+    private static final String MESSAGE_BSSID_LIST = "messageBssidList";
     private static final BitmapDescriptor DEFAULT_ICON = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
     private static final BitmapDescriptor DEFAULT_ICON_NEW = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
     private static final float DEFAULT_ICON_ALPHA = 0.75f;
@@ -166,9 +169,9 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
 
         private void setupRelabelingTask() {
             // setup camera change listener to fire the asynctask
-            map.setOnCameraChangeListener(new OnCameraChangeListener() {
+            map.setOnCameraIdleListener(new OnCameraIdleListener() {
                 @Override
-                public void onCameraChange(CameraPosition position) {
+                public void onCameraIdle() {
                     new DynamicallyAddMarkerTask().execute(map.getProjection().getVisibleRegion().latLngBounds);
                 }
             });
@@ -178,15 +181,19 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
             @Override
             protected Void doInBackground(LatLngBounds... bounds) {
                 final Collection<Network> nets = MainActivity.getNetworkCache().values();
+                final ArrayList<String> ssids = new ArrayList<>(nets.size());
                 for (final Network network : nets) {
                     final Marker marker = NetworkRenderer.this.getMarker(network);
                     if (marker != null && network.getLatLng() != null) {
                         final boolean inBounds = bounds[0].contains(network.getLatLng());
                         if (inBounds || MapRender.this.labeledNetworks.contains(network)) {
                             // MainActivity.info("sendupdate: " + network.getBssid());
-                            sendUpdateNetwork(network.getBssid());
+                            ssids.add(network.getBssid());
                         }
                     }
+                }
+                if (!ssids.isEmpty()) {
+                    sendUpdateNetwork(ssids);
                 }
                 return null;
             }
@@ -329,15 +336,35 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         updateMarkersHandler.sendMessage(message);
     }
 
-    @SuppressLint("HandlerLeak")
-    final Handler updateMarkersHandler = new Handler() {
+    private void sendUpdateNetwork(final ArrayList<String> bssids) {
+        final Bundle data = new Bundle();
+        data.putStringArrayList(MESSAGE_BSSID_LIST, bssids);
+        Message message = new Message();
+        message.setData(data);
+        updateMarkersHandler.sendMessage(message);
+    }
+
+    final Handler updateMarkersHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(final Message message) {
             final String bssid = message.getData().getString(MESSAGE_BSSID);
-            // MainActivity.info("handleMessage: " + bssid);
-            final Network network = MainActivity.getNetworkCache().get(bssid);
-            if (network != null) {
-                networkRenderer.updateItem(network);
+            if (bssid != null) {
+                // MainActivity.info("handleMessage: " + bssid);
+                final Network network = MainActivity.getNetworkCache().get(bssid);
+                if (network != null) {
+                    networkRenderer.updateItem(network);
+                }
+            }
+
+            final ArrayList<String> bssids = message.getData().getStringArrayList(MESSAGE_BSSID_LIST);
+            if (bssids != null && !bssids.isEmpty()) {
+                Logging.info("bssids: " + bssids.size());
+                for (final String thisBssid : bssids) {
+                    final Network network = MainActivity.getNetworkCache().get(thisBssid);
+                    if (network != null) {
+                        networkRenderer.updateItem(network);
+                    }
+                }
             }
         }
     };

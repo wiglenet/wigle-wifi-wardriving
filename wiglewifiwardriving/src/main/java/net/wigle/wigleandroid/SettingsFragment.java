@@ -18,7 +18,6 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
@@ -45,18 +44,20 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.listener.GNSSListener;
+import net.wigle.wigleandroid.model.api.ApiTokenResponse;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
-import net.wigle.wigleandroid.util.UrlConfig;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
+
+import org.json.JSONObject;
 
 /**
  * configure settings
@@ -165,6 +166,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                         editor.putString(PreferenceKeys.PREF_SHOW_DISCOVERED, PreferenceKeys.PREF_MAP_NO_TILE);
                     }
                     editor.apply();
+                    MainActivity.refreshApiManager(); // recreates the static state WiGLE API
                     if (view != null) {
                         this.updateView(view);
                     }
@@ -310,19 +312,50 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             passEditLayout.setVisibility(View.VISIBLE);
             showPass.setVisibility(View.VISIBLE);
             authButton.setVisibility(View.VISIBLE);
-            final Handler handler = new UserDownloadHandler(view, getActivity().getPackageName(),
-                    getResources(), this);
-            final UserStatsFragment.UserDownloadApiListener apiListener =
-                    new UserStatsFragment.UserDownloadApiListener(handler);
             authButton.setOnClickListener(view12 -> {
-                final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                        "user-stats-cache.json", UrlConfig.USER_STATS_URL, false, true, true,
-                        ApiDownloader.REQUEST_GET,
-                        apiListener);
-                try {
-                    task.startDownload(SettingsFragment.this);
-                } catch (WiGLEAuthException waex) {
-                    Logging.info("User authentication failed");
+                MainActivity.State s = MainActivity.getStaticState();
+                final SettingsFragment frag = this;
+                if (s != null) {
+                    final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, "");
+                    final String password = prefs.getString(PreferenceKeys.PREF_PASSWORD, "");
+                    s.apiManager.getApiToken(userName, password, new RequestCompletedListener<ApiTokenResponse, JSONObject>() {
+                        @Override
+                        public void onTaskCompleted() {
+                            final FragmentActivity a = getActivity();
+                            if (null != a) {
+                                frag.updateView(view);
+                            }
+                        }
+
+                        @Override
+                        public void onTaskSucceeded(ApiTokenResponse response) {
+                            if (null != response) {
+                                Logging.error("Authentication: succeeded as "+response.getAuthname());
+                                final SharedPreferences prefs = MainActivity.getMainActivity()
+                                        .getApplicationContext()
+                                        .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                final Editor editor = prefs.edit();
+                                editor.putString(PreferenceKeys.PREF_AUTHNAME, response.getAuthname());
+                                editor.remove(PreferenceKeys.PREF_PASSWORD);
+                                editor.apply();
+                                TokenAccess.setApiToken(prefs, response.getToken());
+                                MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
+                            } else {
+                                Logging.error("Auth token request succeeded, but response was bad.");
+                            }
+                        }
+
+                        @Override
+                        public void onTaskFailed(int status, JSONObject error) {
+                            Logging.error("Authentication: failed: " + status);
+                            final SharedPreferences prefs = MainActivity.getMainActivity()
+                                    .getApplicationContext()
+                                    .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                            final Editor editor = prefs.edit();
+                            editor.remove(PreferenceKeys.PREF_PASSWORD);
+                            editor.apply();
+                        }
+                    });
                 }
             });
         }

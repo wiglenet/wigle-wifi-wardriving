@@ -3,12 +3,8 @@ package net.wigle.wigleandroid;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -27,84 +23,47 @@ import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
-import net.wigle.wigleandroid.background.ApiDownloader;
-import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.model.RankUser;
-import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.model.api.RankResponse;
+import net.wigle.wigleandroid.model.api.UserStats;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 import net.wigle.wigleandroid.util.PreferenceKeys;
-import net.wigle.wigleandroid.util.UrlConfig;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * User rank fragment. Direct port from old code the OkHttp-based downloader for now.
+ * TODO need to actually paginate correctly for continuous scroll
+ */
 public class RankStatsFragment extends Fragment {
-    private static final int MSG_RANKING_DONE = 100;
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_SWAP = 202;
     private static final int MENU_USER_CENTRIC_SWAP = 203;
 
-    private static final String RESULT_LIST_KEY = "results";
-    /*
-    {
-      eventView: false,
-      myUsername: "arkasha",
-      pageEnd: 100,
-      pageStart: 0,
-      results:[
-        {
-          discoveredCell: 999911,
-          discoveredCellGPS: 718583,
-          discoveredWiFi: 41781793,
-          discoveredWiFiGPS: 26209080,
-          discoveredWiFiGPSPercent: 8.64536,
-          eventMonthCount: 20526,
-          eventPrevMonthCount: 431245,
-          first: "20011003-00001",
-          last: "20170103-00583",
-          monthRank: 1,
-          prevMonthRank: 1,
-          prevRank: 1,
-          rank: 1,
-          self: false,
-          totalWiFiLocations: 185993637,
-          userName: "anonymous"
-        },
-        ...]}
-     */
-    private static final String KEY_MONTH_WIFI_GPS = "eventMonthCount";
-    private static final String KEY_TOTAL_WIFI_GPS = "discoveredWiFiGPS";
-    private static final String KEY_TOTAL_BT_GPS = "discoveredBtGPS";
-    private static final String KEY_TOTAL_CELL_GPS = "discoveredCellGPS";
-    private static final String KEY_RANK = "rank";
-    private static final String KEY_USERNAME = "userName";
-    private static final String KEY_PREV_RANK = "prevRank";
-    private static final String KEY_PREV_MONTH_RANK = "prevMonthRank";
-    private static final String KEY_SELECTED = "selected";
-
     private static final int ROW_COUNT = 100;
-
-    private static final String[] ALL_ROW_KEYS = new String[] {
-            KEY_MONTH_WIFI_GPS, KEY_TOTAL_WIFI_GPS, KEY_TOTAL_BT_GPS, KEY_TOTAL_CELL_GPS, KEY_RANK, KEY_PREV_RANK,
-            KEY_PREV_MONTH_RANK,
-        };
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
     private RankListAdapter listAdapter;
     private AtomicBoolean monthRanking;
+    private final AtomicBoolean busy = new AtomicBoolean(false);
     private AtomicBoolean userCentric;
-    private RankDownloadHandler handler;
+    private RankResponse rankResponse;
+    private long myPage;
+    private long myRank;
+    private long currentPage = -1;
+    private boolean userDownloadFailed = false;
+    private ListView listView;
+    TextView typeView;
 
     /** Called when the activity is first created. */
     @Override
@@ -112,19 +71,20 @@ public class RankStatsFragment extends Fragment {
         Logging.info("RANKSTATS: onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        // set language
+        // set language, volume, number format
         final Activity a = getActivity();
         if (null != a) {
             MainActivity.setLocale(a);
+            a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+            numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(a, a.getResources().getConfiguration()));
+        } else {
+            numberFormat = NumberFormat.getNumberInstance(Locale.US);
         }
-        // media volume
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         finishing = new AtomicBoolean(false);
         monthRanking = new AtomicBoolean(false);
         userCentric = new AtomicBoolean(true);
-        numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        if (numberFormat instanceof DecimalFormat) {
+        if (null != numberFormat && numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
@@ -134,34 +94,44 @@ public class RankStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
         Logging.info("RANKSTATS: onCreateView.a orientation: " + orientation);
-        final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
+        LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
+        typeView = rootView.findViewById(R.id.rankstats_type);
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
         final Activity a = getActivity();
         if (null != a) {
-            handler = new RankDownloadHandler(rootView, numberFormat,
-                    getActivity().getPackageName(), getResources(), monthRanking);
-            handler.setRankListAdapter(listAdapter);
             final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
 
-            //TODO: we should only perform user DL if there's a user set
-            UserStatsFragment.executeUserDownload(this, new UserStatsFragment.UserDownloadApiListener(new Handler() {
-                @Override
-                public void handleMessage(final Message msg) {
-                    final Bundle bundle = msg.getData();
-                    final boolean isCache = bundle.getBoolean(UserStatsFragment.KEY_IS_CACHE);
-                    Logging.info("got user message, isCache: " + isCache);
+            final MainActivity.State s = MainActivity.getStaticState();
+            if (null != s) {
+                s.apiManager.getUserStats(new RequestCompletedListener<UserStats, JSONObject>() {
+                      @Override
+                      public void onTaskCompleted() {
+                        if (userDownloadFailed) {
+                            //TODO: warn
+                        }
+                      }
 
-                    final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putLong(ListFragment.PREF_RANK, bundle.getLong(UserStatsFragment.KEY_RANK));
-                    editor.putLong(ListFragment.PREF_MONTH_RANK, bundle.getLong(UserStatsFragment.KEY_MONTH_RANK));
-                    editor.apply();
-                    downloadRanks(isCache);
-                }
-            }));
+                      @Override
+                      public void onTaskSucceeded(UserStats response) {
+                          myRank = response.getRank();
+                          final SharedPreferences.Editor editor = prefs.edit();
+                          editor.putLong(ListFragment.PREF_RANK, response.getRank());
+                          editor.putLong(ListFragment.PREF_MONTH_RANK, response.getMonthRank());
+                          editor.apply();
+                          downloadRanks(true);
+                          userDownloadFailed = false;
+                      }
+
+                      @Override
+                      public void onTaskFailed(int status, JSONObject error) {
+                          userDownloadFailed = true;
+                      }
+                  }
+                );
+            }
         }
-
         return rootView;
     }
 
@@ -171,55 +141,69 @@ public class RankStatsFragment extends Fragment {
 
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(() -> {
-            // Your code to refresh the list here.
-            // Make sure you call swipeContainer.setRefreshing(false)
-            // once the network request has completed successfully.
-            downloadRanks(false);
+            //TODO: clear
+            downloadRanks(true);
         });
     }
 
-    private void downloadRanks(final boolean isCache) {
-        if (handler == null) {
-            Logging.error("downloadRanks: handler is null");
-            return;
-        }
-        final FragmentActivity fragmentActivity = getActivity();
-        if (fragmentActivity == null) {
-            Logging.error("downloadRanks: fragmentActivity is null");
-            return;
-        }
-        final boolean doMonthRanking = monthRanking.get();
-        final String sort = doMonthRanking ? "monthcount" : "discovered";
-        String top = "top";
-        long pageStart = 0;
-        long selected = 0;
-        if (userCentric.get()) {
-            top = "";
-            final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
-            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-            final long userRank = prefs.getLong(userRankKey, 0);
-            final long startRank = userRank - 50;
-            pageStart = startRank > 0 ? startRank : 0;
-            selected = startRank < 0 ? userRank : 50;
-            selected -= 5;
-            if (selected < 0) selected = 0;
-        }
-        final long finalSelected = selected;
+    private void downloadRanks(final boolean first) {
+        if (busy.compareAndSet(false, true)) {
+            final FragmentActivity fragmentActivity = getActivity();
+            if (fragmentActivity == null) {
+                Logging.error("downloadRanks: fragmentActivity is null");
+                return;
+            }
+            final boolean doMonthRanking = monthRanking.get();
+            final String sort = doMonthRanking ? "monthcount" : "discovered";
+            long pageStart = 0;
+            long pageEnd = ROW_COUNT;
+            long selected = 0;
+            Long userRank;
+            if (userCentric.get()) {
+                final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
+                final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                userRank = prefs.getLong(userRankKey, 0);
+                myPage = (userRank / ROW_COUNT);
+                if (first) {
+                    pageStart = 0;
+                    currentPage = myPage;
+                } else {
+                    pageStart = currentPage * ROW_COUNT;
+                }
+                selected = (userRank != null && userRank > 0) ? Math.max(userRank -5, 5) : 45;
+            } else {
+                myPage = 0;
+            }
+            final long finalSelected = selected;
 
-        final String cacheName = (doMonthRanking ? "month" : "all") + top;
+            MainActivity.State s = MainActivity.getStaticState();
+            if (s != null) {
+                s.apiManager.getRank(pageStart, pageEnd, userCentric.get(), sort,
+                        finalSelected, new RequestCompletedListener<RankResponse, JSONObject>() {
+                    @Override
+                    public void onTaskCompleted() {
+                        if (null != rankResponse) {
+                            handleRanks(rankResponse, first);
+                        } else {
+                            Logging.error("unable to populate ranks - rankResponse is null");
+                        }
+                        busy.set(false);
+                    }
 
-        final String monthUrl = UrlConfig.RANK_STATS_URL + "?pagestart=" + pageStart
-                + "&pageend=" + (pageStart + ROW_COUNT) + "&sort=" + sort;
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "rank-stats-" + cacheName + "-cache.json", monthUrl, false, false, false,
-                ApiDownloader.REQUEST_GET,
-                (json, isCache1) -> handleRankStats(json, handler, finalSelected));
-        task.setCacheOnly(isCache);
-        try {
-            task.startDownload(this);
-        } catch (WiGLEAuthException waex) {
-            Logging.info("Rank Stats Download Failed due to failed auth");
-            WiGLEToast.showOverFragment(getActivity(), R.string.error_general, getString(R.string.error_general));
+                    @Override
+                    public void onTaskSucceeded(RankResponse response) {
+                        rankResponse = response;
+
+                    }
+
+                    @Override
+                    public void onTaskFailed(int status, JSONObject error) {
+
+                    }
+                });
+            }
+        } else {
+            Logging.error("preventing download because previous is still in progress.");
         }
     }
 
@@ -233,98 +217,41 @@ public class RankStatsFragment extends Fragment {
                 listAdapter.clear();
             }
             // always set our current list adapter
-            final ListView listView = view.findViewById(R.id.rank_list_view);
+            listView = view.findViewById(R.id.rank_list_view);
             listView.setAdapter(listAdapter);
+            listView.setOnScrollListener(new EndlessScrollListener() {
+                @Override
+                public boolean onLoadMore(int page, int totalItemsCount) {
+                    Logging.info("download moar ranks!");
+                    currentPage++;
+                    downloadRanks(false);
+                    return true;
+                }
+            });
         }
     }
 
-    private final static class RankDownloadHandler extends DownloadHandler {
-        private RankListAdapter rankListAdapter;
-        final AtomicBoolean monthRanking;
+    public void handleRanks(final RankResponse ranks, final boolean first) {
+        // MainActivity.info("handleMessage. results: " + results);
+        if (ranks != null && listAdapter != null) {
+            final boolean doMonthRanking = monthRanking.get();
+            typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
 
-        private RankDownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
-                                final Resources resources, final AtomicBoolean monthRanking) {
-            super(view, numberFormat, packageName, resources);
-            this.monthRanking = monthRanking;
-        }
-
-        public void setRankListAdapter(final RankListAdapter rankListAdapter) {
-            this.rankListAdapter = rankListAdapter;
-        }
-
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-
-            final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            // MainActivity.info("handleMessage. results: " + results);
-            if (msg.what == MSG_RANKING_DONE && results != null && rankListAdapter != null) {
-                TextView tv = view.findViewById(R.id.rankstats_type);
-                final boolean doMonthRanking = monthRanking.get();
-                tv.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
-                final String rankDiffKey = doMonthRanking ? KEY_PREV_MONTH_RANK : KEY_PREV_RANK;
-                final long selected = bundle.getLong(KEY_SELECTED);
-
-                rankListAdapter.clear();
-                rankListAdapter.setMonthRanking(monthRanking.get());
-                for (final Parcelable result : results) {
-                    if (result instanceof Bundle) {
-                        final Bundle row = (Bundle) result;
-                        final long rankDiff = row.getLong(rankDiffKey) - row.getLong(KEY_RANK);
-                        final RankUser rankUser = new RankUser(row.getLong(KEY_RANK), rankDiff,
-                                row.getString(KEY_USERNAME), row.getLong(KEY_MONTH_WIFI_GPS),
-                                row.getLong(KEY_TOTAL_WIFI_GPS), row.getLong(KEY_TOTAL_BT_GPS),
-                                row.getLong(KEY_TOTAL_CELL_GPS));
-                        rankListAdapter.add(rankUser);
-                    }
-                }
-                final ListView listView = view.findViewById(R.id.rank_list_view);
-                listView.setSelectionFromTop((int)selected, 20);
-
-                final SwipeRefreshLayout swipeRefreshLayout =
-                        view.findViewById(R.id.rank_swipe_container);
-                swipeRefreshLayout.setRefreshing(false);
+            //listAdapter.clear();
+            listAdapter.setMonthRanking(monthRanking.get());
+            for (final RankResponse.RankResponseRow result : ranks.getResults()) {
+                final RankUser rankUser = new RankUser(result, doMonthRanking);
+                listAdapter.add(rankUser);
             }
-            //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
-        }
-    }
-
-    private void handleRankStats(final JSONObject json, final Handler handler, final long selected) {
-        Logging.info("handleRankStats");
-        if (json == null) {
-            Logging.info("handleRankStats null json, returning");
-            return;
-        }
-
-        final Bundle bundle = new Bundle();
-        bundle.putLong(KEY_SELECTED, selected);
-        try {
-            final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
-            for (int i = 0; i < list.length(); i++) {
-                final JSONObject row = list.getJSONObject(i);
-                final Bundle rowBundle = new Bundle();
-                for (final String key : ALL_ROW_KEYS) {
-                    if (row.has(key)) {
-                        rowBundle.putLong(key, row.getLong(key));
-                    }
-                }
-                rowBundle.putString(KEY_USERNAME, row.getString(KEY_USERNAME));
-                resultList.add(rowBundle);
+            if (first) {
+                listView.setSelectionFromTop((int) ranks.getSelected(), 20);
             }
-            bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
-        } catch (final JSONException ex) {
-            //TODO: better error for bundle
-            Logging.error("json error: " + ex, ex);
-        } catch (final Exception e) {
-            //TODO: better error for bundle
-            Logging.error("rank error: " + e, e);
-        }
 
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_RANKING_DONE;
-        handler.sendMessage(message);
+            //final SwipeRefreshLayout swipeRefreshLayout =
+            //        view.findViewById(R.id.rank_swipe_container);
+            //swipeRefreshLayout.setRefreshing(false);
+        }
+        //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
     }
 
     @Override
@@ -420,16 +347,15 @@ public class RankStatsFragment extends Fragment {
                 case MENU_RANK_SWAP:
                     monthRanking.set(!monthRanking.get());
                     item.setTitle(getRankSwapString());
-                    downloadRanks(false);
+                    downloadRanks(true);
                     return true;
                 case MENU_USER_CENTRIC_SWAP:
                     userCentric.set(!userCentric.get());
                     item.setTitle(getUserCentricSwapString());
-                    downloadRanks(false);
+                    downloadRanks(true);
                     return true;
             }
         }
         return false;
     }
-
 }

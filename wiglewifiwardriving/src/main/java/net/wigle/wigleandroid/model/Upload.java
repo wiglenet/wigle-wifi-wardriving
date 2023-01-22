@@ -9,7 +9,7 @@ public final class Upload {
     private final long totalBtGps;
     private final long totalCellGps;
     private final int percentDone;
-    private final String status;
+    private String status;
     private final long fileSize;
     private final String fileName;
     private Boolean uploadedFromLocal;
@@ -52,6 +52,10 @@ public final class Upload {
 
     public String getStatus() {
         return status;
+    }
+
+    public void setStatus(final String status) {
+        this.status = status;
     }
 
     public long getFileSize() {

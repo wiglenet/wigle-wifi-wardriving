@@ -32,7 +32,7 @@ public abstract class AbstractProgressApiRequest extends AbstractApiRequest {
 
     @Override
     /*
-     * need to DRY this up vs. the exception-based version in ApiDownloader
+     * need to DRY this up vs. the exception-based version in AbstractApiRequest
      */
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,

@@ -1,11 +1,9 @@
 package net.wigle.wigleandroid;
 
+import android.app.Activity;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -19,19 +17,15 @@ import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
-import net.wigle.wigleandroid.background.ApiDownloader;
-import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.DownloadHandler;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
-import net.wigle.wigleandroid.util.UrlConfig;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SiteStatsFragment extends Fragment {
@@ -52,7 +46,6 @@ public class SiteStatsFragment extends Fragment {
     private static final String KEY_NETNOWEP = "netnowep";
     private static final String KEY_NETWEP_UNKNOWN = "netwepunknown";
 
-
     private static final String[] ALL_SITE_KEYS = new String[] {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_BTLOC, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
         KEY_NETWPA3, KEY_NETWPA2, KEY_NETWPA, KEY_NETWEP, KEY_NETNOWEP, KEY_NETWEP_UNKNOWN,
@@ -64,6 +57,7 @@ public class SiteStatsFragment extends Fragment {
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
+    private Map<String,Long> siteStats;
 
     /** Called when the activity is first created. */
     @Override
@@ -72,14 +66,16 @@ public class SiteStatsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // set language
-        MainActivity.setLocale(getActivity());
-
-        // media volume
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        final Activity a = getActivity();
+        if (null != a) {
+            MainActivity.setLocale(a);
+            numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(a, a.getResources().getConfiguration()));
+            // media volume
+            a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        }
 
         finishing = new AtomicBoolean(false);
-        numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        if (numberFormat instanceof DecimalFormat) {
+        if (null != numberFormat && numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
             numberFormat.setMaximumFractionDigits(2);
         }
@@ -111,73 +107,55 @@ public class SiteStatsFragment extends Fragment {
         }
     }
 
-    private final static class SiteDownloadHandler extends DownloadHandler {
-        private SiteDownloadHandler(final View view, final NumberFormat numberFormat, final String packageName,
-                                final Resources resources) {
-            super(view, numberFormat, packageName, resources);
-        }
-
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-
-            if (msg.what == MSG_SITE_DONE) {
-                TextView tv;
-
-                for (final String key : ALL_SITE_KEYS) {
-                    int id = resources.getIdentifier(key, "id", packageName);
-                    tv = (TextView) view.findViewById(id);
-                    tv.setText(numberFormat.format(bundle.getLong(key)));
-                }
-            }
-        }
-    }
-
     public void downloadLatestSiteStats(final View view) {
-        // what runs on the gui thread
-        final Handler handler = new SiteDownloadHandler(view, numberFormat, getActivity().getPackageName(),
-                getResources());
-        final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                "site-stats-cache.json", UrlConfig.SITE_STATS_URL, false, false, false,
-                ApiDownloader.REQUEST_GET,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleSiteStats(json, handler);
+        MainActivity.State s = MainActivity.getStaticState();
+        if (s != null) {
+            s.apiManager.getSiteStats(new RequestCompletedListener<Map<String,Long>, JSONObject>() {
+                @Override
+                public void onTaskCompleted() {
+                    TextView tv;
+                    final Activity a = getActivity();
+                    if (null != a) {
+                        for (final String key : ALL_SITE_KEYS) {
+                            int id = getResources().getIdentifier(key, "id", getActivity().getPackageName());
+                            tv = view.findViewById(id);
+                            try {
+                                if (tv != null) {
+                                    if ("netwepunknown".equals(key)) {
+                                        tv.setText(numberFormat.format(siteStats.get("netwep?"))); //ALIBI: Android doesn't like question marks in resource IDs.
+                                    } else {
+                                        tv.setText(numberFormat.format(siteStats.get(key)));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                Logging.error("failed to format: "+key);
+                            }
+                        }
+                        Logging.info("SITESTATS: load completed.");
                     }
-                });
-        try {
-            task.startDownload(this);
-        } catch (WiGLEAuthException waex) {
-            //unauthenticated call - should never trip
-            Logging.warn("Authentication error on site stats load (should not happen)", waex);
+                }
+
+                @Override
+                public void onTaskSucceeded(Map<String,Long> response) {
+                    handleSiteStats(response);
+                }
+
+                @Override
+                public void onTaskFailed(int status, JSONObject error) {
+                    Logging.error("SITESTATS: failed: " + status);
+                    //no-op for now. maybe show an error toast?
+                }
+            });
         }
     }
 
-    private void handleSiteStats(final JSONObject json, final Handler handler) {
+    private void handleSiteStats(final Map<String,Long> stats) {
         Logging.info("handleSiteStats");
-        if (json == null) {
+        if (stats == null) {
             Logging.info("handleSiteStats null json, returning");
             return;
         }
-
-        final Bundle bundle = new Bundle();
-        try {
-            for (final String key : ALL_SITE_KEYS) {
-                String jsonKey = key;
-                if (KEY_NETWEP_UNKNOWN.equals(key)) jsonKey = "netwep?";
-                bundle.putLong(key, json.getLong(jsonKey));
-            }
-        } catch (final JSONException ex) {
-            Logging.error("json error: " + ex, ex);
-        } catch (final Exception e) {
-            Logging.error("Statistics error: " + e, e);
-        }
-
-        final Message message = new Message();
-        message.setData(bundle);
-        message.what = MSG_SITE_DONE;
-        handler.sendMessage(message);
+        this.siteStats = stats;
     }
 
     @Override

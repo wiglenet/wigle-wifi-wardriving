@@ -132,7 +132,11 @@ public class FileUtility {
         final File path = new File(filepath);
 
         final boolean hasSD = hasSD();
-        if (hasSD) {
+        if (internalCacheArea) {
+            File file = new File(context.getCacheDir(), filename);
+            Logging.info("creating file: " + file.getCanonicalPath());
+            return new FileOutputStream(file);
+        } else if (hasSD) {
             //noinspection ResultOfMethodCallIgnored
             path.mkdirs();
             final String openString = filepath + filename;
@@ -143,10 +147,6 @@ public class FileUtility {
                     throw new IOException("Could not create file: " + openString);
                 }
             }
-            return new FileOutputStream(file);
-        } else if (internalCacheArea) {
-            File file = File.createTempFile(filename, null, context.getCacheDir());
-            Logging.info("creating file: " + file.getCanonicalPath());
             return new FileOutputStream(file);
         }
 

@@ -1,1 +1,1 @@
-include ':wiglewifiwardriving', ':android-maps-utils'
+include ':wiglewifiwardriving'

@@ -130,17 +130,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     static {
         final long maxMemory = Runtime.getRuntime().maxMemory();
         int cacheSize = 128;
-        if (maxMemory > 1_000_000_000L) {
-            cacheSize = 4096;
+        if (maxMemory > 400_000_000L) {
+            cacheSize = 4000; // cap at 4,000
         }
-        else if (maxMemory > 500_000_000L) {
-            cacheSize = 2048;
-        }
-        else if (maxMemory > 200_000_000L) {
-            cacheSize = 1024;
-        }
-        else if (maxMemory > 100_000_000L) {
-            cacheSize = 512;
+        else if (maxMemory > 50_000_000L) {
+            cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
         }
         Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);

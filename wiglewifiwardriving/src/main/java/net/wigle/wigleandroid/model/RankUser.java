@@ -4,7 +4,7 @@ import net.wigle.wigleandroid.model.api.RankResponse;
 
 /**
  * rank view user. not thread-safe.
- * This class only exists (vs. RankResopnse.RankRow) to supply rankDiff. which is presentation mode-specific.
+ * This class only exists (vs. {@link RankResponse.RankResponseRow}) to supply rankDiff. which is presentation mode-specific.
  */
 public final class RankUser {
     private final long rank;

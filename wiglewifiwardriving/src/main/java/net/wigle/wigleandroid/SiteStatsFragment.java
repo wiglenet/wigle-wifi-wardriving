@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 import android.view.LayoutInflater;
@@ -29,7 +31,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SiteStatsFragment extends Fragment {
-    private static final int MSG_SITE_DONE = 100;
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_RANK_STATS = 202;
 
@@ -45,6 +46,7 @@ public class SiteStatsFragment extends Fragment {
     private static final String KEY_NETWEP = "netwep";
     private static final String KEY_NETNOWEP = "netnowep";
     private static final String KEY_NETWEP_UNKNOWN = "netwepunknown";
+    private static final String API_NETWEP_UNKNOWN = "netwep?";
 
     private static final String[] ALL_SITE_KEYS = new String[] {
         KEY_NETLOC, KEY_LOCTOTAL, KEY_BTLOC, KEY_GENLOC, KEY_USERSTOT, KEY_TRANSTOT,
@@ -121,8 +123,8 @@ public class SiteStatsFragment extends Fragment {
                             tv = view.findViewById(id);
                             try {
                                 if (tv != null) {
-                                    if ("netwepunknown".equals(key)) {
-                                        tv.setText(numberFormat.format(siteStats.get("netwep?"))); //ALIBI: Android doesn't like question marks in resource IDs.
+                                    if (KEY_NETWEP_UNKNOWN.equals(key)) {
+                                        tv.setText(numberFormat.format(siteStats.get(API_NETWEP_UNKNOWN))); //ALIBI: Android doesn't like question marks in resource IDs.
                                     } else {
                                         tv.setText(numberFormat.format(siteStats.get(key)));
                                     }
@@ -170,7 +172,10 @@ public class SiteStatsFragment extends Fragment {
     public void onResume() {
         Logging.info("SITESTATS: onResume");
         super.onResume();
-        getActivity().setTitle(R.string.site_stats_app_name);
+        final Activity a = getActivity();
+        if (null != a) {
+            a.setTitle(R.string.site_stats_app_name);
+        }
     }
 
     @Override
@@ -192,7 +197,7 @@ public class SiteStatsFragment extends Fragment {
     }
 
     @Override
-    public void onConfigurationChanged( final Configuration newConfig ) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
         Logging.info("SITESTATS: config changed");
         switchView();
         super.onConfigurationChanged( newConfig );
@@ -201,7 +206,7 @@ public class SiteStatsFragment extends Fragment {
 
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_USER_STATS, 0, getString(R.string.user_stats_app_name));
         item.setIcon( android.R.drawable.ic_menu_myplaces );
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
@@ -223,7 +228,7 @@ public class SiteStatsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity();
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
+        NavigationView navigationView = getActivity().findViewById(R.id.left_drawer);
         switch ( item.getItemId() ) {
             case MENU_USER_STATS:
                 MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_user_stats);

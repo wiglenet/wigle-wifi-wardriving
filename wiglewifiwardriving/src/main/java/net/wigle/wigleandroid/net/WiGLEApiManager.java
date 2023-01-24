@@ -18,6 +18,7 @@ import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
+import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.model.api.WiGLENews;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
@@ -143,7 +144,7 @@ public class WiGLEApiManager {
                 if (null != s) {
                     Logging.warn("Network request for user stats failed, returning cached value");
                     completedListener.onTaskSucceeded(s);
-                    mainHandler.post(() -> completedListener.onTaskCompleted());
+                    mainHandler.post(completedListener::onTaskCompleted);
                     return;
                 }
                 onCallFailure("Unsuccessful WiGLE user stats request: ", e,
@@ -165,7 +166,7 @@ public class WiGLEApiManager {
                         }
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
             }
         });
     }
@@ -184,7 +185,7 @@ public class WiGLEApiManager {
                 if (null != s) {
                     Logging.warn("Network request for news failed, returning cached value");
                     completedListener.onTaskSucceeded(s);
-                    mainHandler.post(() -> completedListener.onTaskCompleted());
+                    mainHandler.post(completedListener::onTaskCompleted);
                     return;
                 }
                 onCallFailure("Unsuccessful WiGLE News request: ", e,
@@ -206,7 +207,7 @@ public class WiGLEApiManager {
                         }
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
             }
         });
     }
@@ -225,7 +226,7 @@ public class WiGLEApiManager {
                 if (null != s) {
                     Logging.warn("Network request for site stats failed, returning cached value");
                     completedListener.onTaskSucceeded(s);
-                    mainHandler.post(() -> completedListener.onTaskCompleted());
+                    mainHandler.post(completedListener::onTaskCompleted);
                     return;
                 }
                 onCallFailure("Unsuccessful WiGLE News request: ", e,
@@ -247,7 +248,7 @@ public class WiGLEApiManager {
                         }
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
             }
         });
     }
@@ -270,7 +271,7 @@ public class WiGLEApiManager {
                 onCallFailure("Unsuccessful WiGLE Token request: ", e,
                         completedListener, mainHandler, null);
             }
-            @Override public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
@@ -283,12 +284,12 @@ public class WiGLEApiManager {
                         }
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
             }
         });
     }
 
-    public void getRank(@NotNull final long pageStart, @NotNull final long pageEnd, @NonNull final Boolean userCentric,
+    public void getRank(final long pageStart, final long pageEnd, @NonNull final Boolean userCentric,
                         @NotNull final String sort,long selected,
                         @NotNull final RequestCompletedListener<RankResponse,
             JSONObject> completedListener) {
@@ -308,7 +309,7 @@ public class WiGLEApiManager {
                 onCallFailure("Unsuccessful WiGLE Token request: ", e,
                         completedListener, mainHandler, null);
             }
-            @Override public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
@@ -324,12 +325,12 @@ public class WiGLEApiManager {
                         }
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
             }
         });
     }
 
-    public void getUploads(@NotNull final long pageStart, @NotNull final long pageEnd, @NotNull final RequestCompletedListener<UploadsResponse,
+    public void getUploads(final long pageStart, final long pageEnd, @NotNull final RequestCompletedListener<UploadsResponse,
             JSONObject> completedListener ) {
         final String httpUrl = UrlConfig.UPLOADS_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + pageEnd;
@@ -340,7 +341,7 @@ public class WiGLEApiManager {
 
         authedClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
@@ -352,10 +353,9 @@ public class WiGLEApiManager {
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }
-
                     }
                 }
-                mainHandler.post(() -> completedListener.onTaskCompleted());
+                mainHandler.post(completedListener::onTaskCompleted);
            }
 
             @Override
@@ -363,7 +363,42 @@ public class WiGLEApiManager {
                 onCallFailure("Unsuccessful WiGLE Uploads request: ", e,
                         completedListener, mainHandler, null);
             }
+        });
+    }
 
+    public void searchWiFi(@NotNull final String urlEndodedQueryParams,
+                        @NotNull final RequestCompletedListener<WiFiSearchResponse,
+                                JSONObject> completedListener) {
+
+        final String httpUrl = UrlConfig.SEARCH_WIFI_URL + "?" + urlEndodedQueryParams;
+
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .build();
+        authedClient.newCall(request).enqueue(new Callback() {
+            final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+            @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                onCallFailure("Unsuccessful WiGLE Search request: ", e,
+                        completedListener, mainHandler, null);
+            }
+            @Override public void onResponse(@NotNull Call call, @NotNull Response response) {
+                try (ResponseBody responseBody = response.body()) {
+                    if (!response.isSuccessful()) {
+                        completedListener.onTaskFailed(response.code(), null);
+                    } else {
+                        //TODO- consider caching implications here
+                        if (null != responseBody) {
+                            WiFiSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                    WiFiSearchResponse.class);
+                            completedListener.onTaskSucceeded(r);
+                        } else {
+                            completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                        }
+                    }
+                }
+                mainHandler.post(completedListener::onTaskCompleted);
+            }
         });
     }
 
@@ -372,7 +407,7 @@ public class WiGLEApiManager {
                                        @NotNull final Handler mainHandler, JSONObject o) {
         Logging.error(message, e);
         completedListener.onTaskFailed(LOCAL_FAILURE_CODE, o);
-        mainHandler.post(() -> completedListener.onTaskCompleted());
+        mainHandler.post(completedListener::onTaskCompleted);
     }
 
     private static boolean hasAuthed(final SharedPreferences prefs) {

@@ -2420,7 +2420,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (null != s) {
                 SharedPreferences prefs = mainActivity.getPreferences(MODE_PRIVATE);
                 if (null != prefs) {
-                    mainActivity.state.apiManager = new WiGLEApiManager(prefs, mainActivity.getApplicationContext());
+                    s.apiManager = new WiGLEApiManager(prefs, mainActivity.getApplicationContext());
                     return;
                 } else {
                     Logging.error("Unable to update aipManager: null prefs.");

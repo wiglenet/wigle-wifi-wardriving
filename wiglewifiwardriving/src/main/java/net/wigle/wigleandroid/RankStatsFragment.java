@@ -161,7 +161,7 @@ public class RankStatsFragment extends Fragment {
             Long userRank;
             if (userCentric.get()) {
                 final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
-                final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final SharedPreferences prefs = fragmentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 userRank = prefs.getLong(userRankKey, 0);
                 myPage = (userRank / ROW_COUNT);
                 if (first) {

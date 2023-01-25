@@ -40,7 +40,6 @@ import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
-import net.wigle.wigleandroid.util.Logging;
 import org.json.JSONObject;
 
 public class DBResultActivity extends AppCompatActivity {
@@ -85,7 +84,6 @@ public class DBResultActivity extends AppCompatActivity {
         setupList();
 
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
-        Logging.info("queryArgs: " + queryArgs);
         final TextView tv = findViewById( R.id.dbstatus );
 
         if ( queryArgs != null ) {
@@ -224,8 +222,7 @@ public class DBResultActivity extends AppCompatActivity {
                 }
             }
         }, ListFragment.lameStatic.dbHelper);
-Logging.info("===executing request...");
-        // queue it up
+
         PooledQueryExecutor.enqueue( request );
     }
 

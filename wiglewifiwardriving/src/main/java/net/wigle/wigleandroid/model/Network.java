@@ -74,11 +74,16 @@ public final class Network implements ClusterItem {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI );
+                scanResult.level,  NetworkType.WIFI, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
                     final int level, final NetworkType type ) {
+        this(bssid, ssid, frequency, capabilities, level, type, null);
+    }
+
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+        final int level, final NetworkType type, final LatLng latLng ) {
 
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
@@ -128,13 +133,12 @@ public final class Network implements ClusterItem {
             crypto = CRYPTO_WPA2;
         } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
-        }
-        else if (this.capabilities.contains(WEP_CAP)) {
+        } else if (this.capabilities.contains(WEP_CAP)) {
             crypto = CRYPTO_WEP;
-        }
-        else {
+        } else {
             crypto = CRYPTO_NONE;
         }
+        this.geoPoint = latLng;
     }
 
     public String getTitle() {

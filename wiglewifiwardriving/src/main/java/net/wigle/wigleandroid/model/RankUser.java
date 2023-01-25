@@ -1,7 +1,10 @@
 package net.wigle.wigleandroid.model;
 
+import net.wigle.wigleandroid.model.api.RankResponse;
+
 /**
- * rank user. not thread-safe.
+ * rank view user. not thread-safe.
+ * This class only exists (vs. {@link RankResponse.RankResponseRow}) to supply rankDiff. which is presentation mode-specific.
  */
 public final class RankUser {
     private final long rank;
@@ -21,6 +24,16 @@ public final class RankUser {
         this.totalWifiGps = totalWifiGps;
         this.totalBtGps = totalBtGps;
         this.totalCellGps = totalCellGps;
+    }
+
+    public RankUser(final RankResponse.RankResponseRow row, final boolean monthRankingMode) {
+        this.rank = row.getRank();
+        this.rankDiff = monthRankingMode?(row.getPrevMonthRank()-row.getRank()):(row.getPrevRank()-row.getRank());
+        this.username = row.getUserName();
+        this.monthWifiGps = row.getDiscoveredWiFiGPS();
+        this.totalWifiGps = row.getTotalWiFiLocations();
+        this.totalBtGps = row.getDiscoveredBtGPS();
+        this.totalCellGps = row.getDiscoveredCellGPS();
     }
 
     public long getRank() {

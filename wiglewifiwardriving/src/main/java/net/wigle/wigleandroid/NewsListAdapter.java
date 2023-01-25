@@ -46,10 +46,10 @@ public final class NewsListAdapter extends AbstractListAdapter<NewsItem> {
         tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         tv = row.findViewById( R.id.poster_date );
-        tv.setText(newsItem.getPoster() + " - " + newsItem.getDateTime());
+        tv.setText(newsItem.getUserName() + " - " + newsItem.getPostDate());
 
         tv = row.findViewById( R.id.post );
-        tv.setText(newsItem.getPost());
+        tv.setText(newsItem.getSpannedStory());
         tv.setMovementMethod(LinkMovementMethod.getInstance());
 
         tv = row.findViewById( R.id.link );

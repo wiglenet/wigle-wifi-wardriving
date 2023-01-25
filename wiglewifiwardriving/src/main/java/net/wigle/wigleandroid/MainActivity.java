@@ -33,7 +33,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 
@@ -80,6 +79,7 @@ import net.wigle.wigleandroid.listener.PhoneState;
 import net.wigle.wigleandroid.listener.WifiReceiver;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.WiGLEToast;
@@ -151,6 +151,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         int uiMode;
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
+        WiGLEApiManager apiManager;
     }
 
     private State state;
@@ -286,6 +287,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.finishing = new AtomicBoolean(false);
             state.transferring = new AtomicBoolean(false);
             state.uiRestart = new AtomicBoolean(false);
+            // setup api manager
+            if (state.apiManager == null) {
+                state.apiManager = new WiGLEApiManager(prefs, getApplicationContext());
+            }
 
             // set it up for retain
             stateFragment = new StateFragment();
@@ -470,7 +475,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
      * migration method for viable APIs to switch to encrypted AUTH_TOKENs
      */
     private void checkInitKeystore(final SharedPreferences prefs) {
-        if (TokenAccess.checkMigrateKeystoreVersion(prefs, this)) {
+        if (TokenAccess.checkMigrateKeystoreVersion(prefs)) {
             // successful migration should remove the password value
             if (!prefs.getString(PreferenceKeys.PREF_PASSWORD,
                     "").isEmpty()) {
@@ -2402,6 +2407,27 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.warn("unable to clear default route on end-viz: ", dbe);
                 }
             }
+        }
+    }
+
+    /**
+     * When prefs/the token manager have been updated in response to authorization/de-auth, recreate in order to reflect the state change.
+     */
+    public static void refreshApiManager() {
+        final MainActivity mainActivity = MainActivity.getMainActivity();
+        if (null != mainActivity) {
+            MainActivity.State s = mainActivity.getState();
+            if (null != s) {
+                SharedPreferences prefs = mainActivity.getPreferences(MODE_PRIVATE);
+                if (null != prefs) {
+                    s.apiManager = new WiGLEApiManager(prefs, mainActivity.getApplicationContext());
+                    return;
+                } else {
+                    Logging.error("Unable to update aipManager: null prefs.");
+                }
+            }
+        } else {
+            Logging.error("Unable to update aipManager: null MainActivity.");
         }
     }
 

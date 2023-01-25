@@ -5,74 +5,48 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.os.Parcelable;
+import android.os.Looper;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
-import net.wigle.wigleandroid.background.ApiDownloader;
-import net.wigle.wigleandroid.background.ApiListener;
-import net.wigle.wigleandroid.background.DownloadHandler;
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
-import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.QueryArgs;
+import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
-import net.wigle.wigleandroid.util.Logging;
-import net.wigle.wigleandroid.util.UrlConfig;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DBResultActivity extends AppCompatActivity {
     private static final int MENU_RETURN = 12;
-    private static final int MSG_QUERY_DONE = 2;
-    private static final int MSG_QUERY_EMPTY = 3;
     private static final int LIMIT = 50;
 
     private static final int DEFAULT_ZOOM = 18;
-
-    private static final int MSG_SEARCH_DONE = 100;
-    private static final int MSG_SEARCH_FAILED = 400;
-    private static final int MSG_PARSE_FAILED = 500;
-
-    private static final String RESULT_LIST_KEY = "results";
-
-    private static final String TRILAT_KEY = "trilat";
-    private static final String TRILON_KEY = "trilong";
-    private static final String SSID_KEY = "ssid";
-    private static final String NETID_KEY = "netid";
-    private static final String ENCRYPTION_KEY = "encryption";
-    private static final String CHANNEL_KEY = "channel";
 
     private static final String API_LAT1_PARAM = "latrange1";
     private static final String API_LAT2_PARAM = "latrange2";
@@ -85,16 +59,12 @@ public class DBResultActivity extends AppCompatActivity {
     private static final Double LOCAL_RANGE = 0.1d;
     private static final Double ONLINE_RANGE = 0.001d; //ALIBI: online DB coverage mandates tighter bounds.
 
-    private static final String[] ALL_NET_KEYS = new String[] {
-            TRILAT_KEY, TRILON_KEY, SSID_KEY, NETID_KEY, ENCRYPTION_KEY, CHANNEL_KEY
-    };
-
-
     private SetNetworkListAdapter listAdapter;
     private MapView mapView;
     private MapRender mapRender;
     private final List<Network> resultList = new ArrayList<>();
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>();
+    private WiFiSearchResponse searchResponse;
 
     @Override
     public void onCreate( final Bundle savedInstanceState) {
@@ -111,12 +81,10 @@ public class DBResultActivity extends AppCompatActivity {
 
         // force media volume controls
         setVolumeControlStream( AudioManager.STREAM_MUSIC );
-
         setupList();
 
         QueryArgs queryArgs = ListFragment.lameStatic.queryArgs;
-        Logging.info("queryArgs: " + queryArgs);
-        final TextView tv = (TextView) findViewById( R.id.dbstatus );
+        final TextView tv = findViewById( R.id.dbstatus );
 
         if ( queryArgs != null ) {
             tv.setText( getString(R.string.status_working)); //TODO: throbber/overlay?
@@ -127,7 +95,7 @@ public class DBResultActivity extends AppCompatActivity {
             }
             setupMap( center, savedInstanceState );
             if (queryArgs.searchWiGLE()) {
-                setupWiGLEQuery(queryArgs, this, findViewById(android.R.id.content));
+                setupWiGLEQuery(queryArgs);
             } else {
                 setupQuery(queryArgs);
             }
@@ -140,7 +108,7 @@ public class DBResultActivity extends AppCompatActivity {
     private void setupList() {
         // not set by nonconfig retain
         listAdapter = new SetNetworkListAdapter( this, R.layout.row );
-        final ListView listView = (ListView) findViewById( R.id.dblist );
+        final ListView listView = findViewById( R.id.dblist );
         ListFragment.setupListAdapter( listView, MainActivity.getMainActivity(), listAdapter, true );
     }
 
@@ -149,71 +117,22 @@ public class DBResultActivity extends AppCompatActivity {
         mapView.onCreate(savedInstanceState);
         MapsInitializer.initialize(this);
 
-        mapView.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(final GoogleMap googleMap) {
-                mapRender = new MapRender(DBResultActivity.this, googleMap, true);
+        mapView.getMapAsync(googleMap -> {
+            mapRender = new MapRender(DBResultActivity.this, googleMap, true);
 
-                if (center != null) {
-                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(center).zoom(DEFAULT_ZOOM).build();
-                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                }
+            if (center != null) {
+                final CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(center).zoom(DEFAULT_ZOOM).build(); //TODO: zoom all the way out instead?
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 
-        final RelativeLayout rlView = (RelativeLayout) findViewById( R.id.db_map_rl );
+        final RelativeLayout rlView = findViewById( R.id.db_map_rl );
         rlView.addView( mapView );
     }
 
-    @SuppressLint("HandlerLeak")
     private void setupQuery( final QueryArgs queryArgs ) {
         final Address address = queryArgs.getAddress();
-        final AppCompatActivity activity = this;
-
-        // what runs on the gui thread
-        final Handler handler = new Handler() {
-            @Override
-            public void handleMessage( final Message msg ) {
-                final TextView tv = (TextView) findViewById( R.id.dbstatus );
-
-                if ( msg.what == MSG_QUERY_DONE ) {
-
-                    tv.setText( getString(R.string.status_success)  );
-
-                    listAdapter.clear();
-                    boolean first = true;
-                    for ( final Network network : resultList ) {
-                        listAdapter.add(network);
-                        if ( address == null && first ) {
-                            final LatLng center = MappingFragment.getCenter( DBResultActivity.this, network.getLatLng(), null );
-                            Logging.info( "set center: " + center + " network: " + network.getSsid()
-                                    + " point: " + network.getLatLng());
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(final GoogleMap googleMap) {
-                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(center).zoom(DEFAULT_ZOOM).build();
-                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-                            });
-
-                            first = false;
-                        }
-
-                        if (network.getLatLng() != null && mapRender != null) {
-                            mapRender.addItem(network);
-                        }
-                    }
-                    resultList.clear();
-                } else if (msg.what == MSG_QUERY_EMPTY) {
-                    tv.setText( getString(R.string.search_empty)  );
-                    listAdapter.clear();
-                    WiGLEToast.showOverActivity(activity, R.string.app_name,
-                            getString(R.string.search_empty), Toast.LENGTH_LONG);
-                }
-            }
-        };
 
         String sql = "SELECT bssid,lastlat,lastlon FROM " + DatabaseHelper.NETWORK_TABLE + " WHERE 1=1 ";
         final String ssid = queryArgs.getSSID();
@@ -247,7 +166,7 @@ public class DBResultActivity extends AppCompatActivity {
         final TreeMap<Float,String> top = new TreeMap<>();
         final float[] results = new float[1];
         final long[] count = new long[1];
-
+        final Handler handler = new Handler(Looper.getMainLooper());
         final PooledQueryExecutor.Request request = new PooledQueryExecutor.Request( sql, params.toArray(new String[0]),
                 new PooledQueryExecutor.ResultHandler() {
             @Override
@@ -259,15 +178,13 @@ public class DBResultActivity extends AppCompatActivity {
 
                 if ( address == null ) {
                     top.put( (float) count[0], bssid );
-                }
-                else {
+                } else {
                     Location.distanceBetween( lat, lon, address.getLatitude(), address.getLongitude(), results );
                     final float meters = results[0];
 
                     if ( top.size() <= LIMIT ) {
                         putWithBackoff( top, bssid, meters );
-                    }
-                    else {
+                    } else {
                         Float last = top.lastKey();
                         if ( meters < last ) {
                             top.remove( last );
@@ -275,14 +192,13 @@ public class DBResultActivity extends AppCompatActivity {
                         }
                     }
                 }
-
                 return true;
             }
 
             @Override
             public void complete() {
                 if (top.values().size() > 0) {
-
+                    resultList.clear();
                     for (final String bssid : top.values()) {
                         final Network network = ListFragment.lameStatic.dbHelper.getNetwork(bssid);
                         resultList.add(network);
@@ -291,29 +207,56 @@ public class DBResultActivity extends AppCompatActivity {
                             obsMap.put(point, 0);
                         }
                     }
-
-                    handler.sendEmptyMessage(MSG_QUERY_DONE);
-                    if (mapView != null) {
-                        // force a redraw
-                        mapView.postInvalidate();
-                    }
+                    handler.post(() -> {
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        for (Network n: resultList) {
+                            listAdapter.add(n);
+                            mapRender.addItem(n);
+                            builder.include(n.getPosition());
+                        }
+                        mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                        resultList.clear();
+                    });
                 } else {
-                    handler.sendEmptyMessage(MSG_QUERY_EMPTY);
+                    handler.post(() -> handleFailedRequest());
                 }
             }
         }, ListFragment.lameStatic.dbHelper);
 
-        // queue it up
         PooledQueryExecutor.enqueue( request );
     }
 
-    private void setupWiGLEQuery(final QueryArgs queryArgs, final AppCompatActivity activity, final View view) {
+    private void handleResults() {
+        final TextView tv = findViewById(R.id.dbstatus);
+        tv.setText(getString(R.string.status_success));
+        listAdapter.clear();
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        for (WiFiSearchResponse.WiFiNetwork net : searchResponse.getResults()) {
+            final Network n = WiFiSearchResponse.asNetwork(net);
+            listAdapter.add(n);
+            builder.include(n.getPosition());
+
+            if (n.getLatLng() != null && mapRender != null) {
+                mapRender.addItem(n);
+            }
+        }
+        mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+        resultList.clear();
+    }
+
+    private void handleFailedRequest() {
+        final TextView tv = findViewById( R.id.dbstatus );
+        tv.setText( getString(R.string.search_empty)  );
+        listAdapter.clear();
+        WiGLEToast.showOverActivity(this, R.string.app_name,
+                getString(R.string.search_empty), Toast.LENGTH_LONG);
+    }
+
+    private void setupWiGLEQuery(final QueryArgs queryArgs) {
 
         String queryParams = "";
         if (queryArgs.getSSID() != null && !queryArgs.getSSID().isEmpty()) {
-            if (!queryParams.isEmpty()) {
-                queryParams+="&";
-            }
 
             if (queryArgs.getSSID().contains("%") || queryArgs.getSSID().contains("_")) {
                 queryParams+=API_SSIDLIKE_PARAM+"="+URLEncoder.encode((queryArgs.getSSID()));
@@ -345,73 +288,28 @@ public class DBResultActivity extends AppCompatActivity {
             queryParams+=API_LON2_PARAM+"="+(lon + ONLINE_RANGE);
         }
 
-        final NetsDownloadHandler handler = new NetsDownloadHandler(view,
-                activity.getPackageName(), getResources(),
-                listAdapter,
-                mapView,
-                mapRender,
-                obsMap,
-                this);
-
-        final ApiDownloader task = new ApiDownloader(activity, ListFragment.lameStatic.dbHelper,
-                "search-cache-"+queryParams+".json", UrlConfig.SEARCH_WIFI_URL+"?"+queryParams,
-                false, true, true,
-                ApiDownloader.REQUEST_GET,
-                new ApiListener() {
-                    @Override
-                    public void requestComplete(final JSONObject json, final boolean isCache) {
-                        handleNets(json, handler);
+        final MainActivity.State s = MainActivity.getStaticState();
+        if (null != s) {
+            s.apiManager.searchWiFi(queryParams, new RequestCompletedListener<WiFiSearchResponse, JSONObject>() {
+                @Override
+                public void onTaskCompleted() {
+                    if (null != searchResponse) {
+                        handleResults();
+                    } else {
+                        handleFailedRequest();
                     }
-                });
-        try {
-            task.startDownload(getSupportFragmentManager().findFragmentById(R.id.net_list));
-        } catch (WiGLEAuthException waex) {
-            //unauthenticated call - should never trip
-            Logging.warn("Authentication error on news load (should not happen)", waex);
-        }
-
-    }
-
-    private void handleNets(final JSONObject json, final Handler handler) {
-        Logging.info("handleNets");
-
-        if (json == null) {
-            Logging.info("handleNets null json, returning");
-            return;
-        }
-
-        final Bundle bundle = new Bundle();
-        final Message message = new Message();
-        try {
-            final JSONArray list = json.getJSONArray(RESULT_LIST_KEY);
-            if (list == null || list.length() == 0) {
-                message.what = MSG_PARSE_FAILED;
-                handler.sendMessage(message);
-                Logging.error("empty results");
-            } else {
-                final ArrayList<Parcelable> resultList = new ArrayList<>(list.length());
-                for (int i = 0; i < list.length(); i++) {
-                    final JSONObject row = list.getJSONObject(i);
-                    final Bundle rowBundle = new Bundle();
-                    for (final String key : ALL_NET_KEYS) {
-                        String value = row.getString(key);
-                        rowBundle.putString(key, value);
-                    }
-                    resultList.add(rowBundle);
                 }
-                bundle.putParcelableArrayList(RESULT_LIST_KEY, resultList);
-                message.setData(bundle);
-                message.what = MSG_SEARCH_DONE;
-                handler.sendMessage(message);
-            }
-        } catch (final JSONException ex) {
-            message.what = MSG_PARSE_FAILED;
-            handler.sendMessage(message);
-            Logging.error("json error parsing:  " + json, ex);
-        } catch (final Exception e) {
-            message.what = MSG_SEARCH_FAILED;
-            handler.sendMessage(message);
-            Logging.error("search error: " + e, e);
+
+                @Override
+                public void onTaskSucceeded(WiFiSearchResponse response) {
+                    searchResponse = response;
+                }
+
+                @Override
+                public void onTaskFailed(int status, JSONObject error) {
+                    searchResponse = null;
+                }
+            });
         }
     }
 
@@ -477,7 +375,7 @@ public class DBResultActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mapView != null) {
             mapView.onSaveInstanceState(outState);
@@ -491,101 +389,4 @@ public class DBResultActivity extends AppCompatActivity {
             mapView.onLowMemory();
         }
     }
-
-    private final static class NetsDownloadHandler extends DownloadHandler {
-        private final SetNetworkListAdapter resultList;
-        private final MapView mapView;
-        private final MapRender mapRender;
-        private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap;
-        private final Activity activityContext;
-
-        private NetsDownloadHandler(final View view, final String packageName,
-                                    final Resources resources, final SetNetworkListAdapter resultList,
-                                    final MapView mapView, final MapRender mapRender,
-                                    final ConcurrentLinkedHashMap<LatLng, Integer> obsMap,
-                                    final Activity activityContext) {
-            super(view, null, packageName, resources);
-            this.resultList = resultList;
-            this.mapView = mapView;
-            this.mapRender = mapRender;
-            this.obsMap = obsMap;
-            this.activityContext = activityContext;
-        }
-
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-
-            final ArrayList<Parcelable> results = bundle.getParcelableArrayList(RESULT_LIST_KEY);
-            // DEBUG:
-            Logging.info("handleMessage. results: " + results);
-
-            final TextView statusView = activityContext.findViewById(R.id.dbstatus);
-
-            if (msg.what == MSG_SEARCH_DONE && results != null /*&& handler != null*/) {
-                resultList.clear();
-                boolean first = true;
-
-                for (final Parcelable result : results) {
-                    if (result instanceof Bundle) {
-                        final Bundle row = (Bundle) result;
-                        //TODO: should we move this to a third Network Constructor?
-                        final String encryptionString = row.getString(ENCRYPTION_KEY).toUpperCase();
-                        final Network network = new Network(row.getString(NETID_KEY), row.getString(SSID_KEY),
-                                Integer.parseInt(row.getString(CHANNEL_KEY)), "["+encryptionString+" SEARCH]",
-                        0, NetworkType.WIFI);
-                        network.setLatLng(new LatLng(Double.parseDouble(row.getString(TRILAT_KEY)),
-                                Double.parseDouble(row.getString(TRILON_KEY))));
-                        if ( first ) {
-                            mapView.getMapAsync(new OnMapReadyCallback() {
-                                @Override
-                                public void onMapReady(final GoogleMap googleMap) {
-                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-                            });
-
-                            first = false;
-                        }
-                        resultList.add( network );
-
-                        if (network.getLatLng() != null && mapRender != null) {
-                            mapRender.addItem(network);
-                        }
-
-                        final LatLng point = network.getLatLng();
-                        if (point != null) {
-                            obsMap.put(point, 0);
-                        }
-                    }
-                }
-
-                if (statusView != null) {
-                    statusView.setText(activityContext.getString(R.string.status_success));
-                }
-
-                if (mapView != null) {
-                    mapView.postInvalidate();
-                }
-
-            } else if (msg.what == MSG_SEARCH_FAILED) {
-
-                if (statusView != null) {
-                    statusView.setText(activityContext.getString(R.string.search_failed));
-                }
-                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
-                        activityContext.getString(R.string.search_failed), Toast.LENGTH_LONG);
-            } else if (msg.what == MSG_PARSE_FAILED) {
-                if (statusView != null) {
-                    statusView.setText(activityContext.getString(R.string.search_empty));
-                }
-                WiGLEToast.showOverActivity(activityContext, R.string.app_name,
-                        activityContext.getString(R.string.search_empty), Toast.LENGTH_LONG);
-            }
-        }
-    }
-
-
 }

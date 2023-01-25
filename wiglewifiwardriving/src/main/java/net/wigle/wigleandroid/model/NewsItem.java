@@ -4,17 +4,73 @@ import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 
-import net.wigle.wigleandroid.MainActivity;
-
 /**
  * news. not thread-safe.
  */
 public final class NewsItem {
-    private final String subject;
-    private final Spanned post;
-    private final String poster;
-    private final String dateTime;
-    private final String link;
+    private String subject;
+    private String postDate;
+    private String link;
+    private String story;
+    private String storyId;
+    private Boolean more;
+    private String userName;
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getPostDate() {
+        return postDate;
+    }
+
+    public void setPostDate(String postDate) {
+        this.postDate = postDate;
+    }
+
+    public String getStory() {
+        return story;
+    }
+
+    public void setStory(String story) {
+        this.story = story;
+    }
+
+    public String getStoryId() {
+        return storyId;
+    }
+
+    public void setStoryId(String storyId) {
+        this.storyId = storyId;
+    }
+
+    public Boolean getMore() {
+        return more;
+    }
+
+    public void setMore(Boolean more) {
+        this.more = more;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
     final static String[] format_search = {
             "\\&\\#58;",
@@ -42,38 +98,24 @@ public final class NewsItem {
             "/phpbb/images/smilies",
     };
 
-    public NewsItem(final String subject, final String post, final String poster, final String dateTime,
+    public NewsItem(final String subject, final String story, final String userName, final String postDate,
                     final String link) {
 
         this.subject = subject;
-        this.post = NewsItem.bbCodeToText(post);
-        this.poster = poster;
-        this.dateTime = dateTime;
+        this.story = story;
+        this.userName = userName;
+        this.postDate = postDate;
         this.link = link;
     }
 
-    public String getSubject() {
-        return subject;
+    public Spanned getSpannedStory() {
+        return bbCodeToText(story);
     }
-
-    public Spanned getPost() {
-        return post;
-    }
-
-    public String getPoster() {
-        return poster;
-    }
-
-    public String getDateTime() {
-        return dateTime;
-    }
-
-    public String getLink() {
-        return link;
-    }
-
     private static Spanned bbCodeToText(String sourcePost) {
-        String[] chunked = sourcePost.split("(\r\n|\n)");
+        String filtered = sourcePost.replace("\\n", "\n")
+                .replace("&quot;", "\"")
+                .replace("&amp;", "&").replaceAll("<.*?>", "");
+        String[] chunked = filtered.split("(\r\n|\n)");
         String htmlBreaks = "";
         for (String s: chunked) {
             htmlBreaks += "<p>"+s+"</p>";

@@ -366,11 +366,11 @@ public class WiGLEApiManager {
         });
     }
 
-    public void searchWiFi(@NotNull final String urlEndodedQueryParams,
+    public void searchWiFi(@NotNull final String urlEncodedQueryParams,
                         @NotNull final RequestCompletedListener<WiFiSearchResponse,
                                 JSONObject> completedListener) {
 
-        final String httpUrl = UrlConfig.SEARCH_WIFI_URL + "?" + urlEndodedQueryParams;
+        final String httpUrl = UrlConfig.SEARCH_WIFI_URL + "?" + urlEncodedQueryParams;
 
         Request request = new Request.Builder()
                 .url(httpUrl)

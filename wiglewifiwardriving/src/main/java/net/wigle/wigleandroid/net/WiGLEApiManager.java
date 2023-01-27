@@ -4,6 +4,8 @@ import static net.wigle.wigleandroid.util.UrlConfig.API_DOMAIN;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -20,6 +22,7 @@ import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.model.api.WiGLENews;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -92,10 +95,12 @@ public class WiGLEApiManager {
     /**
      * Build a WiGLEApiManager
      * @param prefs the preferences for the app to configure authentication
+     * @param context the {@link android.content.Context} object to use in creating the instance.
      */
     public WiGLEApiManager(final SharedPreferences prefs, Context context) {
         super();
         this.context = context;
+        //authed connection to WiGLE
         this.authedClient = hasAuthed(prefs) ? new OkHttpClient.Builder()
                 .addNetworkInterceptor(certTransparencyInterceptor)
                 .addInterceptor(new BasicAuthInterceptor(prefs))
@@ -113,6 +118,7 @@ public class WiGLEApiManager {
                 .connectTimeout(CONN_TIMEOUT_S, TimeUnit.SECONDS)
                 .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build():null;
+        //un-authed connection to WiGLE
         this.unauthedClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(certTransparencyInterceptor)
                 .addInterceptor(new Interceptor() {
@@ -130,6 +136,11 @@ public class WiGLEApiManager {
                 .writeTimeout(WRITE_TIMEOUT_S, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT_S, TimeUnit.SECONDS).build();
     }
+
+    /**
+     * Get the user stats from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param completedListener the completion listener to call with results.
+     */
     public void getUserStats(@NotNull final RequestCompletedListener<UserStats,
             JSONObject> completedListener) {
         Request request = new Request.Builder()
@@ -171,6 +182,10 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Get the latest WiGLE front page news from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void getNews(@NotNull final RequestCompletedListener<WiGLENews,
             JSONObject> completedListener) {
         Request request = new Request.Builder()
@@ -212,6 +227,10 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Get the site stats from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void getSiteStats(@NotNull final RequestCompletedListener<Map<String,Long>,
             JSONObject> completedListener) {
         Request request = new Request.Builder()
@@ -253,6 +272,12 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Given a username and password fetch the ANDROID {@link net.wigle.wigleandroid.model.api.ApiTokenResponse} from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param username The username supplied by the user
+     * @param password The password supplied by the user
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void getApiToken(@NotNull String username, @NotNull String password, @NotNull final RequestCompletedListener<ApiTokenResponse,
         JSONObject> completedListener) {
         RequestBody requestBody = new FormBody.Builder()
@@ -289,12 +314,19 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Get the paginated user rank data from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param pageStart the starting page offset
+     * @param pageEnd the ending page offset
+     * @param userCentric whether or not to focus on a current user
+     * @param sort the sort method ('discovered', 'total', 'monthcount', 'prevmonthcount', 'gendisc', 'gentotal', 'firsttransid', 'lasttransid')
+     * @param selected the selected record to highlight
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void getRank(final long pageStart, final long pageEnd, @NonNull final Boolean userCentric,
                         @NotNull final String sort,long selected,
                         @NotNull final RequestCompletedListener<RankResponse,
             JSONObject> completedListener) {
-        String top = userCentric?"":"top";
-
         final String httpUrl = UrlConfig.RANK_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + pageEnd + "&sort=" + sort;
 
@@ -330,6 +362,12 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * get the paginated list of uploads for the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param pageStart the offset for the start of the request page
+     * @param pageEnd the offset for the end of the request page
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void getUploads(final long pageStart, final long pageEnd, @NotNull final RequestCompletedListener<UploadsResponse,
             JSONObject> completedListener ) {
         final String httpUrl = UrlConfig.UPLOADS_STATS_URL + "?pagestart=" + pageStart
@@ -366,6 +404,11 @@ public class WiGLEApiManager {
         });
     }
 
+    /**
+     * Search the WiGLE WiFi database as the authenticated user from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
+     * @param urlEncodedQueryParams a URL-encoded string including the query parameters //TODO: break these out - direct port of old methods
+     * @param completedListener the RequestCompletedListener instance to call on completion
+     */
     public void searchWiFi(@NotNull final String urlEncodedQueryParams,
                         @NotNull final RequestCompletedListener<WiFiSearchResponse,
                                 JSONObject> completedListener) {
@@ -402,6 +445,31 @@ public class WiGLEApiManager {
         });
     }
 
+
+    /**
+     * Check to see if we have a working data connection
+     * @param context context to use to get the {@link android.net.ConnectivityManager} used to check for connection
+     * @return true if there's an active connection, otherwise false.
+     */
+    public static boolean hasDataConnection(final Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (null == connectivityManager) {
+            Logging.error("null ConnectivityManager trying to determine connection info");
+            return false;
+        }
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    /**
+     * Generalized call failure handling method
+     * @param message the message for the failure
+     * @param e an {#link java.io.IOException} if that's the cause of the error.
+     * @param completedListener the {@link net.wigle.wigleandroid.net.RequestCompletedListener} instance to call on completion of processing.
+     * @param mainHandler an {@link android.os.Handler} instance to which to post any GUI thread consequences
+     * @param o a {@link org.json.JSONObject} for any generalized error entity contained in the failure body
+     */
     private void onCallFailure(@NotNull final String message, @NotNull IOException e,
                                        @NotNull RequestCompletedListener completedListener,
                                        @NotNull final Handler mainHandler, JSONObject o) {
@@ -423,7 +491,7 @@ public class WiGLEApiManager {
 
         try (FileOutputStream fos = FileUtility.createFile(context, outputFileName, true)) {
             //DEBUG: Logging.info("writing cache file "+outputFileName);
-            ObservationUploader.writeFos(fos, result);
+            FileAccess.writeFos(fos, result);
         } catch (final IOException ex) {
             Logging.error("exception caching result: " + ex, ex);
         }
@@ -445,5 +513,6 @@ public class WiGLEApiManager {
         }
         return null;
     }
+
 
 }

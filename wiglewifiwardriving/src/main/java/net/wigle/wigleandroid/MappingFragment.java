@@ -72,11 +72,11 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.android.gms.maps.model.TileProvider;
 
-import net.wigle.wigleandroid.background.AbstractApiRequest;
 import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.net.WiGLEApiManager;
 import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
@@ -344,7 +344,7 @@ public final class MappingFragment extends Fragment {
                 }
                 final String authToken = ifAuthToken;
 
-                final String userAgent = AbstractApiRequest.getUserAgentString();
+                final String userAgent = WiGLEApiManager.USER_AGENT;
 
 
                 TileProvider tileProvider = new TileProvider() {

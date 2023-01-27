@@ -723,7 +723,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 final State state = MainActivity.getStaticState();
 
                 if (userConfirmed && null != state) {
-                    uploadFile( state.dbHelper );
+                    uploadFile();
                 } else {
                     makeUploadDialog(main);
                 }
@@ -773,7 +773,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                         editor.apply();
                     }
                     if (null != state) {
-                        uploadFile(state.dbHelper);
+                        uploadFile();
                     }
                     break;
                 case QUICK_PAUSE_DIALOG:
@@ -785,7 +785,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
-    public void uploadFile( final DatabaseHelper dbHelper ){
+    public void uploadFile () {
         Logging.info( "upload file" );
         final MainActivity main = MainActivity.getMainActivity(this);
         if (main == null) { return; }

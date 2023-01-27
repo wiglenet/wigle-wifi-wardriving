@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.UrlConfig;
@@ -89,7 +90,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
                 //DEBUG: MainActivity.info("... file output directory found");
                 File kmlFile = new File(kmlPath, filename);
                 FileOutputStream out = new FileOutputStream(kmlFile);
-                ObservationUploader.writeFos(out, result);
+                FileAccess.writeFos(out, result);
                 //DEBUG: FileUtility.printDirContents(kmlPath);
             }
         }

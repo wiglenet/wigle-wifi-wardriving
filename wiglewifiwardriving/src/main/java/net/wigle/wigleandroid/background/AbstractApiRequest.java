@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -220,7 +221,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         try {
             fos = FileUtility.createFile(context, outputFileName, internalCacheArea);
             // header
-            ObservationUploader.writeFos(fos, result);
+            FileAccess.writeFos(fos, result);
         }
         catch (final IOException ex) {
             Logging.error("exception caching result: " + ex, ex);

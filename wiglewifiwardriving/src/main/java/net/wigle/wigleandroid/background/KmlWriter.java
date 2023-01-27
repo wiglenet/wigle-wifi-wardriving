@@ -14,6 +14,7 @@ import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 
@@ -40,7 +41,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         // make a safe local copy
         this.networks = (networks == null) ? null : new HashSet<>(networks);
-        this.btNetworks = (btNetworks == null) ? null : new HashSet<String>(btNetworks);
+        this.btNetworks = (btNetworks == null) ? null : new HashSet<>(btNetworks);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         // header
-        ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        FileAccess.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
                 + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style>"
                 + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style>"
@@ -81,11 +82,11 @@ public class KmlWriter extends AbstractBackgroundTask {
                 long wifiCount = writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle);
                 cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.CELL);
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
                 cursor.close();
                 long cellCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount, dbHelper.getNetworkCount(), bundle);
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
                 cursor.close();
                 long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
                 Logging.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
@@ -112,7 +113,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                         count++;
                     }
                 }
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
                 //ALIBI: cell networks are still mixed into the lamestatic list of WiFi for now. this can get more efficient when we partition them.
                 for ( String network : cellSet ) {
                     // MainActivity.info( "network: " + network );
@@ -127,7 +128,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                         Logging.warn("unfound cell: ["+network+"]");
                     }
                 }
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
                 if (btNetworks != null) {
                     for (String network : btNetworks) {
                         // MainActivity.info( "network: " + network );
@@ -169,7 +170,7 @@ public class KmlWriter extends AbstractBackgroundTask {
             }
         }
         // footer
-        ObservationUploader.writeFos( fos, "</Folder>\n</Document></kml>" );
+        FileAccess.writeFos( fos, "</Folder>\n</Document></kml>" );
 
         fos.close();
 
@@ -248,10 +249,10 @@ public class KmlWriter extends AbstractBackgroundTask {
 
                 final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
 
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
                 fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -261,15 +262,15 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + encStatus
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
 
             } else if (NetworkType.isCellType(type)) {
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
                 fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -278,15 +279,15 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Type: " + type.name()
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
 
             } else if (NetworkType.isBtType(type)) {
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
                 fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -295,9 +296,9 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Type: " + type.name()
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
             } else {
                 Logging.warn("unknown network type "+type+"for network: "+bssid);
             }

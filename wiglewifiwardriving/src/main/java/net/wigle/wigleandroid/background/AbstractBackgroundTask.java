@@ -98,6 +98,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             sendBundledMessage(BackgroundGuiHandler.CONNECTION_ERROR, errorBundle);
         } catch ( final Exception ex ) {
             dbHelper.deathDialog(name, ex);
+        } finally {
+            latestTask = null;
         }
     }
 

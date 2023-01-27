@@ -141,7 +141,6 @@ public class RankStatsFragment extends Fragment {
 
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(() -> {
-            //TODO: clear
             downloadRanks(true);
         });
     }
@@ -169,6 +168,7 @@ public class RankStatsFragment extends Fragment {
                     currentPage = myPage;
                 } else {
                     pageStart = currentPage * ROW_COUNT;
+                    pageEnd = pageStart+ROW_COUNT;
                 }
                 selected = (userRank != null && userRank > 0) ? Math.max(userRank -5, 5) : 45;
             } else {
@@ -193,7 +193,6 @@ public class RankStatsFragment extends Fragment {
                     @Override
                     public void onTaskSucceeded(RankResponse response) {
                         rankResponse = response;
-
                     }
 
                     @Override
@@ -222,7 +221,7 @@ public class RankStatsFragment extends Fragment {
             listView.setOnScrollListener(new EndlessScrollListener() {
                 @Override
                 public boolean onLoadMore(int page, int totalItemsCount) {
-                    Logging.info("download moar ranks!");
+                    Logging.info("downloading subsequent ranks...");
                     currentPage++;
                     downloadRanks(false);
                     return true;
@@ -251,7 +250,8 @@ public class RankStatsFragment extends Fragment {
             //        view.findViewById(R.id.rank_swipe_container);
             //swipeRefreshLayout.setRefreshing(false);
         }
-        //TODO: swipeRefreshLayout.setRefreshing(false); anyway if request is done?
+        //TODO:
+        //swipeRefreshLayout.setRefreshing(false); //anyway if request is done?
     }
 
     @Override

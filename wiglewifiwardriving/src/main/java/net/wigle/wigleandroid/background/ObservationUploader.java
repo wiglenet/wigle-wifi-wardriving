@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
@@ -347,7 +345,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         //noinspection
         try {
-            return writeFileWithCursor( fos, bundle, countStats, cursor );
+            return writeFileWithCursor( context, fos, bundle, countStats, cursor, prefs );
         } finally {
             fos.close();
             if (cursor != null) {
@@ -359,12 +357,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     /**
      * (lifted directly from FileUploaderTask)
      */
-    private long writeFileWithCursor( final OutputStream fos, final Bundle bundle,
-                                      final ObservationUploader.CountStats countStats,
-                                      final Cursor cursor ) throws IOException,
+    private long writeFileWithCursor(final Context context, final OutputStream fos, final Bundle bundle,
+                                     final ObservationUploader.CountStats countStats,
+                                     final Cursor cursor, final SharedPreferences prefs ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException {
-
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
         long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
 
         final long start = System.currentTimeMillis();

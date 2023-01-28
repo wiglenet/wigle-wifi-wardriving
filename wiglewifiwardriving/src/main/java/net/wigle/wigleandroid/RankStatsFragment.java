@@ -28,6 +28,7 @@ import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
+import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -56,12 +57,14 @@ public class RankStatsFragment extends Fragment {
     private RankListAdapter listAdapter;
     private AtomicBoolean monthRanking;
     private final AtomicBoolean busy = new AtomicBoolean(false);
+    private final AtomicBoolean isRefreshing = new AtomicBoolean(false);
     private AtomicBoolean userCentric;
     private RankResponse rankResponse;
     private long myPage;
     private long myRank;
     private long currentPage = -1;
     private boolean userDownloadFailed = false;
+    private LinearLayout rootView;
     private ListView listView;
     TextView typeView;
 
@@ -94,12 +97,12 @@ public class RankStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final int orientation = getResources().getConfiguration().orientation;
         Logging.info("RANKSTATS: onCreateView.a orientation: " + orientation);
-        LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
+        rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
         typeView = rootView.findViewById(R.id.rankstats_type);
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
-        final Activity a = getActivity();
+        final FragmentActivity a = getActivity();
         if (null != a) {
             final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
 
@@ -109,7 +112,7 @@ public class RankStatsFragment extends Fragment {
                       @Override
                       public void onTaskCompleted() {
                         if (userDownloadFailed) {
-                            //TODO: warn
+                            WiGLEToast.showOverFragment(a, R.string.upload_failed, getString(R.string.dl_failed));
                         }
                       }
 
@@ -141,8 +144,16 @@ public class RankStatsFragment extends Fragment {
 
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(() -> {
-            downloadRanks(true);
+            if (isRefreshing.compareAndSet(false,true)) {
+                downloadRanks(true);
+            }
         });
+    }
+
+    private void setSwipeRefreshDone(final LinearLayout rootView) {
+        // Lookup the swipe container view
+        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
+        swipeContainer.setRefreshing(false);
     }
 
     private void downloadRanks(final boolean first) {
@@ -178,6 +189,9 @@ public class RankStatsFragment extends Fragment {
 
             MainActivity.State s = MainActivity.getStaticState();
             if (s != null) {
+                //DEBUG:
+                Logging.info("getting ranks: "+pageStart + " end: "+ pageEnd + " usercentric: " + userCentric.get() +", sort:" + sort);
+
                 s.apiManager.getRank(pageStart, pageEnd, userCentric.get(), sort,
                         finalSelected, new RequestCompletedListener<RankResponse, JSONObject>() {
                     @Override
@@ -231,12 +245,15 @@ public class RankStatsFragment extends Fragment {
     }
 
     public void handleRanks(final RankResponse ranks, final boolean first) {
-        // MainActivity.info("handleMessage. results: " + results);
+Logging.error("got ranks: "+(ranks != null?ranks.getResults().size():"empty"));
         if (ranks != null && listAdapter != null) {
             final boolean doMonthRanking = monthRanking.get();
             typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
-
-            //listAdapter.clear();
+            if (isRefreshing.compareAndSet(true, false)) {
+Logging.error("clearing list adapter.");
+                listAdapter.clear();
+                setSwipeRefreshDone(rootView);
+            }
             listAdapter.setMonthRanking(monthRanking.get());
             for (final RankResponse.RankResponseRow result : ranks.getResults()) {
                 final RankUser rankUser = new RankUser(result, doMonthRanking);
@@ -245,13 +262,10 @@ public class RankStatsFragment extends Fragment {
             if (first) {
                 listView.setSelectionFromTop((int) ranks.getSelected(), 20);
             }
-
-            //final SwipeRefreshLayout swipeRefreshLayout =
-            //        view.findViewById(R.id.rank_swipe_container);
-            //swipeRefreshLayout.setRefreshing(false);
+            //setupSwipeRefresh(rootView);
+        } else {
+            Logging.error("null ranks or list adapter - unable to refresh.");
         }
-        //TODO:
-        //swipeRefreshLayout.setRefreshing(false); //anyway if request is done?
     }
 
     @Override

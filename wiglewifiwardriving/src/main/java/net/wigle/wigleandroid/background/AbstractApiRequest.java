@@ -26,11 +26,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Abstract base class for WiGLE API connections
@@ -331,7 +333,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
         // get response data
         try (BufferedReader input = new BufferedReader(
-                new InputStreamReader( HttpFileUploader.getInputStream( conn ), StandardCharsets.UTF_8.toString()) )){
+                new InputStreamReader( getInputStream( conn ), StandardCharsets.UTF_8.toString()) )){
             return getResultString(input, preserveNewlines);
         }
     }
@@ -382,5 +384,19 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                     }
                 });
         task.start();
+    }
+
+    /**
+     * get the InputStream, gunzip'ing if needed
+     */
+    public static InputStream getInputStream(HttpURLConnection conn ) throws IOException {
+        InputStream input = conn.getInputStream();
+
+        String encode = conn.getContentEncoding();
+        Logging.info( "Encoding: " + encode );
+        if ( "gzip".equalsIgnoreCase( encode ) ) {
+            input = new GZIPInputStream( input );
+        }
+        return input;
     }
 }

@@ -38,7 +38,7 @@ public class OkFileUploader {
     }
 
     /**
-     * simple upload method. Replace the old to {@link net.wigle.wigleandroid.background.HttpFileUploader#upload HttpFileUploader.upload(...)}
+     * simple upload method.
      * @param urlString the URL string for the target
      * @param filename the file name on-device to upload
      * @param fileParamName parameter name for the file

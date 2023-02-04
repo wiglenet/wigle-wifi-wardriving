@@ -121,6 +121,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
+
+        public ExecutorService executor;
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -138,6 +140,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
+
+        lameStatic.executor =  Executors.newFixedThreadPool(3);
     }
 
     @Override
@@ -196,7 +200,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (view == null) {
             return;
         }
-        final ExecutorService executor = Executors.newFixedThreadPool(3);
+
         //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
         TextView tv = view.findViewById( R.id.stats_run );
@@ -205,7 +209,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
         tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
-        executor.execute(() -> {
+        lameStatic.executor.execute(() -> {
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_wifi );
@@ -214,14 +218,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         });
         tv = view.findViewById( R.id.stats_cell );
         tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells));
-        executor.execute(() -> {
+        lameStatic.executor.execute(() -> {
             final long count = state.dbHelper.getNewBtCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_bt );
                 text.setText( ""+UINumberFormat.counterFormat(count) );
             });
         });
-        executor.execute(() -> {
+        lameStatic.executor.execute(() -> {
             final long count = state.dbHelper.getNetworkCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_dbnets );

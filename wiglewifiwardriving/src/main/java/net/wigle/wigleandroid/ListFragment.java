@@ -121,8 +121,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public QueryArgs queryArgs;
         public ConcurrentLinkedHashMap<String,Network> networkCache;
         public OUI oui;
-
-        public ExecutorService executor;
     }
     public static final LameStatic lameStatic = new LameStatic();
 
@@ -140,9 +138,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
         Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
-
-        lameStatic.executor =  Executors.newFixedThreadPool(3);
     }
+
+    /**
+     * for the doing of things
+     */
+    public ExecutorService executor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -189,6 +190,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        executor =  Executors.newFixedThreadPool(3);
         setHasOptionsMenu(true);
     }
 
@@ -209,7 +211,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
         tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
-        lameStatic.executor.execute(() -> {
+        executor.execute(() -> {
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_wifi );
@@ -218,14 +220,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         });
         tv = view.findViewById( R.id.stats_cell );
         tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells));
-        lameStatic.executor.execute(() -> {
+        executor.execute(() -> {
             final long count = state.dbHelper.getNewBtCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_bt );
                 text.setText( ""+UINumberFormat.counterFormat(count) );
             });
         });
-        lameStatic.executor.execute(() -> {
+        executor.execute(() -> {
             final long count = state.dbHelper.getNetworkCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_dbnets );
@@ -365,6 +367,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onDestroy() {
         Logging.info( "LIST: destroy.");
+        executor.shutdown();
+        executor.shutdownNow();
         super.onDestroy();
     }
 

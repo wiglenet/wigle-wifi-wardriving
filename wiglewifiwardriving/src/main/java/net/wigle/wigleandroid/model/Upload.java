@@ -1,12 +1,17 @@
 package net.wigle.wigleandroid.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * upload. not thread-safe.
  */
 public final class Upload {
     private final String transid;
+    @SerializedName("totalGps")
     private final long totalWifiGps;
+    @SerializedName("btTotalGps")
     private final long totalBtGps;
+    @SerializedName("genTotalGps")
     private final long totalCellGps;
     private final int percentDone;
     private String status;

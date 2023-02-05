@@ -134,9 +134,9 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     }
 
     public static void updateTransferringState(final boolean transferring, final FragmentActivity context) {
-        Button uploadButton = context.findViewById(R.id.upload_button);
+        final Button uploadButton = context.findViewById(R.id.upload_button);
         if (null != uploadButton) uploadButton.setEnabled(!transferring);
-        Button importObservedButton = context.findViewById(R.id.import_observed_button);
+        final Button importObservedButton = context.findViewById(R.id.import_observed_button);
         if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
         if (transferring) {
             MainActivity.getMainActivity().setTransferring();
@@ -149,11 +149,11 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
         final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
         final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
-        final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
 
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
             pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
             pp.show();
+            final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
             taskCancelButton.setOnClickListener(v -> {
                 latestTask.setInterrupted();
                 clearProgressDialog();

@@ -140,6 +140,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
     }
 
+    /**
+     * for the doing of things
+     */
+    public ExecutorService executor;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.list, container, false);
@@ -185,6 +190,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        executor =  Executors.newFixedThreadPool(3);
         setHasOptionsMenu(true);
     }
 
@@ -196,7 +202,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (view == null) {
             return;
         }
-        final ExecutorService executor = Executors.newFixedThreadPool(3);
+
         //ALIBI: the number of async requests to perform.
         final Handler handler = new Handler(Looper.getMainLooper());
         TextView tv = view.findViewById( R.id.stats_run );
@@ -361,6 +367,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onDestroy() {
         Logging.info( "LIST: destroy.");
+        executor.shutdown();
+        executor.shutdownNow();
         super.onDestroy();
     }
 

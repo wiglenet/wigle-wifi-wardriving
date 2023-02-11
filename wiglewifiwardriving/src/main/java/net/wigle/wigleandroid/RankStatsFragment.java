@@ -150,6 +150,12 @@ public class RankStatsFragment extends Fragment {
         });
     }
 
+    private void setSwipeRefreshDone(final LinearLayout rootView) {
+        // Lookup the swipe container view
+        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
+        swipeContainer.setRefreshing(false);
+    }
+
     private void downloadRanks(final boolean first) {
         if (busy.compareAndSet(false, true)) {
             final FragmentActivity fragmentActivity = getActivity();

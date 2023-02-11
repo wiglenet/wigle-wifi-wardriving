@@ -150,12 +150,6 @@ public class RankStatsFragment extends Fragment {
         });
     }
 
-    private void setSwipeRefreshDone(final LinearLayout rootView) {
-        // Lookup the swipe container view
-        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
-        swipeContainer.setRefreshing(false);
-    }
-
     private void downloadRanks(final boolean first) {
         if (busy.compareAndSet(false, true)) {
             final FragmentActivity fragmentActivity = getActivity();
@@ -245,14 +239,13 @@ public class RankStatsFragment extends Fragment {
     }
 
     public void handleRanks(final RankResponse ranks, final boolean first) {
-Logging.error("got ranks: "+(ranks != null?ranks.getResults().size():"empty"));
         if (ranks != null && listAdapter != null) {
             final boolean doMonthRanking = monthRanking.get();
             typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
             if (isRefreshing.compareAndSet(true, false)) {
-Logging.error("clearing list adapter.");
                 listAdapter.clear();
-                setSwipeRefreshDone(rootView);
+                final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
+                swipeContainer.setRefreshing(false);
             }
             listAdapter.setMonthRanking(monthRanking.get());
             for (final RankResponse.RankResponseRow result : ranks.getResults()) {

@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
@@ -20,6 +18,8 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.net.WiGLEApiManager;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -27,7 +27,6 @@ import net.wigle.wigleandroid.util.UrlConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
@@ -39,7 +38,6 @@ import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -48,13 +46,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLException;
-
-import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
-import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
-import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 
 /**
  * replacement file upload task
@@ -91,7 +84,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         this.writeEntireDb = writeEntireDb;
         this.writeRun = writeRun;
     }
-
 
     @Override
     protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
@@ -184,9 +176,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         Status status;
 
-        try {
-            final Object[] fileFilename = new Object[2];
-            final OutputStream fos = getOutputStream( context, bundle, fileFilename );
+        final Object[] fileFilename = new Object[2];
+        try (final OutputStream fos = FileAccess.getOutputStream( context, bundle, fileFilename )) {
             final File file = (File) fileFilename[0];
             final String filename = (String) fileFilename[1];
 
@@ -286,28 +277,12 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         } catch ( final Exception ex ) {
             ex.printStackTrace();
             Logging.error( "ex problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+            MainActivity.writeError( this, ex, context, "Has data connection: " + WiGLEApiManager.hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
         }
 
         return status;
-    }
-
-    public static boolean hasDataConnection(final Context context) {
-        final ConnectivityManager connMgr =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (null == connMgr) {
-            Logging.error("null ConnectivityManager trying to determine connection info");
-            return false;
-        }
-        final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        //noinspection SimplifiableIfStatement
-        if (wifi != null && wifi.isAvailable()) {
-            return true;
-        }
-        return mobile != null && mobile.isAvailable();
     }
 
     /**
@@ -321,7 +296,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final Bundle bundle = new Bundle();
 
         try {
-            try (OutputStream fos = getOutputStream(context, bundle, new Object[2])) {
+            try (OutputStream fos = FileAccess.getOutputStream(context, bundle, new Object[2])) {
                 writeFile(fos, bundle, countStats);
                 // show on the UI
                 status = Status.WRITE_SUCCESS;
@@ -370,7 +345,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         //noinspection
         try {
-            return writeFileWithCursor( fos, bundle, countStats, cursor );
+            return writeFileWithCursor( context, fos, bundle, countStats, cursor, prefs );
         } finally {
             fos.close();
             if (cursor != null) {
@@ -382,12 +357,10 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     /**
      * (lifted directly from FileUploaderTask)
      */
-    private long writeFileWithCursor( final OutputStream fos, final Bundle bundle,
-                                      final ObservationUploader.CountStats countStats,
-                                      final Cursor cursor ) throws IOException,
+    private long writeFileWithCursor(final Context context, final OutputStream fos, final Bundle bundle,
+                                     final ObservationUploader.CountStats countStats,
+                                     final Cursor cursor, final SharedPreferences prefs ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException {
-
-        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
         long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
 
         final long start = System.currentTimeMillis();
@@ -414,7 +387,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 + NEWLINE
                 + CSV_COLUMN_HEADERS
                 + NEWLINE;
-        writeFos( fos, header );
+        FileAccess.writeFos( fos, header );
 
         // assume header is all byte per char
         countStats.byteCount = header.length();
@@ -476,23 +449,23 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     charBuffer.append( network.getCapabilities() );
                     charBuffer.append( COMMA );
                     date.setTime( cursor.getLong(7) );
-                    singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
+                    FileAccess.singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
                     charBuffer.append( COMMA );
                     Integer channel = network.getChannel();
                     if ( channel == null ) {
                         channel = network.getFrequency();
                     }
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
                     charBuffer.append( COMMA );
                     charBuffer.append( network.getType().name() );
                     charBuffer.append( NEWLINE );
@@ -553,90 +526,4 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         return maxId;
     }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     */
-    public static void writeFos( final OutputStream fos, final String data ) throws IOException {
-        if ( data != null ) {
-            fos.write( data.getBytes( MainActivity.ENCODING ) );
-        }
-    }
-
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final int number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final double number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * Copy a date according to format into a position in a string
-     * (lifted directly from FileUploaderTask)
-     */
-    private void singleCopyDateFormat(final DateFormat dateFormat, final StringBuffer stringBuffer,
-                                      final CharBuffer charBuffer, final FieldPosition fp,
-                                      final Date date ) {
-        stringBuffer.setLength( 0 );
-        dateFormat.format( date, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    public static OutputStream getOutputStream(final Context context, final Bundle bundle,
-                                               final Object[] fileFilename)
-            throws IOException {
-        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
-        final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
-
-
-        final boolean hasSD = FileUtility.hasSD();
-        File file = null;
-        bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        final String filePath = FileUtility.getUploadFilePath(context);
-
-        if ( hasSD && filePath != null) {
-            final File path = new File( filePath );
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdirs();
-            String openString = filePath + filename;
-            Logging.info("Opening file: " + openString);
-            file = new File( openString );
-            if ( ! file.exists() ) {
-                if (!file.createNewFile()) {
-                    throw new IOException("Could not create file: " + openString);
-                }
-            }
-            bundle.putString( BackgroundGuiHandler.FILEPATH, filePath );
-        }
-
-        final FileOutputStream rawFos = (hasSD && null != file) ? new FileOutputStream( file )
-                    : context.openFileOutput( filename, Context.MODE_PRIVATE );
-
-        final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
-        fileFilename[0] = file;
-        fileFilename[1] = filename;
-        return fos;
-    }
-
 }

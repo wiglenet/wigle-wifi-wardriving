@@ -9,24 +9,33 @@ public final class Upload {
     private final String transid;
     @SerializedName("totalGps")
     private final long totalWifiGps;
+    @SerializedName("total")
+    private final long totalWifi;
     @SerializedName("btTotalGps")
     private final long totalBtGps;
+    @SerializedName("btTotal")
+    private final long totalBt;
     @SerializedName("genTotalGps")
     private final long totalCellGps;
+    @SerializedName("genTotal")
+    private final long totalCell;
     private final int percentDone;
-    private String status;
+    private String humanReadableStatus;
     private final long fileSize;
     private final String fileName;
     private Boolean uploadedFromLocal;
     private Boolean downloadedToLocal;
+    private final Status status;
 
-    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps,
-                  final int percentDone, final String status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal) {
-
+    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps, final long totalWifi, final long totalBt, final long totalCell,
+                  final int percentDone, final Status status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal) {
         this.transid = transid;
         this.totalWifiGps = totalWifiGps;
         this.totalBtGps = totalBtGps;
         this.totalCellGps = totalCellGps;
+        this.totalWifi = totalWifi;
+        this.totalBt = totalBt;
+        this.totalCell = totalCell;
         this.percentDone = percentDone;
         this.status = status;
         this.fileSize = fileSize;
@@ -51,16 +60,28 @@ public final class Upload {
         return totalCellGps;
     }
 
+    public long getTotalWifi() {
+        return totalWifi;
+    }
+
+    public long getTotalBt() {
+        return totalBt;
+    }
+
+    public long getTotalCell() {
+        return totalCell;
+    }
+
     public int getPercentDone() {
         return percentDone;
     }
 
-    public String getStatus() {
-        return status;
+    public String getHumanReadableStatus() {
+        return humanReadableStatus;
     }
 
-    public void setStatus(final String status) {
-        this.status = status;
+    public void setHumanReadableStatus(final String humanReadableStatus) {
+        this.humanReadableStatus = humanReadableStatus;
     }
 
     public long getFileSize() {
@@ -85,5 +106,39 @@ public final class Upload {
 
     public void setDownloadedToLocal(Boolean downloadedToLocal) {
         this.downloadedToLocal = downloadedToLocal;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public enum Status {
+        @SerializedName("W")
+        QUEUED("W"),
+        @SerializedName("I")
+        PARSING("I"),
+        @SerializedName("T")
+        TRILATERATING("T"),
+        @SerializedName("S")
+        STATS("S"),
+        @SerializedName("D")
+        SUCCESS("D"),
+        @SerializedName("E")
+        FAILED("E"),
+        @SerializedName("A")
+        ARCHIVE("A"),
+        @SerializedName("C")
+        CATALOG("C"),
+        @SerializedName("G")
+        GEOINDEX("G"),
+        //TODO: handoff type
+        @SerializedName("?")
+        UNKNOWN("?");
+
+        private final String stringStatus;
+
+        Status(final String status) {
+            this.stringStatus = status;
+        }
     }
 }

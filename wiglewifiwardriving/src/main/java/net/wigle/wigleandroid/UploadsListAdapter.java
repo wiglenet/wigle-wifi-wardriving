@@ -72,23 +72,24 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
         if (null != upload) {
             TextView tv = row.findViewById(R.id.transid);
             final String transId = upload.getTransid();
-
             tv.setText(transId);
 
+            final boolean completed = Upload.Status.SUCCESS.equals(upload.getStatus());
+            final boolean preTrilateration = Upload.Status.TRILATERATING.equals(upload.getStatus()) || Upload.Status.PARSING.equals(upload.getStatus());
+
             tv = row.findViewById(R.id.total_wifi_gps);
-            tv.setText(numberFormat.format(upload.getTotalWifiGps()));
+            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalWifiGps()):"("+numberFormat.format(upload.getTotalWifi())+")");
 
             tv = row.findViewById(R.id.total_bt_gps);
-            tv.setText(numberFormat.format(upload.getTotalBtGps()));
+            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalBtGps()):"("+numberFormat.format(upload.getTotalBt())+")");
 
             tv = row.findViewById(R.id.total_cell_gps);
-            tv.setText(numberFormat.format(upload.getTotalCellGps()));
+            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalCellGps()):"("+numberFormat.format(upload.getTotalCell())+")");
 
             tv = row.findViewById(R.id.file_size);
             tv.setText(context.getString(R.string.bytes) + ": "
                     + numberFormat.format(upload.getFileSize()));
 
-            final String status = upload.getStatus();
             final String userId = prefs.getString(PreferenceKeys.PREF_AUTHNAME, "");
             final boolean isAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
 
@@ -104,7 +105,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 } else if (upload.getUploadedFromLocal()) {
                     final String fName = upload.getFileName();
                     final String fileName = fName.substring(fName.indexOf("_") + 1) + FileUtility.GZ_EXT;
-                    if ("Completed".equals(status)) {
+                    if (completed) {
                         message += context.getString(R.string.uploaded) + context.getString(R.string.click_access);
                         ib.setImageResource(R.drawable.ic_ulstatus_uled);
                         if (fName.contains("_")) {
@@ -118,7 +119,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                         ib.setOnClickListener(v -> handleCsvShare(transId, fileName, fragment));
                     }
                 } else {
-                    if ("Completed".equals(status)) {
+                    if (completed) {
                         message += context.getString(R.string.uploaded) + context.getString(R.string.click_download);
                         ib.setImageResource(R.drawable.ic_ulstatus_nolocal);
                         ib.setOnClickListener(v -> {
@@ -174,7 +175,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
 
             ImageButton share = row.findViewById(R.id.share_upload);
             ImageButton view = row.findViewById(R.id.view_upload);
-            if (!userId.isEmpty() && (!isAnonymous) && ("Completed".equals(status))) {
+            if (!userId.isEmpty() && (!isAnonymous) && (completed)) {
                 share.setVisibility(View.VISIBLE);
                 share.setOnClickListener(v -> {
                     Logging.info("Sharing transId: " + transId);
@@ -254,7 +255,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
 
             String percentDonePrefix = "";
             String percentDoneSuffix = "%";
-            if ("Queued for Processing".equals(status)) {
+            if (Upload.Status.QUEUED.equals(upload.getStatus())) {
                 percentDonePrefix = "#";
                 percentDoneSuffix = "";
             }
@@ -262,7 +263,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             tv.setText(percentDonePrefix + upload.getPercentDone() + percentDoneSuffix);
 
             tv = row.findViewById(R.id.status);
-            tv.setText(upload.getStatus());
+            tv.setText(upload.getHumanReadableStatus());
         }
 
         return row;

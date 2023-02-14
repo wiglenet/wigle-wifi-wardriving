@@ -248,7 +248,7 @@ public class RankStatsFragment extends Fragment {
         if (ranks != null && listAdapter != null) {
             final boolean doMonthRanking = monthRanking.get();
             typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
-            if (isRefreshing.compareAndSet(true, false)) {
+            if (isRefreshing.compareAndSet(true, false) || first) {
                 listAdapter.clear();
                 final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
                 swipeContainer.setRefreshing(false);

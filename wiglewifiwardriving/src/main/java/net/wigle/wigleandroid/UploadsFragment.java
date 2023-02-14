@@ -62,18 +62,18 @@ public class UploadsFragment extends Fragment {
     private TextView queueDepth;
     private UploadsResponse latestResponse;
 
-    private static final Map<String, String> uploadStatusMap;
+    private static final Map<Upload.Status, String> uploadStatusMap;
     static {
-        Map<String, String> statusMap = new HashMap<>();
-        statusMap.put("W", "upload_queued");
-        statusMap.put("I", "upload_parsing");
-        statusMap.put("T", "upload_trilaterating");
-        statusMap.put("S", "upload_stats");
-        statusMap.put("D", "upload_success");
-        statusMap.put("E", "upload_failed");
-        statusMap.put("A", "upload_archive");
-        statusMap.put("C", "upload_catalog");
-        statusMap.put("G", "upload_geoindex");
+        Map<Upload.Status, String> statusMap = new HashMap<>();
+        statusMap.put(Upload.Status.QUEUED, "upload_queued");
+        statusMap.put(Upload.Status.PARSING, "upload_parsing");
+        statusMap.put(Upload.Status.TRILATERATING, "upload_trilaterating");
+        statusMap.put(Upload.Status.STATS, "upload_stats");
+        statusMap.put(Upload.Status.SUCCESS, "upload_success");
+        statusMap.put(Upload.Status.FAILED, "upload_failed");
+        statusMap.put(Upload.Status.ARCHIVE, "upload_archive");
+        statusMap.put(Upload.Status.CATALOG, "upload_catalog");
+        statusMap.put(Upload.Status.GEOINDEX, "upload_geoindex");
 
         uploadStatusMap = Collections.unmodifiableMap(statusMap);
     }
@@ -178,7 +178,7 @@ public class UploadsFragment extends Fragment {
                                         u.setUploadedFromLocal(false);
                                         u.setDownloadedToLocal(false);
                                     }
-                                    u.setStatus(statusValue(u.getStatus()));
+                                    u.setHumanReadableStatus(statusValue(u.getStatus()));
                                 }
                             } catch (Exception e) {
                                 Logging.error("Uploads download error: ", e);
@@ -228,7 +228,7 @@ public class UploadsFragment extends Fragment {
 
     }
 //TODO: apply to JSON object
-    private String statusValue(String statusCode) {
+    private String statusValue(Upload.Status statusCode) {
         String packageName = "net.wigle.wigleandroid";
         int stringId =  getResources().getIdentifier("upload_unknown", "string", packageName);
         if (uploadStatusMap.containsKey(statusCode)) {

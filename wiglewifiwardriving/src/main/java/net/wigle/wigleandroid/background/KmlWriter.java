@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
@@ -248,7 +247,9 @@ public class KmlWriter extends AbstractBackgroundTask {
                 sanitizedSsid = NO_SSID.getBytes(MainActivity.ENCODING);
             }
 
-            if (type.equals(NetworkType.WIFI)) {
+            if (type == null) {
+                Logging.warn("uninitialized network type for network: "+bssid);
+            } else if (type.equals(NetworkType.WIFI)) {
 
                 final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
 

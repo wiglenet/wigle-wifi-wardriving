@@ -6,11 +6,20 @@
     android:layout_height="wrap_content"
     android:padding="4dp"
     >
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        style="@style/InvertedBackground">
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/rankstats_type"
+        style="@style/InvertedText"
+        android:paddingStart="4dp"
+        android:paddingEnd="1dp"
         android:textSize="18sp" />
+    </LinearLayout>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/rank_swipe_container"
         android:layout_width="match_parent"

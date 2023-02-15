@@ -63,27 +63,28 @@ public final class RankListAdapter extends AbstractListAdapter<RankUser> {
         String rankUsername = rankUser.getUsername();
         if (ANONYMOUS.equals(rankUser.getUsername())) {
             tv.setTypeface(null, Typeface.ITALIC);
-        }
-        else if (username.equals(rankUser.getUsername())) {
+        } else if (username.equals(rankUser.getUsername())) {
             tv.setTypeface(null, Typeface.BOLD);
-            rankUsername = "**** " + rankUsername + " ****";
-        }
-        else {
+        } else {
             tv.setTypeface(null, Typeface.NORMAL);
         }
         tv.setText(rankUsername);
 
+        tv = row.findViewById( R.id.discovered_wifi_gps);
+        tv.setText(numberFormat.format(rankUser.getDiscoveredWiFiGps()));
         tv = row.findViewById( R.id.month_wifi_gps );
-        tv.setText(numberFormat.format(
-                monthRanking ? rankUser.getMonthWifiGps() : rankUser.getTotalWifiGps()));
-
+        tv.setText(numberFormat.format( rankUser.getMonthWifiGps()));
+        tv = row.findViewById( R.id.total_wifi_seen_gps );
+        tv.setText(numberFormat.format(rankUser.getTotalWifiGps()));
         tv = row.findViewById( R.id.total_bt_gps );
-        tv.setText(getContext().getString(R.string.total_bt) + ": "
-                + numberFormat.format(rankUser.getTotalBtGps()));
+        tv.setText( numberFormat.format(rankUser.getDiscoveredBtGps()));
+        tv = row.findViewById( R.id.total_bt_seen_gps );
+        tv.setText( numberFormat.format(rankUser.getTotalBtGps()));
 
         tv = row.findViewById( R.id.total_cell_gps );
-        tv.setText(getContext().getString(R.string.total_cell) + ": "
-                + numberFormat.format(rankUser.getTotalCellGps()));
+        tv.setText(numberFormat.format(rankUser.getDiscoveredCellGps()));
+        tv = row.findViewById( R.id.total_cell_seen_gps );
+        tv.setText( numberFormat.format(rankUser.getTotalCellGps()));
 
         return row;
     }

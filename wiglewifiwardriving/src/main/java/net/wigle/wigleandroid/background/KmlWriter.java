@@ -3,6 +3,7 @@ package net.wigle.wigleandroid.background;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -237,20 +238,17 @@ public class KmlWriter extends AbstractBackgroundTask {
                 style = "zeroConfidence";
             }
 
-            // not unicode. ha ha for them!
-            byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
-            filterIllegalXml( ssidFiltered );
-            if (ssidFiltered.length == 0) {
-                ssidFiltered = NO_SSID.getBytes( MainActivity.ENCODING);
+            byte[] sanitizedSsid = sanitizeKmlString(ssid);
+            if (sanitizedSsid.length == 0) {
+                sanitizedSsid = NO_SSID.getBytes(MainActivity.ENCODING);
             }
-
 
             if (type.equals(NetworkType.WIFI)) {
 
                 final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
 
                 FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
+                fos.write(sanitizedSsid);
                 FileAccess.writeFos(fos, "]]></name>\n");
                 FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
@@ -268,7 +266,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
             } else if (NetworkType.isCellType(type)) {
                 FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
+                fos.write(sanitizedSsid);
                 FileAccess.writeFos(fos, "]]></name>\n");
                 FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
@@ -285,7 +283,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
             } else if (NetworkType.isBtType(type)) {
                 FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
+                fos.write(sanitizedSsid);
                 FileAccess.writeFos(fos, "]]></name>\n");
                 FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
@@ -333,19 +331,38 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
     }
 
-    private void filterIllegalXml( byte[] data ) {
-        for ( int i = 0; i < data.length; i++ ) {
-            byte current = data[i];
-            // (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
-            //noinspection ConstantConditions
-            if ( (current >= 0x00 && current <= 0x08) ||
-                    (current >= 0x0B && current <= 0x1F) ||
-                    (current >= 0x7F && current <= 0x84) ||
-                    (current >= 0x86 && current <= 0x9F)
-                    ) {
-                data[i] = ' ';
-            }
+    // Sanitize string by escaping reserved XML tokens and replace invalid charset ranges
+    private byte[] sanitizeKmlString(String value) throws UnsupportedEncodingException {
+        // Escape reserved KML/XML tokens in order to prevent XXE attacks. The text is inserted into
+        // a CDATA field, only "]]>" sanitization is required and the rest is redundant.
+        final String escapedValue = value
+                .replaceAll("]]>", "]]&gt;")
+                .replaceAll("&", "&amp;")
+                .replaceAll(">", "&gt;")
+                .replaceAll("<", "&lt;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("'", "&apos;");
+
+        // "not unicode. ha ha for them!"
+        final byte[] escapedValueBytes = escapedValue.getBytes( MainActivity.ENCODING );
+
+        // Filtering the illegal symbols from the given charset. The symbols will be replaced with a space character.
+        // Targeted ranges: (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
+        final byte replacementGlyph = ' ';
+        for (int i = 0; i < escapedValueBytes.length; i++) {
+            byte currentGlyph = escapedValueBytes[i];
+
+            if (isBetween(currentGlyph, 0x00, 0x08)) escapedValueBytes[i] = replacementGlyph;
+            if (isBetween(currentGlyph, 0x0B, 0x1F)) escapedValueBytes[i] = replacementGlyph;
+            if (isBetween(currentGlyph, 0x7F, 0x84)) escapedValueBytes[i] = replacementGlyph;
+            if (isBetween(currentGlyph, 0x86, 0x9F)) escapedValueBytes[i] = replacementGlyph;
         }
+
+        return escapedValueBytes;
     }
 
+    // Check if the given values is between two given values (inclusive)
+    private boolean isBetween(byte value, int min, int max) {
+        return value >= min && value <= max;
+    }
 }

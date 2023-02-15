@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -29,8 +30,12 @@ import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
     private final Set<String> btNetworks;
-    private static final String NO_SSID = "(no SSID)";
 
+    private static final String NO_SSID = "(no SSID)";
+    private static final byte SANITIZATION_REPLACEMENT_GLYPH = ' ';
+    private static final Pattern KML_CDATA_OPEN_PATTERN = Pattern.compile("<!\\[CDATA\\[", Pattern.CASE_INSENSITIVE);
+    private static final Pattern KML_CDATA_CLOSE_PATTERN = Pattern.compile("]]>", Pattern.CASE_INSENSITIVE);
+    
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK);
 
     public KmlWriter( final FragmentActivity context, final DatabaseHelper dbHelper ) {
@@ -333,29 +338,22 @@ public class KmlWriter extends AbstractBackgroundTask {
 
     // Sanitize string by escaping reserved XML tokens and replace invalid charset ranges
     private byte[] sanitizeKmlString(String value) throws UnsupportedEncodingException {
-        // Escape reserved KML/XML tokens in order to prevent XXE attacks. The text is inserted into
-        // a CDATA field, only "]]>" sanitization is required and the rest is redundant.
-        final String escapedValue = value
-                .replaceAll("]]>", "]]&gt;")
-                .replaceAll("&", "&amp;")
-                .replaceAll(">", "&gt;")
-                .replaceAll("<", "&lt;")
-                .replaceAll("\"", "&quot;")
-                .replaceAll("'", "&apos;");
+        // Escape reserved KML/XML tokens in order to prevent XXE attacks.
+        value = KML_CDATA_OPEN_PATTERN.matcher(value).replaceAll("&lt;![CDATA[");
+        value = KML_CDATA_CLOSE_PATTERN.matcher(value).replaceAll("]]&gt;");
 
-        // "not unicode. ha ha for them!"
-        final byte[] escapedValueBytes = escapedValue.getBytes( MainActivity.ENCODING );
+        // Using the the Latin1 encoding ~"not unicode. ha ha for them!"
+        final byte[] escapedValueBytes = value.getBytes( MainActivity.ENCODING );
 
         // Filtering the illegal symbols from the given charset. The symbols will be replaced with a space character.
         // Targeted ranges: (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
-        final byte replacementGlyph = ' ';
         for (int i = 0; i < escapedValueBytes.length; i++) {
             byte currentGlyph = escapedValueBytes[i];
 
-            if (isBetween(currentGlyph, 0x00, 0x08)) escapedValueBytes[i] = replacementGlyph;
-            if (isBetween(currentGlyph, 0x0B, 0x1F)) escapedValueBytes[i] = replacementGlyph;
-            if (isBetween(currentGlyph, 0x7F, 0x84)) escapedValueBytes[i] = replacementGlyph;
-            if (isBetween(currentGlyph, 0x86, 0x9F)) escapedValueBytes[i] = replacementGlyph;
+            if (isBetween(currentGlyph, 0x00, 0x08)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x0B, 0x1F)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x7F, 0x84)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x86, 0x9F)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
         }
 
         return escapedValueBytes;

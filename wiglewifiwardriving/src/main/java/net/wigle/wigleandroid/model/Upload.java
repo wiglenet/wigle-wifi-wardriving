@@ -26,9 +26,10 @@ public final class Upload {
     private Boolean uploadedFromLocal;
     private Boolean downloadedToLocal;
     private final Status status;
+    private final long wait;
 
     public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps, final long totalWifi, final long totalBt, final long totalCell,
-                  final int percentDone, final Status status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal) {
+                  final int percentDone, final Status status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal, final long wait) {
         this.transid = transid;
         this.totalWifiGps = totalWifiGps;
         this.totalBtGps = totalBtGps;
@@ -42,6 +43,7 @@ public final class Upload {
         this.fileName = fileName;
         this.uploadedFromLocal = uploadedFromLocal;
         this.downloadedToLocal = downloadedToLocal;
+        this.wait = wait;
     }
 
     public String getTransid() {
@@ -110,6 +112,10 @@ public final class Upload {
 
     public Status getStatus() {
         return status;
+    }
+
+    public long getWait() {
+        return wait;
     }
 
     public enum Status {

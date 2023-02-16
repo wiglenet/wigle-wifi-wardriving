@@ -154,7 +154,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                     } else {
                         message += context.getString(R.string.not_proc);
                         ib.setImageResource(R.drawable.ic_ulstatus_queuenotlocal);
-                        ib.setOnClickListener(v -> Logging.error("not available yet - nothing to do for " + transId));
+                        ib.setOnClickListener(v -> Logging.info("not available yet - nothing to do for " + transId));
                     }
                 }
                 if (disableListButtons) {
@@ -253,14 +253,16 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
                 view.setEnabled(false);
             }
 
+            tv = row.findViewById(R.id.percent_done);
             String percentDonePrefix = "";
             String percentDoneSuffix = "%";
+            long figure = upload.getPercentDone();
             if (Upload.Status.QUEUED.equals(upload.getStatus())) {
-                percentDonePrefix = "#";
-                percentDoneSuffix = "";
+                percentDonePrefix = "(#";
+                percentDoneSuffix = ")";
+                figure = upload.getWait();
             }
-            tv = row.findViewById(R.id.percent_done);
-            tv.setText(percentDonePrefix + upload.getPercentDone() + percentDoneSuffix);
+            tv.setText(String.format("%s%d%s",percentDonePrefix, figure, percentDoneSuffix));
 
             tv = row.findViewById(R.id.status);
             tv.setText(upload.getHumanReadableStatus());

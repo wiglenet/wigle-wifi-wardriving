@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Scanduur:</string>
     <string name="dash_dist_total">Totale afstand:.</string>
     <string name="dash_dist_prev">Vorige run:</string>
-    <string name="dash_db_queue">DB-wachtrij:</string>
+    <string name="dash_db_queue">DB-wachtrij: %1$d</string>
     <string name="dash_db_nets">DB-netwerken:</string>
     <string name="dash_db_locs">DB-locaties:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">in run</string>
     <string name="new_word">Nieuw</string>
     <string name="db">DB</string>
-    <string name="scanned_in">gescand in</string>
+    <string name="scanned_in">%1$d gescand in %2$d%3$s.</string>
     <string name="sort_title">Sorteerinstellingen</string>
     <string name="sort_spin_label">Sorteren op:</string>
     <string name="channel">Kanaal</string>

@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">مدة الفحص:</string>
     <string name="dash_dist_total">المسافة الكلية:</string>
     <string name="dash_dist_prev">التشغيل السابق:</string>
-    <string name="dash_db_queue">طابور:</string>
+    <string name="dash_db_queue"> %1$d: طابور</string>
     <string name="dash_db_nets">شبكات DB:</string>
     <string name="dash_db_locs">مواقع قاعدة البيانات:</string>
     <string name="dash_short_loc">موقعك</string>
@@ -146,7 +146,7 @@
     <string name="run">نفذ</string>
     <string name="new_word">New</string>
     <string name="db">DB</string>
-    <string name="scanned_in">scanned in</string>
+    <string name="scanned_in">%2$d%3$s تم مسحها ضوئيًا في d%1$d </string>
     <string name="sort_title">Sort Options</string>
     <string name="sort_spin_label">Sort List By:</string>
     <string name="channel">Channel</string>

@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">משך הסריקה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
     <string name="dash_dist_prev">הקודם הפעלה:</string>
-    <string name="dash_db_queue">DB תור:</string>
+    <string name="dash_db_queue">%1$d :DB תור</string>
     <string name="dash_db_nets">DB נטס:</string>
     <string name="dash_db_locs">DB מיקומים:</string>
     <string name="dash_short_loc">לוק:</string>
@@ -146,7 +146,7 @@
     <string name="run">לרוץ</string>
     <string name="new_word">חדש</string>
     <string name="db">DB</string>
-    <string name="scanned_in">סריקת</string>
+    <string name="scanned_in">%1$d סריקתn %2$d%3$s.</string>
     <string name="sort_title">אפשרויות מיון</string>
     <string name="sort_spin_label">סייג לפי:</string>
     <string name="channel">ערוץ</string>

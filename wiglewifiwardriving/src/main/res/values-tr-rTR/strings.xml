@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Tarama Süresi:</string>
     <string name="dash_dist_total">Toplam Mesafe.:</string>
     <string name="dash_dist_prev">Önceki Mesafe:</string>
-    <string name="dash_db_queue">DB Sıralaması:</string>
+    <string name="dash_db_queue">DB Sıralaması: %1$d</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Konumları:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Run</string>
     <string name="new_word">Yeni</string>
     <string name="db">DB</string>
-    <string name="scanned_in">da tarandı</string>
+    <string name="scanned_in">%1$d da tarandı %2$d%3$s.</string>
     <string name="sort_title">Sıralama ayarları</string>
     <string name="sort_spin_label">Liste sıralama seçeneği:</string>
     <string name="channel">Kanal</string>

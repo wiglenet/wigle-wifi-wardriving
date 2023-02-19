@@ -215,16 +215,16 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_wifi );
-                text.setText( ""+UINumberFormat.counterFormat(count) );
+                text.setText( UINumberFormat.counterFormat(count) );
             });
         });
         tv = view.findViewById( R.id.stats_cell );
-        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells));
+        tv.setText( UINumberFormat.counterFormat(lameStatic.newCells));
         executor.execute(() -> {
             final long count = state.dbHelper.getNewBtCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_bt );
-                text.setText( ""+UINumberFormat.counterFormat(count) );
+                text.setText( UINumberFormat.counterFormat(count) );
             });
         });
         executor.execute(() -> {
@@ -571,7 +571,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     // why is this even here? this is stupid. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
-    public void onConfigurationChanged( final Configuration newConfig ) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
         final MainActivity main = MainActivity.getMainActivity(this);
         final State state = MainActivity.getStaticState();
 

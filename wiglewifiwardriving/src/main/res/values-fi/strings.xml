@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Skannauksen kesto:</string>
     <string name="dash_dist_total">Yhteensä Dist.:</string>
     <string name="dash_dist_prev">Edellinen Run:</string>
-    <string name="dash_db_queue">DB jonoon:</string>
+    <string name="dash_db_queue">DB jonoon: %1$d</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Toimipaikat:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Suorita</string>
     <string name="new_word">Uusi</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannataan</string>
+    <string name="scanned_in">%1$d skannataan %2$d%3$s.</string>
     <string name="sort_title">Lajittele Options</string>
     <string name="sort_spin_label">Lajittele lista:</string>
     <string name="channel">Kanava</string>

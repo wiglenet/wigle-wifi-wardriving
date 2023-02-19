@@ -110,6 +110,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -208,6 +209,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
+    private static final AtomicLong utteranceSequenceGenerator = new AtomicLong();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1783,8 +1785,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void speak(final String string) {
-        if (!MainActivity.getMainActivity().isMuted() && state.tts != null) {
-            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null);
+        final MainActivity a = MainActivity.getMainActivity();
+        if (a != null && !a.isMuted() && state.tts != null) {
+            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null,
+                    "WiGLEtts-"+utteranceSequenceGenerator.getAndAdd(1L));
         }
     }
 

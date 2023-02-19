@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">스캔 시간:</string>
     <string name="dash_dist_total">Dist 총. :</string>
     <string name="dash_dist_prev">이전이 실행 :</string>
-    <string name="dash_db_queue">DB 대기열 :</string>
+    <string name="dash_db_queue">DB 대기열 : %1$d</string>
     <string name="dash_db_nets">DB 네츠 :</string>
     <string name="dash_db_locs">DB 위치 :</string>
     <string name="dash_short_loc">LOC :</string>
@@ -146,7 +146,7 @@
     <string name="run">실행</string>
     <string name="new_word">새로운</string>
     <string name="db">DB</string>
-    <string name="scanned_in">에서 스캔</string>
+    <string name="scanned_in">%1$d 에서 스캔 %2$d%3$s.</string>
     <string name="sort_title">정렬 옵션</string>
     <string name="sort_spin_label">정렬 목록 :</string>
     <string name="channel">채널</string>

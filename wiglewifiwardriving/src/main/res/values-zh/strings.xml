@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">扫描持续时间：</string>
     <string name="dash_dist_total">总共的距离。</string>
     <string name="dash_dist_prev">上一次的运行：</string>
-    <string name="dash_db_queue">数据库的队列：</string>
+    <string name="dash_db_queue">数据库的队列: %1$d</string>
     <string name="dash_db_nets">数据库的网络：</string>
     <string name="dash_db_locs">数据库的位置：</string>
     <string name="dash_short_loc">位置：</string>
@@ -146,7 +146,7 @@
     <string name="run">运行</string>
     <string name="new_word">新建</string>
     <string name="db">数据库</string>
-    <string name="scanned_in">扫描</string>
+    <string name="scanned_in">%1$d 扫描 %2$d%3$s.</string>
     <string name="sort_title">排序选项</string>
     <string name="sort_spin_label">排序列表：</string>
     <string name="channel">频道</string>

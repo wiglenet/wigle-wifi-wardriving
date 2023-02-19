@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Skanna varaktighet:</string>
     <string name="dash_dist_total">Total distans:.</string>
     <string name="dash_dist_prev">Föregående runda:</string>
-    <string name="dash_db_queue">DB kön:</string>
+    <string name="dash_db_queue">DB kön: %1$d</string>
     <string name="dash_db_nets">DB Nät:</string>
     <string name="dash_db_locs">DB Platser:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Runda</string>
     <string name="new_word">Ny</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannas in</string>
+    <string name="scanned_in">%1$d skannas in %2$d%3$s.</string>
     <string name="sort_title">Sorteringsalternativ</string>
     <string name="sort_spin_label">Sortera efter:</string>
     <string name="channel">Kanal</string>

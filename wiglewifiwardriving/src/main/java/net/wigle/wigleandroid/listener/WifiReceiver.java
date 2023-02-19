@@ -412,9 +412,10 @@ public class WifiReceiver extends BroadcastReceiver {
             // wasn't set, set to now
             scanRequestTime = now;
         }
-        final String status = resultSize + " " + mainActivity.getString(R.string.scanned_in) + " "
-                + (now - scanRequestTime) + mainActivity.getString(R.string.ms_short) + ". "
-                + mainActivity.getString(R.string.dash_db_queue) + " " + preQueueSize;
+
+        final String status =
+                mainActivity.getString(R.string.scanned_in, resultSize, (now - scanRequestTime), mainActivity.getString(R.string.ms_short))
+                + mainActivity.getString(R.string.dash_db_queue, preQueueSize);
         mainActivity.setStatusUI( status );
         // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
         scanRequestTime = nonstopScanRequestTime;

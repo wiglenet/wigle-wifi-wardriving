@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Durata scanării:</string>
     <string name="dash_dist_total">Dist. totală.:</string>
     <string name="dash_dist_prev">Executarea anterioară:</string>
-    <string name="dash_db_queue">Coada BD:</string>
+    <string name="dash_db_queue">Coada BD: %1$d</string>
     <string name="dash_db_nets">BD Nets:</string>
     <string name="dash_db_locs">Locații BD:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Alerga</string>
     <string name="new_word">Nou</string>
     <string name="db">BD</string>
-    <string name="scanned_in">scanat</string>
+    <string name="scanned_in">%1$d scanat %2$d%3$s.</string>
     <string name="sort_title">Opțiuni de sortare</string>
     <string name="sort_spin_label">Sortați lista după:</string>
     <string name="channel">Canal</string>

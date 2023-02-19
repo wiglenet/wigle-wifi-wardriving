@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">掃描持續時間：</string>
     <string name="dash_dist_total">共有區。</string>
     <string name="dash_dist_prev">以前的運行：</string>
-    <string name="dash_db_queue">DB的隊列：</string>
+    <string name="dash_db_queue">DB的隊列: %1$d</string>
     <string name="dash_db_nets">DB的籃網：</string>
     <string name="dash_db_locs">DB的位置：</string>
     <string name="dash_short_loc">LOC：</string>
@@ -146,7 +146,7 @@
     <string name="run">運行</string>
     <string name="new_word">新</string>
     <string name="db">數據庫</string>
-    <string name="scanned_in">掃描</string>
+    <string name="scanned_in">%1$d 掃描 %2$d%3$s.</string>
     <string name="sort_title">排序選項</string>
     <string name="sort_spin_label">排序列表：</string>
     <string name="channel">頻道</string>

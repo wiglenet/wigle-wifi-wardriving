@@ -127,7 +127,7 @@
     <string name="dash_time_scanning">स्कैन की अवधि:</string>
     <string name="dash_dist_total">कुल दूरी:</string>
     <string name="dash_dist_prev">पिछला रन:</string>
-    <string name="dash_db_queue">DB कतार:</string>
+    <string name="dash_db_queue">DB कतार: %1$d</string>
     <string name="dash_db_nets">DB नेट्स:</string>
     <string name="dash_db_locs">DB स्थान:</string>
     <string name="dash_short_loc">स्थान:</string>
@@ -145,7 +145,7 @@
     <string name="run">रन</string>
     <string name="new_word">नया</string>
     <string name="db">DB</string>
-    <string name="scanned_in">में स्कैन किया गया</string>
+    <string name="scanned_in">%1$d में स्कैन किया गया %2$d%3$s.</string>
     <string name="sort_title">सॉर्ट विकल्प</string>
     <string name="sort_spin_label">इसके द्वारा सूची सॉर्ट करें:</string>
     <string name="channel">चैनल</string>

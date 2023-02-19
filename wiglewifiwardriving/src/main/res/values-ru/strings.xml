@@ -127,7 +127,7 @@
     <string name="dash_time_scanning">Продолжительность сканирования:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
     <string name="dash_dist_prev">Предыдущий пробег:</string>
-    <string name="dash_db_queue">Очередь БД:</string>
+    <string name="dash_db_queue">Очередь БД: %1$d</string>
     <string name="dash_db_nets">Сетей в БД:</string>
     <string name="dash_db_locs">Местоположений в БД:</string>
     <string name="dash_short_loc">Спутники:</string>
@@ -145,7 +145,7 @@
     <string name="run">Пробег</string>
     <string name="new_word">Новых</string>
     <string name="db">БД</string>
-    <string name="scanned_in">найдено за</string>
+    <string name="scanned_in">%1$d найдено за %2$d%3$s.</string>
     <string name="sort_title">Параметры сортировки</string>
     <string name="sort_spin_label">Сортировать список по:</string>
     <string name="channel">Канал</string>

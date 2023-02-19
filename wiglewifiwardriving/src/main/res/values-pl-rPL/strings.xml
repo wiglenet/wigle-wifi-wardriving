@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Czas skanowania:</string>
     <string name="dash_dist_total">Całkowity dystans:</string>
     <string name="dash_dist_prev">Poprzedni bieg:</string>
-    <string name="dash_db_queue">Kolejka bazy:</string>
+    <string name="dash_db_queue">Kolejka bazy: %1$d</string>
     <string name="dash_db_nets">Sieci w bazie:</string>
     <string name="dash_db_locs">Lokalizacje sieci:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Wykryte</string>
     <string name="new_word">Nowe</string>
     <string name="db">Baza</string>
-    <string name="scanned_in">znalezionych w</string>
+    <string name="scanned_in">%1$d znalezionych w %2$d%3$s.</string>
     <string name="sort_title">Opcje sortowania</string>
     <string name="sort_spin_label">Sortuj według:</string>
     <string name="channel">Kanał</string>

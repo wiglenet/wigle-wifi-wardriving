@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Duração da análise:</string>
     <string name="dash_dist_total">Dist. Total:</string>
     <string name="dash_dist_prev">Sessão Anterior:</string>
-    <string name="dash_db_queue">Fila do BD:</string>
+    <string name="dash_db_queue">Fila do BD: %1$d</string>
     <string name="dash_db_nets">Redes no BD:</string>
     <string name="dash_db_locs">Localizações no BD:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Redes</string>
     <string name="new_word">Novas</string>
     <string name="db">BD</string>
-    <string name="scanned_in">encontradas em</string>
+    <string name="scanned_in">%1$d encontradas em %2$d%3$s.</string>
     <string name="sort_title">Opções de Ordenação</string>
     <string name="sort_spin_label">Ordenar Lista por:</string>
     <string name="channel">Canal</string>

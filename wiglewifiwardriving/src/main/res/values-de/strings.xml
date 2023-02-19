@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Scandauer:</string>
     <string name="dash_dist_total">Gesamtstrecke:</string>
     <string name="dash_dist_prev">Vorheriger Lauf:</string>
-    <string name="dash_db_queue">DB-Warteschlange:</string>
+    <string name="dash_db_queue">DB-Warteschlange: %1$d</string>
     <string name="dash_db_nets">WLAN in DB:</string>
     <string name="dash_db_locs">Standorte in DB:</string>
     <string name="dash_short_loc">Pos:</string>
@@ -146,7 +146,7 @@
     <string name="run">Lauf</string>
     <string name="new_word">Neu</string>
     <string name="db">DB</string>
-    <string name="scanned_in">gescannt in</string>
+    <string name="scanned_in">%1$d gescannt in %2$d%3$s.</string>
     <string name="sort_title">Sortieroptionen</string>
     <string name="sort_spin_label">Liste sortieren nach:</string>
     <string name="channel">Kanal</string>

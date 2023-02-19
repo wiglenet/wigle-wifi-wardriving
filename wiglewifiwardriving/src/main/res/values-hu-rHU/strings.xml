@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Letapogatás időtartama:</string>
     <string name="dash_dist_total">Teljes táv:</string>
     <string name="dash_dist_prev">Előző futam:</string>
-    <string name="dash_db_queue">Adatbázis-várólista:</string>
+    <string name="dash_db_queue">Adatbázis-várólista: %1$d</string>
     <string name="dash_db_nets">Adatbázis-hálózatok:</string>
     <string name="dash_db_locs">Adatbázis-helyek:</string>
     <string name="dash_short_loc">Hely:</string>
@@ -146,7 +146,7 @@
     <string name="run">Futás</string>
     <string name="new_word">Új</string>
     <string name="db">Adatbázis</string>
-    <string name="scanned_in">találat</string>
+    <string name="scanned_in">%1$d találat %2$d%3$s.</string>
     <string name="sort_title">Rendezési beállítások</string>
     <string name="sort_spin_label">Rendezés alapja:</string>
     <string name="channel">Csatorna</string>

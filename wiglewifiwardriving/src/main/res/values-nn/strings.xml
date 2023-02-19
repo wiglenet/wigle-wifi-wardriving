@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">Scan varighet:</string>
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Previous Run:</string>
-    <string name="dash_db_queue">DB Queue:</string>
+    <string name="dash_db_queue">DB Kø: %1$d</string>
     <string name="dash_db_nets">DB Nets:</string>
     <string name="dash_db_locs">DB Locations:</string>
     <string name="dash_short_loc">Loc:</string>
@@ -146,7 +146,7 @@
     <string name="run">Run</string>
     <string name="new_word">New</string>
     <string name="db">DB</string>
-    <string name="scanned_in">scanned in</string>
+    <string name="scanned_in">%1$d skannes i %2$d%3$s.</string>
     <string name="sort_title">Sort Options</string>
     <string name="sort_spin_label">Sort List By:</string>
     <string name="channel">Channel</string>

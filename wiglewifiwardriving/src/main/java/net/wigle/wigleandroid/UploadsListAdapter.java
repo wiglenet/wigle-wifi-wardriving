@@ -264,7 +264,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             }
             tv.setText(String.format("%s%d%s",percentDonePrefix, figure, percentDoneSuffix));
 
-            tv = row.findViewById(R.id.status);
+            tv = row.findViewById(R.id.upload_row_status);
             tv.setText(upload.getHumanReadableStatus());
         }
 

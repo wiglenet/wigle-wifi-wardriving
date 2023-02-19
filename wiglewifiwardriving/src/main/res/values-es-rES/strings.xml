@@ -127,9 +127,9 @@
     <string name="dash_time_scanning">Duración del escáner:</string>
     <string name="dash_dist_total">Distancia total:</string>
     <string name="dash_dist_prev">Ejecución anterior:</string>
-    <string name="dash_db_queue">Fila de base de datos:</string>
-    <string name="dash_db_nets">Redes de la base de datos:</string>
-    <string name="dash_db_locs">Ubicaciones de base de datos:</string>
+    <string name="dash_db_queue">Fila de BD: %1$d</string>
+    <string name="dash_db_nets">Redes de la BD:</string>
+    <string name="dash_db_locs">Ubicaciones de BD:</string>
     <string name="dash_short_loc">Localización:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
@@ -145,7 +145,7 @@
     <string name="run">Ejecución</string>
     <string name="new_word">Nuevo</string>
     <string name="db">Base de datos</string>
-    <string name="scanned_in">escaneado en</string>
+    <string name="scanned_in">%1$d escaneado en %2$d%3$s.</string>
     <string name="sort_title">Opciones de clasificación</string>
     <string name="sort_spin_label">Ordenar lista por:</string>
     <string name="channel">Canal</string>

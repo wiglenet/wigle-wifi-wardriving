@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -82,6 +83,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private static final int UPLOAD_DIALOG = 101;
     private static final int QUICK_PAUSE_DIALOG = 102;
 
+    private static final long QUEUE_WARN_DEPTH = 500L;
+    private int dbQueueTextColor;
+
     // rank stats data
     public static final String PREF_RANK = "rank";
     public static final String PREF_MONTH_RANK = "monthRank";
@@ -149,6 +153,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
+        final TextView tv = view.findViewById( R.id.db_status );
+        dbQueueTextColor = tv.getCurrentTextColor();
 
         Logging.info("setupUploadButton");
         setupUploadButton(view);
@@ -157,7 +163,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         Logging.info("setNetCountUI");
         setNetCountUI(state, view);
         Logging.info("setStatusUI");
-        setStatusUI(view, null);
+        setScanStatusUI(view, null);
         Logging.info("setupLocation");
         setupLocation(view);
 
@@ -235,14 +241,30 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             });
         });
     }
-
-    public void setStatusUI( String status ) {
-        setStatusUI(getView(), status);
+    public void setDBStatusUI(final View view, final String status, final long queueDepth ) {
+        if ( status != null && view != null ) {
+            final TextView tv = view.findViewById( R.id.db_status );
+            tv.setText( status );
+            if (queueDepth >= QUEUE_WARN_DEPTH) {
+                tv.setTextColor(Color.YELLOW); // if we've had queue problems, turn the UI field red
+            } else {
+                //Q: would it be more useful to leave the warning around until UI reset
+                tv.setTextColor(dbQueueTextColor);
+            }
+        }
     }
 
-    public void setStatusUI( final View view, final String status ) {
+    public void setDBStatusUI(final String status, final long queueDepth ) {
+        setDBStatusUI(getView(), status, queueDepth);
+    }
+
+    public void setScanStatusUI(String status ) {
+        setScanStatusUI(getView(), status);
+    }
+
+    public void setScanStatusUI(final View view, final String status ) {
         if ( status != null && view != null ) {
-            final TextView tv = view.findViewById( R.id.status );
+            final TextView tv = view.findViewById( R.id.scan_status);
             tv.setText( status );
         }
         final MainActivity ma = MainActivity.getMainActivity();
@@ -342,7 +364,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         //ALIBI: default status can confuse users on resume
         Logging.info("setNetCountUI");
         setNetCountUI(MainActivity.getStaticState(), getView());
-        setStatusUI(null);
+        setScanStatusUI(null);
         animating = false;
     }
 
@@ -481,10 +503,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final boolean isScanning = main == null || main.isScanning();
         Logging.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
-            setStatusUI(view, getString(R.string.list_scanning_on));
+        setScanStatusUI(view, getString(R.string.list_scanning_on));
         }
         else {
-            setStatusUI(view, getString(R.string.list_scanning_off));
+            setScanStatusUI(view, getString(R.string.list_scanning_off));
         }
     }
 
@@ -587,7 +609,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         setupUploadButton(getView());
         setNetCountUI( state, getView() );
         setLocationUI(main, getView());
-        setStatusUI(getView(), state.previousStatus);
+        setScanStatusUI(getView(), state.previousStatus);
     }
 
     private void setupList( final View view ) {

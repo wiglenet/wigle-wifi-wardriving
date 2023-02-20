@@ -219,14 +219,26 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
             android:text=""
-			android:layout_weight="5"
+			android:layout_weight="4"
+            android:layout_gravity="start"
 			/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/scan_status"
+            android:text="@string/list_status_default"
+            android:layout_weight="1"
+            android:layout_gravity="end"
+            />
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:id="@+id/status"
-			android:text="@string/list_status_default"
+			android:id="@+id/db_status"
+			android:text="-"
 			android:layout_weight="0"
+            android:layout_gravity="end"
+            android:paddingEnd="5dp"
+            android:paddingStart="3dp"
 			/>
     </LinearLayout>
     <LinearLayout
@@ -237,6 +249,7 @@
         />
     <ListView android:id="@+id/ListView01"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="6"/>
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        />
 </LinearLayout>

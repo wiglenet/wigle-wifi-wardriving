@@ -414,9 +414,10 @@ public class WifiReceiver extends BroadcastReceiver {
         }
 
         final String status =
-                mainActivity.getString(R.string.scanned_in, resultSize, (now - scanRequestTime), mainActivity.getString(R.string.ms_short))
-                + mainActivity.getString(R.string.dash_db_queue, preQueueSize);
-        mainActivity.setStatusUI( status );
+                mainActivity.getString(R.string.scanned_in, resultSize, (now - scanRequestTime), mainActivity.getString(R.string.ms_short));
+        mainActivity.setScanStatusUI( status );
+
+        mainActivity.setDBQueue(preQueueSize);
         // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
         scanRequestTime = nonstopScanRequestTime;
 
@@ -908,7 +909,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // scanning is off. since we're the only timer, update the UI
             mainActivity.setNetCountUI();
             mainActivity.setLocationUI();
-            mainActivity.setStatusUI("Scanning Turned Off" );
+            mainActivity.setScanStatusUI(mainActivity.getString(R.string.list_scanning_off));
             // keep the scan times from getting huge
             scanRequestTime = System.currentTimeMillis();
             // reset this

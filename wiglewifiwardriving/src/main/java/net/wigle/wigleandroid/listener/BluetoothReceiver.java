@@ -525,7 +525,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 // scanning is off. since we're the only timer, update the UI
                 m.setNetCountUI();
                 m.setLocationUI();
-                m.setStatusUI("Scanning Turned Off");
+                m.setScanStatusUI(m.getString(R.string.list_scanning_off));
                 // keep the scan times from getting huge
                 scanRequestTime = System.currentTimeMillis();
                 // reset this

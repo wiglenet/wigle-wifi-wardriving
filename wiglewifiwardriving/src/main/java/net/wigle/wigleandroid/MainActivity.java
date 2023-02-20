@@ -1906,7 +1906,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (isScanning) {
             if (listFragment != null) {
-                listFragment.setStatusUI(getString(R.string.list_scanning_on));
+                listFragment.setScanStatusUI(getString(R.string.list_scanning_on));
                 listFragment.setScanningStatusIndicator(true);
             }
             if (state.wifiReceiver != null) {
@@ -1920,7 +1920,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } else {
             if (listFragment != null) {
-                listFragment.setStatusUI(getString(R.string.list_scanning_off));
+                listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
                 listFragment.setScanningStatusIndicator(false);
             }
             // turn off location updates
@@ -2116,7 +2116,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    public void setStatusUI(String status) {
+    public void setScanStatusUI(String status) {
         if (status == null) {
             status = state.previousStatus;
         }
@@ -2127,7 +2127,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             if (listFragment != null) {
                 // tell list
-                listFragment.setStatusUI(status);
+                listFragment.setScanStatusUI(status);
+            }
+        }
+    }
+
+    public void setDBQueue(final long queue) {
+        final String status = getString(R.string.dash_db_queue, queue);
+        if (status != null) {
+            ListFragment listFragment = getListFragmentIfCurrent();
+            if (listFragment != null) {
+                // tell list
+                listFragment.setDBStatusUI(status, queue);
             }
         }
     }

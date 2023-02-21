@@ -119,8 +119,8 @@
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Scan Desligado)</string>
     <string name="dash_new_wifi">WiFi Novas</string>
-    <string name="dash_vis_nets">Redes Visíveis:</string>
-    <string name="dash_new_upload">Redes Novas Não Enviadas:</string>
+    <string name="dash_vis_nets">Redes Visíveis: %1$d</string>
+    <string name="dash_new_upload">Redes Novas Não Enviadas: %1$d</string>
     <string name="dash_new_cells">Celulares Novas</string>
     <string name="dash_new_bt">Novo Bluetooth</string>
     <string name="dash_dist_run">Distância Percorrida:</string>

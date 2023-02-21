@@ -119,8 +119,8 @@
     <string name="cancel">Annuleren</string>
     <string name="dash_scan_off">Scan is uit</string>
     <string name="dash_new_wifi">Nieuwe WiFi</string>
-    <string name="dash_vis_nets">Zichtbare netwerken:</string>
-    <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
+    <string name="dash_vis_nets">Zichtbare netwerken: %1$d</string>
+    <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload: %1$d</string>
     <string name="dash_new_cells">Nieuwe cellulaire</string>
     <string name="dash_new_bt">Nieuwe Bluetooth</string>
     <string name="dash_dist_run">Runafstand:</string>

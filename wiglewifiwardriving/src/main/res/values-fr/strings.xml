@@ -119,8 +119,8 @@
     <string name="cancel">Annuler</string>
     <string name="dash_scan_off">(Numérisation désactivée)</string>
     <string name="dash_new_wifi">Nouveau WiFi</string>
-    <string name="dash_vis_nets">Réseaux visibles :</string>
-    <string name="dash_new_upload">Réseaux depuis le dernier upload :</string>
+    <string name="dash_vis_nets">Réseaux visibles : %1$d</string>
+    <string name="dash_new_upload">Réseaux depuis le dernier upload : %1$d</string>
     <string name="dash_new_cells">Nouvelles cellaires</string>
     <string name="dash_new_bt">Nouveau Bluetooth</string>
     <string name="dash_dist_run">Distance parcourue :</string>

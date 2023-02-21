@@ -119,8 +119,8 @@
     <string name="cancel">Anulare</string>
     <string name="dash_scan_off">(Scanarea este dezactivată)</string>
     <string name="dash_new_wifi">WiFi nou</string>
-    <string name="dash_vis_nets">Plase vizibile:</string>
-    <string name="dash_new_upload">Plase de la încărcare:</string>
+    <string name="dash_vis_nets">Plase vizibile: %1$d</string>
+    <string name="dash_new_upload">Plase de la încărcare: %1$d</string>
     <string name="dash_new_cells">Celulă nouă</string>
     <string name="dash_new_bt">Bluetooth nou</string>
     <string name="dash_dist_run">Distanța de alergare:</string>

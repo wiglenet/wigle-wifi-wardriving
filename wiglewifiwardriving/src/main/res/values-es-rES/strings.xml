@@ -118,8 +118,8 @@
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Escáner desactivado)</string>
     <string name="dash_new_wifi">Nuevo WiFi</string>
-    <string name="dash_vis_nets">Redes visibles:</string>
-    <string name="dash_new_upload">Redes desde la carga:</string>
+    <string name="dash_vis_nets">Redes visibles: %1$d</string>
+    <string name="dash_new_upload">Redes desde la carga: %1$d</string>
     <string name="dash_new_cells">Nueva celda</string>
     <string name="dash_new_bt">Nuevo bluetooth</string>
     <string name="dash_dist_run">Distancia de ejecución:</string>

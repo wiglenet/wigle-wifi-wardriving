@@ -118,8 +118,8 @@
     <string name="cancel">Katisha</string>
     <string name="dash_scan_off">(Kutambaza Imezimwa)</string>
     <string name="dash_new_wifi">WiFi Mpya</string>
-    <string name="dash_vis_nets">Mitandao Inayoonekana:</string>
-    <string name="dash_new_upload">Mitandao Tangu Kupakia:</string>
+    <string name="dash_vis_nets">Mitandao Inayoonekana: %1$d</string>
+    <string name="dash_new_upload">Mitandao Tangu Kupakia: %1$d</string>
     <string name="dash_new_cells">Seli Mpya</string>
     <string name="dash_new_bt">Bluetooth Mpya</string>
     <string name="dash_dist_run">Umbali wa Utafutaji:</string>

@@ -119,8 +119,8 @@
     <string name="cancel">Mégse</string>
     <string name="dash_scan_off">(Letapogatás ki)</string>
     <string name="dash_new_wifi">Új WiFi</string>
-    <string name="dash_vis_nets">Látható hálózatok:</string>
-    <string name="dash_new_upload">Hálózatok feltöltés óta:</string>
+    <string name="dash_vis_nets">Látható hálózatok: %1$d</string>
+    <string name="dash_new_upload">Hálózatok feltöltés óta: %1$d</string>
     <string name="dash_new_cells">Új cella</string>
     <string name="dash_new_bt">Új Bluetooth</string>
     <string name="dash_dist_run">Futam távolsága:</string>

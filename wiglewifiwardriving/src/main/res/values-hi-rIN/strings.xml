@@ -118,8 +118,8 @@
     <string name="cancel">रद्द करें</string>
     <string name="dash_scan_off">(स्कैनिंग बंद किया गया है)</string>
     <string name="dash_new_wifi">नया WiFi</string>
-    <string name="dash_vis_nets">दृश्यमान नेट्स:</string>
-    <string name="dash_new_upload">अपलोड के बाद से नेट:</string>
+    <string name="dash_vis_nets">दृश्यमान नेट्स: %1$d</string>
+    <string name="dash_new_upload">अपलोड के बाद से नेट: %1$d</string>
     <string name="dash_new_cells">नई सेल</string>
     <string name="dash_new_bt">नया ब्लूटूथ</string>
     <string name="dash_dist_run">रन की दूरी:</string>

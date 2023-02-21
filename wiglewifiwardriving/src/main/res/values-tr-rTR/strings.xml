@@ -119,8 +119,8 @@
     <string name="cancel">İptal</string>
     <string name="dash_scan_off">(Tarama Kapalı)</string>
     <string name="dash_new_wifi">Yeni WiFi</string>
-    <string name="dash_vis_nets">Görünen Ağlar:</string>
-    <string name="dash_new_upload">Son yükleme sonrası görünen ağlar:</string>
+    <string name="dash_vis_nets">Görünen Ağlar: %1$d</string>
+    <string name="dash_new_upload">Son yükleme sonrası görünen ağlar: %1$d</string>
     <string name="dash_new_cells">Yeni baz istasyonları</string>
     <string name="dash_new_bt">Yeni Bluetooth</string>
     <string name="dash_dist_run">Geçerli Mesafe:</string>

@@ -119,8 +119,8 @@
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>
     <string name="dash_new_wifi">חדש WiFi</string>
-    <string name="dash_vis_nets">Visible נטס:</string>
-    <string name="dash_new_upload">הנטס בניו מאז טען:</string>
+    <string name="dash_vis_nets">%1$d Visible נטס: </string>
+    <string name="dash_new_upload">הנטס בניו מאז טען: %1$d</string>
     <string name="dash_new_cells">תא מגדלי חדש</string>
     <string name="dash_new_bt">Bluetooth חדש</string>
     <string name="dash_dist_run">הפעל מרחק:</string>

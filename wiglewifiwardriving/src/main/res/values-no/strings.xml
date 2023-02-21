@@ -119,8 +119,8 @@
     <string name="cancel">Avbryt</string>
     <string name="dash_scan_off">(Scanning slått av)</string>
     <string name="dash_new_wifi">Nye WiFi</string>
-    <string name="dash_vis_nets">Synlig Nets:</string>
-    <string name="dash_new_upload">Nye Nets Siden Upload:</string>
+    <string name="dash_vis_nets">Synlig Nets: %1$d</string>
+    <string name="dash_new_upload">Nye Nets Siden Upload: %1$d</string>
     <string name="dash_new_cells">Nye Cell</string>
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Run Avstand:</string>

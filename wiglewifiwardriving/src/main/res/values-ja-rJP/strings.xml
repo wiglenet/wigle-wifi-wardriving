@@ -118,8 +118,8 @@
     <string name="cancel">キャンセル</string>
     <string name="dash_scan_off">（スキャンがオフになっています）</string>
     <string name="dash_new_wifi">新しい WiFi</string>
-    <string name="dash_vis_nets">可視ネット：</string>
-    <string name="dash_new_upload">アップロード以降のネット：</string>
+    <string name="dash_vis_nets">可視ネット：%1$d</string>
+    <string name="dash_new_upload">アップロード以降のネット： %1$d</string>
     <string name="dash_new_cells">新しいセル</string>
     <string name="dash_new_bt">新しい Bluetooth</string>
     <string name="dash_dist_run">実行間隔：</string>

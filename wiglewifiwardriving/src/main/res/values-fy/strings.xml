@@ -119,8 +119,8 @@
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>
     <string name="dash_new_wifi">Nije WiFi</string>
-    <string name="dash_vis_nets">Sichtbere netwurken:</string>
-    <string name="dash_new_upload">Nije netwurken sûnt lêste upload:</string>
+    <string name="dash_vis_nets">Sichtbere netwurken: %1$d</string>
+    <string name="dash_new_upload">Nije netwurken sûnt lêste upload: %1$d</string>
     <string name="dash_new_cells">Nije stjoermêsten</string>
     <string name="dash_new_bt">Nije Bluetooth</string>
     <string name="dash_dist_run">Runôfstân:</string>

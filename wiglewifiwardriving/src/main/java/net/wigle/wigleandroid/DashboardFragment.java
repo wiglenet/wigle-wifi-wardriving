@@ -140,27 +140,27 @@ public class DashboardFragment extends Fragment {
         }
 
         TextView tv = view.findViewById( R.id.runnets );
-        tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " ");
+        tv.setText( UINumberFormat.counterFormat((ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
 
         tv = view.findViewById( R.id.runcaption );
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-        tv.setText( ListFragment.lameStatic.newWifi + " " );
+        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
 
         tv = view.findViewById( R.id.newbt );
-        tv.setText( ListFragment.lameStatic.newBt + " " );
+        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt) );
 
         tv = view.findViewById( R.id.currnets );
-        tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
+        tv.setText( getString(R.string.dash_vis_nets, ListFragment.lameStatic.currNets));
 
         tv = view.findViewById( R.id.newcells );
-        tv.setText( ListFragment.lameStatic.newCells + " ");
+        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newCells ));
 
         if (null != currentActivity) {
             final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
-            tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload(prefs) );
+            tv.setText( getString(R.string.dash_new_upload, newNetsSinceUpload(prefs)) );
 
             updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
             updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
@@ -170,13 +170,19 @@ public class DashboardFragment extends Fragment {
             updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
         tv = view.findViewById( R.id.queuesize );
-        tv.setText( getString(R.string.dash_db_queue) + " " + wholeNumberFormat.format(ListFragment.lameStatic.preQueueSize) );
+        tv.setText( getString(R.string.dash_db_queue, ListFragment.lameStatic.preQueueSize));
 
         tv = view.findViewById( R.id.dbNets );
         tv.setText( getString(R.string.dash_db_nets) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbNets) );
 
         tv = view.findViewById( R.id.dbLocs );
         tv.setText( getString(R.string.dash_db_locs) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbLocs) );
+
+        tv = view.findViewById( R.id.scanned_in );
+      final String status =
+              getString(R.string.scanned_in, ListFragment.lameStatic.currNets, ListFragment.lameStatic.currWifiScanDurMs, getString(R.string.ms_short));
+
+      tv.setText(status);
 
         tv = view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
@@ -261,7 +267,7 @@ public class DashboardFragment extends Fragment {
         }
   }
 
-  private String newNetsSinceUpload(final SharedPreferences prefs) {
+  private long newNetsSinceUpload(final SharedPreferences prefs) {
       long newSinceUpload = 0;
       final long marker = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
       final long uploaded = prefs.getLong( PreferenceKeys.PREF_NETS_UPLOADED, 0L );
@@ -272,7 +278,7 @@ public class DashboardFragment extends Fragment {
               newSinceUpload = 0;
           }
       }
-    return wholeNumberFormat.format(newSinceUpload);
+    return newSinceUpload;
   }
 
   private void updateDist(final View view, final SharedPreferences prefs, final int id, final String pref, final String title ) {

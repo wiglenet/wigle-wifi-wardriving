@@ -119,6 +119,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
+        public long currWifiScanDurMs;
         public DatabaseHelper dbHelper;
         public Set<String> runNetworks;
         public Set<String> runBtNetworks;

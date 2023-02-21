@@ -119,8 +119,8 @@
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>
     <string name="dash_new_wifi">Uusi WiFi</string>
-    <string name="dash_vis_nets">Näkyvä Nets:</string>
-    <string name="dash_new_upload">Uusi Nets Koska Tallennettu:</string>
+    <string name="dash_vis_nets">Näkyvä Nets: %1$d</string>
+    <string name="dash_new_upload">Uusi Nets Koska Tallennettu: %1$d</string>
     <string name="dash_new_cells">Uusi Cell</string>
     <string name="dash_new_bt">Uusi Bluetooth</string>
     <string name="dash_dist_run">Run Matka:</string>

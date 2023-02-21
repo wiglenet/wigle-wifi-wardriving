@@ -119,8 +119,8 @@
     <string name="cancel">Avbryt</string>
     <string name="dash_scan_off">(Scanning avstängd)</string>
     <string name="dash_new_wifi">Nya WiFi</string>
-    <string name="dash_vis_nets">Synliga Nät:</string>
-    <string name="dash_new_upload">Nya nät sedan uppladdning:</string>
+    <string name="dash_vis_nets">Synliga Nät: %1$d</string>
+    <string name="dash_new_upload">Nya nät sedan uppladdning: %1$d</string>
     <string name="dash_new_cells">Nya mobilmaster</string>
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Körsträcka:</string>

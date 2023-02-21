@@ -53,7 +53,14 @@
     android:id="@+id/dbLocs"
     android:textSize="24sp"
     />
-    
+
+    <TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/scanned_in"
+    android:textSize="24sp"
+    />
+
     <TextView
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content" 

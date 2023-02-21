@@ -119,8 +119,8 @@
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（掃描轉身的）</string>
     <string name="dash_new_wifi">新的WiFi</string>
-    <string name="dash_vis_nets">可見籃網：</string>
-    <string name="dash_new_upload">由於上傳新籃網：</string>
+    <string name="dash_vis_nets">可見籃網：%1$d</string>
+    <string name="dash_new_upload">由於上傳新籃網：%1$d</string>
     <string name="dash_new_cells">新的發射塔</string>
     <string name="dash_new_bt">新藍牙</string>
     <string name="dash_dist_run">運行距離：</string>

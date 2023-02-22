@@ -140,22 +140,22 @@ public class DashboardFragment extends Fragment {
         }
 
         TextView tv = view.findViewById( R.id.runnets );
-        tv.setText( UINumberFormat.counterFormat((ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
+        tv.setText( (NumberFormat.getInstance().format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
 
         tv = view.findViewById( R.id.runcaption );
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
+        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newWifi) );
 
         tv = view.findViewById( R.id.newbt );
-        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt) );
+        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newBt) );
 
         tv = view.findViewById( R.id.currnets );
         tv.setText( getString(R.string.dash_vis_nets, ListFragment.lameStatic.currNets));
 
         tv = view.findViewById( R.id.newcells );
-        tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newCells ));
+        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newCells) );
 
         if (null != currentActivity) {
             final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);

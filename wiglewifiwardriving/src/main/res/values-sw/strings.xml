@@ -128,8 +128,8 @@
     <string name="dash_dist_total">Jumla ya Umbali:</string>
     <string name="dash_dist_prev">Utafutaji wa Awali:</string>
     <string name="dash_db_queue">Foleni ya DB: %1$d</string>
-    <string name="dash_db_nets">Mitandao ya DB:</string>
-    <string name="dash_db_locs">Maeneo ya DB:</string>
+    <string name="dash_db_nets">Mitandao ya DB: %1$d</string>
+    <string name="dash_db_locs">Maeneo ya DB: %1$d</string>
     <string name="dash_short_loc">Mahali:</string>
     <string name="km_short">kilomita</string>
     <string name="mi_short">mi</string>

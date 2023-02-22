@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Totale afstand:.</string>
     <string name="dash_dist_prev">Vorige run:</string>
     <string name="dash_db_queue">DB-wachtrij: %1$d</string>
-    <string name="dash_db_nets">DB-netwerken:</string>
-    <string name="dash_db_locs">DB-locaties:</string>
+    <string name="dash_db_nets">DB-netwerken: %1$d</string>
+    <string name="dash_db_locs">DB-locaties: %1$d</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

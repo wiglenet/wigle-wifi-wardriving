@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Teljes táv:</string>
     <string name="dash_dist_prev">Előző futam:</string>
     <string name="dash_db_queue">Adatbázis-várólista: %1$d</string>
-    <string name="dash_db_nets">Adatbázis-hálózatok:</string>
-    <string name="dash_db_locs">Adatbázis-helyek:</string>
+    <string name="dash_db_nets">Adatbázis-hálózatok: %1$d</string>
+    <string name="dash_db_locs">Adatbázis-helyek: %1$d</string>
     <string name="dash_short_loc">Hely:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mé</string>

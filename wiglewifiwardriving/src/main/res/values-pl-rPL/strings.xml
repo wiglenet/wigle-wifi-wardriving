@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Całkowity dystans:</string>
     <string name="dash_dist_prev">Poprzedni bieg:</string>
     <string name="dash_db_queue">Kolejka bazy: %1$d</string>
-    <string name="dash_db_nets">Sieci w bazie:</string>
-    <string name="dash_db_locs">Lokalizacje sieci:</string>
+    <string name="dash_db_nets">Sieci w bazie: %1$d</string>
+    <string name="dash_db_locs">Lokalizacje sieci: %1$d</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

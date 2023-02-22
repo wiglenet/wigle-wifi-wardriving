@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Yhteensä Dist.:</string>
     <string name="dash_dist_prev">Edellinen Run:</string>
     <string name="dash_db_queue">DB jonoon: %1$d</string>
-    <string name="dash_db_nets">DB Nets:</string>
-    <string name="dash_db_locs">DB Toimipaikat:</string>
+    <string name="dash_db_nets">DB Nets: %1$d</string>
+    <string name="dash_db_locs">DB Toimipaikat: %1$d</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

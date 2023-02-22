@@ -128,8 +128,8 @@
     <string name="dash_dist_total">総間隔：</string>
     <string name="dash_dist_prev">前回の実行：</string>
     <string name="dash_db_queue">DB キュー: %1$d</string>
-    <string name="dash_db_nets">DB ネット：</string>
-    <string name="dash_db_locs">DB の場所：</string>
+    <string name="dash_db_nets">DB ネット：%1$d</string>
+    <string name="dash_db_locs">DB の場所：%1$d</string>
     <string name="dash_short_loc">場所：</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

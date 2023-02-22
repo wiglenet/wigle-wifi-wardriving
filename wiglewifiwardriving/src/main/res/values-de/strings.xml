@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Gesamtstrecke:</string>
     <string name="dash_dist_prev">Vorheriger Lauf:</string>
     <string name="dash_db_queue">DB-Warteschlange: %1$d</string>
-    <string name="dash_db_nets">WLAN in DB:</string>
-    <string name="dash_db_locs">Standorte in DB:</string>
+    <string name="dash_db_nets">WLAN in DB: %1$d</string>
+    <string name="dash_db_locs">Standorte in DB: %1$d</string>
     <string name="dash_short_loc">Pos:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

@@ -129,8 +129,8 @@
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Previous Run:</string>
     <string name="dash_db_queue">DB Queue: %1$d</string>
-    <string name="dash_db_nets">DB Nets:</string>
-    <string name="dash_db_locs">DB Locations:</string>
+    <string name="dash_db_nets">DB Nets: %1$d</string>
+    <string name="dash_db_locs">DB Locations: %1$d</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

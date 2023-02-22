@@ -173,10 +173,10 @@ public class DashboardFragment extends Fragment {
         tv.setText( getString(R.string.dash_db_queue, ListFragment.lameStatic.preQueueSize));
 
         tv = view.findViewById( R.id.dbNets );
-        tv.setText( getString(R.string.dash_db_nets) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbNets) );
+        tv.setText( getString(R.string.dash_db_nets, ListFragment.lameStatic.dbNets) );
 
         tv = view.findViewById( R.id.dbLocs );
-        tv.setText( getString(R.string.dash_db_locs) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbLocs) );
+        tv.setText( getString(R.string.dash_db_locs, ListFragment.lameStatic.dbLocs) );
 
         tv = view.findViewById( R.id.scanned_in );
       final String status =

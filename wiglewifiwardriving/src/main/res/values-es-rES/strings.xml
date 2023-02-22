@@ -130,7 +130,7 @@
     <string name="dash_db_queue">Fila de BD: %1$s</string>
     <string name="dash_db_nets">Redes de la BD: %1$s</string>
     <string name="dash_db_locs">Ubicaciones de BD: %1$s</string>
-    <string name="dash_short_loc">Localización:</string>
+    <string name="dash_short_loc">Localización: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">millas</string>

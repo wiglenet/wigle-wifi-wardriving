@@ -131,7 +131,7 @@
     <string name="dash_db_queue">Coada BD: %1$s</string>
     <string name="dash_db_nets">BD Nets: %1$s</string>
     <string name="dash_db_locs">Locații BD: %1$s</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mile</string>

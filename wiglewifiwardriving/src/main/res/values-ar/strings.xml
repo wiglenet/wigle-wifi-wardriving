@@ -131,7 +131,7 @@
     <string name="dash_db_queue">%1$s: طابور</string>
     <string name="dash_db_nets">%1$s :DB شبكات</string>
     <string name="dash_db_locs">%1$s :مواقع قاعدة البيانات</string>
-    <string name="dash_short_loc">موقعك</string>
+    <string name="dash_short_loc">%1$s موقعك </string>
     <string name="km_short">ألف متر</string>
     <string name="mi_short">الميل</string>
     <string name="miles">أميال</string>

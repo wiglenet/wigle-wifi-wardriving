@@ -131,7 +131,7 @@
     <string name="dash_db_queue">数据库的队列: %1$s</string>
     <string name="dash_db_nets">数据库的网络：%1$s</string>
     <string name="dash_db_locs">数据库的位置：%1$s</string>
-    <string name="dash_short_loc">位置：</string>
+    <string name="dash_short_loc">位置：%1$s</string>
     <string name="km_short">公里</string>
     <string name="mi_short">米</string>
     <string name="miles">英里</string>

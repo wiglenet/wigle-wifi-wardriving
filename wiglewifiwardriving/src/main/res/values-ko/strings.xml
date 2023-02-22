@@ -131,7 +131,7 @@
     <string name="dash_db_queue">DB 대기열 : %1$s</string>
     <string name="dash_db_nets">DB 네츠 : %1$s</string>
     <string name="dash_db_locs">DB 위치 : %1$s</string>
-    <string name="dash_short_loc">LOC :</string>
+    <string name="dash_short_loc">LOC : %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">미</string>
     <string name="miles">마일</string>

@@ -130,7 +130,7 @@
     <string name="dash_db_queue">DB कतार: %1$s</string>
     <string name="dash_db_nets">DB नेट्स: %1$s</string>
     <string name="dash_db_locs">DB स्थान: %1$s</string>
-    <string name="dash_short_loc">स्थान:</string>
+    <string name="dash_short_loc">स्थान: %1$s</string>
     <string name="km_short">किमी</string>
     <string name="mi_short">मील</string>
     <string name="miles">माइल्स</string>

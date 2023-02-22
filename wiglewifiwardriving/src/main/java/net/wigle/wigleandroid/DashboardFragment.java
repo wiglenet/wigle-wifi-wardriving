@@ -37,7 +37,6 @@ public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
-  private NumberFormat  wholeNumberFormat;
   private ScrollView scrollView;
   private View landscape;
   private View portrait;
@@ -67,7 +66,6 @@ public class DashboardFragment extends Fragment {
         locale = Locale.US;
     }
     numberFormat = NumberFormat.getNumberInstance(locale);
-    wholeNumberFormat = NumberFormat.getIntegerInstance(locale);
     if ( numberFormat instanceof DecimalFormat ) {
       numberFormat.setMinimumFractionDigits(2);
       numberFormat.setMaximumFractionDigits(2);
@@ -165,8 +163,7 @@ public class DashboardFragment extends Fragment {
 
             updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
             updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
-            updateTimeTare(view, prefs, R.id.scan_dur, PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN,
-                    PreferenceKeys.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
+            updateTimeTare(view, prefs, R.id.scan_dur, MainActivity.isScanning(getActivity()));
             updateDist(view, prefs, R.id.totaldist, PreferenceKeys.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
             updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
@@ -188,7 +185,7 @@ public class DashboardFragment extends Fragment {
         tv = view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
 
-        tv.setText( getString(R.string.dash_short_loc) + " ");
+        tv.setText( getString(R.string.dash_short_loc, ""));
 
         TextView fixMeta = view.findViewById(R.id.fixmeta);
         TextView conType = view.findViewById(R.id.contype);
@@ -262,7 +259,7 @@ public class DashboardFragment extends Fragment {
                     int colorUnknown = ResourcesCompat.getColor(getResources(), R.color.colorNavigationItem, null);
                     tv.setTextColor(colorUnknown);
                     iv.setVisibility(View.GONE);
-                    tv.setText( getString(R.string.dash_short_loc) + " "+location.getProvider());
+                    tv.setText( getString(R.string.dash_short_loc, location.getProvider()));
                     iv.setColorFilter(colorUnknown);
             }
         }
@@ -297,8 +294,8 @@ public class DashboardFragment extends Fragment {
       tv.setText(durString);
   }
 
-  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id, final String prefCumulative,
-                              final String prefCurrent, final boolean isScanning) {
+  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id,
+                              final boolean isScanning) {
       long cumulative = prefs.getLong(PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
       if (isScanning) {
         cumulative += System.currentTimeMillis() - prefs.getLong(PreferenceKeys.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
@@ -321,7 +318,10 @@ public class DashboardFragment extends Fragment {
     Logging.info( "DASH: onResume" );
     super.onResume();
     setupTimer();
-    getActivity().setTitle(R.string.dashboard_app_name);
+    final Activity a = getActivity();
+    if (null != a) {
+        a.setTitle(R.string.dashboard_app_name);
+    }
   }
 
   @Override

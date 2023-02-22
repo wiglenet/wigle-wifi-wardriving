@@ -131,7 +131,7 @@
     <string name="dash_db_queue">Lunghezza coda del DB: %1$s</string>
     <string name="dash_db_nets">Reti nel DB: %1$s</string>
     <string name="dash_db_locs">Localizzazioni nel DB: %1$s</string>
-    <string name="dash_short_loc">Pos:</string>
+    <string name="dash_short_loc">Pos: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">miglia</string>

@@ -138,24 +138,25 @@ public class DashboardFragment extends Fragment {
             TextView dashScanstatus = view.findViewById(R.id.dash_scanstatus);
             dashScanstatus.setText(getString(R.string.dash_scan_off));
         }
+        final NumberFormat n = NumberFormat.getInstance();
 
         TextView tv = view.findViewById( R.id.runnets );
-        tv.setText( (NumberFormat.getInstance().format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
+        tv.setText( (n.format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
 
         tv = view.findViewById( R.id.runcaption );
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newWifi) );
+        tv.setText( n.format(ListFragment.lameStatic.newWifi) );
 
         tv = view.findViewById( R.id.newbt );
-        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newBt) );
+        tv.setText( n.format(ListFragment.lameStatic.newBt) );
 
         tv = view.findViewById( R.id.currnets );
         tv.setText( getString(R.string.dash_vis_nets, ListFragment.lameStatic.currNets));
 
         tv = view.findViewById( R.id.newcells );
-        tv.setText( NumberFormat.getInstance().format(ListFragment.lameStatic.newCells) );
+        tv.setText( n.format(ListFragment.lameStatic.newCells) );
 
         if (null != currentActivity) {
             final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
@@ -170,13 +171,13 @@ public class DashboardFragment extends Fragment {
             updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
         tv = view.findViewById( R.id.queuesize );
-        tv.setText( getString(R.string.dash_db_queue, ListFragment.lameStatic.preQueueSize));
+        tv.setText( getString(R.string.dash_db_queue, n.format(ListFragment.lameStatic.preQueueSize)));
 
         tv = view.findViewById( R.id.dbNets );
-        tv.setText( getString(R.string.dash_db_nets, ListFragment.lameStatic.dbNets) );
+        tv.setText( getString(R.string.dash_db_nets, n.format(ListFragment.lameStatic.dbNets)));
 
         tv = view.findViewById( R.id.dbLocs );
-        tv.setText( getString(R.string.dash_db_locs, ListFragment.lameStatic.dbLocs) );
+        tv.setText( getString(R.string.dash_db_locs, n.format(ListFragment.lameStatic.dbLocs)));
 
         tv = view.findViewById( R.id.scanned_in );
       final String status =

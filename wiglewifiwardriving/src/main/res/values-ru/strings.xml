@@ -127,9 +127,9 @@
     <string name="dash_time_scanning">Продолжительность сканирования:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
     <string name="dash_dist_prev">Предыдущий пробег:</string>
-    <string name="dash_db_queue">Очередь БД: %1$d</string>
-    <string name="dash_db_nets">Сетей в БД: %1$d</string>
-    <string name="dash_db_locs">Местоположений в БД: %1$d</string>
+    <string name="dash_db_queue">Очередь БД: %1$s</string>
+    <string name="dash_db_nets">Сетей в БД: %1$s</string>
+    <string name="dash_db_locs">Местоположений в БД: %1$s</string>
     <string name="dash_short_loc">Спутники:</string>
     <string name="km_short">км</string>
     <string name="mi_short">миль</string>

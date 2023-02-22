@@ -127,9 +127,9 @@
     <string name="dash_time_scanning">Duração da pesquisa:</string>
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Corrida anterior:</string>
-    <string name="dash_db_queue">Fila da base de dados: %1$d</string>
-    <string name="dash_db_nets">Redes da base de dados: %1$d</string>
-    <string name="dash_db_locs">Localizações da base de dados: %1$d</string>
+    <string name="dash_db_queue">Fila da base de dados: %1$s</string>
+    <string name="dash_db_nets">Redes da base de dados: %1$s</string>
+    <string name="dash_db_locs">Localizações da base de dados: %1$s</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">مدة الفحص:</string>
     <string name="dash_dist_total">المسافة الكلية:</string>
     <string name="dash_dist_prev">التشغيل السابق:</string>
-    <string name="dash_db_queue">%1$d: طابور</string>
-    <string name="dash_db_nets">%1$d :DB شبكات</string>
-    <string name="dash_db_locs">%1$d :مواقع قاعدة البيانات</string>
+    <string name="dash_db_queue">%1$s: طابور</string>
+    <string name="dash_db_nets">%1$s :DB شبكات</string>
+    <string name="dash_db_locs">%1$s :مواقع قاعدة البيانات</string>
     <string name="dash_short_loc">موقعك</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

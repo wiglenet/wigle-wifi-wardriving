@@ -2139,7 +2139,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void setDBQueue(final long queue) {
-        final String status = getString(R.string.dash_db_queue, queue);
+        final String status = getString(R.string.dash_db_queue, NumberFormat.getInstance().format(queue));
         if (status != null) {
             ListFragment listFragment = getListFragmentIfCurrent();
             if (listFragment != null) {

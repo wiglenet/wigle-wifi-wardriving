@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">משך הסריקה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
     <string name="dash_dist_prev">הקודם הפעלה:</string>
-    <string name="dash_db_queue">%1$d :DB תור</string>
-    <string name="dash_db_nets">%1$d :DB נטס</string>
-    <string name="dash_db_locs">%1$d :DB מיקומים</string>
+    <string name="dash_db_queue">%1$s :DB תור</string>
+    <string name="dash_db_nets">%1$s :DB נטס</string>
+    <string name="dash_db_locs">%1$s :DB מיקומים</string>
     <string name="dash_short_loc">לוק:</string>
     <string name="km_short">ק&quot;מ</string>
     <string name="mi_short">מי</string>

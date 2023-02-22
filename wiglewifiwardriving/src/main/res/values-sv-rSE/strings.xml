@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">Skanna varaktighet:</string>
     <string name="dash_dist_total">Total distans:.</string>
     <string name="dash_dist_prev">Föregående runda:</string>
-    <string name="dash_db_queue">DB kön: %1$d</string>
-    <string name="dash_db_nets">DB Nät: %1$d</string>
-    <string name="dash_db_locs">DB Platser: %1$d</string>
+    <string name="dash_db_queue">DB kön: %1$s</string>
+    <string name="dash_db_nets">DB Nät: %1$s</string>
+    <string name="dash_db_locs">DB Platser: %1$s</string>
     <string name="dash_short_loc">Loc:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

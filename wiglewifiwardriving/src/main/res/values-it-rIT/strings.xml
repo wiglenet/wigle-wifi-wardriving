@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">Durata scansione:</string>
     <string name="dash_dist_total">Distanza percorsa (in totale):</string>
     <string name="dash_dist_prev">Distanza percorsa (esecuzione precedente):</string>
-    <string name="dash_db_queue">Lunghezza coda del DB: %1$d</string>
-    <string name="dash_db_nets">Reti nel DB: %1$d</string>
-    <string name="dash_db_locs">Localizzazioni nel DB: %1$d</string>
+    <string name="dash_db_queue">Lunghezza coda del DB: %1$s</string>
+    <string name="dash_db_nets">Reti nel DB: %1$s</string>
+    <string name="dash_db_locs">Localizzazioni nel DB: %1$s</string>
     <string name="dash_short_loc">Pos:</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

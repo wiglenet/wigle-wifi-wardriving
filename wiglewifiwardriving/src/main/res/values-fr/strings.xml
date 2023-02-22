@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">Durée d\'analyse:</string>
     <string name="dash_dist_total">Distance totale :</string>
     <string name="dash_dist_prev">Parcours précédent :</string>
-    <string name="dash_db_queue">File d\'attente de la BDD: %1$d</string>
-    <string name="dash_db_nets">Réseaux dans la BDD : %1$d</string>
-    <string name="dash_db_locs">Emplacements dans la BDD : %1$d</string>
+    <string name="dash_db_queue">File d\'attente de la BDD: %1$s</string>
+    <string name="dash_db_nets">Réseaux dans la BDD : %1$s</string>
+    <string name="dash_db_locs">Emplacements dans la BDD : %1$s</string>
     <string name="dash_short_loc">Loc :</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>

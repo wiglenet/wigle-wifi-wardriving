@@ -504,7 +504,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final boolean isScanning = main == null || main.isScanning();
         Logging.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
-        setScanStatusUI(view, getString(R.string.list_scanning_on));
+            setScanStatusUI(view, getString(R.string.list_scanning_on));
         }
         else {
             setScanStatusUI(view, getString(R.string.list_scanning_off));

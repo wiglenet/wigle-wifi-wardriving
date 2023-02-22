@@ -128,7 +128,7 @@
     <string name="dash_time_scanning">掃描持續時間：</string>
     <string name="dash_dist_total">共有區。</string>
     <string name="dash_dist_prev">以前的運行：</string>
-    <string name="dash_db_queue">DB的隊列: %1$s</string>
+    <string name="dash_db_queue">DB的隊列：%1$s</string>
     <string name="dash_db_nets">DB的籃網：%1$s</string>
     <string name="dash_db_locs">DB的位置：%1$s</string>
     <string name="dash_short_loc">LOC：%1$s</string>

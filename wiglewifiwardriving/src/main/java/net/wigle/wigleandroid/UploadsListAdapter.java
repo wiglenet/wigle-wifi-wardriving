@@ -258,7 +258,8 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             String percentDoneSuffix = "%";
             long figure = upload.getPercentDone();
             if (Upload.Status.QUEUED.equals(upload.getStatus()) ||
-                    ((figure == 100) && (upload.getWait() > 0) && Upload.Status.GEOINDEX.equals(upload.getStatus())) ||
+                    ((figure == 100) && (upload.getWait() > 0) &&
+                            (Upload.Status.GEOINDEX.equals(upload.getStatus()) || Upload.Status.CATALOG.equals(upload.getStatus()))) ||
                     ((figure == 0) && Upload.Status.TRILATERATING.equals(upload.getStatus()))) {
                 percentDonePrefix = "(#";
                 percentDoneSuffix = ")";

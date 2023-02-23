@@ -119,7 +119,7 @@
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>
     <string name="dash_new_wifi">חדש WiFi</string>
-    <string name="dash_vis_nets">%1$d Visible נטס: </string>
+    <string name="dash_vis_nets">\u2066Visible: %1$d\u2069 נטס</string>
     <string name="dash_new_upload">הנטס בניו מאז טען: %1$d</string>
     <string name="dash_new_cells">תא מגדלי חדש</string>
     <string name="dash_new_bt">Bluetooth חדש</string>
@@ -128,9 +128,9 @@
     <string name="dash_time_scanning">משך הסריקה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
     <string name="dash_dist_prev">הקודם הפעלה:</string>
-    <string name="dash_db_queue">%1$s :DB תור</string>
-    <string name="dash_db_nets">%1$s :DB נטס</string>
-    <string name="dash_db_locs">%1$s :DB מיקומים</string>
+    <string name="dash_db_queue">%1$s :\u2066DB \u2069 תור</string>
+    <string name="dash_db_nets">%1$s :\u200fDB\u200f נטס</string>
+    <string name="dash_db_locs">%1$s :\u2066DB\u2069 מיקומים</string>
     <string name="dash_short_loc">לוק: %1$s</string>
     <string name="km_short">ק&quot;מ</string>
     <string name="mi_short">מי</string>

@@ -78,13 +78,13 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             final boolean preTrilateration = Upload.Status.TRILATERATING.equals(upload.getStatus()) || Upload.Status.PARSING.equals(upload.getStatus());
 
             tv = row.findViewById(R.id.total_wifi_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalWifiGps()):"("+numberFormat.format(upload.getTotalWifi())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewWifiGps()):"("+numberFormat.format(upload.getTotalWifiGps())+")");
 
             tv = row.findViewById(R.id.total_bt_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalBtGps()):"("+numberFormat.format(upload.getTotalBt())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewBtGps()):"("+numberFormat.format(upload.getTotalBtGps())+")");
 
             tv = row.findViewById(R.id.total_cell_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getTotalCellGps()):"("+numberFormat.format(upload.getTotalCell())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewCellGps()):"("+numberFormat.format(upload.getTotalCellGps())+")");
 
             tv = row.findViewById(R.id.file_size);
             tv.setText(context.getString(R.string.bytes) + ": "
@@ -257,14 +257,17 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             String percentDonePrefix = "";
             String percentDoneSuffix = "%";
             long figure = upload.getPercentDone();
-            if (Upload.Status.QUEUED.equals(upload.getStatus())) {
+            if (Upload.Status.QUEUED.equals(upload.getStatus()) ||
+                    ((figure == 100) && (upload.getWait() > 0) &&
+                            (Upload.Status.GEOINDEX.equals(upload.getStatus()) || Upload.Status.CATALOG.equals(upload.getStatus()))) ||
+                    ((figure == 0) && Upload.Status.TRILATERATING.equals(upload.getStatus()))) {
                 percentDonePrefix = "(#";
                 percentDoneSuffix = ")";
                 figure = upload.getWait();
             }
             tv.setText(String.format("%s%d%s",percentDonePrefix, figure, percentDoneSuffix));
 
-            tv = row.findViewById(R.id.status);
+            tv = row.findViewById(R.id.upload_row_status);
             tv.setText(upload.getHumanReadableStatus());
         }
 

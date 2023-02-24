@@ -119,8 +119,8 @@
     <string name="cancel">Anulare</string>
     <string name="dash_scan_off">(Scanarea este dezactivată)</string>
     <string name="dash_new_wifi">WiFi nou</string>
-    <string name="dash_vis_nets">Plase vizibile:</string>
-    <string name="dash_new_upload">Plase de la încărcare:</string>
+    <string name="dash_vis_nets">Plase vizibile: %1$d</string>
+    <string name="dash_new_upload">Plase de la încărcare: %1$d</string>
     <string name="dash_new_cells">Celulă nouă</string>
     <string name="dash_new_bt">Bluetooth nou</string>
     <string name="dash_dist_run">Distanța de alergare:</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Durata scanării:</string>
     <string name="dash_dist_total">Dist. totală.:</string>
     <string name="dash_dist_prev">Executarea anterioară:</string>
-    <string name="dash_db_queue">Coada BD:</string>
-    <string name="dash_db_nets">BD Nets:</string>
-    <string name="dash_db_locs">Locații BD:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">Coada BD: %1$s</string>
+    <string name="dash_db_nets">BD Nets: %1$s</string>
+    <string name="dash_db_locs">Locații BD: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mile</string>
@@ -146,7 +146,7 @@
     <string name="run">Alerga</string>
     <string name="new_word">Nou</string>
     <string name="db">BD</string>
-    <string name="scanned_in">scanat</string>
+    <string name="scanned_in">%1$d scanat %2$d%3$s.</string>
     <string name="sort_title">Opțiuni de sortare</string>
     <string name="sort_spin_label">Sortați lista după:</string>
     <string name="channel">Canal</string>

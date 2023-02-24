@@ -118,8 +118,8 @@
     <string name="cancel">Отменить</string>
     <string name="dash_scan_off">(Сканирование выключено)</string>
     <string name="dash_new_wifi">Новых Wi-Fi сетей</string>
-    <string name="dash_vis_nets">Видимые сети:</string>
-    <string name="dash_new_upload">Новые сети с момента загрузки:</string>
+    <string name="dash_vis_nets">Видимые сети: %1$d</string>
+    <string name="dash_new_upload">Новые сети с момента загрузки: %1$d</string>
     <string name="dash_new_cells">Новых сотовых вышек</string>
     <string name="dash_new_bt">Новых устрйоств Bluetooth</string>
     <string name="dash_dist_run">Дистанция пробега:</string>
@@ -127,10 +127,10 @@
     <string name="dash_time_scanning">Продолжительность сканирования:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
     <string name="dash_dist_prev">Предыдущий пробег:</string>
-    <string name="dash_db_queue">Очередь БД:</string>
-    <string name="dash_db_nets">Сетей в БД:</string>
-    <string name="dash_db_locs">Местоположений в БД:</string>
-    <string name="dash_short_loc">Спутники:</string>
+    <string name="dash_db_queue">Очередь БД: %1$s</string>
+    <string name="dash_db_nets">Сетей в БД: %1$s</string>
+    <string name="dash_db_locs">Местоположений в БД: %1$s</string>
+    <string name="dash_short_loc">Спутники: %1$s</string>
     <string name="km_short">км</string>
     <string name="mi_short">миль</string>
     <string name="miles">мили</string>
@@ -145,7 +145,7 @@
     <string name="run">Пробег</string>
     <string name="new_word">Новых</string>
     <string name="db">БД</string>
-    <string name="scanned_in">найдено за</string>
+    <string name="scanned_in">%1$d найдено за %2$d%3$s.</string>
     <string name="sort_title">Параметры сортировки</string>
     <string name="sort_spin_label">Сортировать список по:</string>
     <string name="channel">Канал</string>

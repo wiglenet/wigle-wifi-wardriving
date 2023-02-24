@@ -50,6 +50,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#B0B0B0"
                     android:textSize="38sp"
+                    android:paddingEnd="10dp"
                     />
 
                 <TextView
@@ -76,13 +77,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newwifi"
+                    android:layout_toEndOf="@+id/newwifi"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_wifi"
                     android:textSize="21sp"
@@ -102,13 +104,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newbt"
+                    android:layout_toEndOf="@+id/newbt"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_bt"
                     android:textSize="21sp"
@@ -128,13 +131,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
                     />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newcells"
+                    android:layout_toEndOf="@+id/newcells"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_cells"
                     android:textSize="21sp"
@@ -223,20 +227,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="3dp"
+            android:paddingStart="3dp"
             android:text="@string/dash_time_run"
-            android:textSize="30dp"
+            android:textSize="30sp"
             style="@style/InvertedText"
+            android:gravity="start"
             />
 
         <TextView
             android:id="@+id/run_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:paddingRight="4dp"
-            android:textSize="30dp"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="4dp"
+            android:textSize="30sp"
             style="@style/InvertedText"
+            android:gravity="end"
             />
     </RelativeLayout>
 
@@ -247,20 +253,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="3dp"
+            android:paddingStart="3dp"
             android:text="@string/dash_time_scanning"
-            android:textSize="30dp"
+            android:textSize="30sp"
             style="@style/NonInvertedText"
+            android:gravity="start"
             />
 
         <TextView
             android:id="@+id/scan_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:paddingRight="4dp"
-            android:textSize="30dp"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="4dp"
+            android:textSize="30sp"
             style="@style/NonInvertedText"
+            android:gravity="end"
             />
     </RelativeLayout>
 </LinearLayout>

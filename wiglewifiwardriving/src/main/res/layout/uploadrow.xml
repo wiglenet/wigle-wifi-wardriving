@@ -88,7 +88,7 @@
                 android:textSize="18sp"
                 style="@style/UploadColor"
                 android:gravity="start"/>
-            <TextView android:id="@+id/status" android:layout_width="wrap_content"
+            <TextView android:id="@+id/upload_row_status" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 style="@style/KeyStatColor"

@@ -119,8 +119,8 @@
     <string name="cancel">Storno</string>
     <string name="dash_scan_off">(Skenování vypnuto)</string>
     <string name="dash_new_wifi">Nových WiFi</string>
-    <string name="dash_vis_nets">Viditelných sítí:</string>
-    <string name="dash_new_upload">Nových sítí od posledního nahrání:</string>
+    <string name="dash_vis_nets">Viditelných sítí: %1$d</string>
+    <string name="dash_new_upload">Nových sítí od posledního nahrání: %1$d</string>
     <string name="dash_new_cells">Nových BTS</string>
     <string name="dash_new_bt">Nové Bluetooth</string>
     <string name="dash_dist_run">Vzdálenost:</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Doba skenování:</string>
     <string name="dash_dist_total">Celková vzdálenost:</string>
     <string name="dash_dist_prev">Poslední vzdálenost:</string>
-    <string name="dash_db_queue">DB Fronta:</string>
-    <string name="dash_db_nets">Počet WiFi v DB:</string>
-    <string name="dash_db_locs">Počet lokací v DB:</string>
-    <string name="dash_short_loc">Pol:</string>
+    <string name="dash_db_queue">DB Fronta: %1$s</string>
+    <string name="dash_db_nets">Počet WiFi v DB: %1$s</string>
+    <string name="dash_db_locs">Počet lokací v DB: %1$s</string>
+    <string name="dash_short_loc">Pol: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">míle</string>
@@ -146,7 +146,7 @@
     <string name="run">Aktuální sken</string>
     <string name="new_word">Nový</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skenováno v</string>
+    <string name="scanned_in">%1$d skenováno v %2$d%3$s.</string>
     <string name="sort_title">Nastavení řazení</string>
     <string name="sort_spin_label">Řadit podle:</string>
     <string name="channel">Kanál</string>

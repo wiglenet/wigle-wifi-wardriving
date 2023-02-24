@@ -101,8 +101,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         } catch ( final Throwable throwable ) {
             MainActivity.writeError( Thread.currentThread(), throwable, context );
             throw new RuntimeException( "ObservationUploader throwable: " + throwable, throwable );
-        }
-        finally {
+        } finally {
             // tell the listener
             if (listener != null) {
                 listener.requestComplete(null, false);

@@ -119,8 +119,8 @@
     <string name="cancel">Annuller</string>
     <string name="dash_scan_off">(Scanning er slukket)</string>
     <string name="dash_new_wifi">Nye WiFi</string>
-    <string name="dash_vis_nets">Synlig Net:</string>
-    <string name="dash_new_upload">Nye nets siden sidste upload:</string>
+    <string name="dash_vis_nets">Synlig Net: %1$d</string>
+    <string name="dash_new_upload">Nye nets siden sidste upload: %1$d</string>
     <string name="dash_new_cells">Ny Cell</string>
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Kørt Afstand:</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Scan varighed:</string>
     <string name="dash_dist_total">Samlet Dist.:</string>
     <string name="dash_dist_prev">Forrige forløb:</string>
-    <string name="dash_db_queue">DB kø:</string>
-    <string name="dash_db_nets">DB Net:</string>
-    <string name="dash_db_locs">DB Steder:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB kø: %1$s</string>
+    <string name="dash_db_nets">DB Net: %1$s</string>
+    <string name="dash_db_locs">DB Steder: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mil</string>
@@ -146,7 +146,7 @@
     <string name="run">Kør</string>
     <string name="new_word">Nye</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannet i</string>
+    <string name="scanned_in">%1$d skannet i %2$d%3$s.</string>
     <string name="sort_title">Sorter Optioner</string>
     <string name="sort_spin_label">Sortér liste efter:</string>
     <string name="channel">Kanal</string>

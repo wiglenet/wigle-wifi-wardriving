@@ -367,12 +367,18 @@ public class WifiReceiver extends BroadcastReceiver {
         // update stat
         mainActivity.setNetCountUI();
 
+        if ( scanRequestTime <= 0 ) {
+            // wasn't set, set to now
+            scanRequestTime = now;
+        }
+
         // set the statics for the map
         ListFragment.lameStatic.runNets = runNetworks.size();
         ListFragment.lameStatic.newNets = newNetCount;
         ListFragment.lameStatic.newWifi = newWifiCount;
         ListFragment.lameStatic.newCells = newCellCount;
         ListFragment.lameStatic.currNets = resultSize;
+        ListFragment.lameStatic.currWifiScanDurMs = (now - scanRequestTime);
         ListFragment.lameStatic.preQueueSize = preQueueSize;
         ListFragment.lameStatic.dbNets = dbNets;
         ListFragment.lameStatic.dbLocs = dbLocs;
@@ -408,14 +414,9 @@ public class WifiReceiver extends BroadcastReceiver {
             listAdapter.notifyDataSetChanged();
         }
 
-        if ( scanRequestTime <= 0 ) {
-            // wasn't set, set to now
-            scanRequestTime = now;
-        }
-        final String status = resultSize + " " + mainActivity.getString(R.string.scanned_in) + " "
-                + (now - scanRequestTime) + mainActivity.getString(R.string.ms_short) + ". "
-                + mainActivity.getString(R.string.dash_db_queue) + " " + preQueueSize;
-        mainActivity.setStatusUI( status );
+        mainActivity.setScanStatusUI( resultSize, ListFragment.lameStatic.currWifiScanDurMs);
+
+        mainActivity.setDBQueue(preQueueSize);
         // we've shown it, reset it to the nonstop time above, or min_value if nonstop wasn't set.
         scanRequestTime = nonstopScanRequestTime;
 
@@ -907,7 +908,7 @@ public class WifiReceiver extends BroadcastReceiver {
             // scanning is off. since we're the only timer, update the UI
             mainActivity.setNetCountUI();
             mainActivity.setLocationUI();
-            mainActivity.setStatusUI("Scanning Turned Off" );
+            mainActivity.setScanStatusUI(mainActivity.getString(R.string.list_scanning_off));
             // keep the scan times from getting huge
             scanRequestTime = System.currentTimeMillis();
             // reset this

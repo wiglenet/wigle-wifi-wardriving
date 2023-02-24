@@ -118,8 +118,8 @@
     <string name="cancel">キャンセル</string>
     <string name="dash_scan_off">（スキャンがオフになっています）</string>
     <string name="dash_new_wifi">新しい WiFi</string>
-    <string name="dash_vis_nets">可視ネット：</string>
-    <string name="dash_new_upload">アップロード以降のネット：</string>
+    <string name="dash_vis_nets">可視ネット：%1$d</string>
+    <string name="dash_new_upload">アップロード以降のネット： %1$d</string>
     <string name="dash_new_cells">新しいセル</string>
     <string name="dash_new_bt">新しい Bluetooth</string>
     <string name="dash_dist_run">実行間隔：</string>
@@ -127,10 +127,10 @@
     <string name="dash_time_scanning">スキャン時間：</string>
     <string name="dash_dist_total">総間隔：</string>
     <string name="dash_dist_prev">前回の実行：</string>
-    <string name="dash_db_queue">DB キュー：</string>
-    <string name="dash_db_nets">DB ネット：</string>
-    <string name="dash_db_locs">DB の場所：</string>
-    <string name="dash_short_loc">場所：</string>
+    <string name="dash_db_queue">DB キュー: %1$s</string>
+    <string name="dash_db_nets">DB ネット：%1$s</string>
+    <string name="dash_db_locs">DB の場所：%1$s</string>
+    <string name="dash_short_loc">場所：%1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">マイル</string>
@@ -145,7 +145,7 @@
     <string name="run">実行</string>
     <string name="new_word">新規</string>
     <string name="db">DB</string>
-    <string name="scanned_in">スキャンイン</string>
+    <string name="scanned_in">%1$d スキャンイン %2$d%3$s.</string>
     <string name="sort_title">オプションを並べ替え</string>
     <string name="sort_spin_label">次によるリストの並べ替え：</string>
     <string name="channel">チャネル</string>

@@ -119,8 +119,8 @@
     <string name="cancel">Annuleren</string>
     <string name="dash_scan_off">Scan is uit</string>
     <string name="dash_new_wifi">Nieuwe WiFi</string>
-    <string name="dash_vis_nets">Zichtbare netwerken:</string>
-    <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload:</string>
+    <string name="dash_vis_nets">Zichtbare netwerken: %1$d</string>
+    <string name="dash_new_upload">Nieuwe netwerken sinds laatste upload: %1$d</string>
     <string name="dash_new_cells">Nieuwe cellulaire</string>
     <string name="dash_new_bt">Nieuwe Bluetooth</string>
     <string name="dash_dist_run">Runafstand:</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Scanduur:</string>
     <string name="dash_dist_total">Totale afstand:.</string>
     <string name="dash_dist_prev">Vorige run:</string>
-    <string name="dash_db_queue">DB-wachtrij:</string>
-    <string name="dash_db_nets">DB-netwerken:</string>
-    <string name="dash_db_locs">DB-locaties:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB-wachtrij: %1$s</string>
+    <string name="dash_db_nets">DB-netwerken: %1$s</string>
+    <string name="dash_db_locs">DB-locaties: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mijl</string>
@@ -146,7 +146,7 @@
     <string name="run">in run</string>
     <string name="new_word">Nieuw</string>
     <string name="db">DB</string>
-    <string name="scanned_in">gescand in</string>
+    <string name="scanned_in">%1$d gescand in %2$d%3$s.</string>
     <string name="sort_title">Sorteerinstellingen</string>
     <string name="sort_spin_label">Sorteren op:</string>
     <string name="channel">Kanaal</string>

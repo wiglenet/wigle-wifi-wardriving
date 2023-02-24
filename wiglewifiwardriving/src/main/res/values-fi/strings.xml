@@ -119,8 +119,8 @@
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>
     <string name="dash_new_wifi">Uusi WiFi</string>
-    <string name="dash_vis_nets">Näkyvä Nets:</string>
-    <string name="dash_new_upload">Uusi Nets Koska Tallennettu:</string>
+    <string name="dash_vis_nets">Näkyvä Nets: %1$d</string>
+    <string name="dash_new_upload">Uusi Nets Koska Tallennettu: %1$d</string>
     <string name="dash_new_cells">Uusi Cell</string>
     <string name="dash_new_bt">Uusi Bluetooth</string>
     <string name="dash_dist_run">Run Matka:</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Skannauksen kesto:</string>
     <string name="dash_dist_total">Yhteensä Dist.:</string>
     <string name="dash_dist_prev">Edellinen Run:</string>
-    <string name="dash_db_queue">DB jonoon:</string>
-    <string name="dash_db_nets">DB Nets:</string>
-    <string name="dash_db_locs">DB Toimipaikat:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB jonoon: %1$s</string>
+    <string name="dash_db_nets">DB Nets: %1$s</string>
+    <string name="dash_db_locs">DB Toimipaikat: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">kilometriä</string>
@@ -146,7 +146,7 @@
     <string name="run">Suorita</string>
     <string name="new_word">Uusi</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannataan</string>
+    <string name="scanned_in">%1$d skannataan %2$d%3$s.</string>
     <string name="sort_title">Lajittele Options</string>
     <string name="sort_spin_label">Lajittele lista:</string>
     <string name="channel">Kanava</string>

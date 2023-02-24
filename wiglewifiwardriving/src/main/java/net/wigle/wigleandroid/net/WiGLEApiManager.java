@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +18,7 @@ import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.background.ObservationUploader;
+import net.wigle.wigleandroid.background.Status;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
@@ -293,6 +296,7 @@ public class WiGLEApiManager {
             final Handler mainHandler = new Handler(Looper.getMainLooper());
 
             @Override public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                sendBundledMessage(Status.BAD_LOGIN.ordinal(), new Bundle());
                 onCallFailure("Unsuccessful WiGLE Token request: ", e,
                         completedListener, mainHandler, null);
             }
@@ -514,5 +518,12 @@ public class WiGLEApiManager {
         return null;
     }
 
-
+    //As seen in AbstractBackgroundTask - but accessing the MainLooper directly.
+    private final void sendBundledMessage(final int what, final Bundle bundle) {
+        final Handler mainHandler = new Handler(Looper.getMainLooper());
+        final Message msg = new Message();
+        msg.what = what;
+        msg.setData(bundle);
+        mainHandler.sendMessage(msg);
+    }
 }

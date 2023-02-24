@@ -110,6 +110,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -208,6 +209,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private static final String STATE_FRAGMENT_TAG = "StateFragmentTag";
     public static final String LIST_FRAGMENT_TAG = "ListFragmentTag";
 
+    private static final AtomicLong utteranceSequenceGenerator = new AtomicLong();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1783,8 +1785,10 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void speak(final String string) {
-        if (!MainActivity.getMainActivity().isMuted() && state.tts != null) {
-            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null);
+        final MainActivity a = MainActivity.getMainActivity();
+        if (a != null && !a.isMuted() && state.tts != null) {
+            state.tts.speak(string, TextToSpeech.QUEUE_ADD, null,
+                    "WiGLEtts-"+utteranceSequenceGenerator.getAndAdd(1L));
         }
     }
 
@@ -1902,7 +1906,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
         if (isScanning) {
             if (listFragment != null) {
-                listFragment.setStatusUI(getString(R.string.list_scanning_on));
+                listFragment.setScanStatusUI(getString(R.string.list_scanning_on));
                 listFragment.setScanningStatusIndicator(true);
             }
             if (state.wifiReceiver != null) {
@@ -1916,7 +1920,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             }
         } else {
             if (listFragment != null) {
-                listFragment.setStatusUI(getString(R.string.list_scanning_off));
+                listFragment.setScanStatusUI(getString(R.string.list_scanning_off));
                 listFragment.setScanningStatusIndicator(false);
             }
             // turn off location updates
@@ -2112,7 +2116,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
-    public void setStatusUI(String status) {
+    public void setScanStatusUI(final int resultSize, final long inMs) {
+        final String status =
+                mainActivity.getString(R.string.scanned_in, resultSize, inMs, mainActivity.getString(R.string.ms_short));
+        setScanStatusUI(status);
+    }
+
+    public void setScanStatusUI(String status) {
         if (status == null) {
             status = state.previousStatus;
         }
@@ -2123,7 +2133,18 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
             if (listFragment != null) {
                 // tell list
-                listFragment.setStatusUI(status);
+                listFragment.setScanStatusUI(status);
+            }
+        }
+    }
+
+    public void setDBQueue(final long queue) {
+        final String status = getString(R.string.dash_db_queue, NumberFormat.getInstance().format(queue));
+        if (status != null) {
+            ListFragment listFragment = getListFragmentIfCurrent();
+            if (listFragment != null) {
+                // tell list
+                listFragment.setDBStatusUI(status, queue);
             }
         }
     }

@@ -37,7 +37,7 @@ public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
-  private NumberFormat  wholeNumberFormat;
+  private NumberFormat integerFormat;
   private ScrollView scrollView;
   private View landscape;
   private View portrait;
@@ -67,7 +67,7 @@ public class DashboardFragment extends Fragment {
         locale = Locale.US;
     }
     numberFormat = NumberFormat.getNumberInstance(locale);
-    wholeNumberFormat = NumberFormat.getIntegerInstance(locale);
+    integerFormat = NumberFormat.getInstance();
     if ( numberFormat instanceof DecimalFormat ) {
       numberFormat.setMinimumFractionDigits(2);
       numberFormat.setMaximumFractionDigits(2);
@@ -140,48 +140,53 @@ public class DashboardFragment extends Fragment {
         }
 
         TextView tv = view.findViewById( R.id.runnets );
-        tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " ");
+        tv.setText( (integerFormat.format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
 
         tv = view.findViewById( R.id.runcaption );
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-        tv.setText( ListFragment.lameStatic.newWifi + " " );
+        tv.setText( (integerFormat.format(ListFragment.lameStatic.newWifi)));
 
         tv = view.findViewById( R.id.newbt );
-        tv.setText( ListFragment.lameStatic.newBt + " " );
+        tv.setText(integerFormat.format(ListFragment.lameStatic.newBt) );
 
         tv = view.findViewById( R.id.currnets );
-        tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
+        tv.setText( getString(R.string.dash_vis_nets, ListFragment.lameStatic.currNets));
 
         tv = view.findViewById( R.id.newcells );
-        tv.setText( ListFragment.lameStatic.newCells + " ");
+        tv.setText( integerFormat.format(ListFragment.lameStatic.newCells) );
 
         if (null != currentActivity) {
             final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
-            tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload(prefs) );
+            tv.setText( getString(R.string.dash_new_upload, newNetsSinceUpload(prefs)) );
 
             updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
             updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
-            updateTimeTare(view, prefs, R.id.scan_dur, PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN,
-                    PreferenceKeys.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
+            updateTimeTare(view, prefs, R.id.scan_dur, MainActivity.isScanning(getActivity()));
             updateDist(view, prefs, R.id.totaldist, PreferenceKeys.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
             updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
         tv = view.findViewById( R.id.queuesize );
-        tv.setText( getString(R.string.dash_db_queue) + " " + wholeNumberFormat.format(ListFragment.lameStatic.preQueueSize) );
+        tv.setText( getString(R.string.dash_db_queue, integerFormat.format(ListFragment.lameStatic.preQueueSize)));
 
         tv = view.findViewById( R.id.dbNets );
-        tv.setText( getString(R.string.dash_db_nets) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbNets) );
+        tv.setText( getString(R.string.dash_db_nets, integerFormat.format(ListFragment.lameStatic.dbNets)));
 
         tv = view.findViewById( R.id.dbLocs );
-        tv.setText( getString(R.string.dash_db_locs) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbLocs) );
+        tv.setText( getString(R.string.dash_db_locs, integerFormat.format(ListFragment.lameStatic.dbLocs)));
+
+        tv = view.findViewById( R.id.scanned_in );
+      final String status =
+              getString(R.string.scanned_in, ListFragment.lameStatic.currNets, ListFragment.lameStatic.currWifiScanDurMs, getString(R.string.ms_short));
+
+      tv.setText(status);
 
         tv = view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
 
-        tv.setText( getString(R.string.dash_short_loc) + " ");
+        tv.setText( getString(R.string.dash_short_loc, ""));
 
         TextView fixMeta = view.findViewById(R.id.fixmeta);
         TextView conType = view.findViewById(R.id.contype);
@@ -255,13 +260,13 @@ public class DashboardFragment extends Fragment {
                     int colorUnknown = ResourcesCompat.getColor(getResources(), R.color.colorNavigationItem, null);
                     tv.setTextColor(colorUnknown);
                     iv.setVisibility(View.GONE);
-                    tv.setText( getString(R.string.dash_short_loc) + " "+location.getProvider());
+                    tv.setText( getString(R.string.dash_short_loc, location.getProvider()));
                     iv.setColorFilter(colorUnknown);
             }
         }
   }
 
-  private String newNetsSinceUpload(final SharedPreferences prefs) {
+  private long newNetsSinceUpload(final SharedPreferences prefs) {
       long newSinceUpload = 0;
       final long marker = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
       final long uploaded = prefs.getLong( PreferenceKeys.PREF_NETS_UPLOADED, 0L );
@@ -272,7 +277,7 @@ public class DashboardFragment extends Fragment {
               newSinceUpload = 0;
           }
       }
-    return wholeNumberFormat.format(newSinceUpload);
+    return newSinceUpload;
   }
 
   private void updateDist(final View view, final SharedPreferences prefs, final int id, final String pref, final String title ) {
@@ -290,8 +295,8 @@ public class DashboardFragment extends Fragment {
       tv.setText(durString);
   }
 
-  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id, final String prefCumulative,
-                              final String prefCurrent, final boolean isScanning) {
+  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id,
+                              final boolean isScanning) {
       long cumulative = prefs.getLong(PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
       if (isScanning) {
         cumulative += System.currentTimeMillis() - prefs.getLong(PreferenceKeys.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
@@ -314,7 +319,10 @@ public class DashboardFragment extends Fragment {
     Logging.info( "DASH: onResume" );
     super.onResume();
     setupTimer();
-    getActivity().setTitle(R.string.dashboard_app_name);
+    final Activity a = getActivity();
+    if (null != a) {
+        a.setTitle(R.string.dashboard_app_name);
+    }
   }
 
   @Override

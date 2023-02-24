@@ -119,8 +119,8 @@
     <string name="cancel">Annuler</string>
     <string name="dash_scan_off">(Numérisation désactivée)</string>
     <string name="dash_new_wifi">Nouveau WiFi</string>
-    <string name="dash_vis_nets">Réseaux visibles :</string>
-    <string name="dash_new_upload">Réseaux depuis le dernier upload :</string>
+    <string name="dash_vis_nets">Réseaux visibles : %1$d</string>
+    <string name="dash_new_upload">Réseaux depuis le dernier upload : %1$d</string>
     <string name="dash_new_cells">Nouvelles cellaires</string>
     <string name="dash_new_bt">Nouveau Bluetooth</string>
     <string name="dash_dist_run">Distance parcourue :</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">Durée d\'analyse:</string>
     <string name="dash_dist_total">Distance totale :</string>
     <string name="dash_dist_prev">Parcours précédent :</string>
-    <string name="dash_db_queue">File d\'attente de la BDD :</string>
-    <string name="dash_db_nets">Réseaux dans la BDD :</string>
-    <string name="dash_db_locs">Emplacements dans la BDD :</string>
-    <string name="dash_short_loc">Loc :</string>
+    <string name="dash_db_queue">File d\'attente de la BDD: %1$s</string>
+    <string name="dash_db_nets">Réseaux dans la BDD : %1$s</string>
+    <string name="dash_db_locs">Emplacements dans la BDD : %1$s</string>
+    <string name="dash_short_loc">Loc : %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">miles</string>
@@ -146,7 +146,7 @@
     <string name="run">En cours</string>
     <string name="new_word">Nouveau</string>
     <string name="db">BD</string>
-    <string name="scanned_in">scannés en</string>
+    <string name="scanned_in">%1$d scannés en %2$d%3$s.</string>
     <string name="sort_title">Options de tri</string>
     <string name="sort_spin_label">Trier la liste par :</string>
     <string name="channel">Canal</string>

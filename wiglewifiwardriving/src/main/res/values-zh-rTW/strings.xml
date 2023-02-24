@@ -119,8 +119,8 @@
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（掃描轉身的）</string>
     <string name="dash_new_wifi">新的WiFi</string>
-    <string name="dash_vis_nets">可見籃網：</string>
-    <string name="dash_new_upload">由於上傳新籃網：</string>
+    <string name="dash_vis_nets">可見籃網：%1$d</string>
+    <string name="dash_new_upload">由於上傳新籃網：%1$d</string>
     <string name="dash_new_cells">新的發射塔</string>
     <string name="dash_new_bt">新藍牙</string>
     <string name="dash_dist_run">運行距離：</string>
@@ -128,10 +128,10 @@
     <string name="dash_time_scanning">掃描持續時間：</string>
     <string name="dash_dist_total">共有區。</string>
     <string name="dash_dist_prev">以前的運行：</string>
-    <string name="dash_db_queue">DB的隊列：</string>
-    <string name="dash_db_nets">DB的籃網：</string>
-    <string name="dash_db_locs">DB的位置：</string>
-    <string name="dash_short_loc">LOC：</string>
+    <string name="dash_db_queue">DB的隊列: %1$s</string>
+    <string name="dash_db_nets">DB的籃網：%1$s</string>
+    <string name="dash_db_locs">DB的位置：%1$s</string>
+    <string name="dash_short_loc">LOC：%1$s</string>
     <string name="km_short">公里</string>
     <string name="mi_short">MI</string>
     <string name="miles">英里</string>
@@ -146,7 +146,7 @@
     <string name="run">運行</string>
     <string name="new_word">新</string>
     <string name="db">數據庫</string>
-    <string name="scanned_in">掃描</string>
+    <string name="scanned_in">%1$d 掃描 %2$d%3$s.</string>
     <string name="sort_title">排序選項</string>
     <string name="sort_spin_label">排序列表：</string>
     <string name="channel">頻道</string>

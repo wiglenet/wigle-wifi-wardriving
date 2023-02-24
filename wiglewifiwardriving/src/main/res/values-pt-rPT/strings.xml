@@ -118,8 +118,8 @@
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Digitalização desligada)</string>
     <string name="dash_new_wifi">Novo WiFi</string>
-    <string name="dash_vis_nets">Redes visíveis:</string>
-    <string name="dash_new_upload">Redes desde o upload:</string>
+    <string name="dash_vis_nets">Redes visíveis: %1$d</string>
+    <string name="dash_new_upload">Redes desde o upload: %1$d</string>
     <string name="dash_new_cells">Nova Célula</string>
     <string name="dash_new_bt">Novo Bluetooth</string>
     <string name="dash_dist_run">Distância de corrida:</string>
@@ -127,10 +127,10 @@
     <string name="dash_time_scanning">Duração da pesquisa:</string>
     <string name="dash_dist_total">Total Dist.:</string>
     <string name="dash_dist_prev">Corrida anterior:</string>
-    <string name="dash_db_queue">Fila da base de dados:</string>
-    <string name="dash_db_nets">Redes da base de dados:</string>
-    <string name="dash_db_locs">Localizações da base de dados:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">Fila da base de dados: %1$s</string>
+    <string name="dash_db_nets">Redes da base de dados: %1$s</string>
+    <string name="dash_db_locs">Localizações da base de dados: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">milhas</string>
@@ -145,7 +145,7 @@
     <string name="run">Correr</string>
     <string name="new_word">Novo</string>
     <string name="db">Base de dados</string>
-    <string name="scanned_in">pesquisado em</string>
+    <string name="scanned_in">%1$d pesquisado em %2$d%3$s.</string>
     <string name="sort_title">Opções de classificação</string>
     <string name="sort_spin_label">Classificar lista por:</string>
     <string name="channel">Canal</string>

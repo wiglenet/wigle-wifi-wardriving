@@ -118,8 +118,8 @@
     <string name="cancel">Katisha</string>
     <string name="dash_scan_off">(Kutambaza Imezimwa)</string>
     <string name="dash_new_wifi">WiFi Mpya</string>
-    <string name="dash_vis_nets">Mitandao Inayoonekana:</string>
-    <string name="dash_new_upload">Mitandao Tangu Kupakia:</string>
+    <string name="dash_vis_nets">Mitandao Inayoonekana: %1$d</string>
+    <string name="dash_new_upload">Mitandao Tangu Kupakia: %1$d</string>
     <string name="dash_new_cells">Seli Mpya</string>
     <string name="dash_new_bt">Bluetooth Mpya</string>
     <string name="dash_dist_run">Umbali wa Utafutaji:</string>
@@ -127,10 +127,10 @@
     <string name="dash_time_scanning">Muda wa Kutambaza:</string>
     <string name="dash_dist_total">Jumla ya Umbali:</string>
     <string name="dash_dist_prev">Utafutaji wa Awali:</string>
-    <string name="dash_db_queue">Foleni ya DB:</string>
-    <string name="dash_db_nets">Mitandao ya DB:</string>
-    <string name="dash_db_locs">Maeneo ya DB:</string>
-    <string name="dash_short_loc">Mahali:</string>
+    <string name="dash_db_queue">Foleni ya DB: %1$s</string>
+    <string name="dash_db_nets">Mitandao ya DB: %1$s</string>
+    <string name="dash_db_locs">Maeneo ya DB: %1$s</string>
+    <string name="dash_short_loc">Mahali: %1$s</string>
     <string name="km_short">kilomita</string>
     <string name="mi_short">mi</string>
     <string name="miles">maili</string>
@@ -145,7 +145,7 @@
     <string name="run">Utafutaji</string>
     <string name="new_word">Mpya</string>
     <string name="db">DB</string>
-    <string name="scanned_in">imetambazwa ndani</string>
+    <string name="scanned_in">%1$d imetambazwa ndani %2$d%3$s.</string>
     <string name="sort_title">Chaguzi za Kupanga</string>
     <string name="sort_spin_label">Panga Orodha Kulingana na:</string>
     <string name="channel">Mkondo</string>

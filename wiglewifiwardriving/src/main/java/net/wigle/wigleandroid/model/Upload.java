@@ -11,14 +11,20 @@ public final class Upload {
     private final long totalWifiGps;
     @SerializedName("total")
     private final long totalWifi;
+    @SerializedName("discoveredGps")
+    private final long newWifiGps;
     @SerializedName("btTotalGps")
     private final long totalBtGps;
     @SerializedName("btTotal")
     private final long totalBt;
+    @SerializedName("btDiscoveredGps")
+    private final long newBtGps;
     @SerializedName("genTotalGps")
     private final long totalCellGps;
     @SerializedName("genTotal")
     private final long totalCell;
+    @SerializedName("genDiscoveredGps")
+    private final long newCellGps;
     private final int percentDone;
     private String humanReadableStatus;
     private final long fileSize;
@@ -28,7 +34,7 @@ public final class Upload {
     private final Status status;
     private final long wait;
 
-    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps, final long totalWifi, final long totalBt, final long totalCell,
+    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps, final long newWifiGps, final long newBtGps, final long newCellGps, final long totalWifi, final long totalBt, final long totalCell,
                   final int percentDone, final Status status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal, final long wait) {
         this.transid = transid;
         this.totalWifiGps = totalWifiGps;
@@ -37,6 +43,9 @@ public final class Upload {
         this.totalWifi = totalWifi;
         this.totalBt = totalBt;
         this.totalCell = totalCell;
+        this.newWifiGps = newWifiGps;
+        this.newBtGps = newBtGps;
+        this.newCellGps = newCellGps;
         this.percentDone = percentDone;
         this.status = status;
         this.fileSize = fileSize;
@@ -116,6 +125,18 @@ public final class Upload {
 
     public long getWait() {
         return wait;
+    }
+
+    public long getNewWifiGps() {
+        return newWifiGps;
+    }
+
+    public long getNewBtGps() {
+        return newBtGps;
+    }
+
+    public long getNewCellGps() {
+        return newCellGps;
     }
 
     public enum Status {

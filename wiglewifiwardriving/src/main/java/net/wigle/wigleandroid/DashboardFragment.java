@@ -146,7 +146,7 @@ public class DashboardFragment extends Fragment {
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-      tv.setText( (integerFormat.format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
+        tv.setText( (integerFormat.format(ListFragment.lameStatic.newWifi)));
 
         tv = view.findViewById( R.id.newbt );
         tv.setText(integerFormat.format(ListFragment.lameStatic.newBt) );

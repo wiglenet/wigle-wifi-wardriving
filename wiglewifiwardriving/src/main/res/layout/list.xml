@@ -149,8 +149,7 @@
             <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/LocationTextView03"
-            android:text="@string/list_short_sats"
+            android:id="@+id/speed_text"
             />
         </LinearLayout>
         <LinearLayout

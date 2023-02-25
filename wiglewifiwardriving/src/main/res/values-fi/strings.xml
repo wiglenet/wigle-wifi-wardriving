@@ -86,7 +86,7 @@
     <string name="list_short_sats">SATS: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(Status)</string>
-    <string name="list_speed">Nopeus:</string>
+    <string name="list_speed">Nopeus: %1$s</string>
     <string name="list_upload">Lataa tiedosto?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Tyyppi:</string>

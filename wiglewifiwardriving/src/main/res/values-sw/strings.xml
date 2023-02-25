@@ -85,7 +85,7 @@
     <string name="list_short_sats">Sats: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(hali)</string>
-    <string name="list_speed">Kasi:</string>
+    <string name="list_speed">Kasi: %1$s</string>
     <string name="list_upload">Pakia Faili?</string>
     <string name="network_signal">Ishara:</string>
     <string name="network_type">Aina:</string>

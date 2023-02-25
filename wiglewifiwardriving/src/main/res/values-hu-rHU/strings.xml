@@ -86,7 +86,7 @@
     <string name="list_short_sats">Műhold: %1$d</string>
     <string name="list_short_alt">Magasság: %1$s</string>
     <string name="list_status_default">(állapot)</string>
-    <string name="list_speed">Sebesség:</string>
+    <string name="list_speed">Sebesség: %1$s</string>
     <string name="list_upload">Feltölti a fájlt?</string>
     <string name="network_signal">Jel:</string>
     <string name="network_type">Típus:</string>

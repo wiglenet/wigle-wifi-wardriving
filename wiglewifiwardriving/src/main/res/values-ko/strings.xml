@@ -86,7 +86,7 @@
     <string name="list_short_sats">수능 점수 : %1$d</string>
     <string name="list_short_alt">ALT : %1$s</string>
     <string name="list_status_default">(상태)</string>
-    <string name="list_speed">속도 :</string>
+    <string name="list_speed">속도 : %1$s</string>
     <string name="list_upload">파일 업로드?</string>
     <string name="network_signal">신호 :</string>
     <string name="network_type">유형 :</string>

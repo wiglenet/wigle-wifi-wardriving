@@ -86,7 +86,7 @@
     <string name="list_short_sats">Sat: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(stato)</string>
-    <string name="list_speed">Velocità:</string>
+    <string name="list_speed">Velocità: %1$s</string>
     <string name="list_upload">Carica File?</string>
     <string name="network_signal">Segnale:</string>
     <string name="network_type">Tipo:</string>

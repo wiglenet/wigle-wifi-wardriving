@@ -712,7 +712,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             tv = view.findViewById( R.id.LocationTextView03 );
             final Activity a = getActivity();
             if (null != a) {
-                tv.setText(getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
+                tv.setText(getString(R.string.list_speed, (location == null) ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
             }
 
             TextView tv4 = view.findViewById( R.id.accuracy_text);

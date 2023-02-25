@@ -86,7 +86,7 @@
     <string name="list_short_sats">Clauză: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(stare)</string>
-    <string name="list_speed">Viteză:</string>
+    <string name="list_speed">Viteză: %1$s</string>
     <string name="list_upload">Incarca fisier?</string>
     <string name="network_signal">Semnal:</string>
     <string name="network_type">Tip:</string>

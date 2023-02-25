@@ -85,7 +85,7 @@
     <string name="list_short_sats">उपग्रह: %1$d</string>
     <string name="list_short_alt">ऊंचाई: %1$s</string>
     <string name="list_status_default">(स्थिति)</string>
-    <string name="list_speed">गति:</string>
+    <string name="list_speed">गति: %1$s</string>
     <string name="list_upload">फ़ाइल अपलोड करें?</string>
     <string name="network_signal">सिग्नल:</string>
     <string name="network_type">प्रकार:</string>

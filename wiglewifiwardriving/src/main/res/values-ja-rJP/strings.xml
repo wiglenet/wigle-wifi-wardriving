@@ -85,7 +85,7 @@
     <string name="list_short_sats">Sats：%1$d</string>
     <string name="list_short_alt">Alt： %1$s</string>
     <string name="list_status_default">（状態）</string>
-    <string name="list_speed">速度：</string>
+    <string name="list_speed">速度：%1$s</string>
     <string name="list_upload">ファイルをアップロードしますか？</string>
     <string name="network_signal">信号：</string>
     <string name="network_type">タイプ：</string>

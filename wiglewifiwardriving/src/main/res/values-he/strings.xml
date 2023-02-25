@@ -86,7 +86,7 @@
     <string name="list_short_sats">פסיכומטרי: %1$d</string>
     <string name="list_short_alt">%1$s :גוֹבַה</string>
     <string name="list_status_default">(מעמד)</string>
-    <string name="list_speed">מהירות:</string>
+    <string name="list_speed">מהירות: %1$s</string>
     <string name="list_upload">העלאת קובץ?</string>
     <string name="network_signal">אותות:</string>
     <string name="network_type">סוג:</string>

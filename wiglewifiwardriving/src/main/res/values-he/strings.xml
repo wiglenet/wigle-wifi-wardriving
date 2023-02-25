@@ -11,7 +11,7 @@
     <string name="network_activity_name">WiGLE Wifi - רשת</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
     <string name="dbresult_activity_name">WiGLE Wifi - תוצאות חיפוש</string>
-    <string name="upload_button">טען WiGLE.net</string>
+    <string name="upload_button">טען\n WiGLE.net</string>
     <string name="username">WiGLE שם משתמש</string>
     <string name="password">WiGLE סיסמה</string>
     <string name="show_current">הצג רשתות הנוכחי בלבד</string>

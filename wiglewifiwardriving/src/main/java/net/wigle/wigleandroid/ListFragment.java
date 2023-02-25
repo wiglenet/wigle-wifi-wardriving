@@ -129,6 +129,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
     public static final LameStatic lameStatic = new LameStatic();
 
+    private final NumberFormat dbFormat = NumberFormat.getIntegerInstance();
     private boolean animating = false;
     private AnimatedVectorDrawableCompat scanningAnimation = null;
 
@@ -167,6 +168,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         setScanStatusUI(view, null);
         Logging.info("setupLocation");
         setupLocation(view);
+        dbFormat.setGroupingUsed(false);
 
         return view;
     }
@@ -238,7 +240,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             final long count = state.dbHelper.getNetworkCount();
             handler.post(() -> {
                 TextView text = view.findViewById( R.id.stats_dbnets );
-                text.setText(""+count);
+                text.setText(dbFormat.format(count)); //
             });
         });
     }
@@ -617,7 +619,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != v) {
             setupUploadButton(v);
             setNetCountUI(state, v);
-            setLocationUI(main, v);
+            if (null != main) {
+                setLocationUI(main, v);
+            }
             if (null != state) {
                 setScanStatusUI(v, state.previousStatus);
             }
@@ -717,15 +721,13 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 tv4.setText( "" );
                 tv5.setText( "" );
             } else {
-                if (main != null) {
-                    final SharedPreferences prefs = main.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                    final String distString = UINumberFormat.metersToString(prefs,
-                            state.numberFormat0, main, location.getAccuracy(), true);
-                    tv4.setText("+/- " + distString);
-                    final String accString = UINumberFormat.metersToString(prefs,
-                            state.numberFormat0, main, (float) location.getAltitude(), true);
-                    tv5.setText(getString(R.string.list_short_alt, accString));
-                }
+                final SharedPreferences prefs = main.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final String distString = UINumberFormat.metersToString(prefs,
+                        state.numberFormat0, main, location.getAccuracy(), true);
+                tv4.setText("+/- " + distString);
+                final String accString = UINumberFormat.metersToString(prefs,
+                        state.numberFormat0, main, (float) location.getAltitude(), true);
+                tv5.setText(getString(R.string.list_short_alt, accString));
             }
         }
         catch ( IncompatibleClassChangeError ex ) {

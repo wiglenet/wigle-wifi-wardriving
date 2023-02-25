@@ -81,7 +81,7 @@
     <string name="filter_enabled">סנן מאופשר</string>
     <string name="list_waiting_gps">(מחכים GPS סנכרון &#8230;)</string>
     <string name="list_scanning_off">(סריקה מבוטלת)</string>
-    <string name="list_short_lat">קווי רוחב: %1$s</string>
+    <string name="list_short_lat">קו רוחב: %1$s</string>
     <string name="list_short_lon">לון: %1$s</string>
     <string name="list_short_sats">פסיכומטרי:</string>
     <string name="list_short_alt">%1$s :גוֹבַה</string>

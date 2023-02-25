@@ -83,7 +83,7 @@
     <string name="list_scanning_off">(Scan ausgeschaltet)</string>
     <string name="list_short_lat">Lat: %1$s</string>
     <string name="list_short_lon">Lon: %1$s</string>
-    <string name="list_short_sats">Sat.:</string>
+    <string name="list_short_sats">Sat.: %1$d</string>
     <string name="list_short_alt">Höhe: %1$s</string>
     <string name="list_status_default">(status)</string>
     <string name="list_speed">Geschw.:</string>

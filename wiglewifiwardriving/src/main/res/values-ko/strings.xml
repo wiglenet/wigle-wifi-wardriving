@@ -83,7 +83,7 @@
     <string name="list_scanning_off">(검색이 꺼져)</string>
     <string name="list_short_lat">위도 : %1$s</string>
     <string name="list_short_lon">경도 : %1$s</string>
-    <string name="list_short_sats">수능 점수 :</string>
+    <string name="list_short_sats">수능 점수 : %1$d</string>
     <string name="list_short_alt">ALT : %1$s</string>
     <string name="list_status_default">(상태)</string>
     <string name="list_speed">속도 :</string>

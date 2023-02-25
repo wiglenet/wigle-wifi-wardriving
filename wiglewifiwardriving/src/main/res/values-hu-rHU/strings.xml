@@ -83,7 +83,7 @@
     <string name="list_scanning_off">(Szkennelés kikapcsolva)</string>
     <string name="list_short_lat">Szélesség: %1$s</string>
     <string name="list_short_lon">Hosszúság: %1$s</string>
-    <string name="list_short_sats">Műhold:</string>
+    <string name="list_short_sats">Műhold: %1$d</string>
     <string name="list_short_alt">Magasság: %1$s</string>
     <string name="list_status_default">(állapot)</string>
     <string name="list_speed">Sebesség:</string>

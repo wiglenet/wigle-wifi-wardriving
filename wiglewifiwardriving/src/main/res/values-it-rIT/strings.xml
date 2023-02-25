@@ -83,7 +83,7 @@
     <string name="list_scanning_off">Scansione disattivata</string>
     <string name="list_short_lat">Lat: %1$s</string>
     <string name="list_short_lon">Long: %1$s</string>
-    <string name="list_short_sats">Sat:</string>
+    <string name="list_short_sats">Sat: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(stato)</string>
     <string name="list_speed">Velocità:</string>

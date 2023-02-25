@@ -83,7 +83,7 @@
     <string name="list_scanning_off">(Сканирование выключено)</string>
     <string name="list_short_lat">Широта: %1$s</string>
     <string name="list_short_lon">Долгота: %1$s</string>
-    <string name="list_short_sats">Спутники:</string>
+    <string name="list_short_sats">Спутники: %1$d</string>
     <string name="list_short_alt">Высота: %1$s</string>
     <string name="list_status_default">(Статус)</string>
     <string name="list_speed">Скорость:</string>

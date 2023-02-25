@@ -537,49 +537,55 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
             final Dialog dialog = getDialog();
             View view = inflater.inflate(R.layout.listdialog, container);
-            dialog.setTitle(getString(R.string.sort_title));
+            if (null != dialog) {
+                dialog.setTitle(getString(R.string.sort_title));
+            }
 
             TextView text = view.findViewById( R.id.text );
             text.setText( getString(R.string.sort_spin_label) );
 
-            final SharedPreferences prefs = getActivity().getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
-            final Editor editor = prefs.edit();
-
-            Spinner spinner = view.findViewById( R.id.sort_spinner );
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    getActivity(), android.R.layout.simple_spinner_item);
-            final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
-                    NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
-            final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
-                    getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-            int listSort = prefs.getInt( PreferenceKeys.PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
-            int periodIndex = 0;
-            for ( int i = 0; i < listSorts.length; i++ ) {
-                adapter.add( listSortName[i] );
-                if ( listSort == listSorts[i] ) {
-                    periodIndex = i;
+            final Activity a = getActivity();
+            if (null != a) {
+                final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final Editor editor = prefs.edit();
+                Spinner spinner = view.findViewById( R.id.sort_spinner );
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        getActivity(), android.R.layout.simple_spinner_item);
+                final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
+                        NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
+                final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+                        getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
+                int listSort = prefs.getInt( PreferenceKeys.PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
+                int periodIndex = 0;
+                for ( int i = 0; i < listSorts.length; i++ ) {
+                    adapter.add( listSortName[i] );
+                    if ( listSort == listSorts[i] ) {
+                        periodIndex = i;
+                    }
                 }
+                adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+                spinner.setAdapter( adapter );
+                spinner.setSelection( periodIndex );
+                spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+                        // set pref
+                        final int listSort = listSorts[position];
+                        Logging.info( PreferenceKeys.PREF_LIST_SORT + " setting list sort: " + listSort );
+                        editor.putInt( PreferenceKeys.PREF_LIST_SORT, listSort );
+                        editor.apply();
+                    }
+                    @Override
+                    public void onNothingSelected( final AdapterView<?> arg0 ) {}
+                });
             }
-            adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-            spinner.setAdapter( adapter );
-            spinner.setSelection( periodIndex );
-            spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-                @Override
-                public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-                    // set pref
-                    final int listSort = listSorts[position];
-                    Logging.info( PreferenceKeys.PREF_LIST_SORT + " setting list sort: " + listSort );
-                    editor.putInt( PreferenceKeys.PREF_LIST_SORT, listSort );
-                    editor.apply();
-                }
-                @Override
-                public void onNothingSelected( final AdapterView<?> arg0 ) {}
-            });
 
             Button ok = view.findViewById( R.id.listdialog_button );
             ok.setOnClickListener(buttonView -> {
                 try {
-                    dialog.dismiss();
+                    if (null != dialog) {
+                        dialog.dismiss();
+                    }
                 }
                 catch ( Exception ex ) {
                     // guess it wasn't there anyways
@@ -607,10 +613,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         // getActivity().setContentView( R.layout.list );
 
         // have to redo linkages/listeners
-        setupUploadButton(getView());
-        setNetCountUI( state, getView() );
-        setLocationUI(main, getView());
-        setScanStatusUI(getView(), state.previousStatus);
+        final View v = getView();
+        if (null != v) {
+            setupUploadButton(v);
+            setNetCountUI(state, v);
+            setLocationUI(main, v);
+            if (null != state) {
+                setScanStatusUI(v, state.previousStatus);
+            }
+        }
     }
 
     private void setupList( final View view ) {
@@ -619,12 +630,14 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             state.listAdapter = new SetNetworkListAdapter( getActivity(), R.layout.row );
         }
         // always set our current list adapter
-        state.wifiReceiver.setListAdapter(state.listAdapter);
-        if (null != state.bluetoothReceiver) {
-            state.bluetoothReceiver.setListAdapter(state.listAdapter);
+        if (null != state) {
+            state.wifiReceiver.setListAdapter(state.listAdapter);
+            if (null != state.bluetoothReceiver) {
+                state.bluetoothReceiver.setListAdapter(state.listAdapter);
+            }
+            final ListView listView = view.findViewById( R.id.ListView01 );
+            setupListAdapter(listView, getActivity(), state.listAdapter, false);
         }
-        final ListView listView = view.findViewById( R.id.ListView01 );
-        setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }
 
     public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
@@ -669,7 +682,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
         try {
             TextView tv = view.findViewById( R.id.sats_text);
-            tv.setText( getString(R.string.list_short_sats) + " " + state.GNSSListener.getSatCount() );
+            tv.setText( getString(R.string.list_short_sats, state.GNSSListener.getSatCount()) );
 
             final Location location = state.GNSSListener.getCurrentLocation();
 

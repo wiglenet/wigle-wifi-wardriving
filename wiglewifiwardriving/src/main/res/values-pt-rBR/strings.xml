@@ -83,7 +83,7 @@
     <string name="list_scanning_off">(Scan Desligado)</string>
     <string name="list_short_lat">Lat: %1$s</string>
     <string name="list_short_lon">Lon: %1$s</string>
-    <string name="list_short_sats">Sats:</string>
+    <string name="list_short_sats">Sats: %1$d</string>
     <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(status)</string>
     <string name="list_speed">Velocidade:</string>

@@ -83,7 +83,7 @@
     <string name="list_scanning_off">（扫描关闭的网络）</string>
     <string name="list_short_lat">纬度：%1$s</string>
     <string name="list_short_lon">经度：%1$s</string>
-    <string name="list_short_sats">卫星：</string>
+    <string name="list_short_sats">卫星：%1$d</string>
     <string name="list_short_alt">海拔：%1$s</string>
     <string name="list_status_default">（状态）</string>
     <string name="list_speed">速度：</string>

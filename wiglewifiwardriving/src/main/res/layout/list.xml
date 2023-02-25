@@ -29,8 +29,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run wifi"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="wifi new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
@@ -50,8 +50,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run cell"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="cell new vs. run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
@@ -76,8 +76,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run bluetooth"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="bt new vs run"
                 app:tint="?attr/colorControlNormal" />
             <TextView
@@ -100,8 +100,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run DB"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="database"
                 app:tint="?attr/colorControlNormal" />
             <TextView
@@ -123,9 +123,9 @@
             android:id="@+id/upload_button"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
-            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="2dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="0"
             android:background="@drawable/upload_button"
             android:text="@string/upload_button" />
@@ -138,14 +138,13 @@
             <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/LocationTextView01"
+            android:id="@+id/lat_text"
             android:text="@string/list_waiting_gps"
             />
             <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/LocationTextView02"
-            android:text="@string/list_short_lon"
+            android:id="@+id/lon_text"
             />
             <TextView
             android:layout_width="wrap_content"
@@ -163,17 +162,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/LocationTextView04"
+                android:id="@+id/accuracy_text"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/LocationTextView05"
+                android:id="@+id/alt_text"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/LocationTextView06"
+                android:id="@+id/sats_text"
                 />
         </LinearLayout>
 
@@ -187,9 +186,9 @@
             android:id="@+id/not_scanning"
             android:background="#00000000"
             android:paddingTop="1dip"
-            android:paddingRight="1dip"
+            android:paddingEnd="1dip"
             android:paddingBottom="1dip"
-            android:paddingLeft="3dip"
+            android:paddingStart="3dip"
             android:layout_margin="5dip"
             android:layout_width="44dip"
             android:layout_height="44dip"
@@ -199,9 +198,9 @@
             android:id="@+id/scanning"
             android:background="#00000000"
             android:paddingTop="1dip"
-            android:paddingRight="1dip"
+            android:paddingEnd="1dip"
             android:paddingBottom="1dip"
-            android:paddingLeft="3dip"
+            android:paddingStart="3dip"
             android:layout_margin="5dip"
             android:layout_width="44dip"
             android:layout_height="44dip"

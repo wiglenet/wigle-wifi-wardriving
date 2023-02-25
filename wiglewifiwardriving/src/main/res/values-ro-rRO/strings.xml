@@ -81,10 +81,10 @@
     <string name="filter_enabled">Filtrul activat</string>
     <string name="list_waiting_gps">(Se așteaptă sincronizarea GPS&#8230;)</string>
     <string name="list_scanning_off">(Scanarea a fost dezactivată)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
     <string name="list_short_sats">Clauză:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(stare)</string>
     <string name="list_speed">Viteză:</string>
     <string name="list_upload">Incarca fisier?</string>

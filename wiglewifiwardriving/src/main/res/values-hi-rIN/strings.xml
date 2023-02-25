@@ -80,10 +80,10 @@
     <string name="filter_enabled">फ़िल्टर सक्षम किया गया है</string>
     <string name="list_waiting_gps">(GPS सिंक की प्रतीक्षा की जा रही है...)</string>
     <string name="list_scanning_off">(स्कैनिंग बंद किया गया है)</string>
-    <string name="list_short_lat">अक्षांश:</string>
-    <string name="list_short_lon">देशान्तर:</string>
+    <string name="list_short_lat">अक्षांश: %1$s</string>
+    <string name="list_short_lon">देशान्तर: %1$s</string>
     <string name="list_short_sats">उपग्रह:</string>
-    <string name="list_short_alt">ऊंचाई:</string>
+    <string name="list_short_alt">ऊंचाई: %1$s</string>
     <string name="list_status_default">(स्थिति)</string>
     <string name="list_speed">गति:</string>
     <string name="list_upload">फ़ाइल अपलोड करें?</string>

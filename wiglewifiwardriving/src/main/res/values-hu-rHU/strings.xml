@@ -81,10 +81,10 @@
     <string name="filter_enabled">Szűrő be</string>
     <string name="list_waiting_gps">(Várakozás a GPS-re&#8230;)</string>
     <string name="list_scanning_off">(Szkennelés kikapcsolva)</string>
-    <string name="list_short_lat">Szélesség:</string>
-    <string name="list_short_lon">Hosszúság:</string>
+    <string name="list_short_lat">Szélesség: %1$s</string>
+    <string name="list_short_lon">Hosszúság: %1$s</string>
     <string name="list_short_sats">Műhold:</string>
-    <string name="list_short_alt">Magasság:</string>
+    <string name="list_short_alt">Magasság: %1$s</string>
     <string name="list_status_default">(állapot)</string>
     <string name="list_speed">Sebesség:</string>
     <string name="list_upload">Feltölti a fájlt?</string>

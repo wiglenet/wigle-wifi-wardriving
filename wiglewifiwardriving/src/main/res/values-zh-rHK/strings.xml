@@ -81,10 +81,10 @@
     <string name="filter_enabled">篩選器已啟用</string>
     <string name="list_waiting_gps">（等待GPS同步&#8230;）</string>
     <string name="list_scanning_off">（掃描轉身的）</string>
-    <string name="list_short_lat">緯度：</string>
-    <string name="list_short_lon">經度：</string>
+    <string name="list_short_lat">緯度：%1$s</string>
+    <string name="list_short_lon">經度：%1$s</string>
     <string name="list_short_sats">SATS：</string>
-    <string name="list_short_alt">Alt鍵：</string>
+    <string name="list_short_alt">Alt鍵： %1$s</string>
     <string name="list_status_default">（地位）</string>
     <string name="list_speed">速度：</string>
     <string name="list_upload">上傳文件？</string>

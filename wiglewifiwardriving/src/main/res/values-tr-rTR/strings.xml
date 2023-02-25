@@ -81,10 +81,10 @@
     <string name="filter_enabled">Fitre Etkin</string>
     <string name="list_waiting_gps">(GPS senkronizasyonu bekleniyor&#8230;)</string>
     <string name="list_scanning_off">(Arama Kapalı)</string>
-    <string name="list_short_lat">Enlem:</string>
-    <string name="list_short_lon">Boylam:</string>
+    <string name="list_short_lat">Enlem: %1$s</string>
+    <string name="list_short_lon">Boylam: %1$s</string>
     <string name="list_short_sats">Bilgiler:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(durum)</string>
     <string name="list_speed">Hız:</string>
     <string name="list_upload">Dosya yükle?</string>

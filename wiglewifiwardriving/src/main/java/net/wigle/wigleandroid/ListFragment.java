@@ -668,12 +668,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
 
         try {
-            TextView tv = view.findViewById( R.id.LocationTextView06 );
+            TextView tv = view.findViewById( R.id.sats_text);
             tv.setText( getString(R.string.list_short_sats) + " " + state.GNSSListener.getSatCount() );
 
             final Location location = state.GNSSListener.getCurrentLocation();
 
-            tv = view.findViewById( R.id.LocationTextView01 );
+            tv = view.findViewById( R.id.lat_text);
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
@@ -687,10 +687,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             else {
                 latText = state.numberFormat8.format( location.getLatitude() );
             }
-            tv.setText( getString(R.string.list_short_lat) + " " + latText );
+            tv.setText( getString(R.string.list_short_lat, latText ));
 
-            tv = view.findViewById( R.id.LocationTextView02 );
-            tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
+            tv = view.findViewById( R.id.lon_text);
+            tv.setText( getString(R.string.list_short_lon, (location == null) ? "" : state.numberFormat8.format( location.getLongitude() )) );
 
             tv = view.findViewById( R.id.LocationTextView03 );
             final Activity a = getActivity();
@@ -698,8 +698,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 tv.setText(getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
             }
 
-            TextView tv4 = view.findViewById( R.id.LocationTextView04 );
-            TextView tv5 = view.findViewById( R.id.LocationTextView05 );
+            TextView tv4 = view.findViewById( R.id.accuracy_text);
+            TextView tv5 = view.findViewById( R.id.alt_text);
             if ( location == null ) {
                 tv4.setText( "" );
                 tv5.setText( "" );
@@ -711,7 +711,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     tv4.setText("+/- " + distString);
                     final String accString = UINumberFormat.metersToString(prefs,
                             state.numberFormat0, main, (float) location.getAltitude(), true);
-                    tv5.setText(getString(R.string.list_short_alt) + " " + accString);
+                    tv5.setText(getString(R.string.list_short_alt, accString));
                 }
             }
         }

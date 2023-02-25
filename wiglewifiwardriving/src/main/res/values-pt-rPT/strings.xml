@@ -80,10 +80,10 @@
     <string name="filter_enabled">Filtro ativado</string>
     <string name="list_waiting_gps">(A aguardar sincronização GPS...)</string>
     <string name="list_scanning_off">(Digitalização desligada)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
     <string name="list_short_sats">Sats:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(estado)</string>
     <string name="list_speed">Velocidade:</string>
     <string name="list_upload">Carregar ficheiro?</string>

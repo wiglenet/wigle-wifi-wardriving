@@ -133,10 +133,9 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         return handler;
     }
 
-    public static void updateTransferringState(final boolean transferring, final FragmentActivity context) {
-        final Button uploadButton = context.findViewById(R.id.upload_button);
+    // ALIBI: attempting to avoid context leak but just passing button instances.
+    public static void updateTransferringState(final boolean transferring, final Button uploadButton,  final Button importObservedButton) {
         if (null != uploadButton) uploadButton.setEnabled(!transferring);
-        final Button importObservedButton = context.findViewById(R.id.import_observed_button);
         if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
         if (transferring) {
             MainActivity.getMainActivity().setTransferring();
@@ -149,6 +148,8 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         final LinearLayout progressLayout = context.findViewById(R.id.inline_status_bar);
         final TextView progressLabel = context.findViewById(R.id.inline_progress_status);
         final ProgressBar progressBar = context.findViewById(R.id.inline_status_progress);
+        final Button importObservedButton = context.findViewById(R.id.import_observed_button);
+        final Button uploadButton = context.findViewById(R.id.upload_button);
 
         if ((null != progressLayout) && (null != progressLabel) && (null != progressBar)) {
             pp = new ProgressPanel(progressLayout, progressLabel, progressBar);
@@ -157,14 +158,14 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             taskCancelButton.setOnClickListener(v -> {
                 latestTask.setInterrupted();
                 clearProgressDialog();
-                updateTransferringState(false, context);
+                updateTransferringState(false, uploadButton, importObservedButton);
             });
             //ALIBI: this will get replaced as soon as the progress is set for the first time
             progressBar.setIndeterminate(true);
 
             //ALIBI: prevent multiple simultaneous large transfers by disabling visible buttons,
             // setting global state to make sure they get set on show
-            updateTransferringState(true, context);
+            updateTransferringState(true, uploadButton, importObservedButton);
             pp.setMessage(context.getString(R.string.status_working));
             pp.setIndeterminate();
         }

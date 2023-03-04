@@ -129,6 +129,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
     public static final LameStatic lameStatic = new LameStatic();
 
+    //ALIBI: DBs get big, and the grouping chars make fit hard
     private final NumberFormat dbFormat = NumberFormat.getIntegerInstance();
     private boolean animating = false;
     private AnimatedVectorDrawableCompat scanningAnimation = null;

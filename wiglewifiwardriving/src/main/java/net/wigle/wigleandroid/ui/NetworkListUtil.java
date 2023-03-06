@@ -7,16 +7,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.provider.Settings;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -87,7 +84,6 @@ public class NetworkListUtil {
         return color;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @ColorInt
     public static int getTextColorForSignal(Context context, final int level) {
         Resources.Theme theme = context.getTheme();
@@ -119,13 +115,8 @@ public class NetworkListUtil {
                                                        @ColorInt int tintColor) {
 
         Drawable vectorDrawable;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            vectorDrawable = VectorDrawableCompat.create(context.getResources(), vectorResourceId,
-                    null);
-        } else {
-            vectorDrawable = ResourcesCompat.getDrawable(
-                    context.getResources(), vectorResourceId, null);
-        }
+        vectorDrawable = ResourcesCompat.getDrawable(
+                context.getResources(), vectorResourceId, null);
         if (vectorDrawable == null) {
             Logging.error("Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();

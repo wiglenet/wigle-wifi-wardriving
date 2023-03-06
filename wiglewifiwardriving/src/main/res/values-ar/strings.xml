@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filter Enabled</string>
     <string name="list_waiting_gps">(Waiting for GPS sync&#8230;)</string>
     <string name="list_scanning_off">(Scanning turned off)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">Sats:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">Sats: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(status)</string>
-    <string name="list_speed">Speed:</string>
+    <string name="list_speed">%1$s :سرعة</string>
     <string name="list_upload">Upload File?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Type:</string>
@@ -146,7 +146,7 @@
     <string name="run">نفذ</string>
     <string name="new_word">جديد</string>
     <string name="db">DB</string>
-    <string name="scanned_in">%3$s%2$d تم مسحها ضوئيًا في d%1$d</string>
+    <string name="scanned_in">%3$s%2$d تم مسحها ضوئيًا في %1$d</string>
     <string name="sort_title">Sort Options</string>
     <string name="sort_spin_label">Sort List By:</string>
     <string name="channel">Channel</string>

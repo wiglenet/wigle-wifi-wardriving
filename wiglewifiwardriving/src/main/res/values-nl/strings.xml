@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filter ingeschakeld</string>
     <string name="list_waiting_gps">(Wachten op GPS-fix&#8230;)</string>
     <string name="list_scanning_off">(Scan is uit)</string>
-    <string name="list_short_lat">Bre:</string>
-    <string name="list_short_lon">Len:</string>
-    <string name="list_short_sats">Sat:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Bre: %1$s</string>
+    <string name="list_short_lon">Len: %1$s</string>
+    <string name="list_short_sats">Sat: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(status)</string>
-    <string name="list_speed">Snelheid:</string>
+    <string name="list_speed">Snelheid: %1$s</string>
     <string name="list_upload">Bestand uploaden?</string>
     <string name="network_signal">Signaal:</string>
     <string name="network_type">Type:</string>

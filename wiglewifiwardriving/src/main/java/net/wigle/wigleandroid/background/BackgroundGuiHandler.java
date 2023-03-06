@@ -17,6 +17,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.widget.Button;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
@@ -109,31 +111,28 @@ public class BackgroundGuiHandler extends Handler {
             }
 
             // If we got this far then the task is done
-
-            // make sure we didn't lose this dialog this somewhere
-            if ( pp != null ) {
-                try {
-                    Logging.info("fragment from pp: " + pp);
-                    AbstractBackgroundTask.updateTransferringState(false, context);
-                    pp.hide();
-                    alertSettable.clearProgressDialog();
-                }
-                catch ( Exception ex ) {
-                    // guess it wasn't there anyway
-                    Logging.info( "exception dismissing dialog/hiding progress: " + ex );
-                }
+            // make sure we didn't lose this dialog somewhere
+            try {
+                //DEBUG: Logging.info("fragment from pp: " + pp);
+                final Button importObservedButton = context.findViewById(R.id.import_observed_button);
+                final Button uploadButton = context.findViewById(R.id.upload_button);
+                AbstractBackgroundTask.updateTransferringState(false, uploadButton, importObservedButton);
+                pp.hide();
+                alertSettable.clearProgressDialog();
+            } catch ( Exception ex ) {
+                // guess it wasn't there anyway
+                Logging.error( "exception dismissing dialog/hiding progress: " + ex );
             }
             // Activity context
             final FragmentManager fm = context.getSupportFragmentManager();
             final DialogFragment dialog = (DialogFragment) fm.findFragmentByTag(AbstractBackgroundTask.PROGRESS_TAG);
             if (dialog != null) {
                 try {
-                    Logging.info("fragment from dialog: " + dialog);
+                    //DEBUG: Logging.info("fragment from dialog: " + dialog);
                     dialog.dismiss();
-                }
-                catch ( Exception ex ) {
+                } catch ( Exception ex ) {
                     // you can't dismiss what isn't there
-                    Logging.info( "exception dismissing fm dialog: " + ex );
+                    Logging.error( "exception dismissing fm dialog: " + ex );
                 }
             }
 
@@ -276,35 +275,36 @@ public class BackgroundGuiHandler extends Handler {
             final AlertDialog.Builder builder = new AlertDialog.Builder( activity );
             builder.setCancelable( false );
             final Bundle bundle = getArguments();
-            builder.setTitle( bundle.getInt("title") );
-            final int message = bundle.getInt("message");
-            final int status = bundle.getInt("status");
+            final int titleId = (null != bundle) ? bundle.getInt("title") : -1;
+            if (titleId != -1) {
+                builder.setTitle(titleId);
+            }
+            final int message = (null != bundle) ? bundle.getInt("message"): -1;
+            final int status = (null != bundle) ? bundle.getInt("status"): -1;
 
-            builder.setMessage( composeDisplayMessage(activity,  bundle.getString( ERROR ),
-                    bundle.getString( FILEPATH ), bundle.getString( FILENAME ),
+            builder.setMessage( composeDisplayMessage(activity,  (null != bundle) ? bundle.getString( ERROR ):null,
+                    (null != bundle) ? bundle.getString( FILEPATH ):null, (null != bundle) ? bundle.getString( FILENAME ):null,
                     message ));
 
             AlertDialog ad = builder.create();
-            ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick( final DialogInterface dialog, final int which ) {
-                    try {
-                        dialog.dismiss();
-                    } catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        Logging.info( "exception dismissing alert dialog: " + ex );
-                    }
+            ad.setButton( DialogInterface.BUTTON_POSITIVE, "OK", (dialog, which) -> {
+                try {
+                    dialog.dismiss();
+                } catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing alert dialog: " + ex );
+                }
 
-                    if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
-                            || status == Status.BAD_LOGIN.ordinal()) {
-                        Logging.info("dialog: start settings fragment");
-                        try {
-                            MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
-                        } catch (Exception ex) {
-                            Logging.info("failed to start settings fragment: " + ex, ex);
-                        }
+                if (status == Status.BAD_USERNAME.ordinal() || status == Status.BAD_PASSWORD.ordinal()
+                        || status == Status.BAD_LOGIN.ordinal()) {
+                    Logging.info("dialog: start settings fragment");
+                    try {
+                        MainActivity.getMainActivity().selectFragment(R.id.nav_settings);
+                    } catch (Exception ex) {
+                        Logging.info("failed to start settings fragment: " + ex, ex);
                     }
-                } });
+                }
+            });
 
             return ad;
         }
@@ -314,11 +314,11 @@ public class BackgroundGuiHandler extends Handler {
      * ALIBI: simple filename ext. remover for Android. commons.io versions without security vulns (2.7 and up) break out backward compat.
      * @param fileName the input filename
      * @return the fileName minus the extension
-     * @throws IllegalArgumentException
+     * @throws IllegalArgumentException if the filename is null or invalid
      */
     private static String removeFileExtension(final String fileName) throws IllegalArgumentException {
         if (fileName == null || fileName.indexOf(0) >= 0) {
-            throw new IllegalArgumentException("Invalid file name.");
+            throw new IllegalArgumentException("Invalid file name: "+fileName);
         }
         final int extensionPos = fileName.lastIndexOf('.');
         final int lastSeparator = fileName.lastIndexOf('/');

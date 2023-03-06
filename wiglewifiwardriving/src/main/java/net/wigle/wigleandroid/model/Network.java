@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
+
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -264,6 +267,7 @@ public final class Network implements ClusterItem {
         return retval == null ? "" : retval;
     }
 
+    @NonNull
     @Override
     public LatLng getPosition() {
         return geoPoint;
@@ -276,7 +280,7 @@ public final class Network implements ClusterItem {
 
     @Override
     public boolean equals(final Object other) {
-        if (other != null && other instanceof Network) {
+        if (other instanceof Network) {
             final Network o = (Network) other;
             return bssid.equals(o.bssid);
         }
@@ -290,9 +294,9 @@ public final class Network implements ClusterItem {
 
     /**
      * credit and apologies to credit to - https://github.com/torvalds/linux/blob/ba31f97d43be41ca99ab72a6131d7c226306865f/net/wireless/util.c#L75
-     * @param channel
-     * @param band
-     * @return
+     * @param channel the channel number
+     * @param band the band
+     * @return the integer frequency (center)
      */
     public static Integer frequencyMHzForWiFiChannel(final int channel, final NetworkBand band) {
         NetworkBand bandGuess = band;
@@ -351,7 +355,7 @@ public final class Network implements ClusterItem {
 
     /**
      * credit to int ieee80211_freq_khz_to_channel(u32 freq) - https://github.com/torvalds/linux/blob/ba31f97d43be41ca99ab72a6131d7c226306865f/net/wireless/util.c#L141
-     * @param frequencyMHz
+     * @param frequencyMHz the frequency in MHz for which to determine the channel
      * @return the channel value for the frequency
      */
     public static Integer channelForWiFiFrequencyMhz(final int frequencyMHz) {

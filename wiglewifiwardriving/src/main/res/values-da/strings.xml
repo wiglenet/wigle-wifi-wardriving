@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filtere Aktiveret</string>
     <string name="list_waiting_gps">(Venter på GPS-sync&#8230;)</string>
     <string name="list_scanning_off">(Scanning slukket)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">SAT:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">SAT: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(Status)</string>
-    <string name="list_speed">Hastighed:</string>
+    <string name="list_speed">Hastighed: %1$s</string>
     <string name="list_upload">Upload fil?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Type:</string>

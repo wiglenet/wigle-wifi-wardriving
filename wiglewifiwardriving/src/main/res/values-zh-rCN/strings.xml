@@ -81,12 +81,12 @@
     <string name="filter_enabled">筛选器已启用</string>
     <string name="list_waiting_gps">（等待GPS同步&#8230;）</string>
     <string name="list_scanning_off">（扫描关闭的网络）</string>
-    <string name="list_short_lat">纬度：</string>
-    <string name="list_short_lon">经度：</string>
-    <string name="list_short_sats">卫星：</string>
-    <string name="list_short_alt">海拔：</string>
+    <string name="list_short_lat">纬度：%1$s</string>
+    <string name="list_short_lon">经度：%1$s</string>
+    <string name="list_short_sats">卫星：%1$d</string>
+    <string name="list_short_alt">海拔： %1$s</string>
     <string name="list_status_default">（状态）</string>
-    <string name="list_speed">速度：</string>
+    <string name="list_speed">速度：%1$s</string>
     <string name="list_upload">上传文件？</string>
     <string name="network_signal">信号：</string>
     <string name="network_type">类型：</string>

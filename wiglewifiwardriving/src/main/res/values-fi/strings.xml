@@ -81,12 +81,12 @@
     <string name="filter_enabled">Suodattimen käyttöön</string>
     <string name="list_waiting_gps">(Odotetaan GPS Sync&#8230;)</string>
     <string name="list_scanning_off">(Skannaus sammutettu)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">SATS:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">SATS: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(Status)</string>
-    <string name="list_speed">Nopeus:</string>
+    <string name="list_speed">Nopeus: %1$s</string>
     <string name="list_upload">Lataa tiedosto?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Tyyppi:</string>

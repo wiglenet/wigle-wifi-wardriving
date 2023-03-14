@@ -17,7 +17,6 @@ import com.babylon.certificatetransparency.CTInterceptorBuilder;
 import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.TokenAccess;
-import net.wigle.wigleandroid.background.ObservationUploader;
 import net.wigle.wigleandroid.background.Status;
 import net.wigle.wigleandroid.model.api.ApiTokenResponse;
 import net.wigle.wigleandroid.model.api.RankResponse;
@@ -149,6 +148,9 @@ public class WiGLEApiManager {
         Request request = new Request.Builder()
                 .url(UrlConfig.USER_STATS_URL)
                 .build();
+        if (null == authedClient) {
+            return;
+        }
         authedClient.newCall(request).enqueue(new Callback() {
             final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -374,13 +376,15 @@ public class WiGLEApiManager {
      */
     public void getUploads(final long pageStart, final long pageEnd, @NotNull final RequestCompletedListener<UploadsResponse,
             JSONObject> completedListener ) {
+        if (null == authedClient) {
+            return;
+        }
         final String httpUrl = UrlConfig.UPLOADS_STATS_URL + "?pagestart=" + pageStart
                 + "&pageend=" + pageEnd;
         Request request = new Request.Builder()
                 .url(httpUrl)
                 .build();
         final Handler mainHandler = new Handler(Looper.getMainLooper());
-
         authedClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
@@ -416,7 +420,9 @@ public class WiGLEApiManager {
     public void searchWiFi(@NotNull final String urlEncodedQueryParams,
                         @NotNull final RequestCompletedListener<WiFiSearchResponse,
                                 JSONObject> completedListener) {
-
+        if (null == authedClient) {
+            return;
+        }
         final String httpUrl = UrlConfig.SEARCH_WIFI_URL + "?" + urlEncodedQueryParams;
 
         Request request = new Request.Builder()

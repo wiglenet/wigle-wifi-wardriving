@@ -1150,29 +1150,33 @@ public final class DatabaseHelper extends Thread {
         }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
-            final double accuracy = location.getAccuracy();
-            if (insertRoute != null && location.getTime() != 0L &&
-                    accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
-                    accuracy > 0.0d && //ALIBI: should never happen?
-                    (lastLoggedLocation == null ||
-                            ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
-                                    (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
-                            )) )) {
-                insertRoute.bindLong(1, runId);
-                insertRoute.bindLong(2, wifiVisible);
-                insertRoute.bindLong(3, cellVisible);
-                insertRoute.bindLong(4, btVisible);
-                insertRoute.bindDouble(5, location.getLatitude());
-                insertRoute.bindDouble(6, location.getLongitude());
-                insertRoute.bindDouble(7, location.getAltitude());
-                insertRoute.bindDouble(8, location.getAccuracy());
-                insertRoute.bindLong(9, location.getTime());
-                long start = System.currentTimeMillis();
+            if (!done.get()) {
+                final double accuracy = location.getAccuracy();
+                if (insertRoute != null && location.getTime() != 0L &&
+                        accuracy < MIN_ROUTE_LOCATION_PRECISION_METERS &&
+                        accuracy > 0.0d && //ALIBI: should never happen?
+                        (lastLoggedLocation == null ||
+                                ((lastLoggedLocation.distanceTo(location) > MIN_ROUTE_LOCATION_DIFF_METERS &&
+                                        (location.getTime() - lastLoggedLocation.getTime() > MIN_ROUTE_LOCATION_DIFF_TIME)
+                                )) )) {
+                    insertRoute.bindLong(1, runId);
+                    insertRoute.bindLong(2, wifiVisible);
+                    insertRoute.bindLong(3, cellVisible);
+                    insertRoute.bindLong(4, btVisible);
+                    insertRoute.bindDouble(5, location.getLatitude());
+                    insertRoute.bindDouble(6, location.getLongitude());
+                    insertRoute.bindDouble(7, location.getAltitude());
+                    insertRoute.bindDouble(8, location.getAccuracy());
+                    insertRoute.bindLong(9, location.getTime());
+                    long start = System.currentTimeMillis();
 
-                insertRoute.execute();
-                lastLoggedLocation = location;
-                currentRoutePointCount.incrementAndGet();
-                logTime(start, "db route point added");
+                    insertRoute.execute();
+                    lastLoggedLocation = location;
+                    currentRoutePointCount.incrementAndGet();
+                    logTime(start, "db route point added");
+                }
+            } else {
+                Logging.error("unable to log route point due to closing DB");
             }
         });
     }

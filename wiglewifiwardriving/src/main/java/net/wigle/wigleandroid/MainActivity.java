@@ -2117,9 +2117,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public void setScanStatusUI(final int resultSize, final long inMs) {
-        final String status =
-                mainActivity.getString(R.string.scanned_in, resultSize, inMs, mainActivity.getString(R.string.ms_short));
-        setScanStatusUI(status);
+        if (null != mainActivity) {
+            final String status =
+                    mainActivity.getString(R.string.scanned_in, resultSize, inMs, mainActivity.getString(R.string.ms_short));
+            setScanStatusUI(status);
+        }
     }
 
     public void setScanStatusUI(String status) {

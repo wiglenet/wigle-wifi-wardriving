@@ -1155,23 +1155,29 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     public static void addNetworkToMap(final Network network) {
-        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
-        if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
-            // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
-            if (f != null) {
-                f.addNetwork(network);
+        MainActivity a = MainActivity.mainActivity;
+        if (a != null) {
+            final FragmentManager fragmentManager = a.getSupportFragmentManager();
+            if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
+                // Map is visible, give it the new network
+                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                if (f != null) {
+                    f.addNetwork(network);
+                }
             }
         }
     }
 
     public static void updateNetworkOnMap(final Network network) {
-        final FragmentManager fragmentManager = MainActivity.mainActivity.getSupportFragmentManager();
-        if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
-            // Map is visible, give it the new network
-            final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
-            if (f != null) {
-                f.updateNetwork(network);
+        MainActivity a = MainActivity.mainActivity;
+        if (a != null) {
+            final FragmentManager fragmentManager = a.getSupportFragmentManager();
+            if (null != getStaticState() && getStaticState().currentTab == R.id.nav_map) {
+                // Map is visible, give it the new network
+                final MappingFragment f = (MappingFragment) fragmentManager.findFragmentByTag(FRAGMENT_TAG_PREFIX + R.id.nav_map);
+                if (f != null) {
+                    f.updateNetwork(network);
+                }
             }
         }
     }

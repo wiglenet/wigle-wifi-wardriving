@@ -1,4 +1,4 @@
-* 2.68 - 2.69 (3/14/2023)
+* 2.68 - 2.70 (3/19/2023)
 Minimum SDK update to satisfy Google's new requirements
 GNSSStatus LocationManager changes
 Fixes for start-on-boot in Android 10+ (requires manual prefs config update)

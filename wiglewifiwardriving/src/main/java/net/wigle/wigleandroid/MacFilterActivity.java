@@ -51,8 +51,9 @@ public class MacFilterActivity extends AppCompatActivity {
         //DEBUG: MainActivity.info(filterKey);
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
-        if(values.length>0) {
-            listItems = Arrays.asList(values);
+        if (values.length > 0) {
+            //ALIBI: the java.util.Arrays.ArrayList version is immutable, so a new ArrayList must be made from it.
+            listItems = new ArrayList<>(Arrays.asList(values));
         }
 
         ListView lv = findViewById(R.id.addr_filter_list_view);
@@ -64,7 +65,7 @@ public class MacFilterActivity extends AppCompatActivity {
 
     public void addOui(View v) {
         final MaskedEditText ouiInput = findViewById(R.id.oui_input);
-        final String input = ouiInput.getRawText().toString();
+        final String input = ouiInput.getRawText();
         if (input.length() == 6) {
             final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (addEntry(listItems, prefs, input, filterKey)) {

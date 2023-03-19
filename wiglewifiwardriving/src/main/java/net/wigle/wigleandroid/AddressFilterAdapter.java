@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 
 import net.wigle.wigleandroid.util.Logging;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,8 +24,8 @@ import java.util.List;
 public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
 
     //enough to make a list and update prefs from it.
-    private List<String> list = new ArrayList<String>();
-    private Context context;
+    private final List<String> list;
+    private final Context context;
     private final SharedPreferences prefs;
     private final String filterKey;
 
@@ -68,27 +67,23 @@ public class AddressFilterAdapter extends BaseAdapter implements ListAdapter {
             view = inflater.inflate(R.layout.address_filter_list_item, null);
         }
 
-        TextView listItemText = (TextView)view.findViewById(R.id.list_item_string);
+        TextView listItemText = view.findViewById(R.id.list_item_string);
         listItemText.setText(list.get(position));
 
-        ImageButton deleteBtn = (ImageButton)view.findViewById(R.id.delete_btn);
+        ImageButton deleteBtn = view.findViewById(R.id.delete_btn);
 
-        deleteBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if (position < list.size()) list.remove(position);
-                Gson gson = new Gson();
-                String serialized = gson.toJson(list.toArray());
-                Logging.info(serialized);
-                final SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(filterKey,serialized);
-                editor.apply();
-                notifyDataSetChanged();
-                MainActivity m = MainActivity.getMainActivity();
-                if (null != m) {
-                    m.updateAddressFilter(filterKey);
-                }
-                //ALIBI: if there's no mainactivity, we can't very well log the error.
+        deleteBtn.setOnClickListener(v -> {
+            if (position < list.size()) list.remove(position);
+            Gson gson = new Gson();
+            String serialized = gson.toJson(list.toArray());
+            Logging.info(serialized);
+            final SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(filterKey,serialized);
+            editor.apply();
+            notifyDataSetChanged();
+            MainActivity m = MainActivity.getMainActivity();
+            if (null != m) {
+                m.updateAddressFilter(filterKey);
             }
         });
         return view;

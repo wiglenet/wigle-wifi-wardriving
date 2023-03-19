@@ -73,6 +73,7 @@ public class PreferenceKeys {
     public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
     public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
     public static final String PREF_MAPS_FOLLOW_DAYNIGHT = "mapThemeMatchDayNight";
+    public static final String PREF_MAP_FOLLOW_BEARING = "mapFollowBearing";
 
     // what to speak on announcements
     public static final String PREF_SPEECH_PERIOD = "speechPeriod";

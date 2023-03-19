@@ -439,4 +439,5 @@
     <string name="enable_kalman">Chuja kelele ya GPS</string>
     <string name="gps_old_message">Kifaa hiki hakitumiki tena kupitia duka la programu kwa sababu ya sera za Google. Tafadhali hifadhi nakala ya data yako na upakie WiGLE v. 2.67 .apk (au chini) kutoka https://github.com/wiglenet/wigle-wifi-wardriving/ . Pole kwa usumbufu!</string>
     <string name="gps_old_title">Haijaweza kuanzisha GPS</string>
+    <string name="enable_map_bearing">Fuata mada/kichwa changu</string>
 </resources>

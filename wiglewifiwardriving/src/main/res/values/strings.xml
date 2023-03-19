@@ -440,4 +440,5 @@
     <string name="enable_kalman">Filter GPS noise</string>
     <string name="gps_old_message">This device is no longer supported via the app store due to Google\'s policies. Please back-up your data and side-load the WiGLE v. 2.67 .apk (or lower) from https://github.com/wiglenet/wigle-wifi-wardriving/ . Sorry for the inconvenience!</string>
     <string name="gps_old_title">Unable to initialize GPS</string>
+    <string name="enable_map_bearing">Follow my bearing/heading</string>
 </resources>

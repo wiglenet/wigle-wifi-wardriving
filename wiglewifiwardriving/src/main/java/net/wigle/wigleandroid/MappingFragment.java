@@ -198,7 +198,7 @@ public final class MappingFragment extends Fragment {
         //TODO: almost certainly not like this.
         final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
 
-        if (prefs != null && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
+        if (prefs != null && BuildConfig.DEBUG && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
             headingManager = new HeadingManager(a);
         }
         setupQuery();
@@ -512,7 +512,8 @@ public final class MappingFragment extends Fragment {
                     return bearing;
                 }
             }
-            if (null != headingManager && headingManager.getAccuracy() >= 3.0) {
+            //ALIBI: heading is too often completely wrong. This is here for debugging only unless things improve.
+            if (null != headingManager && BuildConfig.DEBUG && headingManager.getAccuracy() >= 3.0) {
                 // if the fusion of accelerometer and magnetic compass claims it doesn't suck (although it probably still does)
                 return headingManager.getHeading(gpsLocation);
             }
@@ -674,7 +675,7 @@ public final class MappingFragment extends Fragment {
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
                     tv = view.findViewById(R.id.heading);
                     final Location gpsLocation = safelyGetLast(getContext(), LocationManager.GPS_PROVIDER);
-                    if (HeadingManager.DEBUG_MODE) {
+                    if (BuildConfig.DEBUG) {
                         tv.setText(String.format("heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
                         if (null != ListFragment.lameStatic.location) {
                             tv = view.findViewById(R.id.bearing);

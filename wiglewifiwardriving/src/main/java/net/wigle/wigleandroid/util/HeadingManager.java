@@ -9,6 +9,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.widget.Toast;
 
+import net.wigle.wigleandroid.BuildConfig;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +31,6 @@ public class HeadingManager implements SensorEventListener {
     private final float[] mOrientation = new float[3];
     private Context context;
     private final Map<Integer,Integer> accuracyBySensorType = new HashMap<>();
-    public final static boolean DEBUG_MODE = true;
 
     private static final List<String> typeEmoji = new ArrayList<>(Arrays.asList("?",
             "\ud83e\udded \u2699",
@@ -96,7 +97,7 @@ public class HeadingManager implements SensorEventListener {
         if (!accuracyBySensorType.containsKey(sensorType) ||
                 (null != type && type.equals(accuracy))) {
             accuracyBySensorType.put(sensor.getType(),accuracy);
-            if (DEBUG_MODE) {
+            if (BuildConfig.DEBUG) {
                 showAccuracyChangeNotification();
             }
             switch (accuracy) {

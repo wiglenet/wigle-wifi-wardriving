@@ -196,7 +196,7 @@ public final class MappingFragment extends Fragment {
         numberFormat.setMaximumFractionDigits(2);
         // media volume
         //TODO: almost certainly not like this.
-        final SharedPreferences prefs = (null != a)?getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+        final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
 
         if (prefs != null && BuildConfig.DEBUG && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
             headingManager = new HeadingManager(a);
@@ -782,18 +782,16 @@ public final class MappingFragment extends Fragment {
         if (mapRender != null) {
             mapRender.onResume();
         }
-        if (null != tileOverlay) {
-            //DEBUG: MainActivity.info("clearing tile overlay cache");
-            if (null != mapView) {
-                //refresh tiles on resume
-                mapView.postInvalidate();
-            }
+        //DEBUG: MainActivity.info("clearing tile overlay cache");
+        if (null != mapView) {
+            //refresh tiles on resume
+            mapView.postInvalidate();
         }
 
         setupTimer();
         final Activity a = getActivity();
         if (null != a) {
-            getActivity().setTitle(R.string.mapping_app_name);
+            a.setTitle(R.string.mapping_app_name);
         }
         if (null != headingManager) {
             headingManager.startSensor();

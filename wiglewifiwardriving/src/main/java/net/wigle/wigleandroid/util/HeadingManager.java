@@ -33,8 +33,8 @@ public class HeadingManager implements SensorEventListener {
     private final Map<Integer,Integer> accuracyBySensorType = new HashMap<>();
 
     private static final List<String> typeEmoji = new ArrayList<>(Arrays.asList("?",
-            "\ud83e\udded \u2699",
-            "\ud83e\udded \ud83e\uddf2"));
+            "\ud83e\udded \u2699", //compass, gear - accelerometer
+            "\ud83e\udded \ud83e\uddf2")); //compass, magnet - magnetic compass
     private static final List<String> qualityEmoji = new ArrayList<>(
             Arrays.asList("\ud83d\udd34", // red
                     "\ud83d\udfe0", // orange

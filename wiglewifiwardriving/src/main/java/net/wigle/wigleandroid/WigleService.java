@@ -15,6 +15,7 @@ import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -40,6 +41,9 @@ public final class WigleService extends Service {
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
+    private RemoteViews bigRemoteViews;
+    private RemoteViews smallRemoteViews;
+
     // Binder given to clients
     private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
 
@@ -240,8 +244,9 @@ public final class WigleService extends Service {
                     uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
                     final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
-
-                    if (SDK_INT >= Build.VERSION_CODES.O) {
+                    if (SDK_INT >= 31) {
+                        notification = getNotification31(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                    } else if (SDK_INT >= Build.VERSION_CODES.O) {
                         notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else {
                         notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
@@ -295,11 +300,7 @@ public final class WigleService extends Service {
         builder.setContentText(text);
         builder.setWhen(when);
         builder.setLargeIcon(largeIcon);
-        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-        } else {
-            builder.setSmallIcon(R.drawable.wiglewifi_small);
-        }
+        builder.setSmallIcon(R.drawable.wiglewifi_small);
         builder.setOngoing(true);
         builder.setCategory("SERVICE");
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
@@ -333,8 +334,6 @@ public final class WigleService extends Service {
                     title, NotificationManager.IMPORTANCE_LOW);
             notificationManager.createNotificationChannel(channel);
 
-
-            // copied from above
             final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
             builder.setNumber((int) ListFragment.lameStatic.newNets);
@@ -378,4 +377,55 @@ public final class WigleService extends Service {
         }
         return null;
     }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private Notification getNotification31(final String title, final Context context, final String text,
+                                           final long when, final PendingIntent contentIntent,
+                                           final PendingIntent pauseIntent, final PendingIntent scanIntent,
+                                           final PendingIntent uploadIntent) {
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return null;
+
+        this.bigRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.big_notification_content);
+        this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+
+
+        final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
+        builder.setContentIntent(contentIntent)
+                .setNumber((int) ListFragment.lameStatic.newNets)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setWhen(when)
+                .setSmallIcon(R.drawable.ic_w_logo_simple)
+                .setOngoing(true)
+                .setCategory("SERVICE")
+                .setSubText("some subtext.")
+                .setCustomBigContentView(bigRemoteViews)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setColorized(true);
+
+        if (MainActivity.isScanning(getApplicationContext())) {
+            Notification.Action pauseAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_pause),
+                    "Pause", pauseIntent)
+                    .build();
+            builder.addAction(pauseAction);
+        } else {
+            Notification.Action scanAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_play),
+                    "Scan", scanIntent)
+                    .build();
+            builder.addAction(scanAction);
+        }
+        Notification.Action ulAction = new Notification.Action.Builder(
+                Icon.createWithResource(this, android.R.drawable.ic_menu_upload),
+                "Upload", uploadIntent)
+                .build();
+        builder.addAction(ulAction);
+
+        return builder.build();
+    }
+
 }

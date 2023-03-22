@@ -209,23 +209,21 @@ public final class MappingFragment extends Fragment {
         final Activity a = getActivity();
         if (null != a) {
             mapView = new MapView(a);
-        }
-        final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
-        if (serviceAvailable == ConnectionResult.SUCCESS) {
-            try {
-                mapView.onCreate(savedInstanceState);
-                if (null != a) {
+            final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(a);
+            if (serviceAvailable == ConnectionResult.SUCCESS) {
+                try {
+                    mapView.onCreate(savedInstanceState);
                     final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
                 }
+                catch (final SecurityException ex) {
+                    Logging.error("security exception oncreateview map: " + ex, ex);
+                }
+            } else {
+                WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
             }
-            catch (final SecurityException ex) {
-                Logging.error("security exception oncreateview map: " + ex, ex);
-            }
-        } else {
-            WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
+            MapsInitializer.initialize(a);
         }
-        MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
 
         LatLng oldCenter = null;
@@ -577,7 +575,8 @@ public final class MappingFragment extends Fragment {
         @Override
         public void run() {
             final View view = getView();
-            final SharedPreferences prefs = getActivity() != null?getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+            final Activity a = getActivity();
+            final SharedPreferences prefs = a != null?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
                 final Location location = ListFragment.lameStatic.location;
@@ -589,7 +588,7 @@ public final class MappingFragment extends Fragment {
                             float currentZoom = googleMap.getCameraPosition().zoom;
                             Float cameraBearing = null;
                             if (null != prefs && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
-                                cameraBearing = getBearing(getActivity());
+                                cameraBearing = getBearing(a);
                             }
                             final CameraUpdate centerUpdate = (state.firstMove || cameraBearing == null) ?
                                     CameraUpdateFactory.newLatLng(locLatLng) :
@@ -782,10 +781,12 @@ public final class MappingFragment extends Fragment {
         if (mapRender != null) {
             mapRender.onResume();
         }
-        //DEBUG: MainActivity.info("clearing tile overlay cache");
-        if (null != mapView) {
-            //refresh tiles on resume
-            mapView.postInvalidate();
+        if (null != tileOverlay) {
+            //DEBUG: MainActivity.info("clearing tile overlay cache");
+            if (null != mapView) {
+                //refresh tiles on resume
+                mapView.postInvalidate();
+            }
         }
 
         setupTimer();

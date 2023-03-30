@@ -439,4 +439,5 @@
     <string name="settings_gps_head">GPS フィルタリング</string>
     <string name="gps_old_message">Google のポリシーにより、このデバイスは App Store でサポートされなくなりました。データをバックアップし、https://github.com/wiglenet/wigle-wifi-wardriving/ から WiGLE v. 2.67 .apk (またはそれ以下) をサイドロードしてください。ご不便おかけしてすみません！</string>
     <string name="gps_old_title">GPS を初期化できません</string>
+    <string name="enable_map_bearing">私の方位/見出しに従ってください</string>
 </resources>

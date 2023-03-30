@@ -440,4 +440,5 @@
     <string name="enable_kalman">تصفية ضوضاء GPS</string>
     <string name="gps_old_message">لم يعد هذا الجهاز مدعومًا عبر متجر التطبيقات بسبب سياسات Google. يرجى نسخ بياناتك احتياطيًا وتحميل WiGLE v. 2.67 .apk (أو أقل) من https://github.com/wiglenet/wigle-wifi-wardriving/. نأسف للإزعاج!</string>
     <string name="gps_old_title">تعذر تهيئة GPS</string>
+    <string name="enable_map_bearing">اتبع اتجاهي / رأسي</string>
 </resources>

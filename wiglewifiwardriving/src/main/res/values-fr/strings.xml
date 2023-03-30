@@ -440,4 +440,5 @@
     <string name="enable_kalman">Filtrer le bruit GPS</string>
     <string name="gps_old_message">Cet appareil n\'est plus pris en charge via l\'App Store en raison des règles de Google. Veuillez sauvegarder vos données et charger le WiGLE v. 2.67 .apk (ou une version antérieure) depuis https://github.com/wiglenet/wigle-wifi-wardriving/ . Désolé pour le dérangement!</string>
     <string name="gps_old_title">Impossible d\'initialiser le GPS</string>
+    <string name="enable_map_bearing">Suivre mon relèvement/cap</string>
 </resources>

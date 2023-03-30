@@ -36,8 +36,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run wifi"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="wifi new vs run" />
             <TextView
                 android:layout_width="fill_parent"
@@ -57,8 +57,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run cell"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="cell new vs. run" />
             <TextView
                 android:layout_width="fill_parent"
@@ -81,8 +81,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run bluetooth"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="bt new vs run"/>
             <TextView
                 android:layout_width="fill_parent"
@@ -103,8 +103,8 @@
                 android:layout_height="wrap_content"
                 android:contentDescription="run DB"
                 android:paddingTop="3dp"
-                android:paddingLeft="1dp"
-                android:paddingRight="2dp"
+                android:paddingStart="1dp"
+                android:paddingEnd="2dp"
                 android:text="database" />
             <TextView
                 android:layout_width="fill_parent"
@@ -115,10 +115,50 @@
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
+        android:id="@+id/debug"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:background="#AA333333">
+        <TextView
+            android:id="@+id/heading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFFF"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/bearing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFFF"
+            android:textSize="18sp" />
+        <TextView
+            android:id="@+id/selectedbh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:textColor="#FFF4"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:id="@+id/info"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true">
+        android:layout_alignParentEnd="true">
         <TextView
             android:id="@+id/rundistance"
             android:layout_width="wrap_content"
@@ -134,6 +174,6 @@
         <View
             android:layout_width="2dp"
             android:layout_height="25dp"
-            android:layout_marginRight="0dp" />
+            android:layout_marginEnd="0dp" />
     </LinearLayout>
 </RelativeLayout>

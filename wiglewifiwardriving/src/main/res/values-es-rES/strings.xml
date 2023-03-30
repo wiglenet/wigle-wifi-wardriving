@@ -439,4 +439,5 @@
     <string name="enable_kalman">Filtrar el ruido del GPS</string>
     <string name="gps_old_message">Este dispositivo ya no es compatible a través de la tienda de aplicaciones debido a las políticas de Google. Realice una copia de seguridad de sus datos y descargue WiGLE v. 2.67 .apk (o inferior) desde https://github.com/wiglenet/wigle-wifi-wardriving/ . ¡Lo siento por los inconvenientes ocasionados!</string>
     <string name="gps_old_title">No se puede inicializar el GPS</string>
+    <string name="enable_map_bearing">Seguir mi rumbo/rumbo</string>
 </resources>

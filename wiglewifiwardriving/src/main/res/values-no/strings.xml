@@ -442,4 +442,5 @@
     <string name="enable_kalman">Filtrer GPS-støy</string>
     <string name="gps_old_message">Denne enheten støttes ikke lenger via appbutikken på grunn av Googles retningslinjer. Ta sikkerhetskopi av dataene dine og sidelast inn WiGLE v. 2.67 .apk (eller lavere) fra https://github.com/wiglenet/wigle-wifi-wardriving/ . Beklager bryet!</string>
     <string name="gps_old_title">Kan ikke initialisere GPS</string>
+    <string name="enable_map_bearing">Følg min peiling/kurs</string>
 </resources>

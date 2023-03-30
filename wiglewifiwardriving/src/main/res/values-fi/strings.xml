@@ -440,4 +440,5 @@
     <string name="enable_kalman">Suodata GPS-kohinaa</string>
     <string name="gps_old_message">Tätä laitetta ei enää tueta sovelluskaupassa Googlen käytäntöjen vuoksi. Varmuuskopioi tietosi ja lataa WiGLE v. 2.67 .apk (tai vanhempi) osoitteesta https://github.com/wiglenet/wigle-wifi-wardriving/ . Anteeksi häiriö!</string>
     <string name="gps_old_title">GPS:n alustus epäonnistui</string>
+    <string name="enable_map_bearing">Seuraa suuntiani/suuntaani</string>
 </resources>

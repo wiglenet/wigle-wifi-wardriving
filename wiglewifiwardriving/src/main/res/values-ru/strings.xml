@@ -440,4 +440,5 @@
     <string name="enable_kalman">Фильтр шума GPS</string>
     <string name="gps_old_message">Это устройство больше не поддерживается через магазин приложений из-за политики Google. Создайте резервную копию своих данных и загрузите WiGLE v. 2.67 .apk (или более раннюю версию) с https://github.com/wiglenet/wigle-wifi-wardriving/. Простите за неудобства!</string>
     <string name="gps_old_title">Не удалось инициализировать GPS</string>
+    <string name="enable_map_bearing">Следуйте моему азимуту/направлению</string>
 </resources>

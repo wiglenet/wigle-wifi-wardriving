@@ -440,4 +440,5 @@
     <string name="enable_kalman">過濾 GPS 噪聲</string>
     <string name="gps_old_message">由於 Google 的政策，應用商店不再支持此設備。請備份您的數據並從 https://github.com/wiglenet/wigle-wifi-wardriving/ 旁加載 WiGLE v. 2.67 .apk（或更低版本）。帶來不便敬請諒解！</string>
     <string name="gps_old_title">無法初始化 GPS</string>
+    <string name="enable_map_bearing">跟隨我的方位/航向</string>
 </resources>

@@ -440,4 +440,5 @@
     <string name="enable_kalman">Filtrați zgomotul GPS</string>
     <string name="gps_old_message">Acest dispozitiv nu mai este acceptat prin magazinul de aplicații din cauza politicilor Google. Vă rugăm să faceți o copie de rezervă a datelor și să încărcați lateral WiGLE v. 2.67 .apk (sau mai mic) de la https://github.com/wiglenet/wigle-wifi-wardriving/ . Îmi pare rău pentru neplăcerile create!</string>
     <string name="gps_old_title">Imposibil de inițializat GPS</string>
+    <string name="enable_map_bearing">Urmează-mi direcția/direcția</string>
 </resources>

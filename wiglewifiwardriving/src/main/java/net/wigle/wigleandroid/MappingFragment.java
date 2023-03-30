@@ -1,5 +1,6 @@
 package net.wigle.wigleandroid;
 
+import static android.view.View.GONE;
 import static com.google.android.gms.maps.GoogleMap.*;
 
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -30,6 +32,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -59,10 +62,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -81,6 +82,7 @@ import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
 import net.wigle.wigleandroid.ui.ThemeUtil;
 import net.wigle.wigleandroid.ui.UINumberFormat;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.HeadingManager;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
@@ -99,7 +101,6 @@ public final class MappingFragment extends Fragment {
         private boolean locked = true;
         private boolean firstMove = true;
         private LatLng oldCenter = null;
-        private final int oldZoom = Integer.MIN_VALUE;
     }
 
     private final State state = new State();
@@ -114,6 +115,8 @@ public final class MappingFragment extends Fragment {
     private TileOverlay tileOverlay;
     private Polyline routePolyline;
     private Location lastLocation;
+
+    private HeadingManager headingManager;
 
     private Menu menu;
 
@@ -137,8 +140,8 @@ public final class MappingFragment extends Fragment {
     private static final int MENU_TRAFFIC = 20;
     private static final int MENU_MAP_TYPE = 21;
     private static final int MENU_WAKELOCK = 22;
-
-    private static final int SSID_FILTER = 102;
+    // ALIBI: 15% is actually pretty acceptable for map orientation.
+    private static final float MIN_BEARING_UPDATE_ACCURACY = 54.1f;
 
     private static final String MAP_TILE_URL_FORMAT =
             "https://wigle.net/clientTile?zoom=%d&x=%d&y=%d&startTransID=%s&endTransID=%s";
@@ -177,6 +180,7 @@ public final class MappingFragment extends Fragment {
         final Activity a = getActivity();
         if (null != a) {
             MainActivity.setLocale(a);
+            a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
         finishing = new AtomicBoolean(false);
 
@@ -191,7 +195,12 @@ public final class MappingFragment extends Fragment {
         numberFormat = NumberFormat.getNumberInstance(locale);
         numberFormat.setMaximumFractionDigits(2);
         // media volume
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        //TODO: almost certainly not like this.
+        final SharedPreferences prefs = (null != a)?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+
+        if (prefs != null && BuildConfig.DEBUG && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
+            headingManager = new HeadingManager(a);
+        }
         setupQuery();
     }
 
@@ -200,23 +209,21 @@ public final class MappingFragment extends Fragment {
         final Activity a = getActivity();
         if (null != a) {
             mapView = new MapView(a);
-        }
-        final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getActivity());
-        if (serviceAvailable == ConnectionResult.SUCCESS) {
-            try {
-                mapView.onCreate(savedInstanceState);
-                if (null != a) {
+            final int serviceAvailable = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(a);
+            if (serviceAvailable == ConnectionResult.SUCCESS) {
+                try {
+                    mapView.onCreate(savedInstanceState);
                     final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                     mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
                 }
+                catch (final SecurityException ex) {
+                    Logging.error("security exception oncreateview map: " + ex, ex);
+                }
+            } else {
+                WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
             }
-            catch (final SecurityException ex) {
-                Logging.error("security exception oncreateview map: " + ex, ex);
-            }
-        } else {
-            WiGLEToast.showOverFragment(getActivity(), R.string.fatal_pre_message, getString(R.string.map_needs_playservice));
+            MapsInitializer.initialize(a);
         }
-        MapsInitializer.initialize(getActivity());
         final View view = inflater.inflate(R.layout.map, container, false);
 
         LatLng oldCenter = null;
@@ -224,7 +231,6 @@ public final class MappingFragment extends Fragment {
         if (state.oldCenter != null) {
             // pry an orientation change, which calls destroy
             oldCenter = state.oldCenter;
-            oldZoom = state.oldZoom;
         }
 
         setupMapView(view, oldCenter, oldZoom);
@@ -255,6 +261,19 @@ public final class MappingFragment extends Fragment {
                         || ActivityCompat.checkSelfPermission(MappingFragment.this.getContext(),
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     googleMap.setMyLocationEnabled(true);
+                    googleMap.setOnCameraIdleListener(() -> {
+                        if (null != prefs && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
+                            Float cameraBearing = getBearing(getActivity());
+                            Logging.info("Camera Bearing: "+cameraBearing);
+                            if (null != cameraBearing) {
+                                CameraPosition camPos = CameraPosition
+                                        .builder(googleMap.getCameraPosition())
+                                        .bearing(cameraBearing)
+                                        .build();
+                                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(camPos));
+                            }
+                        }
+                    });
                 }
             }
             googleMap.setBuildingsEnabled(true);
@@ -274,21 +293,18 @@ public final class MappingFragment extends Fragment {
             // Seeing stack overflow crashes on multiple phones in specific locations, based on indoor svcs.
             googleMap.setIndoorEnabled(false);
 
-            googleMap.setOnMyLocationButtonClickListener(new OnMyLocationButtonClickListener() {
-                @Override
-                public boolean onMyLocationButtonClick() {
-                    if (!state.locked) {
+            googleMap.setOnMyLocationButtonClickListener(() -> {
+                if (!state.locked) {
 
-                        state.locked = true;
-                        if (menu != null) {
-                            MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
-                            String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
-                            item.setTitle(name);
-                            Logging.info("on-my-location received - activating lock");
-                        }
+                    state.locked = true;
+                    if (menu != null) {
+                        MenuItem item = menu.findItem(MENU_TOGGLE_LOCK);
+                        String name = state.locked ? getString(R.string.menu_turn_off_lockon) : getString(R.string.menu_turn_on_lockon);
+                        item.setTitle(name);
+                        Logging.info("on-my-location received - activating lock");
                     }
-                    return false;
                 }
+                return false;
             });
 
             googleMap.setOnCameraMoveStartedListener(reason -> {
@@ -348,6 +364,7 @@ public final class MappingFragment extends Fragment {
 
 
                 TileProvider tileProvider = new TileProvider() {
+                    @SuppressLint("DefaultLocale")
                     @Override
                     public Tile getTile(int x, int y, int zoom) {
                         if (!checkTileExists(x, y, zoom)) {
@@ -433,8 +450,6 @@ public final class MappingFragment extends Fragment {
                     }
                 };
 
-
-
                 tileOverlay = googleMap.addTileOverlay(new TileOverlayOptions()
                         .tileProvider(tileProvider).transparency(0.35f));
             }
@@ -476,6 +491,32 @@ public final class MappingFragment extends Fragment {
             }
         });
         Logging.info("done setupMapView.");
+    }
+
+    public Float getBearing( final Context context) {
+        final Location gpsLocation = safelyGetLast(context, LocationManager.GPS_PROVIDER);
+        if (gpsLocation != null) {
+            //DEBUG: Logging.info("acc: "+headingManager.getAccuracy());
+            final Float bearing = (gpsLocation.hasBearing() && gpsLocation.getBearing() != 0.0f)?gpsLocation.getBearing():null;
+
+            if (null != bearing) {
+                //ALIBI: prefer bearing if it's not garbage, because heading almost certainly is.
+                if (gpsLocation.hasAccuracy() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+                    if (gpsLocation.getBearingAccuracyDegrees() < MIN_BEARING_UPDATE_ACCURACY) {
+                        return gpsLocation.getBearing();
+                    }
+                } else {
+                    Logging.warn("have GPS location but no headingManager or accuracy");
+                    return bearing;
+                }
+            }
+            //ALIBI: heading is too often completely wrong. This is here for debugging only unless things improve.
+            if (null != headingManager && BuildConfig.DEBUG && headingManager.getAccuracy() >= 3.0) {
+                // if the fusion of accelerometer and magnetic compass claims it doesn't suck (although it probably still does)
+                return headingManager.getHeading(gpsLocation);
+            }
+        }
+        return null;
     }
 
     public static LatLng getCenter( final Context context, final LatLng priorityCenter,
@@ -534,16 +575,25 @@ public final class MappingFragment extends Fragment {
         @Override
         public void run() {
             final View view = getView();
-            final SharedPreferences prefs = getActivity() != null?getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
+            final Activity a = getActivity();
+            final SharedPreferences prefs = a != null?a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0):null;
             // make sure the app isn't trying to finish
             if ( ! finishing.get() ) {
                 final Location location = ListFragment.lameStatic.location;
                 if ( location != null ) {
                     if ( state.locked ) {
                         mapView.getMapAsync(googleMap -> {
-                            // MainActivity.info( "mapping center location: " + location );
+                            // Logging.info( "mapping center location: " + location );
                             final LatLng locLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                            final CameraUpdate centerUpdate = CameraUpdateFactory.newLatLng(locLatLng);
+                            float currentZoom = googleMap.getCameraPosition().zoom;
+                            Float cameraBearing = null;
+                            if (null != prefs && prefs.getBoolean(PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false)) {
+                                cameraBearing = getBearing(a);
+                            }
+                            final CameraUpdate centerUpdate = (state.firstMove || cameraBearing == null) ?
+                                    CameraUpdateFactory.newLatLng(locLatLng) :
+                                    CameraUpdateFactory.newCameraPosition(
+                                        new CameraPosition.Builder().bearing(cameraBearing).zoom(currentZoom).target(locLatLng).build());
                             if (state.firstMove) {
                                 googleMap.moveCamera(centerUpdate);
                                 state.firstMove = false;
@@ -619,9 +669,29 @@ public final class MappingFragment extends Fragment {
                     tv = view.findViewById(R.id.stats_wifi);
                     tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newWifi) );
                     tv = view.findViewById( R.id.stats_cell );
-                    tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
+                    tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newCells)  );
                     tv = view.findViewById( R.id.stats_bt );
-                    tv.setText( ""+UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
+                    tv.setText( UINumberFormat.counterFormat(ListFragment.lameStatic.newBt)  );
+                    tv = view.findViewById(R.id.heading);
+                    final Location gpsLocation = safelyGetLast(getContext(), LocationManager.GPS_PROVIDER);
+                    if (BuildConfig.DEBUG) {
+                        tv.setText(String.format("heading: %3.2f", ((headingManager != null) ? headingManager.getHeading(gpsLocation) : -1f)));
+                        if (null != ListFragment.lameStatic.location) {
+                            tv = view.findViewById(R.id.bearing);
+                            if (gpsLocation.hasAccuracy() && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)) {
+                                tv.setText(String.format("bearing: %3.2f +/- %3.2f", ListFragment.lameStatic.location.getBearing(), ListFragment.lameStatic.location.getBearingAccuracyDegrees()));
+                            } else {
+                                tv.setText(String.format("bearing: %3.2f", ListFragment.lameStatic.location.getBearing()));
+                            }
+                        }
+                        tv = view.findViewById(R.id.selectedbh);
+                        tv.setText(String.format("chose: %3.2f", getBearing(getContext())));
+                    } else {
+                        final View v =view.findViewById(R.id.debug);
+                        if (null != v) {
+                            v.setVisibility(GONE);
+                        }
+                    }
 
                     tv = view.findViewById( R.id.stats_dbnets );
                     tv.setText(UINumberFormat.counterFormat(ListFragment.lameStatic.dbNets));
@@ -692,40 +762,46 @@ public final class MappingFragment extends Fragment {
         super.onPause();
         try {
             mapView.onPause();
-        }
-        catch (final NullPointerException ex) {
+        } catch (final NullPointerException ex) {
             Logging.error("npe on mapview pause: " + ex, ex);
         }
         if (mapRender != null) {
             // save memory
             mapRender.clear();
         }
+        if (null != headingManager) {
+                headingManager.stopSensor();
+        }
     }
 
     @Override
     public void onResume() {
         Logging.info( "MAP: onResume" );
+        super.onResume();
         if (mapRender != null) {
             mapRender.onResume();
         }
-        if (null != mapView) {
-            //refresh tiles on resume
-            mapView.postInvalidate();
-        }
-
         if (null != tileOverlay) {
             //DEBUG: MainActivity.info("clearing tile overlay cache");
-            tileOverlay.clearTileCache();
+            if (null != mapView) {
+                //refresh tiles on resume
+                mapView.postInvalidate();
+            }
         }
-        super.onResume();
 
         setupTimer();
-        getActivity().setTitle(R.string.mapping_app_name);
+        final Activity a = getActivity();
+        if (null != a) {
+            a.setTitle(R.string.mapping_app_name);
+        }
+        if (null != headingManager) {
+            headingManager.startSensor();
+        }
         mapView.onResume();
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
         Logging.info( "MAP: onSaveInstanceState" );
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
@@ -898,12 +974,7 @@ public final class MappingFragment extends Fragment {
 
                     String name = showTraffic ? getString(R.string.menu_traffic_off) : getString(R.string.menu_traffic_on);
                     item.setTitle(name);
-                    mapView.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(@NonNull final GoogleMap googleMap) {
-                            googleMap.setTrafficEnabled(showTraffic);
-                        }
-                    });
+                    mapView.getMapAsync(googleMap -> googleMap.setTrafficEnabled(showTraffic));
                     return true;
                 }
                 case MENU_FILTER: {
@@ -912,36 +983,33 @@ public final class MappingFragment extends Fragment {
                     return true;
                 }
                 case MENU_MAP_TYPE: {
-                    mapView.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(@NonNull final GoogleMap googleMap) {
-                            int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
-                            final Activity a = getActivity();
-                            switch (newMapType) {
-                                case MAP_TYPE_NORMAL:
-                                    newMapType = MAP_TYPE_SATELLITE;
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
-                                    break;
-                                case MAP_TYPE_SATELLITE:
-                                    newMapType = MAP_TYPE_HYBRID;
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
-                                    break;
-                                case MAP_TYPE_HYBRID:
-                                    newMapType = MAP_TYPE_TERRAIN;
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
-                                    break;
-                                case MAP_TYPE_TERRAIN:
-                                    newMapType = MAP_TYPE_NORMAL;
-                                    WiGLEToast.showOverActivity(a, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
-                                    break;
-                                default:
-                                    Logging.error("unhandled mapType: " + newMapType);
-                            }
-                            Editor edit = prefs.edit();
-                            edit.putInt(PreferenceKeys.PREF_MAP_TYPE, newMapType);
-                            edit.apply();
-                            googleMap.setMapType(newMapType);
+                    mapView.getMapAsync(googleMap -> {
+                        int newMapType = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, MAP_TYPE_NORMAL);
+                        final Activity a1 = getActivity();
+                        switch (newMapType) {
+                            case MAP_TYPE_NORMAL:
+                                newMapType = MAP_TYPE_SATELLITE;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_satellite), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_SATELLITE:
+                                newMapType = MAP_TYPE_HYBRID;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_hybrid), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_HYBRID:
+                                newMapType = MAP_TYPE_TERRAIN;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_terrain), Toast.LENGTH_SHORT);
+                                break;
+                            case MAP_TYPE_TERRAIN:
+                                newMapType = MAP_TYPE_NORMAL;
+                                WiGLEToast.showOverActivity(a1, R.string.tab_map, getString(R.string.map_toast_normal), Toast.LENGTH_SHORT);
+                                break;
+                            default:
+                                Logging.error("unhandled mapType: " + newMapType);
                         }
+                        Editor edit = prefs.edit();
+                        edit.putInt(PreferenceKeys.PREF_MAP_TYPE, newMapType);
+                        edit.apply();
+                        googleMap.setMapType(newMapType);
                     });
                 }
                 case MENU_WAKELOCK: {
@@ -961,13 +1029,15 @@ public final class MappingFragment extends Fragment {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
 
-            final String prefix = getArguments().getString(DIALOG_PREFIX);
+            Bundle args = getArguments();
+            final String prefix = null != args? args.getString(DIALOG_PREFIX):"";
 
             final Dialog dialog = getDialog();
             final Activity activity = getActivity();
             final View view = inflater.inflate(R.layout.filterdialog, container);
-            dialog.setTitle( "SSID Filter" );
-
+            if (null != dialog) {
+                dialog.setTitle(R.string.ssid_filter_head);
+            }
             Logging.info("make new dialog. prefix: " + prefix);
             if (null != activity) {
                 final SharedPreferences prefs = activity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
@@ -1001,7 +1071,9 @@ public final class MappingFragment extends Fragment {
                         editor.apply();
                         MainActivity.reclusterMap();
 
-                        dialog.dismiss();
+                        if (null != dialog) {
+                            dialog.dismiss();
+                        }
                     } catch (Exception ex) {
                         // guess it wasn't there anyways
                         Logging.info("exception dismissing filter dialog: " + ex);
@@ -1025,7 +1097,9 @@ public final class MappingFragment extends Fragment {
                         PrefsBackedCheckbox.prefSetCheckBox(activity, view, R.id.enabled,
                                 prefix + PreferenceKeys.PREF_MAPF_ENABLED, true, prefs);
 
-                        dialog.dismiss();
+                        if (null != dialog) {
+                            dialog.dismiss();
+                        }
                     } catch (Exception ex) {
                         // guess it wasn't there anyways
                         Logging.info("exception dismissing filter dialog: " + ex);

@@ -252,6 +252,11 @@
         android:layout_height="wrap_content"
         android:text="@string/enable_map_theme" />
 
+    <CheckBox android:id="@+id/enable_map_bearing"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/enable_map_bearing" />
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

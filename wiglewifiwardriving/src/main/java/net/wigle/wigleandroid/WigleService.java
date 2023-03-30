@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -200,11 +199,7 @@ public final class WigleService extends Service {
                 String wrappedDistString = "";
                 SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
-                    Locale locale = null;
-                    Configuration sysConfig = getResources().getConfiguration();
-                    if (null != sysConfig) {
-                        locale = sysConfig.locale;
-                    }
+                    Locale locale = getResources().getConfiguration().getLocales().get(0);
                     if (null == locale) {
                         locale = Locale.US;
                     }
@@ -389,7 +384,7 @@ public final class WigleService extends Service {
         return null;
     }
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+    @RequiresApi(Build.VERSION_CODES.S)
     private Notification getNotification31(final String title, final Context context, final String text,
                                            final long newWiFi, final long runTotalWiFi,
                                            final long newCell, final long runTotalCell,
@@ -426,9 +421,6 @@ public final class WigleService extends Service {
 
         final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(contentIntent)
-        //.setNumber((int) ListFragment.lameStatic.newNets)
-        //.setLargeIcon(largeIcon)
-        //.setColorized(true)
                 .setTicker(title)
                 .setContentTitle(title)
                 .setContentText(text)

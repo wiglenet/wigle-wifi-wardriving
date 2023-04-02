@@ -196,6 +196,7 @@ public final class WigleService extends Service {
                 String text = context.getString(R.string.list_waiting_gps);
 
                 String distString = "";
+                String distStringShort = "";
                 String wrappedDistString = "";
                 SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
@@ -203,11 +204,14 @@ public final class WigleService extends Service {
                     if (null == locale) {
                         locale = Locale.US;
                     }
-                    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-                    numberFormat.setMaximumFractionDigits(1);
+                    NumberFormat longDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    longDistNumberFormat.setMaximumFractionDigits(2);
+                    NumberFormat shortDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    shortDistNumberFormat.setMaximumFractionDigits(0);
 
                     final float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
-                    distString = UINumberFormat.metersToString(prefs, numberFormat, this, dist, true);
+                    distString = UINumberFormat.metersToString(prefs, longDistNumberFormat, this, dist, true);
+                    distStringShort = UINumberFormat.metersToShortString(prefs, shortDistNumberFormat, this, dist);
                     wrappedDistString = " ("+ distString + ")";
                 }
                 if (dbNets > 0) {
@@ -248,7 +252,7 @@ public final class WigleService extends Service {
                                 ListFragment.lameStatic.newWifi, (ListFragment.lameStatic.runNets-ListFragment.lameStatic.runCells),
                                 ListFragment.lameStatic.newCells, ListFragment.lameStatic.runCells,
                                 ListFragment.lameStatic.newBt, ListFragment.lameStatic.runBt,
-                                distString, dbNets,
+                                distString, distStringShort, dbNets,
                                 MainActivity.isScanning(context)?context.getString(R.string.list_scanning_on):context.getString(R.string.list_scanning_off),
                                 when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else if (SDK_INT >= Build.VERSION_CODES.O) {
@@ -389,8 +393,8 @@ public final class WigleService extends Service {
                                            final long newWiFi, final long runTotalWiFi,
                                            final long newCell, final long runTotalCell,
                                            final long newBt, final long runTotalBt,
-                                           final String distString, final long dbNets,
-                                           final String status,
+                                           final String distString, final String distStringShort,
+                                           final long dbNets, final String status,
                                            final long when, final PendingIntent contentIntent,
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
                                            final PendingIntent uploadIntent) {
@@ -417,7 +421,7 @@ public final class WigleService extends Service {
         smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
         smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
         smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
-        smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distString);
+        smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
 
         final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
         builder.setContentIntent(contentIntent)

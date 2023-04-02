@@ -132,6 +132,7 @@
     <string name="dash_db_nets">Adatbázis-hálózatok: %1$s</string>
     <string name="dash_db_locs">Adatbázis-helyek: %1$s</string>
     <string name="dash_short_loc">Hely: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mé</string>
     <string name="miles">mérföld</string>

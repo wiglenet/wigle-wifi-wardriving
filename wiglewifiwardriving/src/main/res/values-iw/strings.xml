@@ -132,6 +132,7 @@
     <string name="dash_db_nets">%1$s :\u200fDB\u200f נטס</string>
     <string name="dash_db_locs">%1$s :\u2066DB\u2069 מיקומים</string>
     <string name="dash_short_loc">לוק: %1$s</string>
+    <string name="Mm_short">מ"מ</string>
     <string name="km_short">ק&quot;מ</string>
     <string name="mi_short">מי</string>
     <string name="miles">מייל</string>

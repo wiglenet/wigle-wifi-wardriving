@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="162dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:id="@+id/notif_lg">
     <TextView
@@ -33,8 +34,6 @@
                 android:layout_width="26dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_wifi_notif"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
                 android:paddingTop="3dp"
                 android:paddingBottom="3dp"/>
             <TextView
@@ -43,13 +42,18 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
                 android:textStyle="bold"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
-                android:paddingVertical="2dp" />
+                android:paddingTop="1dp"
+                android:paddingBottom="2dp" />
             <TextView
                 android:id="@+id/wifi_total_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
                 android:paddingVertical="2dp"/>
         </LinearLayout>
@@ -65,22 +69,25 @@
             <ImageView
                 android:layout_width="26dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_cell_notif"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"/>
+                android:src="@drawable/ic_cell_notif"/>
             <TextView
                 android:id="@+id/cell_new_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
                 android:textStyle="bold"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
-                android:paddingVertical="2dp" />
+                android:paddingTop="1dp"
+                android:paddingBottom="2dp" />
             <TextView
                 android:id="@+id/cell_total_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
                 android:paddingVertical="2dp" />
         </LinearLayout>
@@ -92,26 +99,29 @@
             android:gravity="center"
             android:paddingStart="1dp"
             android:paddingEnd="1dp"
-            android:background="@drawable/notification_border">>
+            android:background="@drawable/notification_border">
             <ImageView
-                android:layout_width="26dp"
+                android:layout_width="28dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_bt_notif"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"/>
+                android:src="@drawable/ic_bt_notif"/>
             <TextView
                 android:id="@+id/bt_new_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
                 android:textStyle="bold"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
-                android:paddingVertical="2dp"/>
+                android:paddingTop="1dp"
+                android:paddingBottom="2dp"/>
             <TextView
                 android:id="@+id/bt_total_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="4dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textSize="16sp"
                 android:paddingVertical="2dp"/>
         </LinearLayout>
@@ -134,11 +144,11 @@
             android:layout_marginEnd="10dp"
             android:background="@drawable/notification_border">
             <ImageView
-                android:layout_width="16dp"
+                android:layout_width="17dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_db_notif"
                 android:layout_marginTop="2dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="5dp"
                 android:paddingTop="1dp"
                 android:paddingBottom="1dp"/>
@@ -146,8 +156,10 @@
                 android:id="@+id/db_total_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="11dp"
                 android:paddingHorizontal="4dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textStyle="bold"
                 android:textSize="14sp"/>
         </LinearLayout>
@@ -160,19 +172,21 @@
             android:gravity="left"
             android:background="@drawable/notification_border">
             <ImageView
-                android:layout_width="26dp"
+                android:layout_width="22dp"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_dist_notif"
                 android:layout_marginTop="4dp"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="12dp"
                 android:layout_marginEnd="5dp"
                 android:paddingBottom="1dp"/>
             <TextView
                 android:id="@+id/dist_notif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:paddingHorizontal="4dp"
+                android:layout_marginTop="11dp"
+                android:paddingHorizontal="2dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"
                 android:textStyle="bold"
                 android:textSize="14sp"/>
         </LinearLayout>

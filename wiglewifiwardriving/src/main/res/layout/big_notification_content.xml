@@ -149,7 +149,7 @@
                 android:src="@drawable/ic_db_notif"
                 android:layout_marginTop="2dp"
                 android:layout_marginStart="12dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="4dp"
                 android:paddingTop="1dp"
                 android:paddingBottom="1dp"/>
             <TextView
@@ -177,7 +177,7 @@
                 android:src="@drawable/ic_dist_notif"
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="12dp"
-                android:layout_marginEnd="5dp"
+                android:layout_marginEnd="4dp"
                 android:paddingBottom="1dp"/>
             <TextView
                 android:id="@+id/dist_notif"

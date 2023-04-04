@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="24dp"
+    android:layout_height="50dp"
     android:orientation="horizontal"
-    android:id="@+id/notif_sm"
-    android:paddingHorizontal="20dp">
+    android:id="@+id/notif_lg">
     <TextView
         android:id="@+id/notif_title"
-        android:layout_height="0dp"
+        android:text="@string/app_name"
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:paddingTop="1dp"
+        android:textSize="17sp"
+        style="@style/TextAppearance.Compat.Notification.Title"
+        android:textColor="#000"/>
     <LinearLayout
         android:id="@+id/notif_nets"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="4"
-        android:paddingVertical="0dp"
+        android:paddingTop="2dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/notif_title">
         <LinearLayout
             android:layout_width="0dp"
@@ -26,7 +30,7 @@
             android:gravity="left">
             <ImageView
                 android:layout_width="13dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ic_wifi_notif"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
@@ -34,11 +38,12 @@
                 android:paddingBottom="3dp"/>
             <TextView
                 android:id="@+id/wifi_new_notif_sm"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:paddingVertical="1dp"
-                style="@style/TextAppearance.Compat.Notification.Line2"/>
+                android:paddingVertical="2dp"
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"/>
         </LinearLayout>
 
         <LinearLayout
@@ -55,11 +60,12 @@
                 android:layout_marginEnd="1dp"/>
             <TextView
                 android:id="@+id/cell_new_notif_sm"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:paddingVertical="2dp"
-                style="@style/TextAppearance.Compat.Notification.Line2" />
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -75,11 +81,12 @@
                 android:layout_marginEnd="0dp"/>
             <TextView
                 android:id="@+id/bt_new_notif_sm"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:paddingVertical="2dp"
-                style="@style/TextAppearance.Compat.Notification.Line2" />
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -100,7 +107,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:paddingVertical="2dp"
-                style="@style/TextAppearance.Compat.Notification.Line2"/>
+                style="@style/TextAppearance.Compat.Notification.Line2"
+                android:textColor="#000"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

@@ -41,7 +41,6 @@ public final class WigleService extends Service {
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
-    private RemoteViews bigRemoteViews;
     private RemoteViews smallRemoteViews;
 
     // Binder given to clients
@@ -256,7 +255,10 @@ public final class WigleService extends Service {
                                 MainActivity.isScanning(context)?context.getString(R.string.list_scanning_on):context.getString(R.string.list_scanning_off),
                                 when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     } else if (SDK_INT >= Build.VERSION_CODES.O) {
-                        notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                        notification = getNotification26(title, context, text, ListFragment.lameStatic.newWifi,
+                                ListFragment.lameStatic.newCells, ListFragment.lameStatic.newBt,
+                                distStringShort, when, contentIntent, pauseIntent,
+                                scanIntent, uploadIntent);
                     } else {
                         notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     }
@@ -330,6 +332,9 @@ public final class WigleService extends Service {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private Notification getNotification26(final String title, final Context context, final String text,
+                                           final long newWiFi,
+                                           final long newCell,
+                                           final long newBt, final String distStringShort,
                                            final long when, final PendingIntent contentIntent,
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
                                            final PendingIntent uploadIntent) {
@@ -344,21 +349,28 @@ public final class WigleService extends Service {
             channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
 
+            this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+            smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
+            smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
+            smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
+            smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
+
             final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
             builder.setNumber((int) ListFragment.lameStatic.newNets);
             builder.setTicker(title);
             builder.setContentTitle(title);
+            builder.setTicker(title);
+            builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setLargeIcon(largeIcon);
             builder.setSmallIcon(R.drawable.ic_w_logo_simple);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
             builder.setVisibility(VISIBILITY_PUBLIC);
+            builder.setCustomContentView(smallRemoteViews);
+            builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setColorized(true);
-            //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
-            // WiGLE Blue: builder.setColor(6005486);
             if (SDK_INT < 29) {
                 //Classic charcoal:
                 builder.setColor(1973790);
@@ -407,7 +419,7 @@ public final class WigleService extends Service {
         channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);
 
-        this.bigRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.big_notification_content);
+        RemoteViews bigRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.big_notification_content);
         bigRemoteViews.setTextViewText(R.id.wifi_new_notif, UINumberFormat.counterFormat(newWiFi));
         bigRemoteViews.setTextViewText(R.id.wifi_total_notif, UINumberFormat.counterFormat(runTotalWiFi));
         bigRemoteViews.setTextViewText(R.id.cell_new_notif, UINumberFormat.counterFormat(newCell));

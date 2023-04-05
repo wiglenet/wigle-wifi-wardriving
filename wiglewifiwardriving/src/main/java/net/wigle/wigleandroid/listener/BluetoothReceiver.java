@@ -316,6 +316,8 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                         bluetoothLeScanner.stopScan(scanCallback);
                     } catch (SecurityException se) {
                         Logging.error("No permission for bluetoothAdapter.stopScan", se);
+                    } catch (IllegalArgumentException iae) {
+                        Logging.error("Illegal arg. for bluetoothAdapter.stopScan", iae);
                     }
 
                 } else {

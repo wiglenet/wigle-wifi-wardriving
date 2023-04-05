@@ -247,10 +247,13 @@ public class UploadsFragment extends Fragment {
 
         if (response != null && listAdapter != null && lockListAdapter.compareAndSet(false, true)) {
             try {
-                final String queueDepthTitle = getString(R.string.queue_depth,
-                        ""+response.getProcessingQueueDepth(),
-                        ""+response.getTrilaterationQueueDepth(), ""+response.getGeoQueueDepth());
-                queueDepth.setText(queueDepthTitle);
+                final Activity a = getActivity();
+                if (null != response && null != a) {
+                    final String queueDepthTitle = a.getResources().getString(R.string.queue_depth,
+                            "" + response.getProcessingQueueDepth(),
+                            "" + response.getTrilaterationQueueDepth(), "" + response.getGeoQueueDepth());
+                    queueDepth.setText(queueDepthTitle);
+                }
                 //listAdapter.clear(); //TODO: should we clear on update and scroll up to keep this from getting crazy?
                 for (final Upload result : response.getResults()) {
                     listAdapter.add(result);

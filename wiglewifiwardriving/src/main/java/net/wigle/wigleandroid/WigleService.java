@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Icon;
@@ -199,7 +200,11 @@ public final class WigleService extends Service {
                 String wrappedDistString = "";
                 SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
-                    Locale locale = getResources().getConfiguration().getLocales().get(0);
+                    final Configuration conf = getResources().getConfiguration();
+                    Locale locale = null;
+                    if (null != conf && null != conf.getLocales()) {
+                        locale = conf.getLocales().get(0);
+                    }
                     if (null == locale) {
                         locale = Locale.US;
                     }

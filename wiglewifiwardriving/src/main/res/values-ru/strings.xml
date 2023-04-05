@@ -131,6 +131,7 @@
     <string name="dash_db_nets">Сетей в БД: %1$s</string>
     <string name="dash_db_locs">Местоположений в БД: %1$s</string>
     <string name="dash_short_loc">Спутники: %1$s</string>
+    <string name="Mm_short">мм</string>
     <string name="km_short">км</string>
     <string name="mi_short">миль</string>
     <string name="miles">мили</string>

@@ -88,6 +88,7 @@ public class WifiReceiver extends BroadcastReceiver {
     private final long constructionTime = System.currentTimeMillis();
     private long previousTalkTime = System.currentTimeMillis();
     private final Set<String> runNetworks = new HashSet<>();
+    private final Set<String> runCells = new HashSet<>();
     private long prevNewNetCount;
     private long prevScanPeriod;
     private boolean scanInFlight = false;
@@ -374,6 +375,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         // set the statics for the map
         ListFragment.lameStatic.runNets = runNetworks.size();
+        ListFragment.lameStatic.runCells = runCells.size();
         ListFragment.lameStatic.newNets = newNetCount;
         ListFragment.lameStatic.newWifi = newWifiCount;
         ListFragment.lameStatic.newCells = newCellCount;
@@ -666,6 +668,7 @@ public class WifiReceiver extends BroadcastReceiver {
             final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
 
             final boolean newForRun = runNetworks.add( bssid );
+            runCells.add( bssid );
 
             network = networkCache.get( bssid );
             if ( network == null ) {
@@ -1007,6 +1010,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final ConcurrentLinkedHashMap<String,Network> networkCache = MainActivity.getNetworkCache();
         final boolean newForRun = runNetworks.add( bssid );
+        runCells.add( bssid );
 
         Network network = networkCache.get( bssid );
 

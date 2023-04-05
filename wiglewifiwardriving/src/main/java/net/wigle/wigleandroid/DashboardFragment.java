@@ -58,10 +58,10 @@ public class DashboardFragment extends Fragment {
         Logging.error("Failed to set language - null activity in dash onCreate.");
     }
     finishing = new AtomicBoolean( false );
-    Configuration sysConfig = getResources().getConfiguration();
+    final Configuration conf = getResources().getConfiguration();
     Locale locale = null;
-    if (null != sysConfig) {
-        locale = sysConfig.locale;
+    if (null != conf && null != conf.getLocales()) {
+        locale = conf.getLocales().get(0);
     }
     if (null == locale) {
         locale = Locale.US;

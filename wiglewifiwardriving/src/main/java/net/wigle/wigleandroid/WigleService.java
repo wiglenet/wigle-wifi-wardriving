@@ -15,6 +15,7 @@ import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -28,6 +29,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.app.Notification.VISIBILITY_PUBLIC;
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
@@ -40,8 +42,11 @@ public final class WigleService extends Service {
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
+    private RemoteViews smallRemoteViews;
+
     // Binder given to clients
     private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
+    private final NumberFormat countFormat = NumberFormat.getIntegerInstance();
 
     private class GuardThread extends Thread {
         GuardThread() {
@@ -191,21 +196,27 @@ public final class WigleService extends Service {
                 String text = context.getString(R.string.list_waiting_gps);
 
                 String distString = "";
+                String distStringShort = "";
+                String wrappedDistString = "";
                 SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
+                    final Configuration conf = getResources().getConfiguration();
                     Locale locale = null;
-                    Configuration sysConfig = getResources().getConfiguration();
-                    if (null != sysConfig) {
-                        locale = sysConfig.locale;
+                    if (null != conf && null != conf.getLocales()) {
+                        locale = conf.getLocales().get(0);
                     }
                     if (null == locale) {
                         locale = Locale.US;
                     }
-                    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-                    numberFormat.setMaximumFractionDigits(1);
+                    NumberFormat longDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    longDistNumberFormat.setMaximumFractionDigits(2);
+                    NumberFormat shortDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    shortDistNumberFormat.setMaximumFractionDigits(0);
 
                     final float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
-                    distString = " ("+UINumberFormat.metersToString(prefs, numberFormat, this, dist, true) + ")";
+                    distString = UINumberFormat.metersToString(prefs, longDistNumberFormat, this, dist, true);
+                    distStringShort = UINumberFormat.metersToShortString(prefs, shortDistNumberFormat, this, dist);
+                    wrappedDistString = " ("+ distString + ")";
                 }
                 if (dbNets > 0) {
                     long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
@@ -213,7 +224,7 @@ public final class WigleService extends Service {
                     text = context.getString(R.string.run) + ": " + runNets
                             + "  " + context.getString(R.string.new_word) + ": " + newNets
                             + "  " + context.getString(R.string.db) + ": " + dbNets
-                            + distString;
+                            + wrappedDistString;
                 }
                 if (!MainActivity.isScanning(context)) {
                     text = context.getString(R.string.list_scanning_off) + " " + text;
@@ -240,9 +251,19 @@ public final class WigleService extends Service {
                     uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
                     final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
-
-                    if (SDK_INT >= Build.VERSION_CODES.O) {
-                        notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                    if (SDK_INT >= 31) {
+                        notification = getNotification31(title, context, text,
+                                ListFragment.lameStatic.newWifi, (ListFragment.lameStatic.runNets-ListFragment.lameStatic.runCells),
+                                ListFragment.lameStatic.newCells, ListFragment.lameStatic.runCells,
+                                ListFragment.lameStatic.newBt, ListFragment.lameStatic.runBt,
+                                distString, distStringShort, dbNets,
+                                MainActivity.isScanning(context)?context.getString(R.string.list_scanning_on):context.getString(R.string.list_scanning_off),
+                                when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                    } else if (SDK_INT >= Build.VERSION_CODES.O) {
+                        notification = getNotification26(title, context, text, ListFragment.lameStatic.newWifi,
+                                ListFragment.lameStatic.newCells, ListFragment.lameStatic.newBt,
+                                distStringShort, when, contentIntent, pauseIntent,
+                                scanIntent, uploadIntent);
                     } else {
                         notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     }
@@ -295,11 +316,7 @@ public final class WigleService extends Service {
         builder.setContentText(text);
         builder.setWhen(when);
         builder.setLargeIcon(largeIcon);
-        if (SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-        } else {
-            builder.setSmallIcon(R.drawable.wiglewifi_small);
-        }
+        builder.setSmallIcon(R.drawable.wiglewifi_small);
         builder.setOngoing(true);
         builder.setCategory("SERVICE");
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
@@ -320,6 +337,9 @@ public final class WigleService extends Service {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private Notification getNotification26(final String title, final Context context, final String text,
+                                           final long newWiFi,
+                                           final long newCell,
+                                           final long newBt, final String distStringShort,
                                            final long when, final PendingIntent contentIntent,
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
                                            final PendingIntent uploadIntent) {
@@ -330,26 +350,32 @@ public final class WigleService extends Service {
             if (notificationManager == null) return null;
 
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                    title, NotificationManager.IMPORTANCE_LOW);
+                    title, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
 
+            this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+            smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
+            smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
+            smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
+            smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
 
-            // copied from above
             final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
             builder.setNumber((int) ListFragment.lameStatic.newNets);
             builder.setTicker(title);
             builder.setContentTitle(title);
+            builder.setTicker(title);
+            builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setLargeIcon(largeIcon);
             builder.setSmallIcon(R.drawable.ic_w_logo_simple);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            builder.setVisibility(VISIBILITY_PUBLIC);
+            builder.setCustomContentView(smallRemoteViews);
+            builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setColorized(true);
-            //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
-            // WiGLE Blue: builder.setColor(6005486);
             if (SDK_INT < 29) {
                 //Classic charcoal:
                 builder.setColor(1973790);
@@ -378,4 +404,79 @@ public final class WigleService extends Service {
         }
         return null;
     }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private Notification getNotification31(final String title, final Context context, final String text,
+                                           final long newWiFi, final long runTotalWiFi,
+                                           final long newCell, final long runTotalCell,
+                                           final long newBt, final long runTotalBt,
+                                           final String distString, final String distStringShort,
+                                           final long dbNets, final String status,
+                                           final long when, final PendingIntent contentIntent,
+                                           final PendingIntent pauseIntent, final PendingIntent scanIntent,
+                                           final PendingIntent uploadIntent) {
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return null;
+
+        final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                title, NotificationManager.IMPORTANCE_HIGH);
+        channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
+        notificationManager.createNotificationChannel(channel);
+
+        RemoteViews bigRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.big_notification_content);
+        bigRemoteViews.setTextViewText(R.id.wifi_new_notif, UINumberFormat.counterFormat(newWiFi));
+        bigRemoteViews.setTextViewText(R.id.wifi_total_notif, UINumberFormat.counterFormat(runTotalWiFi));
+        bigRemoteViews.setTextViewText(R.id.cell_new_notif, UINumberFormat.counterFormat(newCell));
+        bigRemoteViews.setTextViewText(R.id.cell_total_notif, UINumberFormat.counterFormat(runTotalCell));
+        bigRemoteViews.setTextViewText(R.id.bt_new_notif, UINumberFormat.counterFormat(newBt));
+        bigRemoteViews.setTextViewText(R.id.bt_total_notif, UINumberFormat.counterFormat(runTotalBt));
+        bigRemoteViews.setTextViewText(R.id.dist_notif,distString);
+        bigRemoteViews.setTextViewText(R.id.db_total_notif, countFormat.format(dbNets));
+
+        this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+        smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
+        smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
+        smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
+        smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
+
+        final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
+        builder.setContentIntent(contentIntent)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setWhen(when)
+                .setSmallIcon(R.drawable.ic_w_logo_simple)
+                .setOngoing(true)
+                .setCategory("SERVICE")
+                .setSubText(status) //new
+                .setCustomBigContentView(bigRemoteViews) //new
+                .setCustomContentView(smallRemoteViews) //new
+                .setVisibility(VISIBILITY_PUBLIC)
+                .setOnlyAlertOnce(true) //ALIBI: prevent multiple badge notification
+                .setStyle(new Notification.DecoratedCustomViewStyle())
+                .setColorized(true);
+
+        if (MainActivity.isScanning(getApplicationContext())) {
+            Notification.Action pauseAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_pause),
+                    "Pause", pauseIntent)
+                    .build();
+            builder.addAction(pauseAction);
+        } else {
+            Notification.Action scanAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_play),
+                    "Scan", scanIntent)
+                    .build();
+            builder.addAction(scanAction);
+        }
+        Notification.Action ulAction = new Notification.Action.Builder(
+                Icon.createWithResource(this, android.R.drawable.ic_menu_upload),
+                "Upload", uploadIntent)
+                .build();
+        builder.addAction(ulAction);
+
+        return builder.build();
+    }
+
 }

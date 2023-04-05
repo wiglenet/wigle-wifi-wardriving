@@ -132,6 +132,7 @@
     <string name="dash_db_nets">Počet WiFi v DB: %1$s</string>
     <string name="dash_db_locs">Počet lokací v DB: %1$s</string>
     <string name="dash_short_loc">Pol: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">míle</string>

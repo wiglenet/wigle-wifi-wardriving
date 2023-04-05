@@ -131,6 +131,7 @@
     <string name="dash_db_nets">Redes da base de dados: %1$s</string>
     <string name="dash_db_locs">Localizações da base de dados: %1$s</string>
     <string name="dash_short_loc">Loc: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">milhas</string>

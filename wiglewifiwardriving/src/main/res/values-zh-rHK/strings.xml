@@ -132,6 +132,7 @@
     <string name="dash_db_nets">DB的籃網：%1$s</string>
     <string name="dash_db_locs">DB的位置：%1$s</string>
     <string name="dash_short_loc">LOC：%1$s</string>
+    <string name="Mm_short">兆米</string>
     <string name="km_short">公里</string>
     <string name="mi_short">MI</string>
     <string name="miles">英里</string>

@@ -2,14 +2,14 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+    android:background="#00FFFFFF">
 <LinearLayout
 	android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     >
-
     <TextView
         android:id="@+id/scan_throttle_help"
         android:layout_width="fill_parent"
@@ -21,7 +21,6 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:visibility="gone" />
-
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

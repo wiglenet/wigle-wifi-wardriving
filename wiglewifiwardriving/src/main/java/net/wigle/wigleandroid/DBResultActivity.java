@@ -40,6 +40,8 @@ import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.Logging;
+
 import org.json.JSONObject;
 
 public class DBResultActivity extends AppCompatActivity {
@@ -241,7 +243,11 @@ public class DBResultActivity extends AppCompatActivity {
                 mapRender.addItem(n);
             }
         }
-        mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+        try {
+            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+        } catch (IllegalStateException ise) {
+            Logging.error("Illegal state exception on map move: ",ise);
+        }
         resultList.clear();
     }
 

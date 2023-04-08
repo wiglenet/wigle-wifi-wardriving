@@ -42,6 +42,8 @@ public class HeadingManager implements SensorEventListener {
                     "\ud83d\udfe2", //green
              "?"));
 
+    public static final Boolean DEBUG = false;
+
     private HeadingManager() {}
 
     public HeadingManager(final Context c) {

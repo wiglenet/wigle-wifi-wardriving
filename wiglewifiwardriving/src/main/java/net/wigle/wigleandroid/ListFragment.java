@@ -210,7 +210,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
 
     private void setNetCountUI( final State state, final View view ) {
-        if (view == null) {
+        if (view == null || state == null) {
             return;
         }
 

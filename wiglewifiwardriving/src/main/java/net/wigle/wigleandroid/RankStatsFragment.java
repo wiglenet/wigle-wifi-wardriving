@@ -50,12 +50,12 @@ public class RankStatsFragment extends Fragment {
     private static final int MENU_RANK_SWAP = 202;
     private static final int MENU_USER_CENTRIC_SWAP = 203;
 
-    private static final int ROW_COUNT = 100;
+    private static final int DEFAULT_PAGE_ROW_COUNT = 100;
 
     private AtomicBoolean finishing;
     private NumberFormat numberFormat;
     private RankListAdapter listAdapter;
-    private AtomicBoolean monthRanking;
+    private AtomicBoolean monthRankingMode;
     private final AtomicBoolean busy = new AtomicBoolean(false);
     private final AtomicBoolean isRefreshing = new AtomicBoolean(false);
     private AtomicBoolean userCentric;
@@ -85,7 +85,7 @@ public class RankStatsFragment extends Fragment {
         }
 
         finishing = new AtomicBoolean(false);
-        monthRanking = new AtomicBoolean(false);
+        monthRankingMode = new AtomicBoolean(false);
         userCentric = new AtomicBoolean(true);
         if (null != numberFormat && numberFormat instanceof DecimalFormat) {
             numberFormat.setMinimumFractionDigits(0);
@@ -163,23 +163,25 @@ public class RankStatsFragment extends Fragment {
                 Logging.error("downloadRanks: fragmentActivity is null");
                 return;
             }
-            final boolean doMonthRanking = monthRanking.get();
+            final boolean doMonthRanking = monthRankingMode.get();
             final String sort = doMonthRanking ? "monthcount" : "discovered";
             long pageStart = 0;
-            long pageEnd = ROW_COUNT;
+            long pageEnd = DEFAULT_PAGE_ROW_COUNT;
             long selected = 0;
             Long userRank;
             if (userCentric.get()) {
                 final String userRankKey = doMonthRanking ? ListFragment.PREF_MONTH_RANK : ListFragment.PREF_RANK;
                 final SharedPreferences prefs = fragmentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 userRank = prefs.getLong(userRankKey, 0);
-                myPage = (userRank / ROW_COUNT);
+                myPage = (userRank / DEFAULT_PAGE_ROW_COUNT);
                 if (first) {
+                    //ALIBI: load an initial "megapage" from zero to the user's rank (to nearest DEFAULT_PAGE_ROW_COUNT)
                     pageStart = 0;
                     currentPage = myPage;
+                    pageEnd = (currentPage + 1 * DEFAULT_PAGE_ROW_COUNT);
                 } else {
-                    pageStart = currentPage * ROW_COUNT;
-                    pageEnd = pageStart+ROW_COUNT;
+                    pageStart = currentPage * DEFAULT_PAGE_ROW_COUNT;
+                    pageEnd = pageStart+ DEFAULT_PAGE_ROW_COUNT;
                 }
                 selected = (userRank != null && userRank > 0) ? Math.max(userRank -5, 5) : 45;
             } else {
@@ -246,14 +248,14 @@ public class RankStatsFragment extends Fragment {
 
     public void handleRanks(final RankResponse ranks, final boolean first) {
         if (ranks != null && listAdapter != null) {
-            final boolean doMonthRanking = monthRanking.get();
+            final boolean doMonthRanking = monthRankingMode.get();
             typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
             if (isRefreshing.compareAndSet(true, false) || first) {
                 listAdapter.clear();
                 final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
                 swipeContainer.setRefreshing(false);
             }
-            listAdapter.setMonthRanking(monthRanking.get());
+            listAdapter.setMonthRanking(monthRankingMode.get());
             for (final RankResponse.RankResponseRow result : ranks.getResults()) {
                 final RankUser rankUser = new RankUser(result, doMonthRanking);
                 listAdapter.add(rankUser);
@@ -336,7 +338,7 @@ public class RankStatsFragment extends Fragment {
     }
 
     private String getRankSwapString() {
-        return getString(monthRanking.get() ? R.string.rank_all_time : R.string.rank_month);
+        return getString(monthRankingMode.get() ? R.string.rank_all_time : R.string.rank_month);
     }
 
     private String getUserCentricSwapString() {
@@ -358,7 +360,7 @@ public class RankStatsFragment extends Fragment {
                     MenuUtil.selectStatsSubmenuItem(navigationView, main, R.id.nav_site_stats);
                     return true;
                 case MENU_RANK_SWAP:
-                    monthRanking.set(!monthRanking.get());
+                    monthRankingMode.set(!monthRankingMode.get());
                     item.setTitle(getRankSwapString());
                     downloadRanks(true);
                     return true;

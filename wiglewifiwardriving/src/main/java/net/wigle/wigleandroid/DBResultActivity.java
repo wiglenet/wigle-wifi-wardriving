@@ -235,12 +235,14 @@ public class DBResultActivity extends AppCompatActivity {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         for (WiFiSearchResponse.WiFiNetwork net : searchResponse.getResults()) {
-            final Network n = WiFiSearchResponse.asNetwork(net);
-            listAdapter.add(n);
-            builder.include(n.getPosition());
+            if (null != net) {
+                final Network n = WiFiSearchResponse.asNetwork(net);
+                listAdapter.add(n);
+                builder.include(n.getPosition());
 
-            if (n.getLatLng() != null && mapRender != null) {
-                mapRender.addItem(n);
+                if (n.getLatLng() != null && mapRender != null) {
+                    mapRender.addItem(n);
+                }
             }
         }
         try {

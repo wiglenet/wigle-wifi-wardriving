@@ -156,7 +156,9 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             pp.show();
             final Button taskCancelButton = context.findViewById(R.id.inline_status_cancel);
             taskCancelButton.setOnClickListener(v -> {
-                latestTask.setInterrupted();
+                if (null != latestTask) {
+                    latestTask.setInterrupted();
+                }
                 clearProgressDialog();
                 updateTransferringState(false, uploadButton, importObservedButton);
             });

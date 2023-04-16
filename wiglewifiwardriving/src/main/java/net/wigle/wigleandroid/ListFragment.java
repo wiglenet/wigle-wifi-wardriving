@@ -756,27 +756,31 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void setupUploadButton( final View view ) {
         final Button button = view.findViewById( R.id.upload_button );
-
-        if (MainActivity.getMainActivity().isTransferring()) {
-            button.setEnabled(false);
-        }
-
-        button.setOnClickListener(view1 -> {
-            final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
-            if (main == null) {return;}
-            final FragmentActivity a = getActivity();
-            if (null != a) {
-                final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
-                final State state = MainActivity.getStaticState();
-
-                if (userConfirmed && null != state) {
-                    uploadFile();
-                } else {
-                    makeUploadDialog(main);
-                }
+        if (null != button) {
+            MainActivity m = MainActivity.getMainActivity();
+            if (null != m && m.isTransferring()) {
+                button.setEnabled(false);
             }
-        });
+
+            button.setOnClickListener(view1 -> {
+                final MainActivity main = MainActivity.getMainActivity(ListFragment.this);
+                if (main == null) {
+                    return;
+                }
+                final FragmentActivity a = getActivity();
+                if (null != a) {
+                    final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
+                    final State state = MainActivity.getStaticState();
+
+                    if (userConfirmed && null != state) {
+                        uploadFile();
+                    } else {
+                        makeUploadDialog(main);
+                    }
+                }
+            });
+        }
     }
 
     public void makeUploadDialog(final MainActivity main) {

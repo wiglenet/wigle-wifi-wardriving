@@ -245,10 +245,12 @@ public class DBResultActivity extends AppCompatActivity {
                 }
             }
         }
-        try {
-            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
-        } catch (IllegalStateException ise) {
-            Logging.error("Illegal state exception on map move: ",ise);
+        if (!listAdapter.isEmpty()) {
+            try {
+                mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+            } catch (IllegalStateException ise) {
+                Logging.error("Illegal state exception on map move: ", ise);
+            }
         }
         resultList.clear();
     }

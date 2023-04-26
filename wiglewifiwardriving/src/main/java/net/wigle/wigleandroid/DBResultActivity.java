@@ -214,7 +214,9 @@ public class DBResultActivity extends AppCompatActivity {
                         for (Network n: resultList) {
                             listAdapter.add(n);
                             mapRender.addItem(n);
-                            builder.include(n.getPosition());
+                            final LatLng ll = n.getPosition();
+                            //noinspection ConstantConditions
+                            if (ll != null) builder.include(ll);
                         }
                         mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
                         resultList.clear();

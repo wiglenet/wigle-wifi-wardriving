@@ -214,6 +214,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         final Button importObservedButton = view.findViewById( R.id.import_observed_button );
         SharedPreferences prefs = null;
         Activity a = getActivity();
+        MainActivity m = MainActivity.getMainActivity();
         if (null != a) {
             prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         }
@@ -224,7 +225,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
         if (null == authname) {
             importObservedButton.setEnabled(false);
-        } else if (MainActivity.getMainActivity().isTransferring()) {
+        } else if (null != m &&  m.isTransferring()) {
                 importObservedButton.setEnabled(false);
         }
         importObservedButton.setOnClickListener(buttonView -> {

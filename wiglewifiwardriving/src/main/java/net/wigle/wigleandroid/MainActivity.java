@@ -805,7 +805,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     public static boolean isHighDefinition() {
         DisplayMetrics metrics = new DisplayMetrics();
-        MainActivity.getMainActivity().getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
+        final MainActivity main = MainActivity.getMainActivity();
+        if (main == null) return false;
+        main.getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
         int dpi = metrics.densityDpi;
         return dpi >= 240;
     }

@@ -1,11 +1,14 @@
-* 2.73 (4/22/2023)
+* 2.74 (05/02/2023)
+Various bug fixes including scroll paging, DBResult NPE
+
+* 2.73 (04/22/2023)
 Various bug fixes
 
-* 2.72 (4/10/2023)
+* 2.72 (04/10/2023)
 Updated notification design
 Various bug fixes
 
-* 2.68 - 2.71 (3/19/2023)
+* 2.68 - 2.71 (03/19/2023)
 Minimum SDK update to satisfy Google's new requirements
 GNSSStatus LocationManager changes
 Fixes for start-on-boot in Android 10+ (requires manual prefs config update)
@@ -19,7 +22,7 @@ Defaulting distance units
 Route points updates
 Optional map styling
 
-* 2.64 (2/27/2022)
+* 2.64 (02/27/2022)
 Fix Polish toast text (thanks olekstomek!)
 French updates (thanks k4nfr3!)
 GPX browser and clearer filenames

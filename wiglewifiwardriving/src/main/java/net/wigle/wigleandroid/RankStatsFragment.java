@@ -178,7 +178,7 @@ public class RankStatsFragment extends Fragment {
                     //ALIBI: load an initial "megapage" from zero to the user's rank (to nearest DEFAULT_PAGE_ROW_COUNT)
                     pageStart = 0;
                     currentPage = myPage;
-                    pageEnd = (currentPage + 1 * DEFAULT_PAGE_ROW_COUNT);
+                    pageEnd = ((currentPage + 1) * DEFAULT_PAGE_ROW_COUNT);
                 } else {
                     pageStart = currentPage * DEFAULT_PAGE_ROW_COUNT;
                     pageEnd = pageStart+ DEFAULT_PAGE_ROW_COUNT;

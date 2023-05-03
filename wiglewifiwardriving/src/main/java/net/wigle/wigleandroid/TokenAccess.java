@@ -115,9 +115,9 @@ public class TokenAccess {
         editor.putString(PreferenceKeys.PREF_TOKEN, Base64.encodeToString(cypherToken, Base64.DEFAULT));
         editor.putString(PreferenceKeys.PREF_TOKEN_IV, Base64.encodeToString(iv, Base64.DEFAULT));
         editor.putInt(PreferenceKeys.PREF_TOKEN_TAG_LENGTH, tagLength);
-        editor.apply();
-        Logging.info("[TOKEN] setApiTokenVersion2 set token length: " + apiToken.length());
-        return true;
+        final boolean success = editor.commit();
+        Logging.info("[TOKEN] setApiTokenVersion2 success: "+success+" setting token length: " + apiToken.length());
+        return success;
     }
 
     private static String getApiTokenVersion2(SharedPreferences prefs) throws KeyStoreException, IOException,

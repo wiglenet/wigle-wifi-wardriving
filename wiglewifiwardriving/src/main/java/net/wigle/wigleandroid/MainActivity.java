@@ -2449,7 +2449,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (null != mainActivity) {
             MainActivity.State s = mainActivity.getState();
             if (null != s) {
-                SharedPreferences prefs = mainActivity.getPreferences(MODE_PRIVATE);
+                SharedPreferences prefs = mainActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
                 if (null != prefs) {
                     s.apiManager = new WiGLEApiManager(prefs, mainActivity.getApplicationContext());
                     return;

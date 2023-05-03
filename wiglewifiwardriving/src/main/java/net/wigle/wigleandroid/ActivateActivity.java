@@ -135,6 +135,7 @@ public class ActivateActivity extends Activity {
                                 editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
                                 editor.apply();
                                 TokenAccess.setApiToken(prefs, tokens[2]);
+                                MainActivity.refreshApiManager();
                                 finish();
                             } else {
                                 Log.i(LOG_TAG, item.displayValue + " failed to match token pattern");

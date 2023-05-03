@@ -36,6 +36,7 @@ public class WiGLERegistrationInterface {
         editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
         editor.apply();
         TokenAccess.setApiToken(prefs, token);
+        MainActivity.refreshApiManager();
         activity.finish();
     }
 

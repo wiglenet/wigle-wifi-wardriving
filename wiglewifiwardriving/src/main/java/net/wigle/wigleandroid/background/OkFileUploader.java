@@ -1,15 +1,21 @@
 package net.wigle.wigleandroid.background;
 
+import android.os.Build;
 import android.os.Handler;
 
 import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.SSLContext;
+
 import okhttp3.Call;
+import okhttp3.ConnectionSpec;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -17,6 +23,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.TlsVersion;
 
 /**
  * Alternative upload to HttpFileUploader - use of OkHttp directly gives us several benefits:
@@ -105,12 +112,12 @@ public class OkFileUploader {
                     .build();
         }
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS).build();
+                .readTimeout(30, TimeUnit.SECONDS);
 
-        Call call = client.newCall(request);
+        Call call = enableTls12OnPreLollipop(clientBuilder).build().newCall(request);
         Response response = call.execute();
 
         if (response.code() == 200) {
@@ -118,6 +125,29 @@ public class OkFileUploader {
         } else {
             return null;
         }
+    }
 
+    public static OkHttpClient.Builder enableTls12OnPreLollipop(OkHttpClient.Builder builder) {
+        if (Build.VERSION.SDK_INT >= 16 && Build.VERSION.SDK_INT < 22) {
+            try {
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, null, null);
+                builder.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()));
+
+                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                        .tlsVersions(TlsVersion.TLS_1_2)
+                        .build();
+
+                List<ConnectionSpec> specs = new ArrayList<>();
+                specs.add(cs);
+                specs.add(ConnectionSpec.COMPATIBLE_TLS);
+                specs.add(ConnectionSpec.CLEARTEXT);
+
+                builder.connectionSpecs(specs);
+            } catch (Exception exc) {
+                Logging.error("Error while setting TLS 1.2", exc);
+            }
+        }
+        return builder;
     }
 }

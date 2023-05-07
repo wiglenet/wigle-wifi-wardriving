@@ -4,6 +4,7 @@ import android.os.Build;
 import android.os.Handler;
 
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLProtocolException;
 
 import okhttp3.Call;
 import okhttp3.ConnectionSpec;
@@ -62,7 +65,7 @@ public class OkFileUploader {
                                 final Map<String, String> params,
                                 final String authUser, final String authToken,
                                 final Handler handler)
-            throws IOException {
+            throws IOException, UpgradeSslException {
 
 
         // construct multipart body using file reference

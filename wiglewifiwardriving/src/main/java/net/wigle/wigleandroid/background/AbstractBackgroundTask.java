@@ -20,6 +20,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -85,6 +86,11 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
             subRun();
         } catch ( InterruptedException ex ) {
             Logging.info( name + " interrupted: " + ex );
+        } catch ( final UpgradeSslException usex) {
+            //DEBUG: MainActivity.error("auth error", waex);
+            Bundle errorBundle = new Bundle();
+            errorBundle.putCharSequence("SECURITY_ERROR", usex.getMessage());
+            sendBundledMessage(BackgroundGuiHandler.SECURITY_ERROR, errorBundle);
         } catch ( final WiGLEAuthException waex) {
             //DEBUG: MainActivity.error("auth error", waex);
             Bundle errorBundle = new Bundle();
@@ -116,7 +122,7 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
         handler.sendMessage(msg);
     }
 
-    protected abstract void subRun() throws IOException, InterruptedException, WiGLEAuthException;
+    protected abstract void subRun() throws IOException, InterruptedException, WiGLEAuthException, UpgradeSslException;
 
     /** interrupt this task */
     public final void setInterrupted() {

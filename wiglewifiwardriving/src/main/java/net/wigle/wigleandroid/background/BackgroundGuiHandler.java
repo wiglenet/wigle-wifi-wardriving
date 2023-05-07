@@ -28,9 +28,14 @@ import java.io.File;
 import static net.wigle.wigleandroid.util.FileUtility.CSV_GZ_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.KML_EXT;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
+
 public class BackgroundGuiHandler extends Handler {
     public static final int WRITING_PERCENT_START = 100000;
     public static final int AUTHENTICATION_ERROR = 1;
+    public static final int SECURITY_ERROR = 2;
     public static final int CONNECTION_ERROR = -1;
     public static final String ERROR = "error";
     public static final String FILENAME = "filename";
@@ -65,6 +70,17 @@ public class BackgroundGuiHandler extends Handler {
                 WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
                 if (pp != null) {
                     pp.hide();
+                }
+            }
+            if (msg.what == SECURITY_ERROR) {
+                WiGLEToast.showOverActivity(this.context, R.string.error_general, context.getString(R.string.status_login_fail));
+                if (pp != null) {
+                    pp.hide();
+                }
+                try {
+                    ProviderInstaller.installIfNeeded(context);
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    Logging.error("ProviderInstall failed", e);
                 }
             }
             if (msg.what == CONNECTION_ERROR) {

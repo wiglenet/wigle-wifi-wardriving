@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentActivity;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +26,7 @@ public class ApiDownloader extends AbstractApiRequest {
     }
 
     @Override
-    protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
+    protected void subRun() throws IOException, InterruptedException, WiGLEAuthException, UpgradeSslException {
         String result = null;
         try {
             result = doDownload(this.connectionMethod);

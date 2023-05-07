@@ -18,8 +18,16 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import android.os.Handler;
+
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
+
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLProtocolException;
 
 /**
  * Based on   http://getablogger.blogspot.com/2008/01/android-how-to-post-file-to-php-server.html
@@ -51,7 +59,7 @@ final class HttpFileUploader {
                                  final FileInputStream fileInputStream, final Map<String,String> params,
                                  final PreConnectConfigurator preConnectConfigurator,
                                  final Handler handler, final long filesize)
-                                throws IOException {
+                                throws IOException, UpgradeSslException {
 
         String retval = null;
         HttpURLConnection conn = null;
@@ -160,8 +168,7 @@ final class HttpFileUploader {
             }
             retval = b.toString();
             // MainActivity.info( "Response: " + retval );
-        }
-        finally {
+        } finally {
             if ( conn != null ) {
                 Logging.info( "conn disconnect" );
                 conn.disconnect();

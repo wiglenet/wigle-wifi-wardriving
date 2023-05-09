@@ -83,12 +83,12 @@ public class KmlWriter extends AbstractBackgroundTask {
                 cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.CELL);
                 FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
-                cursor.close();
                 long cellCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount, dbHelper.getNetworkCount(), bundle);
+                cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
                 FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
-                cursor.close();
                 long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
+                cursor.close();
                 Logging.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
             } else {
                 long count = 0;

@@ -11,12 +11,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +31,7 @@ import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
+import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -44,7 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * User rank fragment. Direct port from old code the OkHttp-based downloader for now.
  * TODO need to actually paginate correctly for continuous scroll
  */
-public class RankStatsFragment extends Fragment {
+public class RankStatsFragment extends ProgressThrobberFragment {
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_SWAP = 202;
@@ -99,11 +103,14 @@ public class RankStatsFragment extends Fragment {
         Logging.info("RANKSTATS: onCreateView.a orientation: " + orientation);
         rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
         typeView = rootView.findViewById(R.id.rankstats_type);
+        loadingImage = rootView.findViewById(R.id.rank_throbber);
+
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
         final FragmentActivity a = getActivity();
         if (null != a) {
+            startAnimation();
             final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
 
             final MainActivity.State s = MainActivity.getStaticState();
@@ -113,6 +120,7 @@ public class RankStatsFragment extends Fragment {
                       public void onTaskCompleted() {
                         if (userDownloadFailed) {
                             WiGLEToast.showOverFragment(a, R.string.upload_failed, getString(R.string.dl_failed));
+                            stopAnimation();
                         }
                       }
 
@@ -198,6 +206,7 @@ public class RankStatsFragment extends Fragment {
                         finalSelected, new RequestCompletedListener<RankResponse, JSONObject>() {
                     @Override
                     public void onTaskCompleted() {
+                        stopAnimation();
                         if (null != rankResponse) {
                             handleRanks(rankResponse, first);
                         } else {

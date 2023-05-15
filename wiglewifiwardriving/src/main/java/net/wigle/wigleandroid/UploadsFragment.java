@@ -7,9 +7,9 @@ import android.media.AudioManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +26,7 @@ import net.wigle.wigleandroid.model.Upload;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
+import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -42,7 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UploadsFragment extends Fragment {
+public class UploadsFragment extends ProgressThrobberFragment {
     private static final int MENU_USER_STATS = 200;
     private static final int MENU_SITE_STATS = 201;
 
@@ -106,12 +107,14 @@ public class UploadsFragment extends Fragment {
         final int orientation = getResources().getConfiguration().orientation;
         Logging.info("UPLOADS: onCreateView. orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.uploads, container, false);
+        loadingImage = rootView.findViewById(R.id.uploads_throbber);
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
         final Activity a = getActivity();
         if (null != a) {
             busy.set(false);
+            startAnimation(); //animation only applies for first page.
             downloadUploads(0);
         }
         return rootView;
@@ -147,6 +150,7 @@ public class UploadsFragment extends Fragment {
                                 Logging.error("empty response - unable to update list view.");
                             }
                             busy.set(false);
+                            stopAnimation();
                         }
 
                         @Override

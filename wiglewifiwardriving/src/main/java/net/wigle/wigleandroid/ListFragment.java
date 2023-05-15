@@ -652,7 +652,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener((parent, view, position, id) -> {
             final Network network = (Network) parent.getItemAtPosition(position);
-            if (network != null) {
+            if (network != null && activity != null) {
                 MainActivity.getNetworkCache().put(network.getBssid(), network);
                 final Intent intent = new Intent(activity, NetworkActivity.class);
                 intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());

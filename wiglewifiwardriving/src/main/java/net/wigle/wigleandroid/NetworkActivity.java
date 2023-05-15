@@ -183,14 +183,17 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
 
                     MccMncRecord rec = null;
-                    if (operatorCode.length() > 5 && operatorCode.length() < 7) {
+                    if (operatorCode.length() == 6) {
                         final String mnc = operatorCode.substring(3, operatorCode.length());
                         final String mcc = operatorCode.substring(0, 3);
 
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
 
                         try {
-                            rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                            final MainActivity.State state = MainActivity.getStaticState();
+                            if (state != null) {
+                                rec = state.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                            }
                         } catch (SQLException sqex) {
                             Logging.error("Unable to access Mxc Database: ",sqex);
                         }

@@ -190,9 +190,9 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
 
                         try {
-                            final MainActivity.State state = MainActivity.getStaticState();
-                            if (state != null) {
-                                rec = state.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                            final MainActivity.State s = MainActivity.getStaticState();
+                            if (s != null && s.mxcDbHelper != null) {
+                                rec = s.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
                             }
                         } catch (SQLException sqex) {
                             Logging.error("Unable to access Mxc Database: ",sqex);

@@ -44,6 +44,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -1170,10 +1171,14 @@ public final class DatabaseHelper extends Thread {
                     insertRoute.bindLong(9, location.getTime());
                     long start = System.currentTimeMillis();
 
-                    insertRoute.execute();
-                    lastLoggedLocation = location;
-                    currentRoutePointCount.incrementAndGet();
-                    logTime(start, "db route point added");
+                    try {
+                        insertRoute.execute();
+                        lastLoggedLocation = location;
+                        currentRoutePointCount.incrementAndGet();
+                        logTime(start, "db route point added");
+                    } catch (IllegalStateException | SQLException ex) {
+                        logTime(start, "db route point add failed: " + ex);
+                    }
                 }
             } else {
                 Logging.error("unable to log route point due to closing DB");

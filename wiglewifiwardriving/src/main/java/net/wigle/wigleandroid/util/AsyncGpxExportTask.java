@@ -168,9 +168,10 @@ public class AsyncGpxExportTask extends AsyncTask<Long, Integer, String> {
             intent.setType("application/gpx");
 
             //TODO: verify local-only storage case/gpx_paths.xml
-            if (null != context) {
+            final MainActivity main = MainActivity.getMainActivity();
+            if (null != context && main != null) {
                 final Uri fileUri = FileProvider.getUriForFile(context,
-                        MainActivity.getMainActivity().getApplicationContext().getPackageName() +
+                        main.getApplicationContext().getPackageName() +
                                 ".gpxprovider", gpxDestFile);
 
                 intent.putExtra(Intent.EXTRA_STREAM, fileUri);

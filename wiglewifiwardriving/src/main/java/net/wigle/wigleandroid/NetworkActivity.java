@@ -183,7 +183,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
 
                     MccMncRecord rec = null;
-                    if (operatorCode.length() > 5 && operatorCode.length() < 7) {
+                    if (operatorCode.length() == 6) {
                         final String mnc = operatorCode.substring(3, operatorCode.length());
                         final String mcc = operatorCode.substring(0, 3);
 

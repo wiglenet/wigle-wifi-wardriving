@@ -15,10 +15,14 @@ import net.wigle.wigleandroid.util.Logging;
  */
 public abstract class ProgressThrobberFragment extends Fragment {
     protected ImageView loadingImage;
+    protected ImageView errorImage;
     protected boolean animating = false;
     protected AnimatedVectorDrawableCompat loadingAnimation = null;
 
     protected void startAnimation() {
+        if (null != errorImage) {
+            errorImage.setVisibility(View.GONE);
+        }
         if (null != loadingImage) {
             loadingImage.setVisibility(View.VISIBLE);
         }
@@ -47,6 +51,17 @@ public abstract class ProgressThrobberFragment extends Fragment {
         }
         if (null != loadingImage) {
             loadingImage.setVisibility(View.GONE);
+        }
+    }
+
+    protected void showError() {
+        if (null != errorImage) {
+            errorImage.setVisibility(View.VISIBLE);
+        }
+    }
+    protected void hideError() {
+        if (null != errorImage) {
+            errorImage.setVisibility(View.GONE);
         }
     }
 

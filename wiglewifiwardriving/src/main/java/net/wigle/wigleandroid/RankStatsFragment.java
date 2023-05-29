@@ -26,9 +26,11 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.model.RankUser;
 import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
+import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
+import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -114,17 +116,27 @@ public class RankStatsFragment extends ProgressThrobberFragment {
 
             final MainActivity.State s = MainActivity.getStaticState();
             if (null != s) {
-                s.apiManager.getUserStats(new RequestCompletedListener<UserStats, JSONObject>() {
-                      @Override
-                      public void onTaskCompleted() {
+                s.apiManager.getUserStats(new AuthenticatedRequestCompletedListener<UserStats, JSONObject>() {
+                    @Override
+                    public void onAuthenticationRequired() {
+                        final FragmentActivity fa = getActivity();
+                        if (null != fa) {
+                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                    getString(R.string.login_required), getString(R.string.login),
+                                    getString(R.string.cancel));
+                        }
+                    }
+
+                    @Override
+                    public void onTaskCompleted() {
                         stopAnimation();
                         if (userDownloadFailed) {
                             WiGLEToast.showOverFragment(a, R.string.upload_failed, getString(R.string.dl_failed));
                         }
-                      }
+                    }
 
-                      @Override
-                      public void onTaskSucceeded(UserStats response) {
+                    @Override
+                    public void onTaskSucceeded(UserStats response) {
                           myRank = response.getRank();
                           final SharedPreferences.Editor editor = prefs.edit();
                           editor.putLong(ListFragment.PREF_RANK, response.getRank());
@@ -132,7 +144,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                           editor.apply();
                           downloadRanks(true);
                           userDownloadFailed = false;
-                      }
+                    }
 
                       @Override
                       public void onTaskFailed(int status, JSONObject error) {

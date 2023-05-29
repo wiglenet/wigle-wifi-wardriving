@@ -143,12 +143,13 @@ public class WiGLEApiManager {
      * Get the user stats from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
      * @param completedListener the completion listener to call with results.
      */
-    public void getUserStats(@NotNull final RequestCompletedListener<UserStats,
+    public void getUserStats(@NotNull final AuthenticatedRequestCompletedListener<UserStats,
             JSONObject> completedListener) {
         Request request = new Request.Builder()
                 .url(UrlConfig.USER_STATS_URL)
                 .build();
         if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
             return;
         }
         authedClient.newCall(request).enqueue(new Callback() {
@@ -171,6 +172,9 @@ public class WiGLEApiManager {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
+                        call.cancel();
                     } else {
                         if (null != responseBody) {
                             final String responseBodyString = responseBody.string();
@@ -180,6 +184,7 @@ public class WiGLEApiManager {
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }
+                        call.cancel();
                     }
                 }
                 mainHandler.post(completedListener::onTaskCompleted);
@@ -374,9 +379,10 @@ public class WiGLEApiManager {
      * @param pageEnd the offset for the end of the request page
      * @param completedListener the RequestCompletedListener instance to call on completion
      */
-    public void getUploads(final long pageStart, final long pageEnd, @NotNull final RequestCompletedListener<UploadsResponse,
+    public void getUploads(final long pageStart, final long pageEnd, @NotNull final AuthenticatedRequestCompletedListener<UploadsResponse,
             JSONObject> completedListener ) {
         if (null == authedClient) {
+            completedListener.onAuthenticationRequired();
             return;
         }
         final String httpUrl = UrlConfig.UPLOADS_STATS_URL + "?pagestart=" + pageStart
@@ -391,6 +397,8 @@ public class WiGLEApiManager {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
                     } else {
                         if (null != responseBody) {
                             UploadsResponse r = new Gson().fromJson(responseBody.charStream(),
@@ -418,10 +426,10 @@ public class WiGLEApiManager {
      * @param completedListener the RequestCompletedListener instance to call on completion
      */
     public void searchWiFi(@NotNull final String urlEncodedQueryParams,
-                        @NotNull final RequestCompletedListener<WiFiSearchResponse,
+                        @NotNull final AuthenticatedRequestCompletedListener<WiFiSearchResponse,
                                 JSONObject> completedListener) {
         if (null == authedClient) {
-            return;
+            completedListener.onAuthenticationRequired();
         }
         final String httpUrl = UrlConfig.SEARCH_WIFI_URL + "?" + urlEncodedQueryParams;
 
@@ -439,6 +447,8 @@ public class WiGLEApiManager {
                 try (ResponseBody responseBody = response.body()) {
                     if (!response.isSuccessful()) {
                         completedListener.onTaskFailed(response.code(), null);
+                    } else if (response.code() == 401) {
+                        completedListener.onAuthenticationRequired();
                     } else {
                         //TODO- consider caching implications here
                         if (null != responseBody) {

@@ -442,4 +442,7 @@
     <string name="gps_old_message">Acest dispozitiv nu mai este acceptat prin magazinul de aplicații din cauza politicilor Google. Vă rugăm să faceți o copie de rezervă a datelor și să încărcați lateral WiGLE v. 2.67 .apk (sau mai mic) de la https://github.com/wiglenet/wigle-wifi-wardriving/ . Îmi pare rău pentru neplăcerile create!</string>
     <string name="gps_old_title">Imposibil de inițializat GPS</string>
     <string name="enable_map_bearing">Urmează-mi direcția/direcția</string>
+    <string name="login_title">Conectare obligatorie</string>
+    <string name="login_required">Trebuie să fii autentificat pentru a face acest lucru. Vă rugăm să vă conectați sau să creați un cont dacă este necesar.</string>
+    <string name="login">Log in</string>
 </resources>

@@ -442,4 +442,7 @@
     <string name="gps_old_message">Tätä laitetta ei enää tueta sovelluskaupassa Googlen käytäntöjen vuoksi. Varmuuskopioi tietosi ja lataa WiGLE v. 2.67 .apk (tai vanhempi) osoitteesta https://github.com/wiglenet/wigle-wifi-wardriving/ . Anteeksi häiriö!</string>
     <string name="gps_old_title">GPS:n alustus epäonnistui</string>
     <string name="enable_map_bearing">Seuraa suuntiani/suuntaani</string>
+    <string name="login_title">Sisäänkirjautuminen vaaditaan</string>
+    <string name="login_required">Sinun täytyy olla kirjautunut sisään tehdäksesi tämän. Ole hyvä ja kirjaudu sisään tai luo tili tarvittaessa.</string>
+    <string name="login">Kirjaudu sisään</string>
 </resources>

@@ -442,7 +442,7 @@
     <string name="gps_old_message">This device is no longer supported via the app store due to Google\'s policies. Please back-up your data and side-load the WiGLE v. 2.67 .apk (or lower) from https://github.com/wiglenet/wigle-wifi-wardriving/ . Sorry for the inconvenience!</string>
     <string name="gps_old_title">Unable to initialize GPS</string>
     <string name="enable_map_bearing">Follow my bearing/heading</string>
-    <string name="login_title">Log-in required</string>
+    <string name="login_title">Login required</string>
     <string name="login_required">You must be logged in to do this. Please log in or create an account if necessary.</string>
-    <string name="login">Log in</string>
+    <string name="login">Login</string>
 </resources>

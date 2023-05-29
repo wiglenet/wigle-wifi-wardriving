@@ -442,4 +442,7 @@
     <string name="gps_old_message">Cet appareil n\'est plus pris en charge via l\'App Store en raison des règles de Google. Veuillez sauvegarder vos données et charger le WiGLE v. 2.67 .apk (ou une version antérieure) depuis https://github.com/wiglenet/wigle-wifi-wardriving/ . Désolé pour le dérangement!</string>
     <string name="gps_old_title">Impossible d\'initialiser le GPS</string>
     <string name="enable_map_bearing">Suivre mon relèvement/cap</string>
+    <string name="login_title">Connexion requise</string>
+    <string name="login_required">Vous devez être connecté pour le faire. Veuillez vous connecter ou créer un compte si nécessaire.</string>
+    <string name="login">Connexion</string>
 </resources>

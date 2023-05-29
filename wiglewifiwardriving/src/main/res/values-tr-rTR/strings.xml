@@ -442,4 +442,7 @@
     <string name="gps_old_message">Bu cihaz, Google politikaları nedeniyle artık uygulama mağazası aracılığıyla desteklenmemektedir. Lütfen verilerinizi yedekleyin ve https://github.com/wiglenet/wigle-wifi-wardriving/ adresinden WiGLE v. 2.67 .apk\'yi (veya daha düşük) yandan yükleyin. Rahatsızlıktan dolayı özür dileriz!</string>
     <string name="gps_old_title">GPS başlatılamıyor</string>
     <string name="enable_map_bearing">Yönümü/yönümü takip et</string>
+    <string name="login_title">oturum açmak gereklidir</string>
+    <string name="login_required">Bunu yapmak için giriş yapmalısınız. Lütfen oturum açın veya gerekirse bir hesap oluşturun.</string>
+    <string name="login">Giriş yapmak</string>
 </resources>

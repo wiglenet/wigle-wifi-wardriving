@@ -442,4 +442,7 @@
     <string name="gps_old_message">Dieses Gerät wird aufgrund der Richtlinien von Google nicht mehr über den App Store unterstützt. Bitte sichern Sie Ihre Daten und laden Sie die WiGLE v. 2.67 .apk (oder niedriger) von https://github.com/wiglenet/wigle-wifi-wardriving/ herunter. Entschuldigung für die Unannehmlichkeiten!</string>
     <string name="gps_old_title">GPS kann nicht initialisiert werden</string>
     <string name="enable_map_bearing">Folge meiner Peilung/ meinem Kurs</string>
+    <string name="login_title">Anmeldung erforderlich</string>
+    <string name="login_required">Dazu müssen Sie eingeloggt sein. Bitte melden Sie sich an oder erstellen Sie ggf. ein Konto.</string>
+    <string name="login">Anmeldung</string>
 </resources>

@@ -442,4 +442,7 @@
     <string name="gps_old_message">由於 Google 的政策，應用商店不再支持此設備。請備份您的數據並從 https://github.com/wiglenet/wigle-wifi-wardriving/ 旁加載 WiGLE v. 2.67 .apk（或更低版本）。帶來不便敬請諒解！</string>
     <string name="gps_old_title">無法初始化 GPS</string>
     <string name="enable_map_bearing">跟隨我的方位/航向</string>
+    <string name="login_title">要求登錄</string>
+    <string name="login_required">您必須登錄才能執行此操作。如有必要，請登錄或創建一個帳戶。</string>
+    <string name="login">登錄</string>
 </resources>

@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
@@ -24,9 +25,10 @@ import com.google.android.material.navigation.NavigationView;
 
 import net.wigle.wigleandroid.model.Upload;
 import net.wigle.wigleandroid.model.api.UploadsResponse;
-import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
+import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -55,7 +57,6 @@ public class UploadsFragment extends ProgressThrobberFragment {
     private final AtomicBoolean busy = new AtomicBoolean(false);
 
     private AtomicBoolean finishing;
-    private NumberFormat numberFormat;
     private UploadsListAdapter listAdapter;
     private final AtomicBoolean lockListAdapter = new AtomicBoolean(false);
 
@@ -86,6 +87,7 @@ public class UploadsFragment extends ProgressThrobberFragment {
         setHasOptionsMenu(true);
         // set language, media volume, and number format
         Activity a = getActivity();
+        NumberFormat numberFormat;
         if (null != a) {
             MainActivity.setLocale(a);
             // media volume
@@ -108,6 +110,8 @@ public class UploadsFragment extends ProgressThrobberFragment {
         Logging.info("UPLOADS: onCreateView. orientation: " + orientation);
         final LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.uploads, container, false);
         loadingImage = rootView.findViewById(R.id.uploads_throbber);
+        errorImage = rootView.findViewById(R.id.uploads_error);
+
         setupSwipeRefresh(rootView);
         setupListView(rootView);
 
@@ -123,16 +127,13 @@ public class UploadsFragment extends ProgressThrobberFragment {
     private void setupSwipeRefresh(final LinearLayout rootView) {
         // Lookup the swipe container view
         final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.uploads_swipe_container);
-
         // Setup refresh listener which triggers new data loading
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                if (null != listAdapter) {
-                    listAdapter.clear();
-                }
-                downloadUploads(0);
+        swipeContainer.setOnRefreshListener(() -> {
+            hideError();
+            if (null != listAdapter) {
+                listAdapter.clear();
             }
+            downloadUploads(0);
         });
     }
 
@@ -141,16 +142,20 @@ public class UploadsFragment extends ProgressThrobberFragment {
             final int pageStart = page * ROW_COUNT;
             final MainActivity.State s = MainActivity.getStaticState();
             if (null != s) {
-                s.apiManager.getUploads(pageStart, (pageStart + ROW_COUNT), new RequestCompletedListener<UploadsResponse, JSONObject>() {
+                s.apiManager.getUploads(pageStart, (pageStart + ROW_COUNT), new AuthenticatedRequestCompletedListener<UploadsResponse, JSONObject>() {
                         @Override
                         public void onTaskCompleted() {
+                            busy.set(false);
+                            stopAnimation();
                             if (latestResponse != null) {
                                 handleUploads(latestResponse);
                             } else {
+                                swipeRefreshLayout.setRefreshing(false);
+                                if (page == 0) {
+                                    showError();
+                                }
                                 Logging.error("empty response - unable to update list view.");
                             }
-                            busy.set(false);
-                            stopAnimation();
                         }
 
                         @Override
@@ -193,6 +198,17 @@ public class UploadsFragment extends ProgressThrobberFragment {
                         @Override
                         public void onTaskFailed(int status, JSONObject error) {
                             Logging.error("Failed to update Uploads list.");
+                            latestResponse = null;
+                        }
+
+                        @Override
+                        public void onAuthenticationRequired() {
+                            final FragmentActivity fa = getActivity();
+                            if (null != fa) {
+                                WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                        getString(R.string.login_required), getString(R.string.login),
+                                        getString(R.string.cancel));
+                            }
                         }
                     }
                 );

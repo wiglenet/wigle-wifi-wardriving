@@ -442,4 +442,7 @@
     <string name="gps_old_message">لم يعد هذا الجهاز مدعومًا عبر متجر التطبيقات بسبب سياسات Google. يرجى نسخ بياناتك احتياطيًا وتحميل WiGLE v. 2.67 .apk (أو أقل) من https://github.com/wiglenet/wigle-wifi-wardriving/. نأسف للإزعاج!</string>
     <string name="gps_old_title">تعذر تهيئة GPS</string>
     <string name="enable_map_bearing">اتبع اتجاهي / رأسي</string>
+    <string name="login_title">تسجيل الدخول مطلوب</string>
+    <string name="login_required">يجب أن تكون مسجلا للقيام بذلك. الرجاء تسجيل الدخول أو إنشاء حساب إذا لزم الأمر.</string>
+    <string name="login">تسجيل الدخول</string>
 </resources>

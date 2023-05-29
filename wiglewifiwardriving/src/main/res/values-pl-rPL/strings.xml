@@ -442,4 +442,7 @@
     <string name="gps_old_message">To urządzenie nie jest już obsługiwane w sklepie z aplikacjami ze względu na zasady Google. Wykonaj kopię zapasową danych i załaduj WiGLE w wersji 2.67 .apk (lub starszej) z https://github.com/wiglenet/wigle-wifi-wardriving/. Przepraszam za niedogodności!</string>
     <string name="gps_old_title">Nie można zainicjować GPS</string>
     <string name="enable_map_bearing">Podążaj za moim namiarem/kursem</string>
+    <string name="login_title">Logowanie wymagane</string>
+    <string name="login_required">Aby to zrobić, musisz być zalogowany. Zaloguj się lub utwórz konto, jeśli to konieczne.</string>
+    <string name="login">Zaloguj sie</string>
 </resources>

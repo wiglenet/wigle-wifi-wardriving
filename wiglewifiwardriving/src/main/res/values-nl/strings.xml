@@ -442,4 +442,7 @@
     <string name="gps_old_message">Dit apparaat wordt niet langer ondersteund via de app store vanwege het beleid van Google. Maak een back-up van uw gegevens en laad de WiGLE v. 2.67 .apk (of lager) vanaf https://github.com/wiglenet/wigle-wifi-wardriving/. Excuses voor het ongemak!</string>
     <string name="gps_old_title">GPS kan niet worden geïnitialiseerd</string>
     <string name="enable_map_bearing">Volg mijn peiling/koers</string>
+    <string name="login_title">Aanmelden vereist</string>
+    <string name="login_required">Hiervoor moet u ingelogd zijn. Log in of maak indien nodig een account aan.</string>
+    <string name="login">Log in</string>
 </resources>

@@ -441,4 +441,7 @@
     <string name="gps_old_message">Google のポリシーにより、このデバイスは App Store でサポートされなくなりました。データをバックアップし、https://github.com/wiglenet/wigle-wifi-wardriving/ から WiGLE v. 2.67 .apk (またはそれ以下) をサイドロードしてください。ご不便おかけしてすみません！</string>
     <string name="gps_old_title">GPS を初期化できません</string>
     <string name="enable_map_bearing">私の方位/見出しに従ってください</string>
+    <string name="login_title">ログインが必要です</string>
+    <string name="login_required">これを行うにはログインする必要があります。必要に応じて、ログインするかアカウントを作成してください。</string>
+    <string name="login">ログイン</string>
 </resources>

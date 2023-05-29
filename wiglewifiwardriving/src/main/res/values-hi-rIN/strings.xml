@@ -441,4 +441,7 @@
     <string name="gps_old_message">Google की नीतियों के कारण यह डिवाइस अब ऐप स्टोर द्वारा समर्थित नहीं है। कृपया अपने डेटा का बैकअप लें और https://github.com/wiglenet/wigle-wifi-wardriving/ से WiGLE v. 2.67 .apk (या निचला) साइड-लोड करें। असुविधा के लिए खेद है!</string>
     <string name="gps_old_title">GPS प्रारंभ करने में असमर्थ</string>
     <string name="enable_map_bearing">मेरे असर/शीर्षक का पालन करें</string>
+    <string name="login_title">लॉगिन आवश्यक</string>
+    <string name="login_required">यह करने के लिये लॉग - इन करना आवश्यक है। कृपया लॉग इन करें या यदि आवश्यक हो तो एक खाता बनाएँ।</string>
+    <string name="login">लॉग इन करें</string>
 </resources>

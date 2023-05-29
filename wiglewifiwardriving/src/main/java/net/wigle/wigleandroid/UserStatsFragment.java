@@ -2,6 +2,7 @@ package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -12,8 +13,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +31,10 @@ import android.widget.TextView;
 import com.google.android.material.navigation.NavigationView;
 
 import net.wigle.wigleandroid.model.api.UserStats;
+import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 import net.wigle.wigleandroid.util.UrlConfig;
@@ -102,7 +109,17 @@ public class UserStatsFragment extends Fragment {
         final ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.userstats, container, false);
         MainActivity.State s = MainActivity.getStaticState();
         if (s != null) {
-            s.apiManager.getUserStats(new RequestCompletedListener<UserStats, JSONObject>() {
+            s.apiManager.getUserStats(new AuthenticatedRequestCompletedListener<UserStats, JSONObject>() {
+                @Override
+                public void onAuthenticationRequired() {
+                    final FragmentActivity fa = getActivity();
+                    if (null != fa) {
+                        WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                getString(R.string.login_required), getString(R.string.login),
+                                getString(R.string.cancel));
+                    }
+                }
+
                 @Override
                 public void onTaskCompleted() {
                     final Activity a = getActivity();

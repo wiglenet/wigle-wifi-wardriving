@@ -621,15 +621,11 @@ public class WifiReceiver extends BroadcastReceiver {
             final String operatorCode = tele.getNetworkOperator();
             if ( gsmCellLocation.getLac() >= 0 && gsmCellLocation.getCid() >= 0) {
                 bssid = tele.getNetworkOperator() + "_" + gsmCellLocation.getLac() + "_" + gsmCellLocation.getCid();
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    try {
-                        //TODO: 1/2: when cell gets its own listener, make this async (Strict)
-                        ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
-                    } catch (SQLException sex) {
-                        Logging.error("failed to get op for "+tele.getNetworkOperator());
-                    }
-                } else {
-                    ssid = tele.getNetworkOperatorName();
+                try {
+                    //TODO: 1/2: when cell gets its own listener, make this async (Strict)
+                    ssid = GsmOperator.getOperatorName(tele.getNetworkOperator());
+                } catch (SQLException sex) {
+                    Logging.error("failed to get op for "+tele.getNetworkOperator());
                 }
                 //DEBUG: MainActivity.info("GSM Operator name: "+ ssid + " vs TM: "+ tele.getNetworkOperatorName());
                 type = NetworkType.GSM;

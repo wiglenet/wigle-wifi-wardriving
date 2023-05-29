@@ -442,4 +442,7 @@
     <string name="gps_old_message">Toto zařízení již není podporováno prostřednictvím obchodu s aplikacemi kvůli zásadám společnosti Google. Zálohujte si prosím svá data a stáhněte si WiGLE v. 2.67 .apk (nebo nižší) z https://github.com/wiglenet/wigle-wifi-wardriving/ . Omluvám se za nepříjemnost!</string>
     <string name="gps_old_title">Nelze inicializovat GPS</string>
     <string name="enable_map_bearing">Sledujte můj směr/směr</string>
+    <string name="login_title">Je vyžadováno přihlášení</string>
+    <string name="login_required">K tomu musíte být přihlášeni. V případě potřeby se přihlaste nebo si vytvořte účet.</string>
+    <string name="login">Přihlásit se</string>
 </resources>

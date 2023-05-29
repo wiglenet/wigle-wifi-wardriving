@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,8 +39,11 @@ import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
+import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
+import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 
@@ -266,7 +271,7 @@ public class DBResultActivity extends AppCompatActivity {
     }
 
     private void setupWiGLEQuery(final QueryArgs queryArgs) {
-
+        final FragmentActivity fa = this;
         String queryParams = "";
         if (queryArgs.getSSID() != null && !queryArgs.getSSID().isEmpty()) {
 
@@ -302,7 +307,17 @@ public class DBResultActivity extends AppCompatActivity {
 
         final MainActivity.State s = MainActivity.getStaticState();
         if (null != s) {
-            s.apiManager.searchWiFi(queryParams, new RequestCompletedListener<WiFiSearchResponse, JSONObject>() {
+
+            s.apiManager.searchWiFi(queryParams, new AuthenticatedRequestCompletedListener<WiFiSearchResponse, JSONObject>() {
+                @Override
+                public void onAuthenticationRequired() {
+                    if (null != fa) {
+                        WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                getString(R.string.login_required), getString(R.string.login),
+                                getString(R.string.cancel));
+                    }
+                }
+
                 @Override
                 public void onTaskCompleted() {
                     if (null != searchResponse) {

@@ -442,4 +442,7 @@
     <string name="gps_old_message">מכשיר זה אינו נתמך עוד דרך חנות האפליקציות עקב המדיניות של Google. אנא גבה את הנתונים שלך וטען בצד את WiGLE v. 2.67 .apk (או נמוך יותר) מ-https://github.com/wiglenet/wigle-wifi-wardriving/ . מצטער על אי הנוחות!</string>
     <string name="gps_old_title">לא ניתן לאתחל את ה-GPS</string>
     <string name="enable_map_bearing">עקוב אחר הכיוון/הכיוון שלי</string>
+    <string name="login_title">נדרשת התחברות</string>
+    <string name="login_required">עליך להיות מחובר כדי לעשות זאת. אנא היכנס או צור חשבון במידת הצורך.</string>
+    <string name="login">התחברות</string>
 </resources>

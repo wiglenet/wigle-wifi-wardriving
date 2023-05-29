@@ -444,4 +444,7 @@
     <string name="gps_old_message">Denne enheten støttes ikke lenger via appbutikken på grunn av Googles retningslinjer. Ta sikkerhetskopi av dataene dine og sidelast inn WiGLE v. 2.67 .apk (eller lavere) fra https://github.com/wiglenet/wigle-wifi-wardriving/ . Beklager bryet!</string>
     <string name="gps_old_title">Kan ikke initialisere GPS</string>
     <string name="enable_map_bearing">Følg min peiling/kurs</string>
+    <string name="login_title">innlogging kreves</string>
+    <string name="login_required">Du må være pålogget for å gjøre dette. Logg inn eller opprett en konto om nødvendig.</string>
+    <string name="login">Logg Inn</string>
 </resources>

@@ -7,11 +7,9 @@ import android.media.AudioManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,9 +26,11 @@ import com.google.android.material.navigation.NavigationView;
 import net.wigle.wigleandroid.model.RankUser;
 import net.wigle.wigleandroid.model.api.RankResponse;
 import net.wigle.wigleandroid.model.api.UserStats;
+import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
+import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -70,6 +69,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
     private boolean userDownloadFailed = false;
     private LinearLayout rootView;
     private ListView listView;
+    SwipeRefreshLayout swipeContainer;
     TextView typeView;
 
     /** Called when the activity is first created. */
@@ -104,6 +104,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
         rootView = (LinearLayout) inflater.inflate(R.layout.rankstats, container, false);
         typeView = rootView.findViewById(R.id.rankstats_type);
         loadingImage = rootView.findViewById(R.id.rank_throbber);
+        errorImage = rootView.findViewById(R.id.rank_error);
 
         setupSwipeRefresh(rootView);
         setupListView(rootView);
@@ -115,17 +116,27 @@ public class RankStatsFragment extends ProgressThrobberFragment {
 
             final MainActivity.State s = MainActivity.getStaticState();
             if (null != s) {
-                s.apiManager.getUserStats(new RequestCompletedListener<UserStats, JSONObject>() {
-                      @Override
-                      public void onTaskCompleted() {
+                s.apiManager.getUserStats(new AuthenticatedRequestCompletedListener<UserStats, JSONObject>() {
+                    @Override
+                    public void onAuthenticationRequired() {
+                        final FragmentActivity fa = getActivity();
+                        if (null != fa) {
+                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
+                                    getString(R.string.login_required), getString(R.string.login),
+                                    getString(R.string.cancel));
+                        }
+                    }
+
+                    @Override
+                    public void onTaskCompleted() {
+                        stopAnimation();
                         if (userDownloadFailed) {
                             WiGLEToast.showOverFragment(a, R.string.upload_failed, getString(R.string.dl_failed));
-                            stopAnimation();
                         }
-                      }
+                    }
 
-                      @Override
-                      public void onTaskSucceeded(UserStats response) {
+                    @Override
+                    public void onTaskSucceeded(UserStats response) {
                           myRank = response.getRank();
                           final SharedPreferences.Editor editor = prefs.edit();
                           editor.putLong(ListFragment.PREF_RANK, response.getRank());
@@ -133,7 +144,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                           editor.apply();
                           downloadRanks(true);
                           userDownloadFailed = false;
-                      }
+                    }
 
                       @Override
                       public void onTaskFailed(int status, JSONObject error) {
@@ -148,11 +159,14 @@ public class RankStatsFragment extends ProgressThrobberFragment {
 
     private void setupSwipeRefresh(final LinearLayout rootView) {
         // Lookup the swipe container view
-        final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
-
+        swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(() -> {
+            hideError();
             if (isRefreshing.compareAndSet(false,true)) {
+                if (null != listAdapter) {
+                    listAdapter.clear();
+                }
                 downloadRanks(true);
             }
         });
@@ -207,9 +221,13 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                     @Override
                     public void onTaskCompleted() {
                         stopAnimation();
+                        swipeContainer.setRefreshing(false);
                         if (null != rankResponse) {
                             handleRanks(rankResponse, first);
                         } else {
+                            if (first) {
+                                showError();
+                            }
                             Logging.error("unable to populate ranks - rankResponse is null");
                         }
                         busy.set(false);
@@ -222,7 +240,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
 
                     @Override
                     public void onTaskFailed(int status, JSONObject error) {
-
+                        rankResponse = null;
                     }
                 });
             }
@@ -261,7 +279,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
             typeView.setText(doMonthRanking ? R.string.monthcount_title : R.string.all_time_title);
             if (isRefreshing.compareAndSet(true, false) || first) {
                 listAdapter.clear();
-                final SwipeRefreshLayout swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
+                swipeContainer = rootView.findViewById(R.id.rank_swipe_container);
                 swipeContainer.setRefreshing(false);
             }
             listAdapter.setMonthRanking(monthRankingMode.get());

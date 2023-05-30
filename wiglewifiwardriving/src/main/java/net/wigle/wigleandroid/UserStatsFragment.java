@@ -2,7 +2,6 @@ package net.wigle.wigleandroid;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -13,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -32,9 +30,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import net.wigle.wigleandroid.model.api.UserStats;
 import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
-import net.wigle.wigleandroid.net.RequestCompletedListener;
-import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
-import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
+import net.wigle.wigleandroid.ui.AuthenticatedFragment;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
 import net.wigle.wigleandroid.util.UrlConfig;
@@ -47,7 +43,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class UserStatsFragment extends Fragment {
+public class UserStatsFragment extends AuthenticatedFragment {
     public static final int MSG_USER_DONE = 101;
     private static final int MENU_SITE_STATS = 201;
     private static final int MENU_RANK_STATS = 202;
@@ -114,9 +110,7 @@ public class UserStatsFragment extends Fragment {
                 public void onAuthenticationRequired() {
                     final FragmentActivity fa = getActivity();
                     if (null != fa) {
-                        WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
-                                getString(R.string.login_required), getString(R.string.login),
-                                getString(R.string.cancel));
+                        showAuthDialog();
                     }
                 }
 

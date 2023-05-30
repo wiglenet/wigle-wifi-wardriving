@@ -28,7 +28,6 @@ import net.wigle.wigleandroid.model.api.UploadsResponse;
 import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
-import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -203,12 +202,7 @@ public class UploadsFragment extends ProgressThrobberFragment {
 
                         @Override
                         public void onAuthenticationRequired() {
-                            final FragmentActivity fa = getActivity();
-                            if (null != fa) {
-                                WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
-                                        getString(R.string.login_required), getString(R.string.login),
-                                        getString(R.string.cancel));
-                            }
+                            showAuthDialog();
                         }
                     }
                 );

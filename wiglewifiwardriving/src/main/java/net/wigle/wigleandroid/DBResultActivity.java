@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Location;
@@ -40,10 +39,8 @@ import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.model.api.WiFiSearchResponse;
 import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
-import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
-import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 

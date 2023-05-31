@@ -78,13 +78,13 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             final boolean preTrilateration = Upload.Status.TRILATERATING.equals(upload.getStatus()) || Upload.Status.PARSING.equals(upload.getStatus());
 
             tv = row.findViewById(R.id.total_wifi_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getNewWifiGps()):"("+numberFormat.format(upload.getTotalWifiGps())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewWifiGps()):"("+numberFormat.format(upload.getNewWiFi())+")");
 
             tv = row.findViewById(R.id.total_bt_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getNewBtGps()):"("+numberFormat.format(upload.getTotalBtGps())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewBtGps()):"("+numberFormat.format(upload.getNewBt())+")");
 
             tv = row.findViewById(R.id.total_cell_gps);
-            tv.setText(!preTrilateration?numberFormat.format(upload.getNewCellGps()):"("+numberFormat.format(upload.getTotalCellGps())+")");
+            tv.setText(!preTrilateration?numberFormat.format(upload.getNewCellGps()):"("+numberFormat.format(upload.getNewCell())+")");
 
             tv = row.findViewById(R.id.file_size);
             tv.setText(context.getString(R.string.bytes) + ": "

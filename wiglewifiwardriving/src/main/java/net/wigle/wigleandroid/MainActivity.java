@@ -1314,7 +1314,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         final State state = getStaticState();
         return () -> {
             // Collections.emptyIterator() requires api 19, but this works.
-            if (state == null) return Collections.<String>emptySet().iterator();
+            if (state == null) return Collections.emptyIterator();
 
             return new Iterator<String>() {
                 int currentPointer = state.logPointer;
@@ -1967,12 +1967,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         if (state.GNSSListener != null) {
             // remove any old requests
             locationManager.removeUpdates(state.GNSSListener);
-            if (Build.VERSION.SDK_INT >= 24) {
-                if (gnssStatusCallback != null) {
-                    locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
-                }
-            } else {
-                locationManager.removeGpsStatusListener(state.GNSSListener);
+            if (gnssStatusCallback != null) {
+                locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
             }
         }
 
@@ -1980,48 +1976,31 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         state.GNSSListener = new GNSSListener(this, state.dbHelper);
         state.GNSSListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
 
-        if (Build.VERSION.SDK_INT >= 24) {
-            try {
-                gnssStatusCallback = new GnssStatus.Callback() {
-                    @Override
-                    public void onStarted() {
-                    }
-
-                    @Override
-                    public void onStopped() {
-                        state.GNSSListener.handleScanStop();
-                    }
-
-                    @Override
-                    public void onFirstFix(int ttffMillis) {
-                    }
-
-                    @Override
-                    public void onSatelliteStatusChanged(GnssStatus status) {
-                        state.GNSSListener.onGnssStatusChanged(status);
-                    }
-                };
-                locationManager.registerGnssStatusCallback(gnssStatusCallback);
-            } catch (final SecurityException ex) {
-                Logging.info("\tSecurity exception adding status listener: " + ex, ex);
-            } catch (final Exception ex) {
-                Logging.error("Error registering for gnss: " + ex, ex);
-            }
-        } else {
-            Logging.error("Failed to setup GPS - SDK < 24 ("+Build.VERSION.SDK_INT+")");
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(() -> {
-                AlertDialog.Builder iseDlgBuilder = new AlertDialog.Builder(this);
-                iseDlgBuilder.setMessage(R.string.gps_old_message)
-                        .setTitle(getString(R.string.gps_old_title))
-                        .setCancelable(true)
-                        .setPositiveButton(R.string.ok, (dialog, which) -> dialog.dismiss());
-                final Dialog dialog = iseDlgBuilder.create();
-                if (!isFinishing()) {
-                    dialog.show();
+        try {
+            gnssStatusCallback = new GnssStatus.Callback() {
+                @Override
+                public void onStarted() {
                 }
-            });
 
+                @Override
+                public void onStopped() {
+                    state.GNSSListener.handleScanStop();
+                }
+
+                @Override
+                public void onFirstFix(int ttffMillis) {
+                }
+
+                @Override
+                public void onSatelliteStatusChanged(GnssStatus status) {
+                    state.GNSSListener.onGnssStatusChanged(status);
+                }
+            };
+            locationManager.registerGnssStatusCallback(gnssStatusCallback);
+        } catch (final SecurityException ex) {
+            Logging.info("\tSecurity exception adding status listener: " + ex, ex);
+        } catch (final Exception ex) {
+            Logging.error("Error registering for gnss: " + ex, ex);
         }
 
         final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
@@ -2049,12 +2028,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 Logging.info("removing location listener: " + state.GNSSListener);
                 try {
                     locationManager.removeUpdates(state.GNSSListener);
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        if (gnssStatusCallback != null) {
-                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
-                        }
-                    } else {
-                        locationManager.removeGpsStatusListener(state.GNSSListener);
+                    if (gnssStatusCallback != null) {
+                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
@@ -2250,10 +2225,8 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             if (state.GNSSListener != null && locationManager != null) {
                 try {
-                    if (Build.VERSION.SDK_INT >= 24) {
-                        if (gnssStatusCallback != null) {
-                            locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
-                        }
+                    if (gnssStatusCallback != null) {
+                        locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
                     }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {

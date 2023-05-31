@@ -13,7 +13,7 @@ import net.wigle.wigleandroid.util.Logging;
 /**
  * Loading "throbber" image parent class for network-based fragments.
  */
-public abstract class ProgressThrobberFragment extends Fragment {
+public abstract class ProgressThrobberFragment extends AuthenticatedFragment {
     protected ImageView loadingImage;
     protected ImageView errorImage;
     protected boolean animating = false;

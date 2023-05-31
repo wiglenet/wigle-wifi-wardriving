@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.view.View;
 import android.widget.CheckBox;
 
-import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.listener.PrefCheckboxListener;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;

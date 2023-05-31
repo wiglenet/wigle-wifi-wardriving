@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 
 import okhttp3.Credentials;
@@ -22,7 +24,7 @@ public class BasicAuthInterceptor implements Interceptor {
     }
 
     @Override
-    public Response intercept(Interceptor.Chain chain) throws IOException {
+    public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
         Request request = chain.request();
         Request authenticatedRequest = request.newBuilder()
                 .header("Authorization", credentials).build();

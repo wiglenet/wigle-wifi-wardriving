@@ -30,7 +30,6 @@ import net.wigle.wigleandroid.net.AuthenticatedRequestCompletedListener;
 import net.wigle.wigleandroid.net.RequestCompletedListener;
 import net.wigle.wigleandroid.ui.EndlessScrollListener;
 import net.wigle.wigleandroid.ui.ProgressThrobberFragment;
-import net.wigle.wigleandroid.ui.WiGLEAuthDialog;
 import net.wigle.wigleandroid.ui.WiGLEToast;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.MenuUtil;
@@ -119,12 +118,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                 s.apiManager.getUserStats(new AuthenticatedRequestCompletedListener<UserStats, JSONObject>() {
                     @Override
                     public void onAuthenticationRequired() {
-                        final FragmentActivity fa = getActivity();
-                        if (null != fa) {
-                            WiGLEAuthDialog.createDialog(fa, getString(R.string.login_title),
-                                    getString(R.string.login_required), getString(R.string.login),
-                                    getString(R.string.cancel));
-                        }
+                        showAuthDialog();
                     }
 
                     @Override

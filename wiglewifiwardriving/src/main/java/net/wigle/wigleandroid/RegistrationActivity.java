@@ -1,11 +1,10 @@
 package net.wigle.wigleandroid;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -21,11 +20,12 @@ public class RegistrationActivity extends AppCompatActivity {
 
     public static final String AGENT = "WiGLE WiFi Registrant";
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-        WebView regWebView = (WebView) findViewById(R.id.wigle_registration_container);
+        WebView regWebView = findViewById(R.id.wigle_registration_container);
         WebSettings webSettings = regWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         regWebView.clearCache(true);
@@ -35,9 +35,7 @@ public class RegistrationActivity extends AppCompatActivity {
         }
         regWebView.setWebChromeClient(new WebChromeClient());
         regWebView.getSettings().setUserAgentString(AGENT);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            WebView.setWebContentsDebuggingEnabled(true);
-        }
+        WebView.setWebContentsDebuggingEnabled(true);
         regWebView.addJavascriptInterface(new WiGLERegistrationInterface(this),
                 "WiGLEWiFi");
         regWebView.loadUrl(UrlConfig.REG_URL);
@@ -47,19 +45,8 @@ public class RegistrationActivity extends AppCompatActivity {
      * dammit, android. stolen from:
      * https://stackoverflow.com/questions/28998241/how-to-clear-cookies-and-cache-of-webview-on-android-when-not-in-webview
      */
-    @SuppressWarnings("deprecation")
     protected void clearCookies(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
-        } else  {
-            CookieSyncManager cookieSyncMngr=CookieSyncManager.createInstance(context);
-            cookieSyncMngr.startSync();
-            CookieManager cookieManager=CookieManager.getInstance();
-            cookieManager.removeAllCookie();
-            cookieManager.removeSessionCookie();
-            cookieSyncMngr.stopSync();
-            cookieSyncMngr.sync();
-        }
+        CookieManager.getInstance().removeAllCookies(null);
+        CookieManager.getInstance().flush();
     }
 }

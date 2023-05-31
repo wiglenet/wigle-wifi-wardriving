@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -9,8 +8,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCameraMoveListener;
 import com.google.android.gms.maps.GoogleMap.OnCameraIdleListener;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -67,7 +67,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         }
 
         @Override
-        protected void onBeforeClusterItemRendered(Network network, MarkerOptions markerOptions) {
+        protected void onBeforeClusterItemRendered(@NonNull Network network, MarkerOptions markerOptions) {
             // Draw a single network.
             final BitmapDescriptor icon = getIcon(network);
             markerOptions.icon(icon);
@@ -113,7 +113,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         }
 
         @Override
-        protected void onBeforeClusterRendered(Cluster<Network> cluster, MarkerOptions markerOptions) {
+        protected void onBeforeClusterRendered(@NonNull Cluster<Network> cluster, @NonNull MarkerOptions markerOptions) {
             // Draw a cluster
             super.onBeforeClusterRendered(cluster, markerOptions);
             markerOptions.title(cluster.getSize() + " Networks");
@@ -136,7 +136,7 @@ public class MapRender implements ClusterManager.OnClusterClickListener<Network>
         }
 
         @Override
-        protected boolean shouldRenderAsCluster(Cluster<Network> cluster) {
+        protected boolean shouldRenderAsCluster(@NonNull Cluster<Network> cluster) {
             return (prefs.getBoolean( PreferenceKeys.PREF_MAP_CLUSTER, true ) && cluster.getSize() > 4)
                     || cluster.getSize() >= 100;
         }

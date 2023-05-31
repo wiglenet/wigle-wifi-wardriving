@@ -1,3 +1,9 @@
+* 2.75 (05/30/2023)
+App resize on newer Android versions
+Kml sanitization (thanks Krzysztof!)
+Stats loading animations
+Various bug fixes
+
 * 2.74 (05/02/2023)
 Various bug fixes including scroll paging, DBResult NPE
 

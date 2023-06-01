@@ -49,7 +49,8 @@
 			</LinearLayout>
 
 			<LinearLayout android:orientation="horizontal"
-				android:layout_width="fill_parent" android:layout_height="wrap_content">
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content">
 				<TextView
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
@@ -68,197 +69,254 @@
 					android:layout_weight="5"
 					/>
 			</LinearLayout>
-			<LinearLayout
-			android:orientation="horizontal"
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			>
+			<RelativeLayout
+				android:id="@+id/summary_row"
+				android:orientation="horizontal"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:paddingHorizontal="1dp"
+				android:paddingBottom="2dp"
+				>
 				<TextView
+					android:id="@+id/na_signal_label"
 					android:text="@string/network_signal"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:layout_marginRight="2dip"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
 					android:textStyle="bold"
-					android:gravity="right"
+
 				/>
 				<TextView
 					android:id="@+id/na_signal"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:gravity="left"
-				/>
+					android:paddingStart="4dp"
+					android:paddingEnd="40dp"
+					android:layout_toEndOf="@+id/na_signal_label"
+					/>
 
 				<TextView
+					android:id="@+id/na_type_label"
 					android:text="@string/network_type"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:layout_marginRight="2dip"
 					android:textStyle="bold"
-					android:gravity="right"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
+					android:layout_toEndOf="@+id/na_signal"
 				/>
 				<TextView
 					android:id="@+id/na_type"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:gravity="left"
+					android:paddingStart="4dp"
+					android:paddingEnd="36dp"
+					android:layout_toEndOf="@+id/na_type_label"
 				/>
 
 				<TextView
+					android:id="@+id/na_firsttime_label"
 					android:text="@string/network_firstseen"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
 					android:textStyle="bold"
-					android:layout_marginRight="2dip"
-					android:gravity="right"
+					android:layout_toEndOf="@+id/na_type"
 				/>
 				<TextView
 					android:id="@+id/na_firsttime"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_weight="1"
-					android:gravity="left"
+					android:paddingStart="4dp"
+					android:paddingEnd="1dp"
+					android:layout_toEndOf="@+id/na_firsttime_label"
 				/>
 
-			</LinearLayout>
+			</RelativeLayout>
 
-			<LinearLayout
+			<RelativeLayout
+				android:id="@+id/capabilities_row"
 				android:orientation="horizontal"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:paddingHorizontal="2dp"
-			>
+				android:paddingHorizontal="1dp"
+				android:layout_below="@+id/summary_row"
+				android:paddingBottom="2dp"
+				>
 				<TextView
+					android:id="@+id/na_cap_label"
 					android:text="@string/network_capa"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
+					android:textStyle="bold"
 				/>
 				<TextView
 					android:id="@+id/na_cap"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-				/>
-			</LinearLayout>
+					android:paddingStart="4dp"
+					android:paddingEnd="5dp"
+					android:layout_toEndOf="@+id/na_cap_label"
+					/>
+			</RelativeLayout>
 
-			<LinearLayout
+			<RelativeLayout
+				android:id="@+id/channel_row"
 				android:orientation="horizontal"
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
-				android:weightSum="10"
-				android:paddingHorizontal="2dp"
+				android:paddingHorizontal="1dp"
+				android:paddingBottom="2dp"
+				android:layout_below="@+id/capabilities_row"
 				>
 				<TextView
+					android:id="@+id/na_chan_label"
 					android:text="@string/network_channel"
-					android:layout_width="0dp"
-					android:layout_weight="2"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-				/>
+					android:textStyle="bold"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
+					/>
 				<TextView
 					android:id="@+id/na_chan"
-					android:layout_width="0dp"
-					android:layout_weight="3"
+					android:layout_width="wrap_content"
+					android:paddingStart="4dp"
+					android:paddingEnd="15dp"
 					android:layout_height="wrap_content"
-				/>
+					android:layout_toEndOf="@+id/na_chan_label"
+					/>
 
 				<TextView
+					android:id="@+id/na_observe_label"
 					android:text="@string/network_observations"
-					android:layout_width="0dp"
-					android:layout_weight="3"
-					android:gravity="right"
+					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-				/>
+					android:textStyle="bold"
+					android:paddingStart="1dp"
+					android:paddingEnd="1dp"
+					android:layout_toEndOf="@+id/na_chan"
+					/>
 				<TextView
 					android:id="@+id/na_observe"
 					android:text="@string/network_querying"
-					android:layout_width="0dp"
-					android:layout_weight="2"
+					android:layout_width="wrap_content"
+					android:paddingStart="5dp"
+					android:paddingEnd="5dp"
 					android:layout_height="wrap_content"
+					android:layout_toEndOf="@+id/na_observe_label"
 				/>
-			</LinearLayout>
-			<LinearLayout
+			</RelativeLayout>
+			<RelativeLayout
 				android:id="@+id/cell_info"
 				android:orientation="vertical"
-				android:layout_width="fill_parent"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:visibility="gone"
-				android:layout_marginRight="15dp"
-				android:paddingHorizontal="2dp">
-				<LinearLayout
+				android:paddingHorizontal="2dp"
+				android:layout_below="@+id/channel_row">
+				<RelativeLayout
+					android:id="@+id/status_row"
 					android:orientation="horizontal"
 					android:layout_width="fill_parent"
-					android:layout_height="wrap_content"
-					android:weightSum="4"
-					>
+					android:paddingBottom="2dp"
+					android:layout_height="wrap_content">
 					<TextView
+						android:id="@+id/na_cell_status_label"
 						android:text="@string/cell_network_status"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						android:textStyle="bold"
+						android:paddingStart="1dp"
+						android:paddingEnd="1dp"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						/>
 					<TextView
 						android:id="@+id/na_cell_status"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						android:layout_width="wrap_content"
+						android:paddingStart="4dp"
+						android:paddingEnd="15dp"
 						android:layout_height="wrap_content"
+						android:layout_toEndOf="@+id/na_cell_status_label"
 						/>
 					<TextView
+						android:id="@+id/na_cell_brand_label"
 						android:text="@string/cell_network_brand"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
+						android:paddingStart="5dp"
+						android:paddingEnd="1dp"
+						android:textStyle="bold"
+						android:layout_toEndOf="@+id/na_cell_status"
 						/>
 					<TextView
 						android:id="@+id/na_cell_brand"
-						android:layout_width="0dp"
-						android:layout_weight="1"
+						android:layout_width="wrap_content"
+						android:paddingStart="4dp"
+						android:paddingEnd="4dp"
 						android:layout_height="wrap_content"
+						android:layout_toEndOf="@+id/na_cell_brand_label"
 						/>
-				</LinearLayout>
-				<LinearLayout
+				</RelativeLayout>
+				<RelativeLayout
+					android:id="@+id/brands_row"
 					android:orientation="horizontal"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
-					android:paddingHorizontal="2dp"
-					>
+					android:paddingHorizontal="1dp"
+					android:paddingBottom="2dp"
+					android:layout_below="@+id/status_row">
 					<TextView
+						android:id="@+id/na_cell_brands_label"
 						android:text="@string/cell_network_bands"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textSize="13sp"
+						android:textStyle="bold"
+						android:paddingStart="1dp"
+						android:paddingEnd="1dp"
+
 						/>
 					<TextView
 						android:id="@+id/na_cell_bands"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
+						android:paddingStart="4dp"
+						android:paddingEnd="4dp"
 						android:textSize="13sp"
+						android:layout_toEndOf="@+id/na_cell_brands_label"
 						/>
-				</LinearLayout>
-				<LinearLayout
+				</RelativeLayout>
+				<RelativeLayout
 					android:id="@+id/cell_notes_row"
 					android:visibility="gone"
 					android:orientation="horizontal"
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
-					android:paddingHorizontal="2dp"
-					>
+					android:paddingHorizontal="1dp"
+					android:layout_below="@+id/brands_row">
 					<TextView
+						android:id="@+id/na_cell_notes_label"
 						android:text="@string/cell_network_notes"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
 						android:textSize="13sp"
+						android:textStyle="bold"
 						/>
 					<TextView
 						android:id="@+id/na_cell_notes"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
+						android:paddingStart="5dp"
+						android:paddingEnd="5dp"
 						android:textSize="13sp"
+						android:layout_toEndOf="@+id/na_cell_notes_label"
 						/>
-				</LinearLayout>
-			</LinearLayout>
+				</RelativeLayout>
+			</RelativeLayout>
 		</LinearLayout>
 		<LinearLayout android:id="@+id/filter_row"
 			android:orientation="horizontal"

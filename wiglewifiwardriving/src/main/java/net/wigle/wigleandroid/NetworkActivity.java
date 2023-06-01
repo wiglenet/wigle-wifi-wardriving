@@ -1,5 +1,7 @@
 package net.wigle.wigleandroid;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,10 +41,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -79,6 +79,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private int observations = 0;
     private boolean isDbResult = false;
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
+    private NumberFormat numberFormat;
 
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
@@ -99,6 +100,13 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         }
 
         // set language
+        MainActivity.setLocale(this);
+        numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(this, this.getResources().getConfiguration()));
+        if (numberFormat instanceof DecimalFormat) {
+            numberFormat.setMinimumFractionDigits(0);
+            numberFormat.setMaximumFractionDigits(2);
+        }
+
         MainActivity.setLocale( this );
         setContentView(R.layout.network);
         networkActivity = this;
@@ -155,7 +163,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             } else {
                 tv.setTextColor( NetworkListUtil.getSignalColor( level, false) );
             }
-            tv.setText( Integer.toString( level ) );
+            tv.setText( numberFormat.format( level ) );
 
             tv = findViewById( R.id.na_type );
             tv.setText( network.getType().name() );
@@ -167,16 +175,23 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             Integer chan = network.getChannel();
             if ( NetworkType.WIFI.equals(network.getType()) ) {
                 chan = chan != null ? chan : network.getFrequency();
-                tv.setText(" " + Integer.toString(chan) + " ");
+                tv.setText(numberFormat.format(chan));
             } else if ( NetworkType.CDMA.equals(network.getType()) || chan == null) {
-                tv.setText( getString(R.string.na) );
+                tv.setText(getString(R.string.na));
+            } else if (NetworkType.isBtType(network.getType())) {
+                final String channelCode = NetworkType.channelCodeTypeForNetworkType(network.getType());
+                tv.setText(String.format(MainActivity.getLocale(getApplicationContext(),
+                                getApplicationContext().getResources().getConfiguration()),
+                        "%s %d", (null == channelCode?"":channelCode), chan));
             } else {
                 final String[] cellCapabilities = network.getCapabilities().split(";");
-                tv.setText(cellCapabilities[0]+" "+NetworkType.channelCodeTypeForNetworkType(network.getType())+" "+chan);
+                tv.setText(String.format(MainActivity.getLocale(getApplicationContext(),
+                        getApplicationContext().getResources().getConfiguration()),
+                        "%s %s %d", cellCapabilities[0], NetworkType.channelCodeTypeForNetworkType(network.getType()), chan));
             }
 
             tv = findViewById( R.id.na_cap );
-            tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
+            tv.setText( network.getCapabilities().replace("][", "]  [") );
 
             if ( NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
@@ -184,7 +199,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
                     MccMncRecord rec = null;
                     if (operatorCode.length() == 6) {
-                        final String mnc = operatorCode.substring(3, operatorCode.length());
+                        final String mnc = operatorCode.substring(3);
                         final String mcc = operatorCode.substring(0, 3);
 
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
@@ -201,16 +216,16 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                             View v = findViewById(R.id.cell_info);
                             v.setVisibility(View.VISIBLE);
                             tv = findViewById( R.id.na_cell_status );
-                            tv.setText( " "+rec.getStatus() );
+                            tv.setText(rec.getStatus() );
                             tv = findViewById( R.id.na_cell_brand );
-                            tv.setText( " "+rec.getBrand());
+                            tv.setText(rec.getBrand());
                             tv = findViewById( R.id.na_cell_bands );
-                            tv.setText( " "+rec.getBands());
+                            tv.setText( rec.getBands());
                             if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
                                 v = findViewById(R.id.cell_notes_row);
                                 v.setVisibility(View.VISIBLE);
                                 tv = findViewById( R.id.na_cell_notes );
-                                tv.setText( " "+rec.getNotes());
+                                tv.setText( rec.getNotes());
                             }
                         }
                     }
@@ -287,48 +302,44 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             public void handleMessage( final Message msg ) {
                 final TextView tv = findViewById( R.id.na_observe );
                 if ( msg.what == MSG_OBS_UPDATE ) {
-                    tv.setText( " " + Integer.toString( observations ) + "...");
+                    tv.setText( numberFormat.format( observations ));
                 } else if ( msg.what == MSG_OBS_DONE ) {
-                    tv.setText( " " + Integer.toString( observations ) );
+                    tv.setText( numberFormat.format( observations ) );
                     // ALIBI:  assumes all observations belong to one "cluster" w/ a single centroid.
                     // we could check and perform multi-cluster here
                     // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
                     // but that seems less likely w/ one individual's observations
                     final LatLng estCentroid = computeBasicLocation(obsMap);
                     final int zoomLevel = computeZoom(obsMap, estCentroid);
-                    mapView.getMapAsync(new OnMapReadyCallback() {
-                        @Override
-                        public void onMapReady(@NonNull final GoogleMap googleMap) {
-                            int count = 0;
-                            int maxDistMeters = 0;
-                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
-                                final LatLng latLon = obs.getKey();
-                                final int level = obs.getValue();
+                    mapView.getMapAsync(googleMap -> {
+                        int count = 0;
+                        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+                            final LatLng latLon = obs.getKey();
+                            final int level = obs.getValue();
 
-                                // default to initial position
-                                if (count == 0 && network.getLatLng() == null) {
-                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
-                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                }
-
-                                BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
-                                        getApplicationContext(), level);
-
-                                googleMap.addMarker(new MarkerOptions().icon(obsIcon)
-                                        .position(latLon).zIndex(level));
-                                count++;
-                            }
-                            // if we got a good centroid, display it and center on it
-                            if (estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
-                                //TODO: improve zoom based on obs distances?
+                            // default to initial position
+                            if (count == 0 && network.getLatLng() == null) {
                                 final CameraPosition cameraPosition = new CameraPosition.Builder()
-                                        .target(estCentroid).zoom(zoomLevel).build();
+                                        .target(latLon).zoom(DEFAULT_ZOOM).build();
                                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                                googleMap.addMarker(new MarkerOptions().position(estCentroid));
                             }
-                            Logging.info("observation count: " + count);
+
+                            BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
+                                    getApplicationContext(), level);
+
+                            googleMap.addMarker(new MarkerOptions().icon(obsIcon)
+                                    .position(latLon).zIndex(level));
+                            count++;
                         }
+                        // if we got a good centroid, display it and center on it
+                        if (estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+                            //TODO: improve zoom based on obs distances?
+                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+                                    .target(estCentroid).zoom(zoomLevel).build();
+                            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                            googleMap.addMarker(new MarkerOptions().position(estCentroid));
+                        }
+                        Logging.info("observation count: " + count);
                     });
                 }
             }

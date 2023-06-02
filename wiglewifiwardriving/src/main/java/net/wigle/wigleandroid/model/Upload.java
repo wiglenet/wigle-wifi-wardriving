@@ -11,18 +11,24 @@ public final class Upload {
     private final long totalWifiGps;
     @SerializedName("total")
     private final long totalWifi;
+    @SerializedName("discovered")
+    private final long newWiFi;
     @SerializedName("discoveredGps")
     private final long newWifiGps;
     @SerializedName("btTotalGps")
     private final long totalBtGps;
     @SerializedName("btTotal")
     private final long totalBt;
+    @SerializedName("btDiscovered")
+    private final long newBt;
     @SerializedName("btDiscoveredGps")
     private final long newBtGps;
     @SerializedName("genTotalGps")
     private final long totalCellGps;
     @SerializedName("genTotal")
     private final long totalCell;
+    @SerializedName("genDiscovered")
+    private final long newCell;
     @SerializedName("genDiscoveredGps")
     private final long newCellGps;
     private final int percentDone;
@@ -34,8 +40,13 @@ public final class Upload {
     private final Status status;
     private final long wait;
 
-    public Upload(final String transid, final long totalWifiGps, final long totalBtGps, final long totalCellGps, final long newWifiGps, final long newBtGps, final long newCellGps, final long totalWifi, final long totalBt, final long totalCell,
-                  final int percentDone, final Status status, final long fileSize, final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal, final long wait) {
+    public Upload(final String transid,
+                  final long totalWifiGps, final long totalBtGps, final long totalCellGps,
+                  final long newWifiGps, final long newBtGps, final long newCellGps,
+                  final long totalWifi, final long totalBt, final long totalCell,
+                  final long newWifi, final long newBt, final long newCell,
+                  final int percentDone, final Status status, final long fileSize,
+                  final String fileName, final Boolean uploadedFromLocal, final Boolean downloadedToLocal, final long wait) {
         this.transid = transid;
         this.totalWifiGps = totalWifiGps;
         this.totalBtGps = totalBtGps;
@@ -43,6 +54,9 @@ public final class Upload {
         this.totalWifi = totalWifi;
         this.totalBt = totalBt;
         this.totalCell = totalCell;
+        this.newWiFi = newWifi;
+        this.newBt = newBt;
+        this.newCell = newCell;
         this.newWifiGps = newWifiGps;
         this.newBtGps = newBtGps;
         this.newCellGps = newCellGps;
@@ -125,6 +139,18 @@ public final class Upload {
 
     public long getWait() {
         return wait;
+    }
+
+    public long getNewWiFi() {
+        return newWiFi;
+    }
+
+    public long getNewBt() {
+        return newBt;
+    }
+
+    public long getNewCell() {
+        return newCell;
     }
 
     public long getNewWifiGps() {

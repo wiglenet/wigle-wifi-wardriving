@@ -69,7 +69,6 @@
         android:id="@+id/show_authuser"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="text"
         android:visibility="gone" />
     <Button
         android:id="@+id/deauthorize_client"
@@ -213,8 +212,8 @@
             android:layout_height="match_parent"
             android:text="@string/theme_settings_label"
             android:layout_weight="1"
-            android:layout_marginRight="6dip"
-            android:layout_gravity="left"
+            android:layout_marginEnd="6dip"
+            android:layout_gravity="start"
             />
     </LinearLayout>
     <TextView

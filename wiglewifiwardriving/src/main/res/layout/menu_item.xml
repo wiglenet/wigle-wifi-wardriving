@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootView"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
@@ -23,6 +22,5 @@ android:contentDescription="@string/clear"
         android:gravity="center"
         android:layout_marginTop="11dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_toEndOf="@+id/navIcon"
-        android:layout_toRightOf="@+id/navIcon" />
+        android:layout_toEndOf="@+id/navIcon" />
 </RelativeLayout>

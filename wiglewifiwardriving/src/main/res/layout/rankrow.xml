@@ -28,6 +28,7 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
 			android:paddingStart="18dp"
+			android:paddingEnd="0dp"
 			android:gravity="start"
 			android:textSize="22sp"/>
 	</LinearLayout>

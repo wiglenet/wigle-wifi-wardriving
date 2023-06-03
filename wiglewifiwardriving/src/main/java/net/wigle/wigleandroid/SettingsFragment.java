@@ -348,12 +348,16 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                         @Override
                         public void onTaskFailed(int status, JSONObject error) {
                             Logging.error("Authentication: failed: " + status);
-                            final SharedPreferences prefs = SettingsFragment.this.getActivity()
-                                    .getApplicationContext()
-                                    .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                            final Editor editor = prefs.edit();
-                            editor.remove(PreferenceKeys.PREF_PASSWORD);
-                            editor.apply();
+                            FragmentActivity activity = SettingsFragment.this.getActivity();
+                            if (activity == null) activity = MainActivity.getMainActivity();
+                            if (activity != null) {
+                                final SharedPreferences prefs = activity
+                                        .getApplicationContext()
+                                        .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                final Editor editor = prefs.edit();
+                                editor.remove(PreferenceKeys.PREF_PASSWORD);
+                                editor.apply();
+                            }
                         }
                     });
                 }

@@ -22,7 +22,8 @@
             android:text="@string/status_unknown"
             android:textSize="18sp"
             android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
 
@@ -45,7 +46,8 @@
             android:text="@string/status_unknown"
             android:textSize="18sp"
             android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
 
@@ -68,7 +70,8 @@
             android:text="@string/status_unknown"
             android:textSize="18sp"
             android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -90,7 +93,8 @@
             android:text="@string/status_unknown"
             android:textSize="18sp"
             android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -112,7 +116,8 @@
             android:text="@string/status_unknown"
             android:textSize="18sp"
             android:paddingBottom="2dp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
     <LinearLayout
@@ -132,7 +137,8 @@
             android:layout_height="wrap_content"
             android:text="@string/status_unknown"
             android:textSize="18sp"
-            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="1dp"
             />
     </LinearLayout>
 </LinearLayout>

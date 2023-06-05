@@ -329,12 +329,11 @@ public class WiGLEApiManager {
      * Get the paginated user rank data from the URL configured in the {@link net.wigle.wigleandroid.util.UrlConfig} class
      * @param pageStart the starting page offset
      * @param pageEnd the ending page offset
-     * @param userCentric whether or not to focus on a current user
      * @param sort the sort method ('discovered', 'total', 'monthcount', 'prevmonthcount', 'gendisc', 'gentotal', 'firsttransid', 'lasttransid')
      * @param selected the selected record to highlight
      * @param completedListener the RequestCompletedListener instance to call on completion
      */
-    public void getRank(final long pageStart, final long pageEnd, @NonNull final Boolean userCentric,
+    public void getRank(final long pageStart, final long pageEnd,
                         @NotNull final String sort,long selected,
                         @NotNull final RequestCompletedListener<RankResponse,
             JSONObject> completedListener) {
@@ -535,7 +534,7 @@ public class WiGLEApiManager {
     }
 
     //As seen in AbstractBackgroundTask - but accessing the MainLooper directly.
-    private final void sendBundledMessage(final int what, final Bundle bundle) {
+    private void sendBundledMessage(final int what, final Bundle bundle) {
         final Handler mainHandler = new Handler(Looper.getMainLooper());
         final Message msg = new Message();
         msg.what = what;

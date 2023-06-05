@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linearlayout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/site_stats_top_layout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="4dp"
     >
-
     <TextView
+        android:id="@+id/wifi_loc_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/netloc_title"
@@ -21,14 +21,16 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="4dp"
+        android:layout_below="@+id/wifi_loc_label"
         />
-
     <TextView
+        android:id="@+id/wifi_obs_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/loctotal_title"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:layout_below="@+id/netloc"
         />
     <TextView
         android:id="@+id/loctotal"
@@ -37,14 +39,17 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="4dp"
+        android:layout_below="@+id/wifi_obs_label"
         />
 
     <TextView
+        android:id="@+id/bt_loc_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/btloc_title"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:layout_below="@+id/loctotal"
         />
     <TextView
         android:id="@+id/btloc"
@@ -53,14 +58,17 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="4dp"
+        android:layout_below="@+id/bt_loc_label"
         />
 
     <TextView
+        android:id="@+id/cell_loc_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/genloc_title"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:layout_below="@+id/btloc"
         />
     <TextView
         android:id="@+id/genloc"
@@ -69,15 +77,16 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="4dp"
+        android:layout_below="@+id/cell_loc_label"
         />
-
     <TextView
+        android:id="@+id/users_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/userstot_title"
         android:textSize="20sp"
         android:textStyle="bold"
-
+        android:layout_below="@+id/genloc"
         />
     <TextView
         android:id="@+id/userstot"
@@ -86,15 +95,16 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="2dp"
+        android:layout_below="@+id/users_label"
         />
-
     <TextView
+        android:id="@+id/trans_total_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/transtot_title"
         android:textSize="20sp"
         android:textStyle="bold"
-
+        android:layout_below="@+id/userstot"
         />
     <TextView
         android:id="@+id/transtot"
@@ -103,6 +113,6 @@
         android:text="@string/status_unknown"
         android:textSize="22sp"
         android:paddingBottom="4dp"
+        android:layout_below="@+id/trans_total_label"
         />
-
-</LinearLayout>
+</RelativeLayout>

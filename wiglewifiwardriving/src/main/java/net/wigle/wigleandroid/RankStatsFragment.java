@@ -210,7 +210,7 @@ public class RankStatsFragment extends ProgressThrobberFragment {
                 //DEBUG:
                 Logging.info("getting ranks: "+pageStart + " end: "+ pageEnd + " usercentric: " + userCentric.get() +", sort:" + sort);
 
-                s.apiManager.getRank(pageStart, pageEnd, userCentric.get(), sort,
+                s.apiManager.getRank(pageStart, pageEnd, sort,
                         finalSelected, new RequestCompletedListener<RankResponse, JSONObject>() {
                     @Override
                     public void onTaskCompleted() {

@@ -6,8 +6,7 @@
 <TextView android:id="@+id/subject" android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_weight="1"
-	      style="@style/NewsTitleStyle"/>/>
-
+	      style="@style/NewsTitleStyle"/>
 <TextView android:id="@+id/poster_date" android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_weight="1"

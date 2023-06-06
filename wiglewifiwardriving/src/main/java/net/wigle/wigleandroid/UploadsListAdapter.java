@@ -75,7 +75,7 @@ public final class UploadsListAdapter extends AbstractListAdapter<Upload> {
             tv.setText(transId);
 
             final boolean completed = Upload.Status.SUCCESS.equals(upload.getStatus());
-            final boolean preTrilateration = Upload.Status.TRILATERATING.equals(upload.getStatus()) || Upload.Status.PARSING.equals(upload.getStatus());
+            final boolean preTrilateration = Upload.Status.TRILATERATING.equals(upload.getStatus()) || Upload.Status.PARSING.equals(upload.getStatus()) || Upload.Status.STATS.equals(upload.getStatus());
 
             tv = row.findViewById(R.id.total_wifi_gps);
             tv.setText(!preTrilateration?numberFormat.format(upload.getNewWifiGps()):"("+numberFormat.format(upload.getNewWiFi())+")");

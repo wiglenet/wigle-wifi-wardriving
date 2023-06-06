@@ -18,7 +18,8 @@
         android:id="@+id/queue_depth"
         style="@style/InvertedText"
         android:textSize="16sp"
-        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
+        android:paddingStart="0dp"
         />
     </LinearLayout>
     <RelativeLayout

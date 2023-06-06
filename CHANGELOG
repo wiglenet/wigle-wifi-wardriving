@@ -1,3 +1,8 @@
+* 2.76 (06/06/2023)
+Network detail UI cleanup
+Setting fragment crash fix
+More accurate pending file stats
+
 * 2.75 (05/30/2023)
 App resize on newer Android versions
 Kml sanitization (thanks Krzysztof!)

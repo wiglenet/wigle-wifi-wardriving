@@ -23,11 +23,11 @@
         android:layout_height="wrap_content"
         android:text="@string/filter_not_regex" /> 
         
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content">	
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
               android:orientation="vertical"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content">	
@@ -43,7 +43,7 @@
 	        android:text="@string/filter_show_cell" /> 
 	           
      	</LinearLayout>
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
           android:orientation="vertical"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content">
@@ -77,7 +77,7 @@
 	        android:layout_height="wrap_content"
 	        android:text="@string/filter_enabled" />
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"

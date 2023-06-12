@@ -211,18 +211,20 @@ public class DBResultActivity extends AppCompatActivity {
                             obsMap.put(point, 0);
                         }
                     }
-                    handler.post(() -> {
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        for (Network n: resultList) {
-                            listAdapter.add(n);
-                            mapRender.addItem(n);
-                            final LatLng ll = n.getPosition();
-                            //noinspection ConstantConditions
-                            if (ll != null) builder.include(ll);
-                        }
-                        mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
-                        resultList.clear();
-                    });
+                    if (resultList.size() > 0) {
+                        handler.post(() -> {
+                            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                            for (Network n : resultList) {
+                                listAdapter.add(n);
+                                mapRender.addItem(n);
+                                final LatLng ll = n.getPosition();
+                                //noinspection ConstantConditions
+                                if (ll != null) builder.include(ll);
+                            }
+                            mapView.getMapAsync(googleMap -> googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 0)));
+                            resultList.clear();
+                        });
+                    }
                 } else {
                     handler.post(() -> handleFailedRequest());
                 }

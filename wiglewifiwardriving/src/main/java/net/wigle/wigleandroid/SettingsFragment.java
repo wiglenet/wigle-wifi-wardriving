@@ -283,7 +283,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final View authUserLayout = view.findViewById(R.id.show_authuser_label);
         final EditText passEdit = view.findViewById(R.id.edit_password);
         final View passEditLayout = view.findViewById(R.id.edit_password_label);
-        final CheckBox showPass = view.findViewById(R.id.showpassword);
+        final CheckBox showPassword = view.findViewById(R.id.showpassword);
         final String authToken = prefs.getString(PreferenceKeys.PREF_TOKEN, "");
         final Button deauthButton = view.findViewById(R.id.deauthorize_client);
         final Button authButton = view.findViewById(R.id.authorize_client);
@@ -300,7 +300,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 authButton.setVisibility(View.GONE);
                 passEdit.setVisibility(View.GONE);
                 passEditLayout.setVisibility(View.GONE);
-                showPass.setVisibility(View.GONE);
+                showPassword.setVisibility(View.GONE);
                 user.setEnabled(false);
             } else {
                 user.setEnabled(true);
@@ -312,7 +312,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             deauthButton.setVisibility(View.GONE);
             passEdit.setVisibility(View.VISIBLE);
             passEditLayout.setVisibility(View.VISIBLE);
-            showPass.setVisibility(View.VISIBLE);
+            showPassword.setVisibility(View.VISIBLE);
             authButton.setVisibility(View.VISIBLE);
             authButton.setOnClickListener(view12 -> {
                 MainActivity.State s = MainActivity.getStaticState();
@@ -409,26 +409,11 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
         // register link
         final TextView register = view.findViewById(R.id.register);
-        final String registerString = getString(R.string.register);
-        final String activateString = getString(R.string.activate);
-        String registerBlurb = "<a href='net.wigle.wigleandroid.register://register'>" + registerString +
-                "</a> @WiGLE.net";
-
-        // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...
-        // but we're only supporting qr in v23+ via the uses-permission-sdk-23 tag -rksh
-        if (Build.VERSION.SDK_INT >= 23) {
-            registerBlurb += " or <a href='net.wigle.wigleandroid://activate'>" + activateString +
-                    "</a>";
-        }
         try {
-            if (Build.VERSION.SDK_INT >= 24) {
-                register.setText(Html.fromHtml(registerBlurb,
+                register.setText(Html.fromHtml(getString(R.string.registration_html_prompt),
                         Html.FROM_HTML_MODE_LEGACY));
-            } else {
-                register.setText(Html.fromHtml(registerBlurb));
-            }
         } catch (Exception ex) {
-            register.setText(registerString + " @WiGLE.net");
+            Logging.error("Unable to set registration text from HTML: ",ex);
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
         updateRegister(view);
@@ -444,7 +429,6 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             }
         });
 
-        final CheckBox showPassword = view.findViewById(R.id.showpassword);
         showPassword.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if ( isChecked ) {
                 passEdit.setTransformationMethod(SingleLineTransformationMethod.getInstance());

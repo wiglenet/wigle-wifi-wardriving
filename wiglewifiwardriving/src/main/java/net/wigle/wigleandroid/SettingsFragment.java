@@ -266,12 +266,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         } else if (Build.VERSION.SDK_INT > 29) {
             //ALIBI: starting in SDK 30, we can check the throttle via WiFiManager.isScanThrottleEnabled
             final Context mainActivity = MainActivity.getMainActivity();
-            final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager.isScanThrottleEnabled()) {
-                final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
-                addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
-                scanThrottleHelp.setText(builder.toString());
-                scanThrottleHelp.setVisibility(View.VISIBLE);
+            if (null != mainActivity) {
+                final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager.isScanThrottleEnabled()) {
+                    final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
+                    addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
+                    scanThrottleHelp.setText(builder.toString());
+                    scanThrottleHelp.setVisibility(View.VISIBLE);
+                }
             }
         }
 

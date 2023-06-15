@@ -23,6 +23,7 @@ import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,10 +51,16 @@ import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLProtocolException;
 
 import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
 import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
+
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.security.ProviderInstaller;
 
 /**
  * replacement file upload task
@@ -267,10 +274,17 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             throw ex;
 
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
-            Logging.error( "connection problem: " + ex, ex );
+            Logging.error("connection problem: " + ex, ex);
             ex.printStackTrace();
             status = Status.EXCEPTION;
-            bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
+            bundle.putString(BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn));
+        } catch (UpgradeSslException use) {
+            status = Status.EXCEPTION;
+            try {
+                ProviderInstaller.installIfNeeded(context);
+            } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                Logging.error("ProviderInstall failed", e);
+            }
         } catch (final SSLException ex) {
             Logging.error( "security problem: " + ex, ex );
             ex.printStackTrace();

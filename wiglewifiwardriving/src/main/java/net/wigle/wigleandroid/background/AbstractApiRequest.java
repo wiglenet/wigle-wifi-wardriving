@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
+import android.os.Build;
 import android.util.Base64;
 
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -14,6 +16,7 @@ import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +31,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+
+import javax.net.ssl.SSLHandshakeException;
 
 /**
  * Abstract base class for WiGLE API connections
@@ -69,13 +74,13 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     public static HttpURLConnection connect(String urlString, final boolean setBoundary,
-                                            final String connectionMethod) throws IOException {
+                                            final String connectionMethod) throws IOException, UpgradeSslException  {
         return connect(urlString, setBoundary, null, connectionMethod);
     }
 
     public static HttpURLConnection connect(String urlString, final boolean setBoundary,
                                             final PreConnectConfigurator preConnectConfigurator,
-                                            final String connectionMethod) throws IOException {
+                                            final String connectionMethod) throws IOException, UpgradeSslException  {
         URL connectURL;
         try{
             connectURL = new URL( urlString );
@@ -84,7 +89,6 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             Logging.error( "MALFORMED URL: " + ex, ex );
             return null;
         }
-
         return createConnection(connectURL, setBoundary, preConnectConfigurator, connectionMethod);
     }
 
@@ -106,7 +110,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     private static HttpURLConnection createConnection(final URL connectURL, final boolean setBoundary,
                                                       final PreConnectConfigurator preConnectConfigurator,
                                                       final String connectionMethod)
-            throws IOException {
+            throws IOException, UpgradeSslException {
 
         final String userAgent = AbstractApiRequest.getUserAgentString();
 
@@ -153,10 +157,18 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
         // connect
         Logging.info( "about to connect" );
-        conn.connect();
-        Logging.info( "connected" );
-
-        return conn;
+        try {
+            conn.connect();
+            Logging.info( "connected" );
+            return conn;
+        } catch (SSLHandshakeException sslhe) {
+            Logging.error("Failed to build SSL connection on "+ Build.VERSION.SDK_INT+": ", sslhe);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1 && Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+                Logging.info("Viable SDK for upgrade to TLS 1.2 support");
+                throw new UpgradeSslException("Android version "+Build.VERSION.SDK_INT+" must upgrade to support TLS 1.2");
+            }
+            return null;
+        }
     }
 
     public void setCacheOnly(final boolean cacheOnly) {
@@ -282,10 +294,10 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
         return result.toString();
     }
-    protected String doDownload(final String connectionMethod) throws IOException, InterruptedException {
+    protected String doDownload(final String connectionMethod) throws IOException, InterruptedException, UpgradeSslException {
         return doDownload(connectionMethod, false);
     }
-    protected String doDownload(final String connectionMethod, final boolean preserveNewlines) throws IOException, InterruptedException {
+    protected String doDownload(final String connectionMethod, final boolean preserveNewlines) throws IOException, InterruptedException, UpgradeSslException {
         final boolean setBoundary = false;
 
         PreConnectConfigurator preConnectConfigurator = null;

@@ -8,6 +8,7 @@ import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.util.FileUtility;
 import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UpgradeSslException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +47,9 @@ public class KmlDownloader extends AbstractProgressApiRequest {
                     FileUtility.getKmlPath(context) + "/" + outputFileName + "\"}");
             sendBundledMessage( Status.SUCCESS.ordinal(), bundle );
             listener.requestComplete(json, false);
+        } catch (final UpgradeSslException use) {
+            sendBundledMessage( Status.FAIL.ordinal(), bundle );
+            Logging.error("ex: " + use + " result: " + result, use);
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             sendBundledMessage( Status.FAIL.ordinal(), bundle );

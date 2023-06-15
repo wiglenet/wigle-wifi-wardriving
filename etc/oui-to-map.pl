@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 # data files from:
-# https://code.wireshark.org/review/gitweb?p=wireshark.git;a=blob_plain;f=manuf
+# https://raw.githubusercontent.com/wireshark/wireshark/master/manuf
 # https://regauth.standards.ieee.org/standards-ra-web/pub/view.html#registries
+#   Mac Address Block Small+Medium+Large CSV's
 use utf8;
 use IO::Zlib;
 use Encode qw(decode);

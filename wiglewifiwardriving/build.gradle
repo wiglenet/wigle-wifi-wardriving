@@ -2,6 +2,7 @@ import groovy.sql.Sql
 
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
+apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
     namespace "net.wigle.wigleandroid"

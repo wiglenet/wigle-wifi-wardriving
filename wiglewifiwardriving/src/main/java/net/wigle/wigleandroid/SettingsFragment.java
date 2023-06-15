@@ -266,12 +266,14 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         } else if (Build.VERSION.SDK_INT > 29) {
             //ALIBI: starting in SDK 30, we can check the throttle via WiFiManager.isScanThrottleEnabled
             final Context mainActivity = MainActivity.getMainActivity();
-            final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            if (wifiManager.isScanThrottleEnabled()) {
-                final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
-                addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
-                scanThrottleHelp.setText(builder.toString());
-                scanThrottleHelp.setVisibility(View.VISIBLE);
+            if (mainActivity != null) {
+                final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager.isScanThrottleEnabled()) {
+                    final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
+                    addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
+                    scanThrottleHelp.setText(builder.toString());
+                    scanThrottleHelp.setVisibility(View.VISIBLE);
+                }
             }
         }
 
@@ -330,16 +332,20 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                         @Override
                         public void onTaskSucceeded(ApiTokenResponse response) {
                             if (null != response) {
-                                Logging.error("Authentication: succeeded as "+response.getAuthname());
-                                final SharedPreferences prefs = MainActivity.getMainActivity()
-                                        .getApplicationContext()
-                                        .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                                final Editor editor = prefs.edit();
-                                editor.putString(PreferenceKeys.PREF_AUTHNAME, response.getAuthname());
-                                editor.remove(PreferenceKeys.PREF_PASSWORD);
-                                editor.apply();
-                                TokenAccess.setApiToken(prefs, response.getToken());
-                                MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
+                                final Context mainActivity = MainActivity.getMainActivity();
+                                Logging.info("Authentication: succeeded as " + response.getAuthname()
+                                    + " mainActivity: " + mainActivity);
+                                if (mainActivity != null) {
+                                    final SharedPreferences prefs = mainActivity
+                                            .getApplicationContext()
+                                            .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                    final Editor editor = prefs.edit();
+                                    editor.putString(PreferenceKeys.PREF_AUTHNAME, response.getAuthname());
+                                    editor.remove(PreferenceKeys.PREF_PASSWORD);
+                                    editor.apply();
+                                    TokenAccess.setApiToken(prefs, response.getToken());
+                                    MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
+                                }
                             } else {
                                 Logging.error("Auth token request succeeded, but response was bad.");
                             }

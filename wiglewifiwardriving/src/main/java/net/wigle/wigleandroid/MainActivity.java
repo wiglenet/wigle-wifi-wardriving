@@ -918,7 +918,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     @Override
     public void onPause() {
         Logging.info("MAIN: pause.");
-        super.onPause();
+        try {
+            super.onPause();
+        } catch (RuntimeException ex) {
+            Logging.warn("super onPause exception: " + ex);
+        }
 
         // deal with wake lock
         if (state.wakeLock.isHeld()) {

@@ -435,6 +435,10 @@ public class WiGLEApiManager {
         Request request = new Request.Builder()
                 .url(httpUrl)
                 .build();
+        if (authedClient == null) {
+            Logging.warn("searchWifi authedClient is null, returning");
+            return;
+        }
         authedClient.newCall(request).enqueue(new Callback() {
             final Handler mainHandler = new Handler(Looper.getMainLooper());
 

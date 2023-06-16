@@ -266,7 +266,6 @@
     <string name="map_toast_hybrid">Карта: Гиброд</string>
     <string name="map_toast_terrain">Карта: Рельеф</string>
     <string name="map_needs_playservice">Карта зависит от Сервисов Google Play</string>
-    <string name="register">Зарегистрироваться</string>
     <string name="drawer_open">Ящик открыт</string>
     <string name="drawer_close">Ящик Закрыть</string>
     <string name="netwpa3_title">WPA3</string>
@@ -275,7 +274,6 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
-    <string name="activate">активировать по QR-коду сейчас</string>
     <string name="setting_activate_prompt">посетите https://wigle.net/activate для вашего пользовательского кода</string>
     <string name="upload_queued">В очереди</string>
     <string name="upload_parsing">Обработка…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Требуется вход</string>
     <string name="login_required">Вам необходимо авторизоваться чтобы выполнить это действие. Пожалуйста, войдите или создайте учетную запись, если это необходимо.</string>
     <string name="login">Авторизоваться</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Зарегистрируйте&lt;/a&gt; @WiGLE.net или &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;активируйте сейчас с помощью QR-кода&lt;/a&gt;</string>
 </resources>

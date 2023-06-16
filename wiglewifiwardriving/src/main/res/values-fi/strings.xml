@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Karttatyyppi: Hybridi</string>
     <string name="map_toast_terrain">Karttatyyppi: Maasto</string>
     <string name="map_needs_playservice">Kartta vaatii Google Play -palvelun</string>
-    <string name="register">Rekisteröidy</string>
     <string name="drawer_open">Laatikko auki</string>
     <string name="drawer_close">Laatikko suljettu</string>
     <string name="site_stats_app_name">WiGLE.net-tilastot</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Käyttäjien sijoitus viime kuussa</string>
     <string name="prevmonthrank_title">Kuukauden sijoitus viime kuussa</string>
     <string name="list_scanning_on">(Skannaus käytössä)</string>
-    <string name="activate">Aktivoi nyt</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Jäsennys…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Sisäänkirjautuminen vaaditaan</string>
     <string name="login_required">Sinun täytyy olla kirjautunut sisään tehdäksesi tämän. Ole hyvä ja kirjaudu sisään tai luo tili tarvittaessa.</string>
     <string name="login">Kirjaudu sisään</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Rekisteröidy&lt;/a&gt; @WiGLE.net tai &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivoi nyt QR-koodilla&lt;/a&gt;</string>
 </resources>

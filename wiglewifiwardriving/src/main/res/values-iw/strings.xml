@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">סוג מפה: היברידי</string>
     <string name="map_toast_terrain">סוג מפה: שטח</string>
     <string name="map_needs_playservice">המפה דורשת שירות Google Play</string>
-    <string name="register">הירשם</string>
     <string name="drawer_open">מגירה פתוחה</string>
     <string name="drawer_close">מגירה סגור</string>
     <string name="site_stats_app_name">סטטיסטיקה של WiGLE.net</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">דירוג משתמש בחודש שעבר</string>
     <string name="prevmonthrank_title">חודש החודש האחרון</string>
     <string name="list_scanning_on">(סריקה מופעלת)</string>
-    <string name="activate">הפעל עכשיו</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Parsing…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">נדרשת התחברות</string>
     <string name="login_required">עליך להיות מחובר כדי לעשות זאת. אנא היכנס או צור חשבון במידת הצורך.</string>
     <string name="login">התחברות</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>הרשמה ל-&lt;/a&gt; @WiGLE.net או &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;הפעל עכשיו עם קוד QR&lt;/a&gt;</string>
 </resources>

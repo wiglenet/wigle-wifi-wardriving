@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Térkép típusa: Hibrid</string>
     <string name="map_toast_terrain">Térkép típusa: Domborzat</string>
     <string name="map_needs_playservice">A térképhez Google Play szolgáltatás szükséges</string>
-    <string name="register">Regisztráció</string>
     <string name="drawer_open">Fiók nyitva</string>
     <string name="drawer_close">Fiók zárva</string>
     <string name="site_stats_app_name">WiGLE.net statisztika</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Felhasználói rangsor a múlt hónapban</string>
     <string name="prevmonthrank_title">Havi rangsor a múlt hónapban</string>
     <string name="list_scanning_on">(A letapogatás be van kapcsolva)</string>
-    <string name="activate">aktiválás most QR-kóddal</string>
     <string name="setting_activate_prompt">a https://wigle.net/activate felkeresése a felhasználói kódért</string>
     <string name="upload_queued">Sorba állítva</string>
     <string name="upload_parsing">Feldolgozás…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Bejelentkezés Szükséges</string>
     <string name="login_required">Ehhez be kell jelentkeznie. Kérjük, jelentkezzen be, vagy hozzon létre fiókot, ha szükséges.</string>
     <string name="login">Belépés</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Regisztráció&lt;/a&gt; @WiGLE.net vagy &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiválás most QR-kóddal&lt;/a&gt;</string>
 </resources>

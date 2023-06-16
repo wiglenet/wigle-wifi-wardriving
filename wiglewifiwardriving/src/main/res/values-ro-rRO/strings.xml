@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Tip hartă: hibridă</string>
     <string name="map_toast_terrain">Tip hartă: Teren</string>
     <string name="map_needs_playservice">Harta necesită serviciul Google Play</string>
-    <string name="register">Inregistreaza-te</string>
     <string name="drawer_open">Sertar deschis</string>
     <string name="drawer_close">Închidere sertar</string>
     <string name="site_stats_app_name">Statistici WiGLE.net</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Clasamentul utilizatorilor luna trecută</string>
     <string name="prevmonthrank_title">Clasament lunar Luna trecută</string>
     <string name="list_scanning_on">(Scanarea este activată)</string>
-    <string name="activate">activați acum cu codul QR</string>
     <string name="setting_activate_prompt">vizitați https://wigle.net/activate pentru codul dvs. de utilizator</string>
     <string name="upload_queued">În așteptare</string>
     <string name="upload_parsing">Analizare…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Conectare obligatorie</string>
     <string name="login_required">Trebuie să fii autentificat pentru a face acest lucru. Vă rugăm să vă conectați sau să creați un cont dacă este necesar.</string>
     <string name="login">Log in</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Înregistrează-te pe&lt;/a&gt; @WiGLE.net sau &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activează acum cu codul QR&lt;/a&gt;</string>
 </resources>

@@ -266,7 +266,6 @@
     <string name="map_toast_hybrid">Tipo de mapa: Híbrido</string>
     <string name="map_toast_terrain">Tipo de mapa: Terreno</string>
     <string name="map_needs_playservice">El mapa requiere el servicio de Google Play</string>
-    <string name="register">Registrarse</string>
     <string name="drawer_open">Cajón abierto</string>
     <string name="drawer_close">Cajón cerrado</string>
     <string name="site_stats_app_name">Estadísticas de WiGLE.net</string>
@@ -308,11 +307,10 @@
     <string name="prevrank_title">Clasificación de usuarios el mes pasado</string>
     <string name="prevmonthrank_title">Clasificación mensual el mes pasado</string>
     <string name="list_scanning_on">(Escáner activado)</string>
-    <string name="activate">activar ahora con código QR</string>
     <string name="setting_activate_prompt">visite https://wigle.net/activate para obtener su código de usuario</string>
     <string name="upload_queued">En espera</string>
-    <string name="upload_parsing">Analizando ...</string>
-    <string name="upload_trilaterating">Trilateando ...</string>
+    <string name="upload_parsing">Analizando …</string>
+    <string name="upload_trilaterating">Trilateando…</string>
     <string name="upload_stats">Estadísticas finales…</string>
     <string name="upload_success">Terminado</string>
     <string name="upload_failed">Ha fallado</string>
@@ -348,7 +346,7 @@
     <string name="display_filter_button">Excluir MAC/OUI de la pantalla…</string>
     <string name="add_oui_filter_button">Agregar filtro OUI</string>
     <string name="add_mac_filter_button">Agregar filtro MAC</string>
-    <string name="log_filter_button">Excluir MAC/OUI del registro ...</string>
+    <string name="log_filter_button">Excluir MAC/OUI del registro …</string>
     <string name="mac_filter_app_name">Filtrar direcciones</string>
     <string name="hide_mac">Ocultar MAC</string>
     <string name="hide_oui">Ocultar OUI</string>
@@ -444,4 +442,5 @@
     <string name="login_title">Necesario iniciar sesión</string>
     <string name="login_required">Debes iniciar sesión para hacer esto. Inicie sesión o cree una cuenta si es necesario.</string>
     <string name="login">Acceso</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrarse&lt;/a&gt; @WiGLE.net or &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activar ahora con código QR&lt;/a&gt;</string>
 </resources>

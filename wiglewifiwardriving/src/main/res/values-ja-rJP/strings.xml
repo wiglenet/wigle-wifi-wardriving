@@ -444,4 +444,8 @@
     <string name="login_title">ログインが必要です</string>
     <string name="login_required">これを行うにはログインする必要があります。必要に応じて、ログインするかアカウントを作成してください。</string>
     <string name="login">ログイン</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>WiGLE.net に登録する&lt;/a&gt;か、&lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR コードで今すぐアクティベートしてください&lt;/a&gt;</string>
+
+
+
 </resources>

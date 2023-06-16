@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Harita Türü: Karma</string>
     <string name="map_toast_terrain">Harita Türü: Arazi</string>
     <string name="map_needs_playservice">Harita, Google Play Hizmeti gerektirir</string>
-    <string name="register">Kayıt ol</string>
     <string name="drawer_open">Çekmece Açık</string>
     <string name="drawer_close">Çekmece Kapatma</string>
     <string name="site_stats_app_name">WiGLE.net İstatistikleri</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Geçen Ay Kullanıcı Sıralaması</string>
     <string name="prevmonthrank_title">Geçen Ay Ay Sıralaması</string>
     <string name="list_scanning_on">(Tarama açıldı)</string>
-    <string name="activate">şimdi aktifleştir</string>
     <string name="setting_activate_prompt">Kullanıcı kodunuz için https://wigle.net/activate adresini ziyaret edin</string>
     <string name="upload_queued">Sıraya alındı</string>
     <string name="upload_parsing">Ayrıştırma…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">oturum açmak gereklidir</string>
     <string name="login_required">Bunu yapmak için giriş yapmalısınız. Lütfen oturum açın veya gerekirse bir hesap oluşturun.</string>
     <string name="login">Giriş yapmak</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net'e kaydolun&lt;/a&gt; veya &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;şimdi QR kodu ile etkinleştir&lt;/a&gt;</string>
 </resources>

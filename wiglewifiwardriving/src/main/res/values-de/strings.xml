@@ -96,7 +96,7 @@
     <string name="network_observations">Bemerkungen:</string>
     <string name="network_querying">(frage ab&#8230;)</string>
     <string name="setting_show_password">Passwort anzeigen</string>
-    <string name="setting_db_marker">DB Marker (Uploads ab ...):</string>
+    <string name="setting_db_marker">DB Marker (Uploads ab …):</string>
     <string name="setting_high_up">Hochgeladen bis ID:</string>
     <string name="setting_zero_out">DB-Marker zurücksetzen?</string>
     <string name="setting_max_id">Max Upload-ID:</string>
@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Kartentyp: Hybrid</string>
     <string name="map_toast_terrain">Kartentyp: Terrain</string>
     <string name="map_needs_playservice">Karte benötigt Google Play Service</string>
-    <string name="register">Registrieren</string>
     <string name="drawer_open">Drawer öffnen</string>
     <string name="drawer_close">Drawer schließen</string>
     <string name="site_stats_app_name">WiGLE.net Statistiken</string>
@@ -308,7 +307,6 @@
     <string name="prevrank_title">Rang letzter Monat</string>
     <string name="prevmonthrank_title">Monatlicher Rang letzter Monat</string>
     <string name="list_scanning_on">(Scan eingeschaltet)</string>
-    <string name="activate">jetzt aktivieren</string>
     <string name="setting_activate_prompt">Besuche https://wigle.net/activate für deinen User-Code</string>
     <string name="upload_queued">in Warteschlange</string>
     <string name="upload_parsing">analysiere…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Anmeldung erforderlich</string>
     <string name="login_required">Dazu müssen Sie eingeloggt sein. Bitte melden Sie sich an oder erstellen Sie ggf. ein Konto.</string>
     <string name="login">Anmeldung</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrieren Sie&lt;/a&gt; @WiGLE.net oder &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;Jetzt mit QR-Code aktivieren&lt;/a&gt;</string>
 </resources>

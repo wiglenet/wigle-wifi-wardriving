@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">지도 유형 : 하이브리드</string>
     <string name="map_toast_terrain">지도 유형 : 지형</string>
     <string name="map_needs_playservice">지도에는 Google Play 서비스가 필요합니다.</string>
-    <string name="register">레지스터</string>
     <string name="drawer_open">서랍 열기</string>
     <string name="drawer_close">서랍 닫기</string>
     <string name="site_stats_app_name">WiGLE.net 통계</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">지난달 사용자 랭킹</string>
     <string name="prevmonthrank_title">지난달 순위</string>
     <string name="list_scanning_on">(스캔 켜짐)</string>
-    <string name="activate">지금 실행 시켜라</string>
     <string name="setting_activate_prompt">사용자 코드는 https://wigle.net/activate를 방문하십시오.</string>
     <string name="upload_queued">대기 중</string>
     <string name="upload_parsing">파싱…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">로그인 필요</string>
     <string name="login_required">이 작업을 수행하려면 로그인해야 합니다. 필요한 경우 로그인하거나 계정을 만드십시오.</string>
     <string name="login">로그인</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net 등록&lt;/a&gt; 또는 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;지금 QR 코드로 활성화&lt;/a&gt;</string>
 </resources>

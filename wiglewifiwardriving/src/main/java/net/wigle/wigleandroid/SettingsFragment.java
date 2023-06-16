@@ -332,20 +332,20 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                         @Override
                         public void onTaskSucceeded(ApiTokenResponse response) {
                             if (null != response) {
-                                final Context mainActivity = MainActivity.getMainActivity();
-                                Logging.info("Authentication: succeeded as " + response.getAuthname()
-                                    + " mainActivity: " + mainActivity);
-                                if (mainActivity != null) {
-                                    final SharedPreferences prefs = mainActivity
+                                Logging.error("Authentication: succeeded as "+response.getAuthname());
+                                FragmentActivity activity = SettingsFragment.this.getActivity();
+                                if (activity == null) activity = MainActivity.getMainActivity();
+                                if (activity != null) {
+                                    final SharedPreferences prefs = activity
                                             .getApplicationContext()
                                             .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                                     final Editor editor = prefs.edit();
                                     editor.putString(PreferenceKeys.PREF_AUTHNAME, response.getAuthname());
                                     editor.remove(PreferenceKeys.PREF_PASSWORD);
                                     editor.apply();
-                                    TokenAccess.setApiToken(prefs, response.getToken());
-                                    MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
                                 }
+                                TokenAccess.setApiToken(prefs, response.getToken());
+                                MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
                             } else {
                                 Logging.error("Auth token request succeeded, but response was bad.");
                             }
@@ -410,10 +410,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         // register link
         final TextView register = view.findViewById(R.id.register);
         try {
-                register.setText(Html.fromHtml(getString(R.string.registration_html_prompt),
-                        Html.FROM_HTML_MODE_LEGACY));
+            register.setText(Html.fromHtml(getString(R.string.registration_html_prompt),
+                    Html.FROM_HTML_MODE_LEGACY));
         } catch (Exception ex) {
-            Logging.error("Unable to set registration text from HTML: ",ex);
+            Logging.error("unable to create registration prompt from HTML");
         }
         register.setMovementMethod(LinkMovementMethod.getInstance());
         updateRegister(view);
@@ -477,14 +477,15 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
 
         // period spinners
+        final Context c = getContext();
         SettingsUtil.doScanSpinner( R.id.periodstill_spinner, PreferenceKeys.PREF_SCAN_PERIOD_STILL,
-                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, getContext() );
+                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, c );
         SettingsUtil.doScanSpinner( R.id.period_spinner, PreferenceKeys.PREF_SCAN_PERIOD,
-                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, getContext() );
+                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, c );
         SettingsUtil.doScanSpinner( R.id.periodfast_spinner, PreferenceKeys.PREF_SCAN_PERIOD_FAST,
-                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, getContext() );
+                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, c );
         SettingsUtil.doScanSpinner( R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
-                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, getContext() );
+                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c );
 
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
@@ -727,14 +728,17 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                     Logging.info("Settings auth unsuccessful");
                 } else {
                     Logging.info("Settings auth successful");
-                    final SharedPreferences prefs = MainActivity.getMainActivity()
-                            .getApplicationContext()
-                            .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-                    final Editor editor = prefs.edit();
-                    editor.remove(PreferenceKeys.PREF_PASSWORD);
-                    editor.apply();
-                    //TODO: order dependent -verify no risk of race condition here.
-                    fragment.updateView(view);
+                    final MainActivity m = MainActivity.getMainActivity();
+                    if (null != m) {
+                        final SharedPreferences prefs = m
+                                .getApplicationContext()
+                                .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                        final Editor editor = prefs.edit();
+                        editor.remove(PreferenceKeys.PREF_PASSWORD);
+                        editor.apply();
+                        //TODO: order dependent -verify no risk of race condition here.
+                        fragment.updateView(view);
+                    }
                 }
             }
         }

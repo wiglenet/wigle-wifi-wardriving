@@ -266,7 +266,6 @@
     <string name="map_toast_hybrid">मानचित्र प्रकार: हाइब्रिड</string>
     <string name="map_toast_terrain">मानचित्र प्रकार: क्षेत्र</string>
     <string name="map_needs_playservice">मानचित्र के लिए Google Play सेवा की आवश्यकता होती है</string>
-    <string name="register">पंजीकृत करें</string>
     <string name="drawer_open">ड्रॉवर खुला</string>
     <string name="drawer_close">ड्रॉवर बंद</string>
     <string name="site_stats_app_name">WiGLE.net सांख्यिकी</string>
@@ -308,7 +307,6 @@
     <string name="prevrank_title">पिछले महीने की उपयोगकर्ता रैंकिंग </string>
     <string name="prevmonthrank_title">पिछले महीने की महीना रैंकिंग</string>
     <string name="list_scanning_on">(स्कैनिंग चालू किया गया)</string>
-    <string name="activate">QR कोड के साथ अब सक्रिय करें</string>
     <string name="setting_activate_prompt">अपने उपयोगकर्ता कोड के लिए https://wigle.net/activate पर जाएँ</string>
     <string name="upload_queued">कतारबद्ध किया हुआ</string>
     <string name="upload_parsing">पार्सिंग...</string>
@@ -444,4 +442,5 @@
     <string name="login_title">लॉगिन आवश्यक</string>
     <string name="login_required">यह करने के लिये लॉग - इन करना आवश्यक है। कृपया लॉग इन करें या यदि आवश्यक हो तो एक खाता बनाएँ।</string>
     <string name="login">लॉग इन करें</string>
+    <string name="registration_html_prompt">\@WiGLE.net &lt;a href=\'net.wigle.wigleandroid.register://register\'>पंजीकृतं&lt;/a&gt; करें या &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR कोड के साथ अभी सक्रिय करें&lt;/a&gt;</string>
 </resources>

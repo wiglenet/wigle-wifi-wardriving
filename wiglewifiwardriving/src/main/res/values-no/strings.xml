@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Karttype: Hybrid</string>
     <string name="map_toast_terrain">Karttype: Terreng</string>
     <string name="map_needs_playservice">Kart krever Google Play-tjeneste</string>
-    <string name="register">Registrere</string>
     <string name="drawer_open">Skuff åpen</string>
     <string name="drawer_close">Lukk skuff</string>
     <string name="site_stats_app_name">WiGLE.net-statistikk</string>
@@ -310,8 +309,6 @@
     <string name="prevrank_title">Brukerrangering forrige måned</string>
     <string name="prevmonthrank_title">Månedens rangering forrige måned</string>
     <string name="list_scanning_on">(Skanning slått på)</string>
-
-    <string name="activate">activate now</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Parsing…</string>
@@ -447,4 +444,5 @@
     <string name="login_title">innlogging kreves</string>
     <string name="login_required">Du må være pålogget for å gjøre dette. Logg inn eller opprett en konto om nødvendig.</string>
     <string name="login">Logg Inn</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrer&lt;/a&gt; @WiGLE.net eller &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiver nå med QR-kode&lt;/a&gt;</string>
 </resources>

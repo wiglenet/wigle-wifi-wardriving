@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">地图类型：混合</string>
     <string name="map_toast_terrain">地图类型：地形</string>
     <string name="map_needs_playservice">地图需要Google Play服务</string>
-    <string name="register">寄存器</string>
     <string name="drawer_open">抽屉打开</string>
     <string name="drawer_close">抽屉关闭</string>
     <string name="site_stats_app_name">WiGLE.net统计</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">上个月用户排名</string>
     <string name="prevmonthrank_title">上个月份排名</string>
     <string name="list_scanning_on">（扫描开启）</string>
-    <string name="activate">激活</string>
     <string name="setting_activate_prompt">浏览https://wigle.net/来激活你的用户代码</string>
     <string name="upload_queued">已进入队列</string>
     <string name="upload_parsing">正在解析…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">要求登录</string>
     <string name="login_required">您必须登录才能执行此操作。如有必要，请登录或创建一个帐户。</string>
     <string name="login">登录</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>注册&lt;/a&gt; @WiGLE.net 或者 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;立即使用二维码激活&lt;/a&gt;</string>
 </resources>

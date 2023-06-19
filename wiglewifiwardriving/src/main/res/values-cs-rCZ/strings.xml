@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Typ mapy: Hybridní</string>
     <string name="map_toast_terrain">Typ mapy: Terénní</string>
     <string name="map_needs_playservice">Mapa vyžaduje službu Google Play</string>
-    <string name="register">Registrovat</string>
     <string name="drawer_open">Panel je otevřený</string>
     <string name="drawer_close">Panel je zavřený</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Uživatelské hodnocení za poslední měsíc</string>
     <string name="prevmonthrank_title">Měsíční hodnocení za poslední měsíc</string>
     <string name="list_scanning_on">(Skenování zapnuto)</string>
-    <string name="activate">aktivujte nyní</string>
     <string name="setting_activate_prompt">otevřete https://wigle.net/activate pro váš user code</string>
     <string name="upload_queued">Zařazené</string>
     <string name="upload_parsing">Zpracovávání…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Je vyžadováno přihlášení</string>
     <string name="login_required">K tomu musíte být přihlášeni. V případě potřeby se přihlaste nebo si vytvořte účet.</string>
     <string name="login">Přihlásit se</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Zaregistrujte se na&lt;/a&gt; @WiGLE.net nebo &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivujte nyní pomocí QR kódu&lt;/a&gt;</string>
 </resources>

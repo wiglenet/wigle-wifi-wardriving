@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Kaarttype: hybride</string>
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
     <string name="map_needs_playservice">Map vereist Google Play Service</string>
-    <string name="register">Registreren</string>
     <string name="drawer_open">Lade open</string>
     <string name="drawer_close">Lade gesloten</string>
     <string name="site_stats_app_name">WiGLE.net Statistieken</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Gebruikersranglijst vorige maand</string>
     <string name="prevmonthrank_title">Maandrang vorige maand</string>
     <string name="list_scanning_on">(Scannen ingeschakeld)</string>
-    <string name="activate">activeer nu</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Parsing…</string>
@@ -445,4 +443,5 @@
     <string name="login_title">Aanmelden vereist</string>
     <string name="login_required">Hiervoor moet u ingelogd zijn. Log in of maak indien nodig een account aan.</string>
     <string name="login">Log in</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registreer&lt;/a&gt; @WiGLE.net of &lt;a href=\'net.wigle.wigleandroid://activate\'>activeer nu met QR-code&lt;/a&gt;</string>
 </resources>

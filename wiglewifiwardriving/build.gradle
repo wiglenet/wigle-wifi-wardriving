@@ -35,7 +35,7 @@ configurations {
 }
 
 dependencies {
-    driver 'org.xerial:sqlite-jdbc:3.23.1'
+    driver 'org.xerial:sqlite-jdbc:3.42.0.0'
 }
 
 // make a driver copy, per https://stackoverflow.com/questions/51676049/cannot-change-strategy-of-configuration-sqlite

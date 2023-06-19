@@ -266,7 +266,6 @@
     <string name="map_toast_hybrid">マップタイプ：ハイブリッド</string>
     <string name="map_toast_terrain">マップタイプ：地形</string>
     <string name="map_needs_playservice">地図には GooglePlay 開発者サービスが必要です</string>
-    <string name="register">登録</string>
     <string name="drawer_open">ドローワが開いています</string>
     <string name="drawer_close">ドローワを閉じる</string>
     <string name="site_stats_app_name">WiGLE.net 統計</string>
@@ -308,7 +307,6 @@
     <string name="prevrank_title">先月のユーザーランキング</string>
     <string name="prevmonthrank_title">先月の月間ランキング</string>
     <string name="list_scanning_on">（スキャンがオンになっています）</string>
-    <string name="activate">QR コードで今すぐアクティベート</string>
     <string name="setting_activate_prompt">ユーザーコードについては、https：//wigle.net/activate にアクセスしてください</string>
     <string name="upload_queued">キュー済み</string>
     <string name="upload_parsing">解析しています…</string>
@@ -444,4 +442,5 @@
     <string name="login_title">ログインが必要です</string>
     <string name="login_required">これを行うにはログインする必要があります。必要に応じて、ログインするかアカウントを作成してください。</string>
     <string name="login">ログイン</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>WiGLE.net に登録する&lt;/a&gt;か、&lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR コードで今すぐアクティベートしてください&lt;/a&gt;</string>
 </resources>

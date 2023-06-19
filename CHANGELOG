@@ -1,3 +1,7 @@
+* 2.77 (06/17/2023)
+Bump SQLite library version (thanks Sidharth!)
+Bug fixes (DBResults, SettingsFragment, ApiManager, etc)
+
 * 2.76 (06/06/2023)
 Network detail UI cleanup
 Setting fragment crash fix

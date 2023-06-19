@@ -267,7 +267,6 @@
     <string name="map_toast_hybrid">Tipo di Mappa: Ibrida</string>
     <string name="map_toast_terrain">Tipo di Mappa: Terreno</string>
     <string name="map_needs_playservice">La Mappa necessità di Google Play Service</string>
-    <string name="register">Registrarsi</string>
     <string name="drawer_open">Cassetto Aperto</string>
     <string name="drawer_close">Cassetto Chiuso</string>
     <string name="site_stats_app_name">Generali</string>
@@ -309,7 +308,6 @@
     <string name="prevrank_title">Tua posizione nel mese corrente</string>
     <string name="prevmonthrank_title">Graduatoria del mese corrente</string>
     <string name="list_scanning_on">(Scansione attivata)</string>
-    <string name="activate">attiva</string>
     <string name="setting_activate_prompt">vai a https://wigle.net/activate per ricevere il tuo codice</string>
     <string name="upload_queued">In coda</string>
     <string name="upload_parsing">Parsing…</string>
@@ -445,4 +443,6 @@
     <string name="login_title">Accesso richiesto</string>
     <string name="login_required">Devi essere loggato per effettuare questa operazione. Accedi o crea un account se necessario.</string>
     <string name="login">Login</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrarsi&lt;/a&gt; @WiGLE.net o &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;attiva ora con il codice QR&lt;/a&gt;</string>
+
 </resources>

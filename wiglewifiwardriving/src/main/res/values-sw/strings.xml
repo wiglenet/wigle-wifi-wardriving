@@ -266,7 +266,6 @@
     <string name="map_toast_hybrid">Aina ya Ramani: Mahuluti</string>
     <string name="map_toast_terrain">Aina ya Ramani: Mandhari</string>
     <string name="map_needs_playservice">Ramani inahitaji Huduma ya Google Play</string>
-    <string name="register">Jisajili</string>
     <string name="drawer_open">Droo Wazi</string>
     <string name="drawer_close">Droo Imefungwa</string>
     <string name="site_stats_app_name">Takwimu za WiGLE.net</string>
@@ -308,7 +307,6 @@
     <string name="prevrank_title">Nafasi ya Mtumiaji Mwezi uliopita</string>
     <string name="prevmonthrank_title">Nafasi ya Mwezi Mwezi uliopita</string>
     <string name="list_scanning_on">(Tambazo imewashwa)</string>
-    <string name="activate">amilisha sasa na msimbo wa QR</string>
     <string name="setting_activate_prompt">zuru https://wigle.net/amilisha kwa msimbo wako wa mtumiaji</string>
     <string name="upload_queued">Imewekwa foleni</string>
     <string name="upload_parsing">Inachanganua…</string>
@@ -317,7 +315,7 @@
     <string name="upload_success">Imekamilika</string>
     <string name="upload_failed">Imeshindwa</string>
     <string name="upload_unknown">Haijulikani</string>
-    <string name="upload_archive">Kuweka kumbukumbu ...</string>
+    <string name="upload_archive">Kuweka kumbukumbu …</string>
     <string name="upload_catalog">Kuorodhesha…</string>
     <string name="upload_geoindex">Kutoa viwianishi za kijiografia zinazoendana na (eneo)…</string>
     <string name="auth_username">Mtumiaji Halali</string>
@@ -444,4 +442,5 @@
     <string name="login_title">Kuingia Kunahitajika</string>
     <string name="login_required">Lazima uwe umeingia ili kufanya hivi. Tafadhali ingia au unda akaunti ikiwa ni lazima.</string>
     <string name="login">Ingia</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Sajili&lt;/a&gt; @WiGLE.net au &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;uwashe sasa ukitumia msimbo wa QR&lt;/a&gt;</string>
 </resources>

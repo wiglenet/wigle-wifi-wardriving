@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Запуск</string>
-    <string name="app_name">WiGLE WiFi исследование беспроводных сетей</string>
+    <string name="app_name">WiGLE исследование WiFi сетей</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi — Настройки</string>
     <string name="mapping_app_name">WiGLE WiFi — Карта</string>

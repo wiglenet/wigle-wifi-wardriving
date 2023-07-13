@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="stats">Kuanza</string>
-    <string name="app_name">Utafutaji wa mtandao wa WiGLE WiFi kwa kutumia gari</string>
+    <string name="app_name">Utafutaji wa WiGLE WiFi</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi - Mipangilio</string>
     <string name="mapping_app_name">WiGLE - Ramani</string>

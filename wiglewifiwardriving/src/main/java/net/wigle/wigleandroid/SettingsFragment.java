@@ -524,10 +524,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, PreferenceKeys.PREF_LOG_ROUTES, false, value -> {
             Logging.info("Signaling route logging change: "+value);
-            if (value) {
-                MainActivity.getMainActivity().startRouteLogging(prefs);
-            } else {
-                MainActivity.getMainActivity().endRouteLogging();
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
+                if (value) {
+                    ma.startRouteLogging(prefs);
+                } else {
+                    ma.endRouteLogging();
+                }
             }
         });
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);

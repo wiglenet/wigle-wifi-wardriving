@@ -137,10 +137,13 @@ public abstract class AbstractBackgroundTask extends Thread implements AlertSett
     public static void updateTransferringState(final boolean transferring, final Button uploadButton,  final Button importObservedButton) {
         if (null != uploadButton) uploadButton.setEnabled(!transferring);
         if (null != importObservedButton) importObservedButton.setEnabled(!transferring);
-        if (transferring) {
-            MainActivity.getMainActivity().setTransferring();
-        } else {
-            MainActivity.getMainActivity().transferComplete();
+        final MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            if (transferring) {
+                ma.setTransferring();
+            } else {
+                ma.transferComplete();
+            }
         }
     }
 

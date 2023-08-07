@@ -159,12 +159,15 @@ public class BackgroundGuiHandler extends Handler {
                                         Logging.error("UNABLE to export file - no access to " + filePath + " - " + fileName);
                                         return;
                                     }
-                                    Uri fileUri = FileProvider.getUriForFile(context,
-                                            MainActivity.getMainActivity().getApplicationContext().getPackageName() +
-                                                    ".kmlprovider", file);
+                                    final MainActivity ma = MainActivity.getMainActivity();
+                                    if (null != ma) {
+                                        Uri fileUri = FileProvider.getUriForFile(context,
+                                                ma.getApplicationContext().getPackageName() +
+                                                        ".kmlprovider", file);
+                                        intent.putExtra(Intent.EXTRA_STREAM, fileUri);
+                                    }
                                     //DEBUG: MainActivity.info("send action called for file URI: " + fileUri.toString());
                                     intent.setType("application/vnd.google-earth.kml+xml");
-                                    intent.putExtra(Intent.EXTRA_STREAM, fileUri);
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                     context.startActivity(Intent.createChooser(intent, context.getResources().getText(R.string.send_to)));

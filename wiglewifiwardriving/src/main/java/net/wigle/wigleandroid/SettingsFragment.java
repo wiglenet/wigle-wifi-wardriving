@@ -508,18 +508,24 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         });
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, PreferenceKeys.PREF_SCAN_BT, true, value -> {
             Logging.info("Signaling bluetooth change: "+value);
-            if (value) {
-                MainActivity.getMainActivity().setupBluetooth(prefs);
-            } else {
-                MainActivity.getMainActivity().endBluetooth(prefs);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
+                if (value) {
+                    ma.setupBluetooth(prefs);
+                } else {
+                    ma.endBluetooth(prefs);
+                }
             }
         });
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , PreferenceKeys.PREF_VISUALIZE_ROUTE, false, value -> {
             Logging.info("Signaling route mapping change: "+value);
-            if (value) {
-                MainActivity.getMainActivity().startRouteMapping(prefs);
-            } else {
-                MainActivity.getMainActivity().endRouteMapping(prefs);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
+                if (value) {
+                    ma.startRouteMapping(prefs);
+                } else {
+                    ma.endRouteMapping(prefs);
+                }
             }
         });
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, PreferenceKeys.PREF_LOG_ROUTES, false, value -> {

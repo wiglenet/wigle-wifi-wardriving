@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 
 import com.babylon.certificatetransparency.CTInterceptorBuilder;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.background.Status;
@@ -38,6 +39,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -313,8 +315,13 @@ public class WiGLEApiManager {
                         completedListener.onTaskFailed(response.code(), null);
                     } else {
                         if (null != responseBody) {
-                            completedListener.onTaskSucceeded(new Gson().fromJson(responseBody.charStream(),
+                            try {
+                                completedListener.onTaskSucceeded(new Gson().fromJson(responseBody.charStream(),
                                     ApiTokenResponse.class));
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }
@@ -358,10 +365,15 @@ public class WiGLEApiManager {
                     } else {
                         //TODO caching
                         if (null != responseBody) {
-                            RankResponse r = new Gson().fromJson(responseBody.charStream(),
-                                    RankResponse.class);
-                            r.setSelected(selected);
-                            completedListener.onTaskSucceeded(r);
+                            try {
+                                RankResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        RankResponse.class);
+                                r.setSelected(selected);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }
@@ -400,9 +412,15 @@ public class WiGLEApiManager {
                         completedListener.onAuthenticationRequired();
                     } else {
                         if (null != responseBody) {
-                            UploadsResponse r = new Gson().fromJson(responseBody.charStream(),
-                                    UploadsResponse.class);
-                            completedListener.onTaskSucceeded(r);
+                            try {
+                                UploadsResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        UploadsResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
+
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }
@@ -455,9 +473,14 @@ public class WiGLEApiManager {
                     } else {
                         //TODO- consider caching implications here
                         if (null != responseBody) {
-                            WiFiSearchResponse r = new Gson().fromJson(responseBody.charStream(),
-                                    WiFiSearchResponse.class);
-                            completedListener.onTaskSucceeded(r);
+                            try {
+                                WiFiSearchResponse r = new Gson().fromJson(responseBody.charStream(),
+                                        WiFiSearchResponse.class);
+                                completedListener.onTaskSucceeded(r);
+                            } catch (JsonSyntaxException e) {
+                                //ALIBI: sometimes java.net.SocketTimeoutException manifests as a JSE here?
+                                completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
+                            }
                         } else {
                             completedListener.onTaskFailed(LOCAL_FAILURE_CODE, null);
                         }

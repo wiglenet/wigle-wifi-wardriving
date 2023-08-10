@@ -525,10 +525,8 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                 }
             }
 
+            dismissProgressDialog();
             if (null != result) { //launch task will exist with bg thread enqueued with null return
-                if (pd.isShowing()) {
-                    pd.dismiss();
-                }
                 if (null != dbResult && dbResult.getFirst()) {
                     // fire share intent
                     Intent intent = new Intent(Intent.ACTION_SEND);
@@ -576,9 +574,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
                         if (values[0] > 0) {
                             pd.setIndeterminate(false);
                             if (100 == values[0]) {
-                                if (pd.isShowing()) {
-                                    pd.dismiss();
-                                }
+                                dismissProgressDialog();
                                 return;
                             }
                             pd.setMessage(getString(R.string.backup_in_progress));
@@ -663,6 +659,12 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         } catch (NullPointerException npe) {
             //Nothing to do here.
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        dismissProgressDialog();
+        super.onDestroy();
     }
 
     /**
@@ -910,9 +912,7 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
         protected void onPostExecute(String result) {
             if (null != result) { //launch task will exist with bg thread enqueued with null return
                 Logging.error("POST EXECUTE: " + result);
-                if (pd.isShowing()) {
-                    pd.dismiss();
-                }
+                dismissProgressDialog();
             }
         }
 
@@ -929,26 +929,32 @@ public final class DataFragment extends Fragment implements ApiListener, Transfe
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            if (values.length == 2) { // actually 2-stage?
-                if (values[1] > 0) {
-                    if (100 == values[1]) {
-                        if (pd.isShowing()) {
-                            pd.dismiss();
+            if (null != pd) {
+                if (values.length == 2) { // actually 2-stage?
+                    if (values[1] > 0) {
+                        if (100 == values[1]) {
+                            dismissProgressDialog();
+                            return;
                         }
-                        return;
+                        pd.setMessage(getString(R.string.exporting_m8b_final));
+                        pd.setProgress(values[1]);
+                    } else {
+                        pd.setIndeterminate(false);
+                        pd.setMessage(getString(R.string.calculating_m8b));
+                        pd.setProgress(values[0]);
                     }
-                    pd.setMessage(getString(R.string.exporting_m8b_final));
-                    pd.setProgress(values[1]);
-                } else {
+                } else { // default single progress bar - trust the message already set?
                     pd.setIndeterminate(false);
                     pd.setMessage(getString(R.string.calculating_m8b));
                     pd.setProgress(values[0]);
                 }
-            } else { // default single progress bar - trust the message already set?
-                pd.setIndeterminate(false);
-                pd.setMessage(getString(R.string.calculating_m8b));
-                pd.setProgress(values[0]);
             }
+        }
+    }
+
+    private void dismissProgressDialog() {
+        if (pd != null && pd.isShowing()) {
+            pd.dismiss();
         }
     }
 }

@@ -1,3 +1,7 @@
+* 2.78 (08/10/2023)
+Secrets plugin (thanks Sidharth!)
+Bug fixes (NPE, timeout, timezone, dialog dismissal)
+
 * 2.77 (06/17/2023)
 Bump SQLite library version (thanks Sidharth!)
 Bug fixes (DBResults, SettingsFragment, ApiManager, etc)

@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.net.ssl.SSLException;
 
@@ -364,6 +365,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         final long start = System.currentTimeMillis();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         countStats.lineCount = 0;
         final int total = cursor.getCount();
         long fileWriteMillis = 0;

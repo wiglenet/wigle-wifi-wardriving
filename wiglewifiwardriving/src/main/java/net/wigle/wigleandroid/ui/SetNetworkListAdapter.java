@@ -234,6 +234,18 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         }
         tv.setText(Integer.toString(level));
 
+        tv = row.findViewById(R.id.mac_string);
+        tv.setText(network.getBssid());
+
+        tv = row.findViewById(R.id.chan_freq_string);
+        if (NetworkType.WIFI.equals(network.getType())) {
+            tv.setText(network.getFrequency()+"MHz");
+        } else if (NetworkType.BLE.equals(network.getType())) {
+            tv.setText(network.getType().toString());
+        } else {
+            tv.setText("");
+        }
+
         tv = row.findViewById(R.id.detail);
         String det = network.getDetail();
         tv.setText(det);

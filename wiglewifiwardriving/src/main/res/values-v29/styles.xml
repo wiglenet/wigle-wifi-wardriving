@@ -83,6 +83,9 @@
     <style name="ListSsid" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/colorListSsidText</item>
     </style>
+    <style name="ListFreq" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#405050</item>
+    </style>
     <style name="NewsTitleStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">#306060</item>

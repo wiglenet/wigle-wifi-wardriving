@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import net.wigle.wigleandroid.util.Logging;
+
 /**
  * network data. not thread-safe.
  */
@@ -33,9 +35,10 @@ public final class Network implements ClusterItem {
     public static final List<Integer> wiFi60GHzChannelNumbers = Arrays.asList(1, 2, 3, 4, 5,
             6);
 
+
     private final String bssid;
     private String ssid;
-    private final String capabilities;
+    private String capabilities;
     private final String showCapabilities;
     private final int crypto;
     private NetworkType type;
@@ -50,7 +53,6 @@ public final class Network implements ClusterItem {
     private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
-    private static final String DASH_STRING = " - ";
     private static final String WPA3_CAP = "[WPA3";
     private static final String SAE_CAP = "SAE";
     private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
@@ -77,25 +79,38 @@ public final class Network implements ClusterItem {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI, null);
+                scanResult.level,  NetworkType.WIFI, null, null);
+    }
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+                    final int level, final NetworkType type) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null);
+                    final int level, final NetworkType type, final String bleServiceUuid16) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
         final int level, final NetworkType type, final LatLng latLng ) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, latLng);
+    }
 
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+        final int level, final NetworkType type, final String bleServiceUuid16, final LatLng latLng ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        if (this.type.equals(NetworkType.typeForCode("W"))) {
+        if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
+        } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
+            if (null != bleServiceUuid16 && !bleServiceUuid16.isEmpty()) {
+                channel = Integer.parseInt(bleServiceUuid16, 16);
+                Logging.error(bleServiceUuid16+"-> channel: "+channel+" - "+bssid);
+            }
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             /*if (NetworkType.GSM.equals(type)) {
@@ -190,18 +205,25 @@ public final class Network implements ClusterItem {
     public void setLevel( final int level ) {
         this.level = level;
     }
+    public void setCapabilities( final String capabilities ) {
+        this.capabilities = capabilities;
+    }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
     public void setFrequency( final int frequency) {
         this.frequency = frequency;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
-        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+        } else if (!NetworkType.BLE.equals(this.type) && !NetworkType.BT.equals(this.type) && frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
     }
 
+    public void setBleServiceUuid(final String bleServiceUuid16) {
+        channel = Integer.parseInt(bleServiceUuid16, 16);
+        Logging.error(bleServiceUuid16+"-> channel: "+channel+" - "+bssid);
+    }
     public void setType(final NetworkType type) { this.type = type; }
 
     public void setSsid(final String ssid) {
@@ -256,6 +278,13 @@ public final class Network implements ClusterItem {
             retval = oui.getOui(lookup.substring(0, 9));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 6));
+            if (retval == null &&  NetworkType.BLE.equals(type)) {
+                if (channel != null) {
+                    retval = "~"+channel;
+                } else {
+                    retval = null;
+                }
+            }
         }
         return retval == null ? "" : retval;
     }

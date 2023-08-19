@@ -88,9 +88,11 @@ import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
@@ -104,6 +106,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -115,6 +118,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
+
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     //*** state that is retained ***
@@ -153,6 +160,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
         WiGLEApiManager apiManager;
+        Map<Integer, String> btVendors;
     }
 
     private State state;
@@ -350,6 +358,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 state.numberFormat8.setMaximumFractionDigits(8);
                 state.numberFormat8.setMinimumFractionDigits(8);
             }
+        }
+
+        try (
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader((getAssets().open("btmember.yaml"))))) {
+            Constructor constructor = new Constructor(new LoaderOptions());
+            Yaml yaml = new Yaml(constructor);
+            LinkedHashMap data = yaml.load(reader);
+            List<LinkedHashMap> entries = (List<LinkedHashMap>) data.get("uuids");
+            state.btVendors = new HashMap<>();
+            for (LinkedHashMap entry: entries) {
+                state.btVendors.put((Integer)entry.get("uuid"), (String)entry.get("name"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         Logging.info("MAIN: setupService");
@@ -2459,5 +2482,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         } else if (status == TextToSpeech.ERROR) {
             Logging.error("TTS init failed: "+status);
         }
+    }
+
+    public String getBleVendor(final int i) {
+        return state.btVendors.get(i);
     }
 }

@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid.util;
 
-import android.content.Context;
 import android.telephony.TelephonyManager;
 
 import java.util.Collections;

@@ -19,7 +19,8 @@ wiglewifiwardriving/build
 .gradle
 etc/mccmncsqlite/mcc-mnc-dict.json
 wiglewifiwardriving/src/main/assets/mmcmnc.sqlite
-
+wiglewifiwardriving/src/main/assets/btmember.yaml
+wiglewifiwardriving/src/main/assets/btco.yaml
 # Local configuration file (sdk path, etc)
 local.properties
 .DS_Store

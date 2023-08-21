@@ -223,17 +223,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         if (ouiString.startsWith("~")) {
             final String mfgr = ouiString.replace("~","");
-            final int mfgrIndex = Integer.parseInt(mfgr);
-
-            final MainActivity ma = MainActivity.getMainActivity();
-            if (null != ma) {
-                final String mfgrName = ma.getBleVendor(mfgrIndex);
-                Logging.error("got: "+mfgrName+" for "+mfgrIndex);
-                tv.setText(mfgrName);
-            } else {
-                Logging.error("null MA: "+mfgrIndex);
-                tv.setText(""+mfgrIndex);
-            }
+            tv.setText(mfgr);
             tv.setTextAppearance(getContext(), R.style.ListDebug);
         } else {
             final String sep = ouiString.length() > 0 ? " - " : "";

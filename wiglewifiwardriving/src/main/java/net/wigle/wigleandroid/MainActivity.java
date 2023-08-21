@@ -161,6 +161,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean ttsNag = new AtomicBoolean(true);
         WiGLEApiManager apiManager;
         Map<Integer, String> btVendors;
+        Map<Integer, String> btMfgrIds;
     }
 
     private State state;
@@ -370,6 +371,21 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             state.btVendors = new HashMap<>();
             for (LinkedHashMap entry: entries) {
                 state.btVendors.put((Integer)entry.get("uuid"), (String)entry.get("name"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try (
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader((getAssets().open("btco.yaml"))))) {
+            Constructor constructor = new Constructor(new LoaderOptions());
+            Yaml yaml = new Yaml(constructor);
+            LinkedHashMap data = yaml.load(reader);
+            List<LinkedHashMap> entries = (List<LinkedHashMap>) data.get("company_identifiers");
+            state.btMfgrIds = new HashMap<>();
+            for (LinkedHashMap entry: entries) {
+                state.btMfgrIds.put((Integer)entry.get("value"), (String)entry.get("name"));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -2487,4 +2503,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     public String getBleVendor(final int i) {
         return state.btVendors.get(i);
     }
+
+    public String getBleMfgr(final int i) {
+        return state.btMfgrIds.get(i);
+    }
+
 }

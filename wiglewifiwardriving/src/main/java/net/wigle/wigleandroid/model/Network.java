@@ -1,16 +1,20 @@
 package net.wigle.wigleandroid.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
+import android.os.ParcelUuid;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.Logging;
 
 /**
@@ -48,6 +52,10 @@ public final class Network implements ClusterItem {
     private Integer channel;
     private LatLng geoPoint;
     private boolean isNew;
+
+    private List<String> bleServiceUuids;
+    private Integer bleMfgrId;
+    private String bleMfgr;
 
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
@@ -87,29 +95,32 @@ public final class Network implements ClusterItem {
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type, final String bleServiceUuid16) {
-        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16, null);
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId,  null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
         final int level, final NetworkType type, final LatLng latLng ) {
-        this(bssid, ssid, frequency, capabilities, level, type, null, latLng);
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-        final int level, final NetworkType type, final String bleServiceUuid16, final LatLng latLng ) {
+        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
+        this.bleMfgrId = bleMfgrId;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
         } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
-            if (null != bleServiceUuid16 && !bleServiceUuid16.isEmpty()) {
-                channel = Integer.parseInt(bleServiceUuid16, 16);
-                Logging.error(bleServiceUuid16+"-> channel: "+channel+" - "+bssid);
+            if (null != bleServiceUuid16s && !bleServiceUuid16s.isEmpty()) {
+                this.bleServiceUuids = bleServiceUuid16s;
+                bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
+            } else if (bleMfgrId != null) {
+                bleMfgr = lookupMfgrByMfgrId(bleMfgrId);
             }
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
@@ -220,16 +231,32 @@ public final class Network implements ClusterItem {
         }
     }
 
-    public void setBleServiceUuid(final String bleServiceUuid16) {
-        channel = Integer.parseInt(bleServiceUuid16, 16);
-        Logging.error(bleServiceUuid16+"-> channel: "+channel+" - "+bssid);
-    }
     public void setType(final NetworkType type) { this.type = type; }
 
     public void setSsid(final String ssid) {
         this.ssid = ssid;
     }
 
+    public void addBleServiceUuid(final String uuid) {
+        boolean newSuids = false;
+        if (bleServiceUuids == null) {
+            bleServiceUuids = new ArrayList<>();
+            newSuids = true;
+        }
+        if (!bleServiceUuids.contains(uuid)) {
+            bleServiceUuids.add(uuid);
+        }
+        if (newSuids) {
+            bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
+        }
+    }
+
+    public void addBleMfgrId(Integer id) {
+        bleMfgrId = id;
+        if (bleMfgrId != null) {
+            bleMfgr = lookupMfgrByMfgrId(id);
+        }
+    }
     public void setIsNew() {
         this.isNew = true;
     }
@@ -248,6 +275,41 @@ public final class Network implements ClusterItem {
 
     public long getConstructionTime() {
         return constructionTime;
+    }
+
+    /**
+     * try using a service UUID to lookup mfgr name
+     * @param fullUuid the raw esrvice UUID to use
+     * @return the string if found or null
+     */
+    public String lookupMfgrByServiceUuid(final String fullUuid) {
+        //ALIBI: non-index-0 records seem to be secondary
+        String uuid16Service = fullUuid.substring(4, 8);
+        if (uuid16Service != null) {
+            final MainActivity ma = MainActivity.getMainActivity();
+            int mfgrIndex = Integer.parseInt(uuid16Service, 16);
+            if (null != ma) {
+                final String mfgrName = ma.getBleVendor(mfgrIndex);
+                Logging.error("got: "+mfgrName+" for "+mfgrIndex);
+                return "~"+mfgrName;
+            } else {
+                Logging.error("null mfgr name: "+mfgrIndex);
+            }
+        }
+        return null;
+    }
+
+    public String lookupMfgrByMfgrId(final Integer mfgrId) {
+        //ALIBI: non-index-0 records seem to be secondary
+        final MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            final String mfgrName = ma.getBleMfgr(mfgrId);
+            Logging.error("->>"+bleMfgrId+ ": "+mfgrName + " for "+bssid);
+            return "~"+mfgrName;
+        } else {
+            Logging.error("no main activity accessible.");
+        }
+        return null;
     }
 
     public String getDetail() {
@@ -273,18 +335,16 @@ public final class Network implements ClusterItem {
 
     public String getOui(final OUI oui) {
         String retval = "";
+        if (NetworkType.BLE.equals(type)) {
+            if (bleMfgr != null && !bleMfgr.isEmpty()) {
+                return bleMfgr;
+            }
+        }
         final String lookup = getBssid().replace(":", "").toUpperCase();
         if (oui != null && lookup.length() >= 9) {
             retval = oui.getOui(lookup.substring(0, 9));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 7));
             if (retval == null) retval = oui.getOui(lookup.substring(0, 6));
-            if (retval == null &&  NetworkType.BLE.equals(type)) {
-                if (channel != null) {
-                    retval = "~"+channel;
-                } else {
-                    retval = null;
-                }
-            }
         }
         return retval == null ? "" : retval;
     }

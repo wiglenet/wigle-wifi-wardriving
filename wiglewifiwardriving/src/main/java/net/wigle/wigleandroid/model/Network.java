@@ -230,18 +230,11 @@ public final class Network implements ClusterItem {
 
     public String getDetail() {
         if ( detail == null ) {
-            final Integer chan = channel != null ? channel : frequency;
             final StringBuilder detailBuild = new StringBuilder( 40 );
-            detailBuild.append( BAR_STRING ).append( bssid );
-            detailBuild.append( DASH_STRING );
-            if ( NetworkType.WIFI.equals(type) ) {
-                detailBuild.append( chan );
+            if (!NetworkType.WIFI.equals(type)) {
+                detailBuild.append(type).append(BAR_STRING);
             }
-            else {
-                detailBuild.append( type );
-            }
-
-            detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
+            detailBuild.append( getShowCapabilities() );
             detail = detailBuild.toString();
         }
 

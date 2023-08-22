@@ -140,13 +140,13 @@ task downloadBtMemberFile (type: Download) {
     println "downloading BT Member YAML data"
     download {
         //TODO: this is a specific version - we want latest (1/2)
-        src 'https://bitbucket.org/bluetooth-SIG/public/raw/1ac368526f665502b73c68c9cd999cb03882e5e5/assigned_numbers/uuids/member_uuids.yaml'
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
         dest outputBtMemberUuidFile
         overwrite true
     }
     download {
         //TODO: this is a specific version - we want latest (2/2)
-        src 'https://bitbucket.org/bluetooth-SIG/public/raw/1ac368526f665502b73c68c9cd999cb03882e5e5/assigned_numbers/company_identifiers/company_identifiers.yaml'
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
         dest outputBtCoIdUuidFile
         overwrite true
     }

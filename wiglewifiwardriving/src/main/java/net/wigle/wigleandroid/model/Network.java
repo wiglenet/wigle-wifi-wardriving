@@ -291,7 +291,9 @@ public final class Network implements ClusterItem {
             if (null != ma) {
                 final String mfgrName = ma.getBleVendor(mfgrIndex);
                 Logging.error("got: "+mfgrName+" for "+mfgrIndex);
-                return "~"+mfgrName;
+                if (null != mfgrName) {
+                    return "~" + mfgrName;
+                }
             } else {
                 Logging.error("null mfgr name: "+mfgrIndex);
             }
@@ -305,7 +307,9 @@ public final class Network implements ClusterItem {
         if (null != ma) {
             final String mfgrName = ma.getBleMfgr(mfgrId);
             Logging.error("->>"+bleMfgrId+ ": "+mfgrName + " for "+bssid);
-            return "~"+mfgrName;
+            if (null != mfgrName) {
+                return "~" + mfgrName;
+            }
         } else {
             Logging.error("no main activity accessible.");
         }

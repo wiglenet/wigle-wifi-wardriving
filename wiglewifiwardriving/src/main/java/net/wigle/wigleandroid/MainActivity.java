@@ -1713,7 +1713,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                 for (LinkedHashMap<String, Object> entry : entries) {
                                     state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
                                 }
-                                Logging.info("BLE members initialized: "+entries.size()+"entries");
+                                Logging.info("BLE members initialized: "+entries.size()+" entries");
                             }
                         } catch (IOException e) {
                             Logging.error("Failed to load BLE member yaml:",e);
@@ -1730,7 +1730,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                                 for (LinkedHashMap<String, Object> entry : entries) {
                                     state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
                                 }
-                                Logging.info("BLE mfgrs initialized: "+entries.size()+"entries");
+                                Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
                             }
                         } catch (IOException e) {
                             Logging.error("Failed to load BLE mfgr yaml: ",e);

@@ -21,7 +21,6 @@ public abstract class AbstractListAdapter<M> extends ArrayAdapter<M> {
     public AbstractListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
 
-        //this.mInflater = LayoutInflater.from(context);
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberFormat = NumberFormat.getNumberInstance( Locale.US );
         numberFormat.setGroupingUsed(true);

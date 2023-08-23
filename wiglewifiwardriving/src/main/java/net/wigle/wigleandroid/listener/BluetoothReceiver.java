@@ -215,7 +215,7 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                                     + "\n\tclass:\t"
                                     + (bluetoothClass == null ? null : DEVICE_TYPE_LEGEND.get(bluetoothClass.getDeviceClass()))
                                     + " (" + bluetoothClass + ")"
-                                    + "\n\ttype:\t" + typeMap(device.getType())
+                                    + "\n\ttype:\t" + typeMap(device.getType()) + " ("+device.getType()+")"
                                     + "\n\tRSSI:\t" + scanResult.getRssi()
                                     + "\n\tFlags:\t" + scanRecord.getAdvertiseFlags()
                                     + "\n\tScanRecord:\t" + scanRecord

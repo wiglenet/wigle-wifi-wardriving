@@ -221,15 +221,8 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
 
         tv = row.findViewById(R.id.oui);
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
-        if (ouiString.startsWith("~")) {
-            final String mfgr = ouiString.replace("~","");
-            tv.setText(mfgr);
-            tv.setTextAppearance(getContext(), R.style.ListDebug);
-        } else {
-            final String sep = ouiString.length() > 0 ? " - " : "";
-            tv.setTextAppearance(getContext(), R.style.ListOui);
-            tv.setText(ouiString + sep);
-        }
+        final String sep = ouiString.length() > 0 ? " - " : "";
+        tv.setText(ouiString + sep);
 
         tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));

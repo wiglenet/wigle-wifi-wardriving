@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:paddingTop="1sp">
+		android:paddingTop="1sp"
+		android:layout_gravity="start">
 		<!-- First row -->
 		<ImageView
 			android:id="@+id/wepicon"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:contentDescription="wep icon"
-			android:paddingLeft="2dp"
-			android:paddingRight="10dp"
+			android:paddingStart="2dp"
+			android:paddingEnd="10dp"
 			android:text="wepicon"
 			tools:src="@drawable/wep_ico"/>
 		<ImageView
@@ -23,8 +24,8 @@
 			android:layout_height="wrap_content"
 			android:contentDescription="wep icon"
 			android:paddingTop="1dp"
-			android:paddingLeft="0dp"
-			android:paddingRight="4dp"
+			android:paddingStart="0dp"
+			android:paddingEnd="5dp"
 			android:text="bticon"
 			android:visibility="gone"/>
 		<TextView
@@ -38,7 +39,7 @@
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
-			android:gravity="right">
+			android:gravity="end">
 			<TextView
 				android:id="@+id/oui"
 				android:layout_width="wrap_content"
@@ -48,20 +49,24 @@
 				android:ellipsize="end"
 				android:maxLines="1"
 				style="@style/ListOui"
-				tools:text="WiGLE NIC, Inc"
+				android:layout_weight="1"
+				android:gravity="end"
+				tools:text="WiGLE, a subsidiary of Very, Very Long Name, Inc"
 				/>
 			<TextView
 				android:id="@+id/time"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				style="@style/ListTimestamp"
+				android:gravity="end"
 				tools:text="12:34:56"/>
 		</LinearLayout>
 	</LinearLayout>
 	<LinearLayout
 		android:orientation="horizontal"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true">
 		<!-- Second row -->
 		<TextView
 			android:id="@+id/level_string"

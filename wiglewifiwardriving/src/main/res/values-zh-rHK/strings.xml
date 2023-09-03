@@ -444,4 +444,6 @@
     <string name="login_required">您必須登錄才能執行此操作。如有必要，請登錄或創建一個帳戶。</string>
     <string name="login">登錄</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>註冊&lt;/a&gt; @WiGLE.net 或者 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;立即使用二維碼激活&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID：</string>
+    <string name="ble_vendor">BLE 供應商 ID：</string>
 </resources>

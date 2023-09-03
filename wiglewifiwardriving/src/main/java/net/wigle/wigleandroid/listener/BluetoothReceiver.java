@@ -684,11 +684,14 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
             network.setSsid(mergedSsid);
         } else {
             //DEBUG: MainActivity.info("existing BT net: "+network.getBssid() + "(new: "+newForRun+")");
-            //TODO: update capabilities only if was Misc/Uncategorized, now recognized?
-            //if (capabilities != null && !capabilities.isEmpty() && (network.getCapabilities().isEmpty() || network.getCapabilities().startsWith("Misc") || network.getCapabilities().startsWith("Uncategorized") )) {
-            //    network.setCapabilities(capabilities);
+            //ALIBI: update capabilities only if was Misc/Uncategorized, now recognized?
+            if (capabilities != null && !capabilities.isEmpty() &&
+                    !capabilities.startsWith("Misc") && !capabilities.startsWith("Uncategorized") &&
+                    (network.getCapabilities().isEmpty() || network.getCapabilities().startsWith("Misc")
+                            || network.getCapabilities().startsWith("Uncategorized") )) {
+                network.setCapabilities(capabilities);
             // ALIBI: device state/bond state not available in this method to post-pend;
-            //}
+            }
             network.setLevel(strength);
             network.setFrequency(deviceType);
             if (null != ssid) {

@@ -351,6 +351,18 @@ public final class Network implements ClusterItem {
         return retval == null ? "" : retval;
     }
 
+    public List<String> getBleServiceUuids() {
+        return bleServiceUuids;
+    }
+
+    public Integer getBleMfgrId() {
+        return bleMfgrId;
+    }
+
+    public String getBleMfgr() {
+        return bleMfgr;
+    }
+
     @NonNull
     @Override
     public LatLng getPosition() {

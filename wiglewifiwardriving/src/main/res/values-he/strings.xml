@@ -444,4 +444,6 @@
     <string name="login_required">עליך להיות מחובר כדי לעשות זאת. אנא היכנס או צור חשבון במידת הצורך.</string>
     <string name="login">התחברות</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>הרשמה ל-&lt;/a&gt; @WiGLE.net או &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;הפעל עכשיו עם קוד QR&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">מזהה ספק BLE:</string>
 </resources>

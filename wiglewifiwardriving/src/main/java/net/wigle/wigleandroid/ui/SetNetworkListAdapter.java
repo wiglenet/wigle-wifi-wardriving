@@ -223,6 +223,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
+        if (NetworkType.BLE.equals(network.getType())) {
+            tv.setTextAppearance(R.style.ListBt);
+        } else {
+            tv.setTextAppearance(R.style.ListOui);
+        }
 
         tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));

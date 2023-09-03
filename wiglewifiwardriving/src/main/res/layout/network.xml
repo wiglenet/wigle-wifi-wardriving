@@ -301,6 +301,71 @@
                         android:textSize="13sp" />
                 </RelativeLayout>
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/ble_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/channel_row"
+                android:orientation="vertical"
+                android:paddingHorizontal="2dp"
+                android:visibility="gone">
+                <RelativeLayout
+                    android:id="@+id/ble_vendor_row"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="1dp"
+                    android:visibility="gone">
+                    <TextView
+                        android:id="@+id/na_ble_vendor_id_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ble_vendor"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/na_ble_vendor_id"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/na_ble_vendor_id_label"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/na_ble_vendor_lookup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/na_ble_vendor_id"
+                        style="@style/ListBt"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:textSize="13sp" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/ble_services_row"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ble_vendor_row"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="1dp"
+                    android:visibility="gone">
+                    <TextView
+                        android:id="@+id/na_ble_services_id_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ble_services"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/na_ble_service_uuids"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/na_ble_services_id_label"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="5dp"
+                        android:textSize="13sp" />
+                </RelativeLayout>
+            </RelativeLayout>
         </RelativeLayout>
         <LinearLayout
             android:id="@+id/filter_row"

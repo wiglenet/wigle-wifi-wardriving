@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -231,6 +232,27 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                     }
                 } else {
                     Logging.warn("unable to get operatorCode for "+bssid);
+                }
+            }
+
+            if (NetworkType.isBtType(network.getType())) {
+                View v = findViewById(R.id.ble_info);
+                v.setVisibility(View.VISIBLE);
+                if (network.getBleMfgrId() != null || network.getBleMfgr() != null) {
+                    v = findViewById(R.id.ble_vendor_row);
+                    v.setVisibility(View.VISIBLE);
+                    tv = findViewById( R.id.na_ble_vendor_id );
+                    tv.setText((null != network.getBleMfgrId())?network.getBleMfgrId()+"":"-");
+                    tv = findViewById( R.id.na_ble_vendor_lookup );
+                    tv.setText(network.getBleMfgr() );
+                }
+
+                List<String> serviceUuids = network.getBleServiceUuids();
+                if (null != serviceUuids && !serviceUuids.isEmpty()) {
+                    v = findViewById(R.id.ble_services_row);
+                    v.setVisibility(View.VISIBLE);
+                    tv = findViewById( R.id.na_ble_service_uuids );
+                    tv.setText(serviceUuids.toString() );
                 }
             }
             setupMap(network, savedInstanceState, prefs );

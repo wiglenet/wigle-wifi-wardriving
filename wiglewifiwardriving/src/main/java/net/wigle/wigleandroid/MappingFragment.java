@@ -236,6 +236,7 @@ public final class MappingFragment extends Fragment {
         return view;
     }
 
+    @SuppressLint("MissingPermission")
     private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {
         // view
         final RelativeLayout rlView = view.findViewById(R.id.map_rl);
@@ -557,10 +558,11 @@ public final class MappingFragment extends Fragment {
         return centerPoint;
     }
 
-    private static Location safelyGetLast( final Context context, final String provider ) {
+    @SuppressLint("MissingPermission")
+    private static Location safelyGetLast(final Context context, final String provider ) {
         Location retval = null;
         try {
-            final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            final LocationManager locationManager = (LocationManager) context.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
             retval = locationManager.getLastKnownLocation( provider );
         }
         catch ( final IllegalArgumentException | SecurityException ex ) {

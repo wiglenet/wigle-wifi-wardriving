@@ -1,3 +1,10 @@
+* 2.79 (09/07/2023)
+Bluetooth device manufacturer information displayed
+Stop multiple notification alerts on older devices
+Android is now forcing approval for posting notification
+Layout fixes around long strings
+Various bug/leak fixes
+
 * 2.78 (08/10/2023)
 Secrets plugin (thanks Sidharth!)
 Bug fixes (NPE, timeout, timezone, dialog dismissal)

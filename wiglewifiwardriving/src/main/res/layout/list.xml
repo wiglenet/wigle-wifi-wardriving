@@ -19,7 +19,6 @@
             android:layout_weight="4"
             android:text="@string/run"
             tools:text="Run 88.8K"
-
             />
         <LinearLayout
             android:orientation="horizontal"

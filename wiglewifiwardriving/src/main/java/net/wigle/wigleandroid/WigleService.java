@@ -376,6 +376,8 @@ public final class WigleService extends Service {
             builder.setCustomContentView(smallRemoteViews);
             builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setColorized(true);
+            builder.setOnlyAlertOnce(true); //ALIBI: prevent multiple badge notification
+
             if (SDK_INT < 29) {
                 //Classic charcoal:
                 builder.setColor(1973790);

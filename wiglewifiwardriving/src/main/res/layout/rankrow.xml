@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
+		android:layout_height="wrap_content"
 		android:gravity="center">
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
@@ -16,11 +17,14 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				style="@style/StatRankColor"
-				android:textSize="22sp" />
+				android:textSize="22sp"
+				tools:text="#8888"
+				/>
 			<TextView android:id="@+id/rankdiff"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:textSize="16sp"/>
+				android:textSize="16sp"
+				tools:text="+888" />
 		</LinearLayout>
 
 		<TextView android:id="@+id/username"
@@ -30,12 +34,16 @@
 			android:paddingStart="18dp"
 			android:paddingEnd="0dp"
 			android:gravity="start"
-			android:textSize="22sp"/>
+			android:textSize="22sp"
+			android:scrollHorizontally="true"
+			android:ellipsize="end"
+			android:maxLines="1"
+			tools:text="WiGLEUser@excessivelylongdeomain.com" />
 	</LinearLayout>
 	<!-- Second (WiFi) row -->
 	<LinearLayout android:orientation="horizontal"
 			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
+			android:layout_height="wrap_content"
 			android:paddingTop="2dp">
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
@@ -55,19 +63,24 @@
 				android:layout_weight="0"
 				style="@style/WiFiColor"
 				android:textSize="17sp"
-				android:gravity="start"/>
+				android:gravity="start"
+				tools:text="188,888,888" />
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="17sp"
 				android:paddingHorizontal="3dp"
 				android:text="/"
-				android:gravity="start"/>
+				android:gravity="start" />
 			<TextView android:id="@+id/total_wifi_seen_gps"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:textSize="17sp"
-				android:gravity="start"/>
+				android:gravity="start"
+				android:scrollHorizontally="true"
+				android:ellipsize="end"
+				android:maxLines="1"
+				tools:text="8,888,888,888"/>
 		</LinearLayout>
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
@@ -87,13 +100,14 @@
 				android:layout_height="wrap_content"
 				android:textSize="17sp"
 				style="@style/WiFiColor"
-				android:gravity="end"/>
+				android:gravity="end"
+				tools:text="8,888,888" />
 		</LinearLayout>
 	</LinearLayout>
 	<!-- Third row -->
 	<LinearLayout android:orientation="horizontal"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
+		android:layout_height="wrap_content"
 		android:paddingVertical="2dp">
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
@@ -110,7 +124,8 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				style="@style/BtColor"/>
+				style="@style/BtColor"
+				tools:text="888,888"/>
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -121,7 +136,8 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				style="@style/SmallStats"/>
+				style="@style/SmallStats"
+				tools:text="888,888,888"/>
 		</LinearLayout>
 		<LinearLayout android:orientation="horizontal"
 			android:layout_width="wrap_content"
@@ -138,7 +154,8 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				style="@style/CellColor"/>
+				style="@style/CellColor"
+				tools:text="8,888,888"/>
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -149,7 +166,8 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:gravity="center"
-				style="@style/SmallStats"/>
+				style="@style/SmallStats"
+				tools:text="8,888,888"/>
 		  </LinearLayout>
 	</LinearLayout>
 

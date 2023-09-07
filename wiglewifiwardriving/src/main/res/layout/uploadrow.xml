@@ -2,6 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -71,24 +72,26 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:id="@+id/upload_row_top">
-
             <TextView android:id="@+id/transid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="18sp"
                 style="@style/UploadColor"
-                android:gravity="start"/>
+                android:gravity="start"
+                tools:text="20881208-01234"/>
             <TextView android:id="@+id/upload_row_status" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 style="@style/KeyStatColor"
-                android:gravity="center"/>
+                android:gravity="center"
+                tools:text="Completed" />
             <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="end"
-                style="@style/StatColor" />
+                style="@style/StatColor"
+                tools:text="100%" />
         </LinearLayout>
 
         <LinearLayout android:orientation="horizontal"
@@ -114,7 +117,8 @@
                 <TextView android:id="@+id/total_wifi_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallWiFiStats"/>
+                    style="@style/SmallWiFiStats"
+                    tools:text="88,888" />
             </LinearLayout>
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
@@ -133,7 +137,8 @@
                 <TextView android:id="@+id/total_bt_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallBtStats"/>
+                    style="@style/SmallBtStats"
+                    tools:text="88,888" />
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
@@ -160,7 +165,8 @@
                 <TextView android:id="@+id/total_cell_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallCellStats"/>
+                    style="@style/SmallCellStats"
+                    tools:text="88,888" />
             </LinearLayout>
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
@@ -170,7 +176,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    style="@style/SmallStats"/>
+                    style="@style/SmallStats"
+                    tools:text="88,888,888 bytes"/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
@@ -181,7 +188,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                style="@style/SmallStats"/>
+                style="@style/SmallStats"
+                tools:text="@string/click_download" />
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

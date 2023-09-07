@@ -1,26 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical"
-	    android:layout_width="fill_parent" android:layout_height="fill_parent">
-
-<TextView android:id="@+id/subject" android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-	      style="@style/NewsTitleStyle"/>
-<TextView android:id="@+id/poster_date" android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-	      style="@style/NewsDateStyle"/>
-<TextView android:id="@+id/post" android:layout_width="fill_parent"
-		  android:layout_height="wrap_content"
-		  android:layout_weight="1"
-		  style="@style/NewsPostStyle"/>
-
-<TextView android:id="@+id/link" android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:layout_weight="1"
-          android:textSize="16sp"
-          android:gravity="start"
-          android:layout_marginBottom="4sp"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:orientation="vertical"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content">
+<TextView android:id="@+id/subject"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	style="@style/NewsTitleStyle"
+	tools:text="WiGLE Breaking news of the greatest importance TO YOU"/>
+<TextView android:id="@+id/poster_date"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	style="@style/NewsDateStyle"
+	tools:text="arkasha - 2028-08-08T23:58:58.000Z"/>
+<TextView android:id="@+id/post"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	style="@style/NewsPostStyle"
+	tools:text="Effective immediately, WiGLE will be converted to a social media, dating, payments, real-time-chat, dessert topping, floor wax!"/>
+<TextView android:id="@+id/link"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	android:textSize="16sp"
+	android:gravity="start"
+	android:layout_marginBottom="4sp"
+	tools:text="https://wigle.net/fortunately-not-a-real-news-article?the=thing"/>
 </LinearLayout>
 

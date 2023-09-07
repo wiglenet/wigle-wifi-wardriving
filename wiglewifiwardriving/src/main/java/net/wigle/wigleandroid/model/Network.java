@@ -246,7 +246,7 @@ public final class Network implements ClusterItem {
         if (!bleServiceUuids.contains(uuid)) {
             bleServiceUuids.add(uuid);
         }
-        if (newSuids) {
+        if (newSuids && (bleMfgr == null || bleMfgr.isEmpty())) {
             bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
         }
     }
@@ -254,6 +254,7 @@ public final class Network implements ClusterItem {
     public void addBleMfgrId(Integer id) {
         bleMfgrId = id;
         if (bleMfgrId != null) {
+            //ALIBI: in conjunction with addBleServiceUuid, Mfgr takes precedence over service UUID-derived name in this impl.
             bleMfgr = lookupMfgrByMfgrId(id);
         }
     }

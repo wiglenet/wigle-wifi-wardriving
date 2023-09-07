@@ -159,7 +159,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         final State state = MainActivity.getStaticState();
         final TextView tv = view.findViewById( R.id.db_status );
         dbQueueTextColor = tv.getCurrentTextColor();
-
         Logging.info("setupUploadButton");
         setupUploadButton(view);
         Logging.info("setupList");
@@ -366,6 +365,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != a) {
             a.setTitle(R.string.list_app_name);
         }
+        State state = MainActivity.getStaticState();
+        if (null != state ) {
+            state.listAdapter.updateTheme(requireActivity().getBaseContext());
+        }
+
         //ALIBI: default status can confuse users on resume
         Logging.info("setNetCountUI");
         setNetCountUI(MainActivity.getStaticState(), getView());
@@ -630,10 +634,10 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
     }
 
-    private void setupList( final View view ) {
+    private void setupList(final View view ) {
         State state = MainActivity.getStaticState();
         if (null != state && state.listAdapter == null) {
-            state.listAdapter = new SetNetworkListAdapter( getActivity(), R.layout.row );
+            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), R.layout.row );
         }
         // always set our current list adapter
         if (null != state) {

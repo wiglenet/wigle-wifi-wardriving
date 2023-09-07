@@ -44,7 +44,7 @@ public class WiGLEToast {
                 TextView text = layout.findViewById(R.id.toast_message_text);
                 text.setText(messageString);
 
-                Toast toast = new Toast(context);
+                Toast toast = new Toast(context.getApplicationContext()); // https://stackoverflow.com/questions/57082435/memory-leaks-while-showing-toast-from-other-class
                 //ALIBI: logs errors in Toast, but works
                 toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                 toast.setDuration(toastLength);

@@ -15,17 +15,21 @@ import java.util.Locale;
  * the array adapter base
  */
 public abstract class AbstractListAdapter<M> extends ArrayAdapter<M> {
-    protected final LayoutInflater mInflater;
+    protected LayoutInflater mInflater;
     protected final NumberFormat numberFormat;
 
     public AbstractListAdapter(final Context context, final int rowLayout ) {
         super( context, rowLayout );
 
-        this.mInflater = LayoutInflater.from(context);
+        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         numberFormat = NumberFormat.getNumberInstance( Locale.US );
         numberFormat.setGroupingUsed(true);
     }
 
     @Override
     public abstract View getView(final int position, final View convertView, final ViewGroup parent);
+
+    public void updateTheme(final Context context) {
+        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
 }

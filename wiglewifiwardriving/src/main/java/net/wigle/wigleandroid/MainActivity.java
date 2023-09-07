@@ -41,7 +41,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -88,9 +87,11 @@ import net.wigle.wigleandroid.util.InstallUtility;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Method;
@@ -104,6 +105,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -115,6 +117,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.location.LocationManager.GPS_PROVIDER;
+
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public final class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
     //*** state that is retained ***
@@ -153,12 +159,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         AtomicBoolean uiRestart;
         AtomicBoolean ttsNag = new AtomicBoolean(true);
         WiGLEApiManager apiManager;
+        Map<Integer, String> btVendors;
+        Map<Integer, String> btMfgrIds;
     }
 
     private State state;
     // *** end of state that is retained ***
     private GnssStatus.Callback gnssStatusCallback = null;
-
     static Locale ORIG_LOCALE = Locale.getDefault();
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
@@ -530,15 +537,11 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private boolean addPermission(List<String> permissionsList, String permission) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                permissionsList.add(permission);
-                // Check for Rationale Option
-                if (!shouldShowRequestPermissionRationale(permission))
-                    return false;
-            }
-        } else {
-            return false;
+        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            permissionsList.add(permission);
+            // Check for Rationale Option
+            if (!shouldShowRequestPermissionRationale(permission))
+                return false;
         }
         return true;
     }
@@ -862,6 +865,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return null;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onDestroy() {
         Logging.info("MAIN: destroy.");
@@ -1067,7 +1071,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             //ALIBI: loop protection
             if (MainActivity.getMainActivity() != null &&
                     MainActivity.getMainActivity().state != null &&
-                    MainActivity.getMainActivity().state.ttsChecked == false) {
+                    !MainActivity.getMainActivity().state.ttsChecked) {
                 ttsCheckIntent();
             }
         }
@@ -1670,6 +1674,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         return false;
     }
 
+    @SuppressLint("MissingPermission")
     public void setupBluetooth(final SharedPreferences prefs) {
         try {
             final BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
@@ -1694,7 +1699,42 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     Logging.info("\tnew bluetoothReceiver");
                     // dynamically detect BTLE feature - prevents occasional NPEs
                     boolean hasLeSupport = getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+                    if (hasLeSupport) {
+                        //initialize the two global maps.
+                        try (BufferedReader reader = new BufferedReader(
+                                new InputStreamReader((getAssets().open("btmember.yaml"))))) {
+                            Constructor constructor = new Constructor(new LoaderOptions());
+                            Yaml yaml = new Yaml(constructor);
+                            final HashMap<String,Object> data = yaml.load(reader);
+                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("uuids");
+                            state.btVendors = new HashMap<>();
+                            if (null != entries) {
+                                for (LinkedHashMap<String, Object> entry : entries) {
+                                    state.btVendors.put((Integer) entry.get("uuid"), (String) entry.get("name"));
+                                }
+                                Logging.info("BLE members initialized: "+entries.size()+" entries");
+                            }
+                        } catch (IOException e) {
+                            Logging.error("Failed to load BLE member yaml:",e);
+                        }
 
+                        try (BufferedReader reader = new BufferedReader(
+                                new InputStreamReader((getAssets().open("btco.yaml"))))) {
+                            Constructor constructor = new Constructor(new LoaderOptions());
+                            Yaml yaml = new Yaml(constructor);
+                            final HashMap<String, Object> data = yaml.load(reader);
+                            final List<LinkedHashMap<String, Object>> entries = (List<LinkedHashMap<String, Object>>) data.get("company_identifiers");
+                            state.btMfgrIds = new HashMap<>();
+                            if (null != entries) {
+                                for (LinkedHashMap<String, Object> entry : entries) {
+                                    state.btMfgrIds.put((Integer) entry.get("value"), (String) entry.get("name"));
+                                }
+                                Logging.info("BLE mfgrs initialized: "+entries.size()+" entries");
+                            }
+                        } catch (IOException e) {
+                            Logging.error("Failed to load BLE mfgr yaml: ",e);
+                        }
+                    }
                     // bluetooth scan listener
                     // this receiver is the main workhorse of bluetooth scanning
                     state.bluetoothReceiver = new BluetoothReceiver(state.dbHelper,
@@ -1715,6 +1755,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
         }
     }
 
+    @SuppressLint("MissingPermission")
     public void endBluetooth(SharedPreferences prefs) {
         if (state.bluetoothReceiver != null) {
             state.bluetoothReceiver.stopScanning();
@@ -2461,4 +2502,13 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             Logging.error("TTS init failed: "+status);
         }
     }
+
+    public String getBleVendor(final int i) {
+        return state.btVendors.get(i);
+    }
+
+    public String getBleMfgr(final int i) {
+        return state.btMfgrIds.get(i);
+    }
+
 }

@@ -443,4 +443,6 @@
     <string name="login_required">Lazima uwe umeingia ili kufanya hivi. Tafadhali ingia au unda akaunti ikiwa ni lazima.</string>
     <string name="login">Ingia</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Sajili&lt;/a&gt; @WiGLE.net au &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;uwashe sasa ukitumia msimbo wa QR&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">Kitambulisho cha Muuzaji cha BLE:</string>
 </resources>

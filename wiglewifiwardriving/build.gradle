@@ -47,6 +47,8 @@ ext {
     inputMxcSqlDir = "etc/mccmncsqlite"
     outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
     mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"
+    outputBtMemberUuidFile = "$projectDir/src/main/assets/btmember.yaml"
+    outputBtCoIdUuidFile = "$projectDir/src/main/assets/btco.yaml"
 }
 
 dependencies {
@@ -67,6 +69,7 @@ dependencies {
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
     implementation 'com.google.maps.android:android-maps-utils:3.1.1'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'androidx.test:core:1.5.0'
@@ -130,4 +133,20 @@ task createMccMncDB (dependsOn: 'downloadFile') {
         }
     }
     sql.close()
+}
+
+//TODO: this runs every time, which isn't optimal. just needs to run before build
+task downloadBtMemberFile (type: Download) {
+    println "downloading BT Member YAML data"
+    download {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
+        dest outputBtMemberUuidFile
+        overwrite true
+    }
+    download {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
+        dest outputBtCoIdUuidFile
+        overwrite true
+    }
+
 }

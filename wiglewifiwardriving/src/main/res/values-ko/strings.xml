@@ -444,4 +444,6 @@
     <string name="login_required">이 작업을 수행하려면 로그인해야 합니다. 필요한 경우 로그인하거나 계정을 만드십시오.</string>
     <string name="login">로그인</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net 등록&lt;/a&gt; 또는 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;지금 QR 코드로 활성화&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">BLE 공급업체 ID:</string>
 </resources>

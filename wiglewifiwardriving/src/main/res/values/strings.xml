@@ -444,4 +444,6 @@
     <string name="login_required">You must be logged in to do this. Please log in or create an account if necessary.</string>
     <string name="login">Login</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Register&lt;/a&gt; @WiGLE.net or &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activate now with QR code&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">BLE Vendor ID:</string>
 </resources>

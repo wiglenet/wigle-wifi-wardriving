@@ -443,4 +443,6 @@
     <string name="login_required">यह करने के लिये लॉग - इन करना आवश्यक है। कृपया लॉग इन करें या यदि आवश्यक हो तो एक खाता बनाएँ।</string>
     <string name="login">लॉग इन करें</string>
     <string name="registration_html_prompt">\@WiGLE.net &lt;a href=\'net.wigle.wigleandroid.register://register\'>पंजीकृतं&lt;/a&gt; करें या &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR कोड के साथ अभी सक्रिय करें&lt;/a&gt;</string>
+    <string name="ble_services">बीएलई यूयूआईडी:</string>
+    <string name="ble_vendor">बीएलई विक्रेता आईडी:</string>
 </resources>

@@ -444,4 +444,6 @@
     <string name="login_required">Sinun täytyy olla kirjautunut sisään tehdäksesi tämän. Ole hyvä ja kirjaudu sisään tai luo tili tarvittaessa.</string>
     <string name="login">Kirjaudu sisään</string>
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Rekisteröidy&lt;/a&gt; @WiGLE.net tai &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivoi nyt QR-koodilla&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">BLE-toimittajan tunnus:</string>
 </resources>

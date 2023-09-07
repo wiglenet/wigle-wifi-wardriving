@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.core.widget.ImageViewCompat;
 
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
+import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
@@ -221,6 +223,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
+        if (NetworkType.BLE.equals(network.getType())) {
+            tv.setTextAppearance(R.style.ListBt);
+        } else {
+            tv.setTextAppearance(R.style.ListOui);
+        }
 
         tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));

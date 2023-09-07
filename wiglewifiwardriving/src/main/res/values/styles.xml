@@ -86,6 +86,12 @@
     <style name="ListFreq" parent="TextAppearance.AppCompat.Small">
         <item name="android:textColor">#808080</item>
     </style>
+    <style name="ListBt" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#7799BB</item>
+    </style>
+    <style name="ListDebug" parent="TextAppearance.AppCompat.Small">
+        <item name="android:textColor">#F06000</item>
+    </style>
     <style name="NewsTitleStyle" parent="TextAppearance.AppCompat">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">#60f0f0</item>

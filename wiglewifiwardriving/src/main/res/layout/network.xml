@@ -198,6 +198,9 @@
                     android:layout_toEndOf="@+id/na_observe_label"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="@string/network_querying" />
             </RelativeLayout>
 

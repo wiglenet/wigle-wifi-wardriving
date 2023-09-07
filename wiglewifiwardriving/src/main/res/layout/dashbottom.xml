@@ -1,72 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:keepScreenOn="true" >
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/currnets"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/currnets"
+        android:textSize="24sp"
+        tools:text="@string/dash_vis_nets"
     />
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/newNetsSinceUpload"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/newNetsSinceUpload"
+        android:textSize="24sp"
+        tools:text="@string/dash_new_upload"
     />
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/rundist"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rundist"
+        android:textSize="24sp"
+        tools:text="@string/dash_dist_run"
     />
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/totaldist"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/totaldist"
+        android:textSize="24sp"
+        tools:text="@string/dash_dist_total"
     />
-    
 	<TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/queuesize"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/queuesize"
+        android:textSize="24sp"
+        tools:text="@string/dash_db_queue"
     />
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/dbNets"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dbNets"
+        android:textSize="24sp"
+        tools:text="@string/dash_db_nets"
     />
-    
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/dbLocs"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dbLocs"
+        android:textSize="24sp"
+        tools:text="@string/dash_db_locs"
     />
-
     <TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/scanned_in"
-    android:textSize="24sp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scanned_in"
+        android:textSize="24sp"
+        tools:text="@string/scanned_in"
     />
-
     <TextView
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:id="@+id/prevrundist"
-    android:textSize="24sp"
-    android:textColor="#909090"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/prevrundist"
+        android:textSize="24sp"
+        android:textColor="#909090"
+        tools:text="@string/dash_dist_prev"
     />
-    
 </LinearLayout>

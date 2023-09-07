@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linearlayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -19,7 +20,8 @@
             style="@style/InvertedText"
             android:paddingStart="4dp"
             android:paddingEnd="1dp"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            tools:text="@string/all_time_title"/>
     </LinearLayout>
     <RelativeLayout
         android:layout_height="match_parent"
@@ -35,7 +37,8 @@
                 <ListView
                     android:id="@+id/rank_list_view"
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"/>
+                    android:layout_height="fill_parent"
+                    tools:listitem="@layout/rankrow"/>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </RelativeLayout>
         <RelativeLayout

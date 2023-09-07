@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -17,7 +18,8 @@
             android:textSize="15sp"
             android:layout_weight="4"
             android:text="@string/run"
-        />
+            tools:text="Run 88.8K"
+            />
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -37,7 +39,9 @@
                 android:layout_width="fill_parent" android:layout_height="wrap_content"
                 android:id="@+id/stats_wifi"
                 android:textSize="15sp"
-                style="@style/WiFiColor" />
+                style="@style/WiFiColor"
+                tools:text="888.8 K"
+                />
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
@@ -62,6 +66,7 @@
                 android:layout_weight="1"
                 android:text="@string/stats"
                 style="@style/CellColor"
+                tools:text="888.8 K"
                 />
         </LinearLayout>
         <LinearLayout
@@ -87,6 +92,7 @@
                 android:textSize="15sp"
                 android:layout_weight="1"
                 style="@style/BtColor"
+                tools:text="888.8 K"
                 />
         </LinearLayout>
         <LinearLayout
@@ -109,6 +115,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_dbnets"
                 android:textSize="15sp"
+                tools:text="88888888"
                 />
         </LinearLayout>
     </LinearLayout>
@@ -136,21 +143,25 @@
             android:layout_weight="6"
             >
             <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/lat_text"
-            android:text="@string/list_waiting_gps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lat_text"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@string/list_waiting_gps"
             />
             <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/lon_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/lon_text"
+                tools:text="Lon: -108.44456771"
             />
             <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/speed_text"
-            />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/speed_text"
+                tools:text="Speed: 88 mph" />
         </LinearLayout>
         <LinearLayout
             android:orientation="vertical"
@@ -162,16 +173,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/accuracy_text"
+                tools:text="+/- 160 ft"
+
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/alt_text"
+                tools:text="Alt: 888 ft"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/sats_text"
+                tools:text="Sats: 22"
+
                 />
         </LinearLayout>
 
@@ -219,7 +235,7 @@
             android:text=""
 			android:layout_weight="4"
             android:layout_gravity="start"
-			/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -227,6 +243,7 @@
             android:text="@string/list_status_default"
             android:layout_weight="1"
             android:layout_gravity="end"
+            tools:text="888 scanned in 8888ms."
             />
 		<TextView
 			android:layout_width="wrap_content"
@@ -237,6 +254,7 @@
             android:layout_gravity="end"
             android:paddingEnd="5dp"
             android:paddingStart="3dp"
+            tools:text="DB Queue: 888"
 			/>
     </LinearLayout>
     <LinearLayout
@@ -249,5 +267,6 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
+        tools:listitem="@layout/row"
         />
 </LinearLayout>

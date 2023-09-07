@@ -165,9 +165,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private State state;
     // *** end of state that is retained ***
-
     private GnssStatus.Callback gnssStatusCallback = null;
-
     static Locale ORIG_LOCALE = Locale.getDefault();
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
@@ -511,6 +509,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             addPermission(permissionsList, Manifest.permission.READ_PHONE_STATE);
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_SCAN);
             addPermission(permissionsList, Manifest.permission.BLUETOOTH_CONNECT);
+            addPermission(permissionsList, Manifest.permission.POST_NOTIFICATIONS);
             if (!permissionsList.isEmpty()) {
                 // The permission is NOT already granted.
                 // Check if the user has been asked about this permission already and denied
@@ -1878,7 +1877,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     }
 
     private void setupLocation(final SharedPreferences prefs) {
-        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         try {
             // check if there is a gps
@@ -2007,7 +2006,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
     private void internalSetLocationUpdates(final long updateIntervalMillis, final float updateMeters)
             throws SecurityException {
-        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         if (state.GNSSListener != null) {
             // remove any old requests
@@ -2038,7 +2037,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
 
                 @Override
                 public void onSatelliteStatusChanged(GnssStatus status) {
-                    state.GNSSListener.onGnssStatusChanged(status);
+                    if (null != state && null != state.GNSSListener && !isFinishing()) {
+                        state.GNSSListener.onGnssStatusChanged(status);
+                    }
                 }
             };
             locationManager.registerGnssStatusCallback(gnssStatusCallback);
@@ -2267,7 +2268,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (state.dbHelper != null) state.dbHelper.close();
             if (state.mxcDbHelper != null) state.mxcDbHelper.close();
 
-            final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            final LocationManager locationManager = (LocationManager) this.getApplicationContext().getSystemService(Context.LOCATION_SERVICE); //ALIBI: avoid activity context-based leaks
             if (state.GNSSListener != null && locationManager != null) {
                 try {
                     if (gnssStatusCallback != null) {

@@ -11,6 +11,7 @@ import net.wigle.wigleandroid.util.KalmanLatLong;
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -18,7 +19,6 @@ import android.content.pm.PackageManager;
 import android.location.GnssStatus;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
-import android.location.GpsStatus.Listener;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import androidx.core.content.ContextCompat;
 
-public class GNSSListener implements Listener, LocationListener {
+public class GNSSListener implements LocationListener {
     public static final long GPS_TIMEOUT_DEFAULT = 15000L;
     public static final long NET_LOC_TIMEOUT_DEFAULT = 60000L;
     public static final float LERP_MIN_THRESHOLD_METERS = 20.0f;
@@ -84,18 +84,6 @@ public class GNSSListener implements Listener, LocationListener {
 
     public void setMainActivity( MainActivity mainActivity ) {
         this.mainActivity = mainActivity;
-    }
-
-    @Override
-    public void onGpsStatusChanged( final int event ) {
-        if ( event == GpsStatus.GPS_EVENT_STOPPED ) {
-            Logging.info("GPS STOPPED");
-            // this event lies, on one device it gets called when the
-            // network provider is disabled :(  so we do nothing...
-            // listActivity.setLocationUpdates();
-        }
-        //DEBUG: MainActivity.info("GPS event: " + event);
-        updateLocationData(null);
     }
 
     public void handleScanStop() {
@@ -153,12 +141,12 @@ public class GNSSListener implements Listener, LocationListener {
     }
 
     /** newLocation can be null */
+    @SuppressLint("MissingPermission")
     private synchronized void updateLocationData(final Location newLocation ) {
         /*
           ALIBI: the location manager call's a non-starter if permission hasn't been granted.
          */
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
+        if ( ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
                         android.Manifest.permission.ACCESS_FINE_LOCATION )
                         != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission( mainActivity.getApplicationContext(),
@@ -166,23 +154,16 @@ public class GNSSListener implements Listener, LocationListener {
                         != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        if (mainActivity == null) {
+            return;
+        }
+
         final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
 
         final LocationManager locationManager = (LocationManager)
-                mainActivity.getSystemService(Context.LOCATION_SERVICE);
+                mainActivity.getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         // see if we have new data
-        try {
-            if ( Build.VERSION.SDK_INT < 24 ) {
-                gpsStatus = locationManager.getGpsStatus(gpsStatus);
-            } else {
-                //ALIBI: do nothing - we're updating gnssStatus externally
-                //Logging.error("updateLocationData called, version >= 24. ("+location+")");
-            }
-        } catch (NullPointerException npe) {
-            Logging.error("NPE trying to call getGPSStatus");
-            return;
-        }
         final int satCount = getSatCount();
 
         final long gpsTimeout = prefs.getLong(PreferenceKeys.PREF_GPS_TIMEOUT, GPS_TIMEOUT_DEFAULT);
@@ -446,7 +427,7 @@ public class GNSSListener implements Listener, LocationListener {
 
     public int getSatCount() {
         int satCount = 0;
-        if (gnssStatus != null && Build.VERSION.SDK_INT >= 24) {
+        if (gnssStatus != null) {
             for ( int i = 0; i < gnssStatus.getSatelliteCount(); i++ ) {
                 if ( gnssStatus.usedInFix(i) ) satCount++;
             }
@@ -461,7 +442,7 @@ public class GNSSListener implements Listener, LocationListener {
 
     public Map<String, Integer> getConstellations() {
         final Map<String, Integer> cons = new TreeMap<>();
-        if (gnssStatus != null && Build.VERSION.SDK_INT >= 24) {
+        if (gnssStatus != null) {
             for ( int i = 0; i < gnssStatus.getSatelliteCount(); i++ ) {
                 if ( gnssStatus.usedInFix(i) ) {
                     final String key = constellationToString(gnssStatus.getConstellationType(i));

@@ -234,20 +234,10 @@ public final class BluetoothReceiver extends BroadcastReceiver implements LeScan
                 Integer mfgrKey = null;
                 if (null == uuid16Services && scanRecord.getManufacturerSpecificData() != null) {
                     SparseArray<byte[]> bytesArray= scanRecord.getManufacturerSpecificData();
-                    //String hexDump = "";
                     for(int i = 0; i < bytesArray.size(); i++) {
                         mfgrKey = bytesArray.keyAt(i);
-                        //Logging.error("got: "+mfgrKey+" net "+bssid);
-                        //final MainActivity ma = MainActivity.getMainActivity();
-                        //if (null != ma) {
-                        //    final String mfgrName = ma.getBleMfgr(key);
-                        //    Logging.error("got: "+mfgrName+" for "+key+" net "+bssid);
-                            //return "~"+mfgrName;
-                        //} else {
-                        //    Logging.error("null mfgr name: "+key);
-                        //}
+                        //DEBUG: Logging.error("got: "+mfgrKey+" net "+bssid);
                     }
-                    //Logging.error("Need to try: "+hexDump);
                 }
 
                 final String capabilities = DEVICE_TYPE_LEGEND.get(

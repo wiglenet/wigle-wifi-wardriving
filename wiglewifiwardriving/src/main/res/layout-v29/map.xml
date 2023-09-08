@@ -69,6 +69,9 @@
                 android:textSize="15sp"
                 android:layout_weight="1"
                 android:text="@string/stats"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="1"
                 style="@style/CellColor" />
         </LinearLayout>
         <LinearLayout

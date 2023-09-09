@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filtere Aktiveret</string>
     <string name="list_waiting_gps">(Venter på GPS-sync&#8230;)</string>
     <string name="list_scanning_off">(Scanning slukket)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">SAT:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">SAT: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(Status)</string>
-    <string name="list_speed">Hastighed:</string>
+    <string name="list_speed">Hastighed: %1$s</string>
     <string name="list_upload">Upload fil?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Type:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">Annuller</string>
     <string name="dash_scan_off">(Scanning er slukket)</string>
     <string name="dash_new_wifi">Nye WiFi</string>
-    <string name="dash_vis_nets">Synlig Net:</string>
-    <string name="dash_new_upload">Nye nets siden sidste upload:</string>
+    <string name="dash_vis_nets">Synlig Net: %1$d</string>
+    <string name="dash_new_upload">Nye nets siden sidste upload: %1$d</string>
     <string name="dash_new_cells">Ny Cell</string>
     <string name="dash_new_bt">Ny Bluetooth</string>
     <string name="dash_dist_run">Kørt Afstand:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Scan varighed:</string>
     <string name="dash_dist_total">Samlet Dist.:</string>
     <string name="dash_dist_prev">Forrige forløb:</string>
-    <string name="dash_db_queue">DB kø:</string>
-    <string name="dash_db_nets">DB Net:</string>
-    <string name="dash_db_locs">DB Steder:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB kø: %1$s</string>
+    <string name="dash_db_nets">DB Net: %1$s</string>
+    <string name="dash_db_locs">DB Steder: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mil</string>
@@ -146,7 +147,7 @@
     <string name="run">Kør</string>
     <string name="new_word">Nye</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannet i</string>
+    <string name="scanned_in">%1$d skannet i %2$d%3$s.</string>
     <string name="sort_title">Sorter Optioner</string>
     <string name="sort_spin_label">Sortér liste efter:</string>
     <string name="channel">Kanal</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (polsk)</string>
     <string name="language_pt">português (portugisisk)</string>
     <string name="language_pt_rBR">português brasileiro (brasiliansk portugisisk)</string>
+    <string name="language_ro_rRO">Română (rumænsk)</string>
     <string name="language_ru">ру́сский (russisk)</string>
     <string name="language_sv">svenska (svensk)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Korttype: Hybrid</string>
     <string name="map_toast_terrain">Korttype: Terræn</string>
     <string name="map_needs_playservice">Kort kræver Google Play Service</string>
-    <string name="register">Tilmeld</string>
     <string name="drawer_open">Skuffe åben</string>
     <string name="drawer_close">Skuffe tæt</string>
     <string name="site_stats_app_name">WiGLE.net Statistik</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">placering</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Uploads</string>
-    <string name="queue_depth">Filbehandlingskødybde</string>
+    <string name="queue_depth">WiGLE-kø: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Nyheder</string>
     <string name="tab_news">Nyheder</string>
     <string name="bytes">bytes</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Bruger rangering sidste måned</string>
     <string name="prevmonthrank_title">Månedens rangering sidste måned</string>
     <string name="list_scanning_on">(Scanning tændt)</string>
-    <string name="activate">aktiver nu</string>
     <string name="setting_activate_prompt">Besøg https://wigle.net/activate for your user code</string>
     <string name="upload_queued">I kø</string>
     <string name="upload_parsing">Gennemgår…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Lys</string>
     <string name="theme_dark_label">Mørk</string>
     <string name="theme_follow_label">Følg systemet</string>
+    <string name="manage_gpx_button">Gemte ruter</string>
+    <string name="manage_gpx">Administrer gemte GPX-ruter</string>
+    <string name="enable_map_theme">Tilpas korttema til app</string>
+    <string name="throttle">WiFi-scanning er begrænset. Deaktiver WiFi Scan Throttle under udviklerindstillinger for bedre ydeevne.</string>
+    <string name="no_individual_nets_map">Deaktiver visning af kortnet</string>
+    <string name="filter_show_btle">Vis Bluetooth LE</string>
+    <string name="enable_kalman">"Filtrer GPS-støj "</string>
+    <string name="settings_gps_head">GPS instillinger</string>
+    <string name="gps_old_message">Denne enhed understøttes ikke længere via appbutikken på grund af Googles politikker. Sikkerhedskopier dine data og sideindlæs WiGLE v. 2.67 .apk (eller lavere) fra https://github.com/wiglenet/wigle-wifi-wardriving/ . Beklager ulejligheden!</string>
+    <string name="gps_old_title">Kan ikke initialisere GPS</string>
+    <string name="enable_map_bearing">Følg min pejling/kurs</string>
+    <string name="login_title">Login påkrævet</string>
+    <string name="login_required">Du skal være logget ind for at gøre dette. Log ind eller opret en konto, hvis det er nødvendigt.</string>
+    <string name="login">Log på</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Tilmeld&lt;/a&gt; @WiGLE.net eller &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiver nu med QR-kode&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">BLE Leverandør ID:</string>
 </resources>

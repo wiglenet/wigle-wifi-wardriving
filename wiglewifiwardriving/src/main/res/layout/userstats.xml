@@ -14,7 +14,16 @@
         android:layout_height="wrap_content"
         android:padding="4dp"
         >
-
+        <ImageView
+            android:id="@+id/badgeImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:paddingRight="60dp"
+            android:paddingLeft="60dp"/>
         <LinearLayout
             android:id="@+id/linearlayout2"
             android:orientation="horizontal"
@@ -26,9 +35,8 @@
                 android:layout_height="fill_parent"
                 android:text="@string/rank_title"
                 android:textSize="24sp"
-                android:paddingRight="6dp"
-                />
-
+                android:paddingEnd="6dp"
+                android:paddingStart="0dp"/>
             <TextView
                 android:id="@+id/rank"
                 android:layout_width="wrap_content"
@@ -36,8 +44,8 @@
                 android:text="@string/unknown_number"
                 style="@style/UploadColor"
                 android:textSize="24sp"
-                android:paddingRight="5dip"/>
-
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
             <TextView
                 android:id="@+id/prevRank"
                 android:layout_width="wrap_content"
@@ -56,7 +64,8 @@
                 android:layout_height="fill_parent"
                 android:text="@string/month_rank_title"
                 android:textSize="20sp"
-                android:paddingRight="6dp"
+                android:paddingEnd="6dp"
+                android:paddingStart="0dp"
                 />
 
             <TextView
@@ -66,7 +75,8 @@
                 android:text="@string/unknown_number"
                 style="@style/UploadColor"
                 android:textSize="20sp"
-                android:paddingRight="5dip" />
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
 
             <TextView
                 android:id="@+id/prevMonthRank"
@@ -126,7 +136,8 @@
                     android:textSize="17sp"
                     android:paddingBottom="2dp"
                     style="@style/WiFiColor"
-                    android:paddingLeft="4dip"/>
+                    android:paddingStart="4dip"
+                    android:paddingEnd="0dp"/>
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -145,7 +156,8 @@
                     android:textSize="17sp"
                     android:paddingBottom="2dp"
                     style="@style/BtColor"
-                    android:paddingLeft="2dip"/>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="2dip"/>
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -164,7 +176,8 @@
                     android:textSize="17sp"
                     android:paddingBottom="2dp"
                     style="@style/CellColor"
-                    android:paddingLeft="4dip"/>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="4dip"/>
             </LinearLayout>
         </LinearLayout>
         <View
@@ -209,7 +222,8 @@
                     android:textSize="15sp"
                     android:paddingBottom="2dp"
                     style="@style/WiFiColor"
-                    android:paddingLeft="4dip"/>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="4dip"/>
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -228,7 +242,8 @@
                     android:textSize="15sp"
                     android:paddingBottom="2dp"
                     style="@style/BtColor"
-                    android:paddingLeft="2dip"/>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="2dip"/>
             </LinearLayout>
             <LinearLayout
                 android:orientation="horizontal"
@@ -247,7 +262,8 @@
                     android:textSize="15sp"
                     android:paddingBottom="2dp"
                     style="@style/CellColor"
-                    android:paddingLeft="4dip"/>
+                    android:paddingEnd="0dp"
+                    android:paddingStart="4dip"/>
             </LinearLayout>
         </LinearLayout>
         <View
@@ -270,7 +286,8 @@
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
                 style="@style/WiFiColor"
-                android:paddingRight="3dip"
+                android:paddingEnd="3dip"
+                android:paddingStart="0dp"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -291,7 +308,8 @@
                 android:textSize="16sp"
                 android:paddingBottom="2dip"
                 style="@style/WiFiColor"
-                android:paddingRight="3dip" />
+                android:paddingStart="0dp"
+                android:paddingEnd="3dip" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -311,7 +329,8 @@
                 android:textSize="16sp"
                 android:paddingBottom="2dp"
                 style="@style/WiFiColor"
-                android:paddingRight="3dip" />
+                android:paddingStart="0dp"
+                android:paddingEnd="3dip" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -331,7 +350,8 @@
                 android:textSize="16sp"
                 android:paddingBottom="2dp"
                 style="@style/FgStatColor"
-                android:paddingRight="3dip" />
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -350,7 +370,8 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 style="@style/FgStatColor"
-                android:paddingRight="3dip" />
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -369,7 +390,8 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 style="@style/FgStatColor"
-                android:paddingRight="3dip" />
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -388,7 +410,8 @@
                 android:text="@string/status_unknown"
                 android:textSize="16sp"
                 style="@style/FgStatColor"
-                android:paddingRight="3dip" />
+                android:paddingEnd="5dip"
+                android:paddingStart="0dp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

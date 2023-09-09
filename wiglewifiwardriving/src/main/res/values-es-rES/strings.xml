@@ -80,12 +80,12 @@
     <string name="filter_enabled">Filtro habilitado</string>
     <string name="list_waiting_gps">(Esperando sincronización GPS…)</string>
     <string name="list_scanning_off">(Escáner desactivado)</string>
-    <string name="list_short_lat">Latitud:</string>
-    <string name="list_short_lon">Longitud:</string>
-    <string name="list_short_sats">Satélites:</string>
-    <string name="list_short_alt">Altitud</string>
+    <string name="list_short_lat">Latitud: %1$s</string>
+    <string name="list_short_lon">Longitud: %1$s</string>
+    <string name="list_short_sats">Satélites: %1$d</string>
+    <string name="list_short_alt">Altitud %1$s</string>
     <string name="list_status_default">(estado)</string>
-    <string name="list_speed">Velocidad:</string>
+    <string name="list_speed">Velocidad: %1$s</string>
     <string name="list_upload">¿Cargar archivo?</string>
     <string name="network_signal">Señal:</string>
     <string name="network_type">Tipo:</string>
@@ -118,8 +118,8 @@
     <string name="cancel">Cancelar</string>
     <string name="dash_scan_off">(Escáner desactivado)</string>
     <string name="dash_new_wifi">Nuevo WiFi</string>
-    <string name="dash_vis_nets">Redes visibles:</string>
-    <string name="dash_new_upload">Redes desde la carga:</string>
+    <string name="dash_vis_nets">Redes visibles: %1$d</string>
+    <string name="dash_new_upload">Redes desde la carga: %1$d</string>
     <string name="dash_new_cells">Nueva celda</string>
     <string name="dash_new_bt">Nuevo bluetooth</string>
     <string name="dash_dist_run">Distancia de ejecución:</string>
@@ -127,10 +127,11 @@
     <string name="dash_time_scanning">Duración del escáner:</string>
     <string name="dash_dist_total">Distancia total:</string>
     <string name="dash_dist_prev">Ejecución anterior:</string>
-    <string name="dash_db_queue">Fila de base de datos:</string>
-    <string name="dash_db_nets">Redes de la base de datos:</string>
-    <string name="dash_db_locs">Ubicaciones de base de datos:</string>
-    <string name="dash_short_loc">Localización:</string>
+    <string name="dash_db_queue">Fila de BD: %1$s</string>
+    <string name="dash_db_nets">Redes de la BD: %1$s</string>
+    <string name="dash_db_locs">Ubicaciones de BD: %1$s</string>
+    <string name="dash_short_loc">Localización: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">millas</string>
@@ -145,7 +146,7 @@
     <string name="run">Ejecución</string>
     <string name="new_word">Nuevo</string>
     <string name="db">Base de datos</string>
-    <string name="scanned_in">escaneado en</string>
+    <string name="scanned_in">%1$d escaneado en %2$d%3$s.</string>
     <string name="sort_title">Opciones de clasificación</string>
     <string name="sort_spin_label">Ordenar lista por:</string>
     <string name="channel">Canal</string>
@@ -232,6 +233,7 @@
     <string name="language_pl">polski (polaco)</string>
     <string name="language_pt">português (portugués)</string>
     <string name="language_pt_rBR">português brasileiro (portugués brasileño)</string>
+    <string name="language_ro_rRO">Română (Rumano)</string>
     <string name="language_ru">ру́сский (ruso)</string>
     <string name="language_sv">svenska (sueco)</string>
     <string name="language_sw">Kiswahili (swahili)</string>
@@ -264,7 +266,6 @@
     <string name="map_toast_hybrid">Tipo de mapa: Híbrido</string>
     <string name="map_toast_terrain">Tipo de mapa: Terreno</string>
     <string name="map_needs_playservice">El mapa requiere el servicio de Google Play</string>
-    <string name="register">Registrarse</string>
     <string name="drawer_open">Cajón abierto</string>
     <string name="drawer_close">Cajón cerrado</string>
     <string name="site_stats_app_name">Estadísticas de WiGLE.net</string>
@@ -293,7 +294,7 @@
     <string name="tab_rank">Clasificaciones</string>
     <string name="uploads_app_name">Cargas de WiGLE.net</string>
     <string name="tab_uploads">Cargas</string>
-    <string name="queue_depth">Profundidad de la fila de procesamiento de archivos</string>
+    <string name="queue_depth">Cola WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">Noticias de WiGLE.net</string>
     <string name="tab_news">Noticias</string>
     <string name="bytes">Bytes</string>
@@ -306,11 +307,10 @@
     <string name="prevrank_title">Clasificación de usuarios el mes pasado</string>
     <string name="prevmonthrank_title">Clasificación mensual el mes pasado</string>
     <string name="list_scanning_on">(Escáner activado)</string>
-    <string name="activate">activar ahora con código QR</string>
     <string name="setting_activate_prompt">visite https://wigle.net/activate para obtener su código de usuario</string>
     <string name="upload_queued">En espera</string>
-    <string name="upload_parsing">Analizando ...</string>
-    <string name="upload_trilaterating">Trilateando ...</string>
+    <string name="upload_parsing">Analizando …</string>
+    <string name="upload_trilaterating">Trilateando…</string>
     <string name="upload_stats">Estadísticas finales…</string>
     <string name="upload_success">Terminado</string>
     <string name="upload_failed">Ha fallado</string>
@@ -346,7 +346,7 @@
     <string name="display_filter_button">Excluir MAC/OUI de la pantalla…</string>
     <string name="add_oui_filter_button">Agregar filtro OUI</string>
     <string name="add_mac_filter_button">Agregar filtro MAC</string>
-    <string name="log_filter_button">Excluir MAC/OUI del registro ...</string>
+    <string name="log_filter_button">Excluir MAC/OUI del registro …</string>
     <string name="mac_filter_app_name">Filtrar direcciones</string>
     <string name="hide_mac">Ocultar MAC</string>
     <string name="hide_oui">Ocultar OUI</string>
@@ -428,4 +428,21 @@
     <string name="theme_light_label">Luz</string>
     <string name="theme_dark_label">Oscuro</string>
     <string name="theme_follow_label">Seguir el sistema</string>
+    <string name="manage_gpx_button">Rutas guardadas</string>
+    <string name="manage_gpx">Administrar rutas GPX guardadas</string>
+    <string name="enable_map_theme">Hacer coincidir el tema del mapa con el de la aplicación</string>
+    <string name="throttle">El escaneo WiFi es limitado. Deshabilite WiFi Scan Throttle en Configuración de desarrollador para un mejor rendimiento.</string>
+    <string name="no_individual_nets_map">Deshabilitar la visualización de la red del mapa</string>
+    <string name="filter_show_btle">Mostrar Bluetooth LE</string>
+    <string name="settings_gps_head">Configuración GPS</string>
+    <string name="enable_kalman">Filtrar el ruido del GPS</string>
+    <string name="gps_old_message">Este dispositivo ya no es compatible a través de la tienda de aplicaciones debido a las políticas de Google. Realice una copia de seguridad de sus datos y descargue WiGLE v. 2.67 .apk (o inferior) desde https://github.com/wiglenet/wigle-wifi-wardriving/ . ¡Lo siento por los inconvenientes ocasionados!</string>
+    <string name="gps_old_title">No se puede inicializar el GPS</string>
+    <string name="enable_map_bearing">Seguir mi rumbo/rumbo</string>
+    <string name="login_title">Necesario iniciar sesión</string>
+    <string name="login_required">Debes iniciar sesión para hacer esto. Inicie sesión o cree una cuenta si es necesario.</string>
+    <string name="login">Acceso</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrarse&lt;/a&gt; @WiGLE.net or &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activar ahora con código QR&lt;/a&gt;</string>
+    <string name="ble_services">UUID BLE:</string>
+    <string name="ble_vendor">ID de proveedor BLE:</string>
 </resources>

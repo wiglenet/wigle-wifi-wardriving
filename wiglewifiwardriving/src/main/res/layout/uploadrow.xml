@@ -2,6 +2,7 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -11,49 +12,41 @@
     <LinearLayout
         android:id="@+id/upload_buttons"
         android:orientation="vertical"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_gravity="end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
             android:layout_gravity="end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageButton
                 android:id="@+id/view_upload"
                 android:background="@android:drawable/ic_menu_view"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
                 android:layout_gravity="end"
                 android:layout_height="28dp"
                 android:layout_width="28dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
                 android:visibility="invisible"
                 />
             <ImageButton
                 android:id="@+id/share_upload"
                 android:background="@android:drawable/ic_menu_share"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
                 android:layout_gravity="end"
                 android:layout_height="28dp"
                 android:layout_width="28dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="5dp"
                 android:visibility="invisible"
                 />
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
             android:layout_gravity="end"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -63,7 +56,6 @@
                 android:layout_height="wrap_content"
                 style="?android:attr/borderlessButtonStyle"
                 android:scaleType="fitXY"
-                android:layout_alignParentRight="true"
                 android:layout_gravity="end"
                 android:background="@null"
                 android:paddingTop="2dp"
@@ -75,37 +67,40 @@
     <RelativeLayout android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/upload_buttons">
+        android:layout_toStartOf="@id/upload_buttons">
         <LinearLayout android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/upload_row_top">
-
             <TextView android:id="@+id/transid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textSize="18sp"
                 style="@style/UploadColor"
-                android:gravity="start"/>
-            <TextView android:id="@+id/status" android:layout_width="wrap_content"
+                android:gravity="start"
+                tools:text="20881208-01234"/>
+            <TextView android:id="@+id/upload_row_status" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 style="@style/KeyStatColor"
-                android:gravity="center"/>
+                android:gravity="center"
+                tools:text="Completed" />
             <TextView android:id="@+id/percent_done" android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="end"
-                style="@style/StatColor" />
+                style="@style/StatColor"
+                tools:text="100%" />
         </LinearLayout>
 
         <LinearLayout android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/upload_row_two"
             android:weightSum="2"
-            android:layout_below="@id/upload_row_top">
+            android:layout_below="@id/upload_row_top"
+            android:baselineAligned="false">
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -122,7 +117,8 @@
                 <TextView android:id="@+id/total_wifi_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallWiFiStats"/>
+                    style="@style/SmallWiFiStats"
+                    tools:text="88,888" />
             </LinearLayout>
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
@@ -141,15 +137,17 @@
                 <TextView android:id="@+id/total_bt_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallBtStats"/>
+                    style="@style/SmallBtStats"
+                    tools:text="88,888" />
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="fill_parent"
-                      android:layout_height="fill_parent"
+                      android:layout_height="wrap_content"
                       android:id="@+id/upload_row_three"
                       android:weightSum="2"
-                      android:layout_below="@id/upload_row_two">
+                      android:layout_below="@id/upload_row_two"
+                      android:baselineAligned="false">
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
@@ -167,7 +165,8 @@
                 <TextView android:id="@+id/total_cell_gps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/SmallCellStats"/>
+                    style="@style/SmallCellStats"
+                    tools:text="88,888" />
             </LinearLayout>
             <LinearLayout android:orientation="horizontal"
                 android:layout_width="fill_parent"
@@ -177,18 +176,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    style="@style/SmallStats"/>
+                    style="@style/SmallStats"
+                    tools:text="88,888,888 bytes"/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_below="@id/upload_row_three">
             <TextView android:id="@+id/upload_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                style="@style/SmallStats"/>
+                style="@style/SmallStats"
+                tools:text="@string/click_download" />
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

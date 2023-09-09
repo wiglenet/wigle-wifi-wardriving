@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_w_logo_simple_mono" >
+    <target
+        android:repeatCount="infinite"
+        android:name="w">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:startOffset="250"
+                    android:duration="350"
+                    android:propertyName="fillAlpha"
+                    android:valueFrom="1"
+                    android:valueTo="0"
+                    android:repeatMode="reverse"
+                    android:repeatCount="infinite"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target
+        android:repeatCount="infinite"
+        android:name="inner">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:startOffset="125"
+                    android:duration="350"
+                    android:propertyName="fillAlpha"
+                    android:valueFrom="1"
+                    android:valueTo="0"
+                    android:repeatMode="reverse"
+                    android:repeatCount="infinite"
+                    />
+            </set>
+        </aapt:attr>
+    </target>
+    <target
+        android:name="outer">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:startOffset="0"
+                    android:duration="350"
+                    android:propertyName="fillAlpha"
+                    android:valueFrom="1"
+                    android:valueTo="0"
+                    android:repeatMode="reverse"
+                    android:repeatCount="infinite"
+                    />
+            </set>
+        </aapt:attr>
+    </target>
+
+</animated-vector>

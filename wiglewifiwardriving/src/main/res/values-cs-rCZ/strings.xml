@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filtr zapnut</string>
     <string name="list_waiting_gps">(Čekání na GPS&#8230;)</string>
     <string name="list_scanning_off">(Skenování vypnuto)</string>
-    <string name="list_short_lat">Šíř:</string>
-    <string name="list_short_lon">Dél:</string>
-    <string name="list_short_sats">Sat:</string>
-    <string name="list_short_alt">Výš:</string>
+    <string name="list_short_lat">Šíř: %1$s</string>
+    <string name="list_short_lon">Dél: %1$s</string>
+    <string name="list_short_sats">Sat: %1$d</string>
+    <string name="list_short_alt">Výš: %1$s</string>
     <string name="list_status_default">(status)</string>
-    <string name="list_speed">Rychlost:</string>
+    <string name="list_speed">Rychlost: %1$s</string>
     <string name="list_upload">Nahrát soubor?</string>
     <string name="network_signal">Signál:</string>
     <string name="network_type">Typ:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">Storno</string>
     <string name="dash_scan_off">(Skenování vypnuto)</string>
     <string name="dash_new_wifi">Nových WiFi</string>
-    <string name="dash_vis_nets">Viditelných sítí:</string>
-    <string name="dash_new_upload">Nových sítí od posledního nahrání:</string>
+    <string name="dash_vis_nets">Viditelných sítí: %1$d</string>
+    <string name="dash_new_upload">Nových sítí od posledního nahrání: %1$d</string>
     <string name="dash_new_cells">Nových BTS</string>
     <string name="dash_new_bt">Nové Bluetooth</string>
     <string name="dash_dist_run">Vzdálenost:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Doba skenování:</string>
     <string name="dash_dist_total">Celková vzdálenost:</string>
     <string name="dash_dist_prev">Poslední vzdálenost:</string>
-    <string name="dash_db_queue">DB Fronta:</string>
-    <string name="dash_db_nets">Počet WiFi v DB:</string>
-    <string name="dash_db_locs">Počet lokací v DB:</string>
-    <string name="dash_short_loc">Pol:</string>
+    <string name="dash_db_queue">DB Fronta: %1$s</string>
+    <string name="dash_db_nets">Počet WiFi v DB: %1$s</string>
+    <string name="dash_db_locs">Počet lokací v DB: %1$s</string>
+    <string name="dash_short_loc">Pol: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">míle</string>
@@ -146,7 +147,7 @@
     <string name="run">Aktuální sken</string>
     <string name="new_word">Nový</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skenováno v</string>
+    <string name="scanned_in">%1$d skenováno v %2$d%3$s.</string>
     <string name="sort_title">Nastavení řazení</string>
     <string name="sort_spin_label">Řadit podle:</string>
     <string name="channel">Kanál</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">Polski (polština)</string>
     <string name="language_pt">Português (portugalština)</string>
     <string name="language_pt_rBR">Português Brasileiro (brazilská portugalština)</string>
+    <string name="language_ro_rRO">Română (rumunština)</string>
     <string name="language_ru">ру́сский (ruština)</string>
     <string name="language_sv">Svenska (švédština)</string>
     <string name="language_sw">Kiswahili (svahilština)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Typ mapy: Hybridní</string>
     <string name="map_toast_terrain">Typ mapy: Terénní</string>
     <string name="map_needs_playservice">Mapa vyžaduje službu Google Play</string>
-    <string name="register">Registrovat</string>
     <string name="drawer_open">Panel je otevřený</string>
     <string name="drawer_close">Panel je zavřený</string>
     <string name="site_stats_app_name">Statistiky WiGLE.net</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">Žebříčky</string>
     <string name="uploads_app_name">WiGLE.net Uploady</string>
     <string name="tab_uploads">Uploady</string>
-    <string name="queue_depth">Hloubka fronty pro zpracování souborů</string>
+    <string name="queue_depth">Fronta WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Zprávy</string>
     <string name="tab_news">Zprávy</string>
     <string name="bytes">Byty</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Uživatelské hodnocení za poslední měsíc</string>
     <string name="prevmonthrank_title">Měsíční hodnocení za poslední měsíc</string>
     <string name="list_scanning_on">(Skenování zapnuto)</string>
-    <string name="activate">aktivujte nyní</string>
     <string name="setting_activate_prompt">otevřete https://wigle.net/activate pro váš user code</string>
     <string name="upload_queued">Zařazené</string>
     <string name="upload_parsing">Zpracovávání…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">světelný</string>
     <string name="theme_dark_label">tmavý</string>
     <string name="theme_follow_label">Sledujte systém</string>
+    <string name="manage_gpx_button">Uložené trasy</string>
+    <string name="manage_gpx">Spravujte uložené trasy GPX</string>
+    <string name="enable_map_theme">Spojte motiv mapy s aplikací</string>
+    <string name="throttle">Skenování WiFi je omezené. Pro lepší výkon deaktivujte WiFi Scan Throttle v Nastavení vývojáře.</string>
+    <string name="no_individual_nets_map">Zakázat zobrazení mapy sítě</string>
+    <string name="filter_show_btle">Zobrazit Bluetooth LE</string>
+    <string name="settings_gps_head">Nastavení GPS</string>
+    <string name="enable_kalman">Filtrujte šum GPS</string>
+    <string name="gps_old_message">Toto zařízení již není podporováno prostřednictvím obchodu s aplikacemi kvůli zásadám společnosti Google. Zálohujte si prosím svá data a stáhněte si WiGLE v. 2.67 .apk (nebo nižší) z https://github.com/wiglenet/wigle-wifi-wardriving/ . Omluvám se za nepříjemnost!</string>
+    <string name="gps_old_title">Nelze inicializovat GPS</string>
+    <string name="enable_map_bearing">Sledujte můj směr/směr</string>
+    <string name="login_title">Je vyžadováno přihlášení</string>
+    <string name="login_required">K tomu musíte být přihlášeni. V případě potřeby se přihlaste nebo si vytvořte účet.</string>
+    <string name="login">Přihlásit se</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Zaregistrujte se na&lt;/a&gt; @WiGLE.net nebo &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivujte nyní pomocí QR kódu&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">ID dodavatele BLE:</string>
 </resources>

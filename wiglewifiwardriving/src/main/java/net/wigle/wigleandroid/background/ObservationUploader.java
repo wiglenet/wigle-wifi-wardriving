@@ -1,15 +1,11 @@
 package net.wigle.wigleandroid.background;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import androidx.fragment.app.Fragment;
@@ -17,17 +13,20 @@ import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.net.WiGLEApiManager;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
@@ -39,7 +38,6 @@ import java.nio.channels.ClosedByInterruptException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
@@ -48,13 +46,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.zip.GZIPOutputStream;
+import java.util.TimeZone;
 
 import javax.net.ssl.SSLException;
-
-import static net.wigle.wigleandroid.util.FileUtility.CSV_EXT;
-import static net.wigle.wigleandroid.util.FileUtility.GZ_EXT;
-import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 
 /**
  * replacement file upload task
@@ -80,7 +74,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     public ObservationUploader(final FragmentActivity context,
                                final DatabaseHelper dbHelper, final ApiListener listener,
                                boolean justWriteFile, boolean writeEntireDb, boolean writeRun) {
-        super(context, dbHelper, "ApiUL", null, MainActivity.FILE_POST_URL, false,
+        super(context, dbHelper, "ApiUL", null, UrlConfig.FILE_POST_URL, false,
                 true, false, false,
                 AbstractApiRequest.REQUEST_POST, listener, true);
         this.justWriteFile = justWriteFile;
@@ -92,7 +86,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         this.writeRun = writeRun;
     }
 
-
     @Override
     protected void subRun() throws IOException, InterruptedException, WiGLEAuthException {
         try {
@@ -102,15 +95,14 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 doRun();
             }
         } catch ( final InterruptedException ex ) {
-            MainActivity.info( "file upload interrupted" );
+            Logging.info( "file upload interrupted" );
         } catch (final WiGLEAuthException waex) {
             // ALIBI: allow auth exception through
             throw waex;
         } catch ( final Throwable throwable ) {
             MainActivity.writeError( Thread.currentThread(), throwable, context );
             throw new RuntimeException( "ObservationUploader throwable: " + throwable, throwable );
-        }
-        finally {
+        } finally {
             // tell the listener
             if (listener != null) {
                 listener.requestComplete(null, false);
@@ -149,23 +141,25 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             Activity a = fragment.getActivity();
             if (a != null) {
                 prefs = fragment.getActivity().getSharedPreferences(
-                        ListFragment.SHARED_PREFS, 0);
+                        PreferenceKeys.SHARED_PREFS, 0);
             } else {
                 prefs = null;
-                MainActivity.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
+                Logging.error("Failed to get activity for non-null fragment - prefs access failed on upload.");
             }
         } else {
             prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.getMainActivity().getApplicationContext());
         }
         if (prefs != null) {
-            final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-            final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
-            final String userPass = prefs.getString(ListFragment.PREF_PASSWORD, null);
-            MainActivity.info("authName: " + authName);
+            final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+            final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
+            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
+            final String userPass = prefs.getString(PreferenceKeys.PREF_PASSWORD, null);
+            Logging.info("authName: " + authName);
             if ((!beAnonymous) && (authName == null) && (userName != null) && (userPass != null)) {
-                MainActivity.info("No authName, going to request token");
-                downloadTokenAndStart(fragment);
+                Logging.info("No authName, going to request token");
+                if (null != fragment) {
+                    downloadTokenAndStart(fragment);
+                }
             } else {
                 start();
             }
@@ -174,7 +168,6 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * upload guts. lifted from FileUploaderTask
-     * @param bundle
      * @return the Status of the upload
      * @throws InterruptedException if the upload is interrupted
      */
@@ -183,9 +176,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
         Status status;
 
-        try {
-            final Object[] fileFilename = new Object[2];
-            final OutputStream fos = getOutputStream( context, bundle, fileFilename );
+        final Object[] fileFilename = new Object[2];
+        try (final OutputStream fos = FileAccess.getOutputStream( context, bundle, fileFilename )) {
             final File file = (File) fileFilename[0];
             final String filename = (String) fileFilename[1];
 
@@ -195,16 +187,16 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             final Map<String,String> params = new HashMap<>();
 
-            final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-            if ( prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
+            final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+            if ( prefs.getBoolean(PreferenceKeys.PREF_DONATE, false) ) {
                 params.put("donate","on");
             }
-            final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-            final String authName = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+            final String authName = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             if (!beAnonymous && null == authName) {
                 return Status.BAD_LOGIN;
             }
-            final String userName = prefs.getString(ListFragment.PREF_USERNAME, null);
+            final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
 
             // don't upload empty files
@@ -212,7 +204,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     ! "bobzilla".equals(userName) ) {
                 return Status.EMPTY_FILE;
             }
-            MainActivity.info("preparing upload...");
+            Logging.info("preparing upload...");
 
             // show on the UI
             sendBundledMessage( Status.UPLOADING.ordinal(), bundle );
@@ -222,33 +214,33 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
             final String absolutePath = hasSD ? file.getAbsolutePath() : context.getFileStreamPath(filename).getAbsolutePath();
 
-            MainActivity.info("authName: " + authName);
+            Logging.info("authName: " + authName);
 
             if (beAnonymous) {
-                MainActivity.info("anonymous upload");
+                Logging.info("anonymous upload");
             }
 
-            final String response = OkFileUploader.upload(MainActivity.FILE_POST_URL, absolutePath,
+            final String response = OkFileUploader.upload(UrlConfig.FILE_POST_URL, absolutePath,
                     "file", params, authName, token, getHandler());
 
-            if ( ! prefs.getBoolean(ListFragment.PREF_DONATE, false) ) {
+            if ( ! prefs.getBoolean(PreferenceKeys.PREF_DONATE, false) ) {
                 if ( response != null && response.indexOf("donate=Y") > 0 ) {
                     final SharedPreferences.Editor editor = prefs.edit();
-                    editor.putBoolean( ListFragment.PREF_DONATE, true );
+                    editor.putBoolean( PreferenceKeys.PREF_DONATE, true );
                     editor.apply();
                 }
             }
 
             //TODO: any reason to parse this JSON object? all we care about are two strings.
-            MainActivity.info(response);
+            Logging.info(response);
             if ( response != null && response.indexOf("\"success\":true") > 0 ) {
                 status = Status.SUCCESS;
 
                 // save in the prefs
                 final SharedPreferences.Editor editor = prefs.edit();
-                editor.putLong( ListFragment.PREF_DB_MARKER, maxId );
-                editor.putLong( ListFragment.PREF_MAX_DB, maxId );
-                editor.putLong( ListFragment.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
+                editor.putLong( PreferenceKeys.PREF_DB_MARKER, maxId );
+                editor.putLong( PreferenceKeys.PREF_MAX_DB, maxId );
+                editor.putLong( PreferenceKeys.PREF_NETS_UPLOADED, dbHelper.getNetworkCount() );
                 editor.apply();
             } else if ( response != null && response.indexOf("File upload failed.") > 0 ) {
                 status = Status.FAIL;
@@ -259,54 +251,38 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 } else {
                     error = "response: " + response;
                 }
-                MainActivity.error( error );
+                Logging.error( error );
                 bundle.putString( BackgroundGuiHandler.ERROR, error );
                 status = Status.FAIL;
             }
         } catch ( final InterruptedException ex ) {
-            MainActivity.info("ObservationUploader interrupted");
+            Logging.info("ObservationUploader interrupted");
             throw ex;
 
         } catch (final ClosedByInterruptException | UnknownHostException | ConnectException | FileNotFoundException ex) {
-            MainActivity.error( "connection problem: " + ex, ex );
+            Logging.error( "connection problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_wigle_conn) );
         } catch (final SSLException ex) {
-            MainActivity.error( "security problem: " + ex, ex );
+            Logging.error( "security problem: " + ex, ex );
             ex.printStackTrace();
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, context.getString(R.string.no_secure_wigle_conn) );
         } catch ( final IOException ex ) {
             ex.printStackTrace();
-            MainActivity.error( "io problem: " + ex, ex );
+            Logging.error( "io problem: " + ex, ex );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         } catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
-            MainActivity.writeError( this, ex, context, "Has data connection: " + hasDataConnection(context) );
+            Logging.error( "ex problem: " + ex, ex );
+            MainActivity.writeError( this, ex, context, "Has data connection: " + WiGLEApiManager.hasDataConnection(context) );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
         }
 
         return status;
-    }
-
-    public static boolean hasDataConnection(final Context context) {
-        final ConnectivityManager connMgr =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (null == connMgr) {
-            MainActivity.error("null ConnectivityManager trying to determine connection info");
-            return false;
-        }
-        final NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        final NetworkInfo mobile = connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-        //noinspection SimplifiableIfStatement
-        if (wifi != null && wifi.isAvailable()) {
-            return true;
-        }
-        return mobile != null && mobile.isAvailable();
     }
 
     /**
@@ -320,33 +296,26 @@ public class ObservationUploader extends AbstractProgressApiRequest {
         final Bundle bundle = new Bundle();
 
         try {
-            OutputStream fos = null;
-            try {
-                fos = getOutputStream( context, bundle, new Object[2] );
-                writeFile( fos, bundle, countStats );
+            try (OutputStream fos = FileAccess.getOutputStream(context, bundle, new Object[2])) {
+                writeFile(fos, bundle, countStats);
                 // show on the UI
                 status = Status.WRITE_SUCCESS;
-                sendBundledMessage( status.ordinal(), bundle );
-            }
-            finally {
-                if ( fos != null ) {
-                    fos.close();
-                }
+                sendBundledMessage(status.ordinal(), bundle);
             }
         }
         catch ( InterruptedException ex ) {
-            MainActivity.info("justWriteFile interrupted: " + ex);
+            Logging.info("justWriteFile interrupted: " + ex);
         }
         catch ( IOException ex ) {
             ex.printStackTrace();
-            MainActivity.error( "io problem: " + ex, ex );
+            Logging.error( "io problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "io problem: " + ex );
         }
         catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
+            Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
@@ -357,34 +326,26 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (directly lifted from FileUploadTask)
-     * @param fos
-     * @param bundle
-     * @param countStats
-     * @return
-     * @throws IOException
-     * @throws PackageManager.NameNotFoundException
-     * @throws InterruptedException
-     * @throws DBException
      */
     private long writeFile( final OutputStream fos, final Bundle bundle,
                             final ObservationUploader.CountStats countStats ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException, DBException {
 
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0);
+        long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
         if ( writeEntireDb ) {
             maxId = 0;
         }
         else if ( writeRun ) {
             // max id at startup
-            maxId = prefs.getLong( ListFragment.PREF_MAX_DB, 0L );
+            maxId = prefs.getLong( PreferenceKeys.PREF_MAX_DB, 0L );
         }
-        MainActivity.info( "Writing file starting with observation id: " + maxId);
+        Logging.info( "Writing file starting with observation id: " + maxId);
         final Cursor cursor = dbHelper.locationIterator( maxId );
 
-        //noinspection TryFinallyCanBeTryWithResources
+        //noinspection
         try {
-            return writeFileWithCursor( fos, bundle, countStats, cursor );
+            return writeFileWithCursor( context, fos, bundle, countStats, cursor, prefs );
         } finally {
             fos.close();
             if (cursor != null) {
@@ -395,25 +356,16 @@ public class ObservationUploader extends AbstractProgressApiRequest {
 
     /**
      * (lifted directly from FileUploaderTask)
-     * @param fos
-     * @param bundle
-     * @param countStats
-     * @param cursor
-     * @return
-     * @throws IOException
-     * @throws PackageManager.NameNotFoundException
-     * @throws InterruptedException
      */
-    private long writeFileWithCursor( final OutputStream fos, final Bundle bundle,
-                                      final ObservationUploader.CountStats countStats,
-                                      final Cursor cursor ) throws IOException,
+    private long writeFileWithCursor(final Context context, final OutputStream fos, final Bundle bundle,
+                                     final ObservationUploader.CountStats countStats,
+                                     final Cursor cursor, final SharedPreferences prefs ) throws IOException,
             PackageManager.NameNotFoundException, InterruptedException {
-
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0);
-        long maxId = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
+        long maxId = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
 
         final long start = System.currentTimeMillis();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         countStats.lineCount = 0;
         final int total = cursor.getCount();
         long fileWriteMillis = 0;
@@ -436,7 +388,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 + NEWLINE
                 + CSV_COLUMN_HEADERS
                 + NEWLINE;
-        writeFos( fos, header );
+        FileAccess.writeFos( fos, header );
 
         // assume header is all byte per char
         countStats.byteCount = header.length();
@@ -473,7 +425,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                 netMillis += System.currentTimeMillis() - netStart;
                 if ( network == null ) {
                     // weird condition, skipping
-                    MainActivity.error("network not in database: " + bssid );
+                    Logging.error("network not in database: " + bssid );
                     continue;
                 }
 
@@ -498,29 +450,29 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     charBuffer.append( network.getCapabilities() );
                     charBuffer.append( COMMA );
                     date.setTime( cursor.getLong(7) );
-                    singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
+                    FileAccess.singleCopyDateFormat( dateFormat, stringBuffer, charBuffer, fp, date );
                     charBuffer.append( COMMA );
                     Integer channel = network.getChannel();
                     if ( channel == null ) {
                         channel = network.getFrequency();
                     }
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, channel );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getInt(2) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(3) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(4) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(5) );
                     charBuffer.append( COMMA );
-                    singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
+                    FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
                     charBuffer.append( COMMA );
                     charBuffer.append( network.getType().name() );
                     charBuffer.append( NEWLINE );
                 }
                 catch ( BufferOverflowException ex ) {
-                    MainActivity.info("buffer overflow: " + ex, ex );
+                    Logging.info("buffer overflow: " + ex, ex );
                     // double the buffer
                     charBuffer = CharBuffer.allocate( charBuffer.capacity() * 2 );
                     byteBuffer = ByteBuffer.allocate( byteBuffer.capacity() * 2 );
@@ -539,7 +491,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     encoder.flush( byteBuffer );
                 }
                 catch ( IllegalStateException ex ) {
-                    MainActivity.error("exception flushing: " + ex, ex);
+                    Logging.error("exception flushing: " + ex, ex);
                     continue;
                 }
                 // byteBuffer = encoder.encode( charBuffer );  (old way)
@@ -570,113 +522,9 @@ public class ObservationUploader extends AbstractProgressApiRequest {
             }
         }
 
-        MainActivity.info("wrote file in: " + (System.currentTimeMillis() - start) +
+        Logging.info("wrote file in: " + (System.currentTimeMillis() - start) +
                 "ms. fileWriteMillis: " + fileWriteMillis + " netmillis: " + netMillis );
 
         return maxId;
     }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param fos
-     * @param data
-     * @throws IOException
-     */
-    public static void writeFos( final OutputStream fos, final String data ) throws IOException {
-        if ( data != null ) {
-            fos.write( data.getBytes( MainActivity.ENCODING ) );
-        }
-    }
-
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final int number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * (lifted directly from FileUploaderTask)
-     * @param numberFormat
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp
-     * @param number
-     */
-    private void singleCopyNumberFormat( final NumberFormat numberFormat,
-                                         final StringBuffer stringBuffer,
-                                         final CharBuffer charBuffer, final FieldPosition fp,
-                                         final double number ) {
-        stringBuffer.setLength( 0 );
-        numberFormat.format( number, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    /**
-     * Copy a date according to format into a position in a string
-     * (lifted directly from FileUploaderTask)
-     * @param dateFormat the DateFormat to use
-     * @param stringBuffer
-     * @param charBuffer
-     * @param fp the position at which to insert
-     * @param date the date
-     */
-    private void singleCopyDateFormat(final DateFormat dateFormat, final StringBuffer stringBuffer,
-                                      final CharBuffer charBuffer, final FieldPosition fp,
-                                      final Date date ) {
-        stringBuffer.setLength( 0 );
-        dateFormat.format( date, stringBuffer, fp );
-        stringBuffer.getChars(0, stringBuffer.length(), charBuffer.array(), charBuffer.position() );
-        charBuffer.position( charBuffer.position() + stringBuffer.length() );
-    }
-
-    public static OutputStream getOutputStream(final Context context, final Bundle bundle,
-                                               final Object[] fileFilename)
-            throws IOException {
-        final SimpleDateFormat fileDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
-        final String filename = WIWI_PREFIX + fileDateFormat.format(new Date()) + CSV_EXT + GZ_EXT;
-
-
-        final boolean hasSD = FileUtility.hasSD();
-        File file = null;
-        bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        final String filePath = FileUtility.getUploadFilePath(context);
-
-        if ( hasSD && filePath != null) {
-            final File path = new File( filePath );
-            //noinspection ResultOfMethodCallIgnored
-            path.mkdirs();
-            String openString = filePath + filename;
-            MainActivity.info("Opening file: " + openString);
-            file = new File( openString );
-            if ( ! file.exists() ) {
-                if (!file.createNewFile()) {
-                    throw new IOException("Could not create file: " + openString);
-                }
-            }
-            bundle.putString( BackgroundGuiHandler.FILEPATH, filePath );
-        }
-
-        final FileOutputStream rawFos = (hasSD && null != file) ? new FileOutputStream( file )
-                    : context.openFileOutput( filename, Context.MODE_PRIVATE );
-
-        final GZIPOutputStream fos = new GZIPOutputStream( rawFos );
-        fileFilename[0] = file;
-        fileFilename[1] = filename;
-        return fos;
-    }
-
 }

@@ -3,8 +3,8 @@ package net.wigle.wigleandroid.background;
 import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DatabaseHelper;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.Logging;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +38,7 @@ public class ApiDownloader extends AbstractApiRequest {
             // ALIBI: allow auth exception through
             throw waex;
         } catch (final JSONException ex) {
-            MainActivity.error("ex: " + ex + " result: " + result, ex);
+            Logging.error("ex: " + ex + " result: " + result, ex);
         }
     }
 }

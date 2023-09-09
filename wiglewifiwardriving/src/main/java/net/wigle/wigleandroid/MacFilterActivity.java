@@ -9,8 +9,12 @@ import android.widget.ListView;
 
 import com.google.gson.Gson;
 
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import br.com.sapereaude.maskedEditText.MaskedEditText;
 
@@ -20,39 +24,39 @@ import br.com.sapereaude.maskedEditText.MaskedEditText;
 
 public class MacFilterActivity extends AppCompatActivity {
 
-    private String filterType;
     private String filterKey;
-    ArrayList<String> listItems=new ArrayList<String>();
+    List<String> listItems=new ArrayList<>();
     AddressFilterAdapter filtersAdapter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         setContentView(R.layout.addressfiltersettings);
 
 
         Intent intent = getIntent();
-        filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
+        String filterType = intent.getStringExtra(FilterActivity.ADDR_FILTER_MESSAGE);
         filterKey = "";
-        MainActivity.info(filterType);
+        Logging.info(filterType);
         if (FilterActivity.INTENT_DISPLAY_FILTER.equals(filterType)) {
-            filterKey = ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS;
+            filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         } else if (FilterActivity.INTENT_LOG_FILTER.equals(filterType)) {
-            filterKey = ListFragment.PREF_EXCLUDE_LOG_ADDRS;
+            filterKey = PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS;
         } else {
-            filterKey = ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS;
+            filterKey = PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS;
         }
 
         //DEBUG: MainActivity.info(filterKey);
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(filterKey, "[]"), String[].class);
-        if(values.length>0) {
-            listItems = new ArrayList<String>(Arrays.asList(values));
+        if (values.length > 0) {
+            //ALIBI: the java.util.Arrays.ArrayList version is immutable, so a new ArrayList must be made from it.
+            listItems = new ArrayList<>(Arrays.asList(values));
         }
 
-        ListView lv = (ListView) findViewById(R.id.addr_filter_list_view);
+        ListView lv = findViewById(R.id.addr_filter_list_view);
 
         filtersAdapter = new AddressFilterAdapter(listItems, this, prefs, filterKey);
 
@@ -60,10 +64,10 @@ public class MacFilterActivity extends AppCompatActivity {
     }
 
     public void addOui(View v) {
-        final MaskedEditText ouiInput = (MaskedEditText) findViewById(R.id.oui_input);
-        final String input = ouiInput.getRawText().toString();
-        if (null != input &&  (input.length() == 6)) {
-            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final MaskedEditText ouiInput = findViewById(R.id.oui_input);
+        final String input = ouiInput.getRawText();
+        if (input.length() == 6) {
+            final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (addEntry(listItems, prefs, input, filterKey)) {
                 ouiInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
@@ -72,10 +76,10 @@ public class MacFilterActivity extends AppCompatActivity {
     }
 
     public void addMac(View v) {
-        final MaskedEditText macInput = (MaskedEditText) findViewById(R.id.mac_address_input);
+        final MaskedEditText macInput = findViewById(R.id.mac_address_input);
         final String input = macInput.getRawText();
         if (null != input &&  (input.length() == 12)) {
-            final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             if (addEntry(listItems, prefs, input, filterKey))  {
                 macInput.setText("");
                 filtersAdapter.notifyDataSetChanged();
@@ -93,7 +97,7 @@ public class MacFilterActivity extends AppCompatActivity {
      * @param filterKey the preferences key
      * @return true if we've successfully updated preferences, false on existing or fail
      */
-    public static boolean addEntry(ArrayList<String> entries, SharedPreferences prefs,
+    public static boolean addEntry(List<String> entries, SharedPreferences prefs,
                                    final String rawEntry, final String filterKey) {
         String formatted = "";
         for (int i = 0; i < rawEntry.length(); i++) {
@@ -101,12 +105,12 @@ public class MacFilterActivity extends AppCompatActivity {
             formatted += Character.toUpperCase(rawEntry.charAt(i));
         }
         if (!entries.contains(formatted)) {
-            MainActivity.info("Adding: " + formatted);
+            Logging.info("Adding: " + formatted);
             entries.add(formatted);
 
             Gson gson = new Gson();
             String serialized = gson.toJson(entries.toArray());
-            MainActivity.info(serialized);
+            Logging.info(serialized);
             final SharedPreferences.Editor editor = prefs.edit();
             editor.putString(filterKey,serialized);
             editor.apply();

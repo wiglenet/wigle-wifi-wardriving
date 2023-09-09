@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * Created by arkasha on 7/31/17.
@@ -15,14 +16,14 @@ public class TerminationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // Figure out what to do based on the intent type
         if (null == intent) {
-            MainActivity.error("null intent in termination onReceive");
+            Logging.error("null intent in termination onReceive");
             return;
         }
 
-        MainActivity.info("TerminationRec intent type: " + intent.getAction());
+        Logging.info("TerminationRec intent type: " + intent.getAction());
         switch (intent.getAction()) {
             case MainActivity.ACTION_END:
-                MainActivity.info("Received close action");
+                Logging.info("Received close action");
                 MainActivity ma = MainActivity.getMainActivity();
                 if (null != ma) {
                     //ALIBI: multiple terminations in rapid succession can cause NPE
@@ -30,7 +31,7 @@ public class TerminationReceiver extends BroadcastReceiver {
                 }
                 return;
             default:
-                MainActivity.info("TerminationRec: unhandled intent action: " + intent.getAction());
+                Logging.info("TerminationRec: unhandled intent action: " + intent.getAction());
         }
     }
 }

@@ -81,12 +81,12 @@
     <string name="filter_enabled">Fitre Etkin</string>
     <string name="list_waiting_gps">(GPS senkronizasyonu bekleniyor&#8230;)</string>
     <string name="list_scanning_off">(Arama Kapalı)</string>
-    <string name="list_short_lat">Enlem:</string>
-    <string name="list_short_lon">Boylam:</string>
-    <string name="list_short_sats">Bilgiler:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Enlem: %1$s</string>
+    <string name="list_short_lon">Boylam: %1$s</string>
+    <string name="list_short_sats">Bilgiler: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(durum)</string>
-    <string name="list_speed">Hız:</string>
+    <string name="list_speed">Hız: %1$s</string>
     <string name="list_upload">Dosya yükle?</string>
     <string name="network_signal">Sinyal:</string>
     <string name="network_type">Tip:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">İptal</string>
     <string name="dash_scan_off">(Tarama Kapalı)</string>
     <string name="dash_new_wifi">Yeni WiFi</string>
-    <string name="dash_vis_nets">Görünen Ağlar:</string>
-    <string name="dash_new_upload">Son yükleme sonrası görünen ağlar:</string>
+    <string name="dash_vis_nets">Görünen Ağlar: %1$d</string>
+    <string name="dash_new_upload">Son yükleme sonrası görünen ağlar: %1$d</string>
     <string name="dash_new_cells">Yeni baz istasyonları</string>
     <string name="dash_new_bt">Yeni Bluetooth</string>
     <string name="dash_dist_run">Geçerli Mesafe:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Tarama Süresi:</string>
     <string name="dash_dist_total">Toplam Mesafe.:</string>
     <string name="dash_dist_prev">Önceki Mesafe:</string>
-    <string name="dash_db_queue">DB Sıralaması:</string>
-    <string name="dash_db_nets">DB Nets:</string>
-    <string name="dash_db_locs">DB Konumları:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB Sıralaması: %1$s</string>
+    <string name="dash_db_nets">DB Nets: %1$s</string>
+    <string name="dash_db_locs">DB Konumları: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">mil</string>
@@ -146,7 +147,7 @@
     <string name="run">Run</string>
     <string name="new_word">Yeni</string>
     <string name="db">DB</string>
-    <string name="scanned_in">da tarandı</string>
+    <string name="scanned_in">%1$d da tarandı %2$d%3$s.</string>
     <string name="sort_title">Sıralama ayarları</string>
     <string name="sort_spin_label">Liste sıralama seçeneği:</string>
     <string name="channel">Kanal</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (Lehçe)</string>
     <string name="language_pt">português (Portekizce)</string>
     <string name="language_pt_rBR">português brasileiro (Brezilya Portekizcesi)</string>
+    <string name="language_ro_rRO">Română (Rumence)</string>
     <string name="language_ru">ру́сский (Rusça)</string>
     <string name="language_sv">svenska (İsveççe)</string>
     <string name="language_sw">Kiswahili (Svahili)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Harita Türü: Karma</string>
     <string name="map_toast_terrain">Harita Türü: Arazi</string>
     <string name="map_needs_playservice">Harita, Google Play Hizmeti gerektirir</string>
-    <string name="register">Kayıt ol</string>
     <string name="drawer_open">Çekmece Açık</string>
     <string name="drawer_close">Çekmece Kapatma</string>
     <string name="site_stats_app_name">WiGLE.net İstatistikleri</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">Sıralamalar</string>
     <string name="uploads_app_name">WiGLE.net Yüklemeleri</string>
     <string name="tab_uploads">Yüklemeler</string>
-    <string name="queue_depth">Dosya İşleme Sırası Derinliği</string>
+    <string name="queue_depth">WiGLE kuyruğu: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Haberleri</string>
     <string name="tab_news">Haberler</string>
     <string name="bytes">Bayt</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Geçen Ay Kullanıcı Sıralaması</string>
     <string name="prevmonthrank_title">Geçen Ay Ay Sıralaması</string>
     <string name="list_scanning_on">(Tarama açıldı)</string>
-    <string name="activate">şimdi aktifleştir</string>
     <string name="setting_activate_prompt">Kullanıcı kodunuz için https://wigle.net/activate adresini ziyaret edin</string>
     <string name="upload_queued">Sıraya alındı</string>
     <string name="upload_parsing">Ayrıştırma…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Açık</string>
     <string name="theme_dark_label">Koyu</string>
     <string name="theme_follow_label">Sistemi takip et</string>
+    <string name="manage_gpx_button">Kayıtlı Rotalar</string>
+    <string name="manage_gpx">Kaydedilmiş GPX rotalarını yönetin</string>
+    <string name="enable_map_theme">Harita temasını uygulamayla eşleştirin</string>
+    <string name="throttle">WiFi-skanning är begränsad. Inaktivera WiFi Scan Throttle under utvecklarinställningar för bättre prestanda.</string>
+    <string name="no_individual_nets_map">Harita net görüntüsünü devre dışı bırak</string>
+    <string name="filter_show_btle">Bluetooth LE\'yi göster</string>
+    <string name="settings_gps_head">GPS Ayarları</string>
+    <string name="enable_kalman">GPS gürültüsünü filtrele</string>
+    <string name="gps_old_message">Bu cihaz, Google politikaları nedeniyle artık uygulama mağazası aracılığıyla desteklenmemektedir. Lütfen verilerinizi yedekleyin ve https://github.com/wiglenet/wigle-wifi-wardriving/ adresinden WiGLE v. 2.67 .apk\'yi (veya daha düşük) yandan yükleyin. Rahatsızlıktan dolayı özür dileriz!</string>
+    <string name="gps_old_title">GPS başlatılamıyor</string>
+    <string name="enable_map_bearing">Yönümü/yönümü takip et</string>
+    <string name="login_title">oturum açmak gereklidir</string>
+    <string name="login_required">Bunu yapmak için giriş yapmalısınız. Lütfen oturum açın veya gerekirse bir hesap oluşturun.</string>
+    <string name="login">Giriş yapmak</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net\'e kaydolun&lt;/a&gt; veya &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;şimdi QR kodu ile etkinleştir&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID\'leri:</string>
+    <string name="ble_vendor">BLE Satıcı Kimliği:</string>
 </resources>

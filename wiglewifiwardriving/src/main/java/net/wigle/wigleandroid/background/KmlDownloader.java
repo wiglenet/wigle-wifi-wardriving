@@ -1,13 +1,15 @@
 package net.wigle.wigleandroid.background;
 
-import android.content.Context;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
 
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +30,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
 
     public KmlDownloader(final FragmentActivity context, final DatabaseHelper dbHelper /*TODO: not needed?*/,
                                final String transid, final ApiListener listener) {
-        super(context, dbHelper, "KmlDL", transid+KML_EXT, MainActivity.KML_TRANSID_URL_STEM+transid, false,
+        super(context, dbHelper, "KmlDL", transid+KML_EXT, UrlConfig.KML_TRANSID_URL_STEM+transid, false,
                 true, true, false, AbstractApiRequest.REQUEST_GET, listener, true);
         }
 
@@ -52,7 +54,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             throw waex;
         } catch (final JSONException ex) {
             sendBundledMessage( Status.FAIL.ordinal(), bundle );
-            MainActivity.error("ex: " + ex + " result: " + result, ex);
+            Logging.error("ex: " + ex + " result: " + result, ex);
         }
     }
 
@@ -76,7 +78,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
             // the app files directory might have been enough here, but helps with provider_paths
 
             //see if KML dir exists
-            MainActivity.info("local storage DL...");
+            Logging.info("local storage DL...");
 
             File kmlPath = new File(FileUtility.getKmlPath(context));
             if (!kmlPath.exists()) {
@@ -88,7 +90,7 @@ public class KmlDownloader extends AbstractProgressApiRequest {
                 //DEBUG: MainActivity.info("... file output directory found");
                 File kmlFile = new File(kmlPath, filename);
                 FileOutputStream out = new FileOutputStream(kmlFile);
-                ObservationUploader.writeFos(out, result);
+                FileAccess.writeFos(out, result);
                 //DEBUG: FileUtility.printDirContents(kmlPath);
             }
         }

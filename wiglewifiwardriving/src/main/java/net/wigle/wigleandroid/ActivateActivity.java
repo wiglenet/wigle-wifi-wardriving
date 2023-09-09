@@ -3,7 +3,6 @@ package net.wigle.wigleandroid;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import androidx.annotation.NonNull;
@@ -21,13 +20,14 @@ import android.view.SurfaceView;
 //import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import net.wigle.wigleandroid.ui.WiGLEToast;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 /**
  * fetch wigle authentication tokens by scanning a barcode
- * @Author: rksh
+ * @author rksh
  */
 public class ActivateActivity extends Activity {
 
@@ -48,11 +48,6 @@ public class ActivateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activate);
 
-        //TODO: figure out what checks (if any) make manual setup necessary with AppCompat theme
-        //if (Build.VERSION.SDK_INT >= 11) {
-        //    getActionBar().setDisplayHomeAsUpEnabled(true);
-        //}
-
         Uri data = getIntent().getData();
         //DEBUG Log.i(LOG_TAG, "intent data: "+data+" matches: "+
         //        ActivateActivity.barcodeIntent.equals(data.toString()));
@@ -67,10 +62,6 @@ public class ActivateActivity extends Activity {
     private void launchBarcodeScanning() {
         setContentView(R.layout.activity_activate);
         cameraView = findViewById(R.id.camera_view);
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            Log.e(LOG_TAG, "Attempt to initialize camera capture with a pre-SDKv23 client");
-            return;
-        }
 //        barcodeDetector =
 //                new BarcodeDetector.Builder(this)
 //                        .setBarcodeFormats(Barcode.QR_CODE)
@@ -128,7 +119,7 @@ public class ActivateActivity extends Activity {
 //                    }
 //
 //                    @Override
-//                    public void receiveDetections(Detector.Detections<Barcode> detections) {
+//                    public void receiveDetections(@NonNull Detector.Detections<Barcode> detections) {
 //                        final SparseArray<Barcode> barcodes = detections.getDetectedItems();
 //                        if (barcodes.size() > 0) {
 //                            Log.i(LOG_TAG, "CAMERA received detections");
@@ -137,13 +128,14 @@ public class ActivateActivity extends Activity {
 //                                Log.i(LOG_TAG, item.displayValue + " matched.");
 //                                String[] tokens = item.displayValue.split(":");
 //                                final SharedPreferences prefs = MainActivity.getMainActivity().
-//                                        getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+//                                        getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
 //                                final SharedPreferences.Editor editor = prefs.edit();
-//                                editor.putString(ListFragment.PREF_USERNAME, tokens[0]);
-//                                editor.putString(ListFragment.PREF_AUTHNAME, tokens[1]);
-//                                editor.putBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+//                                editor.putString(PreferenceKeys.PREF_USERNAME, tokens[0]);
+//                                editor.putString(PreferenceKeys.PREF_AUTHNAME, tokens[1]);
+//                                editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
 //                                editor.apply();
 //                                TokenAccess.setApiToken(prefs, tokens[2]);
+//                                MainActivity.refreshApiManager();
 //                                finish();
 //                            } else {
 //                                Log.i(LOG_TAG, item.displayValue + " failed to match token pattern");

@@ -1,26 +1,31 @@
 package net.wigle.wigleandroid;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.AudioManager;
+import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -32,24 +37,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.background.ApiDownloader;
 import net.wigle.wigleandroid.background.DownloadHandler;
-import net.wigle.wigleandroid.listener.GPSListener;
-import net.wigle.wigleandroid.listener.PrefCheckboxListener;
+import net.wigle.wigleandroid.listener.GNSSListener;
+import net.wigle.wigleandroid.model.api.ApiTokenResponse;
+import net.wigle.wigleandroid.net.RequestCompletedListener;
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import static net.wigle.wigleandroid.UserStatsFragment.MSG_USER_DONE;
+
+import org.json.JSONObject;
 
 /**
  * configure settings
@@ -83,7 +91,10 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         super.onCreate(savedInstanceState);
 
         // set language
-        MainActivity.setLocale(getActivity());
+        final Activity a = getActivity();
+        if (null != a) {
+            MainActivity.setLocale(a);
+        }
         setHasOptionsMenu(true);
     }
 
@@ -93,10 +104,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         final View view = inflater.inflate(R.layout.settings, container, false);
 
         // force media volume controls
-        getActivity().setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        final Activity a = getActivity();
+        if (null != a) {
+            a.setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        }
 
         // don't let the textbox have focus to start with, so we don't see a keyboard right away
-        final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linearlayout);
+        final LinearLayout linearLayout = view.findViewById(R.id.linearlayout);
         linearLayout.setFocusableInTouchMode(true);
         linearLayout.requestFocus();
         updateView(view);
@@ -106,129 +120,136 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     @SuppressLint("SetTextI18n")
     @Override
     public void handleDialog(final int dialogId) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final Editor editor = prefs.edit();
-        final View view = getView();
+        final Activity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final Editor editor = prefs.edit();
+            final View view = getView();
 
-        switch (dialogId) {
-            case DONATE_DIALOG: {
-                editor.putBoolean(ListFragment.PREF_DONATE, true);
-                editor.apply();
+            switch (dialogId) {
+                case DONATE_DIALOG: {
+                    editor.putBoolean(PreferenceKeys.PREF_DONATE, true);
+                    editor.apply();
 
-                if (view != null) {
-                    final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
-                    donate.setChecked(true);
+                    if (view != null) {
+                        final CheckBox donate = view.findViewById(R.id.donate);
+                        donate.setChecked(true);
+                    }
+                    // poof
+                    eraseDonate();
+                    break;
                 }
-                // poof
-                eraseDonate();
-                break;
+                case ANONYMOUS_DIALOG: {
+                    // turn anonymous
+                    editor.putBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, true);
+                    editor.remove(PreferenceKeys.PREF_USERNAME);
+                    editor.remove(PreferenceKeys.PREF_PASSWORD);
+                    editor.remove(PreferenceKeys.PREF_AUTHNAME);
+                    editor.remove(PreferenceKeys.PREF_TOKEN);
+                    editor.apply();
+
+                    if (view != null) {
+                        this.updateView(view);
+                    }
+                    break;
+                }
+                case DEAUTHORIZE_DIALOG: {
+                    editor.remove(PreferenceKeys.PREF_AUTHNAME);
+                    editor.remove(PreferenceKeys.PREF_TOKEN);
+                    editor.remove(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER);
+
+                    String mapTileMode = prefs.getString(PreferenceKeys.PREF_SHOW_DISCOVERED,
+                            PreferenceKeys.PREF_MAP_NO_TILE);
+                    if (PreferenceKeys.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
+                            PreferenceKeys.PREF_MAP_ONLYMINE_TILE.equals(mapTileMode)) {
+                        // ALIBI: clear show mine/others on deauthorize
+                        editor.putString(PreferenceKeys.PREF_SHOW_DISCOVERED, PreferenceKeys.PREF_MAP_NO_TILE);
+                    }
+                    editor.apply();
+                    MainActivity.refreshApiManager(); // recreates the static state WiGLE API
+                    if (view != null) {
+                        this.updateView(view);
+                    }
+                    break;
+                }
+                default:
+                    Logging.warn("Settings unhandled dialogId: " + dialogId);
             }
-            case ANONYMOUS_DIALOG: {
-                // turn anonymous
-                editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, true );
-                editor.remove(ListFragment.PREF_USERNAME);
-                editor.remove(ListFragment.PREF_PASSWORD);
-                editor.remove(ListFragment.PREF_AUTHNAME);
-                editor.remove(ListFragment.PREF_TOKEN);
-                editor.apply();
-
-                if (view != null) {
-                    this.updateView(view);
-                }
-                break;
-            }
-            case DEAUTHORIZE_DIALOG: {
-                editor.remove(ListFragment.PREF_AUTHNAME);
-                editor.remove(ListFragment.PREF_TOKEN);
-                editor.remove(ListFragment.PREF_CONFIRM_UPLOAD_USER);
-
-                String mapTileMode = prefs.getString(ListFragment.PREF_SHOW_DISCOVERED,
-                        ListFragment.PREF_MAP_NO_TILE);
-                if (ListFragment.PREF_MAP_NOTMINE_TILE.equals(mapTileMode) ||
-                        ListFragment.PREF_MAP_ONLYMINE_TILE.equals(mapTileMode)) {
-                    // ALIBI: clear show mine/others on deauthorize
-                    editor.putString(ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
-                }
-                editor.apply();
-                if (view != null) {
-                    this.updateView(view);
-                }
-                break;
-            }
-            default:
-                MainActivity.warn("Settings unhandled dialogId: " + dialogId);
         }
     }
 
     @Override
     public void onResume() {
-        MainActivity.info("resume settings.");
+        Logging.info("resume settings.");
 
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        // donate
-        final boolean isDonate = prefs.getBoolean(ListFragment.PREF_DONATE, false);
-        if ( isDonate ) {
-            eraseDonate();
+        final Activity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            // donate
+            final boolean isDonate = prefs.getBoolean(PreferenceKeys.PREF_DONATE, false);
+            if (isDonate) {
+                eraseDonate();
+            }
+            super.onResume();
+            Logging.info("Resume with allow: " + allowRefresh);
+            if (allowRefresh) {
+                allowRefresh = false;
+                final View view = getView();
+
+                updateView(view);
+
+                //ALIBI: what doesn't work here:
+                //does not successfully reload
+                //getFragmentManager().beginTransaction().replace(this.container.getId(),this).commit();
+
+                // WTF: actually re-pauses and resumes.
+                //getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+            }
+            a.setTitle(R.string.settings_app_name);
         }
-        super.onResume();
-        MainActivity.info("Resume with allow: "+allowRefresh);
-        if (allowRefresh) {
-            allowRefresh = false;
-            final View view = getView();
-
-            updateView(view);
-
-            //ALIBI: what doesn't work here:
-            //does not successfully reload
-            //getFragmentManager().beginTransaction().replace(this.container.getId(),this).commit();
-
-            // WTF: actually re-pauses and resumes.
-            //getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-        }
-        getActivity().setTitle(R.string.settings_app_name);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        MainActivity.info("Pause; setting allowRefresh");
+        Logging.info("Pause; setting allowRefresh");
         allowRefresh = true;
     }
 
     private void updateView(final View view) {
         final FragmentActivity activity = getActivity();
         if (activity == null) return;
-        final SharedPreferences prefs = activity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = activity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final Editor editor = prefs.edit();
 
         // donate
-        final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
-        final boolean isDonate = prefs.getBoolean( ListFragment.PREF_DONATE, false);
+        final CheckBox donate = view.findViewById(R.id.donate);
+        final boolean isDonate = prefs.getBoolean( PreferenceKeys.PREF_DONATE, false);
         donate.setChecked( isDonate );
         if ( isDonate ) {
             eraseDonate();
         }
-        donate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                if ( isChecked == prefs.getBoolean( ListFragment.PREF_DONATE, false) ) {
-                    // this would cause no change, bail
-                    return;
-                }
+        donate.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if ( isChecked == prefs.getBoolean( PreferenceKeys.PREF_DONATE, false) ) {
+                // this would cause no change, bail
+                return;
+            }
 
-                if ( isChecked ) {
-                    // turn off until confirmed
-                    buttonView.setChecked( false );
-                    // confirm
-                    MainActivity.createConfirmation( getActivity(),
+            if ( isChecked ) {
+                // turn off until confirmed
+                buttonView.setChecked( false );
+                // confirm
+                final FragmentActivity a = getActivity();
+                if (null != a) {
+                    WiGLEConfirmationDialog.createConfirmation(a,
                             getString(R.string.donate_question) + "\n\n"
                                     + getString(R.string.donate_explain),
                             R.id.nav_settings, DONATE_DIALOG);
                 }
-                else {
-                    editor.putBoolean( ListFragment.PREF_DONATE, false);
-                    editor.apply();
-                }
+            }
+            else {
+                editor.putBoolean( PreferenceKeys.PREF_DONATE, false);
+                editor.apply();
             }
         });
 
@@ -236,29 +257,36 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.P) {
             scanThrottleHelp.setText(R.string.pie_bad);
             scanThrottleHelp.setVisibility(View.VISIBLE);
-        }
-        else if (Build.VERSION.SDK_INT == 29) {
+        }  else if (Build.VERSION.SDK_INT == 29) {
             final StringBuilder builder = new StringBuilder(getString(R.string.q_bad));
-            builder.append("\n\n");
-            if (!MainActivity.isDevMode(getContext())) {
-                builder.append(getString(R.string.enable_developer));
-                builder.append("\n\n");
-            }
+            addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
             builder.append(getString(R.string.disable_throttle));
             scanThrottleHelp.setText(builder.toString());
             scanThrottleHelp.setVisibility(View.VISIBLE);
+        } else if (Build.VERSION.SDK_INT > 29) {
+            //ALIBI: starting in SDK 30, we can check the throttle via WiFiManager.isScanThrottleEnabled
+            final Context mainActivity = MainActivity.getMainActivity();
+            if (mainActivity != null) {
+                final WifiManager wifiManager = (WifiManager) mainActivity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager.isScanThrottleEnabled()) {
+                    final StringBuilder builder = new StringBuilder(getString(R.string.throttle));
+                    addDevModeMesgIfApplicable(builder, getContext(), getString(R.string.enable_developer));
+                    scanThrottleHelp.setText(builder.toString());
+                    scanThrottleHelp.setVisibility(View.VISIBLE);
+                }
+            }
         }
 
-        final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
-        final EditText user = (EditText) view.findViewById(R.id.edit_username);
-        final TextView authUserDisplay = (TextView) view.findViewById(R.id.show_authuser);
+        final String authUser = prefs.getString(PreferenceKeys.PREF_AUTHNAME,"");
+        final EditText user = view.findViewById(R.id.edit_username);
+        final TextView authUserDisplay = view.findViewById(R.id.show_authuser);
         final View authUserLayout = view.findViewById(R.id.show_authuser_label);
-        final EditText passEdit = (EditText) view.findViewById(R.id.edit_password);
+        final EditText passEdit = view.findViewById(R.id.edit_password);
         final View passEditLayout = view.findViewById(R.id.edit_password_label);
-        final CheckBox showPass = (CheckBox) view.findViewById(R.id.showpassword);
-        final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
-        final Button deauthButton = (Button) view.findViewById(R.id.deauthorize_client);
-        final Button authButton = (Button) view.findViewById(R.id.authorize_client);
+        final CheckBox showPassword = view.findViewById(R.id.showpassword);
+        final String authToken = prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+        final Button deauthButton = view.findViewById(R.id.deauthorize_client);
+        final Button authButton = view.findViewById(R.id.authorize_client);
 
         if (!authUser.isEmpty()) {
             authUserDisplay.setText(authUser);
@@ -266,18 +294,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             authUserLayout.setVisibility(View.VISIBLE);
             if (!authToken.isEmpty()) {
                 deauthButton.setVisibility(View.VISIBLE);
-                deauthButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        MainActivity.createConfirmation( getActivity(),
-                                getString(R.string.deauthorize_confirm),
-                                R.id.nav_settings, DEAUTHORIZE_DIALOG );
-                    }
-                });
+                deauthButton.setOnClickListener(view13 -> WiGLEConfirmationDialog.createConfirmation( getActivity(),
+                        getString(R.string.deauthorize_confirm),
+                        R.id.nav_settings, DEAUTHORIZE_DIALOG ));
                 authButton.setVisibility(View.GONE);
                 passEdit.setVisibility(View.GONE);
                 passEditLayout.setVisibility(View.GONE);
-                showPass.setVisibility(View.GONE);
+                showPassword.setVisibility(View.GONE);
                 user.setEnabled(false);
             } else {
                 user.setEnabled(true);
@@ -289,211 +312,236 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             deauthButton.setVisibility(View.GONE);
             passEdit.setVisibility(View.VISIBLE);
             passEditLayout.setVisibility(View.VISIBLE);
-            showPass.setVisibility(View.VISIBLE);
+            showPassword.setVisibility(View.VISIBLE);
             authButton.setVisibility(View.VISIBLE);
-            final Handler handler = new UserDownloadHandler(view, getActivity().getPackageName(),
-                    getResources(), this);
-            final UserStatsFragment.UserDownloadApiListener apiListener =
-                    new UserStatsFragment.UserDownloadApiListener(handler);
-            authButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    final ApiDownloader task = new ApiDownloader(getActivity(), ListFragment.lameStatic.dbHelper,
-                            "user-stats-cache.json", MainActivity.USER_STATS_URL, false, true, true,
-                            ApiDownloader.REQUEST_GET,
-                            apiListener);
-                    try {
-                        task.startDownload(SettingsFragment.this);
-                    } catch (WiGLEAuthException waex) {
-                        MainActivity.info("User authentication failed");
-                    }
+            authButton.setOnClickListener(view12 -> {
+                MainActivity.State s = MainActivity.getStaticState();
+                final SettingsFragment frag = this;
+                if (s != null) {
+                    final String userName = prefs.getString(PreferenceKeys.PREF_USERNAME, "");
+                    final String password = prefs.getString(PreferenceKeys.PREF_PASSWORD, "");
+                    s.apiManager.getApiToken(userName, password, new RequestCompletedListener<ApiTokenResponse, JSONObject>() {
+                        @Override
+                        public void onTaskCompleted() {
+                            final FragmentActivity a = getActivity();
+                            if (null != a) {
+                                frag.updateView(view);
+                            }
+                        }
+
+                        @Override
+                        public void onTaskSucceeded(ApiTokenResponse response) {
+                            if (null != response) {
+                                Logging.error("Authentication: succeeded as "+response.getAuthname());
+                                FragmentActivity activity = SettingsFragment.this.getActivity();
+                                if (activity == null) activity = MainActivity.getMainActivity();
+                                if (activity != null) {
+                                    final SharedPreferences prefs = activity
+                                            .getApplicationContext()
+                                            .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                    final Editor editor = prefs.edit();
+                                    editor.putString(PreferenceKeys.PREF_AUTHNAME, response.getAuthname());
+                                    editor.remove(PreferenceKeys.PREF_PASSWORD);
+                                    editor.apply();
+                                }
+                                TokenAccess.setApiToken(prefs, response.getToken());
+                                MainActivity.refreshApiManager(); // recreates the static WiGLE API instance
+                            } else {
+                                Logging.error("Auth token request succeeded, but response was bad.");
+                            }
+                        }
+
+                        @Override
+                        public void onTaskFailed(int status, JSONObject error) {
+                            Logging.error("Authentication: failed: " + status);
+                            FragmentActivity activity = SettingsFragment.this.getActivity();
+                            if (activity == null) activity = MainActivity.getMainActivity();
+                            if (activity != null) {
+                                final SharedPreferences prefs = activity
+                                        .getApplicationContext()
+                                        .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                                final Editor editor = prefs.edit();
+                                editor.remove(PreferenceKeys.PREF_PASSWORD);
+                                editor.apply();
+                            }
+                        }
+                    });
                 }
             });
         }
 
         // anonymous
-        final CheckBox beAnonymous = (CheckBox) view.findViewById(R.id.be_anonymous);
-        final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
+        final CheckBox beAnonymous = view.findViewById(R.id.be_anonymous);
+        final boolean isAnonymous = prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false);
         if ( isAnonymous ) {
             user.setEnabled( false );
             passEdit.setEnabled( false );
         }
 
         beAnonymous.setChecked( isAnonymous );
-        beAnonymous.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                if ( isChecked == prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false) ) {
-                    // this would cause no change, bail
-                    return;
-                }
+        beAnonymous.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if ( isChecked == prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false) ) {
+                // this would cause no change, bail
+                return;
+            }
 
-                if ( isChecked ) {
-                    // turn off until confirmed
-                    buttonView.setChecked( false );
-                    // confirm
-                    MainActivity.createConfirmation( getActivity(),
+            if ( isChecked ) {
+                // turn off until confirmed
+                buttonView.setChecked( false );
+                // confirm
+                final Activity a = getActivity();
+                if (null != a) {
+                    WiGLEConfirmationDialog.createConfirmation(getActivity(),
                             getString(R.string.anonymous_confirm), R.id.nav_settings,
-                            ANONYMOUS_DIALOG );
-                } else {
-                    // unset anonymous
-                    user.setEnabled(true);
-                    passEdit.setEnabled(true);
-                    editor.putBoolean( ListFragment.PREF_BE_ANONYMOUS, false );
-                    editor.apply();
-
-                    // might have to remove or show register link
-                    updateRegister(view);
+                            ANONYMOUS_DIALOG);
                 }
-            }
-        });
-
-        // register link
-        final TextView register = (TextView) view.findViewById(R.id.register);
-        final String registerString = getString(R.string.register);
-        final String activateString = getString(R.string.activate);
-        String registerBlurb = "<a href='net.wigle.wigleandroid.register://register'>" + registerString +
-                "</a> @WiGLE.net";
-
-        // ALIBI: vision APIs started in 4.2.2; JB2 4.3 = 18 is safe. 17 might work...
-        // but we're only supporting qr in v23+ via the uses-permission-sdk-23 tag -rksh
-        if (Build.VERSION.SDK_INT >= 23) {
-            registerBlurb += " or <a href='net.wigle.wigleandroid://activate'>" + activateString +
-                    "</a>";
-        }
-        try {
-            if (Build.VERSION.SDK_INT >= 24) {
-                register.setText(Html.fromHtml(registerBlurb,
-                        Html.FROM_HTML_MODE_LEGACY));
             } else {
-                register.setText(Html.fromHtml(registerBlurb));
-            }
-        } catch (Exception ex) {
-            register.setText(registerString + " @WiGLE.net");
-        }
-        register.setMovementMethod(LinkMovementMethod.getInstance());
-        updateRegister(view);
-
-        user.setText( prefs.getString( ListFragment.PREF_USERNAME, "" ) );
-        user.addTextChangedListener( new SetWatcher() {
-            @Override
-            public void onTextChanged( final String s ) {
-                credentialsUpdate(ListFragment.PREF_USERNAME, editor, prefs, s);
+                // unset anonymous
+                user.setEnabled(true);
+                passEdit.setEnabled(true);
+                editor.putBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false );
+                editor.apply();
 
                 // might have to remove or show register link
                 updateRegister(view);
             }
         });
 
-        final CheckBox showPassword = (CheckBox) view.findViewById(R.id.showpassword);
-        showPassword.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        // register link
+        final TextView register = view.findViewById(R.id.register);
+        try {
+            register.setText(Html.fromHtml(getString(R.string.registration_html_prompt),
+                    Html.FROM_HTML_MODE_LEGACY));
+        } catch (Exception ex) {
+            Logging.error("unable to create registration prompt from HTML");
+        }
+        register.setMovementMethod(LinkMovementMethod.getInstance());
+        updateRegister(view);
+
+        user.setText( prefs.getString( PreferenceKeys.PREF_USERNAME, "" ) );
+        user.addTextChangedListener( new SetWatcher() {
             @Override
-            public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                if ( isChecked ) {
-                    passEdit.setTransformationMethod(SingleLineTransformationMethod.getInstance());
-                }
-                else {
-                    passEdit.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                }
+            public void onTextChanged( final String s ) {
+                credentialsUpdate(PreferenceKeys.PREF_USERNAME, editor, prefs, s);
+
+                // might have to remove or show register link
+                updateRegister(view);
             }
         });
-;
 
-        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        showPassword.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if ( isChecked ) {
+                passEdit.setTransformationMethod(SingleLineTransformationMethod.getInstance());
+            }
+            else {
+                passEdit.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            }
+        });
+
+        final String showDiscovered = prefs.getString( PreferenceKeys.PREF_SHOW_DISCOVERED, PreferenceKeys.PREF_MAP_NO_TILE);
         final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
         final String[] mapModes = SettingsUtil.getMapModes(isAuthenticated);
         final String[] mapModeName = SettingsUtil.getMapModeNames(isAuthenticated, this.getContext());
 
-        if (!ListFragment.PREF_MAP_NO_TILE.equals(showDiscovered)) {
-            LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+        if (!PreferenceKeys.PREF_MAP_NO_TILE.equals(showDiscovered)) {
+            LinearLayout mainLayout = view.findViewById(R.id.show_map_discovered_since);
             mainLayout.setVisibility(View.VISIBLE);
         }
 
-        SettingsUtil.doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
-                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, getContext(), view );
+        SettingsUtil.doMapSpinner( R.id.show_discovered, PreferenceKeys.PREF_SHOW_DISCOVERED,
+                PreferenceKeys.PREF_MAP_NO_TILE, mapModes, mapModeName, getContext(), view );
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        List<Long> yearValueBase = new ArrayList<Long>();
-        List<String> yearLabelBase = new ArrayList<String>();
+        List<Long> yearValueBase = new ArrayList<>();
+        List<String> yearLabelBase = new ArrayList<>();
         for (int i = 2001; i <= thisYear; i++) {
             yearValueBase.add((long)(i));
             yearLabelBase.add(Integer.toString(i));
         }
-        SettingsUtil.doSpinner( R.id.networks_discovered_since_year, view, ListFragment.PREF_SHOW_DISCOVERED_SINCE,
+        SettingsUtil.doSpinner( R.id.networks_discovered_since_year, view, PreferenceKeys.PREF_SHOW_DISCOVERED_SINCE,
                 2001L, yearValueBase.toArray(new Long[0]),
                 yearLabelBase.toArray(new String[0]), getContext() );
 
-        passEdit.setText( prefs.getString( ListFragment.PREF_PASSWORD, "" ) );
+        passEdit.setText( prefs.getString( PreferenceKeys.PREF_PASSWORD, "" ) );
         passEdit.addTextChangedListener( new SetWatcher() {
             @Override
             public void onTextChanged( final String s ) {
-                credentialsUpdate(ListFragment.PREF_PASSWORD, editor, prefs, s);
+                credentialsUpdate(PreferenceKeys.PREF_PASSWORD, editor, prefs, s);
             }
         });
 
-        final Button button = (Button) view.findViewById(R.id.speech_button);
-        button.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View view ) {
-                final Intent errorReportIntent = new Intent( getActivity(), SpeechActivity.class );
-                SettingsFragment.this.startActivity( errorReportIntent );
-            }
+        final Button button = view.findViewById(R.id.speech_button);
+        button.setOnClickListener(view1 -> {
+            final Intent errorReportIntent = new Intent( getActivity(), SpeechActivity.class );
+            SettingsFragment.this.startActivity( errorReportIntent );
         });
 
         // period spinners
-        SettingsUtil.doScanSpinner( R.id.periodstill_spinner, ListFragment.PREF_SCAN_PERIOD_STILL,
-                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, getContext() );
-        SettingsUtil.doScanSpinner( R.id.period_spinner, ListFragment.PREF_SCAN_PERIOD,
-                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, getContext() );
-        SettingsUtil.doScanSpinner( R.id.periodfast_spinner, ListFragment.PREF_SCAN_PERIOD_FAST,
-                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, getContext() );
-        SettingsUtil.doScanSpinner( R.id.gps_spinner, ListFragment.GPS_SCAN_PERIOD,
-                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, getContext() );
+        final Context c = getContext();
+        SettingsUtil.doScanSpinner( R.id.periodstill_spinner, PreferenceKeys.PREF_SCAN_PERIOD_STILL,
+                MainActivity.SCAN_STILL_DEFAULT, getString(R.string.nonstop), view, c );
+        SettingsUtil.doScanSpinner( R.id.period_spinner, PreferenceKeys.PREF_SCAN_PERIOD,
+                MainActivity.SCAN_DEFAULT, getString(R.string.nonstop), view, c );
+        SettingsUtil.doScanSpinner( R.id.periodfast_spinner, PreferenceKeys.PREF_SCAN_PERIOD_FAST,
+                MainActivity.SCAN_FAST_DEFAULT, getString(R.string.nonstop), view, c );
+        SettingsUtil.doScanSpinner( R.id.gps_spinner, PreferenceKeys.GPS_SCAN_PERIOD,
+                MainActivity.LOCATION_UPDATE_INTERVAL, getString(R.string.setting_tie_wifi), view, c );
 
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, ListFragment.PREF_SHOW_CURRENT, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, ListFragment.PREF_METRIC, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, ListFragment.PREF_FOUND_SOUND, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, ListFragment.PREF_FOUND_NEW_SOUND, true);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, ListFragment.PREF_CIRCLE_SIZE_MAP, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, ListFragment.PREF_USE_NETWORK_LOC, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, ListFragment.PREF_DISABLE_TOAST, false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, ListFragment.PREF_START_AT_BOOT ,false);
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, ListFragment.PREF_SCAN_BT, true, new PrefCheckboxListener() {
-            @Override
-            public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling bluetooth change: "+value);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.edit_showcurrent, PreferenceKeys.PREF_SHOW_CURRENT, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_metric, PreferenceKeys.PREF_METRIC, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_sound, PreferenceKeys.PREF_FOUND_SOUND, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.found_new_sound, PreferenceKeys.PREF_FOUND_NEW_SOUND, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.circle_size_map, PreferenceKeys.PREF_CIRCLE_SIZE_MAP, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.no_individual_nets_map, PreferenceKeys.PREF_MAP_HIDE_NETS, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_bearing, PreferenceKeys.PREF_MAP_FOLLOW_BEARING, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.use_network_location, PreferenceKeys.PREF_USE_NETWORK_LOC, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.disable_toast, PreferenceKeys.PREF_DISABLE_TOAST, false);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.boot_start, PreferenceKeys.PREF_START_AT_BOOT, false, value -> {
+            if (Build.VERSION.SDK_INT >= 29) {
                 if (value) {
-                    MainActivity.getMainActivity().setupBluetooth();
-                } else {
-                    MainActivity.getMainActivity().endBluetooth(prefs);
+                    if (!Settings.canDrawOverlays(getContext())) {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:net.wigle.wigleandroid"));
+                        startActivityForResult(intent, 0);
+                    }
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , ListFragment.PREF_VISUALIZE_ROUTE, false, new PrefCheckboxListener() {
-            @Override
-            public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling route mapping change: "+value);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.bluetooth_ena, PreferenceKeys.PREF_SCAN_BT, true, value -> {
+            Logging.info("Signaling bluetooth change: "+value);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
                 if (value) {
-                    MainActivity.getMainActivity().startRouteMapping(prefs);
+                    ma.setupBluetooth(prefs);
                 } else {
-                    MainActivity.getMainActivity().endRouteMapping(prefs);
+                    ma.endBluetooth(prefs);
                 }
             }
         });
-        MainActivity.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, ListFragment.PREF_LOG_ROUTES, false, new PrefCheckboxListener() {
-            @Override
-            public void preferenceSet(boolean value) {
-                MainActivity.info("Signaling route logging change: "+value);
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_map_display , PreferenceKeys.PREF_VISUALIZE_ROUTE, false, value -> {
+            Logging.info("Signaling route mapping change: "+value);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
                 if (value) {
-                    MainActivity.getMainActivity().startRouteLogging(prefs);
+                    ma.startRouteMapping(prefs);
                 } else {
-                    MainActivity.getMainActivity().endRouteLogging();
+                    ma.endRouteMapping(prefs);
                 }
             }
         });
-
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_route_logging, PreferenceKeys.PREF_LOG_ROUTES, false, value -> {
+            Logging.info("Signaling route logging change: "+value);
+            final MainActivity ma = MainActivity.getMainActivity();
+            if (null != ma) {
+                if (value) {
+                    ma.startRouteLogging(prefs);
+                } else {
+                    ma.endRouteLogging();
+                }
+            }
+        });
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_map_theme , PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);
         final String[] languages = new String[]{ "", "en", "ar", "cs", "da", "de", "es-rES", "fi", "fr", "fy",
-                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ru", "sv",
+                "he", "hi-rIN", "hu", "it", "ja-rJP", "ko", "nl", "no", "pl", "pt-rPT", "pt-rBR", "ro-rRO", "ru", "sv",
                 "sw", "tr", "zh-rCN", "zh-rTW", "zh-rHK" };
         final String[] languageName = new String[]{ getString(R.string.auto), getString(R.string.language_en),
                 getString(R.string.language_ar), getString(R.string.language_cs), getString(R.string.language_da),
@@ -502,18 +550,18 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 getString(R.string.language_hi), getString(R.string.language_hu), getString(R.string.language_it),
                 getString(R.string.language_ja), getString(R.string.language_ko), getString(R.string.language_nl),
                 getString(R.string.language_no), getString(R.string.language_pl), getString(R.string.language_pt),
-                getString(R.string.language_pt_rBR), getString(R.string.language_ru), getString(R.string.language_sv),
-                getString(R.string.language_sw), getString(R.string.language_tr), getString(R.string.language_zh_cn),
-                getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
+                getString(R.string.language_pt_rBR), getString(R.string.language_ro_rRO), getString(R.string.language_ru),
+                getString(R.string.language_sv), getString(R.string.language_sw), getString(R.string.language_tr),
+                getString(R.string.language_zh_cn), getString(R.string.language_zh_tw), getString(R.string.language_zh_hk),
         };
-        SettingsUtil.doSpinner( R.id.language_spinner, view, ListFragment.PREF_LANGUAGE, "", languages, languageName, getContext() );
+        SettingsUtil.doSpinner( R.id.language_spinner, view, PreferenceKeys.PREF_LANGUAGE, "", languages, languageName, getContext() );
 
         if (Build.VERSION.SDK_INT > 28) {
             View theme = view.findViewById(R.id.theme_section);
             theme.setVisibility(View.VISIBLE);
             final Integer[] themes = new Integer[] {AppCompatDelegate.MODE_NIGHT_YES, AppCompatDelegate.MODE_NIGHT_NO, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM};
             final String[] themeName = new String[]{getString(R.string.theme_dark_label), getString(R.string.theme_light_label), getString(R.string.theme_follow_label)};
-            SettingsUtil.doSpinner(R.id.theme_spinner, view, ListFragment.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES, themes, themeName, getContext());
+            SettingsUtil.doSpinner(R.id.theme_spinner, view, PreferenceKeys.PREF_DAYNIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES, themes, themeName, getContext());
         }
 
         final String off = getString(R.string.off);
@@ -523,32 +571,35 @@ public final class SettingsFragment extends Fragment implements DialogListener {
         // battery kill spinner
         final Long[] batteryPeriods = new Long[]{ 1L,2L,3L,4L,5L,10L,15L,20L,0L };
         final String[] batteryName = new String[]{ "1 %","2 %","3 %","4 %","5 %","10 %","15 %","20 %",off };
-        SettingsUtil.doSpinner( R.id.battery_kill_spinner, view, ListFragment.PREF_BATTERY_KILL_PERCENT,
+        SettingsUtil.doSpinner( R.id.battery_kill_spinner, view, PreferenceKeys.PREF_BATTERY_KILL_PERCENT,
                 MainActivity.DEFAULT_BATTERY_KILL_PERCENT, batteryPeriods, batteryName, getContext() );
 
         // reset wifi spinner
         final Long[] resetPeriods = new Long[]{ 15000L,30000L,60000L,90000L,120000L,300000L,600000L,0L };
         final String[] resetName = new String[]{ "15" + sec, "30" + sec,"1" + min,"1.5" + min,
                 "2" + min,"5" + min,"10" + min,off };
-        SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, ListFragment.PREF_RESET_WIFI_PERIOD,
+        SettingsUtil.doSpinner( R.id.reset_wifi_spinner, view, PreferenceKeys.PREF_RESET_WIFI_PERIOD,
                 MainActivity.DEFAULT_RESET_WIFI_PERIOD, resetPeriods, resetName, getContext() );
 
-        final Long[] timeoutPeriods = new Long[]{GPSListener.GPS_TIMEOUT_DEFAULT, 30000L, GPSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
+        final Long[] timeoutPeriods = new Long[]{GNSSListener.GPS_TIMEOUT_DEFAULT, 30000L, GNSSListener.NET_LOC_TIMEOUT_DEFAULT, 300000L, 1800000L, 3600000L};
         final String[] timeoutName = new String[]{ "15" + sec, "30" + sec,"1" + min,"5" + min,
                 "30" + min,"60" + min};
         // gps timeout spinner
-        SettingsUtil.doSpinner( R.id.gps_timeout_spinner, view, ListFragment.PREF_GPS_TIMEOUT,
-                GPSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+        SettingsUtil.doSpinner( R.id.gps_timeout_spinner, view, PreferenceKeys.PREF_GPS_TIMEOUT,
+                GNSSListener.GPS_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // net loc timeout spinner
-        SettingsUtil.doSpinner( R.id.net_loc_timeout_spinner, view, ListFragment.PREF_NET_LOC_TIMEOUT,
-                GPSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
+        SettingsUtil.doSpinner( R.id.net_loc_timeout_spinner, view, PreferenceKeys.PREF_NET_LOC_TIMEOUT,
+                GNSSListener.NET_LOC_TIMEOUT_DEFAULT, timeoutPeriods, timeoutName, getContext() );
 
         // prefs setting for tap-to-pause scan indicator
         final String[] pauseOptions = new String[] {ListFragment.QUICK_SCAN_UNSET, ListFragment.QUICK_SCAN_PAUSE, ListFragment.QUICK_SCAN_DO_NOTHING};
         final String[] pauseOptionNames = new String[] {getString(R.string.quick_pause_unset), getString(R.string.quick_pause), getString(R.string.quick_pause_do_nothing)};
-        SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, ListFragment.PREF_QUICK_PAUSE,
+        SettingsUtil.doSpinner( R.id.quick_pause_spinner, view, PreferenceKeys.PREF_QUICK_PAUSE,
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
+
+        PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, PreferenceKeys.PREF_GPS_KALMAN_FILTER ,true);
+
         TextView appVersion = view.findViewById(R.id.app_version);
         final String appName = getString(R.string.app_name);
         if (null != appVersion) {
@@ -556,27 +607,29 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 String versionName = activity.getApplicationContext().getPackageManager().getPackageInfo(activity.getApplicationContext().getPackageName(), 0).versionName;
                 appVersion.setText(appName+" v."+versionName);
             } catch (PackageManager.NameNotFoundException e) {
-                MainActivity.error("Unable to get version number: ",e);
+                Logging.error("Unable to get version number: ",e);
             }
         }
     }
 
     private void updateRegister(final View view) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final String username = prefs.getString(ListFragment.PREF_USERNAME, "");
-        final boolean isAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final Activity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final String username = prefs.getString(PreferenceKeys.PREF_USERNAME, "");
+            final boolean isAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+            if (view != null) {
+                final TextView register = view.findViewById(R.id.register);
 
-        if (view != null) {
-            final TextView register = (TextView) view.findViewById(R.id.register);
-
-            //ALIBI: ActivateAcitivity.receiveDetections sets isAnonymous = false
-            if ("".equals(username) || isAnonymous) {
-                register.setEnabled(true);
-                register.setVisibility(View.VISIBLE);
-            } else {
-                // poof
-                register.setEnabled(false);
-                register.setVisibility(View.GONE);
+                //ALIBI: ActivateAcitivity.receiveDetections sets isAnonymous = false
+                if ("".equals(username) || isAnonymous) {
+                    register.setEnabled(true);
+                    register.setVisibility(View.VISIBLE);
+                } else {
+                    // poof
+                    register.setEnabled(false);
+                    register.setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -601,9 +654,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             editor.putString(key, newValue.trim());
         }
         // ALIBI: if the u|p changes, force refetch token
-        editor.remove(ListFragment.PREF_AUTHNAME);
-        editor.remove(ListFragment.PREF_TOKEN);
-        editor.remove(ListFragment.PREF_CONFIRM_UPLOAD_USER);
+        editor.remove(PreferenceKeys.PREF_AUTHNAME);
+        editor.remove(PreferenceKeys.PREF_TOKEN);
+        editor.remove(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER);
         editor.apply();
         this.clearCachefiles();
     }
@@ -614,19 +667,13 @@ public final class SettingsFragment extends Fragment implements DialogListener {
      */
     private void clearCachefiles() {
         final File cacheDir = new File(FileUtility.getSDPath());
-        final File[] cacheFiles = cacheDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept( final File dir,
-                                   final String name ) {
-                return name.matches( ".*-cache\\.json" );
-            }
-        } );
+        final File[] cacheFiles = cacheDir.listFiles((dir, name) -> name.matches( ".*-cache\\.json" ));
         if (null != cacheFiles) {
             for (File cache: cacheFiles) {
                 //DEBUG: MainActivity.info("deleting: " + cache.getAbsolutePath());
                 boolean deleted = cache.delete();
                 if (!deleted) {
-                    MainActivity.warn("failed to delete cache file: "+cache.getAbsolutePath());
+                    Logging.warn("failed to delete cache file: "+cache.getAbsolutePath());
                 }
             }
         }
@@ -635,7 +682,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
     private void eraseDonate() {
         final View view = getView();
         if (view != null) {
-            final CheckBox donate = (CheckBox) view.findViewById(R.id.donate);
+            final CheckBox donate = view.findViewById(R.id.donate);
             donate.setEnabled(false);
             donate.setVisibility(View.GONE);
         }
@@ -643,7 +690,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
 
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_DEBUG, 0, getString(R.string.menu_debug));
         item.setIcon( android.R.drawable.ic_media_previous );
 
@@ -673,7 +720,7 @@ public final class SettingsFragment extends Fragment implements DialogListener {
      * used for authentication - this seems really heavy
      */
     private final static class UserDownloadHandler extends DownloadHandler {
-        private SettingsFragment fragment;
+        private final SettingsFragment fragment;
         private UserDownloadHandler(final View view, final String packageName,
                                     final Resources resources, SettingsFragment settingsFragment) {
             super(view, null, packageName, resources);
@@ -687,20 +734,29 @@ public final class SettingsFragment extends Fragment implements DialogListener {
             if (msg.what == MSG_USER_DONE) {
                 if ((null != bundle) && (bundle.containsKey("error"))) {
                     //ALIBI: not doing anything more here, since the toast will alert.
-                    MainActivity.info("Settings auth unsuccessful");
+                    Logging.info("Settings auth unsuccessful");
                 } else {
-                    MainActivity.info("Settings auth successful");
-                    final SharedPreferences prefs = MainActivity.getMainActivity()
-                            .getApplicationContext()
-                            .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                    final Editor editor = prefs.edit();
-                    editor.remove(ListFragment.PREF_PASSWORD);
-                    editor.apply();
-                    //TODO: order dependent -verify no risk of race condition here.
-                    fragment.updateView(view);
+                    Logging.info("Settings auth successful");
+                    final MainActivity m = MainActivity.getMainActivity();
+                    if (null != m) {
+                        final SharedPreferences prefs = m
+                                .getApplicationContext()
+                                .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                        final Editor editor = prefs.edit();
+                        editor.remove(PreferenceKeys.PREF_PASSWORD);
+                        editor.apply();
+                        //TODO: order dependent -verify no risk of race condition here.
+                        fragment.updateView(view);
+                    }
                 }
             }
         }
     }
 
+    private static void addDevModeMesgIfApplicable(StringBuilder builder, final Context c, final String message) {
+        if (!MainActivity.isDevMode(c)) {
+            builder.append("\n\n");
+            builder.append(message);
+        }
+    }
 }

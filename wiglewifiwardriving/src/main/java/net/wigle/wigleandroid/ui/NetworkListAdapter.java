@@ -9,11 +9,11 @@ import android.widget.TextView;
 
 import net.wigle.wigleandroid.AbstractListAdapter;
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -212,7 +212,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             return networks.get(pPosition).getBssid().hashCode();
         }
         catch (final IndexOutOfBoundsException ex) {
-            MainActivity.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
+            Logging.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
         }
         return 0L;
     }
@@ -242,7 +242,7 @@ public final class NetworkListAdapter extends AbstractListAdapter<Network> {
             network = getItem(position);
         } catch (final IndexOutOfBoundsException ex) {
             // yes, this happened to someone
-            MainActivity.info("index out of bounds: " + position + " ex: " + ex);
+            Logging.info("index out of bounds: " + position + " ex: " + ex);
             return row;
         }
         // info( "listing net: " + network.getBssid() );

@@ -2,8 +2,8 @@ package net.wigle.wigleandroid.ui;
 
 import androidx.annotation.NonNull;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.Network;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.lang.reflect.Array;
 import java.util.AbstractList;
@@ -55,6 +55,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     return cellNets.contains(o);
                 default:
                     return false;
@@ -111,6 +112,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -142,6 +144,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     found = cellNets.remove(o);
                     break;
                 default:
@@ -182,12 +185,13 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     if (cellNets.add(net)) {
                         added.add(net);
                     }
                     break;
                 default:
-                    MainActivity.error("unhandled addAll case: "+net.getType());
+                    Logging.error("unhandled addAll case: "+net.getType());
                     break;
             }
         }
@@ -203,7 +207,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public boolean addAll(int i, @NonNull Collection<? extends Network> collection) {
-        MainActivity.info("addAll w/ offset: "+i);
+        Logging.info("addAll w/ offset: "+i);
         Set<Network> added = addAllToSets(collection);
         for (Network net: collection) {
             int offset = i;
@@ -255,14 +259,14 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         try {
             return networks.get(i);
         } catch (IndexOutOfBoundsException iobex) {
-            MainActivity.error("failed SBNL.get - index out of bound (likely structure changed)");
+            Logging.error("failed SBNL.get - index out of bound (likely structure changed) index: "+i);
             return null;
         }
     }
 
     @Override
     public Network set(int i, Network network) {
-        MainActivity.info("set-at index "+i);
+        Logging.info("set-at index "+i);
         if (null != network) {
             boolean newNet = false;
             switch (network.getType()) {
@@ -279,6 +283,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -298,7 +303,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
 
     @Override
     public void add(int i, Network network) {
-        MainActivity.info("add-at index "+i);
+        Logging.info("add-at index "+i);
         if (null != network) {
             boolean newNet = false;
             switch (network.getType()) {
@@ -315,6 +320,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     newNet = cellNets.add(network);
                     break;
                 default:
@@ -345,6 +351,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
                 case GSM:
                 case LTE:
                 case WCDMA:
+                case NR:
                     cellNets.remove(n);
                 default:
                     break;
@@ -466,11 +473,15 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         if (showCurrent) {
             //ALIBI: if we're in current-only, strip last from networks and sets, add new to set, add revamped set to networks
             if (updateLe) {
+                //DEBUG: final int initialSize = networks.size();
                 networks.removeAll(leNets);
+                //DEBUG: final int postRemoveSize = networks.size();
                 //TODO: 1/2: faster to clear and re-add all?
                 leNets.retainAll(nextLeNets);
                 leNets.addAll(nextLeNets);
                 networks.addAll(leNets);
+                //DEBUG: final int finalSize = networks.size();
+                //DEBUG: Logging.error(initialSize+" -> "+postRemoveSize+" -> "+ finalSize + " (prev le: "+ leNets.size()+" new le: "+nextLeNets.size()+")");
             }
             if (updateClassic) {
                 networks.removeAll(btNets);
@@ -509,7 +520,7 @@ public class SetBackedNetworkList extends AbstractList<Network> implements List<
         try {
             Collections.sort(networks, comparator);
         } catch (IllegalArgumentException iaex) {
-            MainActivity.warn("SBNL.sort: IllegalArgumentException", iaex);
+            Logging.warn("SBNL.sort: IllegalArgumentException", iaex);
             iaex.printStackTrace();
             //ALIBI: missing a sort isn't a critical error, since this list gets updated continually
         }

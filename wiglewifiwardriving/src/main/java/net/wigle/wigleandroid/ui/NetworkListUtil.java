@@ -7,27 +7,21 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.provider.Settings;
-import android.util.TypedValue;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
-import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 // import com.google.android.gms.maps.model.BitmapDescriptor;
 // import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
-import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.R;
-import net.wigle.wigleandroid.R.color;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -90,7 +84,6 @@ public class NetworkListUtil {
         return color;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @ColorInt
     public static int getTextColorForSignal(Context context, final int level) {
         Resources.Theme theme = context.getTheme();
@@ -122,15 +115,10 @@ public class NetworkListUtil {
                                                        @ColorInt int tintColor) {
 
         Drawable vectorDrawable;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            vectorDrawable = VectorDrawableCompat.create(context.getResources(), vectorResourceId,
-                    null);
-        } else {
-            vectorDrawable = ResourcesCompat.getDrawable(
-                    context.getResources(), vectorResourceId, null);
-        }
+        vectorDrawable = ResourcesCompat.getDrawable(
+                context.getResources(), vectorResourceId, null);
         if (vectorDrawable == null) {
-            MainActivity.error("Requested vector resource was not found");
+            Logging.error("Requested vector resource was not found");
             return BitmapDescriptorFactory.defaultMarker();
         }
         Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
@@ -172,6 +160,8 @@ public class NetworkListUtil {
             resource = drawable.ic_bt;
         } else if (NetworkType.BLE.equals(network.getType())) {
             resource = drawable.ic_btle;
+        } else if (NetworkType.NR.equals(network.getType())) {
+            resource = drawable.cell_5g;
         } else {
             resource = drawable.ic_cell;
         }

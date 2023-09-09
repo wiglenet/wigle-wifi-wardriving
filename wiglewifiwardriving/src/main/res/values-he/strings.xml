@@ -11,7 +11,7 @@
     <string name="network_activity_name">WiGLE Wifi - רשת</string>
     <string name="data_activity_name">WiGLE Wifi - Database</string>
     <string name="dbresult_activity_name">WiGLE Wifi - תוצאות חיפוש</string>
-    <string name="upload_button">טען WiGLE.net</string>
+    <string name="upload_button">טען\n WiGLE.net</string>
     <string name="username">WiGLE שם משתמש</string>
     <string name="password">WiGLE סיסמה</string>
     <string name="show_current">הצג רשתות הנוכחי בלבד</string>
@@ -81,12 +81,12 @@
     <string name="filter_enabled">סנן מאופשר</string>
     <string name="list_waiting_gps">(מחכים GPS סנכרון &#8230;)</string>
     <string name="list_scanning_off">(סריקה מבוטלת)</string>
-    <string name="list_short_lat">קווי רוחב:</string>
-    <string name="list_short_lon">לון:</string>
-    <string name="list_short_sats">פסיכומטרי:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">קו רוחב: %1$s</string>
+    <string name="list_short_lon">לון: %1$s</string>
+    <string name="list_short_sats">פסיכומטרי: %1$d</string>
+    <string name="list_short_alt">%1$s :גוֹבַה</string>
     <string name="list_status_default">(מעמד)</string>
-    <string name="list_speed">מהירות:</string>
+    <string name="list_speed">מהירות: %1$s</string>
     <string name="list_upload">העלאת קובץ?</string>
     <string name="network_signal">אותות:</string>
     <string name="network_type">סוג:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">לבטל</string>
     <string name="dash_scan_off">(סריקה מבוטלת)</string>
     <string name="dash_new_wifi">חדש WiFi</string>
-    <string name="dash_vis_nets">Visible נטס:</string>
-    <string name="dash_new_upload">הנטס בניו מאז טען:</string>
+    <string name="dash_vis_nets">\u2066Visible: %1$d\u2069 נטס</string>
+    <string name="dash_new_upload">הנטס בניו מאז טען: %1$d</string>
     <string name="dash_new_cells">תא מגדלי חדש</string>
     <string name="dash_new_bt">Bluetooth חדש</string>
     <string name="dash_dist_run">הפעל מרחק:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">משך הסריקה:</string>
     <string name="dash_dist_total">סך Dist.:</string>
     <string name="dash_dist_prev">הקודם הפעלה:</string>
-    <string name="dash_db_queue">DB תור:</string>
-    <string name="dash_db_nets">DB נטס:</string>
-    <string name="dash_db_locs">DB מיקומים:</string>
-    <string name="dash_short_loc">לוק:</string>
+    <string name="dash_db_queue">%1$s :\u2066DB \u2069 תור</string>
+    <string name="dash_db_nets">%1$s :\u200fDB\u200f נטס</string>
+    <string name="dash_db_locs">%1$s :\u2066DB\u2069 מיקומים</string>
+    <string name="dash_short_loc">%1$s לוק:</string>
+    <string name="Mm_short">מ"מ</string>
     <string name="km_short">ק&quot;מ</string>
     <string name="mi_short">מי</string>
     <string name="miles">מייל</string>
@@ -146,7 +147,7 @@
     <string name="run">לרוץ</string>
     <string name="new_word">חדש</string>
     <string name="db">DB</string>
-    <string name="scanned_in">סריקת</string>
+    <string name="scanned_in">%1$d סריקתn %2$d%3$s.</string>
     <string name="sort_title">אפשרויות מיון</string>
     <string name="sort_spin_label">סייג לפי:</string>
     <string name="channel">ערוץ</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (פולנית)</string>
     <string name="language_pt">português (פורטוגזית)</string>
     <string name="language_pt_rBR">português brasileiro (פורטוגזית ברזילאית)</string>
+    <string name="language_ro_rRO">(רומנית) Română</string>
     <string name="language_ru">ру́сский (רוסית)</string>
     <string name="language_sv">svenska (שבדית)</string>
     <string name="language_sw">Kiswahili (סווהילי)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">סוג מפה: היברידי</string>
     <string name="map_toast_terrain">סוג מפה: שטח</string>
     <string name="map_needs_playservice">המפה דורשת שירות Google Play</string>
-    <string name="register">הירשם</string>
     <string name="drawer_open">מגירה פתוחה</string>
     <string name="drawer_close">מגירה סגור</string>
     <string name="site_stats_app_name">סטטיסטיקה של WiGLE.net</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">דירוגים</string>
     <string name="uploads_app_name">העלאות של WiGLE.net</string>
     <string name="tab_uploads">העלאות</string>
-    <string name="queue_depth">עומק תור עיבוד הקובץ</string>
+    <string name="queue_depth">תור WiGLE: %1$s Tri: %2$s גיאוגרפי: %3$s</string>
     <string name="news_app_name">חדשות WiGLE.net</string>
     <string name="tab_news">חֲדָשׁוֹת</string>
     <string name="bytes">בתים</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">דירוג משתמש בחודש שעבר</string>
     <string name="prevmonthrank_title">חודש החודש האחרון</string>
     <string name="list_scanning_on">(סריקה מופעלת)</string>
-    <string name="activate">הפעל עכשיו</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Parsing…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">אור</string>
     <string name="theme_dark_label">כהה</string>
     <string name="theme_follow_label">עקוב אחר המערכת</string>
+    <string name="manage_gpx_button">מסלולים שמורים</string>
+    <string name="manage_gpx">נהל מסלולי GPX שמורים</string>
+    <string name="enable_map_theme">התאם את נושא המפה לאפליקציה</string>
+    <string name="throttle">סריקת WiFi מוגבלת. השבת את מצערת הסריקה של WiFi תחת הגדרות מפתחים לביצועים טובים יותר.</string>
+    <string name="no_individual_nets_map">השבת את תצוגת רשת המפה</string>
+    <string name="filter_show_btle">הצג Bluetooth LE</string>
+    <string name="settings_gps_head">הגדרות GPS</string>
+    <string name="enable_kalman">סינון רעשי GPS</string>
+    <string name="gps_old_message">מכשיר זה אינו נתמך עוד דרך חנות האפליקציות עקב המדיניות של Google. אנא גבה את הנתונים שלך וטען בצד את WiGLE v. 2.67 .apk (או נמוך יותר) מ-https://github.com/wiglenet/wigle-wifi-wardriving/ . מצטער על אי הנוחות!</string>
+    <string name="gps_old_title">לא ניתן לאתחל את ה-GPS</string>
+    <string name="enable_map_bearing">עקוב אחר הכיוון/הכיוון שלי</string>
+    <string name="login_title">נדרשת התחברות</string>
+    <string name="login_required">עליך להיות מחובר כדי לעשות זאת. אנא היכנס או צור חשבון במידת הצורך.</string>
+    <string name="login">התחברות</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>הרשמה ל-&lt;/a&gt; @WiGLE.net או &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;הפעל עכשיו עם קוד QR&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">מזהה ספק BLE:</string>
 </resources>

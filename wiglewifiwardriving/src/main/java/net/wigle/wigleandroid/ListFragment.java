@@ -3,26 +3,31 @@
 
 package net.wigle.wigleandroid;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -47,11 +52,16 @@ import net.wigle.wigleandroid.model.QueryArgs;
 import net.wigle.wigleandroid.ui.SetNetworkListAdapter;
 import net.wigle.wigleandroid.ui.NetworkListSorter;
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.ui.WiGLEConfirmationDialog;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -59,7 +69,7 @@ import static android.view.View.VISIBLE;
 /**
  * Main Network List View Fragment Adapter. Manages dynamic update of view apart from list when showing.
  * TODO: confirm that lameStatic values are being updated correctly, always.
- * @author: bobzilla, arkasha
+ * @author bobzilla, arkasha
  */
 public final class ListFragment extends Fragment implements ApiListener, DialogListener {
     private static final int MENU_WAKELOCK = 12;
@@ -73,99 +83,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private static final int UPLOAD_DIALOG = 101;
     private static final int QUICK_PAUSE_DIALOG = 102;
 
-    public static final float MIN_DISTANCE_ACCURACY = 32f;
-
-    // preferences
-    public static final String SHARED_PREFS = "WiglePrefs";
-    public static final String PREF_USERNAME = "username";
-    public static final String PREF_PASSWORD = "password";
-    public static final String PREF_AUTHNAME = "authname";
-    public static final String PREF_TOKEN = "token";
-    public static final String PREF_TOKEN_IV = "tokenIV";
-    public static final String PREF_TOKEN_TAG_LENGTH = "tokenTagLength";
-    public static final String PREF_SHOW_CURRENT = "showCurrent";
-    public static final String PREF_BE_ANONYMOUS = "beAnonymous";
-    public static final String PREF_DONATE = "donate";
-    public static final String PREF_DB_MARKER = "dbMarker";
-    public static final String PREF_MAX_DB = "maxDbMarker";
-    public static final String PREF_ROUTE_DB_RUN = "routeDbRun";
-    public static final String PREF_NETS_UPLOADED = "netsUploaded";
-    public static final String PREF_SCAN_PERIOD_STILL = "scanPeriodStill";
-    public static final String PREF_SCAN_PERIOD = "scanPeriod";
-    public static final String PREF_SCAN_PERIOD_FAST = "scanPeriodFast";
-    public static final String PREF_OG_BT_SCAN_PERIOD_STILL = "btGeneralScanPeriodStill";
-    public static final String PREF_OG_BT_SCAN_PERIOD = "btGeneralScanPeriod";
-    public static final String PREF_OG_BT_SCAN_PERIOD_FAST = "btGeneralScanPeriodFast";
-    public static final String PREF_QUICK_PAUSE = "quickScanPause";
-    public static final String GPS_SCAN_PERIOD = "gpsPeriod";
-    public static final String PREF_FOUND_SOUND = "foundSound";
-    public static final String PREF_FOUND_NEW_SOUND = "foundNewSound";
-    public static final String PREF_LANGUAGE = "speechLanguage";
-    public static final String PREF_RESET_WIFI_PERIOD = "resetWifiPeriod";
-    public static final String PREF_BATTERY_KILL_PERCENT = "batteryKillPercent";
-    public static final String PREF_MUTED = "muted";
-    public static final String PREF_BT_WAS_OFF = "btWasOff";
-    public static final String PREF_SCAN_BT = "scanBluetooth";
-    public static final String PREF_DISTANCE_RUN = "distRun";
-    public static final String PREF_STARTTIME_RUN = "timestampRunStart";
-    public static final String PREF_CUMULATIVE_SCANTIME_RUN = "millisScannedDuringRun";
-    public static final String PREF_STARTTIME_CURRENT_SCAN = "timestampScanStart";
-    public static final String PREF_DISTANCE_TOTAL = "distTotal";
-    public static final String PREF_DISTANCE_PREV_RUN = "distPrevRun";
-    public static final String PREF_MAP_ONLY_NEWDB = "mapOnlyNewDB";
-    public static final String PREF_PREV_LAT = "prevLat";
-    public static final String PREF_PREV_LON = "prevLon";
-    public static final String PREF_PREV_ZOOM = "prevZoom2";
-    public static final String PREF_LIST_SORT = "listSort";
-    public static final String PREF_SCAN_RUNNING = "scanRunning";
-    public static final String PREF_METRIC = "metric";
-    public static final String PREF_MAP_LABEL = "mapLabel";
-    public static final String PREF_MAP_CLUSTER = "mapCluster";
-    public static final String PREF_MAP_TRAFFIC = "mapTraffic";
-    public static final String PREF_CIRCLE_SIZE_MAP = "circleSizeMap";
-    public static final String PREF_USE_NETWORK_LOC = "useNetworkLoc";
-    public static final String PREF_DISABLE_TOAST = "disableToast"; // bool
-    public static final String PREF_MAP_TYPE = "mapType";
-    public static final String PREF_BLOWED_UP = "blowedUp";
-    public static final String PREF_SHOW_DISCOVERED = "showMyDiscovered";
-    public static final String PREF_SHOW_DISCOVERED_SINCE = "showDiscoveredSince";
-    public static final String PREF_MAP_NO_TILE = "NONE";
-    public static final String PREF_MAP_ONLYMINE_TILE = "MINE";
-    public static final String PREF_MAP_NOTMINE_TILE = "NOTMINE";
-    public static final String PREF_MAP_ALL_TILE = "ALL";
-    public static final String PREF_CONFIRM_UPLOAD_USER = "confirmUploadUser";
-    public static final String PREF_EXCLUDE_DISPLAY_ADDRS = "displayExcludeAddresses";
-    public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
-    public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
-    public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
-    public static final String PREF_START_AT_BOOT = "startAtBoot";
-    public static final String PREF_LOG_ROUTES = "logRoutes";
-    public static final String PREF_VISUALIZE_ROUTE = "visualizeRoute";
-    public static final String PREF_DAYNIGHT_MODE = "dayNightMode";
-
-    // what to speak on announcements
-    public static final String PREF_SPEECH_PERIOD = "speechPeriod";
-    public static final String PREF_SPEECH_GPS = "speechGPS";
-    public static final String PREF_SPEAK_RUN = "speakRun";
-    public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
-    public static final String PREF_SPEAK_NEW_CELL = "speakNewCell";
-    public static final String PREF_SPEAK_QUEUE = "speakQueue";
-    public static final String PREF_SPEAK_MILES = "speakMiles";
-    public static final String PREF_SPEAK_TIME = "speakTime";
-    public static final String PREF_SPEAK_BATTERY = "speakBattery";
-    public static final String PREF_SPEAK_SSID = "speakSsid";
-    public static final String PREF_SPEAK_WIFI_RESTART = "speakWifiRestart";
-
-    // map ssid filter
-    public static final String PREF_MAPF_REGEX = "mapfRegex";
-    public static final String PREF_MAPF_INVERT = "mapfInvert";
-    public static final String PREF_MAPF_OPEN = "mapfOpen";
-    public static final String PREF_MAPF_WEP = "mapfWep";
-    public static final String PREF_MAPF_WPA = "mapfWpa";
-    public static final String PREF_MAPF_CELL = "mapfCell";
-    public static final String PREF_MAPF_BT = "mapfBt";
-    public static final String PREF_MAPF_ENABLED = "mapfEnabled";
-    public static final String FILTER_PREF_PREFIX = "LA";
+    private static final long QUEUE_WARN_DEPTH = 500L;
+    private int dbQueueTextColor;
 
     // rank stats data
     public static final String PREF_RANK = "rank";
@@ -189,6 +108,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public static class LameStatic {
         public Location location;
         public int runNets;
+        public int runCells;
         public int runBt;
         public long newNets;
         public long newWifi;
@@ -200,6 +120,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         public int preQueueSize;
         public long dbNets;
         public long dbLocs;
+        public long currWifiScanDurMs;
         public DatabaseHelper dbHelper;
         public Set<String> runNetworks;
         public Set<String> runBtNetworks;
@@ -209,57 +130,69 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
     public static final LameStatic lameStatic = new LameStatic();
 
+    //ALIBI: DBs get big, and the grouping chars make fit hard
+    private final NumberFormat dbFormat = NumberFormat.getIntegerInstance();
     private boolean animating = false;
     private AnimatedVectorDrawableCompat scanningAnimation = null;
 
     static {
         final long maxMemory = Runtime.getRuntime().maxMemory();
         int cacheSize = 128;
-        if (maxMemory > 200000000L) {
-            cacheSize = 1024;
+        if (maxMemory > 400_000_000L) {
+            cacheSize = 4000; // cap at 4,000
         }
-        else if (maxMemory > 100000000L) {
-            cacheSize = 512;
+        else if (maxMemory > 50_000_000L) {
+            cacheSize = (int)(maxMemory / 100_000); // 100MiB == 1000 cache
         }
-        MainActivity.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
+        Logging.info("Heap: maxMemory: " + maxMemory + " cacheSize: " + cacheSize);
         lameStatic.networkCache = new ConcurrentLinkedHashMap<>(cacheSize);
     }
+
+    /**
+     * for the doing of things
+     */
+    public ExecutorService executor;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.list, container, false);
         final State state = MainActivity.getStaticState();
-
-        MainActivity.info("setupUploadButton");
+        final TextView tv = view.findViewById( R.id.db_status );
+        dbQueueTextColor = tv.getCurrentTextColor();
+        Logging.info("setupUploadButton");
         setupUploadButton(view);
-        MainActivity.info("setupList");
+        Logging.info("setupList");
         setupList(view);
-        MainActivity.info("setNetCountUI");
+        Logging.info("setNetCountUI");
         setNetCountUI(state, view);
-        MainActivity.info("setStatusUI");
-        setStatusUI(view, null);
-        MainActivity.info("setupLocation");
+        Logging.info("setStatusUI");
+        setScanStatusUI(view, null);
+        Logging.info("setupLocation");
         setupLocation(view);
+        dbFormat.setGroupingUsed(false);
 
         return view;
     }
 
     /**
      * hide/show bluetooth new total
-     * @param on
+     * @param on desired bluetooth state
      */
     public void toggleBluetoothStats(final boolean on) {
         try {
-            View fragRoot = this.getActivity().findViewById(android.R.id.content);
-            View btView = fragRoot.findViewById(R.id.bt_list_total);
-            if (on) {
-                btView.setVisibility(VISIBLE);
-            } else {
-                btView.setVisibility(GONE);
+            final Activity a = this.getActivity();
+            if (null != a) {
+                final View fragRoot = this.getActivity().findViewById(android.R.id.content);
+                final View btView = fragRoot.findViewById(R.id.bt_list_total);
+                if (on) {
+                    btView.setVisibility(VISIBLE);
+                } else {
+                    btView.setVisibility(GONE);
+                }
             }
         } catch (Exception ex) {
             //this shouldn't be a critical failure if the view's not present.
-            MainActivity.warn("Failed to toggle bluetooth new total to "+on);
+            Logging.warn("Failed to toggle bluetooth new total to "+on);
         }
     }
 
@@ -267,6 +200,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public void onCreate( final Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
+        executor =  Executors.newFixedThreadPool(3);
         setHasOptionsMenu(true);
     }
 
@@ -275,32 +209,66 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     }
 
     private void setNetCountUI( final State state, final View view ) {
-        if (view == null) {
+        if (view == null || state == null) {
             return;
         }
-        TextView tv = (TextView) view.findViewById( R.id.stats_run );
+
+        //ALIBI: the number of async requests to perform.
+        final Handler handler = new Handler(Looper.getMainLooper());
+        TextView tv = view.findViewById( R.id.stats_run );
         long netCount = state.wifiReceiver.getRunNetworkCount();
         if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
-        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount) );
-        tv = (TextView) view.findViewById( R.id.stats_wifi );
-        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewWifiCount()) );
-        tv = (TextView) view.findViewById( R.id.stats_cell );
-        tv.setText( ""+UINumberFormat.counterFormat(lameStatic.newCells)  );
-        tv = (TextView) view.findViewById( R.id.stats_bt );
-        tv.setText( ""+UINumberFormat.counterFormat(state.dbHelper.getNewBtCount())  );
-        tv = (TextView) view.findViewById( R.id.stats_dbnets );
-        tv.setText(""+state.dbHelper.getNetworkCount());
+        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNewWifiCount();
+            handler.post(() -> {
+                TextView text = view.findViewById( R.id.stats_wifi );
+                text.setText( UINumberFormat.counterFormat(count) );
+            });
+        });
+        tv = view.findViewById( R.id.stats_cell );
+        tv.setText( UINumberFormat.counterFormat(lameStatic.newCells));
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNewBtCount();
+            handler.post(() -> {
+                TextView text = view.findViewById( R.id.stats_bt );
+                text.setText( UINumberFormat.counterFormat(count) );
+            });
+        });
+        executor.execute(() -> {
+            final long count = state.dbHelper.getNetworkCount();
+            handler.post(() -> {
+                TextView text = view.findViewById( R.id.stats_dbnets );
+                text.setText(dbFormat.format(count)); //
+            });
+        });
     }
-
-    public void setStatusUI( String status ) {
-        setStatusUI(getView(), status);
-    }
-
-    public void setStatusUI( final View view, final String status ) {
+    public void setDBStatusUI(final View view, final String status, final long queueDepth ) {
         if ( status != null && view != null ) {
-            final TextView tv = view.findViewById( R.id.status );
+            final TextView tv = view.findViewById( R.id.db_status );
+            tv.setText( status );
+            if (queueDepth >= QUEUE_WARN_DEPTH) {
+                tv.setTextColor(Color.YELLOW); // if we've had queue problems, turn the UI field red
+            } else {
+                //Q: would it be more useful to leave the warning around until UI reset
+                tv.setTextColor(dbQueueTextColor);
+            }
+        }
+    }
+
+    public void setDBStatusUI(final String status, final long queueDepth ) {
+        setDBStatusUI(getView(), status, queueDepth);
+    }
+
+    public void setScanStatusUI(String status ) {
+        setScanStatusUI(getView(), status);
+    }
+
+    public void setScanStatusUI(final View view, final String status ) {
+        if ( status != null && view != null ) {
+            final TextView tv = view.findViewById( R.id.scan_status);
             tv.setText( status );
         }
         final MainActivity ma = MainActivity.getMainActivity();
@@ -321,11 +289,11 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     }
                 }
             } else {
-                MainActivity.error("Null activity context - can't set animation");
+                Logging.error("Null activity context - can't set animation");
             }
 
-            final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-            String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            String quickPausePref = prefs.getString(PreferenceKeys.PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
             if (!QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) {
                 scanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.off));
                 notScanningImageButton.setContentDescription(getString(R.string.scan)+" "+getString(R.string.on));
@@ -334,25 +302,19 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 notScanningImageButton.setContentDescription(getString(R.string.list_scanning_off));
             }
 
-            scanningImageButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
-                    if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
-                    if (QUICK_SCAN_PAUSE.equals(quickPausePref)) {
-                        toggleScan();
-                    } else {
-                        makeQuickPausePrefDialog(ma);
-                    }
+            scanningImageButton.setOnClickListener(buttonView -> {
+                String quickPausePref12 = prefs.getString(PreferenceKeys.PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+                if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref12)) return;
+                if (QUICK_SCAN_PAUSE.equals(quickPausePref12)) {
+                    toggleScan();
+                } else {
+                    makeQuickPausePrefDialog();
                 }
-           });
-            notScanningImageButton.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick( final View buttonView ) {
-                        String quickPausePref = prefs.getString(PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
-                        if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref)) return;
-                        toggleScan();
-                    }
+            });
+            notScanningImageButton.setOnClickListener(buttonView -> {
+                String quickPausePref1 = prefs.getString(PreferenceKeys.PREF_QUICK_PAUSE, QUICK_SCAN_UNSET);
+                if (QUICK_SCAN_DO_NOTHING.equals(quickPausePref1)) return;
+                toggleScan();
             });
         }
 
@@ -370,8 +332,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     public void setScanningStatusIndicator(boolean scanning) {
         View view = getView();
         if (view != null) {
-            final ImageButton scanningImageButton = (ImageButton) view.findViewById(R.id.scanning);
-            final ImageButton notScanningImageButton = (ImageButton) view.findViewById(R.id.not_scanning);
+            final ImageButton scanningImageButton = view.findViewById(R.id.scanning);
+            final ImageButton notScanningImageButton = view.findViewById(R.id.not_scanning);
             if (scanning) {
                 scanningImageButton.setVisibility(VISIBLE);
                 notScanningImageButton.setVisibility(GONE);
@@ -385,7 +347,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void onPause() {
-        MainActivity.info("LIST: paused.");
+        Logging.info("LIST: paused.");
         super.onPause();
         if (animating) {
             if (scanningAnimation != null) {
@@ -397,49 +359,59 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     @Override
     public void onResume() {
-        MainActivity.info( "LIST: resumed.");
+        Logging.info( "LIST: resumed.");
         super.onResume();
-        getActivity().setTitle(R.string.list_app_name);
+        final Activity a = getActivity();
+        if (null != a) {
+            a.setTitle(R.string.list_app_name);
+        }
+        State state = MainActivity.getStaticState();
+        if (null != state ) {
+            state.listAdapter.updateTheme(requireActivity().getBaseContext());
+        }
+
         //ALIBI: default status can confuse users on resume
-        MainActivity.info("setNetCountUI");
+        Logging.info("setNetCountUI");
         setNetCountUI(MainActivity.getStaticState(), getView());
-        setStatusUI(null);
+        setScanStatusUI(null);
         animating = false;
     }
 
     @Override
     public void onStart() {
-        MainActivity.info("LIST: start.");
+        Logging.info("LIST: start.");
         super.onStart();
     }
 
     @Override
     public void onStop() {
-        MainActivity.info( "LIST: stop.");
+        Logging.info( "LIST: stop.");
         super.onStop();
     }
 
     @Override
     public void onDestroyView() {
-        MainActivity.info( "LIST: onDestroyView.");
+        Logging.info( "LIST: onDestroyView.");
         super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "LIST: destroy.");
+        Logging.info( "LIST: destroy.");
+        executor.shutdown();
+        executor.shutdownNow();
         super.onDestroy();
     }
 
     @Override
     public void onDetach() {
-        MainActivity.info( "LIST: onDetach.");
+        Logging.info( "LIST: onDetach.");
         super.onDetach();
     }
 
     /* Creates the menu items */
     @Override
-    public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu (final Menu menu, @NonNull final MenuInflater inflater) {
         MenuItem item = menu.add(0, MENU_MAP, 0, getString(R.string.tab_map));
         item.setIcon( android.R.drawable.ic_menu_mapmode );
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
@@ -452,7 +424,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         item.setIcon( android.R.drawable.ic_menu_sort_alphabetically );
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        MainActivity main = MainActivity.getMainActivity(this);
+        final MainActivity main = MainActivity.getMainActivity(this);
         final String scan = (main == null || main.isScanning()) ? getString(R.string.off) : getString(R.string.on);
         item = menu.add(0, MENU_SCAN, 0, getString(R.string.scan) + " " + scan);
         item.setIcon((main == null || main.isScanning()) ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play);
@@ -462,19 +434,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         item = menu.add(0, MENU_WAKELOCK, 0, wake);
         item.setIcon( android.R.drawable.ic_menu_gallery );
 
-        final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-        boolean muted = prefs.getBoolean(PREF_MUTED, true);
-        item = menu.add(0, MENU_MUTE, 0,
-                muted ? getString(R.string.play) : getString(R.string.mute));
-        item.setIcon( muted ? android.R.drawable.ic_media_play
-                : android.R.drawable.ic_media_pause);
-
-        // item = menu.add(0, MENU_SETTINGS, 0, getString(R.string.menu_settings));
-        // item.setIcon( android.R.drawable.ic_menu_preferences );
-
-        // item = menu.add(0, MENU_EXIT, 0, getString(R.string.menu_exit));
-        // item.setIcon( android.R.drawable.ic_menu_close_clear_cancel );
-
+        final Activity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
+            item = menu.add(0, MENU_MUTE, 0,
+                    muted ? getString(R.string.play) : getString(R.string.mute));
+            item.setIcon(muted ? android.R.drawable.ic_media_play
+                    : android.R.drawable.ic_media_pause);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -482,6 +450,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     @Override
     public boolean onOptionsItemSelected( final MenuItem item ) {
         final MainActivity main = MainActivity.getMainActivity(this);
+        final FragmentActivity a = getActivity();
         switch ( item.getItemId() ) {
             case MENU_WAKELOCK: {
                 boolean screenLocked = ! MainActivity.isScreenLocked( this );
@@ -491,7 +460,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 return true;
             }
             case MENU_SORT: {
-                MainActivity.info("sort dialog");
+                Logging.info("sort dialog");
                 onCreateDialog( SORT_DIALOG );
                 return true;
             }
@@ -509,25 +478,31 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             }
             case MENU_FILTER:
                 final Intent intent = new Intent(getActivity(), FilterActivity.class);
-                getActivity().startActivity(intent);
+                if (null != a) {
+                    a.startActivity(intent);
+                }
                 return true;
             case MENU_MAP:
-                NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.left_drawer);
-                MenuItem mapMenuItem = navigationView.getMenu().findItem(R.id.nav_map);
-                mapMenuItem.setCheckable(true);
-                navigationView.setCheckedItem(R.id.nav_map);
+                if (null != a) {
+                    NavigationView navigationView = a.findViewById(R.id.left_drawer);
+                    MenuItem mapMenuItem = navigationView.getMenu().findItem(R.id.nav_map);
+                    mapMenuItem.setCheckable(true);
+                    navigationView.setCheckedItem(R.id.nav_map);
+                }
                 if (main != null) main.selectFragment(R.id.nav_map);
                 return true;
             case MENU_MUTE:
-                final SharedPreferences prefs = getActivity().getSharedPreferences(SHARED_PREFS, 0);
-                boolean muted = prefs.getBoolean(PREF_MUTED, true);
-                muted = ! muted;
-                Editor editor = prefs.edit();
-                editor.putBoolean(PREF_MUTED, muted);
-                editor.apply();
+                if (null != a) {
+                    final SharedPreferences prefs = a.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    boolean muted = prefs.getBoolean(PreferenceKeys.PREF_MUTED, true);
+                    muted = !muted;
+                    Editor editor = prefs.edit();
+                    editor.putBoolean(PreferenceKeys.PREF_MUTED, muted);
+                    editor.apply();
                 item.setTitle(muted ? getString(R.string.play) : getString(R.string.mute));
                 item.setIcon(muted ? android.R.drawable.ic_media_play
                         : android.R.drawable.ic_media_pause);
+                }
                 return true;
         }
         return false;
@@ -535,12 +510,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void handleScanChange(final MainActivity main, final View view ) {
         final boolean isScanning = main == null || main.isScanning();
-        MainActivity.info("list handleScanChange: isScanning now: " + isScanning );
+        Logging.info("list handleScanChange: isScanning now: " + isScanning );
         if ( isScanning ) {
-            setStatusUI(view, getString(R.string.list_scanning_on));
+            setScanStatusUI(view, getString(R.string.list_scanning_on));
         }
         else {
-            setStatusUI(view, getString(R.string.list_scanning_off));
+            setScanStatusUI(view, getString(R.string.list_scanning_off));
         }
     }
 
@@ -551,12 +526,15 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 dialogFragment = new SortDialog();
                 break;
             default:
-                MainActivity.error( "unhandled dialog: " + which );
+                Logging.error( "unhandled dialog: " + which );
         }
 
         if (dialogFragment != null) {
-            final FragmentManager fm = getActivity().getSupportFragmentManager();
-            dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+            final FragmentActivity a = getActivity();
+            if (null != a) {
+                final FragmentManager fm = a.getSupportFragmentManager();
+                dialogFragment.show(fm, MainActivity.LIST_FRAGMENT_TAG);
+            }
         }
     }
 
@@ -567,58 +545,61 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
             final Dialog dialog = getDialog();
             View view = inflater.inflate(R.layout.listdialog, container);
-            dialog.setTitle(getString(R.string.sort_title));
+            if (null != dialog) {
+                dialog.setTitle(getString(R.string.sort_title));
+            }
 
-            TextView text = (TextView) view.findViewById( R.id.text );
+            TextView text = view.findViewById( R.id.text );
             text.setText( getString(R.string.sort_spin_label) );
 
-            final SharedPreferences prefs = getActivity().getSharedPreferences( SHARED_PREFS, 0 );
-            final Editor editor = prefs.edit();
-
-            Spinner spinner = (Spinner) view.findViewById( R.id.sort_spinner );
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    getActivity(), android.R.layout.simple_spinner_item);
-            final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
-                    NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
-            final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
-                    getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
-            int listSort = prefs.getInt( PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
-            int periodIndex = 0;
-            for ( int i = 0; i < listSorts.length; i++ ) {
-                adapter.add( listSortName[i] );
-                if ( listSort == listSorts[i] ) {
-                    periodIndex = i;
+            final Activity a = getActivity();
+            if (null != a) {
+                final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final Editor editor = prefs.edit();
+                Spinner spinner = view.findViewById( R.id.sort_spinner );
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        getActivity(), android.R.layout.simple_spinner_item);
+                final int[] listSorts = new int[]{ NetworkListSorter.CHANNEL_COMPARE, NetworkListSorter.CRYPTO_COMPARE,
+                        NetworkListSorter.FIND_TIME_COMPARE, NetworkListSorter.SIGNAL_COMPARE, NetworkListSorter.SSID_COMPARE };
+                final String[] listSortName = new String[]{ getString(R.string.channel),getString(R.string.crypto),
+                        getString(R.string.found_time),getString(R.string.signal),getString(R.string.ssid) };
+                int listSort = prefs.getInt( PreferenceKeys.PREF_LIST_SORT, NetworkListSorter.SIGNAL_COMPARE );
+                int periodIndex = 0;
+                for ( int i = 0; i < listSorts.length; i++ ) {
+                    adapter.add( listSortName[i] );
+                    if ( listSort == listSorts[i] ) {
+                        periodIndex = i;
+                    }
                 }
+                adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
+                spinner.setAdapter( adapter );
+                spinner.setSelection( periodIndex );
+                spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
+                        // set pref
+                        final int listSort = listSorts[position];
+                        Logging.info( PreferenceKeys.PREF_LIST_SORT + " setting list sort: " + listSort );
+                        editor.putInt( PreferenceKeys.PREF_LIST_SORT, listSort );
+                        editor.apply();
+                    }
+                    @Override
+                    public void onNothingSelected( final AdapterView<?> arg0 ) {}
+                });
             }
-            adapter.setDropDownViewResource( android.R.layout.simple_spinner_dropdown_item );
-            spinner.setAdapter( adapter );
-            spinner.setSelection( periodIndex );
-            spinner.setOnItemSelectedListener( new OnItemSelectedListener() {
-                @Override
-                public void onItemSelected( final AdapterView<?> parent, final View v, final int position, final long id ) {
-                    // set pref
-                    final int listSort = listSorts[position];
-                    MainActivity.info( PREF_LIST_SORT + " setting list sort: " + listSort );
-                    editor.putInt( PREF_LIST_SORT, listSort );
-                    editor.apply();
-                }
-                @Override
-                public void onNothingSelected( final AdapterView<?> arg0 ) {}
-            });
 
-            Button ok = (Button) view.findViewById( R.id.listdialog_button );
-            ok.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    try {
+            Button ok = view.findViewById( R.id.listdialog_button );
+            ok.setOnClickListener(buttonView -> {
+                try {
+                    if (null != dialog) {
                         dialog.dismiss();
                     }
-                    catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing sort dialog: " + ex );
-                    }
                 }
-            } );
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing sort dialog: " + ex );
+                }
+            });
 
             return view;
         }
@@ -627,53 +608,62 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     // why is this even here? this is stupid. via:
     // http://stackoverflow.com/questions/456211/activity-restart-on-rotation-android
     @Override
-    public void onConfigurationChanged( final Configuration newConfig ) {
+    public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
         final MainActivity main = MainActivity.getMainActivity(this);
         final State state = MainActivity.getStaticState();
 
-        MainActivity.info( "LIST: on config change" );
-        MainActivity.setLocale( this.getActivity(), newConfig);
+        Logging.info( "LIST: on config change" );
+        final FragmentActivity a = this.getActivity();
+        if (null != a) {
+            MainActivity.setLocale( a, newConfig);
+        }
         super.onConfigurationChanged( newConfig );
         // getActivity().setContentView( R.layout.list );
 
         // have to redo linkages/listeners
-        setupUploadButton(getView());
-        setNetCountUI( state, getView() );
-        setLocationUI(main, getView());
-        setStatusUI(getView(), state.previousStatus);
+        final View v = getView();
+        if (null != v) {
+            setupUploadButton(v);
+            setNetCountUI(state, v);
+            if (null != main) {
+                setLocationUI(main, v);
+            }
+            if (null != state) {
+                setScanStatusUI(v, state.previousStatus);
+            }
+        }
     }
 
-    private void setupList( final View view ) {
+    private void setupList(final View view ) {
         State state = MainActivity.getStaticState();
-        if (state.listAdapter == null) {
-            state.listAdapter = new SetNetworkListAdapter( getActivity(), R.layout.row );
+        if (null != state && state.listAdapter == null) {
+            state.listAdapter = new SetNetworkListAdapter(requireActivity().getBaseContext(), R.layout.row );
         }
         // always set our current list adapter
-        state.wifiReceiver.setListAdapter(state.listAdapter);
-        if (null != state.bluetoothReceiver) {
-            state.bluetoothReceiver.setListAdapter(state.listAdapter);
+        if (null != state) {
+            state.wifiReceiver.setListAdapter(state.listAdapter);
+            if (null != state.bluetoothReceiver) {
+                state.bluetoothReceiver.setListAdapter(state.listAdapter);
+            }
+            final ListView listView = view.findViewById( R.id.ListView01 );
+            setupListAdapter(listView, getActivity(), state.listAdapter, false);
         }
-        final ListView listView = view.findViewById( R.id.ListView01 );
-        setupListAdapter(listView, getActivity(), state.listAdapter, false);
     }
 
     public static void setupListAdapter( final ListView listView, final FragmentActivity activity,
                                          final SetNetworkListAdapter listAdapter, final boolean isDbResult) {
 
         listView.setAdapter(listAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, final long id) {
-                final Network network = (Network) parent.getItemAtPosition(position);
-                if (network != null) {
-                    MainActivity.getNetworkCache().put(network.getBssid(), network);
-                    final Intent intent = new Intent(activity, NetworkActivity.class);
-                    intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());
-                    intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
-                    activity.startActivity(intent);
-                } else {
-                    MainActivity.error("Null network onItemClick - ignoring");
-                }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            final Network network = (Network) parent.getItemAtPosition(position);
+            if (network != null && activity != null) {
+                MainActivity.getNetworkCache().put(network.getBssid(), network);
+                final Intent intent = new Intent(activity, NetworkActivity.class);
+                intent.putExtra(NETWORK_EXTRA_BSSID, network.getBssid());
+                intent.putExtra(NETWORK_EXTRA_IS_DB_RESULT, isDbResult);
+                activity.startActivity(intent);
+            } else {
+                Logging.error("Null network onItemClick - ignoring");
             }
         });
     }
@@ -681,7 +671,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
     private void setupLocation( final View view ) {
         // set on UI if we already have one
         final MainActivity main = MainActivity.getMainActivity(this);
-        setLocationUI(main, view);
+        if (null != main) {
+            setLocationUI(main, view);
+        }
         handleScanChange(main, view);
     }
 
@@ -691,7 +683,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void setLocationUI( final MainActivity main, final View view ) {
         final State state = main.getState();
-        if ( state.gpsListener == null ) {
+        if ( state.GNSSListener == null ) {
             return;
         }
         if ( view == null ) {
@@ -699,12 +691,12 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         }
 
         try {
-            TextView tv = view.findViewById( R.id.LocationTextView06 );
-            tv.setText( getString(R.string.list_short_sats) + " " + state.gpsListener.getSatCount() );
+            TextView tv = view.findViewById( R.id.sats_text);
+            tv.setText( getString(R.string.list_short_sats, state.GNSSListener.getSatCount()) );
 
-            final Location location = state.gpsListener.getLocation();
+            final Location location = state.GNSSListener.getCurrentLocation();
 
-            tv = view.findViewById( R.id.LocationTextView01 );
+            tv = view.findViewById( R.id.lat_text);
             String latText;
             if ( location == null ) {
                 if ( main.isScanning() ) {
@@ -718,42 +710,43 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             else {
                 latText = state.numberFormat8.format( location.getLatitude() );
             }
-            tv.setText( getString(R.string.list_short_lat) + " " + latText );
+            tv.setText( getString(R.string.list_short_lat, latText ));
 
-            tv = view.findViewById( R.id.LocationTextView02 );
-            tv.setText( getString(R.string.list_short_lon) + " " + (location == null ? "" : state.numberFormat8.format( location.getLongitude() ) ) );
+            tv = view.findViewById( R.id.lon_text);
+            tv.setText( getString(R.string.list_short_lon, (location == null) ? "" : state.numberFormat8.format( location.getLongitude() )) );
 
-            tv = view.findViewById( R.id.LocationTextView03 );
-            tv.setText( getString(R.string.list_speed) + " " + (location == null ? "" : metersPerSecondToSpeedString(state.numberFormat1, getActivity(), location.getSpeed()) ) );
+            tv = view.findViewById( R.id.speed_text);
+            final Activity a = getActivity();
+            if (null != a) {
+                tv.setText(getString(R.string.list_speed, (location == null) ? "" : metersPerSecondToSpeedString(state.numberFormat1, a, location.getSpeed())));
+            }
 
-            TextView tv4 = view.findViewById( R.id.LocationTextView04 );
-            TextView tv5 = view.findViewById( R.id.LocationTextView05 );
+            TextView tv4 = view.findViewById( R.id.accuracy_text);
+            TextView tv5 = view.findViewById( R.id.alt_text);
             if ( location == null ) {
                 tv4.setText( "" );
                 tv5.setText( "" );
             } else {
-                if (main != null) {
-                    final SharedPreferences prefs = main.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                    final String distString = UINumberFormat.metersToString(prefs,
-                            state.numberFormat0, main, location.getAccuracy(), true);
-                    tv4.setText("+/- " + distString);
-                    final String accString = UINumberFormat.metersToString(prefs,
-                            state.numberFormat0, main, (float) location.getAltitude(), true);
-                    tv5.setText(getString(R.string.list_short_alt) + " " + accString);
-                }
+                final SharedPreferences prefs = main.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                final String distString = UINumberFormat.metersToString(prefs,
+                        state.numberFormat0, main, location.getAccuracy(), true);
+                tv4.setText("+/- " + distString);
+                final String accString = UINumberFormat.metersToString(prefs,
+                        state.numberFormat0, main, (float) location.getAltitude(), true);
+                tv5.setText(getString(R.string.list_short_alt, accString));
             }
         }
         catch ( IncompatibleClassChangeError ex ) {
             // yeah, saw this in the wild, who knows.
-            MainActivity.error( "wierd ex: " + ex, ex);
+            Logging.error( "wierd ex: " + ex, ex);
         }
     }
 
     public static String metersPerSecondToSpeedString( final NumberFormat numberFormat, final Context context,
                                                        final float metersPerSecond ) {
 
-        final SharedPreferences prefs = context.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean metric = prefs.getBoolean( ListFragment.PREF_METRIC, false );
+        final SharedPreferences prefs = context.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+        final boolean metric = prefs.getBoolean( PreferenceKeys.PREF_METRIC, false );
 
         String retval;
         if ( metric ) {
@@ -767,74 +760,89 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private void setupUploadButton( final View view ) {
         final Button button = view.findViewById( R.id.upload_button );
-
-        if (MainActivity.getMainActivity().isTransferring()) {
-            button.setEnabled(false);
-        }
-
-        button.setOnClickListener( new OnClickListener() {
-            @Override
-            public void onClick( final View view ) {
-                final MainActivity main = MainActivity.getMainActivity( ListFragment.this );
-                if (main == null) {return;}
-                final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
-                final State state = MainActivity.getStaticState();
-
-                if (userConfirmed) {
-                    uploadFile( state.dbHelper );
-                } else {
-                    makeUploadDialog(main);
-                }
+        if (null != button) {
+            MainActivity m = MainActivity.getMainActivity();
+            if (null != m && m.isTransferring()) {
+                button.setEnabled(false);
             }
-        });
+
+            button.setOnClickListener(view1 -> {
+                final MainActivity main = MainActivity.getMainActivity(ListFragment.this);
+                if (main == null) {
+                    return;
+                }
+                final FragmentActivity a = getActivity();
+                if (null != a) {
+                    final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+                    final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
+                    final State state = MainActivity.getStaticState();
+
+                    if (userConfirmed && null != state) {
+                        uploadFile();
+                    } else {
+                        makeUploadDialog(main);
+                    }
+                }
+            });
+        }
     }
 
     public void makeUploadDialog(final MainActivity main) {
-        final SharedPreferences prefs = main.getSharedPreferences( ListFragment.SHARED_PREFS, 0 );
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
+        final SharedPreferences prefs = main.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
+        final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
         final String username = beAnonymous? "anonymous":
-                prefs.getString( ListFragment.PREF_USERNAME, "anonymous" );
+                prefs.getString( PreferenceKeys.PREF_USERNAME, "anonymous" );
 
         final String text = getString(R.string.list_upload) + "\n" + getString(R.string.username) + ": " + username;
-        MainActivity.createConfirmation( ListFragment.this.getActivity(), text, R.id.nav_list, UPLOAD_DIALOG);
+        final FragmentActivity a = getActivity();
+        if (null != a) {
+            WiGLEConfirmationDialog.createConfirmation(a, text, R.id.nav_list, UPLOAD_DIALOG);
+        }
     }
 
-    public void makeQuickPausePrefDialog(final MainActivity main) {
+    public void makeQuickPausePrefDialog() {
         final String dialogText = getString(R.string.quick_pause_text);
         final String checkboxText = getString(R.string.quick_pause_decision);
-        MainActivity.createCheckboxConfirmation(ListFragment.this.getActivity(), dialogText, checkboxText,
-                ListFragment.PREF_QUICK_PAUSE, ListFragment.QUICK_SCAN_PAUSE,
-                ListFragment.QUICK_SCAN_DO_NOTHING, R.id.nav_list, QUICK_PAUSE_DIALOG);
+        final FragmentActivity a = getActivity();
+        if (null != a) {
+            WiGLEConfirmationDialog.createCheckboxConfirmation(a, dialogText, checkboxText,
+                    PreferenceKeys.PREF_QUICK_PAUSE, ListFragment.QUICK_SCAN_PAUSE,
+                    ListFragment.QUICK_SCAN_DO_NOTHING, R.id.nav_list, QUICK_PAUSE_DIALOG);
+        }
     }
 
     @Override
     public void handleDialog(final int dialogId) {
-        final SharedPreferences prefs = getActivity().getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-        final SharedPreferences.Editor editor = prefs.edit();
-        switch (dialogId) {
-            case UPLOAD_DIALOG:
-                final State state = MainActivity.getStaticState();
-                final boolean userConfirmed = prefs.getBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER,false);
-                final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
+        final FragmentActivity a = getActivity();
+        if (null != a) {
+            final SharedPreferences prefs = getActivity().getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final SharedPreferences.Editor editor = prefs.edit();
+            switch (dialogId) {
+                case UPLOAD_DIALOG:
+                    final State state = MainActivity.getStaticState();
+                    final boolean userConfirmed = prefs.getBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, false);
+                    final String authUser = prefs.getString(PreferenceKeys.PREF_AUTHNAME, "");
 
-                if (!userConfirmed && !authUser.isEmpty()) {
-                    //remember the confirmation
-                    editor.putBoolean(ListFragment.PREF_CONFIRM_UPLOAD_USER, true);
-                    editor.apply();
-                }
-                uploadFile( state.dbHelper );
-                break;
-            case QUICK_PAUSE_DIALOG:
-                MainActivity.info("quick pause callback");
-                toggleScan();
-            default:
-                MainActivity.warn("ListFragment unhandled dialogId: " + dialogId);
+                    if (!userConfirmed && !authUser.isEmpty()) {
+                        //remember the confirmation
+                        editor.putBoolean(PreferenceKeys.PREF_CONFIRM_UPLOAD_USER, true);
+                        editor.apply();
+                    }
+                    if (null != state) {
+                        uploadFile();
+                    }
+                    break;
+                case QUICK_PAUSE_DIALOG:
+                    Logging.info("quick pause callback");
+                    toggleScan();
+                default:
+                    Logging.warn("ListFragment unhandled dialogId: " + dialogId);
+            }
         }
     }
 
-    public void uploadFile( final DatabaseHelper dbHelper ){
-        MainActivity.info( "upload file" );
+    public void uploadFile () {
+        Logging.info( "upload file" );
         final MainActivity main = MainActivity.getMainActivity(this);
         if (main == null) { return; }
         final State state = main.getState();
@@ -846,7 +854,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         try {
             state.observationUploader.startDownload(this);
         } catch (WiGLEAuthException waex) {
-            MainActivity.warn("Authentication failure on run upload");
+            Logging.warn("Authentication failure on run upload");
         }
     }
 
@@ -858,7 +866,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
             throws WiGLEAuthException {
         final MainActivity main = MainActivity.getMainActivity( this );
         if (main == null) {
-            MainActivity.warn("No main for requestComplete");
+            Logging.warn("No main for requestComplete");
         }
         else {
             main.transferComplete();

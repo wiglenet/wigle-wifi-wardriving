@@ -81,12 +81,12 @@
     <string name="filter_enabled">Suodattimen käyttöön</string>
     <string name="list_waiting_gps">(Odotetaan GPS Sync&#8230;)</string>
     <string name="list_scanning_off">(Skannaus sammutettu)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">SATS:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">SATS: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(Status)</string>
-    <string name="list_speed">Nopeus:</string>
+    <string name="list_speed">Nopeus: %1$s</string>
     <string name="list_upload">Lataa tiedosto?</string>
     <string name="network_signal">Signal:</string>
     <string name="network_type">Tyyppi:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">Peruuta</string>
     <string name="dash_scan_off">(Skannaus sammutettu)</string>
     <string name="dash_new_wifi">Uusi WiFi</string>
-    <string name="dash_vis_nets">Näkyvä Nets:</string>
-    <string name="dash_new_upload">Uusi Nets Koska Tallennettu:</string>
+    <string name="dash_vis_nets">Näkyvä Nets: %1$d</string>
+    <string name="dash_new_upload">Uusi Nets Koska Tallennettu: %1$d</string>
     <string name="dash_new_cells">Uusi Cell</string>
     <string name="dash_new_bt">Uusi Bluetooth</string>
     <string name="dash_dist_run">Run Matka:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Skannauksen kesto:</string>
     <string name="dash_dist_total">Yhteensä Dist.:</string>
     <string name="dash_dist_prev">Edellinen Run:</string>
-    <string name="dash_db_queue">DB jonoon:</string>
-    <string name="dash_db_nets">DB Nets:</string>
-    <string name="dash_db_locs">DB Toimipaikat:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB jonoon: %1$s</string>
+    <string name="dash_db_nets">DB Nets: %1$s</string>
+    <string name="dash_db_locs">DB Toimipaikat: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">kilometriä</string>
@@ -146,7 +147,7 @@
     <string name="run">Suorita</string>
     <string name="new_word">Uusi</string>
     <string name="db">DB</string>
-    <string name="scanned_in">skannataan</string>
+    <string name="scanned_in">%1$d skannataan %2$d%3$s.</string>
     <string name="sort_title">Lajittele Options</string>
     <string name="sort_spin_label">Lajittele lista:</string>
     <string name="channel">Kanava</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (puola)</string>
     <string name="language_pt">português (portugali)</string>
     <string name="language_pt_rBR">português brasileiro (brasilianportugali)</string>
+    <string name="language_ro_rRO">Română (romanialainen)</string>
     <string name="language_ru">ру́сский (venäjä)</string>
     <string name="language_sv">svenska (ruotsi)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Karttatyyppi: Hybridi</string>
     <string name="map_toast_terrain">Karttatyyppi: Maasto</string>
     <string name="map_needs_playservice">Kartta vaatii Google Play -palvelun</string>
-    <string name="register">Rekisteröidy</string>
     <string name="drawer_open">Laatikko auki</string>
     <string name="drawer_close">Laatikko suljettu</string>
     <string name="site_stats_app_name">WiGLE.net-tilastot</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">Sijoitukset</string>
     <string name="uploads_app_name">WiGLE.net-lataukset</string>
     <string name="tab_uploads">Lataukset</string>
-    <string name="queue_depth">Tiedoston käsittelyjonon syvyys</string>
+    <string name="queue_depth">WiGLE-jono: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net-uutiset</string>
     <string name="tab_news">Uutiset</string>
     <string name="bytes">Tavua</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Käyttäjien sijoitus viime kuussa</string>
     <string name="prevmonthrank_title">Kuukauden sijoitus viime kuussa</string>
     <string name="list_scanning_on">(Skannaus käytössä)</string>
-    <string name="activate">Aktivoi nyt</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Jäsennys…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Kevyt</string>
     <string name="theme_dark_label">Tumma</string>
     <string name="theme_follow_label">Seuraa järjestelmää</string>
+    <string name="manage_gpx_button">Tallennetut reitit</string>
+    <string name="manage_gpx">Hallinnoi tallennettuja GPX-reittejä</string>
+    <string name="enable_map_theme">Yhdistä karttateema sovellukseen</string>
+    <string name="throttle">WiFi-skannaus on rajoitettu. Poista WiFi Scan Throttle käytöstä kehittäjäasetuksista parantaaksesi suorituskykyä.</string>
+    <string name="no_individual_nets_map">Poista karttaverkon näyttö käytöstä</string>
+    <string name="filter_show_btle">Näytä Bluetooth LE</string>
+    <string name="settings_gps_head">GPS-asetukset</string>
+    <string name="enable_kalman">Suodata GPS-kohinaa</string>
+    <string name="gps_old_message">Tätä laitetta ei enää tueta sovelluskaupassa Googlen käytäntöjen vuoksi. Varmuuskopioi tietosi ja lataa WiGLE v. 2.67 .apk (tai vanhempi) osoitteesta https://github.com/wiglenet/wigle-wifi-wardriving/ . Anteeksi häiriö!</string>
+    <string name="gps_old_title">GPS:n alustus epäonnistui</string>
+    <string name="enable_map_bearing">Seuraa suuntiani/suuntaani</string>
+    <string name="login_title">Sisäänkirjautuminen vaaditaan</string>
+    <string name="login_required">Sinun täytyy olla kirjautunut sisään tehdäksesi tämän. Ole hyvä ja kirjaudu sisään tai luo tili tarvittaessa.</string>
+    <string name="login">Kirjaudu sisään</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Rekisteröidy&lt;/a&gt; @WiGLE.net tai &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivoi nyt QR-koodilla&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">BLE-toimittajan tunnus:</string>
 </resources>

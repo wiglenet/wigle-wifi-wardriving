@@ -1,3 +1,59 @@
+* 2.79 - 2.80 (09/07/2023)
+Bluetooth device manufacturer information displayed
+Stop multiple notification alerts on older devices
+Android is now forcing approval for posting notification
+Layout fixes around long strings
+Various bug/leak fixes
+
+* 2.78 (08/10/2023)
+Secrets plugin (thanks Sidharth!)
+Bug fixes (NPE, timeout, timezone, dialog dismissal)
+
+* 2.77 (06/17/2023)
+Bump SQLite library version (thanks Sidharth!)
+Bug fixes (DBResults, SettingsFragment, ApiManager, etc)
+
+* 2.76 (06/06/2023)
+Network detail UI cleanup
+Setting fragment crash fix
+More accurate pending file stats
+
+* 2.75 (05/30/2023)
+App resize on newer Android versions
+Kml sanitization (thanks Krzysztof!)
+Stats loading animations
+Various bug fixes
+
+* 2.74 (05/02/2023)
+Various bug fixes including scroll paging, DBResult NPE
+
+* 2.73 (04/22/2023)
+Various bug fixes
+
+* 2.72 (04/10/2023)
+Updated notification design
+Various bug fixes
+
+* 2.68 - 2.71 (03/19/2023)
+Minimum SDK update to satisfy Google's new requirements
+GNSSStatus LocationManager changes
+Fixes for start-on-boot in Android 10+ (requires manual prefs config update)
+Adding stats badge to user stats view
+
+* 2.65 - 2.67 (10/10/2022)
+German language fixes (thanks rumpelyann!)
+Various polish/log/toast improvements (thanks Krzysztofz01!)
+Magic 8 Ball bugfix
+Defaulting distance units
+Route points updates
+Optional map styling
+
+* 2.64 (02/27/2022)
+Fix Polish toast text (thanks olekstomek!)
+French updates (thanks k4nfr3!)
+GPX browser and clearer filenames
+Library updates
+
 * 2.61 - 2.63 (09/19/2021)
 Fix for Android security update turning off GPS when screen is off
 Preferences for dark/light/follow display theme mode in SDK 28 and up devices

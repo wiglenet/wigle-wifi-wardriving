@@ -81,12 +81,12 @@
     <string name="filter_enabled">Filter ynskeakele</string>
     <string name="list_waiting_gps">(Wachtsje op GPS-fix&#8230;)</string>
     <string name="list_scanning_off">(Scan is út)</string>
-    <string name="list_short_lat">Bre:</string>
-    <string name="list_short_lon">Lin:</string>
-    <string name="list_short_sats">Sat:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Bre: %1$s</string>
+    <string name="list_short_lon">Lin: %1$s</string>
+    <string name="list_short_sats">Sat: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(status)</string>
-    <string name="list_speed">Faasje:</string>
+    <string name="list_speed">Faasje: %1$s</string>
     <string name="list_upload">Bestân uploaden?</string>
     <string name="network_signal">Sinjaal:</string>
     <string name="network_type">Type:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">Annulearje</string>
     <string name="dash_scan_off">Scan is út</string>
     <string name="dash_new_wifi">Nije WiFi</string>
-    <string name="dash_vis_nets">Sichtbere netwurken:</string>
-    <string name="dash_new_upload">Nije netwurken sûnt lêste upload:</string>
+    <string name="dash_vis_nets">Sichtbere netwurken: %1$d</string>
+    <string name="dash_new_upload">Nije netwurken sûnt lêste upload: %1$d</string>
     <string name="dash_new_cells">Nije stjoermêsten</string>
     <string name="dash_new_bt">Nije Bluetooth</string>
     <string name="dash_dist_run">Runôfstân:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Scanduur:</string>
     <string name="dash_dist_total">Totale ôfstân:.</string>
     <string name="dash_dist_prev">Foarige run:</string>
-    <string name="dash_db_queue">DB-wachtrige:</string>
-    <string name="dash_db_nets">DB-netwurken:</string>
-    <string name="dash_db_locs">DB-lokaasjes:</string>
-    <string name="dash_short_loc">Loc:</string>
+    <string name="dash_db_queue">DB-wachtrige: %1$s</string>
+    <string name="dash_db_nets">DB-netwurken: %1$s</string>
+    <string name="dash_db_locs">DB-lokaasjes: %1$s</string>
+    <string name="dash_short_loc">Loc: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">my</string>
     <string name="miles">myl</string>
@@ -146,7 +147,7 @@
     <string name="run">yn run</string>
     <string name="new_word">Nij</string>
     <string name="db">DB</string>
-    <string name="scanned_in">scand yn</string>
+    <string name="scanned_in">%1$d scand yn %2$d%3$s.</string>
     <string name="sort_title">Sorteerynstellingen</string>
     <string name="sort_spin_label">Sorteren op:</string>
     <string name="channel">Kanaal</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (Poalsk)</string>
     <string name="language_pt">português (Portegeesk)</string>
     <string name="language_pt_rBR">português brasileiro (Braziliaanske-Portegeesk)</string>
+    <string name="language_ro_rRO">Română (Roemeense)</string>
     <string name="language_ru">ру́сский (Russysk)</string>
     <string name="language_sv">svenska (Sweedsk)</string>
     <string name="language_sw">Kiswahili (Swahili)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Kaarttype: hybride</string>
     <string name="map_toast_terrain">Kaarttype: Terrein</string>
     <string name="map_needs_playservice">Map vereist Google Play Service</string>
-    <string name="register">Registreren</string>
     <string name="drawer_open">Lade open</string>
     <string name="drawer_close">Lade gesloten</string>
     <string name="site_stats_app_name">WiGLE.net Statistieken</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">Ranglist</string>
     <string name="uploads_app_name">WiGLE.net Uploads</string>
     <string name="tab_uploads">Uploads</string>
-    <string name="queue_depth">Djipte fan bestânferwurkjende wachtrige</string>
+    <string name="queue_depth">WiGLE-wachtrij: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net Nijs</string>
     <string name="tab_news">Nijs</string>
     <string name="bytes">Bytes</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Meidogger Ranking Lêste Moanne</string>
     <string name="prevmonthrank_title">Moanne Ranglist Lêste Moanne</string>
     <string name="list_scanning_on">(Scannen ynskeakele)</string>
-    <string name="activate">no aktivearje</string>
     <string name="setting_activate_prompt">visit https://wigle.net/activate for your user code</string>
     <string name="upload_queued">Queued</string>
     <string name="upload_parsing">Parsing…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Lichte</string>
     <string name="theme_dark_label">Donkere</string>
     <string name="theme_follow_label">Volg systeem</string>
+    <string name="manage_gpx_button">Opgeslagen routes</string>
+    <string name="manage_gpx">Beheer opgeslagen GPX-routes</string>
+    <string name="enable_map_theme">Match kaartthema met app</string>
+    <string name="throttle">WiFi-scannen is beperkt. Schakel WiFi Scan Throttle uit onder Ontwikkelaarsinstellingen voor betere prestaties.</string>
+    <string name="no_individual_nets_map">Kaartnetweergave uitschakelen</string>
+    <string name="filter_show_btle">Toon Bluetooth LE</string>
+    <string name="settings_gps_head">GPS-instellingen</string>
+    <string name="enable_kalman">GPS-ruis filteren</string>
+    <string name="gps_old_message">Dit apparaat wordt niet langer ondersteund via de app store vanwege het beleid van Google. Maak een back-up van uw gegevens en laad de WiGLE v. 2.67 .apk (of lager) vanaf https://github.com/wiglenet/wigle-wifi-wardriving/. Excuses voor het ongemak!</string>
+    <string name="gps_old_title">GPS kan niet worden geïnitialiseerd</string>
+    <string name="enable_map_bearing">Volg mijn peiling/koers</string>
+    <string name="login_title">Aanmelden vereist</string>
+    <string name="login_required">Hiervoor moet u ingelogd zijn. Log in of maak indien nodig een account aan.</string>
+    <string name="login">Log in</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registreer&lt;/a&gt; @WiGLE.net of &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;activeer nu met QR-code&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID\'s:</string>
+    <string name="ble_vendor">BLE-leveranciers-ID:</string>
 </resources>

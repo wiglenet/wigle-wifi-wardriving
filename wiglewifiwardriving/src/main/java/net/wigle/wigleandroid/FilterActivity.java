@@ -9,12 +9,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+
 /**
  * Building a filter activity for the network list
  * Created by arkasha on 20170801.
  */
-
-@SuppressWarnings("deprecation")
 public class FilterActivity extends AppCompatActivity {
 
     public static final String ADDR_FILTER_MESSAGE = "net.wigle.wigleandroid.filter.MESSAGE";
@@ -24,7 +26,7 @@ public class FilterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.filtersettings);
 
@@ -33,9 +35,9 @@ public class FilterActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View view = findViewById(android.R.id.content);
-        MainActivity.info("Filter Fragment Selected");
-        final EditText regex = (EditText) findViewById( R.id.edit_regex );
-        final String regexKey = ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_REGEX;
+        Logging.info("Filter Fragment Selected");
+        final EditText regex = findViewById( R.id.edit_regex );
+        final String regexKey = PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;
         regex.setText( prefs.getString(regexKey, "") );
 
         regex.addTextChangedListener( new SettingsFragment.SetWatcher() {
@@ -56,39 +58,35 @@ public class FilterActivity extends AppCompatActivity {
             }
         });
 
-        MainActivity.prefBackedCheckBox(this , view, R.id.showinvert,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showopen,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwep,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WEP, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwpa,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_WPA, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_CELL, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
-        MainActivity.prefBackedCheckBox(this, view, R.id.showbt,
-                ListFragment.FILTER_PREF_PREFIX + ListFragment.PREF_MAPF_BT, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
+        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbt,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BT, true);
+        PrefsBackedCheckbox.prefBackedCheckBox(this, view, R.id.showbtle,
+                PreferenceKeys.FILTER_PREF_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true);
 
-        final Button filter_display_button = (Button) view.findViewById(R.id.display_filter_button);
-        filter_display_button.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( final View view ) {
-                final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
-                macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_DISPLAY_FILTER);
-                startActivity( macFilterIntent );
-            }
+        final Button filter_display_button = view.findViewById(R.id.display_filter_button);
+        filter_display_button.setOnClickListener(view1 -> {
+            final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
+            macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_DISPLAY_FILTER);
+            startActivity( macFilterIntent );
         });
 
-        final Button filter_log_button = (Button) view.findViewById(R.id.log_filter_button);
-        filter_log_button.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick( final View view ) {
-                final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
-                macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_LOG_FILTER);
-                startActivity( macFilterIntent );
-            }
+        final Button filter_log_button = view.findViewById(R.id.log_filter_button);
+        filter_log_button.setOnClickListener(view12 -> {
+            final Intent macFilterIntent = new Intent(getApplicationContext(), MacFilterActivity.class );
+            macFilterIntent.putExtra(ADDR_FILTER_MESSAGE, INTENT_LOG_FILTER);
+            startActivity( macFilterIntent );
         });
 
     }

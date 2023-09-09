@@ -1,6 +1,7 @@
 package net.wigle.wigleandroid.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.view.View;
@@ -18,6 +19,7 @@ import net.wigle.wigleandroid.R;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -85,6 +87,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
                 case GSM:
                 case WCDMA:
                 case LTE:
+                case NR:
                     addCell(network);
                     break;
                 case BT:
@@ -155,7 +158,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
                 return networks.get(pPosition).getBssid().hashCode();
             }
         } catch (final IndexOutOfBoundsException ex) {
-            MainActivity.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
+            Logging.info("index out of bounds on getItem: " + pPosition + " ex: " + ex, ex);
         }
         return 0L;
     }
@@ -186,7 +189,7 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             network = getItem(position);
         } catch (final IndexOutOfBoundsException ex) {
             // yes, this happened to someone
-            MainActivity.info("index out of bounds: " + position + " ex: " + ex);
+            Logging.info("index out of bounds: " + position + " ex: " + ex);
             return row;
         }
 
@@ -220,6 +223,11 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
         final String ouiString = network.getOui(ListFragment.lameStatic.oui);
         final String sep = ouiString.length() > 0 ? " - " : "";
         tv.setText(ouiString + sep);
+        if (NetworkType.BLE.equals(network.getType())) {
+            tv.setTextAppearance(R.style.ListBt);
+        } else {
+            tv.setTextAppearance(R.style.ListOui);
+        }
 
         tv = row.findViewById(R.id.time);
         tv.setText(NetworkListUtil.getConstructionTime(format, network));
@@ -232,6 +240,18 @@ public final class SetNetworkListAdapter extends AbstractListAdapter<Network> {
             tv.setTextColor(NetworkListUtil.getSignalColor(level, false));
         }
         tv.setText(Integer.toString(level));
+
+        tv = row.findViewById(R.id.mac_string);
+        tv.setText(network.getBssid());
+
+        tv = row.findViewById(R.id.chan_freq_string);
+        if (NetworkType.WIFI.equals(network.getType())) {
+            tv.setText(network.getFrequency()+"MHz");
+        } else if (NetworkType.BLE.equals(network.getType())) {
+            tv.setText(network.getType().toString());
+        } else {
+            tv.setText("");
+        }
 
         tv = row.findViewById(R.id.detail);
         String det = network.getDetail();

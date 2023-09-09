@@ -81,12 +81,12 @@
     <string name="filter_enabled">筛选器已启用</string>
     <string name="list_waiting_gps">（等待GPS同步&#8230;）</string>
     <string name="list_scanning_off">（扫描关闭的网络）</string>
-    <string name="list_short_lat">纬度：</string>
-    <string name="list_short_lon">经度：</string>
-    <string name="list_short_sats">卫星：</string>
-    <string name="list_short_alt">海拔：</string>
+    <string name="list_short_lat">纬度：%1$s</string>
+    <string name="list_short_lon">经度：%1$s</string>
+    <string name="list_short_sats">卫星：%1$d</string>
+    <string name="list_short_alt">海拔：%1$s</string>
     <string name="list_status_default">（状态）</string>
-    <string name="list_speed">速度：</string>
+    <string name="list_speed">速度：%1$s</string>
     <string name="list_upload">上传文件？</string>
     <string name="network_signal">信号：</string>
     <string name="network_type">类型：</string>
@@ -119,8 +119,8 @@
     <string name="cancel">取消</string>
     <string name="dash_scan_off">（扫描关闭的网络）</string>
     <string name="dash_new_wifi">新的WiFi</string>
-    <string name="dash_vis_nets">可见的网络：</string>
-    <string name="dash_new_upload">上传的新网络：</string>
+    <string name="dash_vis_nets">可见的网络：%1$d</string>
+    <string name="dash_new_upload">上传的新网络：%1$d</string>
     <string name="dash_new_cells">新的信号塔</string>
     <string name="dash_new_bt">新蓝牙</string>
     <string name="dash_dist_run">运行距离：</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">扫描持续时间：</string>
     <string name="dash_dist_total">总共的距离。</string>
     <string name="dash_dist_prev">上一次的运行：</string>
-    <string name="dash_db_queue">数据库的队列：</string>
-    <string name="dash_db_nets">数据库的网络：</string>
-    <string name="dash_db_locs">数据库的位置：</string>
-    <string name="dash_short_loc">位置：</string>
+    <string name="dash_db_queue">数据库的队列: %1$s</string>
+    <string name="dash_db_nets">数据库的网络：%1$s</string>
+    <string name="dash_db_locs">数据库的位置：%1$s</string>
+    <string name="dash_short_loc">位置：%1$s</string>
+    <string name="Mm_short">兆米</string>
     <string name="km_short">公里</string>
     <string name="mi_short">米</string>
     <string name="miles">英里</string>
@@ -146,7 +147,7 @@
     <string name="run">运行</string>
     <string name="new_word">新建</string>
     <string name="db">数据库</string>
-    <string name="scanned_in">扫描</string>
+    <string name="scanned_in">%1$d 扫描 %2$d%3$s.</string>
     <string name="sort_title">排序选项</string>
     <string name="sort_spin_label">排序列表：</string>
     <string name="channel">频道</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (波兰语)</string>
     <string name="language_pt">português (葡萄牙语)</string>
     <string name="language_pt_rBR">português brasileiro (巴西葡萄牙语)</string>
+    <string name="language_ro_rRO">Română (罗马尼亚语)</string>
     <string name="language_ru">ру́сский (俄语)</string>
     <string name="language_sv">svenska (瑞典语)</string>
     <string name="language_sw">Kiswahili (斯瓦希里语)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">地图类型：混合</string>
     <string name="map_toast_terrain">地图类型：地形</string>
     <string name="map_needs_playservice">地图需要Google Play服务</string>
-    <string name="register">寄存器</string>
     <string name="drawer_open">抽屉打开</string>
     <string name="drawer_close">抽屉关闭</string>
     <string name="site_stats_app_name">WiGLE.net统计</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">排名</string>
     <string name="uploads_app_name">WiGLE.net上传</string>
     <string name="tab_uploads">上传</string>
-    <string name="queue_depth">文件处理队列深度</string>
+    <string name="queue_depth">WiGLE 队列: %1$s 三: %2$s 地理: %3$s</string>
     <string name="news_app_name">WiGLE.net新闻</string>
     <string name="tab_news">新闻</string>
     <string name="bytes">字节</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">上个月用户排名</string>
     <string name="prevmonthrank_title">上个月份排名</string>
     <string name="list_scanning_on">（扫描开启）</string>
-    <string name="activate">激活</string>
     <string name="setting_activate_prompt">浏览https://wigle.net/来激活你的用户代码</string>
     <string name="upload_queued">已进入队列</string>
     <string name="upload_parsing">正在解析…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">灯光模式</string>
     <string name="theme_dark_label">暗模式</string>
     <string name="theme_follow_label">追踪系统</string>
+    <string name="manage_gpx_button">保存的路线</string>
+    <string name="manage_gpx">管理保存的 GPX 路线</string>
+    <string name="enable_map_theme">将地图主题与应用程序匹配</string>
+    <string name="throttle">WiFi 掃描是有限的。在開發者設置下禁用 WiFi 掃描油門以獲得更好的性能。</string>
+    <string name="no_individual_nets_map">禁用地图网络显示</string>
+    <string name="filter_show_btle">显示蓝牙 LE</string>
+    <string name="settings_gps_head">GPS 设置</string>
+    <string name="enable_kalman">过滤 GPS 噪声</string>
+    <string name="gps_old_message">由于 Google 的政策，应用商店不再支持此设备。请备份您的数据并从 https://github.com/wiglenet/wigle-wifi-wardriving/ 旁加载 WiGLE v. 2.67 .apk（或更低版本）。带来不便敬请谅解！</string>
+    <string name="gps_old_title">无法初始化 GPS</string>
+    <string name="enable_map_bearing">跟随我的方位/航向</string>
+    <string name="login_title">要求登录</string>
+    <string name="login_required">您必须登录才能执行此操作。如有必要，请登录或创建一个帐户。</string>
+    <string name="login">登录</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>注册&lt;/a&gt; @WiGLE.net 或者 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;立即使用二维码激活&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID：</string>
+    <string name="ble_vendor">BLE 供应商 ID：</string>
 </resources>

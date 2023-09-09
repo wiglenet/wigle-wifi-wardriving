@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="wrap_content"
     android:keepScreenOn="true" >
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/dash_status_bar"
-
         android:visibility="gone">
         <TextView
             android:layout_width="match_parent"
@@ -25,7 +24,6 @@
             android:gravity="center"
             />
     </RelativeLayout>
-
     <!-- outer 2-sided horizontal -->
     <RelativeLayout
         android:layout_width="match_parent"
@@ -36,22 +34,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
             <RelativeLayout
                 android:id="@+id/runrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_alignParentTop="true">
-
                 <TextView
                     android:id="@+id/runnets"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#B0B0B0"
                     android:textSize="38sp"
+                    android:paddingEnd="10dp"
+                    tools:text="8,888,888"
                     />
-
                 <TextView
                     android:id="@+id/runcaption"
                     android:layout_width="wrap_content"
@@ -60,95 +57,90 @@
                     android:paddingTop="8dp"
                     android:textColor="#AAAAAA"
                     android:textSize="16sp"
+                    tools:text="@string/run"
                     />
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/wifirow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_below="@id/runrow">
-
                 <TextView
                     android:id="@+id/newwifi"
                     style="@style/WiFiColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
+                    tools:text="8,888,888"
                     />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newwifi"
+                    android:layout_toEndOf="@+id/newwifi"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_wifi"
                     android:textSize="21sp"
                     />
             </RelativeLayout>
-
             <RelativeLayout
                 android:id="@+id/btrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_below="@id/wifirow">
-
                 <TextView
                     android:id="@+id/newbt"
                     style="@style/BtDarkColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
+                    tools:text="8,888,888"
                     />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newbt"
+                    android:layout_toEndOf="@+id/newbt"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_bt"
                     android:textSize="21sp"
                     />
             </RelativeLayout>
-
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
                 android:orientation="horizontal"
                 android:layout_below="@id/btrow">
-
                 <TextView
                     android:id="@+id/newcells"
                     style="@style/CellColor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="44sp"
+                    android:paddingEnd="10dp"
+                    tools:text="8,888,888"
                     />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="top|left"
-                    android:layout_toRightOf="@+id/newcells"
+                    android:layout_toEndOf="@+id/newcells"
                     android:paddingTop="8dp"
                     android:text="@string/dash_new_cells"
                     android:textSize="21sp"
                     />
             </RelativeLayout>
-
         </RelativeLayout>
-
         <!-- right side vertical (satellite info) -->
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <TextView
                 android:id="@+id/gpsstatus"
                 android:layout_width="wrap_content"
@@ -159,8 +151,8 @@
                 android:textColor="#46AA00"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                tools:text="Loc:"
                 />
-
             <ImageView
                 android:id="@+id/fixtype"
                 android:layout_width="wrap_content"
@@ -171,7 +163,6 @@
                 android:paddingTop="8dp"
                 app:tint="#46AA00"
                 />
-
             <TextView
                 android:id="@+id/fixmeta"
                 android:layout_width="wrap_content"
@@ -183,6 +174,7 @@
                 android:textColor="#46AA00"
                 android:textSize="20sp"
                 android:visibility="invisible"
+                tools:text="(88)"
                 />
 
             <TextView
@@ -198,7 +190,6 @@
                 android:textStyle="bold"
                 android:visibility="invisible"
                 />
-
             <TextView
                 android:id="@+id/concount"
                 android:layout_width="wrap_content"
@@ -223,20 +214,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="3dp"
+            android:paddingStart="3dp"
             android:text="@string/dash_time_run"
-            android:textSize="30dp"
+            android:textSize="30sp"
             style="@style/InvertedText"
+            android:gravity="start"
             />
-
         <TextView
             android:id="@+id/run_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:paddingRight="4dp"
-            android:textSize="30dp"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="4dp"
+            android:textSize="30sp"
             style="@style/InvertedText"
+            android:gravity="end"
+            tools:text="24:58:58"
             />
     </RelativeLayout>
 
@@ -247,20 +240,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="3dp"
+            android:paddingStart="3dp"
             android:text="@string/dash_time_scanning"
-            android:textSize="30dp"
+            android:textSize="30sp"
             style="@style/NonInvertedText"
+            android:gravity="start"
             />
-
         <TextView
             android:id="@+id/scan_dur"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:paddingRight="4dp"
-            android:textSize="30dp"
+            android:layout_alignParentEnd="true"
+            android:paddingEnd="4dp"
+            android:textSize="30sp"
             style="@style/NonInvertedText"
+            android:gravity="end"
+            tools:text="24:58:58"
             />
     </RelativeLayout>
 </LinearLayout>

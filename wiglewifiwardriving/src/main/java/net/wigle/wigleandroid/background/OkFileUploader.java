@@ -2,15 +2,13 @@ package net.wigle.wigleandroid.background;
 
 import android.os.Handler;
 
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -39,9 +37,8 @@ public class OkFileUploader {
     private OkFileUploader() {
     }
 
-
     /**
-     * simple upload method. Analogous to {@link net.wigle.wigleandroid.background.HttpFileUploader#upload HttpFileUploader.upload(...)}
+     * simple upload method.
      * @param urlString the URL string for the target
      * @param filename the file name on-device to upload
      * @param fileParamName parameter name for the file
@@ -50,7 +47,7 @@ public class OkFileUploader {
      * @param authToken password parameter for Basic authentication
      * @param handler the callback for progress or completion
      * @return string payload (JSON) from the upload POST
-     * @throws IOException
+     * @throws IOException an IOException if the upload fails
      */
     public static String upload(final String urlString, final String filename, final String fileParamName,
                                 final Map<String, String> params,
@@ -63,8 +60,7 @@ public class OkFileUploader {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart(fileParamName, filename,
-                        RequestBody.create(MediaType.parse("application/octet-stream"),
-                                new File(filename)));
+                        RequestBody.create(new File(filename), MediaType.parse("application/octet-stream")));
 
         // add params if present
         if (!params.isEmpty()) {
@@ -79,17 +75,14 @@ public class OkFileUploader {
 
         // progress-aware requestBody
         CountingRequestBody countingBody
-                = new CountingRequestBody(requestBody, new CountingRequestBody.UploadProgressListener() {
-            @Override
-            public void onRequestProgress(long bytesWritten, long contentLength) {
-                int progress = (int)((bytesWritten*1000) / contentLength );
-                MainActivity.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
-                if ( handler != null && progress >= 0 ) {
-                    //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
-                    handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
-                }
-            }
-        });
+                = new CountingRequestBody(requestBody, (bytesWritten, contentLength) -> {
+                    int progress = (int)((bytesWritten*1000) / contentLength );
+                    Logging.info("progress: "+ progress + "("+bytesWritten +"/"+contentLength+")");
+                    if ( handler != null && progress >= 0 ) {
+                        //TODO: we can improve this, but minimal risk dictates reuse of old technique to start
+                        handler.sendEmptyMessage( BackgroundGuiHandler.WRITING_PERCENT_START + progress );
+                    }
+                });
 
         // authorization if necessary
         Request request;
@@ -110,15 +103,13 @@ public class OkFileUploader {
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS).build();
-
-        Call call = client.newCall(request);
-        Response response = call.execute();
-
-        if (response.code() == 200) {
-            return response.body().string();
-        } else {
-            return null;
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                Logging.error("Failed to upload file:"+response.code()+" "+response.message());
+                return null;
+            } else {
+                return response.body().string();
+            }
         }
-
     }
 }

@@ -1,56 +1,64 @@
 --- todo ---
+add frequency to CSV format (in conjunction w/ site)
+connection error message friendliness
+x-scanned-in-y addition to dashboard
+restage local DB from CSV export (partially complete)
+"silver lining" coverage in network detail activity (like site)
+optional low-contrast background signal graphs for list items
 pause/play on notification view, affects gps+wifi
-implement heatmap
-back clustering with our own map for memory
-
-"upload every n" setting
-web replace: seen-networks map tile overlays
-web replace: leaderboard
-username not found notice
 stop counting on startup
-show IEEE octet info (manufacturer stats/speech)
 show countdown while trying to close database
-lat/lon in observed import from wigle
 debug logging mode
-download of cell observed as well
+add download of cell and BT observed
 tablet list+map layout
-try bluetooth/jfc logging again
+NFC logging
 simple map circle mode if label+clustering off
+retry file upload for written-upload failed
+limited backoff for failed uploads
+extended android auto support
+integrate group stats view
+express density in path display
+
 
 --- user suggested ---
 map-page type filter on four csv/kml exports
-option to stop scanning when not plugged in
+be able to disable cell tower recording, and/or filter kml output
 kismet drone support
 some response/info/stat about uploaded files (user stats?)
-configurable sounds for new nets
 first run wizard to make easier setup wiglewifi
-speak similar AP's with count, trying to condense somehow, start with s/\d+$//
-filter for speaking AP's to avoid very regular ones
-  attwifi belkin CableWiFi CenturyLink DIRECT- HOME- HP NETGEAR SLCSD WiFi Hotspot XFINITY xfinitywifi
-summarize AP's since last audio speech
+TTS improvements:
+  - speak similar AP's with count, trying to condense somehow, start with s/\d+$//
+  - filter for speaking AP's to avoid very regular ones
+    attwifi belkin CableWiFi CenturyLink DIRECT- HOME- HP NETGEAR SLCSD WiFi Hotspot XFINITY xfinitywifi
+  - summarize AP's since last audio speech
+configurable sounds for new nets
 stats on what is in the local db
 "only new" on map work with labels too
-workaround the clearing of wifi list on screen rotate somehow
-store system time on db records (not just gps time)
-be able to disable cell tower recording, and/or filter kml output
-output GPX (open street map)
-limit list to one ssid, show multiple observations
 scan on/off toggle added to the dashboard tab
-sending collected data to another place in easy way (mail,ftp...)
-wifi scanner always available in kit kat
-integrate the bluetooth part in
-a checkbox to have it start on bootup
 decoding base64 (assuming ssid)
-switch to satellite maps, or between Google Maps/OSMs
-see frequency the AP is operating on
+switch between Google Maps/OSM (requires OSM tile server)
 a widget
-heat mapping
+
+
+--- handled by intents + external package ---
+* option to stop scanning when not plugged in
+* upload and/or pause on when connected to this network
+* pause at battery level instead of kill
+* geofence for "don't record" and/or "do upload"
+
+
+--- complete/obivated? ---
 import files, instead of uploading to site and downloading to app
-geofence for "don't record" and/or "do upload"
-set minimum on distance decimal to 2 on dashboard
-on networkactivity record more observations on that network (site survey)
 rssi on kml export
-upload and/or pause on when connected to this network
-disable notification bar icon option
-pause at battery level instead of kill
-don't cancel file write/upload when we touch the screen
+on networkactivity record more observations on that network (site survey)
+
+
+--- ideas that have problematic trade-offs ---
+* iterative uploads import from wigle (slows local DB interaction)
+* username not found notice (adds information leak in a&a infra)
+* implement heatmap (interpolation is inaccurate)
+* limit list to one ssid, show multiple observations (see Network activity)
+* store system time on db records, not just gps time (GPS time more likely accurate)
+* disable notification bar icon option (breaks foreground service contract)
+* remove authed-only items for unauthorized users
+* allow device settings sync via WiGLE (different devices need different settings)

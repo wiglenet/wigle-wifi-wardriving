@@ -1,6 +1,5 @@
 package net.wigle.wigleandroid;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -16,17 +15,25 @@ import android.graphics.drawable.Icon;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.RemoteViews;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
+import java.lang.ref.WeakReference;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static android.app.Notification.VISIBILITY_PUBLIC;
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_NONE;
+import static android.os.Build.VERSION.SDK_INT;
 
 public final class WigleService extends Service {
     private static final int NOTIFICATION_ID = 1;
@@ -35,8 +42,11 @@ public final class WigleService extends Service {
     private GuardThread guardThread;
     private final AtomicBoolean done = new AtomicBoolean( false );
     private Bitmap largeIcon = null;
+    private RemoteViews smallRemoteViews;
+
     // Binder given to clients
-    private final IBinder wigleServiceBinder = new WigleServiceBinder();
+    private final IBinder wigleServiceBinder = new WigleServiceBinder(this);
+    private final NumberFormat countFormat = NumberFormat.getIntegerInstance();
 
     private class GuardThread extends Thread {
         GuardThread() {
@@ -49,7 +59,7 @@ public final class WigleService extends Service {
                 MainActivity.sleep( 15000L );
                 setupNotification();
             }
-            MainActivity.info("GuardThread done");
+            Logging.info("GuardThread done");
         }
     }
 
@@ -57,10 +67,17 @@ public final class WigleService extends Service {
      * Class used for the client Binder.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
-    class WigleServiceBinder extends Binder {
+    static class WigleServiceBinder extends Binder {
+        //ALIBI: using WeakRef instead of WiGLEService.this because it leaks.
+        // see https://stackoverflow.com/questions/3243215/how-to-use-weakreference-in-java-and-android-development
+        WeakReference<WigleService> service;
+        public WigleServiceBinder(final WigleService wigleService) {
+            this.service = new WeakReference<>(wigleService);
+        }
+
         WigleService getService() {
             // Return this instance of LocalService so clients can call public methods
-            return WigleService.this;
+            return service.get();
         }
     }
 
@@ -71,19 +88,19 @@ public final class WigleService extends Service {
 
     @Override
     public IBinder onBind( final Intent intent ) {
-        MainActivity.info( "service: onbind. intent: " + intent );
+        Logging.info( "service: onbind. intent: " + intent );
         return wigleServiceBinder;
     }
 
     @Override
     public void onRebind( final Intent intent ) {
-        MainActivity.info( "service: onRebind. intent: " + intent );
+        Logging.info( "service: onRebind. intent: " + intent );
         super.onRebind( intent );
     }
 
     @Override
     public boolean onUnbind( final Intent intent ) {
-        MainActivity.info( "service: onUnbind. intent: " + intent );
+        Logging.info( "service: onUnbind. intent: " + intent );
         shutdownNotification();
         stopSelf();
         return super.onUnbind( intent );
@@ -94,7 +111,7 @@ public final class WigleService extends Service {
      */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        MainActivity.info("service: onTaskRemoved.");
+        Logging.info("service: onTaskRemoved.");
         if (! done.get()) {
             final MainActivity mainActivity = MainActivity.getMainActivity();
             if (mainActivity != null) {
@@ -105,12 +122,12 @@ public final class WigleService extends Service {
         shutdownNotification();
         stopSelf();
         super.onTaskRemoved(rootIntent);
-        MainActivity.info("service: onTaskRemoved complete.");
+        Logging.info("service: onTaskRemoved complete.");
     }
 
     @Override
     public void onCreate() {
-        MainActivity.info( "service: onCreate" );
+        Logging.info( "service: onCreate" );
 
         setupNotification();
 
@@ -122,7 +139,7 @@ public final class WigleService extends Service {
 
     @Override
     public void onDestroy() {
-        MainActivity.info( "service: onDestroy" );
+        Logging.info( "service: onDestroy" );
         // Make sure our notification is gone.
         shutdownNotification();
         setDone();
@@ -132,7 +149,7 @@ public final class WigleService extends Service {
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        MainActivity.info( "service: onLowMemory" );
+        Logging.info( "service: onLowMemory" );
     }
 
     //This is the old onStart method that will be called on the pre-2.0
@@ -141,14 +158,14 @@ public final class WigleService extends Service {
     @SuppressWarnings("deprecation")
     @Override
     public void onStart( Intent intent, int startId ) {
-        MainActivity.info( "service: onStart" );
+        Logging.info( "service: onStart" );
         handleCommand( intent );
         setupNotification();
     }
 
     @Override
     public int onStartCommand( Intent intent, int flags, int startId ) {
-        MainActivity.info( "service: onStartCommand" );
+        Logging.info( "service: onStartCommand" );
         handleCommand( intent );
         setupNotification();
         // We want this service to continue running until it is explicitly
@@ -157,7 +174,7 @@ public final class WigleService extends Service {
     }
 
     private void handleCommand( Intent intent ) {
-        MainActivity.info( "service: handleCommand: intent: " + intent );
+        Logging.info( "service: handleCommand: intent: " + intent );
         setupNotification();
     }
 
@@ -173,26 +190,33 @@ public final class WigleService extends Service {
                 final String title = context.getString(R.string.wigle_service);
 
                 final Intent notificationIntent = new Intent(this, MainActivity.class);
-                final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+                final int flags = SDK_INT >= Build.VERSION_CODES.S?(FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE): FLAG_UPDATE_CURRENT;
+                final PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags);
                 final long dbNets = ListFragment.lameStatic.dbNets;
                 String text = context.getString(R.string.list_waiting_gps);
 
                 String distString = "";
-                SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                String distStringShort = "";
+                String wrappedDistString = "";
+                SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                 if (prefs != null) {
+                    final Configuration conf = getResources().getConfiguration();
                     Locale locale = null;
-                    Configuration sysConfig = getResources().getConfiguration();
-                    if (null != sysConfig) {
-                        locale = sysConfig.locale;
+                    if (null != conf && null != conf.getLocales()) {
+                        locale = conf.getLocales().get(0);
                     }
                     if (null == locale) {
                         locale = Locale.US;
                     }
-                    NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-                    numberFormat.setMaximumFractionDigits(1);
+                    NumberFormat longDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    longDistNumberFormat.setMaximumFractionDigits(2);
+                    NumberFormat shortDistNumberFormat = NumberFormat.getNumberInstance(locale);
+                    shortDistNumberFormat.setMaximumFractionDigits(0);
 
-                    final float dist = prefs.getFloat(ListFragment.PREF_DISTANCE_RUN, 0f);
-                    distString = " ("+UINumberFormat.metersToString(prefs, numberFormat, this, dist, true) + ")";
+                    final float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
+                    distString = UINumberFormat.metersToString(prefs, longDistNumberFormat, this, dist, true);
+                    distStringShort = UINumberFormat.metersToShortString(prefs, shortDistNumberFormat, this, dist);
+                    wrappedDistString = " ("+ distString + ")";
                 }
                 if (dbNets > 0) {
                     long runNets = ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt;
@@ -200,7 +224,7 @@ public final class WigleService extends Service {
                     text = context.getString(R.string.run) + ": " + runNets
                             + "  " + context.getString(R.string.new_word) + ": " + newNets
                             + "  " + context.getString(R.string.db) + ": " + dbNets
-                            + distString;
+                            + wrappedDistString;
                 }
                 if (!MainActivity.isScanning(context)) {
                     text = context.getString(R.string.list_scanning_off) + " " + text;
@@ -213,23 +237,33 @@ public final class WigleService extends Service {
                 pauseSharedIntent.setAction("net.wigle.wigleandroid.PAUSE");
                 pauseSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
 
-                MainActivity ma = MainActivity.getMainActivity();
+                final MainActivity ma = MainActivity.getMainActivity();
                 Notification notification = null;
 
                 if (null != ma) {
-                    final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final PendingIntent pauseIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, pauseSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
                     final Intent scanSharedIntent = new Intent();
                     scanSharedIntent.setAction("net.wigle.wigleandroid.SCAN");
                     scanSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.ScanControlReceiver.class);
-                    final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+                    final PendingIntent scanIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, scanSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
 
                     final Intent uploadSharedIntent = new Intent();
                     uploadSharedIntent.setAction("net.wigle.wigleandroid.UPLOAD");
                     uploadSharedIntent.setClass(getApplicationContext(), net.wigle.wigleandroid.listener.UploadReceiver.class);
-                    final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        notification = getNotification26(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                    final PendingIntent uploadIntent = PendingIntent.getBroadcast(MainActivity.getMainActivity(), 0, uploadSharedIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_CANCEL_CURRENT);
+                    if (SDK_INT >= 31) {
+                        notification = getNotification31(title, context, text,
+                                ListFragment.lameStatic.newWifi, (ListFragment.lameStatic.runNets-ListFragment.lameStatic.runCells),
+                                ListFragment.lameStatic.newCells, ListFragment.lameStatic.runCells,
+                                ListFragment.lameStatic.newBt, ListFragment.lameStatic.runBt,
+                                distString, distStringShort, dbNets,
+                                MainActivity.isScanning(context)?context.getString(R.string.list_scanning_on):context.getString(R.string.list_scanning_off),
+                                when, contentIntent, pauseIntent, scanIntent, uploadIntent);
+                    } else if (SDK_INT >= Build.VERSION_CODES.O) {
+                        notification = getNotification26(title, context, text, ListFragment.lameStatic.newWifi,
+                                ListFragment.lameStatic.newCells, ListFragment.lameStatic.newBt,
+                                distStringShort, when, contentIntent, pauseIntent,
+                                scanIntent, uploadIntent);
                     } else {
                         notification = getNotification16(title, context, text, when, contentIntent, pauseIntent, scanIntent, uploadIntent);
                     }
@@ -243,28 +277,28 @@ public final class WigleService extends Service {
                             notificationManager.notify(NOTIFICATION_ID, notification);
                         }
                         else {
-                            MainActivity.info("service startForeground");
+                            Logging.info("service startForeground");
                             startForeground(NOTIFICATION_ID, notification);
                         }
                     } catch (Exception ex) {
-                        MainActivity.error("notification service error: ", ex);
+                        Logging.error("notification service error: ", ex);
                     }
                 } else {
-                    MainActivity.info("null notification - skipping startForeground");
+                    Logging.info("null notification - skipping startForeground");
                 }
             }
         } catch (Exception ex) {
-            MainActivity.error("trapped notification exception out outer level - ",ex);
+            Logging.error("trapped notification exception out outer level - ",ex);
         }
     }
 
     private boolean isServiceForeground() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (SDK_INT < Build.VERSION_CODES.Q) {
             // no such thing as foreground back then
             return false;
         }
         final boolean isForeground = getForegroundServiceType() != FOREGROUND_SERVICE_TYPE_NONE;
-        MainActivity.info("Service is foreground: " + isForeground);
+        Logging.info("Service is foreground: " + isForeground);
         return isForeground;
     }
 
@@ -282,11 +316,7 @@ public final class WigleService extends Service {
         builder.setContentText(text);
         builder.setWhen(when);
         builder.setLargeIcon(largeIcon);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setSmallIcon(R.drawable.wiglewifi_small_white);
-        } else {
-            builder.setSmallIcon(R.drawable.wiglewifi_small);
-        }
+        builder.setSmallIcon(R.drawable.wiglewifi_small);
         builder.setOngoing(true);
         builder.setCategory("SERVICE");
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
@@ -299,7 +329,7 @@ public final class WigleService extends Service {
             //ALIBI: https://stackoverflow.com/questions/43123466/java-lang-nullpointerexception-attempt-to-invoke-interface-method-java-util-it
             return builder.build();
         } catch (NullPointerException npe) {
-            MainActivity.error("NPE trying to build notification. " + npe.getMessage());
+            Logging.error("NPE trying to build notification. " + npe.getMessage());
             return null;
         }
 
@@ -307,40 +337,47 @@ public final class WigleService extends Service {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private Notification getNotification26(final String title, final Context context, final String text,
+                                           final long newWiFi,
+                                           final long newCell,
+                                           final long newBt, final String distStringShort,
                                            final long when, final PendingIntent contentIntent,
                                            final PendingIntent pauseIntent, final PendingIntent scanIntent,
                                            final PendingIntent uploadIntent) {
         // new notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (notificationManager == null) return null;
 
             final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                    title, NotificationManager.IMPORTANCE_LOW);
+                    title, NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
             notificationManager.createNotificationChannel(channel);
 
+            this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+            smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
+            smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
+            smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
+            smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
 
-            // copied from above
             final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
             builder.setContentIntent(contentIntent);
             builder.setNumber((int) ListFragment.lameStatic.newNets);
             builder.setTicker(title);
             builder.setContentTitle(title);
+            builder.setTicker(title);
+            builder.setContentTitle(title);
             builder.setContentText(text);
             builder.setWhen(when);
-            builder.setLargeIcon(largeIcon);
             builder.setSmallIcon(R.drawable.ic_w_logo_simple);
             builder.setOngoing(true);
             builder.setCategory("SERVICE");
-            builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+            builder.setVisibility(VISIBILITY_PUBLIC);
+            builder.setCustomContentView(smallRemoteViews);
+            builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setColorized(true);
-            //builder.setCustomBigContentView(new RemoteViews(getPackageName(), R.layout.expanded_notification_layout));
-            // WiGLE Blue: builder.setColor(6005486);
-            if (Build.VERSION.SDK_INT < 29) {
-                //Classic charcoal:
-                builder.setColor(1973790);
-            }
+            builder.setOnlyAlertOnce(true); //ALIBI: prevent multiple badge notification
+
             //TODO: figure out how to update notification actions on exec, then we can show relevant
             if (MainActivity.isScanning(getApplicationContext())) {
                 Notification.Action pauseAction = new Notification.Action.Builder(
@@ -365,4 +402,79 @@ public final class WigleService extends Service {
         }
         return null;
     }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private Notification getNotification31(final String title, final Context context, final String text,
+                                           final long newWiFi, final long runTotalWiFi,
+                                           final long newCell, final long runTotalCell,
+                                           final long newBt, final long runTotalBt,
+                                           final String distString, final String distStringShort,
+                                           final long dbNets, final String status,
+                                           final long when, final PendingIntent contentIntent,
+                                           final PendingIntent pauseIntent, final PendingIntent scanIntent,
+                                           final PendingIntent uploadIntent) {
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) return null;
+
+        final NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                title, NotificationManager.IMPORTANCE_HIGH);
+        channel.setLockscreenVisibility(VISIBILITY_PUBLIC);
+        notificationManager.createNotificationChannel(channel);
+
+        RemoteViews bigRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(), R.layout.big_notification_content);
+        bigRemoteViews.setTextViewText(R.id.wifi_new_notif, UINumberFormat.counterFormat(newWiFi));
+        bigRemoteViews.setTextViewText(R.id.wifi_total_notif, UINumberFormat.counterFormat(runTotalWiFi));
+        bigRemoteViews.setTextViewText(R.id.cell_new_notif, UINumberFormat.counterFormat(newCell));
+        bigRemoteViews.setTextViewText(R.id.cell_total_notif, UINumberFormat.counterFormat(runTotalCell));
+        bigRemoteViews.setTextViewText(R.id.bt_new_notif, UINumberFormat.counterFormat(newBt));
+        bigRemoteViews.setTextViewText(R.id.bt_total_notif, UINumberFormat.counterFormat(runTotalBt));
+        bigRemoteViews.setTextViewText(R.id.dist_notif,distString);
+        bigRemoteViews.setTextViewText(R.id.db_total_notif, countFormat.format(dbNets));
+
+        this.smallRemoteViews = new RemoteViews(this.getApplicationContext().getPackageName(),R.layout.small_notification_content);
+        smallRemoteViews.setTextViewText(R.id.wifi_new_notif_sm, UINumberFormat.counterFormat(newWiFi));
+        smallRemoteViews.setTextViewText(R.id.cell_new_notif_sm, UINumberFormat.counterFormat(newCell));
+        smallRemoteViews.setTextViewText(R.id.bt_new_notif_sm, UINumberFormat.counterFormat(newBt));
+        smallRemoteViews.setTextViewText(R.id.dist_notif_sm, distStringShort);
+
+        final Notification.Builder builder = new Notification.Builder(context, NOTIFICATION_CHANNEL_ID);
+        builder.setContentIntent(contentIntent)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setWhen(when)
+                .setSmallIcon(R.drawable.ic_w_logo_simple)
+                .setOngoing(true)
+                .setCategory("SERVICE")
+                .setSubText(status) //new
+                .setCustomBigContentView(bigRemoteViews) //new
+                .setCustomContentView(smallRemoteViews) //new
+                .setVisibility(VISIBILITY_PUBLIC)
+                .setOnlyAlertOnce(true) //ALIBI: prevent multiple badge notification
+                .setStyle(new Notification.DecoratedCustomViewStyle())
+                .setColorized(true);
+
+        if (MainActivity.isScanning(getApplicationContext())) {
+            Notification.Action pauseAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_pause),
+                    "Pause", pauseIntent)
+                    .build();
+            builder.addAction(pauseAction);
+        } else {
+            Notification.Action scanAction = new Notification.Action.Builder(
+                    Icon.createWithResource(this, android.R.drawable.ic_media_play),
+                    "Scan", scanIntent)
+                    .build();
+            builder.addAction(scanAction);
+        }
+        Notification.Action ulAction = new Notification.Action.Builder(
+                Icon.createWithResource(this, android.R.drawable.ic_menu_upload),
+                "Upload", uploadIntent)
+                .build();
+        builder.addAction(ulAction);
+
+        return builder.build();
+    }
+
 }

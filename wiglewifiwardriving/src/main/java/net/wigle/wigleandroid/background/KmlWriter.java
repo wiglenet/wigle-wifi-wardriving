@@ -3,6 +3,7 @@ package net.wigle.wigleandroid.background;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -13,9 +14,10 @@ import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.model.NetworkType;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
 
-import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
@@ -26,7 +28,9 @@ import static net.wigle.wigleandroid.util.FileUtility.WIWI_PREFIX;
 public class KmlWriter extends AbstractBackgroundTask {
     private final Set<String> networks;
     private final Set<String> btNetworks;
+
     private static final String NO_SSID = "(no SSID)";
+    private static final byte SANITIZATION_REPLACEMENT_GLYPH = ' ';
 
     private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.UK);
 
@@ -39,7 +43,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         // make a safe local copy
         this.networks = (networks == null) ? null : new HashSet<>(networks);
-        this.btNetworks = (btNetworks == null) ? null : new HashSet<String>(btNetworks);
+        this.btNetworks = (btNetworks == null) ? null : new HashSet<>(btNetworks);
     }
 
     @Override
@@ -53,7 +57,7 @@ public class KmlWriter extends AbstractBackgroundTask {
 
         final FileOutputStream fos = FileUtility.createFile(context, filename, false);
         // header
-        ObservationUploader.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        FileAccess.writeFos( fos, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                 + "<kml xmlns=\"http://www.opengis.net/kml/2.2\"><Document>"
                 + "<Style id=\"red\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/red.png</href></Icon></IconStyle></Style>"
                 + "<Style id=\"yellow\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/ms/icons/yellow.png</href></Icon></IconStyle></Style>"
@@ -78,13 +82,16 @@ public class KmlWriter extends AbstractBackgroundTask {
             if ( this.networks == null ) {
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.WIFI);
                 long wifiCount = writeKmlFromCursor( fos, cursor, dateFormat, 0, dbHelper.getNetworkCount(), bundle);
+                cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.CELL);
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
                 long cellCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount, dbHelper.getNetworkCount(), bundle);
+                cursor.close();
                 cursor = dbHelper.networkIterator(DatabaseHelper.NetworkFilter.BT);
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
                 long btCount = writeKmlFromCursor( fos, cursor, dateFormat, wifiCount+cellCount, dbHelper.getNetworkCount(), bundle);
-                MainActivity.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
+                cursor.close();
+                Logging.info("Full KML Export: "+dbHelper.getNetworkCount()+" per db, wrote "+(btCount+cellCount+wifiCount)+" total.");
             } else {
                 long count = 0;
                 long btFailCount = 0L;
@@ -95,7 +102,6 @@ public class KmlWriter extends AbstractBackgroundTask {
                 for (String network : networks) {
                     // DEBUG: MainActivity.info( "network: " + network );
                     cursor = dbHelper.getSingleNetwork(network, DatabaseHelper.NetworkFilter.WIFI);
-
                     final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                     // ALIBI: assume this was a cell net, if it didn't match for WiFi - avoid full second iteration
                     if (0L == found) {
@@ -109,7 +115,7 @@ public class KmlWriter extends AbstractBackgroundTask {
                         count++;
                     }
                 }
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Cellular Networks</name>\n" );
                 //ALIBI: cell networks are still mixed into the lamestatic list of WiFi for now. this can get more efficient when we partition them.
                 for ( String network : cellSet ) {
                     // MainActivity.info( "network: " + network );
@@ -121,10 +127,10 @@ public class KmlWriter extends AbstractBackgroundTask {
                     if (found > 0) {
                         count++;
                     } else {
-                        MainActivity.warn("unfound cell: ["+network+"]");
+                        Logging.warn("unfound cell: ["+network+"]");
                     }
                 }
-                ObservationUploader.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
+                FileAccess.writeFos( fos, "</Folder>\n<Folder><name>Bluetooth Networks</name>\n" );
                 if (btNetworks != null) {
                     for (String network : btNetworks) {
                         // MainActivity.info( "network: " + network );
@@ -133,21 +139,21 @@ public class KmlWriter extends AbstractBackgroundTask {
                         final long found = writeKmlFromCursor(fos, cursor, dateFormat, count, totalNets, bundle);
                         if (0L == found) {
                             btFailCount++;
-                            MainActivity.error("unfound BT network: [" + network + "]");
+                            Logging.error("unfound BT network: [" + network + "]");
                         }
                         cursor.close();
                         cursor = null;
                         count++;
                     }
                 }
-                MainActivity.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount
+                Logging.info("Completed; WiFi Fail: "+wifiFailCount+ " BT Fail: "+btFailCount
                         + " from total count: "+totalNets+" (non-bt-networks: "+ networks.size()
                         + " btnets:" + (btNetworks != null?btNetworks.size():"null")+")");
             }
             status = Status.WRITE_SUCCESS;
         }
         catch ( final InterruptedException ex ) {
-            MainActivity.info("Writing Kml Interrupted: " + ex);
+            Logging.info("Writing Kml Interrupted: " + ex);
         }
         catch ( DBException ex ) {
             dbHelper.deathDialog("Writing Kml", ex);
@@ -155,7 +161,7 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
         catch ( final Exception ex ) {
             ex.printStackTrace();
-            MainActivity.error( "ex problem: " + ex, ex );
+            Logging.error( "ex problem: " + ex, ex );
             MainActivity.writeError( this, ex, context );
             status = Status.EXCEPTION;
             bundle.putString( BackgroundGuiHandler.ERROR, "ex problem: " + ex );
@@ -166,14 +172,14 @@ public class KmlWriter extends AbstractBackgroundTask {
             }
         }
         // footer
-        ObservationUploader.writeFos( fos, "</Folder>\n</Document></kml>" );
+        FileAccess.writeFos( fos, "</Folder>\n</Document></kml>" );
 
         fos.close();
 
         //WARNING: ignored if no SD, so this is ok, but misleading...
         bundle.putString( BackgroundGuiHandler.FILEPATH, FileUtility.getSDPath() + filename );
         bundle.putString( BackgroundGuiHandler.FILENAME, filename );
-        MainActivity.info( "done with kml export" );
+        Logging.info( "done with kml export" );
 
         // status is null on interrupted
         if ( status != null ) {
@@ -222,7 +228,7 @@ public class KmlWriter extends AbstractBackgroundTask {
             } else if (NetworkType.BT.equals(type)) {
                 style = "blue";
 
-            } else if (NetworkType.CDMA.equals(type) || NetworkType.GSM.equals(type) || NetworkType.LTE.equals(type) || NetworkType.WCDMA.equals(type)) {
+            } else if (NetworkType.isCellType(type)) {
                 style = "pink";
             } else {
                 style = "zeroConfidence";
@@ -233,22 +239,21 @@ public class KmlWriter extends AbstractBackgroundTask {
                 style = "zeroConfidence";
             }
 
-            // not unicode. ha ha for them!
-            byte[] ssidFiltered = ssid.getBytes( MainActivity.ENCODING );
-            filterIllegalXml( ssidFiltered );
-            if (ssidFiltered.length == 0) {
-                ssidFiltered = NO_SSID.getBytes( MainActivity.ENCODING);
+            byte[] sanitizedSsid = sanitizeKmlString(ssid);
+            if (sanitizedSsid.length == 0) {
+                sanitizedSsid = NO_SSID.getBytes(MainActivity.ENCODING);
             }
 
-
-            if (type.equals(NetworkType.WIFI)) {
+            if (type == null) {
+                Logging.warn("uninitialized network type for network: "+bssid);
+            } else if (type.equals(NetworkType.WIFI)) {
 
                 final String encStatus = "Encryption: " + encryptionStringForCapabilities(capabilities) + "\n";
 
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(sanitizedSsid);
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -258,16 +263,15 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + encStatus
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
 
-            } else if (type.equals(NetworkType.CDMA) || type.equals(NetworkType.LTE) ||
-                    type.equals(NetworkType.GSM) || type.equals(NetworkType.WCDMA)) {
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+            } else if (NetworkType.isCellType(type)) {
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(sanitizedSsid);
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -276,15 +280,15 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Type: " + type.name()
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
 
-            } else if (type.equals(NetworkType.BT) || type.equals(NetworkType.BLE)) {
-                ObservationUploader.writeFos(fos, "<Placemark>\n<name><![CDATA[");
-                fos.write(ssidFiltered);
-                ObservationUploader.writeFos(fos, "]]></name>\n");
-                ObservationUploader.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
+            } else if (NetworkType.isBtType(type)) {
+                FileAccess.writeFos(fos, "<Placemark>\n<name><![CDATA[");
+                fos.write(sanitizedSsid);
+                FileAccess.writeFos(fos, "]]></name>\n");
+                FileAccess.writeFos(fos, "<description><![CDATA[Network ID: " + bssid + "\n"
                         + "Capabilities: " + capabilities + "\n" // ALIBI: not available on server
                         + "Frequency: " + frequency + "\n"       // ALIBI: not in server-side
                         + "Timestamp: " + lasttime + "\n"        // ALIBI: not in server-side
@@ -293,16 +297,16 @@ public class KmlWriter extends AbstractBackgroundTask {
                         + "Type: " + type.name()
                         + "]]>"
                         + "</description><styleUrl>#" + style + "</styleUrl>\n");
-                ObservationUploader.writeFos(fos, "<Point>\n");
-                ObservationUploader.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
-                ObservationUploader.writeFos(fos, "</Point>\n</Placemark>\n");
+                FileAccess.writeFos(fos, "<Point>\n");
+                FileAccess.writeFos(fos, "<coordinates>" + lastlon + "," + lastlat + "</coordinates>");
+                FileAccess.writeFos(fos, "</Point>\n</Placemark>\n");
             } else {
-                MainActivity.warn("unknown network type "+type+"for network: "+bssid);
+                Logging.warn("unknown network type "+type+"for network: "+bssid);
             }
 
             lineCount++;
             if ( (lineCount % 1000) == 0 ) {
-                MainActivity.info("lineCount: " + lineCount + " of " + totalCount );
+                Logging.info("lineCount: " + lineCount + " of " + totalCount );
             }
 
             // update UI
@@ -330,19 +334,31 @@ public class KmlWriter extends AbstractBackgroundTask {
         }
     }
 
-    private void filterIllegalXml( byte[] data ) {
-        for ( int i = 0; i < data.length; i++ ) {
-            byte current = data[i];
-            // (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
-            //noinspection ConstantConditions
-            if ( (current >= 0x00 && current <= 0x08) ||
-                    (current >= 0x0B && current <= 0x1F) ||
-                    (current >= 0x7F && current <= 0x84) ||
-                    (current >= 0x86 && current <= 0x9F)
-                    ) {
-                data[i] = ' ';
-            }
+    // Sanitize string by escaping reserved XML tokens and replace invalid charset ranges
+    private byte[] sanitizeKmlString(String value) throws UnsupportedEncodingException {
+        // Using the the Latin1 encoding ~"not unicode. ha ha for them!"
+        final byte[] escapedValueBytes = value.getBytes( MainActivity.ENCODING );
+
+        // Filtering the illegal symbols from the given charset. The symbols will be replaced with a space character.
+        // Targeted ranges: (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F)
+        // Targeted symbols: 0x3C, 0x3E (Prevent KML/XML injection XXE attacks)
+        for (int i = 0; i < escapedValueBytes.length; i++) {
+            byte currentGlyph = escapedValueBytes[i];
+
+            if (isBetween(currentGlyph, 0x00, 0x08)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x0B, 0x1F)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x7F, 0x84)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (isBetween(currentGlyph, 0x86, 0x9F)) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+
+            if (currentGlyph == 0x3C) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
+            if (currentGlyph == 0x3E) escapedValueBytes[i] = SANITIZATION_REPLACEMENT_GLYPH;
         }
+
+        return escapedValueBytes;
     }
 
+    // Check if the given values is between two given values (inclusive)
+    private boolean isBetween(byte value, int min, int max) {
+        return value >= min && value <= max;
+    }
 }

@@ -7,12 +7,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import android.util.Base64;
 
-import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.ListFragment;
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.TokenAccess;
 import net.wigle.wigleandroid.WiGLEAuthException;
+import net.wigle.wigleandroid.util.FileAccess;
 import net.wigle.wigleandroid.util.FileUtility;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
+import net.wigle.wigleandroid.util.UrlConfig;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,10 +26,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Abstract base class for WiGLE API connections
@@ -80,7 +86,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             connectURL = new URL( urlString );
         }
         catch( Exception ex ) {
-            MainActivity.error( "MALFORMED URL: " + ex, ex );
+            Logging.error( "MALFORMED URL: " + ex, ex );
             return null;
         }
 
@@ -151,9 +157,9 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         }
 
         // connect
-        MainActivity.info( "about to connect" );
+        Logging.info( "about to connect" );
         conn.connect();
-        MainActivity.info( "connected" );
+        Logging.info( "connected" );
 
         return conn;
     }
@@ -163,17 +169,17 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
     }
 
     public JSONObject getCached() {
-        File file = null;
+        File file;
         if (FileUtility.hasSD()) {
             file = new File(FileUtility.getSDPath() + outputFileName);
             if (!file.exists() || !file.canRead()) {
-                MainActivity.warn("External cache file doesn't exist or can't be read: " + file);
+                Logging.warn("External cache file doesn't exist or can't be read: " + file);
                 return null;
             }
         } else {
             file = new File(context.getCacheDir(), outputFileName);
             if (!file.exists() || !file.canRead()) {
-                MainActivity.warn("App-internal cache file doesn't exist or can't be read: " + file);
+                Logging.warn("App-internal cache file doesn't exist or can't be read: " + file);
                 return null;
             }
         }
@@ -192,14 +198,14 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             json = new JSONObject(result.toString());
         }
         catch (final Exception ex) {
-            MainActivity.error("Exception reading cache file: " + ex, ex);
+            Logging.error("Exception reading cache file: " + ex, ex);
         }
         finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (final IOException ex) {
-                    MainActivity.error("exception closing br: " + ex, ex);
+                    Logging.error("exception closing br: " + ex, ex);
                 }
             }
         }
@@ -217,10 +223,10 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
         try {
             fos = FileUtility.createFile(context, outputFileName, internalCacheArea);
             // header
-            ObservationUploader.writeFos(fos, result);
+            FileAccess.writeFos(fos, result);
         }
         catch (final IOException ex) {
-            MainActivity.error("exception caching result: " + ex, ex);
+            Logging.error("exception caching result: " + ex, ex);
         }
         finally {
             if (fos != null) {
@@ -228,7 +234,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                     fos.close();
                 }
                 catch (final IOException ex) {
-                    MainActivity.error("exception closing fos: " + ex, ex);
+                    Logging.error("exception closing fos: " + ex, ex);
                 }
             }
         }
@@ -248,18 +254,18 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             throw new WiGLEAuthException("Unable to access Activity for authentication preferences.");
         }
         final SharedPreferences prefs = fragmentActivity.getSharedPreferences(
-                ListFragment.SHARED_PREFS, 0);
-        final boolean beAnonymous = prefs.getBoolean(ListFragment.PREF_BE_ANONYMOUS, false);
-        final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
-        final String username = prefs.getString(ListFragment.PREF_USERNAME, null);
-        final String password = prefs.getString(ListFragment.PREF_PASSWORD, null);
-        MainActivity.info("authname: " + authname);
+                PreferenceKeys.SHARED_PREFS, 0);
+        final boolean beAnonymous = prefs.getBoolean(PreferenceKeys.PREF_BE_ANONYMOUS, false);
+        final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
+        final String username = prefs.getString(PreferenceKeys.PREF_USERNAME, null);
+        final String password = prefs.getString(PreferenceKeys.PREF_PASSWORD, null);
+        Logging.info("authname: " + authname);
         if (beAnonymous && requiresLogin) {
-            MainActivity.info("anonymous, not running ApiRequest: " + this);
+            Logging.info("anonymous, not running ApiRequest: " + this);
             return;
         }
         if (authname == null && username != null && password != null && doBasicLogin) {
-            MainActivity.info("No authname but have username, going to request token");
+            Logging.info("No authname but have username, going to request token");
             downloadTokenAndStart(fragment);
         } else {
             start();
@@ -289,10 +295,10 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
 
         PreConnectConfigurator preConnectConfigurator = null;
         if (doBasicLogin) {
-            final SharedPreferences prefs = context.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
-            final String authname = prefs.getString(ListFragment.PREF_AUTHNAME, null);
+            final SharedPreferences prefs = context.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+            final String authname = prefs.getString(PreferenceKeys.PREF_AUTHNAME, null);
             final String token = TokenAccess.getApiToken(prefs);
-            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes("UTF-8"), Base64.NO_WRAP);
+            final String encoded = Base64.encodeToString((authname + ":" + token).getBytes(StandardCharsets.UTF_8), Base64.NO_WRAP);
             // Cannot set request property after connection is made
             preConnectConfigurator = new PreConnectConfigurator() {
                 @Override
@@ -315,29 +321,20 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
             if (doFormLogin) {
                 final String username = getUsername();
                 final String password = getPassword();
-                final String content = "credential_0=" + URLEncoder.encode(username, HttpFileUploader.ENCODING) +
-                        "&credential_1=" + URLEncoder.encode(password, HttpFileUploader.ENCODING);
+                final String content = "credential_0=" + URLEncoder.encode(username, StandardCharsets.UTF_8.toString()) +
+                        "&credential_1=" + URLEncoder.encode(password, StandardCharsets.UTF_8.toString());
                 printout.writeBytes(content);
             }
             printout.flush();
             printout.close();
         } else if (ApiDownloader.REQUEST_GET.equals(connectionMethod)) {
-            MainActivity.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
+            Logging.info( "GET to " + conn.getURL() + " responded " + conn.getResponseCode());
         }
 
         // get response data
-        final BufferedReader input = new BufferedReader(
-                new InputStreamReader( HttpFileUploader.getInputStream( conn ), HttpFileUploader.ENCODING) );
-        try {
+        try (BufferedReader input = new BufferedReader(
+                new InputStreamReader( getInputStream( conn ), StandardCharsets.UTF_8.toString()) )){
             return getResultString(input, preserveNewlines);
-        }
-        finally {
-            try {
-                input.close();
-            }
-            catch (final Exception ex) {
-                MainActivity.warn("Exception closing downloader reader: " + ex, ex);
-            }
         }
     }
 
@@ -346,7 +343,7 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
      */
     protected void downloadTokenAndStart(final Fragment fragment) {
         final ApiDownloader task = new ApiDownloader(fragment.getActivity(), ListFragment.lameStatic.dbHelper,
-                null, MainActivity.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
+                null, UrlConfig.TOKEN_URL, true, false, true, AbstractApiRequest.REQUEST_POST,
                 new ApiListener() {
                     @Override
                     public void requestComplete(final JSONObject json, final boolean isCache)
@@ -359,9 +356,9 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                                 Context fragmentContext = fragment.getContext();
                                 if (null != fragmentContext) {
                                     final SharedPreferences prefs = fragmentContext
-                                            .getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+                                            .getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
                                     final SharedPreferences.Editor edit = prefs.edit();
-                                    edit.putString(ListFragment.PREF_AUTHNAME, authname);
+                                    edit.putString(PreferenceKeys.PREF_AUTHNAME, authname);
                                     edit.apply();
                                     TokenAccess.setApiToken(prefs, token);
                                     // execute ourselves, the pending task
@@ -372,20 +369,34 @@ public abstract class AbstractApiRequest extends AbstractBackgroundTask {
                             } else if (json.has("credential_0")) {
                                 String message = "login failed for " +
                                         json.getString("credential_0");
-                                MainActivity.warn(message);
+                                Logging.warn(message);
                                 throw new WiGLEAuthException(message);
                             } else {
                                 throw new WiGLEAuthException("Unable to log in.");
                             }
                         } catch (final JSONException ex) {
-                            MainActivity.warn("json exception: " + ex + " json: " + json, ex);
+                            Logging.warn("json exception: " + ex + " json: " + json, ex);
                             throw new WiGLEAuthException("Unable to log in.");
                         } catch (final Exception e) {
-                            MainActivity.warn("response exception: " + e + " json: " + json, e);
+                            Logging.warn("response exception: " + e + " json: " + json, e);
                             throw new WiGLEAuthException("Unable to log in.");
                         }
                     }
                 });
         task.start();
+    }
+
+    /**
+     * get the InputStream, gunzip'ing if needed
+     */
+    public static InputStream getInputStream(HttpURLConnection conn ) throws IOException {
+        InputStream input = conn.getInputStream();
+
+        String encode = conn.getContentEncoding();
+        Logging.info( "Encoding: " + encode );
+        if ( "gzip".equalsIgnoreCase( encode ) ) {
+            input = new GZIPInputStream( input );
+        }
+        return input;
     }
 }

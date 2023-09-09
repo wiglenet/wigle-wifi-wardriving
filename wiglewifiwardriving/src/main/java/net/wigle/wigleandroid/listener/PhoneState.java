@@ -1,6 +1,6 @@
 package net.wigle.wigleandroid.listener;
 
-import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 import android.telephony.CellInfo;
 import android.telephony.CellLocation;
@@ -20,15 +20,15 @@ public class PhoneState extends PhoneStateListener {
         switch ( state ) {
             case TelephonyManager.CALL_STATE_IDLE:
                 isPhoneActive = false;
-                MainActivity.info( "setting phone inactive. state: " + state );
+                Logging.info( "setting phone inactive. state: " + state );
                 break;
             case TelephonyManager.CALL_STATE_RINGING:
             case TelephonyManager.CALL_STATE_OFFHOOK:
                 isPhoneActive = true;
-                MainActivity.info( "setting phone active. state: " + state );
+                Logging.info( "setting phone active. state: " + state );
                 break;
             default:
-                MainActivity.info( "unhandled call state: " + state );
+                Logging.info( "unhandled call state: " + state );
         }
     }
 
@@ -47,14 +47,14 @@ public class PhoneState extends PhoneStateListener {
     @Override
     public void onCellLocationChanged(CellLocation cellLoc){
         if ( cellLoc.getClass().getSimpleName().equals("CdmaCellLocation") ) {
-            MainActivity.info("cell location changed: cdma: " + cellLoc);
+            Logging.info("cell location changed: cdma: " + cellLoc);
         }
         else if ( cellLoc instanceof GsmCellLocation) {
             GsmCellLocation gsmCell = (GsmCellLocation) cellLoc;
-            MainActivity.info("cell location changed: gsm Cid: " + gsmCell.getCid());
-            MainActivity.info("cell location changed: gsm Lac: " + gsmCell.getLac());
+            Logging.info("cell location changed: gsm Cid: " + gsmCell.getCid());
+            Logging.info("cell location changed: gsm Lac: " + gsmCell.getLac());
         } else if (cellLoc != null) {
-            MainActivity.info("cell location changed on unknown class: "+cellLoc.getClass().getSimpleName());
+            Logging.info("cell location changed on unknown class: "+cellLoc.getClass().getSimpleName());
         }
     }
 
@@ -62,7 +62,7 @@ public class PhoneState extends PhoneStateListener {
     public void onCellInfoChanged(List<CellInfo> cellInfo) {
         if (cellInfo != null) {
             for (CellInfo info: cellInfo) {
-                MainActivity.info("Cell Info Change:"+info.toString());
+                Logging.info("Cell Info Change:"+info.toString());
             }
         }
     }

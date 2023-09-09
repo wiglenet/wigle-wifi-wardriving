@@ -2,13 +2,16 @@ package net.wigle.wigleandroid;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.core.app.NavUtils;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import net.wigle.wigleandroid.ui.PrefsBackedCheckbox;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 import net.wigle.wigleandroid.util.SettingsUtil;
 
 import java.util.ArrayList;
@@ -20,25 +23,22 @@ import java.util.List;
  * Created by arkasha on 8/1/17.
  */
 
-@SuppressWarnings("deprecation")
 public class MapFilterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final SharedPreferences prefs = this.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = this.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         final SharedPreferences.Editor editor = prefs.edit();
         setContentView(R.layout.mapfilter);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+        final androidx.appcompat.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
         View view = findViewById(android.R.id.content);
-        MainActivity.info("Filter Fragment Selected");
-        final EditText regex = (EditText) findViewById( R.id.edit_regex );
-        final String regexKey = MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_REGEX;
+        Logging.info("Filter Fragment Selected");
+        final EditText regex = findViewById( R.id.edit_regex );
+        final String regexKey = MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_REGEX;
         regex.setText( prefs.getString(regexKey, "") );
 
         regex.addTextChangedListener( new SettingsFragment.SetWatcher() {
@@ -60,48 +60,50 @@ public class MapFilterActivity extends AppCompatActivity {
         });
 
         //TODO: DRY up with SettingsFragment
-        final String authUser = prefs.getString(ListFragment.PREF_AUTHNAME,"");
-        final String authToken = prefs.getString(ListFragment.PREF_TOKEN, "");
-        final boolean isAnonymous = prefs.getBoolean( ListFragment.PREF_BE_ANONYMOUS, false);
+        final String authUser = prefs.getString(PreferenceKeys.PREF_AUTHNAME,"");
+        final String authToken = prefs.getString(PreferenceKeys.PREF_TOKEN, "");
+        final boolean isAnonymous = prefs.getBoolean( PreferenceKeys.PREF_BE_ANONYMOUS, false);
 
 
-        final String showDiscovered = prefs.getString( ListFragment.PREF_SHOW_DISCOVERED, ListFragment.PREF_MAP_NO_TILE);
+        final String showDiscovered = prefs.getString( PreferenceKeys.PREF_SHOW_DISCOVERED, PreferenceKeys.PREF_MAP_NO_TILE);
         final boolean isAuthenticated = (!authUser.isEmpty() && !authToken.isEmpty() && !isAnonymous);
         final String[] mapModes = SettingsUtil.getMapModes(isAuthenticated);
         final String[] mapModeName = SettingsUtil.getMapModeNames(isAuthenticated, MapFilterActivity.this);
 
-        if (!ListFragment.PREF_MAP_NO_TILE.equals(showDiscovered)) {
-            LinearLayout mainLayout = (LinearLayout) view.findViewById(R.id.show_map_discovered_since);
+        if (!PreferenceKeys.PREF_MAP_NO_TILE.equals(showDiscovered)) {
+            LinearLayout mainLayout = view.findViewById(R.id.show_map_discovered_since);
             mainLayout.setVisibility(View.VISIBLE);
         }
 
-        SettingsUtil.doMapSpinner( R.id.show_discovered, ListFragment.PREF_SHOW_DISCOVERED,
-                ListFragment.PREF_MAP_NO_TILE, mapModes, mapModeName, MapFilterActivity.this, view );
+        SettingsUtil.doMapSpinner( R.id.show_discovered, PreferenceKeys.PREF_SHOW_DISCOVERED,
+                PreferenceKeys.PREF_MAP_NO_TILE, mapModes, mapModeName, MapFilterActivity.this, view );
 
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        List<Long> yearValueBase = new ArrayList<Long>();
-        List<String> yearLabelBase = new ArrayList<String>();
+        List<Long> yearValueBase = new ArrayList<>();
+        List<String> yearLabelBase = new ArrayList<>();
         for (int i = 2001; i <= thisYear; i++) {
             yearValueBase.add((long)(i));
             yearLabelBase.add(Integer.toString(i));
         }
-        SettingsUtil.doSpinner( R.id.networks_discovered_since_year, view, ListFragment.PREF_SHOW_DISCOVERED_SINCE,
+        SettingsUtil.doSpinner( R.id.networks_discovered_since_year, view, PreferenceKeys.PREF_SHOW_DISCOVERED_SINCE,
                 2001L, yearValueBase.toArray(new Long[0]),
                 yearLabelBase.toArray(new String[0]), MapFilterActivity.this );
 
-        MainActivity.prefBackedCheckBox(this , view, R.id.showinvert,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_INVERT, false );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showopen,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_OPEN, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwep,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_WEP, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showwpa,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_WPA, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showcell,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_CELL, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.showbt,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_BT, true );
-        MainActivity.prefBackedCheckBox( this, view, R.id.enabled,
-                MappingFragment.MAP_DIALOG_PREFIX + ListFragment.PREF_MAPF_ENABLED, true );
+        PrefsBackedCheckbox.prefBackedCheckBox(this , view, R.id.showinvert,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_INVERT, false );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showopen,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_OPEN, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwep,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WEP, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showwpa,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_WPA, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showcell,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_CELL, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbt,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BT, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.showbtle,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_BTLE, true );
+        PrefsBackedCheckbox.prefBackedCheckBox( this, view, R.id.enabled,
+                MappingFragment.MAP_DIALOG_PREFIX + PreferenceKeys.PREF_MAPF_ENABLED, true );
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="stats">Запуск</string>
-    <string name="app_name">WiGLE WiFi исследование беспроводных сетей</string>
+    <string name="app_name">WiGLE исследование WiFi сетей</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi — Настройки</string>
     <string name="mapping_app_name">WiGLE WiFi — Карта</string>
@@ -81,12 +81,12 @@
     <string name="filter_enabled">Фильтр Включён</string>
     <string name="list_waiting_gps">(Ожидание синхр. GPS&#8230;)</string>
     <string name="list_scanning_off">(Сканирование выключено)</string>
-    <string name="list_short_lat">Широта:</string>
-    <string name="list_short_lon">Долгота:</string>
-    <string name="list_short_sats">Спутники:</string>
-    <string name="list_short_alt">Высота:</string>
+    <string name="list_short_lat">Широта: %1$s</string>
+    <string name="list_short_lon">Долгота: %1$s</string>
+    <string name="list_short_sats">Спутники: %1$d</string>
+    <string name="list_short_alt">Высота: %1$s</string>
     <string name="list_status_default">(Статус)</string>
-    <string name="list_speed">Скорость:</string>
+    <string name="list_speed">Скорость: %1$s</string>
     <string name="list_upload">Выгрузить файл?</string>
     <string name="network_signal">Сигнал:</string>
     <string name="network_type">Тип:</string>
@@ -118,8 +118,8 @@
     <string name="cancel">Отменить</string>
     <string name="dash_scan_off">(Сканирование выключено)</string>
     <string name="dash_new_wifi">Новых Wi-Fi сетей</string>
-    <string name="dash_vis_nets">Видимые сети:</string>
-    <string name="dash_new_upload">Новые сети с момента загрузки:</string>
+    <string name="dash_vis_nets">Видимые сети: %1$d</string>
+    <string name="dash_new_upload">Новые сети с момента загрузки: %1$d</string>
     <string name="dash_new_cells">Новых сотовых вышек</string>
     <string name="dash_new_bt">Новых устрйоств Bluetooth</string>
     <string name="dash_dist_run">Дистанция пробега:</string>
@@ -127,10 +127,11 @@
     <string name="dash_time_scanning">Продолжительность сканирования:</string>
     <string name="dash_dist_total">Общая дистанция:</string>
     <string name="dash_dist_prev">Предыдущий пробег:</string>
-    <string name="dash_db_queue">Очередь БД:</string>
-    <string name="dash_db_nets">Сетей в БД:</string>
-    <string name="dash_db_locs">Местоположений в БД:</string>
-    <string name="dash_short_loc">Спутники:</string>
+    <string name="dash_db_queue">Очередь БД: %1$s</string>
+    <string name="dash_db_nets">Сетей в БД: %1$s</string>
+    <string name="dash_db_locs">Местоположений в БД: %1$s</string>
+    <string name="dash_short_loc">Спутники: %1$s</string>
+    <string name="Mm_short">мм</string>
     <string name="km_short">км</string>
     <string name="mi_short">миль</string>
     <string name="miles">мили</string>
@@ -145,7 +146,7 @@
     <string name="run">Пробег</string>
     <string name="new_word">Новых</string>
     <string name="db">БД</string>
-    <string name="scanned_in">найдено за</string>
+    <string name="scanned_in">%1$d найдено за %2$d%3$s.</string>
     <string name="sort_title">Параметры сортировки</string>
     <string name="sort_spin_label">Сортировать список по:</string>
     <string name="channel">Канал</string>
@@ -232,6 +233,7 @@
     <string name="language_pl">polski (польский)</string>
     <string name="language_pt">português (португальский)</string>
     <string name="language_pt_rBR">português brasileiro (бразильский португа́льский)</string>
+    <string name="language_ro_rRO">Română (румынский)</string>
     <string name="language_ru">Ру́сский</string>
     <string name="language_sv">svenska (шведский)</string>
     <string name="language_sw">Kiswahili (суахили)</string>
@@ -264,7 +266,6 @@
     <string name="map_toast_hybrid">Карта: Гиброд</string>
     <string name="map_toast_terrain">Карта: Рельеф</string>
     <string name="map_needs_playservice">Карта зависит от Сервисов Google Play</string>
-    <string name="register">Зарегистрироваться</string>
     <string name="drawer_open">Ящик открыт</string>
     <string name="drawer_close">Ящик Закрыть</string>
     <string name="netwpa3_title">WPA3</string>
@@ -273,7 +274,6 @@
     <string name="netwep_title">WEP</string>
     <string name="netnowep_title">None</string>
     <string name="netwepunknown_title">Unknown</string>
-    <string name="activate">активировать по QR-коду сейчас</string>
     <string name="setting_activate_prompt">посетите https://wigle.net/activate для вашего пользовательского кода</string>
     <string name="upload_queued">В очереди</string>
     <string name="upload_parsing">Обработка…</string>
@@ -400,7 +400,7 @@
     <string name="rank_all_time">Рейтинг за всё время</string>
     <string name="rank_month">Месячный рейтинг</string>
     <string name="rank_stats_app_name">Рейтинги WiGLE.net</string>
-    <string name="queue_depth">Глубина очереди обработки файлов</string>
+    <string name="queue_depth">Очередь WiGLE: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="prevmonthcount_title">сетей Wi-Fi обнаружено в прошлом месяце</string>
     <string name="all_time_title">Обнаружено Wi-Fi за всё время</string>
     <string name="bytes">Байт</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Легкий</string>
     <string name="theme_dark_label">Темный</string>
     <string name="theme_follow_label">Следить за системой</string>
+    <string name="manage_gpx_button">Сохраненные маршруты</string>
+    <string name="manage_gpx">Управление сохраненными маршрутами GPX</string>
+    <string name="enable_map_theme">Сопоставьте тему карты с приложением</string>
+    <string name="throttle">Сканирование WiFi ограничено. Отключите дроссель сканирования WiFi в настройках разработчика для повышения производительности.</string>
+    <string name="no_individual_nets_map">Отключить отображение сети карты</string>
+    <string name="filter_show_btle">Показать Bluetooth LE</string>
+    <string name="settings_gps_head">Настройки GPS</string>
+    <string name="enable_kalman">Фильтр шума GPS</string>
+    <string name="gps_old_message">Это устройство больше не поддерживается через магазин приложений из-за политики Google. Создайте резервную копию своих данных и загрузите WiGLE v. 2.67 .apk (или более раннюю версию) с https://github.com/wiglenet/wigle-wifi-wardriving/. Простите за неудобства!</string>
+    <string name="gps_old_title">Не удалось инициализировать GPS</string>
+    <string name="enable_map_bearing">Следуйте моему азимуту/направлению</string>
+    <string name="login_title">Требуется вход</string>
+    <string name="login_required">Вам необходимо авторизоваться чтобы выполнить это действие. Пожалуйста, войдите или создайте учетную запись, если это необходимо.</string>
+    <string name="login">Авторизоваться</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Зарегистрируйте&lt;/a&gt; @WiGLE.net или &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;активируйте сейчас с помощью QR-кода&lt;/a&gt;</string>
+    <string name="ble_services">UUID BLE:</string>
+    <string name="ble_vendor">Идентификатор поставщика BLE:</string>
 </resources>

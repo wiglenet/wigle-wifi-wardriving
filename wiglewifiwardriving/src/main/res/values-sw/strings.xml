@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="stats">Kuanza</string>
-    <string name="app_name">Utafutaji wa mtandao wa WiGLE WiFi kwa kutumia gari</string>
+    <string name="app_name">Utafutaji wa WiGLE WiFi</string>
     <string name="list_app_name">WiGLE WiFi</string>
     <string name="settings_app_name">WiGLE WiFi - Mipangilio</string>
     <string name="mapping_app_name">WiGLE - Ramani</string>
@@ -80,12 +80,12 @@
     <string name="filter_enabled">Kichujio Kimewezeshwa</string>
     <string name="list_waiting_gps">(Inasubiri ulandanishi wa GPS…)</string>
     <string name="list_scanning_off">(Kitambazo kimezimwa)</string>
-    <string name="list_short_lat">Lat:</string>
-    <string name="list_short_lon">Lon:</string>
-    <string name="list_short_sats">Sats:</string>
-    <string name="list_short_alt">Alt:</string>
+    <string name="list_short_lat">Lat: %1$s</string>
+    <string name="list_short_lon">Lon: %1$s</string>
+    <string name="list_short_sats">Sats: %1$d</string>
+    <string name="list_short_alt">Alt: %1$s</string>
     <string name="list_status_default">(hali)</string>
-    <string name="list_speed">Kasi:</string>
+    <string name="list_speed">Kasi: %1$s</string>
     <string name="list_upload">Pakia Faili?</string>
     <string name="network_signal">Ishara:</string>
     <string name="network_type">Aina:</string>
@@ -118,8 +118,8 @@
     <string name="cancel">Katisha</string>
     <string name="dash_scan_off">(Kutambaza Imezimwa)</string>
     <string name="dash_new_wifi">WiFi Mpya</string>
-    <string name="dash_vis_nets">Mitandao Inayoonekana:</string>
-    <string name="dash_new_upload">Mitandao Tangu Kupakia:</string>
+    <string name="dash_vis_nets">Mitandao Inayoonekana: %1$d</string>
+    <string name="dash_new_upload">Mitandao Tangu Kupakia: %1$d</string>
     <string name="dash_new_cells">Seli Mpya</string>
     <string name="dash_new_bt">Bluetooth Mpya</string>
     <string name="dash_dist_run">Umbali wa Utafutaji:</string>
@@ -127,10 +127,11 @@
     <string name="dash_time_scanning">Muda wa Kutambaza:</string>
     <string name="dash_dist_total">Jumla ya Umbali:</string>
     <string name="dash_dist_prev">Utafutaji wa Awali:</string>
-    <string name="dash_db_queue">Foleni ya DB:</string>
-    <string name="dash_db_nets">Mitandao ya DB:</string>
-    <string name="dash_db_locs">Maeneo ya DB:</string>
-    <string name="dash_short_loc">Mahali:</string>
+    <string name="dash_db_queue">Foleni ya DB: %1$s</string>
+    <string name="dash_db_nets">Mitandao ya DB: %1$s</string>
+    <string name="dash_db_locs">Maeneo ya DB: %1$s</string>
+    <string name="dash_short_loc">Mahali: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">kilomita</string>
     <string name="mi_short">mi</string>
     <string name="miles">maili</string>
@@ -145,7 +146,7 @@
     <string name="run">Utafutaji</string>
     <string name="new_word">Mpya</string>
     <string name="db">DB</string>
-    <string name="scanned_in">imetambazwa ndani</string>
+    <string name="scanned_in">%1$d imetambazwa ndani %2$d%3$s.</string>
     <string name="sort_title">Chaguzi za Kupanga</string>
     <string name="sort_spin_label">Panga Orodha Kulingana na:</string>
     <string name="channel">Mkondo</string>
@@ -232,6 +233,7 @@
     <string name="language_pl">polski (Kipolishi)</string>
     <string name="language_pt">português (Kireno)</string>
     <string name="language_pt_rBR">português brasileiro (Kireno cha Brazil)</string>
+    <string name="language_ro_rRO">Română (Kiromania)</string>
     <string name="language_ru">ру́сский (Kirusi)</string>
     <string name="language_sv">svenska (Kiswidi)</string>
     <string name="language_sw">Kiswahili</string>
@@ -264,7 +266,6 @@
     <string name="map_toast_hybrid">Aina ya Ramani: Mahuluti</string>
     <string name="map_toast_terrain">Aina ya Ramani: Mandhari</string>
     <string name="map_needs_playservice">Ramani inahitaji Huduma ya Google Play</string>
-    <string name="register">Jisajili</string>
     <string name="drawer_open">Droo Wazi</string>
     <string name="drawer_close">Droo Imefungwa</string>
     <string name="site_stats_app_name">Takwimu za WiGLE.net</string>
@@ -293,7 +294,7 @@
     <string name="tab_rank">Seli</string>
     <string name="uploads_app_name">Upakiaji wa WiGLE.net</string>
     <string name="tab_uploads">Upakiaji</string>
-    <string name="queue_depth">Faili Inachakata Kina cha Foleni</string>
+    <string name="queue_depth">Foleni ya WiGLE: %1$s Tatu: %2$s Geo: %3$s</string>
     <string name="news_app_name">Habari za WiGLE.net</string>
     <string name="tab_news">Habari</string>
     <string name="bytes">Baiti</string>
@@ -306,7 +307,6 @@
     <string name="prevrank_title">Nafasi ya Mtumiaji Mwezi uliopita</string>
     <string name="prevmonthrank_title">Nafasi ya Mwezi Mwezi uliopita</string>
     <string name="list_scanning_on">(Tambazo imewashwa)</string>
-    <string name="activate">amilisha sasa na msimbo wa QR</string>
     <string name="setting_activate_prompt">zuru https://wigle.net/amilisha kwa msimbo wako wa mtumiaji</string>
     <string name="upload_queued">Imewekwa foleni</string>
     <string name="upload_parsing">Inachanganua…</string>
@@ -315,7 +315,7 @@
     <string name="upload_success">Imekamilika</string>
     <string name="upload_failed">Imeshindwa</string>
     <string name="upload_unknown">Haijulikani</string>
-    <string name="upload_archive">Kuweka kumbukumbu ...</string>
+    <string name="upload_archive">Kuweka kumbukumbu …</string>
     <string name="upload_catalog">Kuorodhesha…</string>
     <string name="upload_geoindex">Kutoa viwianishi za kijiografia zinazoendana na (eneo)…</string>
     <string name="auth_username">Mtumiaji Halali</string>
@@ -428,4 +428,21 @@
     <string name="theme_light_label">Nyepesi</string>
     <string name="theme_dark_label">Meusi</string>
     <string name="theme_follow_label">Fuata mfumo</string>
+    <string name="manage_gpx_button">Njia Zilizohifadhiwa</string>
+    <string name="manage_gpx">Dhibiti njia za GPX zilizohifadhiwa</string>
+    <string name="enable_map_theme">Linganisha mandhari ya ramani na programu</string>
+    <string name="throttle">Uchanganuzi wa WiFi ni mdogo. Zima Wifi Scan Throttle chini ya Mipangilio ya Wasanidi Programu kwa utendakazi bora.</string>
+    <string name="no_individual_nets_map">Lemaza onyesho la wavu la ramani</string>
+    <string name="filter_show_btle">Onyesha Bluetooth LE</string>
+    <string name="settings_gps_head">Mipangilio ya GPS</string>
+    <string name="enable_kalman">Chuja kelele ya GPS</string>
+    <string name="gps_old_message">Kifaa hiki hakitumiki tena kupitia duka la programu kwa sababu ya sera za Google. Tafadhali hifadhi nakala ya data yako na upakie WiGLE v. 2.67 .apk (au chini) kutoka https://github.com/wiglenet/wigle-wifi-wardriving/ . Pole kwa usumbufu!</string>
+    <string name="gps_old_title">Haijaweza kuanzisha GPS</string>
+    <string name="enable_map_bearing">Fuata mada/kichwa changu</string>
+    <string name="login_title">Kuingia Kunahitajika</string>
+    <string name="login_required">Lazima uwe umeingia ili kufanya hivi. Tafadhali ingia au unda akaunti ikiwa ni lazima.</string>
+    <string name="login">Ingia</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Sajili&lt;/a&gt; @WiGLE.net au &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;uwashe sasa ukitumia msimbo wa QR&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUIDs:</string>
+    <string name="ble_vendor">Kitambulisho cha Muuzaji cha BLE:</string>
 </resources>

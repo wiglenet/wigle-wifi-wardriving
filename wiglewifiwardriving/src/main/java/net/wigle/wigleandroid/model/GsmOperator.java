@@ -5,10 +5,11 @@ import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.os.Build;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityLte;
+import android.telephony.CellIdentityNr;
 import android.telephony.CellIdentityWcdma;
 
 import net.wigle.wigleandroid.MainActivity;
-import net.wigle.wigleandroid.util.InsufficientSpaceException;
+import net.wigle.wigleandroid.util.Logging;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class GsmOperator {
     private String mcc;
     private String mnc;
     private int xac;
-    private int cellId;
+    private final long cellId;
     private final int fcn;
 
     private static Map<String, Map<String,String>> OPERATOR_CACHE;
@@ -29,7 +30,6 @@ public class GsmOperator {
     }
 
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     public GsmOperator(final CellIdentityGsm cellIdentG) throws GsmOperatorException {
         cellId = cellIdentG.getCid();
         xac = cellIdentG.getLac();
@@ -53,19 +53,18 @@ public class GsmOperator {
                 res += "\n\tBSIC: " + cellIdentG.getBsic();
             }
         }
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "GSM") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
+                    Logging.info("Discarding GSM cell with invalid ID for ARFCN: " + cellIdentG.getArfcn());
                 } else {
-                    MainActivity.info("Discarding GSM cell with invalid ID");
+                    Logging.info("Discarding GSM cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid GSM Cell Identity values: "+getOperatorKeyString());
         }
     }
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR1)
     public GsmOperator(final CellIdentityLte cellIdentL) throws GsmOperatorException{
         cellId = cellIdentL.getCi();
         xac = cellIdentL.getTac();
@@ -88,23 +87,60 @@ public class GsmOperator {
                 //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
             }
 
-            MainActivity.info(res);
+            Logging.info(res);
         }
 
 
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+        if (!validCellId(this.cellId, "LTE") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
+                    Logging.info("Discarding LTE cell with invalid ID for EARFCN: " + cellIdentL.getEarfcn());
                 } else {
-                    MainActivity.info("Discarding LTE cell with invalid ID");
+                    Logging.info("Discarding LTE cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid LTE Cell Identity values "+getOperatorKeyString());
         }
     }
 
-    @TargetApi(android.os.Build.VERSION_CODES.JELLY_BEAN_MR2)
+    @TargetApi(android.os.Build.VERSION_CODES.Q)
+    public GsmOperator(final CellIdentityNr cellIdentN) throws GsmOperatorException{
+        cellId = cellIdentN.getNci();
+        xac = cellIdentN.getTac();
+        mcc = cellIdentN.getMccString();
+        mnc = cellIdentN.getMncString();
+
+        fcn = android.os.Build.VERSION.SDK_INT >= 24 && cellIdentN.getNrarfcn() != Integer.MAX_VALUE ? cellIdentN.getNrarfcn() : 0;
+        if (MainActivity.DEBUG_CELL_DATA) {
+            String res = "NR Cell: " +
+                    "\n\tNCI: " + cellId +
+                    "\n\tPCI: " + cellIdentN.getPci() +
+                    "\n\tTAC: " + xac +
+                    "\n\tMCC: " + mcc +
+                    "\n\tMNC: " + mnc +
+                    "\n\tNetwork Key: " + getOperatorKeyString() +
+                    "\n\toperator: " + getOperatorString() +
+                    "\n\tNRARFCN:" + fcn;
+
+            if (Build.VERSION.SDK_INT >= 28) {
+                //TODO: res += "\n\tBandwidth: "+cellIdentL.getBandwidth()
+            }
+
+            Logging.info(res);
+        }
+
+        if (!validCellId(this.cellId, "NR") || !validXac(xac) || !validMccMnc(mcc,mnc)) {
+            if (MainActivity.DEBUG_CELL_DATA) {
+                if (android.os.Build.VERSION.SDK_INT >= 24) {
+                    Logging.info("Discarding NR cell with invalid ID for NRARFCN: " + cellIdentN.getNrarfcn());
+                } else {
+                    Logging.info("Discarding NR cell with invalid ID");
+                }
+            }
+            throw new GsmOperatorException("invalid NR Cell Identity values "+getOperatorKeyString());
+        }
+    }
+
     public GsmOperator(final CellIdentityWcdma cellIdentW) throws GsmOperatorException {
         cellId = cellIdentW.getCid();
         xac = cellIdentW.getLac();
@@ -123,15 +159,15 @@ public class GsmOperator {
                     "\n\toperator: " + getOperatorString() +
                     "\n\tUARFCN:" + fcn;
 
-            MainActivity.info(res);
+            Logging.info(res);
         }
 
-        if (!validCellId(this.cellId) || !validXac(xac) || !validMccMnc(mcc, mnc)) {
+        if (!validCellId(this.cellId, "WCDMA") || !validXac(xac) || !validMccMnc(mcc, mnc)) {
             if (MainActivity.DEBUG_CELL_DATA) {
                 if (android.os.Build.VERSION.SDK_INT >= 24) {
-                    MainActivity.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
+                    Logging.info("Discarding WCDMA cell with invalid ID for UARFCN: " + cellIdentW.getUarfcn());
                 } else {
-                    MainActivity.info("Discarding WCDMA cell with invalid ID");
+                    Logging.info("Discarding WCDMA cell with invalid ID");
                 }
             }
             throw new GsmOperatorException("invalid WCDMA Cell Identity values "+getOperatorKeyString());
@@ -152,9 +188,18 @@ public class GsmOperator {
         return fcn;
     }
 
-    private boolean validCellId(final int cellId) {
-        if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
-            return true;
+    private boolean validCellId(final long cellId, final String type) {
+        switch (type) {
+            case "LTE":
+            case "WCDMA":
+            case "GSM":
+                if ((cellId > 0) && (cellId < Integer.MAX_VALUE)) {
+                    return true;
+                }
+            case "NR":
+                if ((cellId > 0) && (cellId < Long.MAX_VALUE)) {
+                    return true;
+                }
         }
         return false;
     }
@@ -210,8 +255,6 @@ public class GsmOperator {
 
     /**
      * Map the 5-6 digit operator PLMN code against the database of operator names
-     * @param operatorCode
-     * @return
      */
     public static String getOperatorName(final String operatorCode) {
         //ALIBI: MCC is always 3 chars, MNC may be 2 or 3.
@@ -235,7 +278,7 @@ public class GsmOperator {
             }
 
             MainActivity.State s = MainActivity.getMainActivity().getState();
-            if (null != s) {
+            if (null != s && null != s.mxcDbHelper) {
                 operator = s.mxcDbHelper.networkNameForMccMnc(mcc,mnc);
                 mccMap.put(mnc, operator);
                 return operator;
@@ -263,16 +306,9 @@ public class GsmOperator {
                     operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
                 } catch (SQLiteDatabaseCorruptException sqldbex) {
                     // this case seems isolated to LG android 4.4 devices
-                    MainActivity.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
-                    try {
-                        //recopy the MccMnc DB file to see whether we can recover.
-                        s.mxcDbHelper.implantMxcDatabase();
-                        //TODO: too aggressive? operator = s.mxcDbHelper.networkNameForMccMnc(mcc, mnc);
-                    } catch (InsufficientSpaceException sex) {
-                        MainActivity.error("GSMOp implant failed: ",sex);
-                    } catch (Exception ex) {
-                        MainActivity.warn("Mxc DB recopy failed", ex);
-                    }
+                    Logging.warn("Mxc DB corrupt - unable to lookup carrier", sqldbex);
+                    //attempt to recopy the MccMnc DB file to see whether we can recover.
+                    s.mxcDbHelper.implantMxcDatabase(MainActivity.getMainActivity(), false);
                 }
                 if (operator != null) {
                     //DEBUG: MainActivity.info("matched operator L2: "+operator+" ("+mcc+":"+mnc+")");

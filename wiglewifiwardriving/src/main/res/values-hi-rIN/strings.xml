@@ -80,12 +80,12 @@
     <string name="filter_enabled">फ़िल्टर सक्षम किया गया है</string>
     <string name="list_waiting_gps">(GPS सिंक की प्रतीक्षा की जा रही है...)</string>
     <string name="list_scanning_off">(स्कैनिंग बंद किया गया है)</string>
-    <string name="list_short_lat">अक्षांश:</string>
-    <string name="list_short_lon">देशान्तर:</string>
-    <string name="list_short_sats">उपग्रह:</string>
-    <string name="list_short_alt">ऊंचाई:</string>
+    <string name="list_short_lat">अक्षांश: %1$s</string>
+    <string name="list_short_lon">देशान्तर: %1$s</string>
+    <string name="list_short_sats">उपग्रह: %1$d</string>
+    <string name="list_short_alt">ऊंचाई: %1$s</string>
     <string name="list_status_default">(स्थिति)</string>
-    <string name="list_speed">गति:</string>
+    <string name="list_speed">गति: %1$s</string>
     <string name="list_upload">फ़ाइल अपलोड करें?</string>
     <string name="network_signal">सिग्नल:</string>
     <string name="network_type">प्रकार:</string>
@@ -118,8 +118,8 @@
     <string name="cancel">रद्द करें</string>
     <string name="dash_scan_off">(स्कैनिंग बंद किया गया है)</string>
     <string name="dash_new_wifi">नया WiFi</string>
-    <string name="dash_vis_nets">दृश्यमान नेट्स:</string>
-    <string name="dash_new_upload">अपलोड के बाद से नेट:</string>
+    <string name="dash_vis_nets">दृश्यमान नेट्स: %1$d</string>
+    <string name="dash_new_upload">अपलोड के बाद से नेट: %1$d</string>
     <string name="dash_new_cells">नई सेल</string>
     <string name="dash_new_bt">नया ब्लूटूथ</string>
     <string name="dash_dist_run">रन की दूरी:</string>
@@ -127,10 +127,11 @@
     <string name="dash_time_scanning">स्कैन की अवधि:</string>
     <string name="dash_dist_total">कुल दूरी:</string>
     <string name="dash_dist_prev">पिछला रन:</string>
-    <string name="dash_db_queue">DB कतार:</string>
-    <string name="dash_db_nets">DB नेट्स:</string>
-    <string name="dash_db_locs">DB स्थान:</string>
-    <string name="dash_short_loc">स्थान:</string>
+    <string name="dash_db_queue">DB कतार: %1$s</string>
+    <string name="dash_db_nets">DB नेट्स: %1$s</string>
+    <string name="dash_db_locs">DB स्थान: %1$s</string>
+    <string name="dash_short_loc">स्थान: %1$s</string>
+    <string name="Mm_short">मेगामीटर</string>
     <string name="km_short">किमी</string>
     <string name="mi_short">मील</string>
     <string name="miles">माइल्स</string>
@@ -145,7 +146,7 @@
     <string name="run">रन</string>
     <string name="new_word">नया</string>
     <string name="db">DB</string>
-    <string name="scanned_in">में स्कैन किया गया</string>
+    <string name="scanned_in">%1$d में स्कैन किया गया %2$d%3$s.</string>
     <string name="sort_title">सॉर्ट विकल्प</string>
     <string name="sort_spin_label">इसके द्वारा सूची सॉर्ट करें:</string>
     <string name="channel">चैनल</string>
@@ -232,6 +233,7 @@
     <string name="language_pl">polski (पोलिश)</string>
     <string name="language_pt">português (पुर्तगाली)</string>
     <string name="language_pt_rBR">português brasileiroो (ब्राज़ीलियाई पुर्तगाली)</string>
+    <string name="language_ro_rRO">Română (रोमानियाई)</string>
     <string name="language_ru">ру́сский (रूसी)</string>
     <string name="language_sv">svenska (स्वीडिश)</string>
     <string name="language_sw">Kiswahili (स्वाहिली)</string>
@@ -264,7 +266,6 @@
     <string name="map_toast_hybrid">मानचित्र प्रकार: हाइब्रिड</string>
     <string name="map_toast_terrain">मानचित्र प्रकार: क्षेत्र</string>
     <string name="map_needs_playservice">मानचित्र के लिए Google Play सेवा की आवश्यकता होती है</string>
-    <string name="register">पंजीकृत करें</string>
     <string name="drawer_open">ड्रॉवर खुला</string>
     <string name="drawer_close">ड्रॉवर बंद</string>
     <string name="site_stats_app_name">WiGLE.net सांख्यिकी</string>
@@ -293,7 +294,7 @@
     <string name="tab_rank">रैंकिंग</string>
     <string name="uploads_app_name">WiGLE.net अपलोड</string>
     <string name="tab_uploads">अपलोड</string>
-    <string name="queue_depth">फ़ाइल प्रोसेसिंग कतार गहराई</string>
+    <string name="queue_depth">WiGLE कतार: %1$s त्रि: %2$s भू: %3$s</string>
     <string name="news_app_name">WiGLE.net समाचार</string>
     <string name="tab_news">समाचार</string>
     <string name="bytes">बाइट्स</string>
@@ -306,7 +307,6 @@
     <string name="prevrank_title">पिछले महीने की उपयोगकर्ता रैंकिंग </string>
     <string name="prevmonthrank_title">पिछले महीने की महीना रैंकिंग</string>
     <string name="list_scanning_on">(स्कैनिंग चालू किया गया)</string>
-    <string name="activate">QR कोड के साथ अब सक्रिय करें</string>
     <string name="setting_activate_prompt">अपने उपयोगकर्ता कोड के लिए https://wigle.net/activate पर जाएँ</string>
     <string name="upload_queued">कतारबद्ध किया हुआ</string>
     <string name="upload_parsing">पार्सिंग...</string>
@@ -428,4 +428,21 @@
     <string name="theme_light_label">प्रकाश</string>
     <string name="theme_dark_label">डार्क</string>
     <string name="theme_follow_label">सिस्टम का पालन करें</string>
+    <string name="manage_gpx_button">सहेजे गए मार्ग</string>
+    <string name="manage_gpx">सहेजे गए GPX मार्ग प्रबंधित करें</string>
+    <string name="enable_map_theme">ऐप के लिए मैप थीम का मिलान करें</string>
+    <string name="throttle">वाईफाई स्कैनिंग सीमित है। बेहतर प्रदर्शन के लिए डेवलपर सेटिंग्स के तहत वाईफाई स्कैन थ्रॉटल को अक्षम करें।</string>
+    <string name="no_individual_nets_map">मानचित्र शुद्ध प्रदर्शन अक्षम करें</string>
+    <string name="filter_show_btle">ब्लूटूथ ले दिखाएँ</string>
+    <string name="settings_gps_head">जीपीएस सेटिंग्स</string>
+    <string name="enable_kalman">GPS शोर फ़िल्टर करें</string>
+    <string name="gps_old_message">Google की नीतियों के कारण यह डिवाइस अब ऐप स्टोर द्वारा समर्थित नहीं है। कृपया अपने डेटा का बैकअप लें और https://github.com/wiglenet/wigle-wifi-wardriving/ से WiGLE v. 2.67 .apk (या निचला) साइड-लोड करें। असुविधा के लिए खेद है!</string>
+    <string name="gps_old_title">GPS प्रारंभ करने में असमर्थ</string>
+    <string name="enable_map_bearing">मेरे असर/शीर्षक का पालन करें</string>
+    <string name="login_title">लॉगिन आवश्यक</string>
+    <string name="login_required">यह करने के लिये लॉग - इन करना आवश्यक है। कृपया लॉग इन करें या यदि आवश्यक हो तो एक खाता बनाएँ।</string>
+    <string name="login">लॉग इन करें</string>
+    <string name="registration_html_prompt">\@WiGLE.net &lt;a href=\'net.wigle.wigleandroid.register://register\'>पंजीकृतं&lt;/a&gt; करें या &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR कोड के साथ अभी सक्रिय करें&lt;/a&gt;</string>
+    <string name="ble_services">बीएलई यूयूआईडी:</string>
+    <string name="ble_vendor">बीएलई विक्रेता आईडी:</string>
 </resources>

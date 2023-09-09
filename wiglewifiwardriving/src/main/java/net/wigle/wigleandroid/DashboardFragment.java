@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,19 +22,22 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import net.wigle.wigleandroid.listener.GPSListener;
+import net.wigle.wigleandroid.listener.GNSSListener;
 import net.wigle.wigleandroid.ui.UINumberFormat;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DashboardFragment extends Fragment {
   private final Handler timer = new Handler();
   private AtomicBoolean finishing;
   private NumberFormat numberFormat;
-  private NumberFormat  wholeNumberFormat;
+  private NumberFormat integerFormat;
   private ScrollView scrollView;
   private View landscape;
   private View portrait;
@@ -41,7 +45,7 @@ public class DashboardFragment extends Fragment {
   /** Called when the activity is first created. */
   @Override
   public void onCreate( final Bundle savedInstanceState ) {
-    MainActivity.info("DASH: onCreate");
+    Logging.info("DASH: onCreate");
     super.onCreate( savedInstanceState );
     setHasOptionsMenu(true);
     Activity activity = getActivity();
@@ -51,19 +55,19 @@ public class DashboardFragment extends Fragment {
         // media volume
         getActivity().setVolumeControlStream( AudioManager.STREAM_MUSIC );
     } else {
-        MainActivity.error("Failed to set language - null activity in dash onCreate.");
+        Logging.error("Failed to set language - null activity in dash onCreate.");
     }
     finishing = new AtomicBoolean( false );
-    Configuration sysConfig = getResources().getConfiguration();
+    final Configuration conf = getResources().getConfiguration();
     Locale locale = null;
-    if (null != sysConfig) {
-        locale = sysConfig.locale;
+    if (null != conf && null != conf.getLocales()) {
+        locale = conf.getLocales().get(0);
     }
     if (null == locale) {
         locale = Locale.US;
     }
     numberFormat = NumberFormat.getNumberInstance(locale);
-    wholeNumberFormat = NumberFormat.getIntegerInstance(locale);
+    integerFormat = NumberFormat.getInstance();
     if ( numberFormat instanceof DecimalFormat ) {
       numberFormat.setMinimumFractionDigits(2);
       numberFormat.setMaximumFractionDigits(2);
@@ -73,7 +77,7 @@ public class DashboardFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     final int orientation = getResources().getConfiguration().orientation;
-    MainActivity.info("DASH: onCreateView. orientation: " + orientation);
+    Logging.info("DASH: onCreateView. orientation: " + orientation);
     scrollView = (ScrollView) inflater.inflate(R.layout.dash, container, false);
     landscape = inflater.inflate(R.layout.dashlandscape, container, false);
     portrait = inflater.inflate(R.layout.dashportrait, container, false);
@@ -106,13 +110,13 @@ public class DashboardFragment extends Fragment {
                     updateUI(view);
                 }
             } catch (Exception e) {
-                MainActivity.error("failed to update dash UI: ",e);
+                Logging.error("failed to update dash UI: ",e);
             }
             final long period = 1000L;
             // info("wifitimer: " + period );
             timer.postDelayed( this, period );
         } else {
-          MainActivity.info( "finishing mapping timer" );
+          Logging.info( "finishing mapping timer" );
         }
     }
   };
@@ -136,48 +140,53 @@ public class DashboardFragment extends Fragment {
         }
 
         TextView tv = view.findViewById( R.id.runnets );
-        tv.setText( (ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )+ " ");
+        tv.setText( (integerFormat.format(ListFragment.lameStatic.runNets + ListFragment.lameStatic.runBt )));
 
         tv = view.findViewById( R.id.runcaption );
         tv.setText( (getString(R.string.run)));
 
         tv = view.findViewById( R.id.newwifi );
-        tv.setText( ListFragment.lameStatic.newWifi + " " );
+        tv.setText( (integerFormat.format(ListFragment.lameStatic.newWifi)));
 
         tv = view.findViewById( R.id.newbt );
-        tv.setText( ListFragment.lameStatic.newBt + " " );
+        tv.setText(integerFormat.format(ListFragment.lameStatic.newBt) );
 
         tv = view.findViewById( R.id.currnets );
-        tv.setText( getString(R.string.dash_vis_nets) + " " + ListFragment.lameStatic.currNets );
+        tv.setText( getString(R.string.dash_vis_nets, ListFragment.lameStatic.currNets));
 
         tv = view.findViewById( R.id.newcells );
-        tv.setText( ListFragment.lameStatic.newCells + " ");
+        tv.setText( integerFormat.format(ListFragment.lameStatic.newCells) );
 
         if (null != currentActivity) {
-            final SharedPreferences prefs = currentActivity.getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+            final SharedPreferences prefs = currentActivity.getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
             tv = view.findViewById( R.id.newNetsSinceUpload );
-            tv.setText( getString(R.string.dash_new_upload) + " " + newNetsSinceUpload(prefs) );
+            tv.setText( getString(R.string.dash_new_upload, newNetsSinceUpload(prefs)) );
 
-            updateDist(view, prefs, R.id.rundist, ListFragment.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
-            updateTime(view, prefs, R.id.run_dur, ListFragment.PREF_STARTTIME_RUN);
-            updateTimeTare(view, prefs, R.id.scan_dur, ListFragment.PREF_CUMULATIVE_SCANTIME_RUN,
-                    ListFragment.PREF_STARTTIME_RUN, MainActivity.isScanning(getActivity()));
-            updateDist(view, prefs, R.id.totaldist, ListFragment.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
-            updateDist(view, prefs, R.id.prevrundist, ListFragment.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
+            updateDist(view, prefs, R.id.rundist, PreferenceKeys.PREF_DISTANCE_RUN, getString(R.string.dash_dist_run));
+            updateTime(view, prefs, R.id.run_dur, PreferenceKeys.PREF_STARTTIME_RUN);
+            updateTimeTare(view, prefs, R.id.scan_dur, MainActivity.isScanning(getActivity()));
+            updateDist(view, prefs, R.id.totaldist, PreferenceKeys.PREF_DISTANCE_TOTAL, getString(R.string.dash_dist_total));
+            updateDist(view, prefs, R.id.prevrundist, PreferenceKeys.PREF_DISTANCE_PREV_RUN, getString(R.string.dash_dist_prev));
         }
         tv = view.findViewById( R.id.queuesize );
-        tv.setText( getString(R.string.dash_db_queue) + " " + wholeNumberFormat.format(ListFragment.lameStatic.preQueueSize) );
+        tv.setText( getString(R.string.dash_db_queue, integerFormat.format(ListFragment.lameStatic.preQueueSize)));
 
         tv = view.findViewById( R.id.dbNets );
-        tv.setText( getString(R.string.dash_db_nets) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbNets) );
+        tv.setText( getString(R.string.dash_db_nets, integerFormat.format(ListFragment.lameStatic.dbNets)));
 
         tv = view.findViewById( R.id.dbLocs );
-        tv.setText( getString(R.string.dash_db_locs) + " " + wholeNumberFormat.format(ListFragment.lameStatic.dbLocs) );
+        tv.setText( getString(R.string.dash_db_locs, integerFormat.format(ListFragment.lameStatic.dbLocs)));
+
+        tv = view.findViewById( R.id.scanned_in );
+      final String status =
+              getString(R.string.scanned_in, ListFragment.lameStatic.currNets, ListFragment.lameStatic.currWifiScanDurMs, getString(R.string.ms_short));
+
+      tv.setText(status);
 
         tv = view.findViewById( R.id.gpsstatus );
         Location location = ListFragment.lameStatic.location;
 
-        tv.setText( getString(R.string.dash_short_loc) + " ");
+        tv.setText( getString(R.string.dash_short_loc, ""));
 
         TextView fixMeta = view.findViewById(R.id.fixmeta);
         TextView conType = view.findViewById(R.id.contype);
@@ -200,7 +209,7 @@ public class DashboardFragment extends Fragment {
                     String conKeyString = null;
                     String conValString = null;
                     if (MainActivity.getMainActivity() != null && MainActivity.getMainActivity().getGPSListener() != null) {
-                        final GPSListener listener = MainActivity.getMainActivity().getGPSListener();
+                        final GNSSListener listener = MainActivity.getMainActivity().getGPSListener();
                         satString = "("+listener.getSatCount()+")";
                         conKeyString = MainActivity.join("\n", listener.getConstellations().keySet());
                         conValString = MainActivity.join("\n", listener.getConstellations().values());
@@ -251,16 +260,16 @@ public class DashboardFragment extends Fragment {
                     int colorUnknown = ResourcesCompat.getColor(getResources(), R.color.colorNavigationItem, null);
                     tv.setTextColor(colorUnknown);
                     iv.setVisibility(View.GONE);
-                    tv.setText( getString(R.string.dash_short_loc) + " "+location.getProvider());
+                    tv.setText( getString(R.string.dash_short_loc, location.getProvider()));
                     iv.setColorFilter(colorUnknown);
             }
         }
   }
 
-  private String newNetsSinceUpload(final SharedPreferences prefs) {
+  private long newNetsSinceUpload(final SharedPreferences prefs) {
       long newSinceUpload = 0;
-      final long marker = prefs.getLong( ListFragment.PREF_DB_MARKER, 0L );
-      final long uploaded = prefs.getLong( ListFragment.PREF_NETS_UPLOADED, 0L );
+      final long marker = prefs.getLong( PreferenceKeys.PREF_DB_MARKER, 0L );
+      final long uploaded = prefs.getLong( PreferenceKeys.PREF_NETS_UPLOADED, 0L );
       // marker is set but no uploaded, a migration situation, so return zero
       if (marker == 0 || uploaded != 0) {
           newSinceUpload = ListFragment.lameStatic.dbNets - uploaded;
@@ -268,7 +277,7 @@ public class DashboardFragment extends Fragment {
               newSinceUpload = 0;
           }
       }
-    return wholeNumberFormat.format(newSinceUpload);
+    return newSinceUpload;
   }
 
   private void updateDist(final View view, final SharedPreferences prefs, final int id, final String pref, final String title ) {
@@ -286,11 +295,11 @@ public class DashboardFragment extends Fragment {
       tv.setText(durString);
   }
 
-  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id, final String prefCumulative,
-                              final String prefCurrent, final boolean isScanning) {
-      long cumulative = prefs.getLong(ListFragment.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
+  private void updateTimeTare(final View view, final SharedPreferences prefs, final int id,
+                              final boolean isScanning) {
+      long cumulative = prefs.getLong(PreferenceKeys.PREF_CUMULATIVE_SCANTIME_RUN, 0L);
       if (isScanning) {
-        cumulative += System.currentTimeMillis() - prefs.getLong(ListFragment.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
+        cumulative += System.currentTimeMillis() - prefs.getLong(PreferenceKeys.PREF_STARTTIME_CURRENT_SCAN, System.currentTimeMillis());
       }
       final String durString = timeString(cumulative);
       final TextView tv = view.findViewById( id );
@@ -299,7 +308,7 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onDestroy() {
-    MainActivity.info( "DASH: onDestroy" );
+    Logging.info( "DASH: onDestroy" );
     finishing.set( true );
 
     super.onDestroy();
@@ -307,59 +316,62 @@ public class DashboardFragment extends Fragment {
 
   @Override
   public void onResume() {
-    MainActivity.info( "DASH: onResume" );
+    Logging.info( "DASH: onResume" );
     super.onResume();
     setupTimer();
-    getActivity().setTitle(R.string.dashboard_app_name);
+    final Activity a = getActivity();
+    if (null != a) {
+        a.setTitle(R.string.dashboard_app_name);
+    }
   }
 
   @Override
   public void onStart() {
-    MainActivity.info( "DASH: onStart" );
+    Logging.info( "DASH: onStart" );
     super.onStart();
   }
 
   @Override
   public void onPause() {
-    MainActivity.info( "DASH: onPause" );
+    Logging.info( "DASH: onPause" );
     super.onPause();
   }
 
   @Override
   public void onStop() {
-    MainActivity.info( "DASH: onStop" );
+    Logging.info( "DASH: onStop" );
     super.onStop();
   }
 
   @Override
-  public void onConfigurationChanged( final Configuration newConfig ) {
-    MainActivity.info( "DASH: config changed" );
+  public void onConfigurationChanged(@NonNull final Configuration newConfig ) {
+    Logging.info( "DASH: config changed" );
     switchView();
     super.onConfigurationChanged( newConfig );
   }
 
   /* Creates the menu items */
   @Override
-  public void onCreateOptionsMenu (final Menu menu, final MenuInflater inflater) {
+  public void onCreateOptionsMenu (@NonNull final Menu menu, @NonNull final MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
   }
 
   /* Handles item selections */
   @Override
-  public boolean onOptionsItemSelected( final MenuItem item ) {
+  public boolean onOptionsItemSelected(@NonNull final MenuItem item ) {
       return false;
   }
 
   private String timeString(final long duration) {
-    //TODO: better to just use TimeUnit?
-    int seconds = (int) (duration / 1000) % 60 ;
-    int minutes = (int) ((duration / (1000*60)) % 60);
-    int hours   = (int) ((duration / (1000*60*60)) % 24);
-    String durString = String.format("%02d", minutes)+":"+String.format("%02d", seconds);
-    if (hours > 0) {
-      durString = String.format("%d", hours) + ":" + durString;
-    }
-    return " " +durString;
+    final long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+    final long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+    final long hours = TimeUnit.MILLISECONDS.toHours(duration);
+    
+    Locale defaultLocale = Locale.getDefault();
+    
+    return hours > 0
+      ? String.format(defaultLocale," %d:%02d:%02d", hours, minutes, seconds)
+      : String.format(defaultLocale, " %02d:%02d", minutes, seconds);
   }
 
 }

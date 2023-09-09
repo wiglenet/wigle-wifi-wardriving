@@ -81,12 +81,12 @@
     <string name="filter_enabled">필터 사용</string>
     <string name="list_waiting_gps">(GPS 동기화 대기 &#8230;)</string>
     <string name="list_scanning_off">(검색이 꺼져)</string>
-    <string name="list_short_lat">위도 :</string>
-    <string name="list_short_lon">경도 :</string>
-    <string name="list_short_sats">수능 점수 :</string>
-    <string name="list_short_alt">ALT :</string>
+    <string name="list_short_lat">위도 : %1$s</string>
+    <string name="list_short_lon">경도 : %1$s</string>
+    <string name="list_short_sats">수능 점수 : %1$d</string>
+    <string name="list_short_alt">ALT : %1$s</string>
     <string name="list_status_default">(상태)</string>
-    <string name="list_speed">속도 :</string>
+    <string name="list_speed">속도 : %1$s</string>
     <string name="list_upload">파일 업로드?</string>
     <string name="network_signal">신호 :</string>
     <string name="network_type">유형 :</string>
@@ -119,8 +119,8 @@
     <string name="cancel">취소</string>
     <string name="dash_scan_off">(검색이 꺼져)</string>
     <string name="dash_new_wifi">새로운 와이파이</string>
-    <string name="dash_vis_nets">표시 네츠 :</string>
-    <string name="dash_new_upload">업로드 이후 새로운 네츠 :</string>
+    <string name="dash_vis_nets">표시 네츠 : %1$d</string>
+    <string name="dash_new_upload">업로드 이후 새로운 네츠 : %1$d</string>
     <string name="dash_new_cells">새로운 셀 타워</string>
     <string name="dash_new_bt">새로운 블루투스</string>
     <string name="dash_dist_run">거리를 실행합니다 :</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">스캔 시간:</string>
     <string name="dash_dist_total">Dist 총. :</string>
     <string name="dash_dist_prev">이전이 실행 :</string>
-    <string name="dash_db_queue">DB 대기열 :</string>
-    <string name="dash_db_nets">DB 네츠 :</string>
-    <string name="dash_db_locs">DB 위치 :</string>
-    <string name="dash_short_loc">LOC :</string>
+    <string name="dash_db_queue">DB 대기열 : %1$s</string>
+    <string name="dash_db_nets">DB 네츠 : %1$s</string>
+    <string name="dash_db_locs">DB 위치 : %1$s</string>
+    <string name="dash_short_loc">LOC : %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">미</string>
     <string name="miles">마일</string>
@@ -146,7 +147,7 @@
     <string name="run">실행</string>
     <string name="new_word">새로운</string>
     <string name="db">DB</string>
-    <string name="scanned_in">에서 스캔</string>
+    <string name="scanned_in">%1$d 에서 스캔 %2$d%3$s.</string>
     <string name="sort_title">정렬 옵션</string>
     <string name="sort_spin_label">정렬 목록 :</string>
     <string name="channel">채널</string>
@@ -233,6 +234,7 @@
     <string name="language_pl">polski (폴란드어)</string>
     <string name="language_pt">português (포르투갈어)</string>
     <string name="language_pt_rBR">português brasileiro (브라질 포르투갈어)</string>
+    <string name="language_ro_rRO">Română (루마니아 사람)</string>
     <string name="language_ru">ру́сский (러시아어)</string>
     <string name="language_sv">svenska (스웨덴어)</string>
     <string name="language_sw">Kiswahili (스와힐리어)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">지도 유형 : 하이브리드</string>
     <string name="map_toast_terrain">지도 유형 : 지형</string>
     <string name="map_needs_playservice">지도에는 Google Play 서비스가 필요합니다.</string>
-    <string name="register">레지스터</string>
     <string name="drawer_open">서랍 열기</string>
     <string name="drawer_close">서랍 닫기</string>
     <string name="site_stats_app_name">WiGLE.net 통계</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">순위</string>
     <string name="uploads_app_name">WiGLE.net 업로드</string>
     <string name="tab_uploads">업로드</string>
-    <string name="queue_depth">파일 처리 대기열 깊이</string>
+    <string name="queue_depth">WiGLE 대기열: %1$s 트라이: %2$s 지역: %3$s</string>
     <string name="news_app_name">WiGLE.net 뉴스</string>
     <string name="tab_news">뉴스</string>
     <string name="bytes">바이트</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">지난달 사용자 랭킹</string>
     <string name="prevmonthrank_title">지난달 순위</string>
     <string name="list_scanning_on">(스캔 켜짐)</string>
-    <string name="activate">지금 실행 시켜라</string>
     <string name="setting_activate_prompt">사용자 코드는 https://wigle.net/activate를 방문하십시오.</string>
     <string name="upload_queued">대기 중</string>
     <string name="upload_parsing">파싱…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">라이트</string>
     <string name="theme_dark_label">다크</string>
     <string name="theme_follow_label">팔로우 시스템</string>
+    <string name="manage_gpx_button">저장된 경로</string>
+    <string name="manage_gpx">저장된 GPX 경로 관리</string>
+    <string name="enable_map_theme">앱에 지도 테마 일치</string>
+    <string name="throttle">WiFi 검색이 제한됩니다. 더 나은 성능을 위해 개발자 설정에서 WiFi 스캔 스로틀을 비활성화하십시오.</string>
+    <string name="no_individual_nets_map">지도 네트 표시 비활성화</string>
+    <string name="filter_show_btle">블루투스 LE 표시</string>
+    <string name="settings_gps_head">GPS 설정</string>
+    <string name="enable_kalman">GPS 노이즈 필터링</string>
+    <string name="gps_old_message">이 기기는 Google 정책으로 인해 더 이상 앱 스토어를 통해 지원되지 않습니다. 데이터를 백업하고 https://github.com/wiglenet/wigle-wifi-wardriving/에서 WiGLE v. 2.67 .apk(또는 그 이하)를 사이드로드하십시오. 불편을 드려 죄송합니다!</string>
+    <string name="gps_old_title">GPS를 초기화할 수 없습니다.</string>
+    <string name="enable_map_bearing">내 방위/방향을 따르십시오</string>
+    <string name="login_title">로그인 필요</string>
+    <string name="login_required">이 작업을 수행하려면 로그인해야 합니다. 필요한 경우 로그인하거나 계정을 만드십시오.</string>
+    <string name="login">로그인</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net 등록&lt;/a&gt; 또는 &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;지금 QR 코드로 활성화&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">BLE 공급업체 ID:</string>
 </resources>

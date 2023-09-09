@@ -1,8 +1,11 @@
 package net.wigle.wigleandroid;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -10,7 +13,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -22,7 +24,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,41 +34,36 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 //import com.google.android.gms.maps.CameraUpdateFactory;
-//import com.google.android.gms.maps.GoogleMap;
 //import com.google.android.gms.maps.MapView;
 //import com.google.android.gms.maps.MapsInitializer;
-//import com.google.android.gms.maps.OnMapReadyCallback;
 //import com.google.android.gms.maps.model.BitmapDescriptor;
 //import com.google.android.gms.maps.model.CameraPosition;
 //import com.google.android.gms.maps.model.CircleOptions;
 //import com.google.android.gms.maps.model.LatLng;
 //import com.google.android.gms.maps.model.MarkerOptions;
+import net.wigle.wigleandroid.model.LatLng;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
-import net.wigle.wigleandroid.background.QueryThread;
+import net.wigle.wigleandroid.background.PooledQueryExecutor;
 import net.wigle.wigleandroid.db.DatabaseHelper;
 import net.wigle.wigleandroid.model.ConcurrentLinkedHashMap;
-import net.wigle.wigleandroid.model.LatLng;
 import net.wigle.wigleandroid.model.MccMncRecord;
 import net.wigle.wigleandroid.model.Network;
 import net.wigle.wigleandroid.model.NetworkType;
 import net.wigle.wigleandroid.model.OUI;
 import net.wigle.wigleandroid.ui.NetworkListUtil;
 import net.wigle.wigleandroid.ui.ThemeUtil;
+import net.wigle.wigleandroid.util.Logging;
+import net.wigle.wigleandroid.util.PreferenceKeys;
 
 @SuppressWarnings("deprecation")
 public class NetworkActivity extends AppCompatActivity implements DialogListener {
@@ -84,6 +81,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private int observations = 0;
     private boolean isDbResult = false;
     private final ConcurrentLinkedHashMap<LatLng, Integer> obsMap = new ConcurrentLinkedHashMap<>(512);
+    private NumberFormat numberFormat;
 
     // used for shutting extraneous activities down on an error
     public static NetworkActivity networkActivity;
@@ -91,7 +89,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        MainActivity.info("NET: onCreate");
+        Logging.info("NET: onCreate");
         super.onCreate(savedInstanceState);
 
         if (ListFragment.lameStatic.oui == null) {
@@ -104,17 +102,24 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         }
 
         // set language
+        MainActivity.setLocale(this);
+        numberFormat = NumberFormat.getNumberInstance(MainActivity.getLocale(this, this.getResources().getConfiguration()));
+        if (numberFormat instanceof DecimalFormat) {
+            numberFormat.setMinimumFractionDigits(0);
+            numberFormat.setMaximumFractionDigits(2);
+        }
+
         MainActivity.setLocale( this );
         setContentView(R.layout.network);
         networkActivity = this;
 
-        final SharedPreferences prefs = getSharedPreferences(ListFragment.SHARED_PREFS, 0);
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
         ThemeUtil.setNavTheme(getWindow(), this, prefs);
 
         final Intent intent = getIntent();
         final String bssid = intent.getStringExtra( ListFragment.NETWORK_EXTRA_BSSID );
         isDbResult = intent.getBooleanExtra(ListFragment.NETWORK_EXTRA_IS_DB_RESULT, false);
-        MainActivity.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
+        Logging.info( "bssid: " + bssid + " isDbResult: " + isDbResult);
 
         final SimpleDateFormat format = NetworkListUtil.getConstructionTimeFormater(this);
         if (null != MainActivity.getNetworkCache()) {
@@ -125,9 +130,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         tv.setText( bssid );
 
         if ( network == null ) {
-            MainActivity.info( "no network found in cache for bssid: " + bssid );
-        }
-        else {
+            Logging.info( "no network found in cache for bssid: " + bssid );
+        } else {
             // do gui work
             tv = findViewById( R.id.ssid );
             tv.setText( network.getSsid() );
@@ -161,7 +165,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             } else {
                 tv.setTextColor( NetworkListUtil.getSignalColor( level, false) );
             }
-            tv.setText( Integer.toString( level ) );
+            tv.setText( numberFormat.format( level ) );
 
             tv = findViewById( R.id.na_type );
             tv.setText( network.getType().name() );
@@ -173,67 +177,95 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             Integer chan = network.getChannel();
             if ( NetworkType.WIFI.equals(network.getType()) ) {
                 chan = chan != null ? chan : network.getFrequency();
-                tv.setText(" " + Integer.toString(chan) + " ");
+                tv.setText(numberFormat.format(chan));
             } else if ( NetworkType.CDMA.equals(network.getType()) || chan == null) {
-                tv.setText( getString(R.string.na) );
+                tv.setText(getString(R.string.na));
+            } else if (NetworkType.isBtType(network.getType())) {
+                final String channelCode = NetworkType.channelCodeTypeForNetworkType(network.getType());
+                tv.setText(String.format(MainActivity.getLocale(getApplicationContext(),
+                                getApplicationContext().getResources().getConfiguration()),
+                        "%s %d", (null == channelCode?"":channelCode), chan));
             } else {
                 final String[] cellCapabilities = network.getCapabilities().split(";");
-                tv.setText(cellCapabilities[0]+" "+channelCodeTypeForNetworkType(network.getType())+" "+chan);
+                tv.setText(String.format(MainActivity.getLocale(getApplicationContext(),
+                        getApplicationContext().getResources().getConfiguration()),
+                        "%s %s %d", cellCapabilities[0], NetworkType.channelCodeTypeForNetworkType(network.getType()), chan));
             }
 
             tv = findViewById( R.id.na_cap );
-            tv.setText( " " + network.getCapabilities().replace("][", "]  [") );
+            tv.setText( network.getCapabilities().replace("][", "]  [") );
 
-            if ( NetworkType.GSM.equals(network.getType()) ||
-                    NetworkType.LTE.equals(network.getType()) ||
-                    NetworkType.WCDMA.equals(network.getType())) { // cell net types  with advanced data
-
+            if ( NetworkType.isGsmLike(network.getType())) { // cell net types  with advanced data
                 if ((bssid != null) && (bssid.length() > 5) && (bssid.indexOf('_') >= 5)) {
                     final String operatorCode = bssid.substring(0, bssid.indexOf("_"));
 
                     MccMncRecord rec = null;
-                    if (operatorCode.length() > 5 && operatorCode.length() < 7) {
-                        final String mnc = operatorCode.substring(3, operatorCode.length());
+                    if (operatorCode.length() == 6) {
+                        final String mnc = operatorCode.substring(3);
                         final String mcc = operatorCode.substring(0, 3);
 
                         //DEBUG: MainActivity.info("\t\tmcc: "+mcc+"; mnc: "+mnc);
 
                         try {
-                            rec = MainActivity.getStaticState().mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                            final MainActivity.State s = MainActivity.getStaticState();
+                            if (s != null && s.mxcDbHelper != null) {
+                                rec = s.mxcDbHelper.networkRecordForMccMnc(mcc, mnc);
+                            }
                         } catch (SQLException sqex) {
-                            MainActivity.error("Unable to access Mxc Database: ",sqex);
+                            Logging.error("Unable to access Mxc Database: ",sqex);
                         }
                         if (rec != null) {
                             View v = findViewById(R.id.cell_info);
                             v.setVisibility(View.VISIBLE);
                             tv = findViewById( R.id.na_cell_status );
-                            tv.setText( " "+rec.getStatus() );
+                            tv.setText(rec.getStatus() );
                             tv = findViewById( R.id.na_cell_brand );
-                            tv.setText( " "+rec.getBrand());
+                            tv.setText(rec.getBrand());
                             tv = findViewById( R.id.na_cell_bands );
-                            tv.setText( " "+rec.getBands());
+                            tv.setText( rec.getBands());
                             if (rec.getNotes() != null && !rec.getNotes().isEmpty()) {
                                 v = findViewById(R.id.cell_notes_row);
                                 v.setVisibility(View.VISIBLE);
                                 tv = findViewById( R.id.na_cell_notes );
-                                tv.setText( " "+rec.getNotes());
+                                tv.setText( rec.getNotes());
                             }
                         }
                     }
                 } else {
-                    MainActivity.warn("unable to get operatorCode for "+bssid);
+                    Logging.warn("unable to get operatorCode for "+bssid);
+                }
+            }
+
+            if (NetworkType.isBtType(network.getType())) {
+                View v = findViewById(R.id.ble_info);
+                v.setVisibility(View.VISIBLE);
+                if (network.getBleMfgrId() != null || network.getBleMfgr() != null) {
+                    v = findViewById(R.id.ble_vendor_row);
+                    v.setVisibility(View.VISIBLE);
+                    tv = findViewById( R.id.na_ble_vendor_id );
+                    tv.setText((null != network.getBleMfgrId())?network.getBleMfgrId()+"":"-");
+                    tv = findViewById( R.id.na_ble_vendor_lookup );
+                    tv.setText(network.getBleMfgr() );
+                }
+
+                List<String> serviceUuids = network.getBleServiceUuids();
+                if (null != serviceUuids && !serviceUuids.isEmpty()) {
+                    v = findViewById(R.id.ble_services_row);
+                    v.setVisibility(View.VISIBLE);
+                    tv = findViewById( R.id.na_ble_service_uuids );
+                    tv.setText(serviceUuids.toString() );
                 }
             }
             setupMap(network, savedInstanceState, prefs );
             // kick off the query now that we have our map
-            setupQuery();
             setupButtons(network, prefs);
+            setupQuery();
         }
     }
 
     @Override
     public void onDestroy() {
-        MainActivity.info("NET: onDestroy");
+        Logging.info("NET: onDestroy");
         networkActivity = null;
 //        if (mapView != null) {
 //            mapView.onDestroy();
@@ -243,18 +275,19 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onResume() {
-        MainActivity.info("NET: onResume");
+        Logging.info("NET: onResume");
         super.onResume();
 //        if (mapView != null) {
 //            mapView.onResume();
 //        } else {
-//            setupMap( network, null );
+//            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+//            setupMap( network, null, prefs);
 //        }
     }
 
     @Override
     public void onPause() {
-        MainActivity.info("NET: onPause");
+        Logging.info("NET: onPause");
         super.onPause();
 //        if (mapView != null) {
 //            mapView.onPause();
@@ -262,14 +295,14 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     }
 
     @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        MainActivity.info("NET: onSaveInstanceState");
+    public void onSaveInstanceState(@NonNull final Bundle outState) {
+        Logging.info("NET: onSaveInstanceState");
         super.onSaveInstanceState(outState);
 //        if (mapView != null) {
 //            try {
 //                mapView.onSaveInstanceState(outState);
 //            } catch (android.os.BadParcelableException bpe) {
-//                MainActivity.error("Exception saving NetworkActivity instance state: ",bpe);
+//                Logging.error("Exception saving NetworkActivity instance state: ",bpe);
 //                //this is really low-severity, since we can restore all state anyway
 //            }
 //        }
@@ -277,7 +310,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     @Override
     public void onLowMemory() {
-        MainActivity.info("NET: onLowMemory");
+        Logging.info("NET: onLowMemory");
         super.onLowMemory();
 //        if (mapView != null) {
 //            mapView.onLowMemory();
@@ -292,79 +325,75 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             public void handleMessage( final Message msg ) {
                 final TextView tv = findViewById( R.id.na_observe );
                 if ( msg.what == MSG_OBS_UPDATE ) {
-                    tv.setText( " " + Integer.toString( observations ) + "...");
-                }
-                else if ( msg.what == MSG_OBS_DONE ) {
-                    tv.setText( " " + Integer.toString( observations ) );
+                    tv.setText( numberFormat.format( observations ));
+                } else if ( msg.what == MSG_OBS_DONE ) {
+                    tv.setText( numberFormat.format( observations ) );
                     // ALIBI:  assumes all observations belong to one "cluster" w/ a single centroid.
                     // we could check and perform multi-cluster here
                     // (get arithmetic mean, std-dev, try to do sigma-based partitioning)
                     // but that seems less likely w/ one individual's observations
 //                    final LatLng estCentroid = computeBasicLocation(obsMap);
 //                    final int zoomLevel = computeZoom(obsMap, estCentroid);
-//                    mapView.getMapAsync(new OnMapReadyCallback() {
-//                        @Override
-//                        public void onMapReady(final GoogleMap googleMap) {
-//                            int count = 0;
-//                            int maxDistMeters = 0;
-//                            for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
-//                                final LatLng latLon = obs.getKey();
-//                                final int level = obs.getValue();
+//                    mapView.getMapAsync(googleMap -> {
+//                        int count = 0;
+//                        for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
+//                            final LatLng latLon = obs.getKey();
+//                            final int level = obs.getValue();
 //
-//                                // default to initial position
-//                                if (count == 0 && network.getLatLng() == null) {
-//                                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                                            .target(latLon).zoom(DEFAULT_ZOOM).build();
-//                                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//                                }
-//
-//                                BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
-//                                        getApplicationContext(), level);
-//
-//                                googleMap.addMarker(new MarkerOptions().icon(obsIcon)
-//                                        .position(latLon).zIndex(level));
-//                                count++;
-//                            }
-//                            // if we got a good centroid, display it and center on it
-//                            if (null != estCentroid && estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
-//                                //TODO: improve zoom based on obs distances?
+//                            // default to initial position
+//                            if (count == 0 && network.getLatLng() == null) {
 //                                final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                                        .target(estCentroid).zoom(zoomLevel).build();
+//                                        .target(latLon).zoom(DEFAULT_ZOOM).build();
 //                                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//                                googleMap.addMarker(new MarkerOptions().position(estCentroid));
 //                            }
-//                            MainActivity.info("observation count: " + count);
+//
+//                            BitmapDescriptor obsIcon = NetworkListUtil.getSignalBitmap(
+//                                    getApplicationContext(), level);
+//
+//                            googleMap.addMarker(new MarkerOptions().icon(obsIcon)
+//                                    .position(latLon).zIndex(level));
+//                            count++;
 //                        }
+//                        // if we got a good centroid, display it and center on it
+//                        if (estCentroid.latitude != 0d && estCentroid.longitude != 0d) {
+//                            //TODO: improve zoom based on obs distances?
+//                            final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                    .target(estCentroid).zoom(zoomLevel).build();
+//                            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                            googleMap.addMarker(new MarkerOptions().position(estCentroid));
+//                        }
+//                        Logging.info("observation count: " + count);
 //                    });
                 }
             }
         };
 
-//        final String sql = "SELECT level,lat,lon FROM "
-//                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = '" + network.getBssid() +
-//                "' ORDER BY _id DESC limit " + obsMap.maxSize();
-//
-//        final QueryThread.Request request = new QueryThread.Request( sql, new QueryThread.ResultHandler() {
-//            @Override
-//            public boolean handleRow( final Cursor cursor ) {
-//                observations++;
-//                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
-//                if ( ( observations % 10 ) == 0 ) {
-//                    // change things on the gui thread
-//                    handler.sendEmptyMessage( MSG_OBS_UPDATE );
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public void complete() {
-//                handler.sendEmptyMessage( MSG_OBS_DONE );
-//            }
-//        });
-//        ListFragment.lameStatic.dbHelper.addToQueue( request );
+        final String sql = "SELECT level,lat,lon FROM "
+                + DatabaseHelper.LOCATION_TABLE + " WHERE bssid = ?" +
+                " ORDER BY _id DESC limit ?" ;
+
+        PooledQueryExecutor.enqueue( new PooledQueryExecutor.Request( sql,
+                new String[]{network.getBssid(), obsMap.maxSize()+""}, new PooledQueryExecutor.ResultHandler() {
+            @Override
+            public boolean handleRow( final Cursor cursor ) {
+                observations++;
+                obsMap.put( new LatLng( cursor.getFloat(1), cursor.getFloat(2) ), cursor.getInt(0) );
+                if ( ( observations % 10 ) == 0 ) {
+                    // change things on the gui thread
+                    handler.sendEmptyMessage( MSG_OBS_UPDATE );
+                }
+                return true;
+            }
+
+            @Override
+            public void complete() {
+                handler.sendEmptyMessage( MSG_OBS_DONE );
+            }
+        }, ListFragment.lameStatic.dbHelper ));
+        //ListFragment.lameStatic.dbHelper.addToQueue( request );
     }
 
-    private final LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
+    private LatLng computeBasicLocation(ConcurrentLinkedHashMap<LatLng, Integer> obsMap) {
         double latSum = 0.0;
         double lonSum = 0.0;
         double weightSum = 0.0;
@@ -390,7 +419,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         return new LatLng(trilateratedLatitude, trilateratedLongitude);
     }
 
-    private final int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
+    private int computeZoom(ConcurrentLinkedHashMap<LatLng, Integer> obsMap, final LatLng centroid) {
         float maxDist = 0f;
         for (Map.Entry<LatLng, Integer> obs : obsMap.entrySet()) {
             float[] res = new float[3];
@@ -399,7 +428,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 maxDist = res[0];
             }
         }
-        MainActivity.info("max dist: "+maxDist);
+        Logging.info("max dist: "+maxDist);
         if (maxDist < 135) {
             return 18;
         } else if (maxDist < 275) {
@@ -426,12 +455,10 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
     /**
      * optimistic signal weighting
-     * @param signal
-     * @return
      */
     public static float cleanSignal(Float signal) {
         float signalMemo = signal;
-        if (signal == null || signal == 0f) {
+        if (signal == 0f) {
             return 100f;
         } else if (signal >= -200 && signal < 0) {
             signalMemo += 200f;
@@ -448,28 +475,26 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 //        mapView = new MapView( this );
 //        try {
 //            mapView.onCreate(savedInstanceState);
+//            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
 //        }
 //        catch (NullPointerException ex) {
-//            MainActivity.error("npe in mapView.onCreate: " + ex, ex);
+//            Logging.error("npe in mapView.onCreate: " + ex, ex);
 //        }
 //        MapsInitializer.initialize( this );
 //
 //        if ((network != null) && (network.getLatLng() != null)) {
-//            mapView.getMapAsync(new OnMapReadyCallback() {
-//                @Override
-//                public void onMapReady(final GoogleMap googleMap) {
-//                    final CameraPosition cameraPosition = new CameraPosition.Builder()
-//                            .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
-//                    googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//            mapView.getMapAsync(googleMap -> {
+//                final CameraPosition cameraPosition = new CameraPosition.Builder()
+//                        .target(network.getLatLng()).zoom(DEFAULT_ZOOM).build();
+//                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 //
-//                    googleMap.addCircle(new CircleOptions()
-//                            .center(network.getLatLng())
-//                            .radius(5)
-//                            .fillColor(Color.argb(128, 240, 240, 240))
-//                            .strokeColor(Color.argb(200, 255, 32, 32))
-//                            .strokeWidth(3f)
-//                            .zIndex(100));
-//                }
+//                googleMap.addCircle(new CircleOptions()
+//                        .center(network.getLatLng())
+//                        .radius(5)
+//                        .fillColor(Color.argb(128, 240, 240, 240))
+//                        .strokeColor(Color.argb(200, 255, 32, 32))
+//                        .strokeWidth(3f)
+//                        .zIndex(100));
 //            });
 //        }
 //
@@ -478,8 +503,8 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     }
 
     private void setupButtons( final Network network, final SharedPreferences prefs ) {
-        final ArrayList<String> hideAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
-        final ArrayList<String> blockAddresses = addressListForPref(prefs, ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+        final ArrayList<String> hideAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
+        final ArrayList<String> blockAddresses = addressListForPref(prefs, PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
 
         if ( ! NetworkType.WIFI.equals(network.getType()) ) {
             final View filterRowView = findViewById(R.id.filter_row);
@@ -504,36 +529,33 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             }
 
 
-            hideMacButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a display-exclude row fot MAC
+            hideMacButton.setOnClickListener(buttonView -> {
+                // add a display-exclude row fot MAC
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
+                            prefs, network.getBssid().replace(":",""), PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
                     hideMacButton.setEnabled(false);
                 }
             });
 
-            hideOuiButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a display-exclude row fot OUI
+            hideOuiButton.setOnClickListener(buttonView -> {
+                // add a display-exclude row fot OUI
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(hideAddresses,
-                            prefs, network.getBssid().replace(":","").substring(0,6),
-                            ListFragment.PREF_EXCLUDE_DISPLAY_ADDRS);
-                    hideOuiButton.setEnabled(false);
+                            prefs, network.getBssid().replace(":", "").substring(0, 6),
+                            PreferenceKeys.PREF_EXCLUDE_DISPLAY_ADDRS);
                 }
+                hideOuiButton.setEnabled(false);
             });
 
-            disableLogMacButton.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    // add a log-exclude row fot OUI
+            disableLogMacButton.setOnClickListener(buttonView -> {
+                // add a log-exclude row fot OUI
+                if (network.getBssid() != null) {
                     MacFilterActivity.addEntry(blockAddresses,
-                            prefs, network.getBssid().replace(":",""), ListFragment.PREF_EXCLUDE_LOG_ADDRS);
+                            prefs, network.getBssid().replace(":", ""), PreferenceKeys.PREF_EXCLUDE_LOG_ADDRS);
                     //TODO: should this also delete existing records?
-                    disableLogMacButton.setEnabled(false);
                 }
+                disableLogMacButton.setEnabled(false);
             });
         }
     }
@@ -541,7 +563,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
     private ArrayList<String> addressListForPref(final SharedPreferences prefs, final String key) {
         Gson gson = new Gson();
         String[] values = gson.fromJson(prefs.getString(key, "[]"), String[].class);
-        return new ArrayList<String>(Arrays.asList(values));
+        return new ArrayList<>(Arrays.asList(values));
     }
 
     private int getExistingSsid( final String ssid ) {
@@ -550,7 +572,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
         int netId = -2;
 
         for ( final WifiConfiguration config : wifiManager.getConfiguredNetworks() ) {
-            MainActivity.info( "bssid: " + config.BSSID
+            Logging.info( "bssid: " + config.BSSID
                             + " ssid: " + config.SSID
                             + " status: " + config.status
                             + " id: " + config.networkId
@@ -581,7 +603,7 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 connectToNetwork( null );
                 break;
             default:
-                MainActivity.warn("Network unhandled dialogId: " + dialogId);
+                Logging.warn("Network unhandled dialogId: " + dialogId);
         }
     }
 
@@ -628,13 +650,16 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
 
             final Dialog dialog = getDialog();
             View view = inflater.inflate(R.layout.cryptodialog, container);
-            dialog.setTitle(getArguments().getString("ssid"));
+            final Bundle args = getArguments();
+            if (null != dialog) {
+                dialog.setTitle(args != null ? args.getString("ssid") : "");
+            }
 
             TextView text = view.findViewById( R.id.security );
-            text.setText(getArguments().getString("capabilities"));
+            text.setText(args != null?args.getString("capabilities"):"");
 
             text = view.findViewById( R.id.signal );
-            text.setText(getArguments().getString("level"));
+            text.setText(args != null?args.getString("level"):"");
 
             final Button ok = view.findViewById( R.id.ok_button );
 
@@ -649,49 +674,46 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
             });
 
             final CheckBox showpass = view.findViewById( R.id.showpass );
-            showpass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged( final CompoundButton buttonView, final boolean isChecked ) {
-                    if ( isChecked ) {
-                        password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
-                        password.setTransformationMethod( null );
-                    }
-                    else {
-                        password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
-                        password.setTransformationMethod(
-                                android.text.method.PasswordTransformationMethod.getInstance() );
-                    }
+            showpass.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if ( isChecked ) {
+                    password.setInputType( InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD );
+                    password.setTransformationMethod( null );
+                }
+                else {
+                    password.setInputType( InputType.TYPE_TEXT_VARIATION_PASSWORD );
+                    password.setTransformationMethod(
+                            android.text.method.PasswordTransformationMethod.getInstance() );
                 }
             });
 
-            ok.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    try {
-                        final NetworkActivity networkActivity = (NetworkActivity) getActivity();
-                        networkActivity.connectToNetwork( password.getText().toString() );
+            ok.setOnClickListener(buttonView -> {
+                try {
+                    final NetworkActivity networkActivity = (NetworkActivity) getActivity();
+                    if (networkActivity != null && password.getText() != null) {
+                        networkActivity.connectToNetwork(password.getText().toString());
+                    }
+                    if (null != dialog) {
                         dialog.dismiss();
                     }
-                    catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing crypto dialog: " + ex );
-                    }
                 }
-            } );
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing crypto dialog: " + ex );
+                }
+            });
 
             Button cancel = view.findViewById( R.id.cancel_button );
-            cancel.setOnClickListener( new OnClickListener() {
-                @Override
-                public void onClick( final View buttonView ) {
-                    try {
+            cancel.setOnClickListener(buttonView -> {
+                try {
+                    if (null != dialog) {
                         dialog.dismiss();
                     }
-                    catch ( Exception ex ) {
-                        // guess it wasn't there anyways
-                        MainActivity.info( "exception dismissing crypto dialog: " + ex );
-                    }
                 }
-            } );
+                catch ( Exception ex ) {
+                    // guess it wasn't there anyways
+                    Logging.info( "exception dismissing crypto dialog: " + ex );
+                }
+            });
 
             return view;
         }
@@ -733,18 +755,5 @@ public class NetworkActivity extends AppCompatActivity implements DialogListener
                 }
         }
         return false;
-    }
-
-    private static final String channelCodeTypeForNetworkType(NetworkType type) {
-        switch (type) {
-            case GSM:
-                return "ARFCN"  ;
-            case LTE:
-                return "EARFCN";
-            case WCDMA:
-                return "UARFCN";
-            default:
-                return null;
-        }
     }
 }

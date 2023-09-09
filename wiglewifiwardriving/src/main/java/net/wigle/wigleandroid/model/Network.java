@@ -1,10 +1,22 @@
 package net.wigle.wigleandroid.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+
 import android.annotation.SuppressLint;
 import android.net.wifi.ScanResult;
+import android.os.ParcelUuid;
+
+import androidx.annotation.NonNull;
+
+//import com.google.android.gms.maps.model.LatLng;
+import net.wigle.wigleandroid.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
+import net.wigle.wigleandroid.MainActivity;
+import net.wigle.wigleandroid.util.Logging;
 
 /**
  * network data. not thread-safe.
@@ -28,9 +40,10 @@ public final class Network {
     public static final List<Integer> wiFi60GHzChannelNumbers = Arrays.asList(1, 2, 3, 4, 5,
             6);
 
+
     private final String bssid;
     private String ssid;
-    private final String capabilities;
+    private String capabilities;
     private final String showCapabilities;
     private final int crypto;
     private NetworkType type;
@@ -41,11 +54,14 @@ public final class Network {
     private LatLng geoPoint;
     private boolean isNew;
 
+    private List<String> bleServiceUuids;
+    private Integer bleMfgrId;
+    private String bleMfgr;
+
     private String detail;
     private final long constructionTime = System.currentTimeMillis(); // again
 
     private static final String BAR_STRING = " | ";
-    private static final String DASH_STRING = " - ";
     private static final String WPA3_CAP = "[WPA3";
     private static final String SAE_CAP = "SAE";
     private static final String SUITE_B_192_CAP = "EAP_SUITE_B_192";
@@ -64,7 +80,7 @@ public final class Network {
     public static final int CRYPTO_WPA3 = 4;
 
     public enum NetworkBand {
-        WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED;
+        WIFI_2_4_GHZ, WIFI_5_GHZ, WIFI_6_GHZ, WIFI_60_GHZ, CELL_2_3_GHZ, UNDEFINED
     }
     /**
      * convenience constructor
@@ -72,20 +88,41 @@ public final class Network {
      */
     public Network( final ScanResult scanResult ) {
         this( scanResult.BSSID, scanResult.SSID, scanResult.frequency, scanResult.capabilities,
-                scanResult.level,  NetworkType.WIFI );
+                scanResult.level,  NetworkType.WIFI, null, null);
+    }
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+                    final int level, final NetworkType type) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null);
     }
 
     public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
-                    final int level, final NetworkType type ) {
+                    final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId) {
+        this(bssid, ssid, frequency, capabilities, level, type, bleServiceUuid16s, bleMfgrId,  null);
+    }
 
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+        final int level, final NetworkType type, final LatLng latLng ) {
+        this(bssid, ssid, frequency, capabilities, level, type, null, null, latLng);
+    }
+
+    public Network( final String bssid, final String ssid, final int frequency, final String capabilities,
+        final int level, final NetworkType type, final List<String> bleServiceUuid16s, Integer bleMfgrId, final LatLng latLng ) {
         this.bssid = ( bssid == null ) ? "" : bssid.toLowerCase(Locale.US);
         this.ssid = ( ssid == null ) ? "" : ssid;
         this.frequency = frequency;
         this.capabilities = ( capabilities == null ) ? "" : capabilities;
         this.level = level;
         this.type = type;
-        if (this.type.equals(NetworkType.typeForCode("W"))) {
+        this.bleMfgrId = bleMfgrId;
+        if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
+        } else if (NetworkType.BLE.equals(this.type) || NetworkType.BT.equals(this.type)) {
+            if (null != bleServiceUuid16s && !bleServiceUuid16s.isEmpty()) {
+                this.bleServiceUuids = bleServiceUuid16s;
+                bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
+            } else if (bleMfgrId != null) {
+                bleMfgr = lookupMfgrByMfgrId(bleMfgrId);
+            }
         } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             /*if (NetworkType.GSM.equals(type)) {
@@ -93,6 +130,8 @@ public final class Network {
             } else if (NetworkType.LTE.equals(type)) {
 
             } else if (NetworkType.WCDMA.equals(type)) {
+
+            } else if (NetworkType.NR.equals(type)) {
 
             } else {
                 channel = 0;
@@ -124,13 +163,20 @@ public final class Network {
             crypto = CRYPTO_WPA2;
         } else if (this.capabilities.contains(WPA_CAP)) {
             crypto = CRYPTO_WPA;
-        }
-        else if (this.capabilities.contains(WEP_CAP)) {
+        } else if (this.capabilities.contains(WEP_CAP)) {
             crypto = CRYPTO_WEP;
-        }
-        else {
+        } else {
             crypto = CRYPTO_NONE;
         }
+        this.geoPoint = latLng;
+    }
+
+    public String getTitle() {
+        return ssid;
+    }
+
+    public String getSnippet() {
+        return bssid;
     }
 
     public String getBssid() {
@@ -171,13 +217,16 @@ public final class Network {
     public void setLevel( final int level ) {
         this.level = level;
     }
+    public void setCapabilities( final String capabilities ) {
+        this.capabilities = capabilities;
+    }
 
     // Overloading for *FCN in GSM-derived networks for now. a subclass is probably more correct.
     public void setFrequency( final int frequency) {
         this.frequency = frequency;
         if (NetworkType.WIFI.equals(this.type)) {
             this.channel = channelForWiFiFrequencyMhz(frequency);
-        } else if (frequency != 0 && frequency != Integer.MAX_VALUE) {
+        } else if (!NetworkType.BLE.equals(this.type) && !NetworkType.BT.equals(this.type) && frequency != 0 && frequency != Integer.MAX_VALUE) {
             //TODO: this maps *FCN directly to channel; could xlate to band by network type here (2/2)
             this.channel = frequency;
         }
@@ -189,6 +238,27 @@ public final class Network {
         this.ssid = ssid;
     }
 
+    public void addBleServiceUuid(final String uuid) {
+        boolean newSuids = false;
+        if (bleServiceUuids == null) {
+            bleServiceUuids = new ArrayList<>();
+            newSuids = true;
+        }
+        if (!bleServiceUuids.contains(uuid)) {
+            bleServiceUuids.add(uuid);
+        }
+        if (newSuids && (bleMfgr == null || bleMfgr.isEmpty())) {
+            bleMfgr = lookupMfgrByServiceUuid(bleServiceUuids.get(0));
+        }
+    }
+
+    public void addBleMfgrId(Integer id) {
+        bleMfgrId = id;
+        if (bleMfgrId != null) {
+            //ALIBI: in conjunction with addBleServiceUuid, Mfgr takes precedence over service UUID-derived name in this impl.
+            bleMfgr = lookupMfgrByMfgrId(id);
+        }
+    }
     public void setIsNew() {
         this.isNew = true;
     }
@@ -209,20 +279,50 @@ public final class Network {
         return constructionTime;
     }
 
+    /**
+     * try using a service UUID to lookup mfgr name
+     * @param fullUuid the raw esrvice UUID to use
+     * @return the string if found or null
+     */
+    public String lookupMfgrByServiceUuid(final String fullUuid) {
+        //ALIBI: non-index-0 records seem to be secondary
+        String uuid16Service = fullUuid.substring(4, 8);
+        if (uuid16Service != null) {
+            final MainActivity ma = MainActivity.getMainActivity();
+            int mfgrIndex = Integer.parseInt(uuid16Service, 16);
+            if (null != ma) {
+                final String mfgrName = ma.getBleVendor(mfgrIndex);
+                if (null != mfgrName) {
+                    return mfgrName;
+                }
+            } else {
+                Logging.error("null mfgr name: "+mfgrIndex);
+            }
+        }
+        return null;
+    }
+
+    public String lookupMfgrByMfgrId(final Integer mfgrId) {
+        //ALIBI: non-index-0 records seem to be secondary
+        final MainActivity ma = MainActivity.getMainActivity();
+        if (null != ma) {
+            final String mfgrName = ma.getBleMfgr(mfgrId);
+            if (null != mfgrName) {
+                return  mfgrName;
+            }
+        } else {
+            Logging.error("no main activity accessible.");
+        }
+        return null;
+    }
+
     public String getDetail() {
         if ( detail == null ) {
-            final Integer chan = channel != null ? channel : frequency;
             final StringBuilder detailBuild = new StringBuilder( 40 );
-            detailBuild.append( BAR_STRING ).append( bssid );
-            detailBuild.append( DASH_STRING );
-            if ( NetworkType.WIFI.equals(type) ) {
-                detailBuild.append( chan );
+            if (!NetworkType.WIFI.equals(type)) {
+                detailBuild.append(type).append(BAR_STRING);
             }
-            else {
-                detailBuild.append( type );
-            }
-
-            detailBuild.append( DASH_STRING ).append( getShowCapabilities() );
+            detailBuild.append( getShowCapabilities() );
             detail = detailBuild.toString();
         }
 
@@ -239,6 +339,11 @@ public final class Network {
 
     public String getOui(final OUI oui) {
         String retval = "";
+        if (NetworkType.BLE.equals(type)) {
+            if (bleMfgr != null && !bleMfgr.isEmpty()) {
+                return bleMfgr;
+            }
+        }
         final String lookup = getBssid().replace(":", "").toUpperCase();
         if (oui != null && lookup.length() >= 9) {
             retval = oui.getOui(lookup.substring(0, 9));
@@ -248,6 +353,20 @@ public final class Network {
         return retval == null ? "" : retval;
     }
 
+    public List<String> getBleServiceUuids() {
+        return bleServiceUuids;
+    }
+
+    public Integer getBleMfgrId() {
+        return bleMfgrId;
+    }
+
+    public String getBleMfgr() {
+        return bleMfgr;
+    }
+
+    @NonNull
+//    @Override
     public LatLng getPosition() {
         return geoPoint;
     }
@@ -259,7 +378,7 @@ public final class Network {
 
     @Override
     public boolean equals(final Object other) {
-        if (other != null && other instanceof Network) {
+        if (other instanceof Network) {
             final Network o = (Network) other;
             return bssid.equals(o.bssid);
         }
@@ -273,9 +392,9 @@ public final class Network {
 
     /**
      * credit and apologies to credit to - https://github.com/torvalds/linux/blob/ba31f97d43be41ca99ab72a6131d7c226306865f/net/wireless/util.c#L75
-     * @param channel
-     * @param band
-     * @return
+     * @param channel the channel number
+     * @param band the band
+     * @return the integer frequency (center)
      */
     public static Integer frequencyMHzForWiFiChannel(final int channel, final NetworkBand band) {
         NetworkBand bandGuess = band;
@@ -334,7 +453,7 @@ public final class Network {
 
     /**
      * credit to int ieee80211_freq_khz_to_channel(u32 freq) - https://github.com/torvalds/linux/blob/ba31f97d43be41ca99ab72a6131d7c226306865f/net/wireless/util.c#L141
-     * @param frequencyMHz
+     * @param frequencyMHz the frequency in MHz for which to determine the channel
      * @return the channel value for the frequency
      */
     public static Integer channelForWiFiFrequencyMhz(final int frequencyMHz) {

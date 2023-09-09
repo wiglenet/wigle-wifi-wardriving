@@ -8,13 +8,13 @@
               >
 	<com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="wrap_content"
+		android:hint="@string/filter_show_ssid">
 		<com.google.android.material.textfield.TextInputEditText
 		android:id="@+id/edit_regex"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:inputType="textFilter"
-		android:hint="@string/filter_show_ssid"
 		/>
 	</com.google.android.material.textfield.TextInputLayout>
 
@@ -23,11 +23,11 @@
         android:layout_height="wrap_content"
         android:text="@string/filter_not_regex" /> 
         
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content">	
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
               android:orientation="vertical"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content">	
@@ -43,7 +43,7 @@
 	        android:text="@string/filter_show_cell" /> 
 	           
      	</LinearLayout>
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
           android:orientation="vertical"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content">
@@ -67,12 +67,17 @@
         android:layout_height="wrap_content"
         android:text="@string/filter_show_bt" />
 
+	<CheckBox android:id="@+id/showbtle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/filter_show_btle" />
+
     <CheckBox android:id="@+id/enabled"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:text="@string/filter_enabled" />
 
-	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	<LinearLayout
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"

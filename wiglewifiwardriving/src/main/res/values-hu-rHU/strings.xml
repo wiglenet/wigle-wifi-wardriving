@@ -81,12 +81,12 @@
     <string name="filter_enabled">Szűrő be</string>
     <string name="list_waiting_gps">(Várakozás a GPS-re&#8230;)</string>
     <string name="list_scanning_off">(Szkennelés kikapcsolva)</string>
-    <string name="list_short_lat">Szélesség:</string>
-    <string name="list_short_lon">Hosszúság:</string>
-    <string name="list_short_sats">Műhold:</string>
-    <string name="list_short_alt">Magasság:</string>
+    <string name="list_short_lat">Szélesség: %1$s</string>
+    <string name="list_short_lon">Hosszúság: %1$s</string>
+    <string name="list_short_sats">Műhold: %1$d</string>
+    <string name="list_short_alt">Magasság: %1$s</string>
     <string name="list_status_default">(állapot)</string>
-    <string name="list_speed">Sebesség:</string>
+    <string name="list_speed">Sebesség: %1$s</string>
     <string name="list_upload">Feltölti a fájlt?</string>
     <string name="network_signal">Jel:</string>
     <string name="network_type">Típus:</string>
@@ -119,8 +119,8 @@
     <string name="cancel">Mégse</string>
     <string name="dash_scan_off">(Letapogatás ki)</string>
     <string name="dash_new_wifi">Új WiFi</string>
-    <string name="dash_vis_nets">Látható hálózatok:</string>
-    <string name="dash_new_upload">Hálózatok feltöltés óta:</string>
+    <string name="dash_vis_nets">Látható hálózatok: %1$d</string>
+    <string name="dash_new_upload">Hálózatok feltöltés óta: %1$d</string>
     <string name="dash_new_cells">Új cella</string>
     <string name="dash_new_bt">Új Bluetooth</string>
     <string name="dash_dist_run">Futam távolsága:</string>
@@ -128,10 +128,11 @@
     <string name="dash_time_scanning">Letapogatás időtartama:</string>
     <string name="dash_dist_total">Teljes táv:</string>
     <string name="dash_dist_prev">Előző futam:</string>
-    <string name="dash_db_queue">Adatbázis-várólista:</string>
-    <string name="dash_db_nets">Adatbázis-hálózatok:</string>
-    <string name="dash_db_locs">Adatbázis-helyek:</string>
-    <string name="dash_short_loc">Hely:</string>
+    <string name="dash_db_queue">Adatbázis-várólista: %1$s</string>
+    <string name="dash_db_nets">Adatbázis-hálózatok: %1$s</string>
+    <string name="dash_db_locs">Adatbázis-helyek: %1$s</string>
+    <string name="dash_short_loc">Hely: %1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mé</string>
     <string name="miles">mérföld</string>
@@ -146,7 +147,7 @@
     <string name="run">Futás</string>
     <string name="new_word">Új</string>
     <string name="db">Adatbázis</string>
-    <string name="scanned_in">találat</string>
+    <string name="scanned_in">%1$d találat %2$d%3$s.</string>
     <string name="sort_title">Rendezési beállítások</string>
     <string name="sort_spin_label">Rendezés alapja:</string>
     <string name="channel">Csatorna</string>
@@ -234,6 +235,7 @@
     <string name="language_pt">português (portugál)</string>
     <string name="language_pt_rBR">português brasileiro (brazil portugál)</string>
     <string name="language_ru">ру́сский (orosz)</string>
+    <string name="language_ro_rRO">Română (román)</string>
     <string name="language_sv">svenska (svéd)</string>
     <string name="language_sw">Kiswahili (szuahéli)</string>
     <string name="language_tr">Türkçe (zörök)</string>
@@ -265,7 +267,6 @@
     <string name="map_toast_hybrid">Térkép típusa: Hibrid</string>
     <string name="map_toast_terrain">Térkép típusa: Domborzat</string>
     <string name="map_needs_playservice">A térképhez Google Play szolgáltatás szükséges</string>
-    <string name="register">Regisztráció</string>
     <string name="drawer_open">Fiók nyitva</string>
     <string name="drawer_close">Fiók zárva</string>
     <string name="site_stats_app_name">WiGLE.net statisztika</string>
@@ -294,7 +295,7 @@
     <string name="tab_rank">Ranglista</string>
     <string name="uploads_app_name">WiGLE.net feltöltések</string>
     <string name="tab_uploads">Feltöltések</string>
-    <string name="queue_depth">Fájlfeldolgozási várólánc mélysége</string>
+    <string name="queue_depth">WiGLE sor: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net hírek</string>
     <string name="tab_news">Hírek</string>
     <string name="bytes">Bájt</string>
@@ -307,7 +308,6 @@
     <string name="prevrank_title">Felhasználói rangsor a múlt hónapban</string>
     <string name="prevmonthrank_title">Havi rangsor a múlt hónapban</string>
     <string name="list_scanning_on">(A letapogatás be van kapcsolva)</string>
-    <string name="activate">aktiválás most QR-kóddal</string>
     <string name="setting_activate_prompt">a https://wigle.net/activate felkeresése a felhasználói kódért</string>
     <string name="upload_queued">Sorba állítva</string>
     <string name="upload_parsing">Feldolgozás…</string>
@@ -429,4 +429,21 @@
     <string name="theme_light_label">Fény</string>
     <string name="theme_dark_label">Sötét</string>
     <string name="theme_follow_label">Kövesse a rendszert</string>
+    <string name="manage_gpx_button">Mentett útvonalak</string>
+    <string name="manage_gpx">Mentett GPX-útvonalak kezelése</string>
+    <string name="enable_map_theme">Párosítsa a térképtémát az alkalmazáshoz</string>
+    <string name="throttle">A WiFi szkennelés korlátozott. A jobb teljesítmény érdekében kapcsolja ki a WiFi Scan Throttle funkciót a Fejlesztői beállítások alatt.</string>
+    <string name="no_individual_nets_map">A térképháló megjelenítésének letiltása</string>
+    <string name="filter_show_btle">Bluetooth LE megjelenítése</string>
+    <string name="settings_gps_head">GPS beállítások</string>
+    <string name="enable_kalman">GPS-zaj szűrése</string>
+    <string name="gps_old_message">Ezt az eszközt a Google irányelvei miatt már nem támogatja az App Store. Kérjük, készítsen biztonsági másolatot adatairól, és töltse be oldalra a WiGLE v. 2.67 .apk (vagy régebbi) verzióját a https://github.com/wiglenet/wigle-wifi-wardriving/ webhelyről. Elnézést a kellemetlenségért!</string>
+    <string name="gps_old_title">Nem sikerült inicializálni a GPS-t</string>
+    <string name="enable_map_bearing">Kövesd az irányom/irányomat</string>
+    <string name="login_title">Bejelentkezés Szükséges</string>
+    <string name="login_required">Ehhez be kell jelentkeznie. Kérjük, jelentkezzen be, vagy hozzon létre fiókot, ha szükséges.</string>
+    <string name="login">Belépés</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Regisztráció&lt;/a&gt; @WiGLE.net vagy &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktiválás most QR-kóddal&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID-ok:</string>
+    <string name="ble_vendor">BLE szállítói azonosító:</string>
 </resources>

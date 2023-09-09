@@ -2,15 +2,15 @@ import groovy.sql.Sql
 
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
+apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
-
+    namespace "net.wigle.wigleandroid"
+    compileSdkVersion 33
     defaultConfig {
         applicationId "net.wigle.wigleandroid"
-        minSdkVersion 14
-        targetSdkVersion 29
+        minSdkVersion 24
+        targetSdkVersion 33
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
@@ -22,15 +22,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/MANIFEST.MF'
+        resources {
+            excludes += ['META-INF/ASL2.0', 'META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/LICENSE.txt', 'META-INF/MANIFEST.MF']
+        }
     }
+
 }
 
 configurations {
@@ -38,7 +35,7 @@ configurations {
 }
 
 dependencies {
-    driver 'org.xerial:sqlite-jdbc:3.23.1'
+    driver 'org.xerial:sqlite-jdbc:3.42.0.0'
 }
 
 // make a driver copy, per https://stackoverflow.com/questions/51676049/cannot-change-strategy-of-configuration-sqlite
@@ -50,34 +47,36 @@ ext {
     inputMxcSqlDir = "etc/mccmncsqlite"
     outputMxcDbFile = "$projectDir/src/main/assets/mmcmnc.sqlite"
     mxcDictionaryFile = "$inputMxcSqlDir/mcc-mnc-dict.json"
+    outputBtMemberUuidFile = "$projectDir/src/main/assets/btmember.yaml"
+    outputBtCoIdUuidFile = "$projectDir/src/main/assets/btco.yaml"
 }
 
 dependencies {
-    // implementation project(':android-maps-utils')
-    implementation "androidx.core:core:1.3.2"
-    implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.2.0"
-    implementation "com.google.android.material:material:1.3.0"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
-    implementation "androidx.appcompat:appcompat:1.2.0"
-    // implementation "com.google.android.gms:play-services-maps:17.0.0"
+    implementation "androidx.legacy:legacy-support-core-utils:1.0.0"
+    implementation "androidx.core:core:1.6.0"
+    implementation "androidx.appcompat:appcompat:1.4.2"
+    implementation "com.google.android.material:material:1.6.0"
+    // implementation "com.google.android.gms:play-services-maps:18.1.0"
     // implementation 'com.google.android.gms:play-services-vision:20.1.3'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.slf4j:slf4j-android:1.7.19'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr3'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.11.1'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr3'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.12'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
-    implementation 'commons-io:commons-io:2.6'
-    //TODO: MinAPI issue: implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.2.0'
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'androidx.test:core:1.3.0'
+    implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
+    implementation 'com.google.maps.android:android-maps-utils:3.1.1'
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'androidx.test:core:1.5.0'
     testImplementation 'org.mockito:mockito-core:1.10.19'
-    androidTestImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
 
 import groovy.json.JsonSlurper
@@ -134,4 +133,20 @@ task createMccMncDB (dependsOn: 'downloadFile') {
         }
     }
     sql.close()
+}
+
+//TODO: this runs every time, which isn't optimal. just needs to run before build
+task downloadBtMemberFile (type: Download) {
+    println "downloading BT Member YAML data"
+    download {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/uuids/member_uuids.yaml'
+        dest outputBtMemberUuidFile
+        overwrite true
+    }
+    download {
+        src 'https://api.bitbucket.org/2.0/repositories/bluetooth-SIG/public/src/main/assigned_numbers/company_identifiers/company_identifiers.yaml'
+        dest outputBtCoIdUuidFile
+        overwrite true
+    }
+
 }

@@ -80,12 +80,12 @@
     <string name="filter_enabled">フィルタが有効化されています</string>
     <string name="list_waiting_gps">（GPS 同期を待っています…）</string>
     <string name="list_scanning_off">（スキャンがオフになっています）</string>
-    <string name="list_short_lat">Lat：</string>
-    <string name="list_short_lon">Lon：</string>
-    <string name="list_short_sats">Sats：</string>
-    <string name="list_short_alt">Alt：</string>
+    <string name="list_short_lat">Lat：%1$s</string>
+    <string name="list_short_lon">Lon：%1$s</string>
+    <string name="list_short_sats">Sats：%1$d</string>
+    <string name="list_short_alt">Alt： %1$s</string>
     <string name="list_status_default">（状態）</string>
-    <string name="list_speed">速度：</string>
+    <string name="list_speed">速度：%1$s</string>
     <string name="list_upload">ファイルをアップロードしますか？</string>
     <string name="network_signal">信号：</string>
     <string name="network_type">タイプ：</string>
@@ -118,8 +118,8 @@
     <string name="cancel">キャンセル</string>
     <string name="dash_scan_off">（スキャンがオフになっています）</string>
     <string name="dash_new_wifi">新しい WiFi</string>
-    <string name="dash_vis_nets">可視ネット：</string>
-    <string name="dash_new_upload">アップロード以降のネット：</string>
+    <string name="dash_vis_nets">可視ネット：%1$d</string>
+    <string name="dash_new_upload">アップロード以降のネット： %1$d</string>
     <string name="dash_new_cells">新しいセル</string>
     <string name="dash_new_bt">新しい Bluetooth</string>
     <string name="dash_dist_run">実行間隔：</string>
@@ -127,10 +127,11 @@
     <string name="dash_time_scanning">スキャン時間：</string>
     <string name="dash_dist_total">総間隔：</string>
     <string name="dash_dist_prev">前回の実行：</string>
-    <string name="dash_db_queue">DB キュー：</string>
-    <string name="dash_db_nets">DB ネット：</string>
-    <string name="dash_db_locs">DB の場所：</string>
-    <string name="dash_short_loc">場所：</string>
+    <string name="dash_db_queue">DB キュー: %1$s</string>
+    <string name="dash_db_nets">DB ネット：%1$s</string>
+    <string name="dash_db_locs">DB の場所：%1$s</string>
+    <string name="dash_short_loc">場所：%1$s</string>
+    <string name="Mm_short">Mm</string>
     <string name="km_short">km</string>
     <string name="mi_short">mi</string>
     <string name="miles">マイル</string>
@@ -145,7 +146,7 @@
     <string name="run">実行</string>
     <string name="new_word">新規</string>
     <string name="db">DB</string>
-    <string name="scanned_in">スキャンイン</string>
+    <string name="scanned_in">%1$d スキャンイン %2$d%3$s.</string>
     <string name="sort_title">オプションを並べ替え</string>
     <string name="sort_spin_label">次によるリストの並べ替え：</string>
     <string name="channel">チャネル</string>
@@ -232,6 +233,7 @@
     <string name="language_pl">polski（ポーランド語）</string>
     <string name="language_pt">português（ポルトガル語）</string>
     <string name="language_pt_rBR">português brasileiro（ブラジルポルトガル語）</string>
+    <string name="language_ro_rRO">Română (ルーマニア語)</string>
     <string name="language_ru">ру́сский（ロシア語）</string>
     <string name="language_sv">svenska（スウェーデン語）</string>
     <string name="language_sw">Kiswahili (スワヒリ語)</string>
@@ -264,7 +266,6 @@
     <string name="map_toast_hybrid">マップタイプ：ハイブリッド</string>
     <string name="map_toast_terrain">マップタイプ：地形</string>
     <string name="map_needs_playservice">地図には GooglePlay 開発者サービスが必要です</string>
-    <string name="register">登録</string>
     <string name="drawer_open">ドローワが開いています</string>
     <string name="drawer_close">ドローワを閉じる</string>
     <string name="site_stats_app_name">WiGLE.net 統計</string>
@@ -293,7 +294,7 @@
     <string name="tab_rank">ランキング</string>
     <string name="uploads_app_name">WiGLE.net アップロード</string>
     <string name="tab_uploads">アップロード</string>
-    <string name="queue_depth">ファイル処理キューの深さ</string>
+    <string name="queue_depth">WiGLE キュー: %1$s Tri: %2$s Geo: %3$s</string>
     <string name="news_app_name">WiGLE.net ニュース</string>
     <string name="tab_news">ニュース</string>
     <string name="bytes">バイト</string>
@@ -306,7 +307,6 @@
     <string name="prevrank_title">先月のユーザーランキング</string>
     <string name="prevmonthrank_title">先月の月間ランキング</string>
     <string name="list_scanning_on">（スキャンがオンになっています）</string>
-    <string name="activate">QR コードで今すぐアクティベート</string>
     <string name="setting_activate_prompt">ユーザーコードについては、https：//wigle.net/activate にアクセスしてください</string>
     <string name="upload_queued">キュー済み</string>
     <string name="upload_parsing">解析しています…</string>
@@ -428,4 +428,21 @@
     <string name="theme_light_label">ライト</string>
     <string name="theme_dark_label">ダーク</string>
     <string name="theme_follow_label">フォローシステム</string>
+    <string name="manage_gpx_button">保存されたルート</string>
+    <string name="manage_gpx">保存されたGPXルートを管理する</string>
+    <string name="enable_map_theme">マップのテーマをアプリに一致させる</string>
+    <string name="throttle">WiFiスキャンは制限されています。パフォーマンスを向上させるには、開発者設定でWiFiスキャンスロットルを無効にします。</string>
+    <string name="no_individual_nets_map">マップネット表示を無効にする</string>
+    <string name="filter_show_btle">BluetoothLEを表示する</string>
+    <string name="enable_kalman">GPSノイズをフィルターする</string>
+    <string name="settings_gps_head">GPS フィルタリング</string>
+    <string name="gps_old_message">Google のポリシーにより、このデバイスは App Store でサポートされなくなりました。データをバックアップし、https://github.com/wiglenet/wigle-wifi-wardriving/ から WiGLE v. 2.67 .apk (またはそれ以下) をサイドロードしてください。ご不便おかけしてすみません！</string>
+    <string name="gps_old_title">GPS を初期化できません</string>
+    <string name="enable_map_bearing">私の方位/見出しに従ってください</string>
+    <string name="login_title">ログインが必要です</string>
+    <string name="login_required">これを行うにはログインする必要があります。必要に応じて、ログインするかアカウントを作成してください。</string>
+    <string name="login">ログイン</string>
+    <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>WiGLE.net に登録する&lt;/a&gt;か、&lt;a href=\'net.wigle.wigleandroid://activate\'&gt;QR コードで今すぐアクティベートしてください&lt;/a&gt;</string>
+    <string name="ble_services">BLE UUID:</string>
+    <string name="ble_vendor">BLE ベンダー ID:</string>
 </resources>

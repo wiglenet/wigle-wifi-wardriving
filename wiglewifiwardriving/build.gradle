@@ -2,7 +2,7 @@ import groovy.sql.Sql
 
 apply plugin: 'com.android.application'
 apply plugin: 'de.undercouch.download'
-apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+//apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 
 android {
     namespace "net.wigle.wigleandroid"
@@ -68,7 +68,7 @@ dependencies {
     implementation 'ru.egslava:MaskedEditText:1.0.5'
     implementation 'com.goebl:simplify:1.0.0'
     implementation 'com.babylon.certificatetransparency:certificatetransparency-android:0.3.0'
-    implementation 'com.google.maps.android:android-maps-utils:3.1.1'
+//    implementation 'com.google.maps.android:android-maps-utils:3.1.1'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.1'
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
     testImplementation 'junit:junit:4.13.2'

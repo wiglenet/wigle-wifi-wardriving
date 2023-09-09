@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.GoogleMap;
 
 import net.wigle.wigleandroid.ListFragment;
 import net.wigle.wigleandroid.R;
@@ -156,25 +156,25 @@ public class GpxRecyclerAdapter extends RecyclerView.Adapter<GpxRecyclerAdapter.
             selectedPos = position; //.getLayoutPosition();
             notifyItemChanged(selectedPos);
             //DEBUG: MainActivity.info("get route "+clickedId);
-            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
-                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
-                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
-                if (null == routeCursor) {
-                    Logging.info("null route cursor; not mapping");
-                } else {
-                    PolylineRoute newRoute = new PolylineRoute();
-                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
-                        final float lat = routeCursor.getFloat(0);
-                        final float lon = routeCursor.getFloat(1);
-                        //final long time = routeCursor.getLong(2);
-                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
-                    }
-                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
-                    configurable.configureMapForRoute(newRoute);
-                }
-            } catch (Exception e) {
-                Logging.error("Unable to add route: ",e);
-            }
+//            try (Cursor routeCursor = ListFragment.lameStatic.dbHelper.routeIterator(clickedId)) {
+//                final int mapMode = prefs.getInt(PreferenceKeys.PREF_MAP_TYPE, GoogleMap.MAP_TYPE_NORMAL);
+//                final boolean nightMode = ThemeUtil.shouldUseMapNightMode(context, prefs);
+//                if (null == routeCursor) {
+//                    Logging.info("null route cursor; not mapping");
+//                } else {
+//                    PolylineRoute newRoute = new PolylineRoute();
+//                    for (routeCursor.moveToFirst(); !routeCursor.isAfterLast(); routeCursor.moveToNext()) {
+//                        final float lat = routeCursor.getFloat(0);
+//                        final float lon = routeCursor.getFloat(1);
+//                        //final long time = routeCursor.getLong(2);
+//                        newRoute.addLatLng(lat, lon, mapMode, nightMode);
+//                    }
+//                    Logging.info("Loaded route with " + newRoute.getSegments() + " segments");
+//                    configurable.configureMapForRoute(newRoute);
+//                }
+//            } catch (Exception e) {
+//                Logging.error("Unable to add route: ",e);
+//            }
         });
         holder.shareButton.setOnClickListener(v -> {
             Logging.info("share route "+clickedId);

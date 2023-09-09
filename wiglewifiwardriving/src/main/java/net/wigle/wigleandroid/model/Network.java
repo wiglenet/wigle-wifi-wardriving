@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 
 //import com.google.android.gms.maps.model.LatLng;
 import net.wigle.wigleandroid.model.LatLng;
-import com.google.maps.android.clustering.ClusterItem;
+//import com.google.maps.android.clustering.ClusterItem;
 
 import net.wigle.wigleandroid.MainActivity;
 import net.wigle.wigleandroid.util.Logging;

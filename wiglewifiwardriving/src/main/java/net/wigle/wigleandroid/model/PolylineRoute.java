@@ -3,8 +3,8 @@ package net.wigle.wigleandroid.model;
 import android.graphics.Color;
 import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolylineOptions;
+//import com.google.android.gms.maps.model.LatLng;
+//import com.google.android.gms.maps.model.PolylineOptions;
 
 import net.wigle.wigleandroid.MainActivity;
 
@@ -16,7 +16,7 @@ import static net.wigle.wigleandroid.MappingFragment.getRouteColorForMapType;
 public class PolylineRoute {
     public static final float DEFAULT_ROUTE_WIDTH = 15.0f; //TODO: dedup with MappingFragment
 
-    private PolylineOptions polyline;
+//    private PolylineOptions polyline;
     private float westExtent;
     private float eastExtent;
     private float northExtent;
@@ -27,8 +27,8 @@ public class PolylineRoute {
 
     public PolylineRoute() {
         distanceMeters = 0;
-        polyline = new PolylineOptions()
-                .clickable(false);
+//        polyline = new PolylineOptions()
+//                .clickable(false);
         //init to sure - opposites
         westExtent = 180f;
         eastExtent = -180f;
@@ -48,10 +48,10 @@ public class PolylineRoute {
      */
     public void addLatLng(final float latitude, final float longitude, final int mapMode, final boolean nightMode) {
         final LatLng newPoint = new LatLng(latitude, longitude);
-        polyline.add(newPoint);
-        polyline.color(getRouteColorForMapType(mapMode, nightMode));
-        polyline.width(DEFAULT_ROUTE_WIDTH);
-        polyline.zIndex(10000); //to overlay above traffic data
+//        polyline.add(newPoint);
+//        polyline.color(getRouteColorForMapType(mapMode, nightMode));
+//        polyline.width(DEFAULT_ROUTE_WIDTH);
+//        polyline.zIndex(10000); //to overlay above traffic data
         if (latitude > northExtent) {
             northExtent = latitude;
         }
@@ -75,9 +75,9 @@ public class PolylineRoute {
      * Get the google maps polyline for the route
      * @return the corresponding polyline to render
      */
-    public PolylineOptions getPolyline() {
-        return polyline;
-    }
+//    public PolylineOptions getPolyline() {
+//        return polyline;
+//    }
 
     /**
      * Get the north-eastern-most point of the route

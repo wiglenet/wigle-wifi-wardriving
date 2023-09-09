@@ -12,8 +12,8 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.MapStyleOptions;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.model.MapStyleOptions;
 
 import net.wigle.wigleandroid.util.Logging;
 import net.wigle.wigleandroid.util.PreferenceKeys;
@@ -53,15 +53,15 @@ public class ThemeUtil {
         });
     }
 
-    public static void setMapTheme(final GoogleMap googleMap, final Context c, final SharedPreferences prefs, final int mapNightThemeId) {
-        if (shouldUseMapNightMode(c, prefs)) {
-            try {
-                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(c, mapNightThemeId));
-            } catch (Resources.NotFoundException e) {
-                Logging.error("Unable to theme map: ", e);
-            }
-        }
-    }
+//    public static void setMapTheme(final GoogleMap googleMap, final Context c, final SharedPreferences prefs, final int mapNightThemeId) {
+//        if (shouldUseMapNightMode(c, prefs)) {
+//            try {
+//                googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(c, mapNightThemeId));
+//            } catch (Resources.NotFoundException e) {
+//                Logging.error("Unable to theme map: ", e);
+//            }
+//        }
+//    }
 
     public static boolean shouldUseMapNightMode(final Context c, final SharedPreferences prefs) {
         final boolean mapsMatchMode = prefs.getBoolean(PreferenceKeys.PREF_MAPS_FOLLOW_DAYNIGHT, false);

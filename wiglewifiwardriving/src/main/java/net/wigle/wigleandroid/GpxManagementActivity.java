@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Polyline;
+//import com.google.android.gms.maps.CameraUpdate;
+//import com.google.android.gms.maps.CameraUpdateFactory;
+//import com.google.android.gms.maps.MapView;
+//import com.google.android.gms.maps.MapsInitializer;
+//import com.google.android.gms.maps.model.LatLngBounds;
+//import com.google.android.gms.maps.model.Polyline;
 
 import net.wigle.wigleandroid.db.DBException;
 import net.wigle.wigleandroid.db.DatabaseHelper;
@@ -45,10 +45,10 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     private final NumberFormat numberFormat;
     private final int DEFAULT_MAP_PADDING = 25;
     private final DatabaseHelper dbHelper;
-    private MapView mapView;
+//    private MapView mapView;
     private View infoView;
     private TextView distanceText;
-    private Polyline routePolyline;
+//    private Polyline routePolyline;
     private final String CURRENT_ROUTE_LINE_TAG = "currentRoutePolyline";
     private SharedPreferences prefs;
     private ProgressDialog pd;
@@ -77,9 +77,9 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     @Override
     public void onDestroy() {
         Logging.info("NET: onDestroy");
-        if (mapView != null) {
-            mapView.onDestroy();
-        }
+//        if (mapView != null) {
+//            mapView.onDestroy();
+//        }
         super.onDestroy();
         //setResult(Result.OK);
         finish();
@@ -89,51 +89,51 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
     public void onResume() {
         Logging.info("NET: onResume");
         super.onResume();
-        if (mapView != null) {
-            mapView.onResume();
-        } else {
-            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
-            setupMap(prefs);
-        }
+//        if (mapView != null) {
+//            mapView.onResume();
+//        } else {
+//            final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, 0);
+//            setupMap(prefs);
+//        }
     }
 
     @Override
     public void onPause() {
         Logging.info("NET: onPause");
         super.onPause();
-        if (mapView != null) {
-            mapView.onPause();
-        }
+//        if (mapView != null) {
+//            mapView.onPause();
+//        }
     }
 
     private void setupMap(final SharedPreferences prefs) {
-        mapView = new MapView( this );
-        try {
-            mapView.onCreate(null);
-            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
-        } catch (NullPointerException ex) {
-            Logging.error("npe in mapView.onCreate: " + ex, ex);
-        }
-        MapsInitializer.initialize( this );
-        final RelativeLayout rlView = findViewById( R.id.gpx_map_rl );
-        rlView.addView( mapView );
-        infoView = findViewById(R.id.gpx_info);
-        distanceText = findViewById(R.id.gpx_rundistance);
+//        mapView = new MapView( this );
+//        try {
+//            mapView.onCreate(null);
+//            mapView.getMapAsync(googleMap -> ThemeUtil.setMapTheme(googleMap, mapView.getContext(), prefs, R.raw.night_style_json));
+//        } catch (NullPointerException ex) {
+//            Logging.error("npe in mapView.onCreate: " + ex, ex);
+//        }
+//        MapsInitializer.initialize( this );
+//        final RelativeLayout rlView = findViewById( R.id.gpx_map_rl );
+//        rlView.addView( mapView );
+//        infoView = findViewById(R.id.gpx_info);
+//        distanceText = findViewById(R.id.gpx_rundistance);
     }
 
     @Override
     public void configureMapForRoute(final PolylineRoute polyRoute) {
         if ((polyRoute != null)) {
-            mapView.getMapAsync(googleMap -> {
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                builder.include(polyRoute.getNEExtent());
-                builder.include(polyRoute.getSWExtent());
-                LatLngBounds bounds = builder.build();
-                final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_MAP_PADDING);
-                googleMap.animateCamera(cu);
-                routePolyline = googleMap.addPolyline(polyRoute.getPolyline());
-                routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
-            });
+//            mapView.getMapAsync(googleMap -> {
+//                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//                builder.include(polyRoute.getNEExtent());
+//                builder.include(polyRoute.getSWExtent());
+//                LatLngBounds bounds = builder.build();
+//                final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_MAP_PADDING);
+//                googleMap.animateCamera(cu);
+//                routePolyline = googleMap.addPolyline(polyRoute.getPolyline());
+//                routePolyline.setTag(CURRENT_ROUTE_LINE_TAG);
+//            });
             infoView.setVisibility(View.VISIBLE);
             final String distString = UINumberFormat.metersToString(prefs,
                     numberFormat, this, polyRoute.getDistanceMeters(), true);
@@ -146,9 +146,9 @@ public class GpxManagementActivity extends AppCompatActivity implements PolyRout
 
     @Override
     public void clearCurrentRoute() {
-        if (routePolyline != null ) {
-            routePolyline.remove();
-        }
+//        if (routePolyline != null ) {
+//            routePolyline.remove();
+//        }
     }
 
     private void setupList() {

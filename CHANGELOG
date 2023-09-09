@@ -1,5 +1,5 @@
 * 2.79 - 2.80 (09/07/2023)
-Bluetooth device manufacturer information displayed
+Bluetooth device manufacturer information displayed (thanks XenoKovah for insight)
 Stop multiple notification alerts on older devices
 Android is now forcing approval for posting notification
 Layout fixes around long strings

@@ -9,16 +9,12 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/netmap_rl"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
-
-        <RelativeLayout
             style="@style/NetworkViewOverlay"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingBottom="4dp">
+
             <LinearLayout
                 android:id="@+id/na_network_title"
                 android:layout_width="fill_parent"
@@ -369,6 +365,23 @@
                         android:textSize="13sp" />
                 </RelativeLayout>
             </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/no_map"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ble_info"
+                android:orientation="vertical"
+                android:paddingHorizontal="2dp"
+                >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mapless"
+                style="@style/NetDetailSsid"
+                />
+            </RelativeLayout>
+
         </RelativeLayout>
         <LinearLayout
             android:id="@+id/filter_row"

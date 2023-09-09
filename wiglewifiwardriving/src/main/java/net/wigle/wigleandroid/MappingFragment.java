@@ -204,8 +204,8 @@ public final class MappingFragment extends Fragment {
         setupQuery();
     }
 
-//    @Override
-//    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 //        final Activity a = getActivity();
 //        if (null != a) {
 //            mapView = new MapView(a);
@@ -224,7 +224,7 @@ public final class MappingFragment extends Fragment {
 //            }
 //            MapsInitializer.initialize(a);
 //        }
-//        final View view = inflater.inflate(R.layout.map, container, false);
+        final View view = inflater.inflate(R.layout.map, container, false);
 //
 //        LatLng oldCenter = null;
 //        int oldZoom = Integer.MIN_VALUE;
@@ -234,8 +234,8 @@ public final class MappingFragment extends Fragment {
 //        }
 //
 //        setupMapView(view, oldCenter, oldZoom);
-//        return view;
-//    }
+        return view;
+    }
 
 //    @SuppressLint("MissingPermission")
 //    private void setupMapView(final View view, final LatLng oldCenter, final int oldZoom) {

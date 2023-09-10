@@ -448,4 +448,5 @@
     <string name="ble_vendor">מזהה ספק BLE:</string>
     <string name="speech_new_bt">Bluetooth חדש ל-DB</string>
     <string name="tts_new_bt">בלוטוס חדש</string>
+    <string name="gnss_full">השתמש במעקב מלא GNSS (ריקון סוללה גדול)</string>
 </resources>

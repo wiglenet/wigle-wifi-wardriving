@@ -448,4 +448,5 @@
     <string name="ble_vendor">BLE szállítói azonosító:</string>
     <string name="speech_new_bt">Új bluetooth a DB-hez</string>
     <string name="tts_new_bt">Új bluetooth</string>
+    <string name="gnss_full">Használja a GNSS teljes követést (nagy akkumulátorlemerülés)</string>
 </resources>

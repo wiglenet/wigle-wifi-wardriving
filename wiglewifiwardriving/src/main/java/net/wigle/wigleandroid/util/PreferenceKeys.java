@@ -52,6 +52,7 @@ public class PreferenceKeys {
     public static final String PREF_EXCLUDE_LOG_ADDRS = "logExcludeAddresses";
     public static final String PREF_GPS_TIMEOUT = "gpsTimeout";
     public static final String PREF_GPS_KALMAN_FILTER = "gpsKalmanFilter";
+    public static final String PREF_GPS_GNSS_FULL = "gpsGnssFull";
     public static final String PREF_NET_LOC_TIMEOUT = "networkLocationTimeout";
     public static final String PREF_START_AT_BOOT = "startAtBoot";
     public static final String PREF_LOG_ROUTES = "logRoutes";

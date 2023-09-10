@@ -448,4 +448,5 @@
     <string name="ble_vendor">ID dodavatele BLE:</string>
     <string name="speech_new_bt">Nové bluetooth do DB</string>
     <string name="tts_new_bt">Nové bluetooth</string>
+    <string name="gnss_full">Použít úplné sledování GNSS (velká spotřeba baterie)</string>
 </resources>

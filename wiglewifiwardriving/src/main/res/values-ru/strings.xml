@@ -448,4 +448,5 @@
     <string name="ble_vendor">Идентификатор поставщика BLE:</string>
     <string name="speech_new_bt">Новый Bluetooth для БД</string>
     <string name="tts_new_bt">Новый блютуз</string>
+    <string name="gnss_full">Используйте полное отслеживание GNSS (большой расход заряда батареи)</string>
 </resources>

@@ -448,4 +448,5 @@
     <string name="ble_vendor">BLE 공급업체 ID:</string>
     <string name="speech_new_bt">DB에 새로운 블루투스</string>
     <string name="tts_new_bt">새로운 블루투스</string>
+    <string name="gnss_full">GNSS 전체 추적 사용(배터리 소모가 많음)</string>
 </resources>

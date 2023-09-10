@@ -46,6 +46,7 @@ public class SpeechActivity extends AppCompatActivity {
         doTtsCheckbox( prefs, R.id.speech_run, PreferenceKeys.PREF_SPEAK_RUN );
         doTtsCheckbox( prefs, R.id.speech_new_wifi, PreferenceKeys.PREF_SPEAK_NEW_WIFI );
         doTtsCheckbox( prefs, R.id.speech_new_cell, PreferenceKeys.PREF_SPEAK_NEW_CELL );
+        doTtsCheckbox( prefs, R.id.speech_new_bt, PreferenceKeys.PREF_SPEAK_NEW_BT );
         doTtsCheckbox( prefs, R.id.speech_queue, PreferenceKeys.PREF_SPEAK_QUEUE );
         doTtsCheckbox( prefs, R.id.speech_miles, PreferenceKeys.PREF_SPEAK_MILES );
         doTtsCheckbox( prefs, R.id.speech_time, PreferenceKeys.PREF_SPEAK_TIME );

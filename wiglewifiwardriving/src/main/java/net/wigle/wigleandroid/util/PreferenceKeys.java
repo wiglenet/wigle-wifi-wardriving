@@ -81,6 +81,7 @@ public class PreferenceKeys {
     public static final String PREF_SPEAK_RUN = "speakRun";
     public static final String PREF_SPEAK_NEW_WIFI = "speakNew";
     public static final String PREF_SPEAK_NEW_CELL = "speakNewCell";
+    public static final String PREF_SPEAK_NEW_BT = "speakNewBt";
     public static final String PREF_SPEAK_QUEUE = "speakQueue";
     public static final String PREF_SPEAK_MILES = "speakMiles";
     public static final String PREF_SPEAK_TIME = "speakTime";

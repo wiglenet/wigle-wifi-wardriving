@@ -55,6 +55,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/speech_new_cell" />
+<CheckBox android:id="@+id/speech_new_bt"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/speech_new_bt" />
 <CheckBox android:id="@+id/speech_queue"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

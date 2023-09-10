@@ -446,4 +446,6 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>سجل في&lt;/a&gt; @WiGLE.net أو &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;تفعيل الآن مع رمز الاستجابة السريعة&lt;/a&gt;</string>
     <string name="ble_services">:UUIDs بليه</string>
     <string name="ble_vendor">معرف البائع بليه:</string>
+    <string name="speech_new_bt">بلوتوث جديد لقاعدة البيانات</string>
+    <string name="tts_new_bt">بلوتوث جديد</string>
 </resources>

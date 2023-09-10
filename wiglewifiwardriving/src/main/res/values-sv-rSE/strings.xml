@@ -446,4 +446,6 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Registrera&lt;/a&gt; @WiGLE.net eller &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivera nu med QR-kod&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID:</string>
     <string name="ble_vendor">BLE leverantörs-ID:</string>
+    <string name="speech_new_bt">Ny bluetooth till DB</string>
+    <string name="tts_new_bt">Ny bluetooth</string>
 </resources>

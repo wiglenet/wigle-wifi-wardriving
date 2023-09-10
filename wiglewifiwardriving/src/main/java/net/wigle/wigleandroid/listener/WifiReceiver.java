@@ -428,7 +428,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
         final long speechPeriod = prefs.getLong( PreferenceKeys.PREF_SPEECH_PERIOD, MainActivity.DEFAULT_SPEECH_PERIOD );
         if ( speechPeriod != 0 && now - previousTalkTime > speechPeriod * 1000L ) {
-            doAnnouncement( preQueueSize, newWifiCount, newCellCount, now );
+            doAnnouncement( preQueueSize, newWifiCount, newCellCount, ListFragment.lameStatic.newBt, now );
         }
     }
 
@@ -714,7 +714,7 @@ public class WifiReceiver extends BroadcastReceiver {
     /**
      * Voice announcement method for scan
      */
-    private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long now ) {
+    private void doAnnouncement( int preQueueSize, long newWifiCount, long newCellCount, long newBtCount, long now ) {
         final SharedPreferences prefs = mainActivity.getSharedPreferences( PreferenceKeys.SHARED_PREFS, 0 );
         StringBuilder builder = new StringBuilder();
 
@@ -734,6 +734,10 @@ public class WifiReceiver extends BroadcastReceiver {
         if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_CELL, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_new_cell)).append(" ")
                     .append(newCellCount).append( ", " );
+        }
+        if ( prefs.getBoolean( PreferenceKeys.PREF_SPEAK_NEW_BT, true ) ) {
+            builder.append(mainActivity.getString(R.string.tts_new_bt)).append(" ")
+                    .append(newBtCount).append( ", " );
         }
         if ( preQueueSize > 0 && prefs.getBoolean( PreferenceKeys.PREF_SPEAK_QUEUE, true ) ) {
             builder.append(mainActivity.getString(R.string.tts_queue)).append(" ")

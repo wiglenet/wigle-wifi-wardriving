@@ -446,4 +446,6 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>Zaregistrujte se na&lt;/a&gt; @WiGLE.net nebo &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;aktivujte nyní pomocí QR kódu&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID:</string>
     <string name="ble_vendor">ID dodavatele BLE:</string>
+    <string name="speech_new_bt">Nové bluetooth do DB</string>
+    <string name="tts_new_bt">Nové bluetooth</string>
 </resources>

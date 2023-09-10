@@ -446,4 +446,6 @@
     <string name="registration_html_prompt">&lt;a href=\'net.wigle.wigleandroid.register://register\'>@WiGLE.net\'e kaydolun&lt;/a&gt; veya &lt;a href=\'net.wigle.wigleandroid://activate\'&gt;şimdi QR kodu ile etkinleştir&lt;/a&gt;</string>
     <string name="ble_services">BLE UUID\'leri:</string>
     <string name="ble_vendor">BLE Satıcı Kimliği:</string>
+    <string name="speech_new_bt">DB\'ye yeni Bluetooth</string>
+    <string name="tts_new_bt">Yeni bluetooth</string>
 </resources>

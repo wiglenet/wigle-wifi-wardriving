@@ -448,4 +448,5 @@
     <string name="ble_vendor">BLE-leverandør-ID:</string>
     <string name="speech_new_bt">Ny bluetooth til DB</string>
     <string name="tts_new_bt">Ny bluetooth</string>
+    <string name="gnss_full">Bruk GNSS full sporing (stort batteriforbruk)</string>
 </resources>

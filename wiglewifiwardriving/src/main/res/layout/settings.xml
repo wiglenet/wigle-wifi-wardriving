@@ -479,6 +479,10 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/enable_kalman" />
+    <CheckBox android:id="@+id/gnss_full"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gnss_full" />
 
     <Button android:id="@+id/speech_button" android:layout_width="wrap_content"
     android:layout_height="0dip"

@@ -447,4 +447,5 @@
     <string name="ble_vendor">Kitambulisho cha Muuzaji cha BLE:</string>
     <string name="speech_new_bt">Bluetooth mpya kwa DB</string>
     <string name="tts_new_bt">Bluetooth mpya</string>
+    <string name="gnss_full">Tumia ufuatiliaji kamili wa GNSS (kukimbia kwa betri kubwa)</string>
 </resources>

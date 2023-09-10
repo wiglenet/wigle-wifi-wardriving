@@ -447,4 +447,5 @@
     <string name="ble_vendor">बीएलई विक्रेता आईडी:</string>
     <string name="speech_new_bt">डीबी में नया ब्लूटूथ</string>
     <string name="tts_new_bt">नया ब्लूटूथ</string>
+    <string name="gnss_full">जीएनएसएस पूर्ण ट्रैकिंग (बड़ी बैटरी ड्रेन) का उपयोग करें</string>
 </resources>

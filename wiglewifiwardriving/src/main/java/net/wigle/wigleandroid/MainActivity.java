@@ -19,6 +19,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
+import android.location.GnssMeasurementRequest;
+import android.location.GnssMeasurementsEvent;
 import android.location.GnssStatus;
 import android.location.LocationManager;
 import android.location.LocationProvider;
@@ -41,6 +43,7 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.core.content.ContextCompat;
 import androidx.core.location.LocationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -166,6 +169,7 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
     private State state;
     // *** end of state that is retained ***
     private GnssStatus.Callback gnssStatusCallback = null;
+    private GnssMeasurementsEvent.Callback gnssMeasurementsCallback = null;
     static Locale ORIG_LOCALE = Locale.getDefault();
     public static final String ENCODING = "ISO-8859-1";
     private static final int PERMISSIONS_REQUEST = 1;
@@ -2014,11 +2018,15 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
             if (gnssStatusCallback != null) {
                 locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
             }
+            if (gnssMeasurementsCallback != null) {
+                locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
+            }
         }
 
         // create a new listener to try and get around the gps stopping bug
         state.GNSSListener = new GNSSListener(this, state.dbHelper);
         state.GNSSListener.setMapListener(MappingFragment.STATIC_LOCATION_LISTENER);
+        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
 
         try {
             gnssStatusCallback = new GnssStatus.Callback() {
@@ -2043,13 +2051,30 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 }
             };
             locationManager.registerGnssStatusCallback(gnssStatusCallback);
+
+            // gnss full tracking option, available in android sdk 31
+            final boolean useGnssFull = prefs.getBoolean(PreferenceKeys.PREF_GPS_GNSS_FULL, false);
+            if (useGnssFull && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                gnssMeasurementsCallback = new GnssMeasurementsEvent.Callback() {
+                    @Override
+                    public void onGnssMeasurementsReceived(GnssMeasurementsEvent eventArgs) {
+                        Logging.debug("GnssMeasurements clock: " + eventArgs.getClock());
+                    }
+                };
+
+                final GnssMeasurementRequest request = new GnssMeasurementRequest.Builder()
+                        .setFullTracking(useGnssFull).build();
+                locationManager.registerGnssMeasurementsCallback(request,
+                        ContextCompat.getMainExecutor(getApplicationContext()),
+                        gnssMeasurementsCallback
+                );
+            }
         } catch (final SecurityException ex) {
             Logging.info("\tSecurity exception adding status listener: " + ex, ex);
         } catch (final Exception ex) {
             Logging.error("Error registering for gnss: " + ex, ex);
         }
 
-        final SharedPreferences prefs = getSharedPreferences(PreferenceKeys.SHARED_PREFS, Context.MODE_PRIVATE);
         final boolean useNetworkLoc = prefs.getBoolean(PreferenceKeys.PREF_USE_NETWORK_LOC, false);
 
         final List<String> providers = locationManager.getAllProviders();
@@ -2076,6 +2101,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                     locationManager.removeUpdates(state.GNSSListener);
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    }
+                    if (gnssMeasurementsCallback != null) {
+                        locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
                     }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {
@@ -2273,6 +2301,9 @@ public final class MainActivity extends AppCompatActivity implements TextToSpeec
                 try {
                     if (gnssStatusCallback != null) {
                         locationManager.unregisterGnssStatusCallback(gnssStatusCallback);
+                    }
+                    if (gnssMeasurementsCallback != null) {
+                        locationManager.unregisterGnssMeasurementsCallback(gnssMeasurementsCallback);
                     }
                     locationManager.removeUpdates(state.GNSSListener);
                 } catch (final SecurityException ex) {

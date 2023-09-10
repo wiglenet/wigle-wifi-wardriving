@@ -599,6 +599,9 @@ public final class SettingsFragment extends Fragment implements DialogListener {
                 ListFragment.QUICK_SCAN_UNSET, pauseOptions, pauseOptionNames, getContext() );
 
         PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.enable_kalman, PreferenceKeys.PREF_GPS_KALMAN_FILTER ,true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PrefsBackedCheckbox.prefBackedCheckBox(this.getActivity(), view, R.id.gnss_full, PreferenceKeys.PREF_GPS_GNSS_FULL, false);
+        }
 
         TextView appVersion = view.findViewById(R.id.app_version);
         final String appName = getString(R.string.app_name);

@@ -64,7 +64,7 @@ public class ObservationUploader extends AbstractProgressApiRequest {
     private final boolean writeEntireDb;
     private final boolean writeRun;
 
-    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type";
+    public final static String CSV_COLUMN_HEADERS = "MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type,RCOIs";
 
     private static class CountStats {
         int byteCount;
@@ -469,6 +469,8 @@ public class ObservationUploader extends AbstractProgressApiRequest {
                     FileAccess.singleCopyNumberFormat( numberFormat, stringBuffer, charBuffer, fp, cursor.getDouble(6) );
                     charBuffer.append( COMMA );
                     charBuffer.append( network.getType().name() );
+                    charBuffer.append( COMMA );
+                    charBuffer.append( network.getRcois() );
                     charBuffer.append( NEWLINE );
                 }
                 catch ( BufferOverflowException ex ) {

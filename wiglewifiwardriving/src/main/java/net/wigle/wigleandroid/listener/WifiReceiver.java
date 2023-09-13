@@ -457,12 +457,16 @@ public class WifiReceiver extends BroadcastReceiver {
                 throw new IllegalArgumentException("Element id is not ROAMING_CONSORTIUM, : "
                         + ie.getId());
             }
+            // RCOI length handling from https://android.googlesource.com/platform/frameworks/opt/net/wifi/+/6f5af9b7f69b15369238bd2642c46638ba1f0255/service/java/com/android/server/wifi/util/InformationElementUtil.java#206
+            
+            // Roaming Consortium (OI) element format defined in IEEE 802.11 clause 9.4.2.95
+            // ElementID (1 Octet), Length (1 Octet), Number of OIs (1 Octet), OI #1 and #2 Lengths (1 Octet), OI#1 (variable), OI#2 (variable), OI#3 (variable)
+            // where 1 octet "OI #1 and #2 Length" comprises: OI#1 Length [B0-B3], OI#2 Length [B4-B7]
             ByteBuffer data = ie.getBytes().order(ByteOrder.LITTLE_ENDIAN);
             anqpOICount = data.get() & BYTE_MASK;
             int oi12Length = data.get() & BYTE_MASK;
             int oi1Length = oi12Length & NIBBLE_MASK;
             int oi2Length = (oi12Length >>> 4) & NIBBLE_MASK;
-            // https://android.googlesource.com/platform/frameworks/opt/net/wifi/+/6f5af9b7f69b15369238bd2642c46638ba1f0255/service/java/com/android/server/wifi/util/InformationElementUtil.java#212
             int oi3Length = ie.getBytes().limit() - 2 - oi1Length - oi2Length;
             int oiCount = 0;
             if (oi1Length > 0) {
@@ -493,7 +497,7 @@ public class WifiReceiver extends BroadcastReceiver {
             }
 
         }
-// OpenRoaming example "5A03BA0000/BAA2D00000/BAA2D02000"
+// OpenRoaming example "5A03BA0000 BAA2D00000 BAA2D02000"
         return concatenatedRcois;
     }
 

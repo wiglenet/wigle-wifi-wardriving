@@ -59,6 +59,7 @@ import net.wigle.wigleandroid.util.PreferenceKeys;
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -85,6 +86,8 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
 
     private static final long QUEUE_WARN_DEPTH = 500L;
     private int dbQueueTextColor;
+
+    private NumberFormat distanceNumberFormat;
 
     // rank stats data
     public static final String PREF_RANK = "rank";
@@ -171,6 +174,17 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         setupLocation(view);
         dbFormat.setGroupingUsed(false);
 
+        final Configuration conf = getResources().getConfiguration();
+        Locale locale = null;
+        if (null != conf && null != conf.getLocales()) {
+            locale = conf.getLocales().get(0);
+        }
+        if (null == locale) {
+            locale = Locale.US;
+        }
+        distanceNumberFormat = NumberFormat.getNumberInstance(locale);
+        distanceNumberFormat.setMaximumFractionDigits(2);
+
         return view;
     }
 
@@ -220,7 +234,7 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
         if (null != state.bluetoothReceiver){
             netCount += state.bluetoothReceiver.getRunNetworkCount();
         }
-        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount));
+        tv.setText( getString(R.string.run) + ": " + UINumberFormat.counterFormat(netCount)); //TODO: change to a templated string
         executor.execute(() -> {
             final long count = state.dbHelper.getNewWifiCount();
             handler.post(() -> {
@@ -711,7 +725,6 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 latText = state.numberFormat8.format( location.getLatitude() );
             }
             tv.setText( getString(R.string.list_short_lat, latText ));
-
             tv = view.findViewById( R.id.lon_text);
             tv.setText( getString(R.string.list_short_lon, (location == null) ? "" : state.numberFormat8.format( location.getLongitude() )) );
 
@@ -734,9 +747,9 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                 final String accString = UINumberFormat.metersToString(prefs,
                         state.numberFormat0, main, (float) location.getAltitude(), true);
                 tv5.setText(getString(R.string.list_short_alt, accString));
+                setRunDistUI(view, prefs);
             }
-        }
-        catch ( IncompatibleClassChangeError ex ) {
+        } catch ( IncompatibleClassChangeError ex ) {
             // yeah, saw this in the wild, who knows.
             Logging.error( "wierd ex: " + ex, ex);
         }
@@ -784,6 +797,16 @@ public final class ListFragment extends Fragment implements ApiListener, DialogL
                     }
                 }
             });
+        }
+    }
+
+    private void setRunDistUI(final View view, final SharedPreferences prefs) {
+        if (prefs != null && distanceNumberFormat != null) {
+            float dist = prefs.getFloat(PreferenceKeys.PREF_DISTANCE_RUN, 0f);
+            final String distString = UINumberFormat.metersToString(prefs,
+                    distanceNumberFormat, getActivity(), dist, true);
+            TextView tv = view.findViewById(R.id.list_run_distance);
+            tv.setText(distString);
         }
     }
 

@@ -222,7 +222,8 @@
             app:srcCompat="@drawable/ic_wifi_simplified"
             android:scaleType="fitCenter"
             android:visibility="gone"
-            app:tint="?attr/colorControlNormal"/>
+            app:tint="?attr/colorControlNormal"
+            tools:visibility="visible"/>
         </LinearLayout>
 
     </LinearLayout>

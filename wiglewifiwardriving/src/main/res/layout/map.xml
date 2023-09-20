@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -24,7 +25,8 @@
             android:textSize="15sp"
             android:layout_weight="4"
             style="@style/StatColor"
-            android:text="@string/run" />
+            android:text="@string/run"
+            tools:text="Run: 88,88k"/>
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
@@ -44,7 +46,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_wifi"
                 android:textSize="15sp"
-                style="@style/WiFiColor" />
+                style="@style/WiFiColor"
+                tools:text="888.81k"/>
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
@@ -93,7 +96,8 @@
                 android:id="@+id/stats_bt"
                 android:textSize="15sp"
                 android:layout_weight="1"
-                style="@style/BtColor" />
+                style="@style/BtColor"
+                tools:text="8,888k"/>
         </LinearLayout>
         <LinearLayout
             android:orientation="horizontal"
@@ -113,7 +117,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/stats_dbnets"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                tools:text="8888888"/>
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -173,7 +178,8 @@
             android:textColor="#FFFF"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:background="#AA333333"/>
+            android:background="#AA333333"
+            tools:text="8,888 km"/>
         <View
             android:layout_width="2dp"
             android:layout_height="25dp"
